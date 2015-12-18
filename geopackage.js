@@ -131,13 +131,12 @@ GeoPackage.prototype.createAndOpenGeoPackageFile = function(filePath, callback) 
     var srsDao = self.geoPackage.getSpatialReferenceSystemDaoSync();
     var srsWgs84 = srsDao.getOrCreateSync(4326);
     var srsEpsg3857 = srsDao.getOrCreateSync(3857);
-    callback();
+    callback(null, self);
   }).done();
 }
 
 GeoPackage.prototype.openGeoPackageFile = function(filePath, callback) {
   console.log('opening geopackage ' + filePath);
-  console.log('init promise', this.initPromise);
   this.initPromise.then(function(self) {
     console.log('promise inited');
     var File = java.import('java.io.File');
@@ -145,7 +144,7 @@ GeoPackage.prototype.openGeoPackageFile = function(filePath, callback) {
     var canRead = gpkgFile.canReadSync();
     console.log('can read the geopackage file? ', canRead);
     self.geoPackage = java.callStaticMethodSync('mil.nga.geopackage.manager.GeoPackageManager', 'open', gpkgFile);
-    callback();
+    callback(null, self);
   }).done();
 }
 
@@ -326,7 +325,11 @@ GeoPackage.prototype.addMultiPolygon = function(multiPolygon, featureRow, callba
 GeoPackage.prototype.getFeatureTables = function(callback) {
   this.initPromise.then(function(self) {
     var featureTables = self.geoPackage.getFeatureTablesSync();
-    callback(null, featureTables);
+    var featureTableNames = []
+    for (var i = 0; i < featureTables.sizeSync(); i++) {
+      featureTableNames.push(featureTables.getSync(i));
+    }
+    callback(null, featureTableNames);
   });
 }
 
@@ -430,7 +433,11 @@ GeoPackage.prototype._rowToJson = function(row, columnMap, callback) {
 GeoPackage.prototype.getTileTables = function(callback) {
   this.initPromise.then(function(self) {
     var tileTables = self.geoPackage.getTileTablesSync();
-    callback(null, tileTables);
+    var tileTableNames = []
+    for (var i = 0; i < tileTables.sizeSync(); i++) {
+      tileTableNames.push(tileTables.getSync(i));
+    }
+    callback(null, tileTableNames);
   });
 }
 
@@ -446,6 +453,7 @@ GeoPackage.prototype.getTileFromTable = function(table, z, x, y, callback) {
       callback(null, BufferStream(buffer));
     } catch (e) {
       console.log('e', e);
+      callback(e, null);
     }
   });
 }
