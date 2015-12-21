@@ -72,6 +72,12 @@ var java = require('java')
     return tileBounds;
   }
 
+/**
+ * Constructor for the GeoPackage API object that can be used to operate on the GeoPackage.
+ * @constructor
+ * @param {Object} configuration object
+ * @returns {Object} GeoPackage API object.
+ */
 var GeoPackage = function(config) {
   config = config || {};
   this.featureDaos = {};
@@ -79,7 +85,7 @@ var GeoPackage = function(config) {
   this.tableProperties = {};
   this.initDefer = q.defer();
   this.initPromise = this.initDefer.promise;
-  this.initialize();
+  this._initialize();
   this.initPromise.then(function(self){
     // set up the log4j library to log to the console.
     var ConsoleAppender = java.import('org.apache.log4j.ConsoleAppender');
@@ -93,7 +99,11 @@ var GeoPackage = function(config) {
   });
 }
 
-GeoPackage.prototype.initialize = function() {
+/**
+ * Initialize the GeoPackage API.  Pulls down and adds maven artifacts to the java classpath
+ * @private
+ */
+GeoPackage.prototype._initialize = function() {
   console.log('Initializing the GeoPackage with the package json', __dirname+'/package.json');
   var self = this;
   try {
@@ -109,7 +119,6 @@ GeoPackage.prototype.initialize = function() {
         java.classpath.push(c);
       });
 
-      self.initialized = true;
       console.log('resolving promise');
       self.initDefer.resolve(self);
     });
@@ -118,6 +127,20 @@ GeoPackage.prototype.initialize = function() {
   }
 }
 
+/**
+ * Callback for general GeoPackage operations.
+ *
+ * @callback geoPackageCallback
+ * @param {Object} err - Any error that occurred.
+ * @param {Object} geoPackageAPI - this GeoPackageAPI object
+ */
+
+/**
+ * Creates a new GeoPackage at the path specified and opens that GeoPackage for editing
+ * @param  {string}   filePath Absolute path to the GeoPackage to create
+ * @param  {geoPackageCallback} callback function to callback when created
+ * @return {undefined} calls callback
+ */
 GeoPackage.prototype.createAndOpenGeoPackageFile = function(filePath, callback) {
   console.log('opening geopackage ' + filePath);
   this.initPromise.then(function(self) {
