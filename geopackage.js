@@ -136,6 +136,15 @@ GeoPackage.prototype._initialize = function() {
  */
 
 /**
+ * Progress callback for GeoPackage operations.  This function must call the callback passed to it
+ * to continue processing.
+ *
+ * @callback progressCallback
+ * @param {Object} progress - the current progress.
+ * @param {Function} callback - callback to be called to continue processing
+ */
+
+/**
  * Creates a new GeoPackage at the path specified and opens that GeoPackage for editing
  * @param  {string}   filePath Absolute path to the GeoPackage to create
  * @param  {geoPackageCallback} callback function to callback when created
@@ -158,6 +167,12 @@ GeoPackage.prototype.createAndOpenGeoPackageFile = function(filePath, callback) 
   }).done();
 }
 
+/**
+ * Opens an existing GeoPackage at the path specified for reading and writing
+ * @param  {string}   filePath Absolute path to the GeoPackage to create
+ * @param  {geoPackageCallback} callback function to callback when created
+ * @return {undefined} calls callback
+ */
 GeoPackage.prototype.openGeoPackageFile = function(filePath, callback) {
   console.log('opening geopackage ' + filePath);
   this.initPromise.then(function(self) {
@@ -171,6 +186,16 @@ GeoPackage.prototype.openGeoPackageFile = function(filePath, callback) {
   }).done();
 }
 
+/**
+ * Adds a tile to the GeoPackage
+ * @param  {Object}   tileStream Stream to the tile file
+ * @param  {string}   tableName  Name of the table to add the tile to
+ * @param  {Number}   zoom       Zoom level of the tile
+ * @param  {Number}   tileRow    Tile row
+ * @param  {Number}   tileColumn Tile columns
+ * @param  {geoPackageCallback} callback   function to call when complete
+ * @return {undefined}              calls callback
+ */
 GeoPackage.prototype.addTileToGeoPackage = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
   this.initPromise.then(function(self) {
     var tileDao = self.tileDaos[tableName];
@@ -193,11 +218,19 @@ GeoPackage.prototype.addTileToGeoPackage = function(tileStream, tableName, zoom,
       var bytes = java.newArray('byte', byteArray);
       newRow.setTileDataSync(bytes);
       tileDao.createSync(newRow);
-      callback();
+      callback(null, self);
     });
   }).done();
 }
 
+/**
+ * Adds an array of GeoJSON features to the GeoPackage
+ * @param  {array}   features         GeoJSON features to add
+ * @param  {string}   tableName        Name of the table to add the feature to
+ * @param  {geoPackageCallback} callback         function to call when complete
+ * @param  {progressCallback}   [progressCallback] function to call to report progress
+ * @return {undefined}                    calls callback
+ */
 GeoPackage.prototype.addFeaturesToGeoPackage = function(features, tableName, callback, progressCallback) {
   progressCallback = progressCallback || function(progress, callback) {
     callback(null);
@@ -231,17 +264,17 @@ GeoPackage.prototype.addFeaturesToGeoPackage = function(features, tableName, cal
         }
 
         if (type === 'Point') {
-          self.addPoint(geom, featureRow, geometryAddComplete);
+          self._addPoint(geom, featureRow, geometryAddComplete);
         } else if (type === 'MultiPoint') {
-          self.addMultiPoint(geom, featureRow, geometryAddComplete);
+          self._addMultiPoint(geom, featureRow, geometryAddComplete);
         } else if (type === 'LineString') {
-          self.addLine(geom, featureRow, geometryAddComplete);
+          self._addLine(geom, featureRow, geometryAddComplete);
         } else if (type === 'MultiLineString') {
-          self.addMultiLine(geom, featureRow, geometryAddComplete);
+          self._addMultiLine(geom, featureRow, geometryAddComplete);
         } else if (type === 'Polygon') {
-          self.addPolygon(geom, featureRow, geometryAddComplete);
+          self._addPolygon(geom, featureRow, geometryAddComplete);
         } else if (type === 'MultiPolygon') {
-          self.addMultiPolygon(geom, featureRow, geometryAddComplete);
+          self._addMultiPolygon(geom, featureRow, geometryAddComplete);
         }
 
       });
@@ -251,14 +284,20 @@ GeoPackage.prototype.addFeaturesToGeoPackage = function(features, tableName, cal
   }).done();
 }
 
-GeoPackage.prototype.indexGeoPackage = function(tableName, featureCount, callback) {
+/**
+ * Indexes the GeoPackage using the NGA Table Index extension
+ * @param  {string}   tableName    table to index
+ * @param  {geoPackageCallback} callback     called when complete
+ * @return {undefined}                calls callback
+ */
+GeoPackage.prototype.indexGeoPackage = function(tableName, callback) {
   this.initPromise.then(function(self) {
     var featureDao = self.featureDaos[tableName];
     var FeatureTableIndex = java.import('mil.nga.geopackage.extension.index.FeatureTableIndex');
     var featureTableIndex = new FeatureTableIndex(self.geoPackage, featureDao);
 
     var indexedFeatures = 0;
-    var max = featureCount;
+    var max = featureDao.countSync();
     var progress = java.newProxy('mil.nga.geopackage.io.GeoPackageProgress', {
       setMax: function(max) { },
       addProgress: function(progress) {
@@ -280,71 +319,76 @@ GeoPackage.prototype.indexGeoPackage = function(tableName, featureCount, callbac
   }).done();
 }
 
-GeoPackage.prototype.addPoint = function(point, featureRow, callback) {
+GeoPackage.prototype._addPoint = function(point, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createPoint(point));
+    geometryData.setGeometrySync(self._createPoint(point));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
-GeoPackage.prototype.addMultiPoint = function(multiPoint, featureRow, callback) {
+GeoPackage.prototype._addMultiPoint = function(multiPoint, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
 
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createMultiPoint(multiPoint));
+    geometryData.setGeometrySync(self._createMultiPoint(multiPoint));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
-GeoPackage.prototype.addLine = function(line, featureRow, callback) {
+GeoPackage.prototype._addLine = function(line, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
 
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createLine(line));
+    geometryData.setGeometrySync(self._createLine(line));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
-GeoPackage.prototype.addMultiLine = function(multiLine, featureRow, callback) {
+GeoPackage.prototype._addMultiLine = function(multiLine, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
 
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createMultiLine(multiLine));
+    geometryData.setGeometrySync(self._createMultiLine(multiLine));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
-GeoPackage.prototype.addPolygon = function(polygon, featureRow, callback) {
+GeoPackage.prototype._addPolygon = function(polygon, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
 
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createPolygon(polygon));
+    geometryData.setGeometrySync(self._createPolygon(polygon));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
-GeoPackage.prototype.addMultiPolygon = function(multiPolygon, featureRow, callback) {
+GeoPackage.prototype._addMultiPolygon = function(multiPolygon, featureRow, callback) {
   this.initPromise.then(function(self) {
     var GeoPackageGeometryData = java.import('mil.nga.geopackage.geom.GeoPackageGeometryData');
 
     var geometryData = new GeoPackageGeometryData(3857);
-    geometryData.setGeometrySync(self.createMultiPolygon(multiPolygon));
+    geometryData.setGeometrySync(self._createMultiPolygon(multiPolygon));
     featureRow.setGeometrySync(geometryData);
     callback();
   }).done();
 }
 
+/**
+ * Gets the names of all the feature tables in the GeoPackage
+ * @param  {Function} callback called with err, array of table names
+ * @return {undefined}            calls callback
+ */
 GeoPackage.prototype.getFeatureTables = function(callback) {
   this.initPromise.then(function(self) {
     var featureTables = self.geoPackage.getFeatureTablesSync();
@@ -356,6 +400,13 @@ GeoPackage.prototype.getFeatureTables = function(callback) {
   });
 }
 
+/**
+ * Iterates the features from a table and calls the callback with the GeoJSON feature
+ * @param  {string} table           table to Iterates
+ * @param  {Function} featureCallback called with err, GeoJSON feature, callback.  Callback must be called to continue processing
+ * @param  {Function} doneCallback    called when iteration is complete
+ * @return {undefined}                 calls callback
+ */
 GeoPackage.prototype.iterateFeaturesFromTable = function(table, featureCallback, doneCallback) {
   this.initPromise.then(function(self) {
 
@@ -426,33 +477,38 @@ GeoPackage.prototype._rowToJson = function(row, columnMap, callback) {
   switch (type) {
     case 'POINT':
       jsonRow.geometry.type = 'Point';
-      jsonRow.geometry.coordinates = this.readPoint(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readPoint(geometry, transformation);
       break;
     case 'MULTIPOINT':
       jsonRow.geometry.type = 'MultiPoint';
-      jsonRow.geometry.coordinates = this.readMultiPoint(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readMultiPoint(geometry, transformation);
       break;
     case 'LINESTRING':
       jsonRow.geometry.type = 'LineString';
-      jsonRow.geometry.coordinates = this.readLine(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readLine(geometry, transformation);
       break;
     case 'MULTILINESTRING':
       jsonRow.geometry.type = 'MultiLineString';
-      jsonRow.geometry.coordinates = this.readMultiLine(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readMultiLine(geometry, transformation);
       break;
     case 'POLYGON':
       jsonRow.geometry.type = 'Polygon';
-      jsonRow.geometry.coordinates = this.readPolygon(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readPolygon(geometry, transformation);
       break;
     case 'MULTIPOLYGON':
       jsonRow.geometry.type = 'MultiPolygon';
-      jsonRow.geometry.coordinates = this.readMultiPolygon(geometry, transformation);
+      jsonRow.geometry.coordinates = this._readMultiPolygon(geometry, transformation);
       break;
   }
 
   callback(null, jsonRow);
 }
 
+/**
+ * Gets the names of all tile tables in the GeoPackage
+ * @param  {Function} callback called with err, array of tile table names
+ * @return {undefined}            calls callback
+ */
 GeoPackage.prototype.getTileTables = function(callback) {
   this.initPromise.then(function(self) {
     var tileTables = self.geoPackage.getTileTablesSync();
@@ -464,6 +520,15 @@ GeoPackage.prototype.getTileTables = function(callback) {
   });
 }
 
+/**
+ * Gets the tile bytes as a stream for the xyz tile specified
+ * @param  {string}   table    table name to get the tile from
+ * @param  {Number}   z        zoom level of tile
+ * @param  {Number}   x        x coordinate of tile
+ * @param  {Number}   y        y coordinate of tile
+ * @param  {Function} callback called with err, stream
+ * @return {undefined}            calls callback
+ */
 GeoPackage.prototype.getTileFromTable = function(table, z, x, y, callback) {
   this.initPromise.then(function(self) {
     var tileDao = self.geoPackage.getTileDaoSync(table);
@@ -481,6 +546,15 @@ GeoPackage.prototype.getTileFromTable = function(table, z, x, y, callback) {
   });
 }
 
+/**
+ * Creates a tile table in the GeoPackage
+ * @param  {Object}   extent    extent of the tile table
+ * @param  {string}   tableName name of the tile table
+ * @param  {Number}   minZoom   minimum zoom level of the table
+ * @param  {Number}   maxZoom   maxiumum zoom level of the table
+ * @param  {geoPackageCallback} callback  called when the table is created
+ * @return {undefined}             calls callback
+ */
 GeoPackage.prototype.createTileTable = function(extent, tableName, minZoom, maxZoom, callback) {
   this.initPromise.then(function(self) {
     var TileTable = java.import('mil.nga.geopackage.tiles.user.TileTable');
@@ -571,11 +645,20 @@ GeoPackage.prototype.createTileTable = function(extent, tableName, minZoom, maxZ
       tileMatrix.setPixelYSizeSync(java.newDouble(pixelYSize));
       tileMatrixDao.createSync(tileMatrix);
     }
-    callback();
+    callback(null, self);
   }).done();
 
 }
 
+/**
+ * Adds the tile matricies for the tile table
+ * @param  {Object}   extent    extent of the tile table
+ * @param  {string}   tableName name of the table
+ * @param  {Number}   minZoom   minimum zoom level of the table
+ * @param  {Number}   maxZoom   maxiumum zoom level of the table
+ * @param  {geoPackageCallback} callback  called when the matricies are complete
+ * @return {undefined}             calls callback
+ */
 GeoPackage.prototype.addTileMatrices = function(extent, tableName, minZoom, maxZoom, callback) {
   this.initPromise.then(function(self) {
     var xRangeMinZoom = xCalculator(extent, minZoom);
@@ -610,10 +693,18 @@ GeoPackage.prototype.addTileMatrices = function(extent, tableName, minZoom, maxZ
       tileMatrix.setPixelYSizeSync(java.newDouble(pixelYSize));
       tileMatrixDao.createSync(tileMatrix);
     }
-    callback();
+    callback(null, self);
   }).done();
 }
 
+/**
+ * Creates a feature table in the GeoPackage
+ * @param  {Object}   extent              extent of the table
+ * @param  {string}   tableName           name of the table
+ * @param  {Array}   propertyColumnNames names of the properties
+ * @param  {geoPackageCallback} callback            called when the feature table is created
+ * @return {undefined}                       calls callback
+ */
 GeoPackage.prototype.createFeatureTable = function(extent, tableName, propertyColumnNames, callback) {
   console.log('creating feature table', tableName);
   this.initPromise.then(function(self) {
@@ -682,122 +773,122 @@ GeoPackage.prototype.createFeatureTable = function(extent, tableName, propertyCo
     	dataColumnsDao.createSync(dataColumns);
     }
 
-    callback();
+    callback(null, self);
 
   }).done();
 }
 
-GeoPackage.prototype.readPoint = function(point, transformation) {
+GeoPackage.prototype._readPoint = function(point, transformation) {
   return transformation.transformSync(point.getXSync(), point.getYSync());
 }
 
-GeoPackage.prototype.createPoint = function(point) {
+GeoPackage.prototype._createPoint = function(point) {
   var Point = java.import('mil.nga.wkb.geom.Point');
   return new Point(java.newDouble(point[0]), java.newDouble(point[1]));
 }
 
-GeoPackage.prototype.readMultiPoint = function(multiPoint, transformation) {
+GeoPackage.prototype._readMultiPoint = function(multiPoint, transformation) {
   var points = multiPoint.getPointsSync();
   var numPoints = multiPoint.numPointsSync();
   var jsonPoints = [];
   for (var i = 0; i < numPoints; i++) {
-    jsonPoints.push(this.readPoint(points.getSync(i), transformation));
+    jsonPoints.push(this._readPoint(points.getSync(i), transformation));
   }
   return jsonPoints;
 }
 
-GeoPackage.prototype.createMultiPoint = function(multiPoint) {
+GeoPackage.prototype._createMultiPoint = function(multiPoint) {
   var MultiPoint = java.import('mil.nga.wkb.geom.MultiPoint');
 
   var multiPointGeom = new MultiPoint(false, false);
   for (var i = 0; i < multiPoint.length; i++) {
-    multiPointGeom.addPointSync(this.createPoint(multiPoint[i]));
+    multiPointGeom.addPointSync(this._createPoint(multiPoint[i]));
   }
   return multiPointGeom;
 }
 
-GeoPackage.prototype.readLine = function(line, transformation) {
+GeoPackage.prototype._readLine = function(line, transformation) {
   var points = line.getPointsSync();
   var numPoints = line.numPointsSync();
   var jsonPoints = [];
   for (var i = 0; i < numPoints; i++) {
-    jsonPoints.push(this.readPoint(points.getSync(i), transformation));
+    jsonPoints.push(this._readPoint(points.getSync(i), transformation));
   }
   return jsonPoints;
 }
 
-GeoPackage.prototype.createLine = function(line) {
+GeoPackage.prototype._createLine = function(line) {
   var LineString = java.import('mil.nga.wkb.geom.LineString');
 
   var lineGeom = new LineString(false, false);
   for (var i = 0; i < line.length; i++) {
     var point = line[i];
     if (point[0] == null || point[1] == null) continue;
-    lineGeom.addPointSync(this.createPoint(point));
+    lineGeom.addPointSync(this._createPoint(point));
   }
   return lineGeom;
 }
 
-GeoPackage.prototype.readMultiLine = function(multiLine, transformation) {
+GeoPackage.prototype._readMultiLine = function(multiLine, transformation) {
   var lineStrings = multiLine.getLineStringsSync();
   var numStrings = multiLine.numLineStringsSync();
   var jsonLines = [];
   for (var i = 0; i < numStrings; i++) {
     var line = lineStrings.getSync(i);
-    jsonLines.push(this.readLine(line, transformation));
+    jsonLines.push(this._readLine(line, transformation));
   }
   return jsonLines;
 }
 
-GeoPackage.prototype.createMultiLine = function(multiLine) {
+GeoPackage.prototype._createMultiLine = function(multiLine) {
   var MultiLineString = java.import('mil.nga.wkb.geom.MultiLineString');
 
   var multiLineGeom = new MultiLineString(false, false);
   for (var i = 0; i < multiLine.length; i++) {
     var line = multiLine[i];
-    multiLineGeom.addLineStringSync(this.createLine(line));
+    multiLineGeom.addLineStringSync(this._createLine(line));
   }
   return multiLineGeom;
 }
 
-GeoPackage.prototype.readPolygon = function(polygon, transformation) {
+GeoPackage.prototype._readPolygon = function(polygon, transformation) {
   var rings = polygon.getRingsSync();
   var numRings = polygon.getNumRingsSync();
   var jsonRings = [];
   for (var i = 0; i < numRings; i++) {
     var ring = rings.getSync(i);
-    jsonRings.push(this.readLine(ring, transformation));
+    jsonRings.push(this._readLine(ring, transformation));
   }
   return jsonRings;
 }
 
-GeoPackage.prototype.createPolygon = function(polygon) {
+GeoPackage.prototype._createPolygon = function(polygon) {
   var Polygon = java.import('mil.nga.wkb.geom.Polygon');
   var polygonGeom = new Polygon(false, false);
   for (var ring = 0; ring < polygon.length; ring++) {
     var linearRing = polygon[ring];
-    polygonGeom.addRingSync(this.createLine(linearRing));
+    polygonGeom.addRingSync(this._createLine(linearRing));
   }
   return polygonGeom;
 }
 
-GeoPackage.prototype.readMultiPolygon = function(multiPolygon, transformation) {
+GeoPackage.prototype._readMultiPolygon = function(multiPolygon, transformation) {
   var polygons = multiPolygon.getPolygonsSync();
   var numPolygons = multiPolygon.getNumPolygonsSync();
   var jsonPolygons = [];
   for (var i = 0; i < numPolygons; i++) {
     var polygon = polygons.getSync(i);
-    jsonPolygons.push(this.readPolygon(polygon, transformation));
+    jsonPolygons.push(this._readPolygon(polygon, transformation));
   }
   return jsonPolygons;
 }
 
-GeoPackage.prototype.createMultiPolygon = function(multiPolygon) {
+GeoPackage.prototype._createMultiPolygon = function(multiPolygon) {
   var MultiPolygon = java.import('mil.nga.wkb.geom.MultiPolygon');
 
   var multiPolygonGeom = new MultiPolygon(false, false);
   for (var polygon = 0; polygon < multiPolygon.length; polygon++) {
-    multiPolygonGeom.addPolygonSync(this.createPolygon(multiPolygon[polygon]));
+    multiPolygonGeom.addPolygonSync(this._createPolygon(multiPolygon[polygon]));
   }
   return multiPolygonGeom;
 }
