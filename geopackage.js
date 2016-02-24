@@ -251,7 +251,7 @@ GeoPackage.prototype.addFeaturesToGeoPackage = function(features, tableName, cal
           featureRow.setValue(self.tableProperties[tableName][propertyKey], ''+feature.properties[propertyKey]);
         }
 
-        var featureGeometry = JSON.parse(feature.geometry);
+        var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
         var geom = featureGeometry.coordinates;
         var type = featureGeometry.type;
 
