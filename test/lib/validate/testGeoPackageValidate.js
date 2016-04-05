@@ -52,7 +52,7 @@ describe('GeoPackage Validate tests', function() {
   });
 
   it('should have the required minimum tables', function(done) {
-    var db = new sqlite3.Database(path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg'), function(err) {
+    var db = new sqlite3.Database(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
       var geoPackage = new GeoPackage('', '', db);
       GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
         should.not.exist(err);

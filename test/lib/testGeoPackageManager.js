@@ -5,10 +5,8 @@ var GeoPackageManager = require('../../lib/geoPackageManager')
 describe('GeoPackageManager tests', function() {
 
   it('should open the geopackage', function(done) {
-    var filename = path.join(__dirname, '..', 'fixtures', 'rivers.gpkg');
+    var filename = path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg');
     GeoPackageManager.open(filename, function(err, gp) {
-      console.log('err', err);
-      console.log('gp', gp);
       should.not.exist(err);
       should.exist(gp);
       gp.getDatabase().open.should.be.equal(true);
@@ -20,8 +18,6 @@ describe('GeoPackageManager tests', function() {
   it('should fail to open the geopackage due to the extension', function(done) {
     var filename = path.join(__dirname, __filename);
     GeoPackageManager.open(filename, function(err, gp) {
-      console.log('err', err);
-      console.log('gp', gp);
       should.exist(err);
       should.not.exist(gp);
       done();
