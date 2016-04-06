@@ -35,4 +35,35 @@ describe('GeoPackage tests', function() {
     });
   });
 
+  it.only('should get the features', function(done) {
+    var db = new sqlite3.Database(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
+      var geoPackage = new GeoPackage('', '', db);
+      geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
+        console.log('featureDao', featureDao);
+        // should.not.exist(err);
+        // should.exist(tables);
+        // tables.length.should.be.equal(16);
+        // tables.should.have.members([
+        //   'point2d',
+        //    'linestring2d',
+        //    'polygon2d',
+        //    'multipoint2d',
+        //    'multilinestring2d',
+        //    'multipolygon2d',
+        //    'geomcollection2d',
+        //    'geometry2d',
+        //    'point3d',
+        //    'linestring3d',
+        //    'polygon3d',
+        //    'multipoint3d',
+        //    'multilinestring3d',
+        //    'multipolygon3d',
+        //    'geomcollection3d',
+        //    'geometry3d'
+        // ]);
+        done();
+      });
+    });
+  });
+
 });

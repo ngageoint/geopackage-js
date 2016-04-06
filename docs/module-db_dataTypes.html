@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>GeoPackage Node Class: GeometryColumnsDao</title>
+	<title>GeoPackage Node Module: db/dataTypes</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -70,17 +70,10 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: GeometryColumnsDao</h1>
+	<h1 class="page-title">Module: db/dataTypes</h1>
 <section>
 
 <header>
-    
-        <h2>
-            <span class="ancestors"><a href="module-dao_geometryColumns.html">dao/geometryColumns</a>~</span>
-        
-        GeometryColumnsDao
-        </h2>
-        
     
 </header>
 
@@ -89,28 +82,10 @@
     <div class="container-overview">
     
         
-<hr>
-<dt>
-    <h4 class="name" id="GeometryColumnsDao"><span class="type-signature"></span>new GeometryColumnsDao()</h4>
-    
-    
-</dt>
-<dd>
+            <div class="description">Data Types module.</div>
+        
 
-    
-    <div class="description">
-        Geometry Columns Data Access Object
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
+        
 <dl class="details">
     
 
@@ -150,34 +125,9 @@
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
+        
     
     </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="module-dao_dao-Dao.html">module:dao/dao~Dao</a></li>
-    </ul>
-
 
     
 
@@ -195,15 +145,15 @@
         <dl>
             
 <hr>
-<dt class="name" id=".COLUMN_COLUMN_NAME">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_COLUMN_NAME<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_BLOB_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_BLOB_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        columnName field name
+        BLOB{(max_size)}: Variable length binary data.
     </div>
     
 
@@ -266,15 +216,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_GEOMETRY_TYPE_NAME">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_GEOMETRY_TYPE_NAME<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_BOOLEAN_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_BOOLEAN_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        geometryTypeName field name
+        A boolean value representing true or false.
     </div>
     
 
@@ -337,15 +287,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_ID_1">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_ID_1<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_DATE_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_DATE_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        id 1 field name, tableName
+        ISO-8601 date string in the form YYYY-MM-DD encoded in either UTF-8 or UTF-16.
     </div>
     
 
@@ -408,15 +358,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_ID_2">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_ID_2<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_DATETIME_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_DATETIME_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        id 2 field name, columnName
+        ISO-8601 date/time string in the form YYYY-MM-DDTHH:MM:SS.SSSZ with T separator character and Z suffix for coordinated universal time (UTC) encoded in either UTF-8 or UTF-16.
     </div>
     
 
@@ -479,15 +429,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_M">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_M<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_DOUBLE_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_DOUBLE_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        m field name
+        64-bit IEEE floating point number.
     </div>
     
 
@@ -550,15 +500,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_SRS_ID">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_SRS_ID<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_FLOAT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_FLOAT_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        srsId field name
+        32-bit IEEE floating point number.
     </div>
     
 
@@ -621,15 +571,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_TABLE_NAME">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_TABLE_NAME<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_INT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_INT_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        tableName field name
+        64-bit signed two’s complement integer.
     </div>
     
 
@@ -692,15 +642,15 @@
         
             
 <hr>
-<dt class="name" id=".COLUMN_Z">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_Z<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_INTEGER_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_INTEGER_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        z field name
+        64-bit signed two’s complement integer.
     </div>
     
 
@@ -763,15 +713,299 @@
         
             
 <hr>
-<dt class="name" id="tableName">
-    <h4><span class="type-signature"></span>tableName<span class="type-signature"> :String</span></h4>
+<dt class="name" id=".GPKG_DT_MEDIUMINT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_MEDIUMINT_NAME<span class="type-signature"> :String</span></h4>
 
     
 </dt>
 <dd>
     
     <div class="description">
-        Table Name
+        32-bit signed two’s complement integer.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".GPKG_DT_REAL_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_REAL_NAME<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        64-bit IEEE floating point number.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".GPKG_DT_SMALLINT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_SMALLINT_NAME<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        16-bit signed two’s complement integer.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".GPKG_DT_TEXT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_TEXT_NAME<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        TEXT{(maxchar_count)}: Variable length string encoded in either UTF-8 or UTF-16, determined by PRAGMA encoding; see http://www.sqlite.org/pragma.html#pragma_encoding.
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt class="name" id=".GPKG_DT_TINYINT_NAME">
+    <h4><span class="type-signature">&lt;static> </span>GPKG_DT_TINYINT_NAME<span class="type-signature"> :String</span></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        8-bit signed two’s complement integer.
     </div>
     
 
@@ -841,7 +1075,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getContents"><span class="type-signature"></span>getContents(geometryColumns, callback)</h4>
+    <h4 class="name" id=".fromName"><span class="type-signature">&lt;static> </span>fromName(name)</h4>
     
     
 </dt>
@@ -849,7 +1083,7 @@
 
     
     <div class="description">
-        Get the Contents of the Geometry Columns
+        Get the Data Type from the name, ignoring case
     </div>
     
 
@@ -884,13 +1118,13 @@
 
         <tr>
             
-                <td class="name"><code>geometryColumns</code></td>
+                <td class="name"><code>name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="module-dao_geometryColumns-GeometryColumns.html">module:dao/geometryColumns~GeometryColumns</a></span>
+<span class="param-type">String</span>
 
 
 
@@ -901,31 +1135,7 @@
 
             
 
-            <td class="description last">geometry columns</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {Contents}</td>
+            <td class="description last">the name of the enum</td>
         </tr>
 
     
@@ -985,6 +1195,30 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    the enum value
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">GPKGDataType</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -993,7 +1227,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="getFeatureTables"><span class="type-signature"></span>getFeatureTables(callback)</h4>
+    <h4 class="name" id=".name"><span class="type-signature">&lt;static> </span>name(dataType)</h4>
     
     
 </dt>
@@ -1001,7 +1235,7 @@
 
     
     <div class="description">
-        Get the feature table names
+        Returns the {string} from this data type
     </div>
     
 
@@ -1036,13 +1270,13 @@
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>dataType</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type">GPKGDataType</span>
 
 
 
@@ -1053,7 +1287,7 @@
 
             
 
-            <td class="description last">called with an error if one occurred and an array of the {FeatureTable}</td>
+            <td class="description last">the enum to retrieve the name for</td>
         </tr>
 
     
@@ -1113,447 +1347,30 @@
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
+            
+<div class="param-desc">
+    the string corresponding to the enum
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="getSrs"><span class="type-signature"></span>getSrs(geometryColumns, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the Spatial Reference System of the Geometry Columns
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>geometryColumns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="module-dao_geometryColumns-GeometryColumns.html">module:dao/geometryColumns~GeometryColumns</a></span>
+<span class="param-type">String</span>
 
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">geometry columns</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {SpatialReferenceSystem}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
+    </dd>
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="isTableExists"><span class="type-signature"></span>isTableExists(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Checks if the table exists
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">validationCallback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Callback to call with the results of if the table exists or not</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="module-dao_dao-Dao.html#isTableExists">module:dao/dao~Dao#isTableExists</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="queryForTableName"><span class="type-signature"></span>queryForTableName(tableName, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Query for the table name
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tableName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">table name</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {module:dao/geometryColumns~GeometryColumns}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
 
     
 </dd>
@@ -1606,7 +1423,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-04-06T07:57:09-06:00
+		on 2016-04-06T07:57:10-06:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
