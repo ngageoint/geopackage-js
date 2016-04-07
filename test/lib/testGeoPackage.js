@@ -1,7 +1,8 @@
 var GeoPackage = require('../../lib/geoPackage')
   , sqlite3 = require('sqlite3').verbose()
   , should = require('chai').should()
-  , path = require('path');
+  , path = require('path')
+  , async = require('async');
 
 describe('GeoPackage tests', function() {
 
@@ -13,7 +14,7 @@ describe('GeoPackage tests', function() {
         should.exist(tables);
         tables.length.should.be.equal(16);
         tables.should.have.members([
-          'point2d',
+           'point2d',
            'linestring2d',
            'polygon2d',
            'multipoint2d',
@@ -40,28 +41,33 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', db);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
         console.log('featureDao', featureDao);
-        // should.not.exist(err);
-        // should.exist(tables);
-        // tables.length.should.be.equal(16);
-        // tables.should.have.members([
-        //   'point2d',
-        //    'linestring2d',
-        //    'polygon2d',
-        //    'multipoint2d',
-        //    'multilinestring2d',
-        //    'multipolygon2d',
-        //    'geomcollection2d',
-        //    'geometry2d',
-        //    'point3d',
-        //    'linestring3d',
-        //    'polygon3d',
-        //    'multipoint3d',
-        //    'multilinestring3d',
-        //    'multipolygon3d',
-        //    'geomcollection3d',
-        //    'geometry3d'
-        // ]);
-        done();
+
+        featureDao.queryForEach(function(err, statement) {
+          console.log('statement', statement);
+          var currentRow;
+          async.during(
+            function(callback) {
+              statement.get(function(err, row) {
+                if (row) {
+                  currentRow = featureDao.getFeatureRow(row);
+                }
+                callback(null, row);
+              });
+            },
+            function(callback) {
+              console.log('row', currentRow);
+
+              var geometry = currentRow.getGeometry();
+
+              console.log('geometry', geometry);
+              callback();
+            },
+            function(err) {
+              done();
+            }
+          )
+
+        });
       });
     });
   });
