@@ -36,7 +36,7 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it.only('should get the features', function(done) {
+  it('should get the features', function(done) {
     var db = new sqlite3.Database(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
       var geoPackage = new GeoPackage('', '', db);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
