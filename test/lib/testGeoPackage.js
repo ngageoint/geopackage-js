@@ -1,5 +1,5 @@
 var GeoPackage = require('../../lib/geoPackage')
-  , sqlite3 = require('sqlite3').verbose()
+  , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , should = require('chai').should()
   , path = require('path')
   , async = require('async');
@@ -7,8 +7,8 @@ var GeoPackage = require('../../lib/geoPackage')
 describe('GeoPackage tests', function() {
 
   it('should get the feature table names', function(done) {
-    var db = new sqlite3.Database(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
-      var geoPackage = new GeoPackage('', '', db);
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
         should.not.exist(err);
         should.exist(tables);
@@ -37,36 +37,53 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the features', function(done) {
-    var db = new sqlite3.Database(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
-      var geoPackage = new GeoPackage('', '', db);
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
         console.log('featureDao', featureDao);
 
-        featureDao.queryForEach(function(err, statement) {
-          console.log('statement', statement);
-          var currentRow;
-          async.during(
-            function(callback) {
-              statement.get(function(err, row) {
-                if (row) {
-                  currentRow = featureDao.getFeatureRow(row);
-                }
-                callback(null, row);
-              });
-            },
-            function(callback) {
-              console.log('row', currentRow);
+        featureDao.queryForEach(function(err, row) {
+          var currentRow = featureDao.getFeatureRow(row);
+          var geometry = currentRow.getGeometry();
+          console.log('geometry', geometry);
+        }, function(err) {
+          done();
+        });
+      });
+    });
+  });
 
-              var geometry = currentRow.getGeometry();
-
-              console.log('geometry', geometry);
-              callback();
-            },
-            function(err) {
-              done();
+  it.only('should get the features from all tables', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getFeatureTables(function(err, tables) {
+        console.log('tables', tables);
+        async.eachSeries(tables, function(table, callback) {
+          console.log('table', table);
+          geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+            console.log('featureDao', featureDao);
+            if (err) {
+              return callback();
             }
-          )
+            console.log('projection', featureDao.getProjection());
+            featureDao.queryForEach(function(err, row) {
+              var currentRow = featureDao.getFeatureRow(row);
+              var geometry = currentRow.getGeometry();
+              // console.log('geometry', geometry);
+              var geom = geometry.geometry;
+              if (geom.points) {
+                for (var i = 0; i < geom.points.length; i++) {
+                  // console.log('geom.points[i]', geom.points[i]);
 
+                  geom.points[i] = {x:0,y:0};
+                }
+              }
+            }, function(err) {
+              callback();
+            });
+          });
+        }, function(err) {
+          done();
         });
       });
     });

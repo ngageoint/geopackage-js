@@ -1,5 +1,6 @@
 var GeoPackageValidate = require('../../../lib/validate/geoPackageValidate')
   , GeoPackage = require('../../../lib/geoPackage')
+  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , sqlite3 = require('sqlite3').verbose()
   , should = require('chai').should()
   , path = require('path');
@@ -42,8 +43,8 @@ describe('GeoPackage Validate tests', function() {
   });
 
   it('should not have the required minimum tables', function(done) {
-    var db = new sqlite3.Database(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'), function(err) {
-      var geoPackage = new GeoPackage('', '', db);
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
       GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
         should.exist(err);
         done();
@@ -52,8 +53,8 @@ describe('GeoPackage Validate tests', function() {
   });
 
   it('should have the required minimum tables', function(done) {
-    var db = new sqlite3.Database(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err) {
-      var geoPackage = new GeoPackage('', '', db);
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
       GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
         should.not.exist(err);
         done();

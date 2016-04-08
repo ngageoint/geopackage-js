@@ -1,19 +1,23 @@
-var GeoPackageManager = require('../../../lib/geoPackageManager')
-  , GeometryColumnsDao = require('../../../lib/dao/geometryColumns').GeometryColumnsDao
-  , sqlite3 = require('sqlite3').verbose()
+var GeoPackageManager = require('../../../../lib/geoPackageManager')
+  , GeometryColumnsDao = require('../../../../lib/features/columns').GeometryColumnsDao
+  , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
   , should = require('chai').should()
   , path = require('path');
 
 describe('GeometryColumns tests', function() {
 
   var db;
+  var connection;
 
   beforeEach('should open the geopackage', function(done) {
-    db = new sqlite3.Database(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), done);
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err, gpConnection) {
+      connection = gpConnection;
+      done();
+    });
   });
 
   it('should get the feature tables', function(done) {
-    var gcd = new GeometryColumnsDao(db);
+    var gcd = new GeometryColumnsDao(connection);
     gcd.getFeatureTables(function(err, tables) {
       should.not.exist(err);
       should.exist(tables);

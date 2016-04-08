@@ -9,7 +9,7 @@ describe('GeoPackageManager tests', function() {
     GeoPackageManager.open(filename, function(err, gp) {
       should.not.exist(err);
       should.exist(gp);
-      gp.getDatabase().open.should.be.equal(true);
+      should.exist(gp.getDatabase().getDBConnection());
       gp.getPath().should.be.equal(filename);
       done();
     });

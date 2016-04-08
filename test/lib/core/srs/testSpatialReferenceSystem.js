@@ -13,7 +13,7 @@ describe('SpatialReferenceSystem tests', function() {
       geoPackage = gp;
       should.not.exist(err);
       should.exist(gp);
-      gp.getDatabase().open.should.be.equal(true);
+      should.exist(gp.getDatabase().getDBConnection());
       gp.getPath().should.be.equal(filename);
       done();
     });
