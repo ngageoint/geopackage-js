@@ -27,6 +27,7 @@
     "proj4": "^2.3.6",
     "q": "^1.4.1",
     "simple-bufferstream": "^1.0.0",
+    "sql.js": "^0.3.2",
     "sqlite3": "^3.1.2",
     "stream-to-array": "^2.1.0",
     "wkx": "^0.2.0"
@@ -64,7 +65,8 @@
     "watchify": "^3.7.0"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "istanbul cover  _mocha",
+    "mocha": "mocha",
     "btest": "karma start",
     "predoc": "rm -rf docs/*",
     "doc": "jsdoc -c jsdoc.conf"
