@@ -1,5 +1,7 @@
 var GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
+  , proj4 = require('proj4')
+  , reproject = require('reproject')
   , should = require('chai').should()
   , path = require('path')
   , async = require('async');
@@ -54,36 +56,46 @@ describe('GeoPackage tests', function() {
   });
 
   it.only('should get the features from all tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
-        console.log('tables', tables);
+        // console.log('tables', tables);
         async.eachSeries(tables, function(table, callback) {
-          console.log('table', table);
+          // console.log('table', table);
           geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-            console.log('featureDao', featureDao);
+            // console.log('featureDao', featureDao);
             if (err) {
+              console.log('err', err);
               return callback();
             }
-            console.log('projection', featureDao.getProjection());
-            featureDao.queryForEach(function(err, row) {
-              var currentRow = featureDao.getFeatureRow(row);
-              var geometry = currentRow.getGeometry();
-              // console.log('geometry', geometry);
-              var geom = geometry.geometry;
-              if (geom.points) {
-                for (var i = 0; i < geom.points.length; i++) {
-                  // console.log('geom.points[i]', geom.points[i]);
-
-                  geom.points[i] = {x:0,y:0};
+            featureDao.getSrs(function(err, srs) {
+              console.log('srs.definition', srs.definition);
+              // callback();
+              // console.log('projection', featureDao.getProjection());
+              featureDao.queryForEach(function(err, row) {
+                var currentRow = featureDao.getFeatureRow(row);
+                var geometry = currentRow.getGeometry();
+                if (!geometry) {
+                  return;
                 }
-              }
-            }, function(err) {
-              callback();
+                // console.log('geometry', geometry);
+                var geom = geometry.geometry;
+                console.log('geom', geom);
+                var geoJson = projectedJson = geom.toGeoJSON();
+                if (srs.definition && srs.definition !== 'undefined') {
+                  projectedJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                }
+                console.log('projected', projectedJson);
+
+              }, function(err) {
+                console.log('err', err);
+                callback();
+              });
             });
           });
         }, function(err) {
-          done();
+          console.log('err', err);
+          done(err);
         });
       });
     });

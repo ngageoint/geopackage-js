@@ -5,6 +5,7 @@ var GeoPackage = require('./lib/geopackage')
   , SQL = require('sql.js')
   , jquery = require('jquery')
   , proj4 = require('proj4')
+  , reproject = require('reproject')
   , L = require('leaflet');
 
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
@@ -39,19 +40,20 @@ var GeoPackage = require('./lib/geopackage')
               if (err) {
                 return callback();
               }
-              featureDao.queryForEach(function(err, row) {
-                var currentRow = featureDao.getFeatureRow(row);
-                var geometry = currentRow.getGeometry();
-                var geom = geometry.geometry;
-                for (var i = 0; i < geom.points.length; i++) {
-                  // TODO translate the projection properly here
-                  geom.points[i] = proj4('EPSG:3857', 'EPSG:4326', geom.points[i]);
-                }
-                var geoJson = geometry.geometry.toGeoJSON();
-                // console.log('geoJson', geoJson);
-                geojsonLayer.addData(geoJson);
-              }, function(err) {
-                callback();
+              featureDao.getSrs(function(err, srs) {
+                featureDao.queryForEach(function(err, row) {
+                  var currentRow = featureDao.getFeatureRow(row);
+                  var geometry = currentRow.getGeometry();
+                  var geom = geometry.geometry;
+                  var geoJson = geometry.geometry.toGeoJSON();
+                  if (srs.definition && srs.definition !== 'undefined') {
+                    geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                  }
+                  // console.log('geoJson', geoJson);
+                  geojsonLayer.addData(geoJson);
+                }, function(err) {
+                  callback();
+                });
               });
             });
           });
