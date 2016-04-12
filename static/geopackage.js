@@ -30,19 +30,19 @@ var GeoPackage = require('./lib/geopackage')
     r.onload = function() {
       var Uints = new Uint8Array(r.result);
       db = new SQL.Database(Uints);
-      console.log('db', db);
       GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
         var geoPackage = new GeoPackage('', '', connection);
         geoPackage.getFeatureTables(function(err, tables) {
           async.eachSeries(tables, function(table, callback) {
             console.log('table', table);
             geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-              console.log('featureDao', featureDao);
               if (err) {
                 return callback();
               }
+              var features = 0;
               featureDao.getSrs(function(err, srs) {
                 featureDao.queryForEach(function(err, row) {
+                  features++;
                   var currentRow = featureDao.getFeatureRow(row);
                   var geometry = currentRow.getGeometry();
                   var geom = geometry.geometry;
@@ -53,6 +53,7 @@ var GeoPackage = require('./lib/geopackage')
                   // console.log('geoJson', geoJson);
                   geojsonLayer.addData(geoJson);
                 }, function(err) {
+                  console.log('added ' + features + ' features');
                   callback();
                 });
               });
@@ -848,7 +849,6 @@ GeoPackageConnection.prototype.all = function (sql, params, callback) {
     this.each(sql, params, function(err, row) {
       rows.push(row);
     }, function(err) {
-      console.log('calling back from the all');
       callback(err, rows);
     });
   }
@@ -1790,10 +1790,9 @@ FeatureTableReader.prototype.createColumnWithResults = function (results, index,
   }
   var defaultValue = undefined;
   if (defaultValueIndex) {
-    console.log('default value index', defaultValueIndex);
-    console.log('result', results);
+    // console.log('default value index', defaultValueIndex);
+    // console.log('result', results);
   }
-  console.log('arguments', arguments);
   var column = new FeatureColumn(index, name, dataType, max, notNull, defaultValue, primaryKey, geometryType);
 
   return column;

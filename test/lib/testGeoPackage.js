@@ -1,10 +1,12 @@
 var GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
+  , GeoPackageTileRetriever = require('../../lib/tiles/retriever')
   , proj4 = require('proj4')
   , reproject = require('reproject')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async');
+  , async = require('async')
+  , fs = require('fs');
 
 describe('GeoPackage tests', function() {
 
@@ -55,7 +57,7 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it.only('should get the features from all tables', function(done) {
+  it('should get the features from all tables', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
@@ -88,13 +90,66 @@ describe('GeoPackage tests', function() {
                 console.log('projected', projectedJson);
 
               }, function(err) {
-                console.log('err', err);
                 callback();
               });
             });
           });
         }, function(err) {
-          console.log('err', err);
+          done(err);
+        });
+      });
+    });
+  });
+
+  it('should get the tile table names', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getTileTables(function(err, tables) {
+        console.log('tables', tables);
+        should.not.exist(err);
+        should.exist(tables);
+        tables.length.should.be.equal(1);
+        tables.should.have.members([
+           'TILESosmds'
+        ]);
+        done();
+      });
+    });
+  });
+
+  it.only('should get the tiles', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getTileTables(function(err, tables) {
+        console.log('tables', tables);
+        async.eachSeries(tables, function(table, callback) {
+          geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+            console.log('tileDao', tileDao);
+
+            var maxZoom = tileDao.maxZoom;
+            var minZoom = tileDao.minZoom;
+
+            console.log('min zoom', minZoom);
+            console.log('max zoom', maxZoom);
+
+            var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+            gpr.getTile(0, 0, 0, function(err, tile) {
+              console.log('err', err);
+              console.log('tile', tile);
+              callback();
+            });
+
+            // tileDao.queryForTilesWithZoomLevel(0, function(err, tile) {
+            //   console.log('err', err);
+            //   console.log('tile', tile);
+            //   fs.writeFileSync('/tmp/gptile.png', tile.tile_data);
+            // }, function(err) {
+            //   console.log('done');
+            //   callback(err);
+            // });
+
+          });
+        }, function(err) {
           done(err);
         });
       });
