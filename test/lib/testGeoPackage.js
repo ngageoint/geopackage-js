@@ -8,7 +8,7 @@ var GeoPackage = require('../../lib/geoPackage')
   , async = require('async')
   , fs = require('fs');
 
-describe('GeoPackage tests', function() {
+describe.skip('GeoPackage tests', function() {
 
   it('should get the feature table names', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
@@ -117,7 +117,7 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it.only('should get the tiles', function(done) {
+  it('should get the tiles', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
