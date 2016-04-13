@@ -124,18 +124,15 @@ describe('GeoPackage tests', function() {
         console.log('tables', tables);
         async.eachSeries(tables, function(table, callback) {
           geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
-            console.log('tileDao', tileDao);
 
             var maxZoom = tileDao.maxZoom;
             var minZoom = tileDao.minZoom;
 
-            console.log('min zoom', minZoom);
-            console.log('max zoom', maxZoom);
-
             var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-            gpr.getTile(0, 0, 0, function(err, tile) {
+            gpr.getTile(0, 0, 1, function(err, tile) {
               console.log('err', err);
               console.log('tile', tile);
+              fs.writeFileSync('/tmp/gptile.png', tile.tile_data);
               callback();
             });
 
