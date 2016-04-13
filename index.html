@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>geopackage</title>
+
+  <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
+</head>
+
+<body>
+
+  <div>hi</div>
+  <div class="file-chooser">
+    <input type="file" onchange="geopackage.loadGeoPackage(this.files)">
+  </div>
+
+  <div id="map" style="position: absolute; top: 50px; bottom: 0px; left: 0px; right: 0px;"></div>
+
+  <script type="text/javascript" src="static/geopackage.js"></script>
+</body>
+</html>
