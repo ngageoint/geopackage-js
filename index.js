@@ -7,7 +7,8 @@ var GeoPackage = require('./lib/geopackage')
   , jquery = require('jquery')
   , proj4 = require('proj4')
   , reproject = require('reproject')
-  , L = require('leaflet');
+  , L = require('leaflet')
+  , fileType = require('file-type');
 
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
   var map = L.map('map', {
@@ -45,14 +46,17 @@ var GeoPackage = require('./lib/geopackage')
               var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
               tableLayer.drawTile = function(canvas, tilePoint, zoom) {
                 gpr.getTile(tilePoint.x, tilePoint.y, zoom, function(err, tile) {
-                  var ctx = canvas.getContext('2d');
+                  if (tile) {
+                    var ctx = canvas.getContext('2d');
+                    var type = fileType(tile.tile_data);
 
-                  var base64Data = btoa(String.fromCharCode.apply(null, tile.tile_data));
-                  var image = document.createElement('img');
-                  image.onload = function() {
-                    ctx.drawImage(image, 0, 0, 256, 256);
-                  };
-                  image.src = 'data:image/png;base64,' + base64Data;
+                    var base64Data = btoa(String.fromCharCode.apply(null, tile.tile_data));
+                    var image = document.createElement('img');
+                    image.onload = function() {
+                      ctx.drawImage(image, 0, 0, 256, 256);
+                    };
+                    image.src = 'data:'+type.mime+';base64,' + base64Data;
+                  }
 
                 });
               };
