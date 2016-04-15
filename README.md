@@ -1,4 +1,8 @@
 # GeoPackage Node
+
+#### Current Refactor ####
+This library is currently being refactored to remove the reliance on  [GeoPackage Java](http://ngageoint.github.io/geopackage-java/).  The goal of this refactor is to open and edit GeoPackage files in the browser and Node.  Cloning this project and opening the index.html file in your browser allows you to open a GeoPackage.  Support is currently limited to Web Mercator tiles that are split along XYZ lines, but this is currently being worked to no longer be a restriction.  The demo can also open all feature tables.  The demo is very raw at this point and is currently being worked on.
+
 #### GeoPackage Node Library ####
 
 The [GeoPackage Libraries](http://ngageoint.github.io/GeoPackage/) were developed at the [National Geospatial-Intelligence Agency (NGA)](http://www.nga.mil/) in collaboration with [BIT Systems](http://www.bit-sys.com/). The government has "unlimited rights" and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the [MIT license](http://choosealicense.com/licenses/mit/).
