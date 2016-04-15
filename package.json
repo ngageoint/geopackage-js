@@ -22,6 +22,7 @@
   "dependencies": {
     "async": "^1.5.0",
     "bufferstream": "^0.6.2",
+    "file-type": "^3.8.0",
     "java": "^0.6.0",
     "jquery": "^2.2.3",
     "leaflet": "^0.7.7",
@@ -52,6 +53,7 @@
     "browserify-istanbul": "^2.0.0",
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
+    "image-diff": "^1.5.1",
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
@@ -73,8 +75,8 @@
     "mocha": "mocha",
     "btest": "karma start",
     "predoc": "rm -rf docs/*",
-    "doc": "jsdoc -c jsdoc.conf",
-    "build": "browserify index.js --standalone geopackage --exclude sqlite3 > static/geopackage.js",
+    "doc": "jsdoc --verbose -c jsdoc.conf",
+    "build": "browserify index.js --standalone geopackage --exclude sqlite3 -o static/geopackage.js",
     "watch": "watchify index.js --standalone geopackage --exclude sqlite3 -o static/geopackage.js"
   }
 }

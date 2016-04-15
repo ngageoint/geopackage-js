@@ -1,5 +1,6 @@
 var GeoPackage = require('../../geopackage')
   , should = require('chai').should()
+  , fs = require('fs')
   , path = require('path');
 
 describe.skip('JAVA GeoPackage tests', function() {
@@ -26,6 +27,20 @@ describe.skip('JAVA GeoPackage tests', function() {
       console.log('err', err);
       console.log('gp', gp);
       done();
+    });
+  });
+
+  it('should pull the 2,2,1 tile', function(done) {
+    var gp = new GeoPackage();
+    gp.openGeoPackageFile(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, gp) {
+      gp.getTileFromTable('TILESosmds', 2, 2, 1, function(err, tile) {
+        console.log('tile', tile);
+        var writeStream = fs.createWriteStream('/tmp/javatile.png');
+        tile.pipe(writeStream);
+        tile.on('end', function() {
+          done();
+        });
+      });
     });
   });
 });
