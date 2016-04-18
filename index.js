@@ -36,7 +36,7 @@ var GeoPackage = require('./lib/geopackage')
 
         geoPackage.getTileTables(function(err, tables) {
           async.eachSeries(tables, function(table, callback) {
-
+            console.log('tile table', table);
             geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
               var maxZoom = tileDao.maxZoom;
@@ -46,16 +46,15 @@ var GeoPackage = require('./lib/geopackage')
               var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
               tableLayer.drawTile = function(canvas, tilePoint, zoom) {
                 gpr.getTile(tilePoint.x, tilePoint.y, zoom, function(err, tile) {
+                  console.log('tile', tile);
                   if (tile) {
                     var ctx = canvas.getContext('2d');
-                    var type = fileType(tile.tile_data);
 
-                    var base64Data = btoa(String.fromCharCode.apply(null, tile.tile_data));
                     var image = document.createElement('img');
                     image.onload = function() {
-                      ctx.drawImage(image, 0, 0, 256, 256);
+                      ctx.drawImage(image, 0, 0);
                     };
-                    image.src = 'data:'+type.mime+';base64,' + base64Data;
+                    image.src = tile;
                   }
 
                 });

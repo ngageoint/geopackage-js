@@ -34,3 +34,5 @@ node_modules
 .node_repl_history
 
 mochawesome-reports
+
+.tern-project

@@ -47,5 +47,4 @@ describe('TileBoundingBoxUtils tests', function() {
     done();
   });
 
-
 });

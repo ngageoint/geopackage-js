@@ -152,7 +152,7 @@ describe('Contents tests', function() {
         matrixSet.should.have.property('tableName', 'TILESosmds');
         matrixSet.should.have.property('srsId', 3857);
         matrixSet.should.have.property('minX', -20037508.342789244);
-        matrixSet.should.have.property('minY', -20037508.342789255);
+        matrixSet.should.have.property('minY', -20037508.342789244);
         matrixSet.should.have.property('maxX', 20037508.342789244);
         matrixSet.should.have.property('maxY', 20037508.342789244);
         done();
