@@ -87,7 +87,7 @@ describe('Tile Matrix tests', function() {
         tileMatrixSet.should.have.property('srsId', 3857);
         tileMatrixSet.should.have.property('tableName', 'TILESosmds');
         tileMatrixSet.should.have.property('minX', -20037508.342789244);
-        tileMatrixSet.should.have.property('minY', -20037508.342789255);
+        tileMatrixSet.should.have.property('minY', -20037508.342789244);
         tileMatrixSet.should.have.property('maxX', 20037508.342789244);
         tileMatrixSet.should.have.property('maxY', 20037508.342789244);
         done();

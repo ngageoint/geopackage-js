@@ -37,7 +37,7 @@ describe('Tile Matrix Set tests', function() {
       tileMatrixSet.should.have.property('tableName', 'TILESosmds');
       tileMatrixSet.should.have.property('srsId', 3857);
       tileMatrixSet.should.have.property('minX', -20037508.342789244);
-      tileMatrixSet.should.have.property('minY', -20037508.342789255);
+      tileMatrixSet.should.have.property('minY', -20037508.342789244);
       tileMatrixSet.should.have.property('maxX', 20037508.342789244);
       tileMatrixSet.should.have.property('maxY', 20037508.342789244);
       done();
@@ -95,7 +95,7 @@ describe('Tile Matrix Set tests', function() {
       var bb = tileMatrixSet.getBoundingBox();
       bb.minLongitude.should.be.equal(-20037508.342789244);
       bb.maxLongitude.should.be.equal(20037508.342789244);
-      bb.minLatitude.should.be.equal(-20037508.342789255);
+      bb.minLatitude.should.be.equal(-20037508.342789244);
       bb.maxLatitude.should.be.equal(20037508.342789244);
       done();
     });
