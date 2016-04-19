@@ -132,7 +132,7 @@ describe.skip('GeoPackage tests', function() {
             gpr.getTile(0, 0, 1, function(err, tile) {
               console.log('err', err);
               console.log('tile', tile);
-              fs.writeFileSync('/tmp/gptile.png', tile.tile_data);
+              fs.writeFileSync('/tmp/gptile.png', tile.getTileData());
               callback();
             });
 

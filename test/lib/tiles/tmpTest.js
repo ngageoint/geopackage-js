@@ -45,7 +45,7 @@ describe.skip('Whitehorse Tile Retriever tests', function() {
     gpr.getTile(1019,2339,13, function(err, tile) {
       console.log('err', err);
       console.log('tile', tile);
-      fs.writeFileSync('/tmp/whitehorsetile.png', tile.tile_data);
+      fs.writeFileSync('/tmp/whitehorsetile.png', tile.getTileData());
       done();
       // var imageDiff = require('image-diff');
       // imageDiff({
