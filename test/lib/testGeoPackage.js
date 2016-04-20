@@ -8,7 +8,7 @@ var GeoPackage = require('../../lib/geoPackage')
   , async = require('async')
   , fs = require('fs');
 
-describe.skip('GeoPackage tests', function() {
+describe('GeoPackage tests', function() {
 
   it('should get the feature table names', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
@@ -44,12 +44,9 @@ describe.skip('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
-        console.log('featureDao', featureDao);
-
         featureDao.queryForEach(function(err, row) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
-          console.log('geometry', geometry);
         }, function(err) {
           done();
         });
@@ -61,34 +58,23 @@ describe.skip('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
-        // console.log('tables', tables);
         async.eachSeries(tables, function(table, callback) {
-          // console.log('table', table);
           geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-            // console.log('featureDao', featureDao);
             if (err) {
-              console.log('err', err);
-              return callback();
+              return callback(err);
             }
             featureDao.getSrs(function(err, srs) {
-              console.log('srs.definition', srs.definition);
-              // callback();
-              // console.log('projection', featureDao.getProjection());
               featureDao.queryForEach(function(err, row) {
                 var currentRow = featureDao.getFeatureRow(row);
                 var geometry = currentRow.getGeometry();
                 if (!geometry) {
                   return;
                 }
-                // console.log('geometry', geometry);
                 var geom = geometry.geometry;
-                console.log('geom', geom);
                 var geoJson = projectedJson = geom.toGeoJSON();
                 if (srs.definition && srs.definition !== 'undefined') {
                   projectedJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
                 }
-                console.log('projected', projectedJson);
-
               }, function(err) {
                 callback();
               });
@@ -105,7 +91,6 @@ describe.skip('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
-        console.log('tables', tables);
         should.not.exist(err);
         should.exist(tables);
         tables.length.should.be.equal(1);
@@ -121,7 +106,6 @@ describe.skip('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
-        console.log('tables', tables);
         async.eachSeries(tables, function(table, callback) {
           geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
@@ -129,22 +113,10 @@ describe.skip('GeoPackage tests', function() {
             var minZoom = tileDao.minZoom;
 
             var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-            gpr.getTile(0, 0, 1, function(err, tile) {
-              console.log('err', err);
-              console.log('tile', tile);
-              fs.writeFileSync('/tmp/gptile.png', tile.getTileData());
+            gpr.getTile(0, 0, 1, function(err, tileData) {
+              fs.writeFileSync('/tmp/gptile.png', tileData);
               callback();
             });
-
-            // tileDao.queryForTilesWithZoomLevel(0, function(err, tile) {
-            //   console.log('err', err);
-            //   console.log('tile', tile);
-            //   fs.writeFileSync('/tmp/gptile.png', tile.tile_data);
-            // }, function(err) {
-            //   console.log('done');
-            //   callback(err);
-            // });
-
           });
         }, function(err) {
           done(err);
