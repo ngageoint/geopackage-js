@@ -4,8 +4,6 @@ var GeoPackage = require('./lib/geopackage')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
   , async = require('async')
   , SQL = require('sql.js')
-  , jquery = require('jquery')
-  , proj4 = require('proj4')
   , reproject = require('reproject')
   , L = require('leaflet')
   , fileType = require('file-type');
@@ -21,8 +19,6 @@ var GeoPackage = require('./lib/geopackage')
   baseLayer.addTo(map);
 
   var geojsonLayer = L.geoJson();
-
-
 
   module.exports.loadGeoPackage = function(files) {
     console.log('files', files);

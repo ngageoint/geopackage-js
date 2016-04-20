@@ -60,6 +60,15 @@ describe('GeometryColumns tests', function() {
     });
   });
 
+  it('should get no table', function(done) {
+    var gcd = new GeometryColumnsDao(connection);
+    gcd.queryForTableName('doesnotexist', function(err, table) {
+      should.not.exist(err);
+      should.not.exist(table);
+      done();
+    });
+  });
+
   it('should get all the tables', function(done){
     var gcd = new GeometryColumnsDao(connection);
     gcd.queryForAll(function(err, results) {

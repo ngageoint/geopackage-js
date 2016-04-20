@@ -84,10 +84,9 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
   });
 
-  it.only('should get a tile specified with wgs84 coordinates', function(done) {
+  it('should get a tile specified with wgs84 coordinates', function(done) {
     var maxZoom = tileDao.maxZoom;
     var minZoom = tileDao.minZoom;
-
 
     var wgs84BoundingBox = new BoundingBox(0, 180, 0, 85.05112877980659);
 
@@ -108,7 +107,6 @@ describe('GeoPackage Tile Retriever tests', function() {
     gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, function(err, tileMatrix) {
       should.not.exist(err);
       should.exist(tileMatrix);
-      console.log('tileMatrix', tileMatrix);
       tileMatrix.zoomLevel.should.be.equal(2);
       done();
     });

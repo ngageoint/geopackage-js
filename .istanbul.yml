@@ -1,3 +1,3 @@
 instrumentation:
-  excludes: ['node_modules/**', 'docs/**', 'test/**', 'mochawesome-reports/**', 'karma.conf.js', 'geopackage.js']
+  excludes: ['node_modules/**', 'docs/**', 'test/**', 'mochawesome-reports/**', 'karma.conf.js', 'geopackage.js', 'index.js', 'lib/db/sqljsAdapter.js']
   include-all-sources: true
