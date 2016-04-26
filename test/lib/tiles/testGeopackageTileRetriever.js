@@ -2,6 +2,7 @@ var GeoPackageManager = require('../../../lib/geoPackageManager')
   , GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
   , BoundingBox = require('../../../lib/boundingBox')
   , fs = require('fs')
+  , async = require('async')
   , should = require('chai').should()
   , path = require('path');
 
@@ -26,6 +27,7 @@ describe('GeoPackage Tile Retriever tests', function() {
   });
 
   it('should get the x: 2, y: 1, z: 2 tile', function(done) {
+    this.timeout(0);
     var maxZoom = tileDao.maxZoom;
     var minZoom = tileDao.minZoom;
 
@@ -35,16 +37,54 @@ describe('GeoPackage Tile Retriever tests', function() {
       var imageDiff = require('image-diff');
       imageDiff({
         actualImage: '/tmp/gptile.png',
-        expectedImage: '/tmp/javatile.png',
+        expectedImage: path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'),
         diffImage: '/tmp/diff.png',
       }, function (err, imagesAreSame) {
         imagesAreSame.should.be.equal(true);
+        fs.unlinkSync('/tmp/gptile.png');
         done();
         // error will be any errors that occurred
         // imagesAreSame is a boolean whether the images were the same or not
         // diffImage will have an image which highlights differences
         //
       });
+    });
+  });
+
+  it('should pull all of the tiles and compare them', function(done) {
+    this.timeout(30000);
+    var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+
+    async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
+      var tiles = [];
+      var tileCount = Math.pow(2,zoom);
+      for (var i = 0; i < tileCount; i++) {
+        tiles.push(i);
+      }
+      async.eachSeries(tiles, function(xTile, xDone) {
+        async.eachSeries(tiles, function(yTile, yDone) {
+          gpr.getTile(xTile,yTile,zoom, function(err, tile) {
+            fs.writeFileSync('/tmp/gptile.png', tile);
+            var imageDiff = require('image-diff');
+            imageDiff({
+              actualImage: '/tmp/gptile.png',
+              expectedImage: path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'),
+              diffImage: '/tmp/diff.png',
+            }, function (err, imagesAreSame) {
+              console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', imagesAreSame);
+              imagesAreSame.should.be.equal(true);
+              fs.unlinkSync('/tmp/gptile.png');
+              yDone();
+              // error will be any errors that occurred
+              // imagesAreSame is a boolean whether the images were the same or not
+              // diffImage will have an image which highlights differences
+              //
+            });
+          });
+        }, xDone);
+      }, zoomDone);
+    }, function(err) {
+      done(err);
     });
   });
 

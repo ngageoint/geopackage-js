@@ -36,3 +36,6 @@ node_modules
 mochawesome-reports
 
 .tern-project
+
+test/private
+test/fixtures/private
