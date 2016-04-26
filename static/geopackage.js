@@ -33,7 +33,6 @@ var GeoPackage = require('./lib/geopackage')
 
         geoPackage.getTileTables(function(err, tables) {
           async.eachSeries(tables, function(table, callback) {
-            console.log('tile table', table);
             geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
               var maxZoom = tileDao.maxZoom;
@@ -69,7 +68,7 @@ var GeoPackage = require('./lib/geopackage')
                   }
                   var features = 0;
                   featureDao.getSrs(function(err, srs) {
-                    featureDao.queryForEach(function(err, row) {
+                    featureDao.queryForEach(function(err, row, rowDone) {
                       features++;
                       var currentRow = featureDao.getFeatureRow(row);
                       var geometry = currentRow.getGeometry();
@@ -80,6 +79,7 @@ var GeoPackage = require('./lib/geopackage')
                       }
                       // console.log('geoJson', geoJson);
                       geojsonLayer.addData(geoJson);
+                      rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
                       callback();
@@ -1013,126 +1013,56 @@ module.exports = Dao;
 
 },{"../db/sqliteQueryBuilder":11}],7:[function(require,module,exports){
 (function (process){
+
 var GeoPackageConnection = function(filePath, callback) {
-  this.isNode = true;
   if (typeof(process) !== 'undefined' && process.version) {
-    this.isNode = true;
+    this.adapterCreator = require('./sqliteAdapter');
   } else {
-    this.isNode = false;
+    this.adapterCreator = require('./sqljsAdapter');
   }
 
   if(filePath) {
-    if(this.isNode) {
-      constructSqlite3(filePath, function(err, db) {
-        this.setDBConnection(db);
-        this.sqlite3 = true;
-        callback(err, this);
-      }.bind(this));
-    } else {
-      constructSqljs(filePath, function(err, db) {
-        this.setDBConnection(db);
-        this.sqlite3 = false;
-        callback(err, this);
-      }.bind(this));
-    }
+    this.adapterCreator.createAdapter(filePath, function(err, adapter) {
+      this.adapter = adapter;
+      callback(err, this);
+    }.bind(this));
   } else {
     callback(null, this);
   }
 }
 
-function constructSqlite3(filePath, callback) {
-  var sqlite3 = require('sqlite3').verbose();
-  var db = new sqlite3.Database(filePath, function(err) {
-    if (err) {
-      console.log('cannot open ' + filePath);
-      return callback(err);
-    }
-    callback(err, db);
-  });
-}
-
-function constructSqljs(filePath, callback) {
-  var fs = require('fs');
-  var sqljs = require('sql.js');
-  fs.readFile(filePath, function(err, fileBuffer) {
-    var db = new sqljs.Database(fileBuffer);
-    callback(err, db);
-  });
-}
-
 GeoPackageConnection.prototype.getDBConnection = function () {
-  return this.db;
+  return this.adapter.db;
 };
 
 GeoPackageConnection.prototype.setDBConnection = function (db) {
-  if (db.open) {
-    this.sqlite3 = true;
-  } else {
-    this.sqlite3 = false;
-  }
-  this.db = db;
+  this.adapter = this.adapterCreator.createAdapterFromDb(db);
 };
 
 GeoPackageConnection.prototype.get = function (sql, params, callback) {
-  if (this.sqlite3) {
-    this.db.get.apply(this.db, arguments);
-  } else {
-    if (typeof params === 'function') {
-      callback = params;
-      params = [];
-    }
-    var statement = this.db.prepare(sql);
-    statement.bind(params);
-    var hasResult = statement.step();
-    var row;
-
-    if (hasResult) {
-      row = statement.getAsObject();
-    }
-
-    statement.free();
-    callback(null, row);
-  }
+  this.adapter.get(sql, params, callback);
 };
 
 GeoPackageConnection.prototype.prepare = function () {
-  this.db.prepare.apply(this.db, arguments);
+  this.adapter.prepare(arguments);
 };
 
 GeoPackageConnection.prototype.all = function (sql, params, callback) {
-  if (this.sqlite3) {
-    this.db.all.apply(this.db, arguments);
-  } else {
-    if (typeof params === 'function') {
-      callback = params;
-      params = [];
-    }
-    var rows = [];
-    this.each(sql, params, function(err, row) {
-      rows.push(row);
-    }, function(err) {
-      callback(err, rows);
-    });
+  if (typeof params === 'function') {
+    callback = params;
+    params = [];
   }
+  this.adapter.all(sql, params, callback);
 };
 
 GeoPackageConnection.prototype.each = function (sql, params, eachCallback, doneCallback) {
-  if (!doneCallback) doneCallback = function(){};
-  if (this.sqlite3) {
-    this.db.each.apply(this.db, arguments);
-  } else {
-    if (typeof params === 'function') {
-      doneCallback = eachCallback;
-      eachCallback = params;
-      params = [];
-    }
-    rowCallback = function(row) {
-      if (eachCallback) {
-        eachCallback(null, row);
-      }
-    };
-    this.db.each(sql, params, rowCallback, doneCallback);
+  if (typeof params === 'function') {
+    doneCallback = eachCallback;
+    eachCallback = params;
+    params = [];
   }
+  if (!doneCallback) doneCallback = function(){};
+  this.adapter.each(sql, params, eachCallback, doneCallback);
 };
 
 GeoPackageConnection.prototype.minOfColumn = function(table, column, where, whereArgs, callback) {
@@ -1144,7 +1074,7 @@ GeoPackageConnection.prototype.minOfColumn = function(table, column, where, wher
     }
     minStatement += where;
   }
-  this.get(minStatement, whereArgs, function(err, result) {
+  this.adapter.get(minStatement, whereArgs, function(err, result) {
     if (err || !result) return callback(err);
     callback(err, result.min);
   });
@@ -1159,7 +1089,7 @@ GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, wher
     }
     maxStatement += where;
   }
-  this.get(maxStatement, whereArgs, function(err, result) {
+  this.adapter.get(maxStatement, whereArgs, function(err, result) {
     if (err || !result) return callback(err);
     callback(err, result.max);
   });
@@ -1179,7 +1109,7 @@ GeoPackageConnection.connectWithDatabase = function(db, callback) {
 }
 
 }).call(this,require('_process'))
-},{"_process":247,"fs":45,"sql.js":340,"sqlite3":undefined}],8:[function(require,module,exports){
+},{"./sqliteAdapter":10,"./sqljsAdapter":12,"_process":247}],8:[function(require,module,exports){
 /**
  * Data Types module.
  * @module db/dataTypes
@@ -1388,104 +1318,8 @@ module.exports.fromName = function(name) {
 // }
 
 },{}],9:[function(require,module,exports){
-(function (process){
-
-var GeoPackageConnection = function(filePath, callback) {
-  if (typeof(process) !== 'undefined' && process.version) {
-    this.adapterCreator = require('./sqliteAdapter');
-  } else {
-    this.adapterCreator = require('./sqljsAdapter');
-  }
-
-  if(filePath) {
-    this.adapterCreator.createAdapter(filePath, function(err, adapter) {
-      this.adapter = adapter;
-      callback(err, this);
-    }.bind(this));
-  } else {
-    callback(null, this);
-  }
-}
-
-GeoPackageConnection.prototype.getDBConnection = function () {
-  return this.adapter.db;
-};
-
-GeoPackageConnection.prototype.setDBConnection = function (db) {
-  this.adapter = this.adapterCreator.createAdapterFromDb(db);
-};
-
-GeoPackageConnection.prototype.get = function (sql, params, callback) {
-  this.adapter.get(sql, params, callback);
-};
-
-GeoPackageConnection.prototype.prepare = function () {
-  this.adapter.prepare(arguments);
-};
-
-GeoPackageConnection.prototype.all = function (sql, params, callback) {
-  if (typeof params === 'function') {
-    callback = params;
-    params = [];
-  }
-  this.adapter.all(sql, params, callback);
-};
-
-GeoPackageConnection.prototype.each = function (sql, params, eachCallback, doneCallback) {
-  if (typeof params === 'function') {
-    doneCallback = eachCallback;
-    eachCallback = params;
-    params = [];
-  }
-  if (!doneCallback) doneCallback = function(){};
-  this.adapter.each(sql, params, eachCallback, doneCallback);
-};
-
-GeoPackageConnection.prototype.minOfColumn = function(table, column, where, whereArgs, callback) {
-  var minStatement = 'select min('+column+') as min from ' + table;
-  if(where) {
-    minStatement += ' ';
-    if (where.indexOf('where')) {
-      where = 'where ' + where;
-    }
-    minStatement += where;
-  }
-  this.adapter.get(minStatement, whereArgs, function(err, result) {
-    if (err || !result) return callback(err);
-    callback(err, result.min);
-  });
-};
-
-GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, whereArgs, callback) {
-  var maxStatement = 'select max('+column+') as max from ' + table;
-  if(where) {
-    maxStatement += ' ';
-    if (where.indexOf('where')) {
-      where = 'where ' + where;
-    }
-    maxStatement += where;
-  }
-  this.adapter.get(maxStatement, whereArgs, function(err, result) {
-    if (err || !result) return callback(err);
-    callback(err, result.max);
-  });
-};
-
-module.exports = GeoPackageConnection;
-
-GeoPackageConnection.connect = function(filePath, callback) {
-  new GeoPackageConnection(filePath, callback);
-}
-
-GeoPackageConnection.connectWithDatabase = function(db, callback) {
-  new GeoPackageConnection(undefined, function(err, connection) {
-    connection.setDBConnection(db);
-    callback(err, connection);
-  });
-}
-
-}).call(this,require('_process'))
-},{"./sqliteAdapter":10,"./sqljsAdapter":12,"_process":247}],10:[function(require,module,exports){
+arguments[4][7][0].apply(exports,arguments)
+},{"./sqliteAdapter":10,"./sqljsAdapter":12,"_process":247,"dup":7}],10:[function(require,module,exports){
 
 module.exports.createAdapter = function(filePath, callback) {
   var sqlite3 = require('sqlite3').verbose();
@@ -1581,6 +1415,7 @@ function isEmpty(string) {
 }
 
 },{}],12:[function(require,module,exports){
+var async = require('async');
 
 module.exports.createAdapter = function(filePath, callback) {
   var fs = require('fs');
@@ -1628,8 +1463,9 @@ Adapter.prototype.prepare = function () {
 
 Adapter.prototype.all = function (sql, params, callback) {
   var rows = [];
-  this.each(sql, params, function(err, row) {
+  this.each(sql, params, function(err, row, rowDone) {
     rows.push(row);
+    rowDone();
   }, function(err) {
     callback(err, rows);
   });
@@ -1641,15 +1477,29 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     eachCallback = params;
     params = [];
   }
-  rowCallback = function(row) {
-    if (eachCallback) {
-      eachCallback(null, row);
+
+  var statement = this.db.prepare(sql);
+  statement.bind(params);
+
+  async.whilst(
+    function() {
+      return statement.step();
+    },
+    function(callback) {
+      var row = statement.getAsObject();
+      eachCallback(null, row, callback);
+    },
+    function() {
+      console.log('done');
+      statement.free();
+      doneCallback();
     }
-  };
-  this.db.each(sql, params, rowCallback, doneCallback);
+  );
+
+
 };
 
-},{"fs":45,"sql.js":340}],13:[function(require,module,exports){
+},{"async":44,"fs":45,"sql.js":340}],13:[function(require,module,exports){
 /**
  * GeometryColumns module.
  * @module dao/geometryColumns
@@ -1773,9 +1623,10 @@ GeometryColumnsDao.prototype.queryForTableName = function (tableName, callback) 
  */
 GeometryColumnsDao.prototype.getFeatureTables = function (callback) {
   var tableNames = [];
-  this.connection.each('select ' + GeometryColumnsDao.COLUMN_TABLE_NAME + ' from ' + this.tableName, function(err, result) {
-    if (err) return callback(err);
+  this.connection.each('select ' + GeometryColumnsDao.COLUMN_TABLE_NAME + ' from ' + this.tableName, function(err, result, rowDone) {
+    if (err) return rowDone(err);
     tableNames.push(result[GeometryColumnsDao.COLUMN_TABLE_NAME]);
+    rowDone();
   }, function(err, numberOfResults) {
     callback(err, tableNames);
   });
@@ -2753,71 +2604,158 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 arguments[4][19][0].apply(exports,arguments)
 },{"./core/contents":3,"./core/srs":4,"./features/columns":13,"./features/user/featureDao":15,"./features/user/featureTableReader":18,"./tiles/matrix":25,"./tiles/matrixset":26,"./tiles/user/tileDao":31,"./tiles/user/tileTableReader":35,"async":44,"dup":19}],24:[function(require,module,exports){
 (function (process){
-var fileType = require('file-type');
+var fileType = require('file-type')
+  , proj4 = require('proj4')
+  , async = require('async');
 
-module.exports.initialize = function(width, height, callback) {
+var TileBoundingBoxUtils = require('../tileBoundingBoxUtils');
+
+module.exports.initialize = function(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
-    new LwipTileCreator(width, height, callback);
+    new LwipTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback);
   } else {
-    new CanvasTileCreator(width, height, callback);
+    new CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback);
   }
 }
 
-function CanvasTileCreator(width, height, callback) {
+function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
   this.canvas = document.createElement('canvas');
   this.canvas.width  = width;
   this.canvas.height = height;
   this.ctx = this.canvas.getContext('2d');
+
+  this.image = document.createElement('img');
+
+  this.tileCanvas = document.createElement('canvas');
+  this.tileContext = this.tileCanvas.getContext('2d');
+  this.tileCanvas.width = tileMatrix.tileWidth;
+  this.tileCanvas.height = tileMatrix.tileHeight;
+
+  this.width = width;
+  this.height = height;
+  this.tileMatrix = tileMatrix;
+  this.projectionFrom = projectionFrom;
+  this.projectionTo = projectionTo;
+  this.tileBoundingBox = tileBoundingBox;
+  this.tileMatrixSet = tileMatrixSet;
+
+  this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
+  this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
+
   callback(null, this);
 }
 
-CanvasTileCreator.prototype.addTile = function (tileData, xOffset, yOffset, callback) {
-  var type = fileType(tileData);
+CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
+  var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
 
-  var base64Data = btoa(String.fromCharCode.apply(null, tileData));
-  var image = document.createElement('img');
-  image.onload = function() {
-    this.ctx.drawImage(image, xOffset, yOffset);
+  var type = fileType(tileData);
+  var binary = '';
+  var bytes = tileData;
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+      binary += String.fromCharCode( bytes[ i ] );
+  }
+  var base64Data = btoa( binary );
+  this.image.onload = function() {
+    this.tileContext.drawImage(this.image, 0, 0);
+    for (var y = 0; y < this.height; y++) {
+      for (var x = 0; x < this.width; x++) {
+        // get the pixel for the result image from the other image
+
+        // get the location of the pixel in resultant projection
+        var longitude = this.tileBoundingBox.minLongitude + (x*this.tileWidthUnitsPerPixel);
+        var latitude = this.tileBoundingBox.maxLatitude - (y*this.tileHeightUnitsPerPixel);
+        var projected = proj4(this.projectionTo, this.projectionFrom, [longitude, latitude]);
+        var projectedLongitude = projected[0];
+        var projectedLatitude = projected[1];
+
+        var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
+        var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
+        if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
+        && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
+          // console.log('xPixel: ' + xPixel + ' yPixel: ' + yPixel + ' maps to x: ' + x + ' y: ' + y);
+          var color = this.tileContext.getImageData(xPixel, yPixel, 1, 1);
+          this.ctx.putImageData(color, x, y);
+        }
+      }
+    }
     callback();
   }.bind(this);
-  image.src = 'data:'+type.mime+';base64,' + base64Data;
+  this.image.src = 'data:'+type.mime+';base64,' + base64Data;
 };
 
-CanvasTileCreator.prototype.getCompleteTile = function (format, callback) {
+CanvasTileCreator.prototype.getCompleteTile = function (format, projectionFrom, projectionTo, fullBoundingBox, cropBoundingBox, callback) {
   callback(null, this.canvas.toDataURL());
 };
 
-function LwipTileCreator(width, height, callback) {
+function LwipTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
   this.lwip = require('lwip');
   this.width = width;
   this.height = height;
-  // width and height are the size of the resultant tile.  We need to make an image
-  // that has that amount of padding around the outside so we can paste outside of
-  // the resultant bounds
-  this.lwip.create(this.width * 3, this.height * 3, function(err, image){
+  this.tileMatrix = tileMatrix;
+  this.projectionFrom = projectionFrom;
+  this.projectionTo = projectionTo;
+  this.tileBoundingBox = tileBoundingBox;
+  this.tileMatrixSet = tileMatrixSet;
+
+  this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
+  this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
+
+  this.lwip.create(this.width, this.height, function(err, image){
     this.image = image;
     callback(null, this);
   }.bind(this));
 }
 
-LwipTileCreator.prototype.addTile = function (tileData, xOffset, yOffset, callback) {
+LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
+
+  var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
+  var pixels = [];
   var type = fileType(tileData);
   this.lwip.open(tileData, type.ext, function(err, tile) {
-    this.image.paste(xOffset+this.width, yOffset+this.height, tile, callback);
+    for (var y = 0; y < this.height; y++) {
+      for (var x = 0; x < this.width; x++) {
+        // get the pixel for the result image from the other image
+
+        // get the location of the pixel in resultant projection
+        var longitude = this.tileBoundingBox.minLongitude + (x*this.tileWidthUnitsPerPixel);
+        var latitude = this.tileBoundingBox.maxLatitude - (y*this.tileHeightUnitsPerPixel);
+        var projected = proj4(this.projectionTo, this.projectionFrom, [longitude, latitude]);
+        var projectedLongitude = projected[0];
+        var projectedLatitude = projected[1];
+
+
+        var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
+        var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
+        if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
+        && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
+          pixels.push({
+            x: x,
+            y: y,
+            color: tile.getPixel(xPixel, yPixel)
+          });
+        }
+      }
+    }
+
+    async.eachSeries(pixels, function(pixel, pixelDone) {
+      this.image.setPixel(pixel.x, pixel.y, pixel.color, pixelDone);
+    }.bind(this), function(err) {
+      callback(err, this.image);
+    }.bind(this));
   }.bind(this));
 };
 
-LwipTileCreator.prototype.getCompleteTile = function (format, callback) {
+LwipTileCreator.prototype.getCompleteTile = function (format, projectionFrom, projectionTo, fullBoundingBox, cropBoundingBox, callback) {
   this.image.writeFile('/tmp/lwip.png', function(err) {
     this.image.batch()
-    .crop(this.width, this.height)
     .toBuffer(format, callback);
 
   }.bind(this));
 };
 
 }).call(this,require('_process'))
-},{"_process":247,"file-type":268,"lwip":undefined}],25:[function(require,module,exports){
+},{"../tileBoundingBoxUtils":28,"_process":247,"async":44,"file-type":268,"lwip":undefined,"proj4":306}],25:[function(require,module,exports){
 /**
  * TileMatrix module.
  * @module tiles/matrix
@@ -3155,9 +3093,10 @@ TileMatrixSetDao.prototype.createObject = function () {
  */
 TileMatrixSetDao.prototype.getTileTables = function (callback) {
   var tableNames = [];
-  this.connection.each('select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME, function(err, result) {
-    if (err) return callback(err);
+  this.connection.each('select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME, function(err, result, rowDone) {
+    if (err) return rowDone(err);
     tableNames.push(result[TileMatrixSetDao.COLUMN_TABLE_NAME]);
+    rowDone();
   }, function(err, numberOfResults) {
     callback(err, tableNames);
   });
@@ -3256,7 +3195,11 @@ GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox = function (callback
     var tileMatrixSet = this.tileDao.tileMatrixSet;
     tileMatrixSetDao.getSrs(tileMatrixSet, function(err, srs) {
       this.setProjectionBoundingBox = tileMatrixSet.getBoundingBox();
-      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:3857');
+      if (srs.organizationCoordsysId === 4326 && srs.organization === 'EPSG') {
+        this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
+        this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
+      }
+      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox(this.tileDao.projection, 'EPSG:3857');
 
       callback(null, this.setWebMercatorBoundingBox);
     }.bind(this));
@@ -3295,35 +3238,47 @@ GeoPackageTileRetriever.prototype.getTileWithBounds = function (webMercatorBound
     var tileWidth = tileMatrix.tileWidth;
     var tileHeight = tileMatrix.tileHeight;
 
-    TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, function(err, creator) {
+    var boundingBoxReproject = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', this.tileDao.projection);
+    var matrixSetProjectionToWebMercator = this.tileDao.tileMatrixSet.getBoundingBox().projectBoundingBox(this.tileDao.projection, 'EPSG:3857');
+    var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixSetProjectionToWebMercator, tileMatrix.matrixWidth, tileMatrix.matrixHeight, webMercatorBoundingBox);
+
+    var matrixSetBoundingBox = this.tileDao.tileMatrixSet.getBoundingBox();
+
+    var bb;
+
+    TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, webMercatorBoundingBox, this.tileDao.projection, 'EPSG:3857', function(err, creator) {
+
       this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, tile) {
+        console.log('tile', tile);
         this.getWebMercatorBoundingBox(function(err, box) {
+
           var tileWebMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(box, tileMatrix, tile.getTileColumn(), tile.getTileRow());
+          var tileBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(matrixSetBoundingBox, tileMatrix, tile.getTileColumn(), tile.getTileRow());
+
+          bb = bb || tileBoundingBox;
+          bb.minLatitude = Math.min(bb.minLatitude, tileBoundingBox.minLatitude);
+          bb.maxLatitude = Math.max(bb.maxLatitude, tileBoundingBox.maxLatitude);
+          bb.minLongitude = Math.min(bb.minLongitude, tileBoundingBox.minLongitude);
+          bb.maxLongitude = Math.max(bb.maxLongitude, tileBoundingBox.maxLongitude);
 
           var overlap = TileBoundingBoxUtils.overlapWithBoundingBox(webMercatorBoundingBox, tileWebMercatorBoundingBox);
+          console.log('overlap', overlap);
           if (overlap) {
-            var xOffset = Math.round(TileBoundingBoxUtils.getXPixelOffset(this.width || tileWidth, webMercatorBoundingBox, tileWebMercatorBoundingBox.minLongitude));
-            var yOffset = Math.round(TileBoundingBoxUtils.getYPixelOffset(this.height || tileHeight, webMercatorBoundingBox, tileWebMercatorBoundingBox.maxLatitude));
-            if (xOffset <= -(this.height || tileHeight) || xOffset >= (this.height || tileHeight) || yOffset <= -(this.width || tileWidth) || yOffset >= (this.width || tileWidth)) {
-              // this tile doesn't belong just skip it
-            } else {
-              // return the tile
-              tiles.push({
-                data: tile.getTileData(),
-                xOffset: xOffset,
-                yOffset: yOffset
-              });
-            }
+            tiles.push({
+              data: tile.getTileData(),
+              gridColumn: tile.getTileColumn(),
+              gridRow: tile.getTileRow()
+            });
           }
         }.bind(this));
-
       }.bind(this), function(err) {
+        console.log('done');
         async.eachSeries(tiles, function(tile, callback) {
-          creator.addTile(tile.data, tile.xOffset, tile.yOffset, callback);
+          creator.addTile(tile.data, tile.gridColumn, tile.gridRow, callback);
         }, function(err) {
-          creator.getCompleteTile('png', callback);
-        });
-      });
+          creator.getCompleteTile('png', 'EPSG:3857', this.tileDao.projection, bb, webMercatorBoundingBox, callback);
+        }.bind(this));
+      }.bind(this));
     }.bind(this));
   }.bind(this));
 };
@@ -3354,10 +3309,11 @@ GeoPackageTileRetriever.prototype.getTileMatrixWithWebMercatorBoundingBox = func
 
 GeoPackageTileRetriever.prototype.retrieveTileResults = function (webMercatorBoundingBox, tileMatrix, tileCallback, doneCallback) {
   if(tileMatrix) {
-    this.getWebMercatorBoundingBox(function(err, setWebMercatorBoundingBox) {
-      var tileGrid = TileBoundingBoxUtils.getTileGridWithWebMercatorTotalBoundingBox(setWebMercatorBoundingBox, tileMatrix.matrixWidth, tileMatrix.matrixHeight, webMercatorBoundingBox);
+    // project the web mercator bounding box into the projection of the matrix
+    var boundingBoxReproject = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', this.tileDao.projection);
+    var matrixSetProjectionToWebMercator = this.tileDao.tileMatrixSet.getBoundingBox().projectBoundingBox(this.tileDao.projection, 'EPSG:3857');
+    var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixSetProjectionToWebMercator, tileMatrix.matrixWidth, tileMatrix.matrixHeight, webMercatorBoundingBox);
       this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoomLevel, tileCallback, doneCallback);
-    }.bind(this));
   } else {
     doneCallback();
   }
@@ -3458,6 +3414,7 @@ module.exports.getXPixelOffset = function(width, boundingBox, longitude) {
 //  */
 // +(double) getYPixelWithHeight: (int) height andBoundingBox: (GPKGBoundingBox *) boundingBox andLatitude: (double) latitude;
 module.exports.getYPixelOffset = function(height, boundingBox, latitude) {
+  console.log('arguments', arguments);
   var boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;
   var offset = boundingBox.maxLatitude - latitude;
   var percentage = offset / boxHeight;
@@ -3718,6 +3675,36 @@ module.exports.getTileGridWithWebMercatorTotalBoundingBox = function(webMercator
   return tileGrid;
 }
 
+module.exports.getTileGridWithTotalBoundingBox = function(totalBoundingBox, matrixWidth, matrixHeight, boundingBox) {
+  var minColumn = module.exports.getTileColumnWithWebMercatorTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.minLongitude);
+  var maxColumn = module.exports.getTileColumnWithWebMercatorTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.maxLongitude, true);
+
+  if (minColumn < matrixWidth && maxColumn >= 0) {
+    if (minColumn < 0) {
+      minColumn = 0;
+    }
+    if (maxColumn >= matrixWidth) {
+      maxColumn = matrixWidth - 1;
+    }
+  }
+
+  var maxRow = module.exports.getTileRowWithWebMercatorTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.minLatitude, true);
+  var minRow = module.exports.getTileRowWithWebMercatorTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.maxLatitude);
+
+
+  if(minRow < matrixHeight && maxRow >= 0){
+    if(minRow < 0){
+      minRow = 0;
+    }
+    if(maxRow >= matrixHeight){
+      maxRow = matrixHeight - 1;
+    }
+  }
+
+  var tileGrid = new TileGrid(minColumn, maxColumn, minRow, maxRow);
+  return tileGrid;
+}
+
 // /**
 //  *  Get the tile column of the longitude in degrees
 //  *
@@ -3729,6 +3716,7 @@ module.exports.getTileGridWithWebMercatorTotalBoundingBox = function(webMercator
 //  */
 // +(int) getTileColumnWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andMatrixWidth: (int) matrixWidth andLongitude: (double) longitude;
 module.exports.getTileColumnWithWebMercatorTotalBoundingBox = function(webMercatorTotalBox, matrixWidth, longitude, max) {
+  console.log('arguments', arguments);
   var minX = webMercatorTotalBox.minLongitude;
   var maxX = webMercatorTotalBox.maxLongitude;
 
@@ -4104,7 +4092,11 @@ TileDao.prototype.initialize = function(callback) {
   var tileMatrixSetDao = this.getTileMatrixSetDao();
   tileMatrixSetDao.getSrs(this.tileMatrixSet, function(err, srs) {
     if (srs.definition && srs.definition !== 'undefined') {
-      this.projection = proj4(srs.definition);
+      try {
+        this.projection = proj4(srs.definition);
+      } catch (e) {
+        this.projection = proj4(srs.organization + ':' + srs.organizationCoordsysId);
+      }
     } else {
       this.projection = proj4(srs.organization + ':' + srs.organizationCoordsysId);
     }
@@ -4263,11 +4255,13 @@ TileDao.prototype.queryForTile = function (column, row, zoomLevel, callback) {
   fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
   fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
   fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-
-  this.queryForFieldValues(fieldValues, function(err, result) {
-    var tileRow = this.getTileRow(result);
-    callback(err, tileRow);
-  }.bind(this));
+  var tileRow;
+  this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
+    tileRow = this.getTileRow(result);
+    rowDone();
+  }.bind(this), function() {
+    callback(null, tileRow);
+  });
 };
 
 TileDao.prototype.queryForTilesWithZoomLevel = function (zoomLevel, tileCallback, doneCallback) {
@@ -4304,10 +4298,11 @@ TileDao.prototype.queryForTilesInColumn = function (column, zoomLevel, tileCallb
   fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
   fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
 
-  this.queryForFieldValues(fieldValues, function(err, result) {
+  this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
     tileCallback(err, this.getTileRow(result));
+    rowDone();
   }.bind(this), doneCallback);
 };
 
@@ -4323,10 +4318,11 @@ TileDao.prototype.queryForTilesInRow = function (row, zoomLevel, tileCallback, d
   fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
   fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
 
-  this.queryForFieldValues(fieldValues, function(err, result) {
+  this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
     tileCallback(err, this.getTileRow(result));
+    rowDone();
   }.bind(this), doneCallback);
 };
 
@@ -4349,24 +4345,64 @@ TileDao.prototype.getZoomLevelWithLength = function (length) {
 TileDao.prototype.queryByTileGrid = function (tileGrid, zoomLevel, tileCallback, doneCallback) {
   if (!tileGrid) return doneCallback();
 
-  var where = '';
-  where += this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-  where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, tileGrid.minX, '>=');
-  where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, tileGrid.maxX, '<=');
-  where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, tileGrid.minY, '>=');
-  where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, tileGrid.maxY, '<=');
+  var x = tileGrid.minX;
 
-  var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, tileGrid.minX, tileGrid.maxX, tileGrid.minY, tileGrid.maxY]);
+  async.whilst(
+    function() {
+      return x <= tileGrid.maxX;
+    }, function(xCallback) {
+      var y = tileGrid.minY;
+      async.whilst(
+        function() {
+          return y <= tileGrid.maxY;
+        },
+        function(yCallback) {
+          var where = '';
+          where += this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+          where += ' and ';
+          where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, x, '=');
+          where += ' and ';
+          where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, y, '=');
+          var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, x, y]);
 
-  this.queryWhereWithArgsDistinct(where, whereArgs, function(err, result) {
-    if(!tileCallback) return;
-    if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
-  }.bind(this), doneCallback);
+          this.queryWhereWithArgsDistinct(where, whereArgs, function(err, result, rowDone) {
+            if(!tileCallback) return yCallback();
+            if (err || !result) return yCallback(err);
+            tileCallback(err, this.getTileRow(result));
+            rowDone();
+          }.bind(this), function() {
+            y++;
+            yCallback();
+          });
+        }.bind(this),
+        function() {
+          x++;
+          xCallback();
+        }
+      );
+    }.bind(this),
+    doneCallback
+  );
+
+  // var where = '';
+  // where += this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  // where += ' and ';
+  // where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, tileGrid.minX, '>=');
+  // where += ' and ';
+  // where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, tileGrid.maxX, '<=');
+  // where += ' and ';
+  // where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, tileGrid.minY, '>=');
+  // where += ' and ';
+  // where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, tileGrid.maxY, '<=');
+  //
+  // var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, tileGrid.minX, tileGrid.maxX, tileGrid.minY, tileGrid.maxY]);
+  //
+  // this.queryWhereWithArgsDistinct(where, whereArgs, function(err, result, rowDone) {
+  //   if(!tileCallback) return;
+  //   if (err || !result) return tileCallback(err);
+  //   tileCallback(err, this.getTileRow(result));
+  //   rowDone();
+  // }.bind(this), doneCallback);
 };
 
 
@@ -4892,11 +4928,12 @@ UserDao.prototype.setValueInObject = function (object, columnIndex, value) {
 UserDao.prototype.getRow = function (results) {
   var row = undefined;
   if (!this.table) return row;
-
   var columns = this.table.columnCount();
-  var columnTypes = new Array();
-  var values = new Array();
-
+  var columnTypes = {};
+  for (var i = 0; i < columns; i++) {
+    var column = this.table.getColumnWithIndex(i);
+    columnTypes[column.name] = column.dataType;
+  }
   return this.newRowWithColumnTypes(columnTypes, results);
 };
 
@@ -4907,7 +4944,7 @@ UserDao.prototype.getRow = function (results) {
  * @return {UserRow}             user row
  */
 UserDao.prototype.newRowWithColumnTypes = function (columnTypes, values) {
-  return new UserRow();
+  return new UserRow(this.table, columnTypes, values);
 };
 
 /**
@@ -4941,355 +4978,6 @@ UserDao.prototype.getZoomLevel = function () {
 module.exports = UserDao;
 
 },{"../dao/dao":6,"./userRow":40,"util":265}],37:[function(require,module,exports){
-/**
- * UserRow module.
- * @module user/userRow
- */
-
-/**
- * User Row containing the values from a single result row
- * @class UserRow
- * @param  {UserTable} table       user table
- * @param  {Array} columnTypes column types
- * @param  {Array} values      values
- */
-var UserRow = function(table, columnTypes, values) {
-  /**
-   * User table
-   * @type {UserTable}
-   */
-  this.table = table;
-  /**
-   * Column types of this row, based upon the data values
-   * @type {Array}
-   */
-  this.columnTypes = columnTypes;
-  /**
-   * Array of row values
-   * @type {Array}
-   */
-  this.values = values;
-
-  if (!this.columnTypes) {
-    var columnCount = this.table.columnCount();
-    this.columnTypes = [];
-    this.values = [];
-    for (var i = 0; i < columnCount; i++) {
-      this.columnTypes.push(null);
-      this.values.push(null);
-    }
-  }
-}
-
-module.exports = UserRow;
-
-/**
- * Get the column count
- * @return {number} column count
- */
-UserRow.prototype.columnCount = function () {
-  return this.table.columnCount();
-};
-
-/**
- * Get the column names
- * @return {Array} column names
- */
-UserRow.prototype.getColumnNames = function () {
-  return this.table.columnNames;
-};
-
-/**
- * Get the column name at the index
- * @param  {Number} index index
- * @return {string}       column name
- */
-UserRow.prototype.getColumnNameWithIndex = function (index) {
-  return this.table.getColumnNameWithIndex(index);
-};
-
-/**
- * Get the column index of the column name
- * @param  {string} columnName column name
- * @return {Number}            column index
- */
-UserRow.prototype.getColumnIndexWithColumnName = function (columnName) {
-  return this.table.getColumnIndex(columnName);
-};
-
-/**
- * Get the value at the index
- * @param  {Number} index index
- * @return {object}       value
- */
-UserRow.prototype.getValueWithIndex = function (index) {
-  var value = this.values[this.getColumnNameWithIndex(index)];
-  if (value !== undefined) {
-    value = this.toObjectValue(index, value);
-  }
-  return value;
-};
-
-/**
- * Get the value of the column name
- * @param  {string} columnName column name
- * @return {Object}            value
- */
-UserRow.prototype.getValueWithColumnName = function (columnName) {
-  return this.values[columnName];
-};
-
-/**
- * Get the database formatted value at the index
- * @param  {Number} index index
- * @return {object}       value
- */
-UserRow.prototype.getDatabaseValueWithIndex = function (index) {
-  var value = this.values[index];
-  if (value !== undefined) {
-    value = this.toDatabaseValue(index, value);
-  }
-  return value;
-};
-
-/**
- * Get the database formatted value of the column name
- * @param  {string} columnName column name
- * @return {Object}            value
- */
-UserRow.prototype.getDatabaseValueWithColumnName = function (columnName) {
-  return this.getDatabaseValueWithIndex(this.table.getColumnIndex(columnName));
-};
-
-/**
- * Get the row column type at the index
- * @param  {Number} index index
- * @return {Number}       row column type
- */
-UserRow.prototype.getRowColumnTypeWithIndex = function (index) {
-  return this.columnTypes[index];
-};
-
-/**
- * Get the row column type of the column name
- * @param  {string} columnName column name
- * @return {Number}            row column type
- */
-UserRow.prototype.getRowColumnTypeWithColumnName = function (columnName) {
-  return this.columnTypes[this.table.getColumnIndex(columnName)];
-};
-
-/**
- * Get the column at the index
- * @param  {Number} index index
- * @return {UserColumn}       column
- */
-UserRow.prototype.getColumnWithIndex = function (index) {
-  return this.table.getColumnWithIndex(index);
-};
-
-/**
- * Get the column of the column name
- * @param  {string} columnName column name
- * @return {UserColumn}            column
- */
-UserRow.prototype.getColumnWithColumnName = function (columnName) {
-  return this.table.getColumnWithColumnName(columnName);
-};
-
-/**
- * Get the id value, which is the value of the primary key
- * @return {Number} id value
- */
-UserRow.prototype.getId = function () {
-  var id = undefined;
-  var objectValue = this.getValueWithIndex(this.getPkColumnIndex());
-  if (objectValue == undefined) {
-    throw new Error('Row Id was null. Table: ' + this.table.tableName + ', Column Index: ' + this.getPkColumnIndex() + ', Column Name: ' + this.getPkColumn().name);
-  }
-  // TODO ensure the id was a number
-  id = objectValue;
-  return id;
-};
-
-/**
- * Get the primary key column Index
- * @return {Number} pk index
- */
-UserRow.prototype.getPkColumnIndex = function () {
-  return this.table.pkIndex;
-};
-
-/**
- * Get the primary key column
- * @return {UserColumn} pk column
- */
-UserRow.prototype.getPkColumn = function () {
-  return this.table.getPkColumn();
-};
-
-/**
- * Set the value at the index
- * @param {Number} index index
- * @param {object} value value
- */
-UserRow.prototype.setValueWithIndex = function (index, value) {
-  if (index === this.table.pkIndex) {
-    throw new Error('Cannot update the primary key of the row.  Table Name: ' + this.table.tableName + ', Index: ' + index + ', Name: ' + this.table.getPkColumn().name);
-  }
-  this.setValueNoValidationWithIndex(index, value);
-};
-
-/**
- * Set the value at the index without validation
- * @param {Number} index index
- * @param {Object} value value
- */
-UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
-  self.values[index] = value;
-};
-
-/**
- * Set the value of the column name
- * @param {string} columnName column name
- * @param {Object} value      value
- */
-UserRow.prototype.setValueWithColumnName = function (columnName, value) {
-  this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
-};
-
-/**
- * Set the primary key id value
- * @param {Number} id id
- */
-UserRow.prototype.setId = function (id) {
-  this.values[this.getPkColumnIndex()] = id;
-};
-
-/**
- * Clears the id so the row can be used as part of an insert or create
- */
-UserRow.prototype.resetId = function () {
-  this.values[this.getPkColumnIndex()] = undefined;
-};
-
-/**
- * Validate the value and its actual value types against eh column data type class
- * @param  {UserColumn} column     column
- * @param  {Object} value      value
- * @param  {Array} valueTypes value types
- */
-UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes) {
-  // TODO implement validation
-};
-
-},{}],38:[function(require,module,exports){
-/**
- * userTableReader module.
- * @module user/userTableReader
- */
-
-/** @class UserTableReader */
-var UserTableReader = function(tableName) {
-  this.tableName = tableName;
-}
-
-var GPKG_UTR_CID = "cid";
-var GPKG_UTR_NAME = "name";
-var GPKG_UTR_TYPE = "type";
-var GPKG_UTR_NOT_NULL = "notnull";
-var GPKG_UTR_PK = "pk";
-var GPKG_UTR_DFLT_VALUE = "dflt_value";
-
-/**
- * Read the table
- * @param  {sqlite3} db sqlite3 db connection
- * @param  {Function} callback called with an error if one occurred and the table
- */
-UserTableReader.prototype.readTable = function (db, callback) {
-  var columnList = [];
-  db.all('PRAGMA table_info('+this.tableName+')', function(err, results) {
-    for (var i =0; i < results.length; i++) {
-      var result = results[i];
-      var index = result[GPKG_UTR_CID];
-      var name = result[GPKG_UTR_NAME];
-      var type = result[GPKG_UTR_TYPE];
-      var notNull = result[GPKG_UTR_NOT_NULL] === 1;
-      var primarykey = result[GPKG_UTR_PK] === 1;
-      var max = undefined;
-      if (type && type.lastIndexOf(')') === type.length-1) {
-        var maxStart = type.indexOf('(');
-        if (maxStart > -1) {
-          var maxString = type.substring(maxStart + 1, type.length - 1);
-          if (maxString !== '') {
-            max = parseInt(maxString);
-            type = type.substring(0, maxStart);
-          }
-        }
-      }
-      var defaultValueIndex = result[GPKG_UTR_DFLT_VALUE];
-      try {
-        var column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValueIndex, primarykey);
-        columnList.push(column);
-      } catch (e) {
-        return callback(e);
-      }
-    }
-
-    if (columnList.length === 0) {
-      return callback(new Error('Table does not exist: ' + this.tableName));
-    }
-    var table = this.createTableWithNameAndColumns(this.tableName, columnList);
-    callback(null, table);
-  }.bind(this));
-};
-
-/**
- * The UserTableReader
- * @type {UserTableReader}
- */
-module.exports = UserTableReader;
-
-},{}],39:[function(require,module,exports){
-/**
- * userColumn module.
- * @module user/userColumn
- */
-
-var DataTypes = require('../db/dataTypes');
-
-/**
- * UserColumn
- * @class UserColumn
- */
-function UserColumn(index, name, dataType, max, notNull, defaultValue, primaryKey) {
-  this.index = index;
-  this.name = name;
-  this.dataType = dataType;
-  this.max = max;
-  this.notNull = notNull,
-  this.defaultValue = defaultValue;
-  this.primaryKey = primaryKey;
-  this.validateMax();
-}
-
-UserColumn.prototype.getTypeName = function () {
-  var type = undefined;
-  if (this.dataType !== DataTypes.GPKG_DT_GEOMETRY) {
-    type = DataTypes.name(this.dataType);
-  }
-  return type;
-};
-
-UserColumn.prototype.validateMax = function () {
-  if(this.max && this.dataType !== 'TEXT' && this.dataType !== 'BLOB') {
-    throw new Error('Column max is only supported for TEXT and BLOB columns. column: ' + self.name + ', max: ' + self.max + ', type: ' + self.dataType)
-  }
-};
-
-module.exports = UserColumn;
-
-},{"../db/dataTypes":8}],40:[function(require,module,exports){
 /**
  * UserRow module.
  * @module user/userRow
@@ -5514,7 +5202,137 @@ UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes)
   // TODO implement validation
 };
 
-},{}],41:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
+/**
+ * userTableReader module.
+ * @module user/userTableReader
+ */
+
+var UserColumn = require('./userColumn')
+  , UserTable = require('./userTable')
+  , DataTypes = require('../db/dataTypes');
+
+/** @class UserTableReader */
+var UserTableReader = function(tableName) {
+  this.tableName = tableName;
+}
+
+var GPKG_UTR_CID = "cid";
+var GPKG_UTR_NAME = "name";
+var GPKG_UTR_TYPE = "type";
+var GPKG_UTR_NOT_NULL = "notnull";
+var GPKG_UTR_PK = "pk";
+var GPKG_UTR_DFLT_VALUE = "dflt_value";
+
+/**
+ * Read the table
+ * @param  {sqlite3} db sqlite3 db connection
+ * @param  {Function} callback called with an error if one occurred and the table
+ */
+UserTableReader.prototype.readTable = function (db, callback) {
+  var columnList = [];
+  db.all('PRAGMA table_info('+this.tableName+')', function(err, results) {
+    for (var i =0; i < results.length; i++) {
+      var result = results[i];
+      var index = result[GPKG_UTR_CID];
+      var name = result[GPKG_UTR_NAME];
+      var type = result[GPKG_UTR_TYPE];
+      var notNull = result[GPKG_UTR_NOT_NULL] === 1;
+      var primarykey = result[GPKG_UTR_PK] === 1;
+      var max = undefined;
+      if (type && type.lastIndexOf(')') === type.length-1) {
+        var maxStart = type.indexOf('(');
+        if (maxStart > -1) {
+          var maxString = type.substring(maxStart + 1, type.length - 1);
+          if (maxString !== '') {
+            max = parseInt(maxString);
+            type = type.substring(0, maxStart);
+          }
+        }
+      }
+      var defaultValueIndex = result[GPKG_UTR_DFLT_VALUE];
+      try {
+        var column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValueIndex, primarykey);
+
+        columnList.push(column);
+      } catch (e) {
+        console.err(e);
+        return callback(e);
+      }
+    }
+
+    if (columnList.length === 0) {
+      return callback(new Error('Table does not exist: ' + this.tableName));
+    }
+    var table = this.createTableWithNameAndColumns(this.tableName, columnList);
+    callback(null, table);
+  }.bind(this));
+};
+
+UserTableReader.prototype.createColumnWithResults = function(result, index, name, type, max, notNull, defaultValueIndex, primaryKey) {
+
+  var dataType = DataTypes.fromName(type);
+
+  var defaultValue = undefined;
+  if (defaultValueIndex) {
+    // console.log('default value index', defaultValueIndex);
+    // console.log('result', results);
+  }
+  return new UserColumn(index, name, dataType, max, notNull, defaultValue, primaryKey);
+}
+
+UserTableReader.prototype.createTableWithNameAndColumns = function (tableName, columns) {
+  return new UserTable(tableName, columns);
+};
+
+/**
+ * The UserTableReader
+ * @type {UserTableReader}
+ */
+module.exports = UserTableReader;
+
+},{"../db/dataTypes":8,"./userColumn":39,"./userTable":41}],39:[function(require,module,exports){
+/**
+ * userColumn module.
+ * @module user/userColumn
+ */
+
+var DataTypes = require('../db/dataTypes');
+
+/**
+ * UserColumn
+ * @class UserColumn
+ */
+function UserColumn(index, name, dataType, max, notNull, defaultValue, primaryKey) {
+  this.index = index;
+  this.name = name;
+  this.dataType = dataType;
+  this.max = max;
+  this.notNull = notNull,
+  this.defaultValue = defaultValue;
+  this.primaryKey = primaryKey;
+  this.validateMax();
+}
+
+UserColumn.prototype.getTypeName = function () {
+  var type = undefined;
+  if (this.dataType !== DataTypes.GPKG_DT_GEOMETRY) {
+    type = DataTypes.name(this.dataType);
+  }
+  return type;
+};
+
+UserColumn.prototype.validateMax = function () {
+  if(this.max && this.dataType !== 'TEXT' && this.dataType !== 'BLOB') {
+    throw new Error('Column max is only supported for TEXT and BLOB columns. column: ' + self.name + ', max: ' + self.max + ', type: ' + self.dataType)
+  }
+};
+
+module.exports = UserColumn;
+
+},{"../db/dataTypes":8}],40:[function(require,module,exports){
+arguments[4][37][0].apply(exports,arguments)
+},{"dup":37}],41:[function(require,module,exports){
 /**
  * userTable module.
  * @module user/userTable

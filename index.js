@@ -32,7 +32,6 @@ var GeoPackage = require('./lib/geopackage')
 
         geoPackage.getTileTables(function(err, tables) {
           async.eachSeries(tables, function(table, callback) {
-            console.log('tile table', table);
             geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
               var maxZoom = tileDao.maxZoom;
@@ -68,7 +67,7 @@ var GeoPackage = require('./lib/geopackage')
                   }
                   var features = 0;
                   featureDao.getSrs(function(err, srs) {
-                    featureDao.queryForEach(function(err, row) {
+                    featureDao.queryForEach(function(err, row, rowDone) {
                       features++;
                       var currentRow = featureDao.getFeatureRow(row);
                       var geometry = currentRow.getGeometry();
@@ -79,6 +78,7 @@ var GeoPackage = require('./lib/geopackage')
                       }
                       // console.log('geoJson', geoJson);
                       geojsonLayer.addData(geoJson);
+                      rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
                       callback();
