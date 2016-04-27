@@ -155,7 +155,7 @@ describe('TileDao tests', function() {
     var tileDao;
 
     beforeEach('should open the geopackage', function(done) {
-      var filename = path.join(__dirname, '..', '..', 'fixtures', 'alaska.gpkg');
+      var filename = path.join(__dirname, '..', '..', 'fixtures', 'private', 'alaska.gpkg');
       GeoPackageManager.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
@@ -181,10 +181,10 @@ describe('TileDao tests', function() {
           if (zoom === 5) {
             should.not.exist(bb);
           } else {
-            bb.minLongitude.should.be.equal(-157.5);
-            bb.maxLongitude.should.be.equal(-135.0);
-            bb.minLatitude.should.be.equal(67.5);
-            bb.maxLatitude.should.be.equal(90);
+            bb.minLongitude.should.be.equal(-180);
+            bb.maxLongitude.should.be.equal(-157.5);
+            bb.minLatitude.should.be.equal(45);
+            bb.maxLatitude.should.be.equal(67.5);
           }
           callback();
         });
