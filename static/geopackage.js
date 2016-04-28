@@ -2657,6 +2657,8 @@ function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundin
   this.tileCanvas.width = tileMatrix.tileWidth;
   this.tileCanvas.height = tileMatrix.tileHeight;
 
+  this.imageData = new Uint8ClampedArray(width * height * 4);
+
   callback(null, this);
 }
 
@@ -2744,7 +2746,7 @@ CanvasTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
 
 CanvasTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, sourceY) {
   var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
-  this.ctx.putImageData(color, targetX, targetY);
+  this.imageData.set(color.data, (targetY * this.width * 4) + (targetX * 4));
 };
 
 CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
@@ -2761,6 +2763,7 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
   this.image.onload = function() {
     this.tileContext.drawImage(this.image, 0, 0);
     this.projectTile(tileData, gridColumn, gridRow, function() {
+      this.ctx.putImageData(new ImageData(this.imageData, this.width, this.height), 0, 0);
       console.log('chunks', this.chunks.length);
       async.eachSeries(this.chunks, function(chunk, chunkDone) {
         var type = fileType(tileData);
@@ -3357,15 +3360,11 @@ GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBo
 
       // get the bounding box of the tile in the target projection
       var tileTargetProjectionBoundingBox = TileBoundingBoxUtils.getTileBoundingBox(matrixSetBoundsInTargetProjection, tileMatrix, tile.getTileColumn(), tile.getTileRow());
-
-      var overlap = TileBoundingBoxUtils.overlapWithBoundingBox(targetBoundingBox, tileTargetProjectionBoundingBox);
-      if (overlap) {
-        tiles.push({
-          data: tile.getTileData(),
-          gridColumn: tile.getTileColumn(),
-          gridRow: tile.getTileRow()
-        });
-      }
+      tiles.push({
+        data: tile.getTileData(),
+        gridColumn: tile.getTileColumn(),
+        gridRow: tile.getTileRow()
+      });
 
     }.bind(this), function(err) {
       async.eachSeries(tiles, function(tile, callback) {
@@ -3386,7 +3385,7 @@ GeoPackageTileRetriever.prototype.getTileMatrixWithWebMercatorBoundingBox = func
 GeoPackageTileRetriever.prototype.retrieveTileResults = function (tileMatrixProjectionBoundingBox, tileMatrix, tileCallback, doneCallback) {
   if(tileMatrix) {
     var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrixWidth, tileMatrix.matrixHeight, tileMatrixProjectionBoundingBox);
-      this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoomLevel, tileCallback, doneCallback);
+    this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoomLevel, tileCallback, doneCallback);
   } else {
     doneCallback();
   }
