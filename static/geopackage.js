@@ -2612,7 +2612,8 @@ arguments[4][19][0].apply(exports,arguments)
 (function (process){
 var fileType = require('file-type')
   , proj4 = require('proj4')
-  , async = require('async');
+  , async = require('async')
+  , util = require('util');
 
 var TileBoundingBoxUtils = require('../tileBoundingBoxUtils');
 
@@ -2624,7 +2625,25 @@ module.exports.initialize = function(width, height, tileMatrix, tileMatrixSet, t
   }
 }
 
+function TileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
+  this.width = width;
+  this.height = height;
+  this.tileMatrix = tileMatrix;
+  this.projectionFrom = projectionFrom;
+  this.projectionTo = projectionTo;
+  this.tileBoundingBox = tileBoundingBox;
+  this.tileMatrixSet = tileMatrixSet;
+
+  this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
+  this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
+
+  // use this as a quick check if the projections are equal.  If they are we can shortcut some math
+  this.sameProjection = projectionFrom.oProj.title === projectionTo.oProj.title;
+}
+
 function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
+  TileCreator.apply(this, arguments);
+
   this.canvas = document.createElement('canvas');
   this.canvas.width  = width;
   this.canvas.height = height;
@@ -2637,19 +2656,63 @@ function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundin
   this.tileCanvas.width = tileMatrix.tileWidth;
   this.tileCanvas.height = tileMatrix.tileHeight;
 
-  this.width = width;
-  this.height = height;
-  this.tileMatrix = tileMatrix;
-  this.projectionFrom = projectionFrom;
-  this.projectionTo = projectionTo;
-  this.tileBoundingBox = tileBoundingBox;
-  this.tileMatrixSet = tileMatrixSet;
-
-  this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
-  this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
-
   callback(null, this);
 }
+
+util.inherits(CanvasTileCreator, TileCreator);
+
+TileCreator.prototype.projectTile = function(gridColumn, gridRow, callback) {
+  var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
+  var y = 0;
+  var x = 0;
+  var height = this.height;
+  var width = this.width;
+  async.whilst(
+    function() {
+      return y < height;
+    },
+    function(yDone) {
+      async.setImmediate(function () {
+        async.whilst(
+          function() {
+            return x < width;
+          },
+          function(xDone) {
+            async.setImmediate(function () {
+              var longitude = this.tileBoundingBox.minLongitude + (x*this.tileWidthUnitsPerPixel);
+              var latitude = this.tileBoundingBox.maxLatitude - (y*this.tileHeightUnitsPerPixel);
+              var projected = proj4(this.projectionTo, this.projectionFrom, [longitude, latitude]);
+              var projectedLongitude = projected[0];
+              var projectedLatitude = projected[1];
+
+              var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
+              var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
+              if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
+              && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
+                this.addPixel(x, y, xPixel, yPixel);
+              }
+              x++;
+              xDone();
+            }.bind(this));
+          }.bind(this),
+          function() {
+            x = 0;
+            y++;
+            yDone();
+          }
+        );
+      }.bind(this));
+    }.bind(this),
+    function() {
+      callback();
+    }
+  );
+}
+
+CanvasTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, sourceY) {
+  var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
+  this.ctx.putImageData(color, targetX, targetY);
+};
 
 CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
   var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
@@ -2664,28 +2727,7 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
   var base64Data = btoa( binary );
   this.image.onload = function() {
     this.tileContext.drawImage(this.image, 0, 0);
-    for (var y = 0; y < this.height; y++) {
-      for (var x = 0; x < this.width; x++) {
-        // get the pixel for the result image from the other image
-
-        // get the location of the pixel in resultant projection
-        var longitude = this.tileBoundingBox.minLongitude + (x*this.tileWidthUnitsPerPixel);
-        var latitude = this.tileBoundingBox.maxLatitude - (y*this.tileHeightUnitsPerPixel);
-        var projected = proj4(this.projectionTo, this.projectionFrom, [longitude, latitude]);
-        var projectedLongitude = projected[0];
-        var projectedLatitude = projected[1];
-
-        var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
-        var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
-        if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
-        && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
-          // console.log('xPixel: ' + xPixel + ' yPixel: ' + yPixel + ' maps to x: ' + x + ' y: ' + y);
-          var color = this.tileContext.getImageData(xPixel, yPixel, 1, 1);
-          this.ctx.putImageData(color, x, y);
-        }
-      }
-    }
-    callback();
+    this.projectTile(gridColumn, gridRow, callback);
   }.bind(this);
   this.image.src = 'data:'+type.mime+';base64,' + base64Data;
 };
@@ -2695,59 +2737,36 @@ CanvasTileCreator.prototype.getCompleteTile = function (format, callback) {
 };
 
 function LwipTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
+  TileCreator.apply(this, arguments);
+
   this.lwip = require('lwip');
-  this.width = width;
-  this.height = height;
-  this.tileMatrix = tileMatrix;
-  this.projectionFrom = projectionFrom;
-  this.projectionTo = projectionTo;
-  this.tileBoundingBox = tileBoundingBox;
-  this.tileMatrixSet = tileMatrixSet;
-
-  this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
-  this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
-
+  this.pixels = [];
   this.lwip.create(this.width, this.height, function(err, image){
     this.image = image;
     callback(null, this);
   }.bind(this));
 }
 
-LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
+util.inherits(LwipTileCreator, TileCreator);
 
-  var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
-  var pixels = [];
+LwipTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, sourceY) {
+  this.pixels.push({
+    x: targetX,
+    y: targetY,
+    color: this.tile.getPixel(sourceX, sourceY)
+  });
+};
+
+LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
   var type = fileType(tileData);
   this.lwip.open(tileData, type.ext, function(err, tile) {
-    for (var y = 0; y < this.height; y++) {
-      for (var x = 0; x < this.width; x++) {
-        // get the pixel for the result image from the other image
-
-        // get the location of the pixel in resultant projection
-        var longitude = this.tileBoundingBox.minLongitude + (x*this.tileWidthUnitsPerPixel);
-        var latitude = this.tileBoundingBox.maxLatitude - (y*this.tileHeightUnitsPerPixel);
-        var projected = proj4(this.projectionTo, this.projectionFrom, [longitude, latitude]);
-        var projectedLongitude = projected[0];
-        var projectedLatitude = projected[1];
-
-
-        var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
-        var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
-        if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
-        && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
-          pixels.push({
-            x: x,
-            y: y,
-            color: tile.getPixel(xPixel, yPixel)
-          });
-        }
-      }
-    }
-
-    async.eachSeries(pixels, function(pixel, pixelDone) {
-      this.image.setPixel(pixel.x, pixel.y, pixel.color, pixelDone);
-    }.bind(this), function(err) {
-      callback(err, this.image);
+    this.tile = tile;
+    this.projectTile(gridColumn, gridRow, function() {
+      async.eachSeries(this.pixels, function(pixel, pixelDone) {
+        this.image.setPixel(pixel.x, pixel.y, pixel.color, pixelDone);
+      }.bind(this), function(err) {
+        callback(err, this.image);
+      }.bind(this));
     }.bind(this));
   }.bind(this));
 };
@@ -2761,7 +2780,7 @@ LwipTileCreator.prototype.getCompleteTile = function (format, callback) {
 };
 
 }).call(this,require('_process'))
-},{"../tileBoundingBoxUtils":28,"_process":247,"async":44,"file-type":268,"lwip":undefined,"proj4":306}],25:[function(require,module,exports){
+},{"../tileBoundingBoxUtils":28,"_process":247,"async":44,"file-type":268,"lwip":undefined,"proj4":306,"util":265}],25:[function(require,module,exports){
 /**
  * TileMatrix module.
  * @module tiles/matrix
