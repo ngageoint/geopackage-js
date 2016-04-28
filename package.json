@@ -20,20 +20,21 @@
     "npm": ">= 1.2.0"
   },
   "dependencies": {
-    "bufferstream": "^0.6.2",
-    "java": "^0.6.0",
-    "node-java-maven": "0.0.11",
-    "simple-bufferstream": "^1.0.0",
-    "stream-to-array": "^2.1.0",
     "async": "^1.5.0",
+    "bufferstream": "^0.6.2",
     "file-type": "^3.8.0",
+    "java": "^0.6.0",
     "leaflet": "^0.7.7",
     "lwip": "0.0.8",
+    "node-java-maven": "0.0.11",
     "proj4": "^2.3.14",
+    "proj4js-defs": "0.0.1",
     "q": "^1.4.1",
     "reproject": "^1.1.1",
+    "simple-bufferstream": "^1.0.0",
     "sql.js": "^0.3.2",
     "sqlite3": "^3.1.2",
+    "stream-to-array": "^2.1.0",
     "uglify-js": "^2.6.2",
     "wkx": "^0.2.0"
   },
@@ -73,7 +74,7 @@
     "watchify": "^3.7.0"
   },
   "testling": {
-    "harness":"mocha",
+    "harness": "mocha",
     "files": "test/*.js",
     "browsers": [
       "ie/6..latest",
@@ -92,8 +93,8 @@
     "btest": "karma start",
     "predoc": "rm -rf docs/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
-    "build": "browserify index.js --standalone geopackage --exclude sqlite3 --exclude lwip =-o static/geopackage.js",
+    "build": "browserify index.js --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js",
     "postbuild": "uglifyjs --stats static/geopackage.js --output static/geopackage.min.js",
-    "watch": "watchify index.js -v --standalone geopackage --exclude sqlite3 --exclude lwip =-o static/geopackage.js"
+    "watch": "watchify index.js -v --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js"
   }
 }

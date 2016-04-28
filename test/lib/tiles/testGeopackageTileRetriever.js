@@ -51,7 +51,7 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
   });
 
-  it('should pull all of the tiles and compare them', function(done) {
+  it.only('should pull all of the tiles and compare them', function(done) {
     this.timeout(30000);
     var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
 
