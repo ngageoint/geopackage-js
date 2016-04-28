@@ -41,17 +41,17 @@ var GeoPackage = require('./lib/geopackage')
               var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
               var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
               tableLayer.drawTile = function(canvas, tilePoint, zoom) {
-                gpr.getTile(tilePoint.x, tilePoint.y, zoom, function(err, tile) {
+                gpr.drawTileIn(tilePoint.x, tilePoint.y, zoom, canvas, function(err, tile) {
                   console.log('tile', tile);
-                  if (tile) {
-                    var ctx = canvas.getContext('2d');
-
-                    var image = document.createElement('img');
-                    image.onload = function() {
-                      ctx.drawImage(image, 0, 0);
-                    };
-                    image.src = tile;
-                  }
+                  // if (tile) {
+                  //   var ctx = canvas.getContext('2d');
+                  //
+                  //   var image = document.createElement('img');
+                  //   image.onload = function() {
+                  //     ctx.drawImage(image, 0, 0);
+                  //   };
+                  //   image.src = tile;
+                  // }
 
                 });
               };
@@ -2617,11 +2617,11 @@ var fileType = require('file-type')
 
 var TileBoundingBoxUtils = require('../tileBoundingBoxUtils');
 
-module.exports.initialize = function(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
+module.exports.initialize = function(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, canvas, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
     new LwipTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback);
   } else {
-    new CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback);
+    new CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, canvas, callback);
   }
 }
 
@@ -2633,6 +2633,7 @@ function TileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, 
   this.projectionTo = projectionTo;
   this.tileBoundingBox = tileBoundingBox;
   this.tileMatrixSet = tileMatrixSet;
+  this.chunks = [];
 
   this.tileHeightUnitsPerPixel = (tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude) / height;
   this.tileWidthUnitsPerPixel = (tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude) / width;
@@ -2641,10 +2642,10 @@ function TileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, 
   this.sameProjection = projectionFrom.oProj.title === projectionTo.oProj.title;
 }
 
-function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, callback) {
+function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, projectionFrom, projectionTo, canvas, callback) {
   TileCreator.apply(this, arguments);
 
-  this.canvas = document.createElement('canvas');
+  this.canvas = canvas || document.createElement('canvas');
   this.canvas.width  = width;
   this.canvas.height = height;
   this.ctx = this.canvas.getContext('2d');
@@ -2661,8 +2662,31 @@ function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundin
 
 util.inherits(CanvasTileCreator, TileCreator);
 
-TileCreator.prototype.projectTile = function(gridColumn, gridRow, callback) {
-  var bb = TileBoundingBoxUtils.getWebMercatorBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
+TileCreator.prototype.projectTile = function(tileData, gridColumn, gridRow, callback) {
+  var bb = TileBoundingBoxUtils.getTileBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
+
+  if (!this.sameProjection) {
+    this.reproject(bb, callback);
+  } else {
+    this.cutAndScale(tileData, bb, callback);
+  }
+}
+
+TileCreator.prototype.cutAndScale = function (tileData, tilePieceBoundingBox, callback) {
+
+  var xOffset = Math.round(TileBoundingBoxUtils.getXPixelOffset(this.width || tileWidth, tilePieceBoundingBox, this.tileBoundingBox.minLongitude));
+  var yOffset = Math.round(TileBoundingBoxUtils.getYPixelOffset(this.height || tileHeight, tilePieceBoundingBox, this.tileBoundingBox.maxLatitude));
+
+  if (xOffset <= -(this.height || tileHeight) || xOffset >= (this.height || tileHeight) || yOffset <= -(this.width || tileWidth) || yOffset >= (this.width || tileWidth)) {
+    // this tile doesn't belong just skip it
+    callback();
+  } else {
+    this.addChunk(tileData, xOffset, yOffset);
+    callback();
+  }
+};
+
+TileCreator.prototype.reproject = function (tilePieceBoundingBox, callback) {
   var y = 0;
   var x = 0;
   var height = this.height;
@@ -2685,8 +2709,8 @@ TileCreator.prototype.projectTile = function(gridColumn, gridRow, callback) {
               var projectedLongitude = projected[0];
               var projectedLatitude = projected[1];
 
-              var xPixel = this.tileMatrix.tileWidth - Math.round((bb.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
-              var yPixel = Math.round((bb.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
+              var xPixel = this.tileMatrix.tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
+              var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
               if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
               && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
                 this.addPixel(x, y, xPixel, yPixel);
@@ -2707,7 +2731,16 @@ TileCreator.prototype.projectTile = function(gridColumn, gridRow, callback) {
       callback();
     }
   );
-}
+};
+
+CanvasTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
+  console.log('chunk', xOffset,yOffset);
+  this.chunks.push({
+    chunk: chunk,
+    x: xOffset,
+    y: yOffset
+  });
+};
 
 CanvasTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, sourceY) {
   var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
@@ -2727,7 +2760,20 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
   var base64Data = btoa( binary );
   this.image.onload = function() {
     this.tileContext.drawImage(this.image, 0, 0);
-    this.projectTile(gridColumn, gridRow, callback);
+    this.projectTile(tileData, gridColumn, gridRow, function() {
+      console.log('chunks', this.chunks.length);
+      async.eachSeries(this.chunks, function(chunk, chunkDone) {
+        var type = fileType(tileData);
+
+        var base64Data = btoa(String.fromCharCode.apply(null, chunk.chunk));
+        var image = document.createElement('img');
+        image.onload = function() {
+          this.ctx.drawImage(image, chunk.x, chunk.y);
+          chunkDone();
+        }.bind(this);
+        image.src = 'data:'+type.mime+';base64,' + base64Data;
+      }.bind(this), callback);
+    }.bind(this));
   }.bind(this);
   this.image.src = 'data:'+type.mime+';base64,' + base64Data;
 };
@@ -2757,15 +2803,32 @@ LwipTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, source
   });
 };
 
+LwipTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
+  this.chunks.push({
+    chunk: chunk,
+    x: xOffset,
+    y: yOffset
+  });
+};
+
 LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
   var type = fileType(tileData);
   this.lwip.open(tileData, type.ext, function(err, tile) {
     this.tile = tile;
-    this.projectTile(gridColumn, gridRow, function() {
+    this.projectTile(tileData, gridColumn, gridRow, function() {
       async.eachSeries(this.pixels, function(pixel, pixelDone) {
         this.image.setPixel(pixel.x, pixel.y, pixel.color, pixelDone);
       }.bind(this), function(err) {
-        callback(err, this.image);
+        async.eachSeries(this.chunks, function(chunk, chunkDone) {
+          var type = fileType(chunk.chunk);
+          this.lwip.open(chunk.chunk, type.ext, function(err, tile) {
+            tile.crop(Math.abs(Math.min(0, chunk.x)), Math.abs(Math.min(0, chunk.y)), Math.min(this.tileMatrix.tileWidth-1, this.tileMatrix.tileWidth - chunk.x), Math.min(this.tileMatrix.tileHeight-1, this.tileMatrix.tileHeight - chunk.y), function(err, tile) {
+              this.image.paste(Math.max(0, chunk.x), Math.max(0, chunk.y), tile, chunkDone);
+            }.bind(this));
+          }.bind(this));
+        }.bind(this), function(err) {
+          callback(err, this.image);
+        });
       }.bind(this));
     }.bind(this));
   }.bind(this));
@@ -3251,6 +3314,11 @@ GeoPackageTileRetriever.prototype.getTile = function (x, y, zoom, callback) {
   this.getTileWithBounds(webMercatorBoundingBox, zoom, proj4('EPSG:3857'), callback);
 };
 
+GeoPackageTileRetriever.prototype.drawTileIn = function (x, y, zoom, canvas, callback) {
+  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+  this.getTileWithBounds(webMercatorBoundingBox, zoom, proj4('EPSG:3857'), canvas, callback);
+};
+
 GeoPackageTileRetriever.prototype.getTileWithWgs84Bounds = function (wgs84BoundingBox, zoom, callback) {
   var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
   this.getTileWithBounds(webMercatorBoundingBox, zoom, proj4('EPSG:3857'), callback);
@@ -3266,7 +3334,11 @@ GeoPackageTileRetriever.prototype.getWebMercatorTile = function (x, y, zoom, cal
   this.getTileWithBounds(webMercatorBoundingBox, zoom, proj4('EPSG:3857'), callback);
 };
 
-GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBox, zoom, targetProjection, callback) {
+GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBox, zoom, targetProjection, canvas, callback) {
+  if (!callback) {
+    callback = canvas;
+    canvas = undefined;
+  }
   var tiles = [];
   var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
 
@@ -3280,7 +3352,7 @@ GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBo
 
   var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixTotalBoundingBox, tileMatrix.matrixWidth, tileMatrix.matrixHeight, targetBoundingBoxInMatrixSetProjection);
 
-  TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.projection, targetProjection, function(err, creator) {
+  TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.projection, targetProjection, canvas, function(err, creator) {
     this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix, function(err, tile) {
 
       // get the bounding box of the tile in the target projection
@@ -3299,7 +3371,9 @@ GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBo
       async.eachSeries(tiles, function(tile, callback) {
         creator.addTile(tile.data, tile.gridColumn, tile.gridRow, callback);
       }, function(err) {
-        creator.getCompleteTile('png', callback);
+        if (!canvas) {
+          creator.getCompleteTile('png', callback);
+        }
       }.bind(this));
     }.bind(this));
   }.bind(this));
@@ -4116,15 +4190,15 @@ util.inherits(TileDao, UserDao);
 TileDao.prototype.initialize = function(callback) {
   var tileMatrixSetDao = this.getTileMatrixSetDao();
   tileMatrixSetDao.getSrs(this.tileMatrixSet, function(err, srs) {
-    if (srs.definition && srs.definition !== 'undefined') {
-      try {
-        this.projection = proj4(srs.definition);
-      } catch (e) {
-        this.projection = proj4(srs.organization + ':' + srs.organizationCoordsysId);
-      }
-    } else {
+    // if (srs.definition && srs.definition !== 'undefined') {
+    //   try {
+    //     this.projection = proj4(srs.definition);
+    //   } catch (e) {
+    //     this.projection = proj4(srs.organization + ':' + srs.organizationCoordsysId);
+    //   }
+    // } else {
       this.projection = proj4(srs.organization + ':' + srs.organizationCoordsysId);
-    }
+    // }
 
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
     for (var i = this.tileMatrices.length-1; i >= 0; i--) {

@@ -40,17 +40,17 @@ var GeoPackage = require('./lib/geopackage')
               var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
               var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
               tableLayer.drawTile = function(canvas, tilePoint, zoom) {
-                gpr.getTile(tilePoint.x, tilePoint.y, zoom, function(err, tile) {
+                gpr.drawTileIn(tilePoint.x, tilePoint.y, zoom, canvas, function(err, tile) {
                   console.log('tile', tile);
-                  if (tile) {
-                    var ctx = canvas.getContext('2d');
-
-                    var image = document.createElement('img');
-                    image.onload = function() {
-                      ctx.drawImage(image, 0, 0);
-                    };
-                    image.src = tile;
-                  }
+                  // if (tile) {
+                  //   var ctx = canvas.getContext('2d');
+                  //
+                  //   var image = document.createElement('img');
+                  //   image.onload = function() {
+                  //     ctx.drawImage(image, 0, 0);
+                  //   };
+                  //   image.src = tile;
+                  // }
 
                 });
               };
