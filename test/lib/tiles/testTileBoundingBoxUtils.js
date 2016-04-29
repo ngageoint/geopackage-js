@@ -9,7 +9,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var longitude = 10018754.17139462;
 
 
-    var maxColumn = TileBoundingBoxUtils.getTileColumnWithWebMercatorTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
+    var maxColumn = TileBoundingBoxUtils.getTileColumnWithTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
     maxColumn.should.be.equal(2);
     done();
   });
@@ -20,7 +20,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var longitude = 10018755.17139462;
 
 
-    var maxColumn = TileBoundingBoxUtils.getTileColumnWithWebMercatorTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
+    var maxColumn = TileBoundingBoxUtils.getTileColumnWithTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
     maxColumn.should.be.equal(3);
     done();
   });
@@ -31,7 +31,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018754.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getTileRowWithWebMercatorTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getTileRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
     minRow.should.be.equal(1);
     done();
   });
@@ -42,7 +42,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018755.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getTileRowWithWebMercatorTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getTileRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
     minRow.should.be.equal(0);
     done();
   });
