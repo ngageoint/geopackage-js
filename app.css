@@ -5,7 +5,7 @@ body {
 
 .map {
   position: absolute;
-  top: 45px;
+  top: 65px;
   bottom: 0px;
   left: 0px;
   right: 33vw;
@@ -16,13 +16,13 @@ body {
   top: 0px;
   left: 0px;
   right: 0px;
-  height: 45px;
+  height: 65px;
   padding: 7px;
 }
 
 .information {
   position: absolute;
-  top: 45px;
+  top: 65px;
   right: 0px;
   bottom: 0px;
   width: 33vw;
