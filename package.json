@@ -24,6 +24,7 @@
     "bufferstream": "^0.6.2",
     "file-type": "^3.8.0",
     "java": "^0.6.0",
+    "jquery": "^2.2.3",
     "leaflet": "^0.7.7",
     "lwip": "0.0.8",
     "node-java-maven": "0.0.11",
@@ -52,6 +53,7 @@
   "main": "geopackage.js",
   "devDependencies": {
     "browserify": "^13.0.0",
+    "browserify-css": "^0.9.1",
     "browserify-istanbul": "^2.0.0",
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
@@ -93,8 +95,8 @@
     "btest": "karma start",
     "predoc": "rm -rf docs/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
-    "build": "browserify index.js --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js",
+    "build": "browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js",
     "postbuild": "uglifyjs --stats static/geopackage.js --output static/geopackage.min.js",
-    "watch": "watchify index.js -v --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js"
+    "watch": "watchify -t browserify-css index.js -v --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js"
   }
 }
