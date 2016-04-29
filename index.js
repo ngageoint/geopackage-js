@@ -19,8 +19,12 @@ var GeoPackage = require('./lib/geopackage')
     maxBounds: [
       [-85, -180],
       [85, 180]
-    ]
+    ],
+    attributionControl: false
   });
+
+  var credits = L.control.attribution().addTo(map);
+  credits.addAttribution("&copy; <a href='https://www.mapbox.com/map-feedback/'>Mapbox</a> &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>");
 
   var baseLayer = L.tileLayer('http://mapbox.geointapps.org:2999/v4/mapbox.light/{z}/{x}/{y}.png');
   baseLayer.addTo(map);
