@@ -9,18 +9,19 @@
 
   <div class="top-bar">
     <div>
-      <span>This opens the GeoPackage in the browser with no server side component.  Be aware that large GeoPackages may not work at this time.</span>
-      <span>Sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
-    </div>
-    <div>
       <input type="file" name="file" id="file" class="inputfile" onchange="geopackage.loadGeoPackage(this.files)"/>
       <label id="choose-label" for="file">Choose a GeoPackage file to open</label>
-      <span>Please excuse the crude styling of the page, this page is still under construction.</span>
     </div>
   </div>
 
   <div id="map" class="map"></div>
 
+  <div class="side-bar">
+    <div>
+      <span>This opens the GeoPackage in the browser with no server side component.  Be aware that large GeoPackages may not work at this time.</span>
+      <span>Sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
+      <span>Please excuse the crude styling of the page, this page is still under construction.</span>
+    </div>
   <div id="information" class="information hidden">
     <div id="title" class="title"></div>
     <div class="tableGroup">Tile Tables</div>
@@ -28,6 +29,7 @@
     <div class="tableGroup">Feature Tables</div>
     <div id="feature-tables"></div>
   </div>
+</div>
 
   <script type="text/javascript" src="static/geopackage.js"></script>
 </body>
