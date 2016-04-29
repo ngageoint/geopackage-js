@@ -82,14 +82,16 @@ var GeoPackage = require('./lib/geopackage')
                       features++;
                       var currentRow = featureDao.getFeatureRow(row);
                       var geometry = currentRow.getGeometry();
-                      var geom = geometry.geometry;
-                      var geoJson = geometry.geometry.toGeoJSON();
-                      if (srs.definition && srs.definition !== 'undefined') {
-                        geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                      if (geometry ) {
+                        var geom = geometry.geometry;
+                        var geoJson = geometry.geometry.toGeoJSON();
+                        if (srs.definition && srs.definition !== 'undefined') {
+                          geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                        }
+                        // console.log('geoJson', geoJson);
+                        geojsonLayer.addData(geoJson);
+                        countNode.text(features);
                       }
-                      // console.log('geoJson', geoJson);
-                      geojsonLayer.addData(geoJson);
-                      countNode.text(features);
                       rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
