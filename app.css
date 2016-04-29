@@ -5,7 +5,7 @@ body {
 
 .map {
   position: absolute;
-  top: 65px;
+  top: 45px;
   bottom: 0px;
   left: 0px;
   right: 33vw;
@@ -16,13 +16,14 @@ body {
   top: 0px;
   left: 0px;
   right: 0px;
-  height: 65px;
+  height: 45px;
   padding: 7px;
+  font-size: 14px;
 }
 
-.information {
+.side-bar {
   position: absolute;
-  top: 65px;
+  top: 45px;
   right: 0px;
   bottom: 0px;
   width: 33vw;
