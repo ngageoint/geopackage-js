@@ -2,18 +2,25 @@
 <html>
 <head>
   <title>geopackage</title>
-
-  <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" type="text/css" href="app.css"/>
 </head>
 
 <body>
 
-  <div>hi</div>
-  <div class="file-chooser">
-    <input type="file" onchange="geopackage.loadGeoPackage(this.files)">
+  <div class="top-bar">
+    <input type="file" name="file" id="file" class="inputfile" onchange="geopackage.loadGeoPackage(this.files)"/>
+    <label id="choose-label" for="file">Choose a GeoPackage file to open</label>
   </div>
 
-  <div id="map" style="position: absolute; top: 50px; bottom: 0px; left: 0px; right: 0px;"></div>
+  <div id="map" class="map"></div>
+
+  <div id="information" class="information hidden">
+    <div id="title" class="title"></div>
+    <div class="tableGroup">Tile Tables</div>
+    <div id="tile-tables"></div>
+    <div class="tableGroup">Feature Tables</div>
+    <div id="feature-tables"></div>
+  </div>
 
   <script type="text/javascript" src="static/geopackage.js"></script>
 </body>

@@ -51,7 +51,7 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
   });
 
-  it.only('should pull all of the tiles and compare them', function(done) {
+  it('should pull all of the tiles and compare them', function(done) {
     this.timeout(30000);
     var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
 
@@ -139,30 +139,30 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
   });
 
-  it('should get the tile matrix for 1 tile and no zoom specified', function(done) {
-    var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-    var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
-    var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-
-    gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, function(err, tileMatrix) {
-      should.not.exist(err);
-      should.exist(tileMatrix);
-      tileMatrix.zoomLevel.should.be.equal(2);
-      done();
-    });
-  });
-
-  it('should get the tile matrix for 1 tile and zoom specified', function(done) {
-    var gpr = new GeoPackageTileRetriever(tileDao, 512, 512);
-    var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
-    var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-
-    gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, 3, function(err, tileMatrix) {
-      should.not.exist(err);
-      should.exist(tileMatrix);
-      tileMatrix.zoomLevel.should.be.equal(3);
-      done();
-    });
-  });
+  // it('should get the tile matrix for 1 tile and no zoom specified', function(done) {
+  //   var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+  //   var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
+  //   var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
+  //
+  //   gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, function(err, tileMatrix) {
+  //     should.not.exist(err);
+  //     should.exist(tileMatrix);
+  //     tileMatrix.zoomLevel.should.be.equal(2);
+  //     done();
+  //   });
+  // });
+  //
+  // it('should get the tile matrix for 1 tile and zoom specified', function(done) {
+  //   var gpr = new GeoPackageTileRetriever(tileDao, 512, 512);
+  //   var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
+  //   var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
+  //
+  //   gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, 3, function(err, tileMatrix) {
+  //     should.not.exist(err);
+  //     should.exist(tileMatrix);
+  //     tileMatrix.zoomLevel.should.be.equal(3);
+  //     done();
+  //   });
+  // });
 
 });

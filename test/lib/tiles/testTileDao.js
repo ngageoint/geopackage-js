@@ -149,7 +149,7 @@ describe('TileDao tests', function() {
     });
   });
 
-  describe('Alaska GeoPackage tests', function() {
+  describe.skip('Alaska GeoPackage tests', function() {
 
     var geoPackage;
     var tileDao;

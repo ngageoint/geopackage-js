@@ -1,3 +1,5 @@
+var css = require('./includes.css');
+
 var GeoPackage = require('./lib/geopackage')
   , GeoPackageManager = require('./lib/geoPackageManager')
   , GeoPackageConnection = require('./lib/db/GeoPackageConnection')
@@ -6,13 +8,18 @@ var GeoPackage = require('./lib/geopackage')
   , SQL = require('sql.js')
   , reproject = require('reproject')
   , L = require('leaflet')
+  , $ = require('jquery')
   , fileType = require('file-type');
 
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
   var map = L.map('map', {
     center: [45,0],
-    zoom: 0,
-    worldCopyJump: true
+    zoom: 3,
+    worldCopyJump: false,
+    maxBounds: [
+      [-85, -180],
+      [85, 180]
+    ]
   });
 
   var baseLayer = L.tileLayer('http://mapbox.geointapps.org:2999/v4/mapbox.light/{z}/{x}/{y}.png');
@@ -21,8 +28,15 @@ var GeoPackage = require('./lib/geopackage')
   var geojsonLayer = L.geoJson();
 
   module.exports.loadGeoPackage = function(files) {
-    console.log('files', files);
     var f = files[0];
+    $('#choose-label').text(f.name);
+    $('#title').text(f.name);
+
+    var tileTableNode = $('#tile-tables');
+    var featureTableNode = $('#feature-tables');
+    $('#information').removeClass('hidden').addClass('visible');
+
+
     var r = new FileReader();
     r.onload = function() {
       var Uints = new Uint8Array(r.result);
@@ -30,37 +44,34 @@ var GeoPackage = require('./lib/geopackage')
       GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
         var geoPackage = new GeoPackage('', '', connection);
 
-        geoPackage.getTileTables(function(err, tables) {
-          async.eachSeries(tables, function(table, callback) {
-            geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+        async.parallel([
+          function(callback) {
+            geoPackage.getTileTables(function(err, tables) {
+              async.eachSeries(tables, function(table, callback) {
+                tileTableNode.append('<div id="tile-'+table+'">' + table + ' zoom: (<span class="zoom"></span>)</div>');
+                var zoomNode = $('#tile-' + table + ' .zoom');
+                geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
-              var maxZoom = tileDao.maxZoom;
-              var minZoom = tileDao.minZoom;
+                  var maxZoom = tileDao.maxZoom;
+                  var minZoom = tileDao.minZoom;
+                  zoomNode.text(minZoom + ' - ' + maxZoom);
 
-              var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-              var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
-              tableLayer.drawTile = function(canvas, tilePoint, zoom) {
-                gpr.drawTileIn(tilePoint.x, tilePoint.y, zoom, canvas, function(err, tile) {
-                  console.log('tile', tile);
-                  // if (tile) {
-                  //   var ctx = canvas.getContext('2d');
-                  //
-                  //   var image = document.createElement('img');
-                  //   image.onload = function() {
-                  //     ctx.drawImage(image, 0, 0);
-                  //   };
-                  //   image.src = tile;
-                  // }
-
+                  var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+                  var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
+                  tableLayer.drawTile = function(canvas, tilePoint, zoom) {
+                    gpr.drawTileIn(tilePoint.x, tilePoint.y, zoom, canvas, function(err, tile) {
+                    });
+                  };
+                  tableLayer.addTo(map);
+                  callback();
                 });
-              };
-              tableLayer.addTo(map);
-              callback();
+              }, callback);
             });
-          }, function() {
+          }, function(callback) {
             geoPackage.getFeatureTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                console.log('table', table);
+                featureTableNode.append('<div id="tile-'+table+'">' + table + ' (<span class="count"></span>)</div>');
+                var countNode = $('#tile-' + table + ' .count');
                 geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
                   if (err) {
                     return callback();
@@ -71,13 +82,16 @@ var GeoPackage = require('./lib/geopackage')
                       features++;
                       var currentRow = featureDao.getFeatureRow(row);
                       var geometry = currentRow.getGeometry();
-                      var geom = geometry.geometry;
-                      var geoJson = geometry.geometry.toGeoJSON();
-                      if (srs.definition && srs.definition !== 'undefined') {
-                        geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                      if (geometry ) {
+                        var geom = geometry.geometry;
+                        var geoJson = geometry.geometry.toGeoJSON();
+                        if (srs.definition && srs.definition !== 'undefined') {
+                          geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                        }
+                        // console.log('geoJson', geoJson);
+                        geojsonLayer.addData(geoJson);
+                        countNode.text(features);
                       }
-                      // console.log('geoJson', geoJson);
-                      geojsonLayer.addData(geoJson);
                       rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
@@ -88,10 +102,11 @@ var GeoPackage = require('./lib/geopackage')
               }, function() {
                 geojsonLayer.addTo(map);
                 geojsonLayer.bringToFront();
+                callback();
               });
             });
-          });
-        });
+          }
+        ]);
       });
     }
     r.readAsArrayBuffer(f);

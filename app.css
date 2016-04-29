@@ -1,0 +1,64 @@
+body {
+  background-color: light-gray;
+  font-family: Helvetica;
+}
+
+.map {
+  position: absolute;
+  top: 45px;
+  bottom: 0px;
+  left: 0px;
+  right: 33vw;
+}
+
+.top-bar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 45px;
+  padding: 7px;
+}
+
+.information {
+  position: absolute;
+  top: 45px;
+  right: 0px;
+  bottom: 0px;
+  width: 33vw;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.inputfile + label {
+  font-weight: 700;
+  color: #333;
+  background-color: #DDD;
+  padding: 7px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+    background-color: #CCC;
+}
+
+.inputfile + label {
+  cursor: pointer; /* "hand" cursor */
+}
