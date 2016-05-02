@@ -125,4 +125,16 @@ describe('GeoPackage tests', function() {
     });
   });
 
+  it.only('should get the info for the table', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getTileDaoWithTableName('TILESosmds', function(err, dao) {
+        geoPackage.getInfoForTable(dao, function(err, info) {
+          console.log('info', info);
+          done(err);
+        });
+      });
+    });
+  });
+
 });

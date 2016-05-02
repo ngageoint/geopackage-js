@@ -47,6 +47,9 @@ var GeoPackage = require('./lib/geopackage')
     var featureTableTemplate = $('#feature-table-template').html();
     Mustache.parse(featureTableTemplate);
 
+    var tileTableTemplate = $('#tile-table-template').html();
+    Mustache.parse(tileTableTemplate);
+
 
     var r = new FileReader();
     r.onload = function() {
@@ -59,13 +62,10 @@ var GeoPackage = require('./lib/geopackage')
           function(callback) {
             geoPackage.getTileTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                tileTableNode.append('<div id="tile-'+table+'">' + table + ' zoom: (<span class="zoom"></span>)</div>');
-                var zoomNode = $('#tile-' + table + ' .zoom');
                 geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
                   var maxZoom = tileDao.maxZoom;
                   var minZoom = tileDao.minZoom;
-                  zoomNode.text(minZoom + ' - ' + maxZoom);
 
                   var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
                   var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
@@ -74,15 +74,17 @@ var GeoPackage = require('./lib/geopackage')
                     });
                   };
                   tableLayer.addTo(map);
-                  callback();
+                  geoPackage.getInfoForTable(tileDao, function(err, info) {
+                    var rendered = Mustache.render(tileTableTemplate, info);
+                    tileTableNode.append(rendered);
+                    callback();
+                  });
                 });
               }, callback);
             });
           }, function(callback) {
             geoPackage.getFeatureTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                // featureTableNode.append('<div id="feature-'+table+'">' + table + ' (<span class="count"></span>)</div>');
-                // var countNode = $('#feature-' + table + ' .count');
                 geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
                   if (err) {
                     return callback();
@@ -97,18 +99,18 @@ var GeoPackage = require('./lib/geopackage')
                         var geom = geometry.geometry;
                         var geoJson = geometry.geometry.toGeoJSON();
                         if (srs.definition && srs.definition !== 'undefined') {
-                          geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                          geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
                         }
-                        // console.log('geoJson', geoJson);
                         geojsonLayer.addData(geoJson);
-                        // countNode.text(features);
                       }
                       rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
-                      var rendered = Mustache.render(featureTableTemplate, {name: table, count: features});
-                      featureTableNode.append(rendered);
-                      callback();
+                      geoPackage.getInfoForTable(featureDao, function(err, info) {
+                        var rendered = Mustache.render(featureTableTemplate, info);
+                        featureTableNode.append(rendered);
+                        callback();
+                      });
                     });
                   });
                 });
@@ -1122,6 +1124,10 @@ GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, wher
   });
 };
 
+GeoPackageConnection.prototype.count = function(table, callback) {
+  this.adapter.count(table, callback);
+};
+
 module.exports = GeoPackageConnection;
 
 GeoPackageConnection.connect = function(filePath, callback) {
@@ -1395,6 +1401,12 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   this.db.each(sql, params, rowCallback, doneCallback);
 };
 
+Adapter.prototype.count = function (tableName, callback) {
+  this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
+    callback(err, result.count);
+  });
+};
+
 },{"async":45,"sqlite3":undefined}],12:[function(require,module,exports){
 /**
  * SQLite query builder module.
@@ -1531,8 +1543,12 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
       doneCallback();
     }
   );
+};
 
-
+Adapter.prototype.count = function (tableName, callback) {
+  this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
+    callback(err, result.count);
+  });
 };
 
 },{"async":45,"fs":47,"sql.js":344}],14:[function(require,module,exports){
@@ -1883,6 +1899,7 @@ module.exports = FeatureColumn;
 
 var UserDao = require('../../user/UserDao')
   , GeometryColumnsDao = require('../columns').GeometryColumnsDao
+  , ContentsDao = require('../../core/contents').ContentsDao
   , FeatureRow = require('./featureRow');
 
 var util = require('util');
@@ -1993,7 +2010,7 @@ FeatureDao.prototype.getContentsDao = function () {
 
 FeatureDao.prototype.getSrs = function(callback) {
   this.getGeometryColumnsDao().getSrs(this.geometryColumns, callback);
-}
+};
 
 FeatureDao.prototype.getBoundingBox = function () {
   return undefined;
@@ -2014,7 +2031,7 @@ FeatureDao.prototype.getBoundingBox = function () {
 
 module.exports = FeatureDao;
 
-},{"../../user/UserDao":37,"../columns":14,"./featureRow":17,"util":267}],17:[function(require,module,exports){
+},{"../../core/contents":4,"../../user/UserDao":37,"../columns":14,"./featureRow":17,"util":267}],17:[function(require,module,exports){
 /**
  * featureRow module.
  * @module features/user/featureRow
@@ -2120,6 +2137,10 @@ util.inherits(FeatureTable, UserTable);
 FeatureTable.prototype.getGeometryColumn = function () {
   return this.getColumnWithIndex(this.geometryIndex);
 };
+
+FeatureTable.prototype.getTableType = function() {
+  return UserTable.FEATURE_TABLE;
+}
 
 /**
  * The FeatureTable
@@ -2242,7 +2263,8 @@ var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
   , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
   , TileMatrix = require('./tiles/matrix').TileMatrix
   , TileTableReader = require('./tiles/user/tileTableReader')
-  , TileDao = require('./tiles/user/tileDao');
+  , TileDao = require('./tiles/user/tileDao')
+  , UserTable = require('./user/userTable');
 
 var async = require('async');
 
@@ -2426,20 +2448,91 @@ GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback)
     }
     self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
   });
-/**
- * GPKGGeometryColumnsDao * dao = [self getGeometryColumnsDao];
-    GPKGGeometryColumns * geometryColumns = [dao queryForTableName:tableName];
-    if(geometryColumns == nil){
-        [NSException raise:@"No Feature Table" format:@"No Feature Table exists for table name: %@", tableName];
-    }
-    return [self getFeatureDaoWithGeometryColumns:geometryColumns];
- */
+};
 
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      info.tableName = tableDao.tableName;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.tableName;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.columnName;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometryTypeName;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.tableName;
+        info.contents.dataType = contents.dataType;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.theDescription;
+        info.contents.lastChange = contents.lastChange;
+        info.contents.minX = contents.minX;
+        info.contents.maxX = contents.maxX;
+        info.contents.minY = contents.minY;
+        info.contents.maxY = contents.maxY;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, srs){
+          info.srs = {
+            name:srs.srsName,
+            id:srs.srsId,
+            organization:srs.organization,
+            organizationCoordsysId:srs.organizationCoordsysId,
+            definition:srs.definition,
+            description:srs.theDescription
+          };
+          callback(null, info);
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      for (var i = 0; i < tableDao.table.columns.length; i++) {
+        var column = tableDao.table.columns[i];
+        info.columns.push({
+          index: column.index,
+          name: column.name,
+          max: column.max,
+          min: column.min,
+          notNull: column.notNull,
+          primaryKey: column.primaryKey
+        });
+      }
+      callback(null, info);
+    }
+  ], callback);
 };
 
 module.exports = GeoPackage;
 
-},{"./core/contents":4,"./core/srs":5,"./features/columns":14,"./features/user/featureDao":16,"./features/user/featureTableReader":19,"./tiles/matrix":26,"./tiles/matrixset":27,"./tiles/user/tileDao":32,"./tiles/user/tileTableReader":36,"async":45}],21:[function(require,module,exports){
+},{"./core/contents":4,"./core/srs":5,"./features/columns":14,"./features/user/featureDao":16,"./features/user/featureTableReader":19,"./tiles/matrix":26,"./tiles/matrixset":27,"./tiles/user/tileDao":32,"./tiles/user/tileTableReader":36,"./user/userTable":42,"async":45}],21:[function(require,module,exports){
 /**
  * GeoPackage Constants module.
  * @module dao/geoPackageConstants
@@ -2636,8 +2729,444 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 
 }).call(this,require("buffer").Buffer)
 },{"../geoPackageConstants":21,"buffer":49,"wkx":357}],24:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"./core/contents":4,"./core/srs":5,"./features/columns":14,"./features/user/featureDao":16,"./features/user/featureTableReader":19,"./tiles/matrix":26,"./tiles/matrixset":27,"./tiles/user/tileDao":32,"./tiles/user/tileTableReader":36,"async":45,"dup":20}],25:[function(require,module,exports){
+/**
+ * GeoPackage module.
+ * @module geoPackage
+ */
+
+var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
+  , GeometryColumnsDao = require('./features/columns').GeometryColumnsDao
+  , FeatureDao = require('./features/user/featureDao')
+  , FeatureTableReader = require('./features/user/featureTableReader')
+  , ContentsDao = require('./core/contents').ContentsDao
+  , TileMatrixSetDao = require('./tiles/matrixset').TileMatrixSetDao
+  , TileMatrixSet = require('./tiles/matrixset').TileMatrixSet
+  , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
+  , TileMatrix = require('./tiles/matrix').TileMatrix
+  , TileTableReader = require('./tiles/user/tileTableReader')
+  , TileDao = require('./tiles/user/tileDao')
+  , UserTable = require('./user/userTable');
+
+var async = require('async');
+
+/**
+ * GeoPackage database
+ * @class GeoPackage
+ */
+var GeoPackage = function(name, path, connection) {
+  this.name = name;
+  this.path = path;
+  this.connection = connection;
+}
+
+GeoPackage.prototype.getDatabase = function() {
+  return this.connection;
+}
+
+GeoPackage.prototype.getPath = function() {
+  return this.path;
+}
+
+/**
+ * Get the GeoPackage name
+ * @return {String} the GeoPackage name
+ */
+GeoPackage.prototype.getName = function() {
+  return this.name;
+}
+
+GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
+  return new SpatialReferenceSystemDao(this.connection);
+}
+
+GeoPackage.prototype.getContentsDao = function() {
+  return new ContentsDao(this.connection);
+}
+
+GeoPackage.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+
+GeoPackage.prototype.getTileMatrixDao = function() {
+  return new TileMatrixDao(this.connection);
+}
+
+GeoPackage.prototype.createDao = function () {
+
+};
+
+GeoPackage.prototype.getSrs = function(srsId) {
+
+}
+
+GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
+  var tileMatrices = [];
+  var tileMatrixDao = this.getTileMatrixDao();
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.tableName, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+    async.eachSeries(results, function(result, callback) {
+      var tm = new TileMatrix();
+      tileMatrixDao.populateObjectFromResult(tm, result);
+      tileMatrices.push(tm);
+      callback();
+    }, function(err) {
+      var tableReader = new TileTableReader(tileMatrixSet);
+      tableReader.readTileTable(this.connection, function(err, tileTable) {
+        new TileDao(this.connection, tileTable, tileMatrixSet, tileMatrices, function(err, tileDao){
+          callback(err, tileDao);
+        });
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithContents = function (contents, callback) {
+
+};
+
+GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
+    if (results.length > 1) {
+      return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));
+    }
+    var tileMatrixSet = new TileMatrixSet();
+    tms.populateObjectFromResult(tileMatrixSet, results[0]);
+    this.getTileDaoWithTileMatrixSet(tileMatrixSet, callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileTables = function (callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    tms.getTileTables(callback);
+  });
+};
+
+/**
+ *  Get the feature tables
+ *  @param {callback} callback called with an error if one occurred and the array of {FeatureTable} names
+ */
+GeoPackage.prototype.getFeatureTables = function (callback) {
+  var gcd = this.getGeometryColumnsDao();
+  gcd.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    gcd.getFeatureTables(callback);
+  });
+};
+
+GeoPackage.prototype.getGeometryColumnsDao = function () {
+  return new GeometryColumnsDao(this.connection);
+};
+
+/**
+ *  Get a Feature DAO from Geometry Columns
+ *
+ *  @param {GeometryColumns} geometryColumns Geometry Columns
+ *  @param {callback} callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns = function (geometryColumns, callback) {
+  if (!geometryColumns) {
+    return callback(new Error('Non null Geometry Columns is required to create Feature DAO'));
+  }
+
+  var tableReader = new FeatureTableReader(geometryColumns);
+  var featureTable = tableReader.readFeatureTable(this.connection, function(err, featureTable) {
+    if (err) {
+      return callback(err);
+    }
+    var dao = new FeatureDao(this.connection, featureTable, geometryColumns, this.metadataDb);
+
+    // TODO
+    // [self dropSQLiteTriggers:geometryColumns]
+
+    callback(null, dao);
+  }.bind(this));
+
+  /*
+  if(geometryColumns == nil){
+      [NSException raise:@"Illegal Argument" format:@"Non null Geometry Columns is required to create Feature DAO"];
+  }
+
+  // Read the existing table and create the dao
+  GPKGFeatureTableReader * tableReader = [[GPKGFeatureTableReader alloc] initWithGeometryColumns:geometryColumns];
+  GPKGFeatureTable * featureTable = [tableReader readFeatureTableWithConnection:self.database];
+  GPKGFeatureDao * dao = [[GPKGFeatureDao alloc] initWithDatabase:self.database andTable:featureTable andGeometryColumns:geometryColumns andMetadataDb:self.metadataDb];
+
+  // TODO
+  // GeoPackages created with SQLite version 4.2.0+ with GeoPackage
+  // support are not fully supported in previous sqlite versions
+  [self dropSQLiteTriggers:geometryColumns];
+
+  return dao;
+  */
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {Contents}   contents Contents
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithContents = function (contents, callback) {
+
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {string}   tableName table name
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback) {
+  var self = this;
+  var dao = this.getGeometryColumnsDao();
+  var geometryColumns = dao.queryForTableName(tableName, function(err, geometryColumns) {
+    if (!geometryColumns) {
+      return callback(new Error('No Feature Table exists for table name: ' + tableName));
+    }
+    self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
+  });
+};
+
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      console.log('tableDao', tableDao);
+      info.tableName = tableDao.tableName;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.tableName;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.columnName;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometryTypeName;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.tableName;
+        info.contents.dataType = contents.dataType;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.theDescription;
+        info.contents.lastChange = contents.lastChange;
+        info.contents.minX = contents.minX;
+        info.contents.maxX = contents.maxX;
+        info.contents.minY = contents.minY;
+        info.contents.maxY = contents.maxY;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, srs){
+          info.srs = {
+            name:srs.srsName,
+            id:srs.srsId,
+            organization:srs.organization,
+            organizationCoordsysId:srs.organizationCoordsysId,
+            definition:srs.definition,
+            description:srs.theDescription
+          };
+          callback(null, info);
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      for (var i = 0; i < tableDao.table.columns.length; i++) {
+        var column = tableDao.table.columns[i];
+        info.columns.push({
+          index: column.index,
+          name: column.name,
+          max: column.max,
+          min: column.min,
+          notNull: column.notNull,
+          primaryKey: column.primaryKey
+        });
+      }
+      callback(null, info);
+    }
+  ], callback);
+
+/*
+switch(tableDao.table.getTableType()) {
+  case UserTable.FEATURE_TABLE:
+    info.tableType = UserT
+    break;
+  case UserTable.TILE_TABLE:
+
+    break;
+}
+ */
+
+//   -(NSString *) buildTextForTable: (GPKGSTable *) table{
+//     NSMutableString * info = [[NSMutableString alloc] init];
+//     GPKGGeoPackage * geoPackage = [self.manager open:table.database];
+//     @try {
+//         NSString * tableName = table.name;
+//         GPKGContents * contents = nil;
+//         GPKGFeatureDao * featureDao = nil;
+//         GPKGTileDao * tileDao = nil;
+//         GPKGUserTable * userTable = nil;
+//
+//         switch([table getType]){
+//             case GPKGS_TT_FEATURE_OVERLAY:
+//                 tableName = ((GPKGSFeatureOverlayTable *) table).featureTable;
+//             case GPKGS_TT_FEATURE:
+//             {
+//                 featureDao = [geoPackage getFeatureDaoWithTableName:tableName];
+//                 GPKGGeometryColumnsDao * geometryColumnsDao = [geoPackage getGeometryColumnsDao];
+//                 contents = [geometryColumnsDao getContents:featureDao.geometryColumns];
+//                 [info appendString:@"Feature Table"];
+//                 [info appendFormat:@"\nFeatures: %d", [featureDao count]];
+//                 userTable = featureDao.table;
+//             }
+//                 break;
+//             case GPKGS_TT_TILE:
+//             {
+//                 tileDao = [geoPackage getTileDaoWithTableName:tableName];
+//                 GPKGTileMatrixSetDao * tileMatrixSetDao = [geoPackage getTileMatrixSetDao];
+//                 contents = [tileMatrixSetDao getContents:tileDao.tileMatrixSet];
+//                 [info appendString:@"Tile Table"];
+//                 [info appendFormat:@"\nZoom Levels: %lu", (unsigned long)[tileDao.tileMatrices count]];
+//                 [info appendFormat:@"\nTiles: %d", [tileDao count]];
+//                 userTable = tileDao.table;
+//             }
+//                 break;
+//             default:
+//                 [NSException raise:@"Unsupported" format:@"Unsupported table type: %d", [table getType]];
+//         }
+//
+//         GPKGContentsDao * contentsDao = [geoPackage getContentsDao];
+//         GPKGSpatialReferenceSystem * srs = [contentsDao getSrs:contents];
+//
+//         [info appendString:@"\n\nSpatial Reference System:"];
+//         [self addSrsToInfoString:info withSrs:srs];
+//
+//         [info appendString:@"\n\nContents:"];
+//         [info appendFormat:@"\nTable Name: %@", contents.tableName];
+//         [info appendFormat:@"\nData Type: %@", contents.dataType];
+//         [info appendFormat:@"\nIdentifier: %@", contents.identifier];
+//         [info appendFormat:@"\nDescription: %@", contents.theDescription];
+//         [info appendFormat:@"\nLast Change: %@", contents.lastChange];
+//         [info appendFormat:@"\nMin X: %@", contents.minX];
+//         [info appendFormat:@"\nMin Y: %@", contents.minY];
+//         [info appendFormat:@"\nMax X: %@", contents.maxX];
+//         [info appendFormat:@"\nMax Y: %@", contents.maxY];
+//
+//         if(featureDao != nil){
+//             GPKGGeometryColumns * geometryColumns = featureDao.geometryColumns;
+//             [info appendString:@"\n\nGeometry Columns:"];
+//             [info appendFormat:@"\nTable Name: %@", geometryColumns.tableName];
+//             [info appendFormat:@"\nColumn Name: %@", geometryColumns.columnName];
+//             [info appendFormat:@"\nGeometry Type Name: %@", geometryColumns.geometryTypeName];
+//             [info appendFormat:@"\nZ: %@", geometryColumns.z];
+//             [info appendFormat:@"\nM: %@", geometryColumns.m];
+//         }
+//
+//         if(tileDao != nil){
+//             GPKGTileMatrixSet * tileMatrixSet = tileDao.tileMatrixSet;
+//
+//             GPKGTileMatrixSetDao * tileMatrixSetDao = [geoPackage getTileMatrixSetDao];
+//             GPKGSpatialReferenceSystem * tileMatrixSetSrs = [tileMatrixSetDao getSrs:tileMatrixSet];
+//             if(![tileMatrixSetSrs.srsId isEqualToNumber:srs.srsId]){
+//                 [info appendString:@"\n\nTile Matrix Set Spatial Reference System:"];
+//                 [self addSrsToInfoString:info withSrs:tileMatrixSetSrs];
+//             }
+//
+//             [info appendString:@"\n\nTile Matrices:"];
+//             [info appendFormat:@"\nTable Name: %@", tileMatrixSet.tableName];
+//             [info appendFormat:@"\nMin X: %@", tileMatrixSet.minX];
+//             [info appendFormat:@"\nMin Y: %@", tileMatrixSet.minY];
+//             [info appendFormat:@"\nMax X: %@", tileMatrixSet.maxX];
+//             [info appendFormat:@"\nMax Y: %@", tileMatrixSet.maxY];
+//
+//             [info appendFormat:@"\n\nTile Matrices:"];
+//             for(GPKGTileMatrix * tileMatrix in tileDao.tileMatrices){
+//                 [info appendFormat:@"\n\nTable Name: %@", tileMatrix.tableName];
+//                 [info appendFormat:@"\nZoom Level: %@", tileMatrix.zoomLevel];
+//                 [info appendFormat:@"\nTiles: %d", [tileDao countWithZoomLevel:[tileMatrix.zoomLevel intValue]]];
+//                 [info appendFormat:@"\nMatrix Width: %@", tileMatrix.matrixWidth];
+//                 [info appendFormat:@"\nMatrix Height: %@", tileMatrix.matrixHeight];
+//                 [info appendFormat:@"\nTile Width: %@", tileMatrix.tileWidth];
+//                 [info appendFormat:@"\nTile Height: %@", tileMatrix.tileHeight];
+//                 [info appendFormat:@"\nPixel X Size: %@", tileMatrix.pixelXSize];
+//                 [info appendFormat:@"\nPixel Y Size: %@", tileMatrix.pixelYSize];
+//             }
+//         }
+//
+//         [info appendFormat:@"\n\n%@ columns:", tableName];
+//         GPKGDataColumnsDao *dataColumnsDao = [geoPackage getDataColumnsDao];
+//         for(GPKGUserColumn * userColumn in userTable.columns){
+//             [info appendFormat:@"\n\nIndex: %d", userColumn.index];
+//             [info appendFormat:@"\nName: %@", userColumn.name];
+//             if(userColumn.max != nil){
+//                 [info appendFormat:@"\nMax: %@", userColumn.max];
+//             }
+//             [info appendFormat:@"\nNot Null: %d", userColumn.notNull];
+//             if(userColumn.defaultValue != nil){
+//                 [info appendFormat:@"\nDefault Value: %@", userColumn.defaultValue];
+//             }
+//             if(userColumn.primaryKey){
+//                 [info appendFormat:@"\nPrimary Key: %d", userColumn.primaryKey];
+//             }
+//             [info appendFormat:@"\nType: %@", [userColumn getTypeName]];
+//             GPKGDataColumns * dataColumn = [dataColumnsDao getDataColumnByTableName:tableName andColumnName:userColumn.name];
+//             if (dataColumn) {
+//                 [info appendFormat: @"\nData Column Information:"];
+//                 if ([dataColumn name]) {
+//                     [info appendFormat:@"\n\tName: %@", [dataColumn name]];
+//                 }
+//                 if ([dataColumn title]) {
+//                     [info appendFormat:@"\n\tTitle: %@", [dataColumn title]];
+//                 }
+//                 if ([dataColumn theDescription]) {
+//                     [info appendFormat:@"\n\tThe Description: %@", [dataColumn theDescription]];
+//                 }
+//                 if ([dataColumn mimeType]) {
+//                     [info appendFormat:@"\n\tMime Type: %@", [dataColumn mimeType]];
+//                 }
+//             }
+//
+//         }
+//     }
+//     @catch (NSException *e) {
+//         [info appendString:[e description]];
+//     }
+//     @finally {
+//         [geoPackage close];
+//     }
+//     return info;
+// }
+
+};
+
+module.exports = GeoPackage;
+
+},{"./core/contents":4,"./core/srs":5,"./features/columns":14,"./features/user/featureDao":16,"./features/user/featureTableReader":19,"./tiles/matrix":26,"./tiles/matrixset":27,"./tiles/user/tileDao":32,"./tiles/user/tileTableReader":36,"./user/userTable":42,"async":45}],25:[function(require,module,exports){
 (function (process){
 var fileType = require('file-type')
   , proj4 = require('proj4')
@@ -4114,6 +4643,7 @@ var UserDao = require('../../user/UserDao')
   , TileGrid = require('../tileGrid')
   , TileRow = require('./tileRow')
   , TileMatrixSetDao = require('../matrixset').TileMatrixSetDao
+  , ContentsDao = require('../../core/contents').ContentsDao
   , BoundingBoxUtils = require('../tileBoundingBoxUtils')
   , ColumnValues = require('../../dao/columnValues')
   , TileTable = require('./tileTable')
@@ -4502,9 +5032,13 @@ TileDao.prototype.getTileMatrixSetDao = function () {
   return new TileMatrixSetDao(this.connection);
 };
 
+TileDao.prototype.getContentsDao = function () {
+  return new ContentsDao(this.connection);
+};
+
 module.exports = TileDao;
 
-},{"../../dao/columnValues":6,"../../user/UserDao":37,"../matrixset":27,"../tileBoundingBoxUtils":29,"../tileGrid":30,"./tileDaoUtils":33,"./tileRow":34,"./tileTable":35,"async":45,"proj4":310,"util":267}],33:[function(require,module,exports){
+},{"../../core/contents":4,"../../dao/columnValues":6,"../../user/UserDao":37,"../matrixset":27,"../tileBoundingBoxUtils":29,"../tileGrid":30,"./tileDaoUtils":33,"./tileRow":34,"./tileTable":35,"async":45,"proj4":310,"util":267}],33:[function(require,module,exports){
 
 module.exports.adjustTileMatrixLengths = function(tileMatrixSet, tileMatrices) {
   var tileMatrixWidth = tileMatrixSet.maxX - tileMatrixSet.minX;
@@ -4860,6 +5394,10 @@ TileTable.prototype.getTileDataColumn = function() {
   return this.getColumnWithIndex(this.tileDataIndex);
 };
 
+TileTable.prototype.getTableType = function() {
+  return UserTable.TILE_TABLE;
+}
+
 TileTable.createRequiredColumns = function() {
   return TileTable.createRequiredColumnsWithStartingIndex(0);
 }
@@ -5029,6 +5567,10 @@ UserDao.prototype.getZoomLevel = function () {
   // GPKGBoundingBox * webMercatorBoundingBox = [webMercatorTransform transformWithBoundingBox:boundingBox];
   // int zoomLevel = [GPKGTileBoundingBoxUtils getZoomLevelWithWebMercatorBoundingBox:webMercatorBoundingBox];
   // return zoomLevel;
+};
+
+UserDao.prototype.getCount = function (callback) {
+  this.connection.count(this.tableName, callback);
 };
 
 module.exports = UserDao;
@@ -5308,7 +5850,6 @@ UserTableReader.prototype.readTable = function (db, callback) {
       }
       var defaultValueIndex = result[GPKG_UTR_DFLT_VALUE];
       try {
-        console.log('result', result);
         var column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValueIndex, primarykey);
 
         columnList.push(column);
@@ -5534,6 +6075,9 @@ UserTable.prototype.columnCount = function () {
 UserTable.prototype.getPkColumn = function () {
   return this.columns[this.pkIndex];
 };
+
+UserTable.FEATURE_TABLE = 'FEATURE';
+UserTable.TILE_TABLE = 'TILE';
 
 
 // -(void) addUniqueConstraint: (GPKGUserUniqueConstraint *) uniqueConstraint{

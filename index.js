@@ -9,6 +9,7 @@ var GeoPackage = require('./lib/geopackage')
   , reproject = require('reproject')
   , L = require('leaflet')
   , $ = require('jquery')
+  , Mustache = require('mustache')
   , fileType = require('file-type');
 
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
@@ -40,6 +41,12 @@ var GeoPackage = require('./lib/geopackage')
     var featureTableNode = $('#feature-tables');
     $('#information').removeClass('hidden').addClass('visible');
 
+    var featureTableTemplate = $('#feature-table-template').html();
+    Mustache.parse(featureTableTemplate);
+
+    var tileTableTemplate = $('#tile-table-template').html();
+    Mustache.parse(tileTableTemplate);
+
 
     var r = new FileReader();
     r.onload = function() {
@@ -52,13 +59,10 @@ var GeoPackage = require('./lib/geopackage')
           function(callback) {
             geoPackage.getTileTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                tileTableNode.append('<div id="tile-'+table+'">' + table + ' zoom: (<span class="zoom"></span>)</div>');
-                var zoomNode = $('#tile-' + table + ' .zoom');
                 geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
                   var maxZoom = tileDao.maxZoom;
                   var minZoom = tileDao.minZoom;
-                  zoomNode.text(minZoom + ' - ' + maxZoom);
 
                   var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
                   var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
@@ -67,15 +71,17 @@ var GeoPackage = require('./lib/geopackage')
                     });
                   };
                   tableLayer.addTo(map);
-                  callback();
+                  geoPackage.getInfoForTable(tileDao, function(err, info) {
+                    var rendered = Mustache.render(tileTableTemplate, info);
+                    tileTableNode.append(rendered);
+                    callback();
+                  });
                 });
               }, callback);
             });
           }, function(callback) {
             geoPackage.getFeatureTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                featureTableNode.append('<div id="tile-'+table+'">' + table + ' (<span class="count"></span>)</div>');
-                var countNode = $('#tile-' + table + ' .count');
                 geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
                   if (err) {
                     return callback();
@@ -90,16 +96,18 @@ var GeoPackage = require('./lib/geopackage')
                         var geom = geometry.geometry;
                         var geoJson = geometry.geometry.toGeoJSON();
                         if (srs.definition && srs.definition !== 'undefined') {
-                          geoJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
+                          geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
                         }
-                        // console.log('geoJson', geoJson);
                         geojsonLayer.addData(geoJson);
-                        countNode.text(features);
                       }
                       rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
-                      callback();
+                      geoPackage.getInfoForTable(featureDao, function(err, info) {
+                        var rendered = Mustache.render(featureTableTemplate, info);
+                        featureTableNode.append(rendered);
+                        callback();
+                      });
                     });
                   });
                 });
