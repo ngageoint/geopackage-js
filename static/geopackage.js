@@ -12,6 +12,7 @@ var GeoPackage = require('./lib/geopackage')
   , reproject = require('reproject')
   , L = require('leaflet')
   , $ = require('jquery')
+  , Mustache = require('mustache')
   , fileType = require('file-type');
 
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
@@ -42,6 +43,9 @@ var GeoPackage = require('./lib/geopackage')
     var tileTableNode = $('#tile-tables');
     var featureTableNode = $('#feature-tables');
     $('#information').removeClass('hidden').addClass('visible');
+
+    var featureTableTemplate = $('#feature-table-template').html();
+    Mustache.parse(featureTableTemplate);
 
 
     var r = new FileReader();
@@ -77,8 +81,8 @@ var GeoPackage = require('./lib/geopackage')
           }, function(callback) {
             geoPackage.getFeatureTables(function(err, tables) {
               async.eachSeries(tables, function(table, callback) {
-                featureTableNode.append('<div id="tile-'+table+'">' + table + ' (<span class="count"></span>)</div>');
-                var countNode = $('#tile-' + table + ' .count');
+                // featureTableNode.append('<div id="feature-'+table+'">' + table + ' (<span class="count"></span>)</div>');
+                // var countNode = $('#feature-' + table + ' .count');
                 geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
                   if (err) {
                     return callback();
@@ -97,11 +101,13 @@ var GeoPackage = require('./lib/geopackage')
                         }
                         // console.log('geoJson', geoJson);
                         geojsonLayer.addData(geoJson);
-                        countNode.text(features);
+                        // countNode.text(features);
                       }
                       rowDone();
                     }, function(err) {
                       console.log('added ' + features + ' features');
+                      var rendered = Mustache.render(featureTableTemplate, {name: table, count: features});
+                      featureTableNode.append(rendered);
                       callback();
                     });
                   });
@@ -119,7 +125,7 @@ var GeoPackage = require('./lib/geopackage')
     r.readAsArrayBuffer(f);
   }
 
-},{"./includes.css":1,"./lib/db/GeoPackageConnection":8,"./lib/geoPackageManager":22,"./lib/geopackage":24,"./lib/tiles/retriever":28,"async":45,"file-type":270,"jquery":271,"leaflet":272,"reproject":342,"sql.js":343}],3:[function(require,module,exports){
+},{"./includes.css":1,"./lib/db/GeoPackageConnection":8,"./lib/geoPackageManager":22,"./lib/geopackage":24,"./lib/tiles/retriever":28,"async":45,"file-type":270,"jquery":271,"leaflet":272,"mustache":273,"reproject":343,"sql.js":344}],3:[function(require,module,exports){
 var proj4 = require('proj4');
 
 /**
@@ -227,7 +233,7 @@ BoundingBox.prototype.projectBoundingBox = function (from, to) {
 //  */
 // -(struct GPKGBoundingBoxSize) sizeInMeters;
 
-},{"proj4":309}],4:[function(require,module,exports){
+},{"proj4":310}],4:[function(require,module,exports){
 /**
  * Contents module.
  * @module core/contents
@@ -784,7 +790,7 @@ SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDa
 module.exports.SpatialReferenceSystemDao = SpatialReferenceSystemDao;
 module.exports.SpatialReferenceSystem = SpatialReferenceSystem;
 
-},{"../../dao/dao":7,"proj4":309,"util":267}],6:[function(require,module,exports){
+},{"../../dao/dao":7,"proj4":310,"util":267}],6:[function(require,module,exports){
 
 var ColumnValues = function() {
   this.values = {};
@@ -1297,6 +1303,7 @@ module.exports.name = function(dataType) {
  * @return {GPKGDataType}      the enum value
  */
 module.exports.fromName = function(name) {
+  name = name.toUpperCase();
   var value = -1;
   if (name) {
     value = module.exports.GPKGDataType[name];
@@ -1513,8 +1520,10 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
       return statement.step();
     },
     function(callback) {
-      var row = statement.getAsObject();
-      eachCallback(null, row, callback);
+      async.setImmediate(function() {
+        var row = statement.getAsObject();
+        eachCallback(null, row, callback);
+      });
     },
     function() {
       console.log('done');
@@ -1526,7 +1535,7 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
 
 };
 
-},{"async":45,"fs":47,"sql.js":343}],14:[function(require,module,exports){
+},{"async":45,"fs":47,"sql.js":344}],14:[function(require,module,exports){
 /**
  * GeometryColumns module.
  * @module dao/geometryColumns
@@ -1788,7 +1797,6 @@ var util = require('util');
  * Represents a user feature column
  */
 var FeatureColumn = function(index, name, dataType, max, notNull, defaultValue, primaryKey, geometryType) {
-
   UserColumn.call(this, index, name, dataType, max, notNull, defaultValue, primaryKey);
   this.geometryType = geometryType;
 
@@ -2627,7 +2635,7 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../geoPackageConstants":21,"buffer":49,"wkx":356}],24:[function(require,module,exports){
+},{"../geoPackageConstants":21,"buffer":49,"wkx":357}],24:[function(require,module,exports){
 arguments[4][20][0].apply(exports,arguments)
 },{"./core/contents":4,"./core/srs":5,"./features/columns":14,"./features/user/featureDao":16,"./features/user/featureTableReader":19,"./tiles/matrix":26,"./tiles/matrixset":27,"./tiles/user/tileDao":32,"./tiles/user/tileTableReader":36,"async":45,"dup":20}],25:[function(require,module,exports){
 (function (process){
@@ -2757,7 +2765,6 @@ TileCreator.prototype.reproject = function (tilePieceBoundingBox, callback) {
 };
 
 CanvasTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
-  console.log('chunk', xOffset,yOffset);
   this.chunks.push({
     chunk: chunk,
     x: xOffset,
@@ -2785,7 +2792,6 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
     this.tileContext.drawImage(this.image, 0, 0);
     this.projectTile(tileData, gridColumn, gridRow, function() {
       this.ctx.putImageData(new ImageData(this.imageData, this.width, this.height), 0, 0);
-      console.log('chunks', this.chunks.length);
       async.eachSeries(this.chunks, function(chunk, chunkDone) {
         var type = fileType(tileData);
 
@@ -2867,7 +2873,7 @@ LwipTileCreator.prototype.getCompleteTile = function (format, callback) {
 };
 
 }).call(this,require('_process'))
-},{"../tileBoundingBoxUtils":29,"_process":249,"async":45,"file-type":270,"lwip":undefined,"proj4":309,"util":267}],26:[function(require,module,exports){
+},{"../tileBoundingBoxUtils":29,"_process":249,"async":45,"file-type":270,"lwip":undefined,"proj4":310,"util":267}],26:[function(require,module,exports){
 /**
  * TileMatrix module.
  * @module tiles/matrix
@@ -3412,7 +3418,7 @@ GeoPackageTileRetriever.prototype.retrieveTileResults = function (tileMatrixProj
   }
 };
 
-},{"../creator":25,"../matrixset":27,"../tileBoundingBoxUtils":29,"async":45,"proj4":309}],29:[function(require,module,exports){
+},{"../creator":25,"../matrixset":27,"../tileBoundingBoxUtils":29,"async":45,"proj4":310}],29:[function(require,module,exports){
 
 var BoundingBox = require('../boundingBox')
   , TileGrid = require('./tileGrid');
@@ -4001,7 +4007,7 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
 //  */
 // +(GPKGBoundingBox *) boundWgs84BoundingBoxWithWebMercatorLimits: (GPKGBoundingBox *) boundingBox;
 
-},{"../boundingBox":3,"./tileGrid":30,"proj4":309}],30:[function(require,module,exports){
+},{"../boundingBox":3,"./tileGrid":30,"proj4":310}],30:[function(require,module,exports){
 
 /**
  *  Tile grid with x and y ranges
@@ -4498,7 +4504,7 @@ TileDao.prototype.getTileMatrixSetDao = function () {
 
 module.exports = TileDao;
 
-},{"../../dao/columnValues":6,"../../user/UserDao":37,"../matrixset":27,"../tileBoundingBoxUtils":29,"../tileGrid":30,"./tileDaoUtils":33,"./tileRow":34,"./tileTable":35,"async":45,"proj4":309,"util":267}],33:[function(require,module,exports){
+},{"../../dao/columnValues":6,"../../user/UserDao":37,"../matrixset":27,"../tileBoundingBoxUtils":29,"../tileGrid":30,"./tileDaoUtils":33,"./tileRow":34,"./tileTable":35,"async":45,"proj4":310,"util":267}],33:[function(require,module,exports){
 
 module.exports.adjustTileMatrixLengths = function(tileMatrixSet, tileMatrices) {
   var tileMatrixWidth = tileMatrixSet.maxX - tileMatrixSet.minX;
@@ -5302,11 +5308,12 @@ UserTableReader.prototype.readTable = function (db, callback) {
       }
       var defaultValueIndex = result[GPKG_UTR_DFLT_VALUE];
       try {
+        console.log('result', result);
         var column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValueIndex, primarykey);
 
         columnList.push(column);
       } catch (e) {
-        console.err(e);
+        console.log(e);
         return callback(e);
       }
     }
@@ -5630,13 +5637,14 @@ wktToEnum[wkx.Types.wkt.GeometryCollection] = wkx.Types.wkb.GeometryCollection;
  * @return {Number}      number corresponding to the wkb name
  */
 module.exports.fromName = function(name) {
+  name = name.toUpperCase();
   if (name === 'GEOMETRY') {
     return wkx.Types.wkb.GeometryCollection;
   }
   return wktToEnum[name];
 }
 
-},{"wkx":356}],45:[function(require,module,exports){
+},{"wkx":357}],45:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -47770,6 +47778,637 @@ L.Map.include({
 
 }(window, document));
 },{}],273:[function(require,module,exports){
+/*!
+ * mustache.js - Logic-less {{mustache}} templates with JavaScript
+ * http://github.com/janl/mustache.js
+ */
+
+/*global define: false Mustache: true*/
+
+(function defineMustache (global, factory) {
+  if (typeof exports === 'object' && exports && typeof exports.nodeName !== 'string') {
+    factory(exports); // CommonJS
+  } else if (typeof define === 'function' && define.amd) {
+    define(['exports'], factory); // AMD
+  } else {
+    global.Mustache = {};
+    factory(global.Mustache); // script, wsh, asp
+  }
+}(this, function mustacheFactory (mustache) {
+
+  var objectToString = Object.prototype.toString;
+  var isArray = Array.isArray || function isArrayPolyfill (object) {
+    return objectToString.call(object) === '[object Array]';
+  };
+
+  function isFunction (object) {
+    return typeof object === 'function';
+  }
+
+  /**
+   * More correct typeof string handling array
+   * which normally returns typeof 'object'
+   */
+  function typeStr (obj) {
+    return isArray(obj) ? 'array' : typeof obj;
+  }
+
+  function escapeRegExp (string) {
+    return string.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+  }
+
+  /**
+   * Null safe way of checking whether or not an object,
+   * including its prototype, has a given property
+   */
+  function hasProperty (obj, propName) {
+    return obj != null && typeof obj === 'object' && (propName in obj);
+  }
+
+  // Workaround for https://issues.apache.org/jira/browse/COUCHDB-577
+  // See https://github.com/janl/mustache.js/issues/189
+  var regExpTest = RegExp.prototype.test;
+  function testRegExp (re, string) {
+    return regExpTest.call(re, string);
+  }
+
+  var nonSpaceRe = /\S/;
+  function isWhitespace (string) {
+    return !testRegExp(nonSpaceRe, string);
+  }
+
+  var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+  };
+
+  function escapeHtml (string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s) {
+      return entityMap[s];
+    });
+  }
+
+  var whiteRe = /\s*/;
+  var spaceRe = /\s+/;
+  var equalsRe = /\s*=/;
+  var curlyRe = /\s*\}/;
+  var tagRe = /#|\^|\/|>|\{|&|=|!/;
+
+  /**
+   * Breaks up the given `template` string into a tree of tokens. If the `tags`
+   * argument is given here it must be an array with two string values: the
+   * opening and closing tags used in the template (e.g. [ "<%", "%>" ]). Of
+   * course, the default is to use mustaches (i.e. mustache.tags).
+   *
+   * A token is an array with at least 4 elements. The first element is the
+   * mustache symbol that was used inside the tag, e.g. "#" or "&". If the tag
+   * did not contain a symbol (i.e. {{myValue}}) this element is "name". For
+   * all text that appears outside a symbol this element is "text".
+   *
+   * The second element of a token is its "value". For mustache tags this is
+   * whatever else was inside the tag besides the opening symbol. For text tokens
+   * this is the text itself.
+   *
+   * The third and fourth elements of the token are the start and end indices,
+   * respectively, of the token in the original template.
+   *
+   * Tokens that are the root node of a subtree contain two more elements: 1) an
+   * array of tokens in the subtree and 2) the index in the original template at
+   * which the closing tag for that section begins.
+   */
+  function parseTemplate (template, tags) {
+    if (!template)
+      return [];
+
+    var sections = [];     // Stack to hold section tokens
+    var tokens = [];       // Buffer to hold the tokens
+    var spaces = [];       // Indices of whitespace tokens on the current line
+    var hasTag = false;    // Is there a {{tag}} on the current line?
+    var nonSpace = false;  // Is there a non-space char on the current line?
+
+    // Strips all whitespace tokens array for the current line
+    // if there was a {{#tag}} on it and otherwise only space.
+    function stripSpace () {
+      if (hasTag && !nonSpace) {
+        while (spaces.length)
+          delete tokens[spaces.pop()];
+      } else {
+        spaces = [];
+      }
+
+      hasTag = false;
+      nonSpace = false;
+    }
+
+    var openingTagRe, closingTagRe, closingCurlyRe;
+    function compileTags (tagsToCompile) {
+      if (typeof tagsToCompile === 'string')
+        tagsToCompile = tagsToCompile.split(spaceRe, 2);
+
+      if (!isArray(tagsToCompile) || tagsToCompile.length !== 2)
+        throw new Error('Invalid tags: ' + tagsToCompile);
+
+      openingTagRe = new RegExp(escapeRegExp(tagsToCompile[0]) + '\\s*');
+      closingTagRe = new RegExp('\\s*' + escapeRegExp(tagsToCompile[1]));
+      closingCurlyRe = new RegExp('\\s*' + escapeRegExp('}' + tagsToCompile[1]));
+    }
+
+    compileTags(tags || mustache.tags);
+
+    var scanner = new Scanner(template);
+
+    var start, type, value, chr, token, openSection;
+    while (!scanner.eos()) {
+      start = scanner.pos;
+
+      // Match any text between tags.
+      value = scanner.scanUntil(openingTagRe);
+
+      if (value) {
+        for (var i = 0, valueLength = value.length; i < valueLength; ++i) {
+          chr = value.charAt(i);
+
+          if (isWhitespace(chr)) {
+            spaces.push(tokens.length);
+          } else {
+            nonSpace = true;
+          }
+
+          tokens.push([ 'text', chr, start, start + 1 ]);
+          start += 1;
+
+          // Check for whitespace on the current line.
+          if (chr === '\n')
+            stripSpace();
+        }
+      }
+
+      // Match the opening tag.
+      if (!scanner.scan(openingTagRe))
+        break;
+
+      hasTag = true;
+
+      // Get the tag type.
+      type = scanner.scan(tagRe) || 'name';
+      scanner.scan(whiteRe);
+
+      // Get the tag value.
+      if (type === '=') {
+        value = scanner.scanUntil(equalsRe);
+        scanner.scan(equalsRe);
+        scanner.scanUntil(closingTagRe);
+      } else if (type === '{') {
+        value = scanner.scanUntil(closingCurlyRe);
+        scanner.scan(curlyRe);
+        scanner.scanUntil(closingTagRe);
+        type = '&';
+      } else {
+        value = scanner.scanUntil(closingTagRe);
+      }
+
+      // Match the closing tag.
+      if (!scanner.scan(closingTagRe))
+        throw new Error('Unclosed tag at ' + scanner.pos);
+
+      token = [ type, value, start, scanner.pos ];
+      tokens.push(token);
+
+      if (type === '#' || type === '^') {
+        sections.push(token);
+      } else if (type === '/') {
+        // Check section nesting.
+        openSection = sections.pop();
+
+        if (!openSection)
+          throw new Error('Unopened section "' + value + '" at ' + start);
+
+        if (openSection[1] !== value)
+          throw new Error('Unclosed section "' + openSection[1] + '" at ' + start);
+      } else if (type === 'name' || type === '{' || type === '&') {
+        nonSpace = true;
+      } else if (type === '=') {
+        // Set the tags for the next time around.
+        compileTags(value);
+      }
+    }
+
+    // Make sure there are no open sections when we're done.
+    openSection = sections.pop();
+
+    if (openSection)
+      throw new Error('Unclosed section "' + openSection[1] + '" at ' + scanner.pos);
+
+    return nestTokens(squashTokens(tokens));
+  }
+
+  /**
+   * Combines the values of consecutive text tokens in the given `tokens` array
+   * to a single token.
+   */
+  function squashTokens (tokens) {
+    var squashedTokens = [];
+
+    var token, lastToken;
+    for (var i = 0, numTokens = tokens.length; i < numTokens; ++i) {
+      token = tokens[i];
+
+      if (token) {
+        if (token[0] === 'text' && lastToken && lastToken[0] === 'text') {
+          lastToken[1] += token[1];
+          lastToken[3] = token[3];
+        } else {
+          squashedTokens.push(token);
+          lastToken = token;
+        }
+      }
+    }
+
+    return squashedTokens;
+  }
+
+  /**
+   * Forms the given array of `tokens` into a nested tree structure where
+   * tokens that represent a section have two additional items: 1) an array of
+   * all tokens that appear in that section and 2) the index in the original
+   * template that represents the end of that section.
+   */
+  function nestTokens (tokens) {
+    var nestedTokens = [];
+    var collector = nestedTokens;
+    var sections = [];
+
+    var token, section;
+    for (var i = 0, numTokens = tokens.length; i < numTokens; ++i) {
+      token = tokens[i];
+
+      switch (token[0]) {
+        case '#':
+        case '^':
+          collector.push(token);
+          sections.push(token);
+          collector = token[4] = [];
+          break;
+        case '/':
+          section = sections.pop();
+          section[5] = token[2];
+          collector = sections.length > 0 ? sections[sections.length - 1][4] : nestedTokens;
+          break;
+        default:
+          collector.push(token);
+      }
+    }
+
+    return nestedTokens;
+  }
+
+  /**
+   * A simple string scanner that is used by the template parser to find
+   * tokens in template strings.
+   */
+  function Scanner (string) {
+    this.string = string;
+    this.tail = string;
+    this.pos = 0;
+  }
+
+  /**
+   * Returns `true` if the tail is empty (end of string).
+   */
+  Scanner.prototype.eos = function eos () {
+    return this.tail === '';
+  };
+
+  /**
+   * Tries to match the given regular expression at the current position.
+   * Returns the matched text if it can match, the empty string otherwise.
+   */
+  Scanner.prototype.scan = function scan (re) {
+    var match = this.tail.match(re);
+
+    if (!match || match.index !== 0)
+      return '';
+
+    var string = match[0];
+
+    this.tail = this.tail.substring(string.length);
+    this.pos += string.length;
+
+    return string;
+  };
+
+  /**
+   * Skips all text until the given regular expression can be matched. Returns
+   * the skipped string, which is the entire tail if no match can be made.
+   */
+  Scanner.prototype.scanUntil = function scanUntil (re) {
+    var index = this.tail.search(re), match;
+
+    switch (index) {
+      case -1:
+        match = this.tail;
+        this.tail = '';
+        break;
+      case 0:
+        match = '';
+        break;
+      default:
+        match = this.tail.substring(0, index);
+        this.tail = this.tail.substring(index);
+    }
+
+    this.pos += match.length;
+
+    return match;
+  };
+
+  /**
+   * Represents a rendering context by wrapping a view object and
+   * maintaining a reference to the parent context.
+   */
+  function Context (view, parentContext) {
+    this.view = view;
+    this.cache = { '.': this.view };
+    this.parent = parentContext;
+  }
+
+  /**
+   * Creates a new context using the given view with this context
+   * as the parent.
+   */
+  Context.prototype.push = function push (view) {
+    return new Context(view, this);
+  };
+
+  /**
+   * Returns the value of the given name in this context, traversing
+   * up the context hierarchy if the value is absent in this context's view.
+   */
+  Context.prototype.lookup = function lookup (name) {
+    var cache = this.cache;
+
+    var value;
+    if (cache.hasOwnProperty(name)) {
+      value = cache[name];
+    } else {
+      var context = this, names, index, lookupHit = false;
+
+      while (context) {
+        if (name.indexOf('.') > 0) {
+          value = context.view;
+          names = name.split('.');
+          index = 0;
+
+          /**
+           * Using the dot notion path in `name`, we descend through the
+           * nested objects.
+           *
+           * To be certain that the lookup has been successful, we have to
+           * check if the last object in the path actually has the property
+           * we are looking for. We store the result in `lookupHit`.
+           *
+           * This is specially necessary for when the value has been set to
+           * `undefined` and we want to avoid looking up parent contexts.
+           **/
+          while (value != null && index < names.length) {
+            if (index === names.length - 1)
+              lookupHit = hasProperty(value, names[index]);
+
+            value = value[names[index++]];
+          }
+        } else {
+          value = context.view[name];
+          lookupHit = hasProperty(context.view, name);
+        }
+
+        if (lookupHit)
+          break;
+
+        context = context.parent;
+      }
+
+      cache[name] = value;
+    }
+
+    if (isFunction(value))
+      value = value.call(this.view);
+
+    return value;
+  };
+
+  /**
+   * A Writer knows how to take a stream of tokens and render them to a
+   * string, given a context. It also maintains a cache of templates to
+   * avoid the need to parse the same template twice.
+   */
+  function Writer () {
+    this.cache = {};
+  }
+
+  /**
+   * Clears all cached templates in this writer.
+   */
+  Writer.prototype.clearCache = function clearCache () {
+    this.cache = {};
+  };
+
+  /**
+   * Parses and caches the given `template` and returns the array of tokens
+   * that is generated from the parse.
+   */
+  Writer.prototype.parse = function parse (template, tags) {
+    var cache = this.cache;
+    var tokens = cache[template];
+
+    if (tokens == null)
+      tokens = cache[template] = parseTemplate(template, tags);
+
+    return tokens;
+  };
+
+  /**
+   * High-level method that is used to render the given `template` with
+   * the given `view`.
+   *
+   * The optional `partials` argument may be an object that contains the
+   * names and templates of partials that are used in the template. It may
+   * also be a function that is used to load partial templates on the fly
+   * that takes a single argument: the name of the partial.
+   */
+  Writer.prototype.render = function render (template, view, partials) {
+    var tokens = this.parse(template);
+    var context = (view instanceof Context) ? view : new Context(view);
+    return this.renderTokens(tokens, context, partials, template);
+  };
+
+  /**
+   * Low-level method that renders the given array of `tokens` using
+   * the given `context` and `partials`.
+   *
+   * Note: The `originalTemplate` is only ever used to extract the portion
+   * of the original template that was contained in a higher-order section.
+   * If the template doesn't use higher-order sections, this argument may
+   * be omitted.
+   */
+  Writer.prototype.renderTokens = function renderTokens (tokens, context, partials, originalTemplate) {
+    var buffer = '';
+
+    var token, symbol, value;
+    for (var i = 0, numTokens = tokens.length; i < numTokens; ++i) {
+      value = undefined;
+      token = tokens[i];
+      symbol = token[0];
+
+      if (symbol === '#') value = this.renderSection(token, context, partials, originalTemplate);
+      else if (symbol === '^') value = this.renderInverted(token, context, partials, originalTemplate);
+      else if (symbol === '>') value = this.renderPartial(token, context, partials, originalTemplate);
+      else if (symbol === '&') value = this.unescapedValue(token, context);
+      else if (symbol === 'name') value = this.escapedValue(token, context);
+      else if (symbol === 'text') value = this.rawValue(token);
+
+      if (value !== undefined)
+        buffer += value;
+    }
+
+    return buffer;
+  };
+
+  Writer.prototype.renderSection = function renderSection (token, context, partials, originalTemplate) {
+    var self = this;
+    var buffer = '';
+    var value = context.lookup(token[1]);
+
+    // This function is used to render an arbitrary template
+    // in the current context by higher-order sections.
+    function subRender (template) {
+      return self.render(template, context, partials);
+    }
+
+    if (!value) return;
+
+    if (isArray(value)) {
+      for (var j = 0, valueLength = value.length; j < valueLength; ++j) {
+        buffer += this.renderTokens(token[4], context.push(value[j]), partials, originalTemplate);
+      }
+    } else if (typeof value === 'object' || typeof value === 'string' || typeof value === 'number') {
+      buffer += this.renderTokens(token[4], context.push(value), partials, originalTemplate);
+    } else if (isFunction(value)) {
+      if (typeof originalTemplate !== 'string')
+        throw new Error('Cannot use higher-order sections without the original template');
+
+      // Extract the portion of the original template that the section contains.
+      value = value.call(context.view, originalTemplate.slice(token[3], token[5]), subRender);
+
+      if (value != null)
+        buffer += value;
+    } else {
+      buffer += this.renderTokens(token[4], context, partials, originalTemplate);
+    }
+    return buffer;
+  };
+
+  Writer.prototype.renderInverted = function renderInverted (token, context, partials, originalTemplate) {
+    var value = context.lookup(token[1]);
+
+    // Use JavaScript's definition of falsy. Include empty arrays.
+    // See https://github.com/janl/mustache.js/issues/186
+    if (!value || (isArray(value) && value.length === 0))
+      return this.renderTokens(token[4], context, partials, originalTemplate);
+  };
+
+  Writer.prototype.renderPartial = function renderPartial (token, context, partials) {
+    if (!partials) return;
+
+    var value = isFunction(partials) ? partials(token[1]) : partials[token[1]];
+    if (value != null)
+      return this.renderTokens(this.parse(value), context, partials, value);
+  };
+
+  Writer.prototype.unescapedValue = function unescapedValue (token, context) {
+    var value = context.lookup(token[1]);
+    if (value != null)
+      return value;
+  };
+
+  Writer.prototype.escapedValue = function escapedValue (token, context) {
+    var value = context.lookup(token[1]);
+    if (value != null)
+      return mustache.escape(value);
+  };
+
+  Writer.prototype.rawValue = function rawValue (token) {
+    return token[1];
+  };
+
+  mustache.name = 'mustache.js';
+  mustache.version = '2.2.1';
+  mustache.tags = [ '{{', '}}' ];
+
+  // All high-level mustache.* functions use this writer.
+  var defaultWriter = new Writer();
+
+  /**
+   * Clears all cached templates in the default writer.
+   */
+  mustache.clearCache = function clearCache () {
+    return defaultWriter.clearCache();
+  };
+
+  /**
+   * Parses and caches the given template in the default writer and returns the
+   * array of tokens it contains. Doing this ahead of time avoids the need to
+   * parse templates on the fly as they are rendered.
+   */
+  mustache.parse = function parse (template, tags) {
+    return defaultWriter.parse(template, tags);
+  };
+
+  /**
+   * Renders the `template` with the given `view` and `partials` using the
+   * default writer.
+   */
+  mustache.render = function render (template, view, partials) {
+    if (typeof template !== 'string') {
+      throw new TypeError('Invalid template! Template should be a "string" ' +
+                          'but "' + typeStr(template) + '" was given as the first ' +
+                          'argument for mustache#render(template, view, partials)');
+    }
+
+    return defaultWriter.render(template, view, partials);
+  };
+
+  // This is here for backwards compatibility with 0.4.x.,
+  /*eslint-disable */ // eslint wants camel cased function name
+  mustache.to_html = function to_html (template, view, partials, send) {
+    /*eslint-enable*/
+
+    var result = mustache.render(template, view, partials);
+
+    if (isFunction(send)) {
+      send(result);
+    } else {
+      return result;
+    }
+  };
+
+  // Export the escaping function so that the user may override it.
+  // See https://github.com/janl/mustache.js/issues/244
+  mustache.escape = escapeHtml;
+
+  // Export these mainly for testing, but also for advanced usage.
+  mustache.Scanner = Scanner;
+  mustache.Context = Context;
+  mustache.Writer = Writer;
+
+}));
+
+},{}],274:[function(require,module,exports){
 var mgrs = require('mgrs');
 
 function Point(x, y, z) {
@@ -47805,7 +48444,7 @@ Point.prototype.toMGRS = function(accuracy) {
 };
 module.exports = Point;
 
-},{"mgrs":340}],274:[function(require,module,exports){
+},{"mgrs":341}],275:[function(require,module,exports){
 var parseCode = require("./parseCode");
 var extend = require('./extend');
 var projections = require('./projections');
@@ -47840,7 +48479,7 @@ Projection.projections = projections;
 Projection.projections.start();
 module.exports = Projection;
 
-},{"./deriveConstants":305,"./extend":306,"./parseCode":310,"./projections":312}],275:[function(require,module,exports){
+},{"./deriveConstants":306,"./extend":307,"./parseCode":311,"./projections":313}],276:[function(require,module,exports){
 module.exports = function(crs, denorm, point) {
   var xin = point.x,
     yin = point.y,
@@ -47893,14 +48532,14 @@ module.exports = function(crs, denorm, point) {
   return point;
 };
 
-},{}],276:[function(require,module,exports){
+},{}],277:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 var sign = require('./sign');
 
 module.exports = function(x) {
   return (Math.abs(x) < HALF_PI) ? x : (x - (sign(x) * Math.PI));
 };
-},{"./sign":293}],277:[function(require,module,exports){
+},{"./sign":294}],278:[function(require,module,exports){
 var TWO_PI = Math.PI * 2;
 // SPI is slightly greater than Math.PI, so values that exceed the -180..180
 // degree range by a tiny amount don't get wrapped. This prevents points that
@@ -47912,35 +48551,35 @@ var sign = require('./sign');
 module.exports = function(x) {
   return (Math.abs(x) <= SPI) ? x : (x - (sign(x) * TWO_PI));
 };
-},{"./sign":293}],278:[function(require,module,exports){
+},{"./sign":294}],279:[function(require,module,exports){
 module.exports = function(x) {
   if (Math.abs(x) > 1) {
     x = (x > 1) ? 1 : -1;
   }
   return Math.asin(x);
 };
-},{}],279:[function(require,module,exports){
+},{}],280:[function(require,module,exports){
 module.exports = function(x) {
   return (1 - 0.25 * x * (1 + x / 16 * (3 + 1.25 * x)));
 };
-},{}],280:[function(require,module,exports){
+},{}],281:[function(require,module,exports){
 module.exports = function(x) {
   return (0.375 * x * (1 + 0.25 * x * (1 + 0.46875 * x)));
 };
-},{}],281:[function(require,module,exports){
+},{}],282:[function(require,module,exports){
 module.exports = function(x) {
   return (0.05859375 * x * x * (1 + 0.75 * x));
 };
-},{}],282:[function(require,module,exports){
+},{}],283:[function(require,module,exports){
 module.exports = function(x) {
   return (x * x * x * (35 / 3072));
 };
-},{}],283:[function(require,module,exports){
+},{}],284:[function(require,module,exports){
 module.exports = function(a, e, sinphi) {
   var temp = e * sinphi;
   return a / Math.sqrt(1 - temp * temp);
 };
-},{}],284:[function(require,module,exports){
+},{}],285:[function(require,module,exports){
 module.exports = function(ml, e0, e1, e2, e3) {
   var phi;
   var dphi;
@@ -47957,7 +48596,7 @@ module.exports = function(ml, e0, e1, e2, e3) {
   //..reportError("IMLFN-CONV:Latitude failed to converge after 15 iterations");
   return NaN;
 };
-},{}],285:[function(require,module,exports){
+},{}],286:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 
 module.exports = function(eccent, q) {
@@ -47990,16 +48629,16 @@ module.exports = function(eccent, q) {
   //console.log("IQSFN-CONV:Latitude failed to converge after 30 iterations");
   return NaN;
 };
-},{}],286:[function(require,module,exports){
+},{}],287:[function(require,module,exports){
 module.exports = function(e0, e1, e2, e3, phi) {
   return (e0 * phi - e1 * Math.sin(2 * phi) + e2 * Math.sin(4 * phi) - e3 * Math.sin(6 * phi));
 };
-},{}],287:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 module.exports = function(eccent, sinphi, cosphi) {
   var con = eccent * sinphi;
   return cosphi / (Math.sqrt(1 - con * con));
 };
-},{}],288:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 module.exports = function(eccent, ts) {
   var eccnth = 0.5 * eccent;
@@ -48016,7 +48655,7 @@ module.exports = function(eccent, ts) {
   //console.log("phi2z has NoConvergence");
   return -9999;
 };
-},{}],289:[function(require,module,exports){
+},{}],290:[function(require,module,exports){
 var C00 = 1;
 var C02 = 0.25;
 var C04 = 0.046875;
@@ -48041,7 +48680,7 @@ module.exports = function(es) {
   en[4] = t * es * C88;
   return en;
 };
-},{}],290:[function(require,module,exports){
+},{}],291:[function(require,module,exports){
 var pj_mlfn = require("./pj_mlfn");
 var EPSLN = 1.0e-10;
 var MAX_ITER = 20;
@@ -48062,13 +48701,13 @@ module.exports = function(arg, es, en) {
   //..reportError("cass:pj_inv_mlfn: Convergence error");
   return phi;
 };
-},{"./pj_mlfn":291}],291:[function(require,module,exports){
+},{"./pj_mlfn":292}],292:[function(require,module,exports){
 module.exports = function(phi, sphi, cphi, en) {
   cphi *= sphi;
   sphi *= sphi;
   return (en[0] * phi - cphi * (en[1] + sphi * (en[2] + sphi * (en[3] + sphi * en[4]))));
 };
-},{}],292:[function(require,module,exports){
+},{}],293:[function(require,module,exports){
 module.exports = function(eccent, sinphi) {
   var con;
   if (eccent > 1.0e-7) {
@@ -48079,15 +48718,15 @@ module.exports = function(eccent, sinphi) {
     return (2 * sinphi);
   }
 };
-},{}],293:[function(require,module,exports){
+},{}],294:[function(require,module,exports){
 module.exports = function(x) {
   return x<0 ? -1 : 1;
 };
-},{}],294:[function(require,module,exports){
+},{}],295:[function(require,module,exports){
 module.exports = function(esinp, exp) {
   return (Math.pow((1 - esinp) / (1 + esinp), exp));
 };
-},{}],295:[function(require,module,exports){
+},{}],296:[function(require,module,exports){
 module.exports = function (array){
   var out = {
     x: array[0],
@@ -48101,7 +48740,7 @@ module.exports = function (array){
   }
   return out;
 };
-},{}],296:[function(require,module,exports){
+},{}],297:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 
 module.exports = function(eccent, phi, sinphi) {
@@ -48110,7 +48749,7 @@ module.exports = function(eccent, phi, sinphi) {
   con = Math.pow(((1 - con) / (1 + con)), com);
   return (Math.tan(0.5 * (HALF_PI - phi)) / con);
 };
-},{}],297:[function(require,module,exports){
+},{}],298:[function(require,module,exports){
 exports.wgs84 = {
   towgs84: "0,0,0",
   ellipse: "WGS84",
@@ -48191,7 +48830,7 @@ exports.rnb72 = {
   ellipse: "intl",
   datumName: "Reseau National Belge 1972"
 };
-},{}],298:[function(require,module,exports){
+},{}],299:[function(require,module,exports){
 exports.MERIT = {
   a: 6378137.0,
   rf: 298.257,
@@ -48407,7 +49046,7 @@ exports.sphere = {
   b: 6370997.0,
   ellipseName: "Normal Sphere (r=6370997)"
 };
-},{}],299:[function(require,module,exports){
+},{}],300:[function(require,module,exports){
 exports.greenwich = 0.0; //"0dE",
 exports.lisbon = -9.131906111111; //"9d07'54.862\"W",
 exports.paris = 2.337229166667; //"2d20'14.025\"E",
@@ -48421,11 +49060,11 @@ exports.brussels = 4.367975; //"4d22'4.71\"E",
 exports.stockholm = 18.058277777778; //"18d3'29.8\"E",
 exports.athens = 23.7163375; //"23d42'58.815\"E",
 exports.oslo = 10.722916666667; //"10d43'22.5\"E"
-},{}],300:[function(require,module,exports){
+},{}],301:[function(require,module,exports){
 exports.ft = {to_meter: 0.3048};
 exports['us-ft'] = {to_meter: 1200 / 3937};
 
-},{}],301:[function(require,module,exports){
+},{}],302:[function(require,module,exports){
 var proj = require('./Proj');
 var transform = require('./transform');
 var wgs84 = proj('WGS84');
@@ -48490,7 +49129,7 @@ function proj4(fromProj, toProj, coord) {
   }
 }
 module.exports = proj4;
-},{"./Proj":274,"./transform":338}],302:[function(require,module,exports){
+},{"./Proj":275,"./transform":339}],303:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 var PJD_3PARAM = 1;
 var PJD_7PARAM = 2;
@@ -48895,7 +49534,7 @@ datum.prototype = {
 */
 module.exports = datum;
 
-},{}],303:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 var PJD_3PARAM = 1;
 var PJD_7PARAM = 2;
 var PJD_GRIDSHIFT = 3;
@@ -48996,7 +49635,7 @@ module.exports = function(source, dest, point) {
 };
 
 
-},{}],304:[function(require,module,exports){
+},{}],305:[function(require,module,exports){
 var globals = require('./global');
 var parseProj = require('./projString');
 var wkt = require('./wkt');
@@ -49053,7 +49692,7 @@ function defs(name) {
 globals(defs);
 module.exports = defs;
 
-},{"./global":307,"./projString":311,"./wkt":339}],305:[function(require,module,exports){
+},{"./global":308,"./projString":312,"./wkt":340}],306:[function(require,module,exports){
 var Datum = require('./constants/Datum');
 var Ellipsoid = require('./constants/Ellipsoid');
 var extend = require('./extend');
@@ -49111,7 +49750,7 @@ module.exports = function(json) {
   return json;
 };
 
-},{"./constants/Datum":297,"./constants/Ellipsoid":298,"./datum":302,"./extend":306}],306:[function(require,module,exports){
+},{"./constants/Datum":298,"./constants/Ellipsoid":299,"./datum":303,"./extend":307}],307:[function(require,module,exports){
 module.exports = function(destination, source) {
   destination = destination || {};
   var value, property;
@@ -49127,7 +49766,7 @@ module.exports = function(destination, source) {
   return destination;
 };
 
-},{}],307:[function(require,module,exports){
+},{}],308:[function(require,module,exports){
 module.exports = function(defs) {
   defs('EPSG:4326', "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees");
   defs('EPSG:4269', "+title=NAD83 (long/lat) +proj=longlat +a=6378137.0 +b=6356752.31414036 +ellps=GRS80 +datum=NAD83 +units=degrees");
@@ -49140,7 +49779,7 @@ module.exports = function(defs) {
   defs['EPSG:102113'] = defs['EPSG:3857'];
 };
 
-},{}],308:[function(require,module,exports){
+},{}],309:[function(require,module,exports){
 var projs = [
   require('./projections/tmerc'),
   require('./projections/utm'),
@@ -49170,7 +49809,7 @@ module.exports = function(proj4){
     proj4.Proj.projections.add(proj);
   });
 };
-},{"./projections/aea":313,"./projections/aeqd":314,"./projections/cass":315,"./projections/cea":316,"./projections/eqc":317,"./projections/eqdc":318,"./projections/gnom":320,"./projections/krovak":321,"./projections/laea":322,"./projections/lcc":323,"./projections/mill":326,"./projections/moll":327,"./projections/nzmg":328,"./projections/omerc":329,"./projections/poly":330,"./projections/sinu":331,"./projections/somerc":332,"./projections/stere":333,"./projections/sterea":334,"./projections/tmerc":335,"./projections/utm":336,"./projections/vandg":337}],309:[function(require,module,exports){
+},{"./projections/aea":314,"./projections/aeqd":315,"./projections/cass":316,"./projections/cea":317,"./projections/eqc":318,"./projections/eqdc":319,"./projections/gnom":321,"./projections/krovak":322,"./projections/laea":323,"./projections/lcc":324,"./projections/mill":327,"./projections/moll":328,"./projections/nzmg":329,"./projections/omerc":330,"./projections/poly":331,"./projections/sinu":332,"./projections/somerc":333,"./projections/stere":334,"./projections/sterea":335,"./projections/tmerc":336,"./projections/utm":337,"./projections/vandg":338}],310:[function(require,module,exports){
 var proj4 = require('./core');
 proj4.defaultDatum = 'WGS84'; //default datum
 proj4.Proj = require('./Proj');
@@ -49183,7 +49822,7 @@ proj4.mgrs = require('mgrs');
 proj4.version = require('../package.json').version;
 require('./includedProjections')(proj4);
 module.exports = proj4;
-},{"../package.json":341,"./Point":273,"./Proj":274,"./common/toPoint":295,"./core":301,"./defs":304,"./includedProjections":308,"./transform":338,"mgrs":340}],310:[function(require,module,exports){
+},{"../package.json":342,"./Point":274,"./Proj":275,"./common/toPoint":296,"./core":302,"./defs":305,"./includedProjections":309,"./transform":339,"mgrs":341}],311:[function(require,module,exports){
 var defs = require('./defs');
 var wkt = require('./wkt');
 var projStr = require('./projString');
@@ -49220,7 +49859,7 @@ function parse(code){
 }
 
 module.exports = parse;
-},{"./defs":304,"./projString":311,"./wkt":339}],311:[function(require,module,exports){
+},{"./defs":305,"./projString":312,"./wkt":340}],312:[function(require,module,exports){
 var D2R = 0.01745329251994329577;
 var PrimeMeridian = require('./constants/PrimeMeridian');
 var units = require('./constants/units');
@@ -49354,7 +49993,7 @@ module.exports = function(defData) {
   return self;
 };
 
-},{"./constants/PrimeMeridian":299,"./constants/units":300}],312:[function(require,module,exports){
+},{"./constants/PrimeMeridian":300,"./constants/units":301}],313:[function(require,module,exports){
 var projs = [
   require('./projections/merc'),
   require('./projections/longlat')
@@ -49390,7 +50029,7 @@ exports.start = function() {
   projs.forEach(add);
 };
 
-},{"./projections/longlat":324,"./projections/merc":325}],313:[function(require,module,exports){
+},{"./projections/longlat":325,"./projections/merc":326}],314:[function(require,module,exports){
 var EPSLN = 1.0e-10;
 var msfnz = require('../common/msfnz');
 var qsfnz = require('../common/qsfnz');
@@ -49513,7 +50152,7 @@ exports.phi1z = function(eccent, qs) {
 };
 exports.names = ["Albers_Conic_Equal_Area", "Albers", "aea"];
 
-},{"../common/adjust_lon":277,"../common/asinz":278,"../common/msfnz":287,"../common/qsfnz":292}],314:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/asinz":279,"../common/msfnz":288,"../common/qsfnz":293}],315:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var HALF_PI = Math.PI/2;
 var EPSLN = 1.0e-10;
@@ -49712,7 +50351,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Azimuthal_Equidistant", "aeqd"];
 
-},{"../common/adjust_lon":277,"../common/asinz":278,"../common/e0fn":279,"../common/e1fn":280,"../common/e2fn":281,"../common/e3fn":282,"../common/gN":283,"../common/imlfn":284,"../common/mlfn":286}],315:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/asinz":279,"../common/e0fn":280,"../common/e1fn":281,"../common/e2fn":282,"../common/e3fn":283,"../common/gN":284,"../common/imlfn":285,"../common/mlfn":287}],316:[function(require,module,exports){
 var mlfn = require('../common/mlfn');
 var e0fn = require('../common/e0fn');
 var e1fn = require('../common/e1fn');
@@ -49816,7 +50455,7 @@ exports.inverse = function(p) {
 
 };
 exports.names = ["Cassini", "Cassini_Soldner", "cass"];
-},{"../common/adjust_lat":276,"../common/adjust_lon":277,"../common/e0fn":279,"../common/e1fn":280,"../common/e2fn":281,"../common/e3fn":282,"../common/gN":283,"../common/imlfn":284,"../common/mlfn":286}],316:[function(require,module,exports){
+},{"../common/adjust_lat":277,"../common/adjust_lon":278,"../common/e0fn":280,"../common/e1fn":281,"../common/e2fn":282,"../common/e3fn":283,"../common/gN":284,"../common/imlfn":285,"../common/mlfn":287}],317:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var qsfnz = require('../common/qsfnz');
 var msfnz = require('../common/msfnz');
@@ -49881,7 +50520,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["cea"];
 
-},{"../common/adjust_lon":277,"../common/iqsfnz":285,"../common/msfnz":287,"../common/qsfnz":292}],317:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/iqsfnz":286,"../common/msfnz":288,"../common/qsfnz":293}],318:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var adjust_lat = require('../common/adjust_lat');
 exports.init = function() {
@@ -49924,7 +50563,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Equirectangular", "Equidistant_Cylindrical", "eqc"];
 
-},{"../common/adjust_lat":276,"../common/adjust_lon":277}],318:[function(require,module,exports){
+},{"../common/adjust_lat":277,"../common/adjust_lon":278}],319:[function(require,module,exports){
 var e0fn = require('../common/e0fn');
 var e1fn = require('../common/e1fn');
 var e2fn = require('../common/e2fn');
@@ -50036,7 +50675,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Equidistant_Conic", "eqdc"];
 
-},{"../common/adjust_lat":276,"../common/adjust_lon":277,"../common/e0fn":279,"../common/e1fn":280,"../common/e2fn":281,"../common/e3fn":282,"../common/imlfn":284,"../common/mlfn":286,"../common/msfnz":287}],319:[function(require,module,exports){
+},{"../common/adjust_lat":277,"../common/adjust_lon":278,"../common/e0fn":280,"../common/e1fn":281,"../common/e2fn":282,"../common/e3fn":283,"../common/imlfn":285,"../common/mlfn":287,"../common/msfnz":288}],320:[function(require,module,exports){
 var FORTPI = Math.PI/4;
 var srat = require('../common/srat');
 var HALF_PI = Math.PI/2;
@@ -50083,7 +50722,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["gauss"];
 
-},{"../common/srat":294}],320:[function(require,module,exports){
+},{"../common/srat":295}],321:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var EPSLN = 1.0e-10;
 var asinz = require('../common/asinz');
@@ -50184,7 +50823,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["gnom"];
 
-},{"../common/adjust_lon":277,"../common/asinz":278}],321:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/asinz":279}],322:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 exports.init = function() {
   this.a = 6377397.155;
@@ -50284,7 +50923,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Krovak", "krovak"];
 
-},{"../common/adjust_lon":277}],322:[function(require,module,exports){
+},{"../common/adjust_lon":278}],323:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 var FORTPI = Math.PI/4;
 var EPSLN = 1.0e-10;
@@ -50574,7 +51213,7 @@ exports.authlat = function(beta, APA) {
 };
 exports.names = ["Lambert Azimuthal Equal Area", "Lambert_Azimuthal_Equal_Area", "laea"];
 
-},{"../common/adjust_lon":277,"../common/qsfnz":292}],323:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/qsfnz":293}],324:[function(require,module,exports){
 var EPSLN = 1.0e-10;
 var msfnz = require('../common/msfnz');
 var tsfnz = require('../common/tsfnz');
@@ -50711,7 +51350,7 @@ exports.inverse = function(p) {
 
 exports.names = ["Lambert Tangential Conformal Conic Projection", "Lambert_Conformal_Conic", "Lambert_Conformal_Conic_2SP", "lcc"];
 
-},{"../common/adjust_lon":277,"../common/msfnz":287,"../common/phi2z":288,"../common/sign":293,"../common/tsfnz":296}],324:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/msfnz":288,"../common/phi2z":289,"../common/sign":294,"../common/tsfnz":297}],325:[function(require,module,exports){
 exports.init = function() {
   //no-op for longlat
 };
@@ -50723,7 +51362,7 @@ exports.forward = identity;
 exports.inverse = identity;
 exports.names = ["longlat", "identity"];
 
-},{}],325:[function(require,module,exports){
+},{}],326:[function(require,module,exports){
 var msfnz = require('../common/msfnz');
 var HALF_PI = Math.PI/2;
 var EPSLN = 1.0e-10;
@@ -50822,7 +51461,7 @@ exports.inverse = function(p) {
 
 exports.names = ["Mercator", "Popular Visualisation Pseudo Mercator", "Mercator_1SP", "Mercator_Auxiliary_Sphere", "merc"];
 
-},{"../common/adjust_lon":277,"../common/msfnz":287,"../common/phi2z":288,"../common/tsfnz":296}],326:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/msfnz":288,"../common/phi2z":289,"../common/tsfnz":297}],327:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 /*
   reference
@@ -50869,7 +51508,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Miller_Cylindrical", "mill"];
 
-},{"../common/adjust_lon":277}],327:[function(require,module,exports){
+},{"../common/adjust_lon":278}],328:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var EPSLN = 1.0e-10;
 exports.init = function() {};
@@ -50948,7 +51587,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Mollweide", "moll"];
 
-},{"../common/adjust_lon":277}],328:[function(require,module,exports){
+},{"../common/adjust_lon":278}],329:[function(require,module,exports){
 var SEC_TO_RAD = 4.84813681109535993589914102357e-6;
 /*
   reference
@@ -51168,7 +51807,7 @@ exports.inverse = function(p) {
   return p;
 };
 exports.names = ["New_Zealand_Map_Grid", "nzmg"];
-},{}],329:[function(require,module,exports){
+},{}],330:[function(require,module,exports){
 var tsfnz = require('../common/tsfnz');
 var adjust_lon = require('../common/adjust_lon');
 var phi2z = require('../common/phi2z');
@@ -51337,7 +51976,7 @@ exports.inverse = function(p) {
 };
 
 exports.names = ["Hotine_Oblique_Mercator", "Hotine Oblique Mercator", "Hotine_Oblique_Mercator_Azimuth_Natural_Origin", "Hotine_Oblique_Mercator_Azimuth_Center", "omerc"];
-},{"../common/adjust_lon":277,"../common/phi2z":288,"../common/tsfnz":296}],330:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/phi2z":289,"../common/tsfnz":297}],331:[function(require,module,exports){
 var e0fn = require('../common/e0fn');
 var e1fn = require('../common/e1fn');
 var e2fn = require('../common/e2fn');
@@ -51466,7 +52105,7 @@ exports.inverse = function(p) {
   return p;
 };
 exports.names = ["Polyconic", "poly"];
-},{"../common/adjust_lat":276,"../common/adjust_lon":277,"../common/e0fn":279,"../common/e1fn":280,"../common/e2fn":281,"../common/e3fn":282,"../common/gN":283,"../common/mlfn":286}],331:[function(require,module,exports){
+},{"../common/adjust_lat":277,"../common/adjust_lon":278,"../common/e0fn":280,"../common/e1fn":281,"../common/e2fn":282,"../common/e3fn":283,"../common/gN":284,"../common/mlfn":287}],332:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var adjust_lat = require('../common/adjust_lat');
 var pj_enfn = require('../common/pj_enfn');
@@ -51573,7 +52212,7 @@ exports.inverse = function(p) {
   return p;
 };
 exports.names = ["Sinusoidal", "sinu"];
-},{"../common/adjust_lat":276,"../common/adjust_lon":277,"../common/asinz":278,"../common/pj_enfn":289,"../common/pj_inv_mlfn":290,"../common/pj_mlfn":291}],332:[function(require,module,exports){
+},{"../common/adjust_lat":277,"../common/adjust_lon":278,"../common/asinz":279,"../common/pj_enfn":290,"../common/pj_inv_mlfn":291,"../common/pj_mlfn":292}],333:[function(require,module,exports){
 /*
   references:
     Formules et constantes pour le Calcul pour la
@@ -51655,7 +52294,7 @@ exports.inverse = function(p) {
 
 exports.names = ["somerc"];
 
-},{}],333:[function(require,module,exports){
+},{}],334:[function(require,module,exports){
 var HALF_PI = Math.PI/2;
 var EPSLN = 1.0e-10;
 var sign = require('../common/sign');
@@ -51823,7 +52462,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["stere", "Stereographic_South_Pole", "Polar Stereographic (variant B)"];
 
-},{"../common/adjust_lon":277,"../common/msfnz":287,"../common/phi2z":288,"../common/sign":293,"../common/tsfnz":296}],334:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/msfnz":288,"../common/phi2z":289,"../common/sign":294,"../common/tsfnz":297}],335:[function(require,module,exports){
 var gauss = require('./gauss');
 var adjust_lon = require('../common/adjust_lon');
 exports.init = function() {
@@ -51882,7 +52521,7 @@ exports.inverse = function(p) {
 
 exports.names = ["Stereographic_North_Pole", "Oblique_Stereographic", "Polar_Stereographic", "sterea","Oblique Stereographic Alternative"];
 
-},{"../common/adjust_lon":277,"./gauss":319}],335:[function(require,module,exports){
+},{"../common/adjust_lon":278,"./gauss":320}],336:[function(require,module,exports){
 var e0fn = require('../common/e0fn');
 var e1fn = require('../common/e1fn');
 var e2fn = require('../common/e2fn');
@@ -52019,7 +52658,7 @@ exports.inverse = function(p) {
 };
 exports.names = ["Transverse_Mercator", "Transverse Mercator", "tmerc"];
 
-},{"../common/adjust_lon":277,"../common/asinz":278,"../common/e0fn":279,"../common/e1fn":280,"../common/e2fn":281,"../common/e3fn":282,"../common/mlfn":286,"../common/sign":293}],336:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/asinz":279,"../common/e0fn":280,"../common/e1fn":281,"../common/e2fn":282,"../common/e3fn":283,"../common/mlfn":287,"../common/sign":294}],337:[function(require,module,exports){
 var D2R = 0.01745329251994329577;
 var tmerc = require('./tmerc');
 exports.dependsOn = 'tmerc';
@@ -52039,7 +52678,7 @@ exports.init = function() {
 };
 exports.names = ["Universal Transverse Mercator System", "utm"];
 
-},{"./tmerc":335}],337:[function(require,module,exports){
+},{"./tmerc":336}],338:[function(require,module,exports){
 var adjust_lon = require('../common/adjust_lon');
 var HALF_PI = Math.PI/2;
 var EPSLN = 1.0e-10;
@@ -52160,7 +52799,7 @@ exports.inverse = function(p) {
   return p;
 };
 exports.names = ["Van_der_Grinten_I", "VanDerGrinten", "vandg"];
-},{"../common/adjust_lon":277,"../common/asinz":278}],338:[function(require,module,exports){
+},{"../common/adjust_lon":278,"../common/asinz":279}],339:[function(require,module,exports){
 var D2R = 0.01745329251994329577;
 var R2D = 57.29577951308232088;
 var PJD_3PARAM = 1;
@@ -52233,7 +52872,7 @@ module.exports = function transform(source, dest, point) {
 
   return point;
 };
-},{"./Proj":274,"./adjust_axis":275,"./common/toPoint":295,"./datum_transform":303}],339:[function(require,module,exports){
+},{"./Proj":275,"./adjust_axis":276,"./common/toPoint":296,"./datum_transform":304}],340:[function(require,module,exports){
 var D2R = 0.01745329251994329577;
 var extend = require('./extend');
 
@@ -52458,7 +53097,7 @@ module.exports = function(wkt, self) {
   return extend(self, obj.output);
 };
 
-},{"./extend":306}],340:[function(require,module,exports){
+},{"./extend":307}],341:[function(require,module,exports){
 
 
 
@@ -53202,7 +53841,7 @@ function getMinNorthing(zoneLetter) {
 
 }
 
-},{}],341:[function(require,module,exports){
+},{}],342:[function(require,module,exports){
 module.exports={
   "name": "proj4",
   "version": "2.3.14",
@@ -53311,7 +53950,7 @@ module.exports={
   "readme": "ERROR: No README data found!"
 }
 
-},{}],342:[function(require,module,exports){
+},{}],343:[function(require,module,exports){
 'use strict';
 
 var proj4 = require('proj4');
@@ -53448,7 +54087,7 @@ module.exports = {
     }
   };
 
-},{"proj4":309}],343:[function(require,module,exports){
+},{"proj4":310}],344:[function(require,module,exports){
 (function (process,Buffer,__dirname){
 // This prevents pollution of the global namespace
 var SQL = (function () {
@@ -53963,7 +54602,7 @@ if (typeof module !== 'undefined') module.exports = SQL;
 if (typeof define === 'function') define(SQL);
 
 }).call(this,require('_process'),require("buffer").Buffer,"/node_modules/sql.js/js")
-},{"_process":249,"buffer":49,"crypto":53,"fs":47,"path":248}],344:[function(require,module,exports){
+},{"_process":249,"buffer":49,"crypto":53,"fs":47,"path":248}],345:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryReader;
 
@@ -54014,7 +54653,7 @@ BinaryReader.prototype.readVarInt = function () {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":49}],345:[function(require,module,exports){
+},{"buffer":49}],346:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryWriter;
 
@@ -54083,7 +54722,7 @@ BinaryWriter.prototype.ensureSize = function (size) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":49}],346:[function(require,module,exports){
+},{"buffer":49}],347:[function(require,module,exports){
 (function (Buffer){
 module.exports = Geometry;
 
@@ -54465,7 +55104,7 @@ Geometry.prototype.toGeoJSON = function (options) {
 };
 
 }).call(this,{"isBuffer":require("../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":247,"./binaryreader":344,"./binarywriter":345,"./geometrycollection":347,"./linestring":348,"./multilinestring":349,"./multipoint":350,"./multipolygon":351,"./point":352,"./polygon":353,"./types":354,"./wktparser":355,"./zigzag.js":357}],347:[function(require,module,exports){
+},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":247,"./binaryreader":345,"./binarywriter":346,"./geometrycollection":348,"./linestring":349,"./multilinestring":350,"./multipoint":351,"./multipolygon":352,"./point":353,"./polygon":354,"./types":355,"./wktparser":356,"./zigzag.js":358}],348:[function(require,module,exports){
 module.exports = GeometryCollection;
 
 var util = require('util');
@@ -54630,7 +55269,7 @@ GeometryCollection.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./types":354,"util":267}],348:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./types":355,"util":267}],349:[function(require,module,exports){
 module.exports = LineString;
 
 var util = require('util');
@@ -54810,7 +55449,7 @@ LineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./point":352,"./types":354,"./zigzag.js":357,"util":267}],349:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./point":353,"./types":355,"./zigzag.js":358,"util":267}],350:[function(require,module,exports){
 module.exports = MultiLineString;
 
 var util = require('util');
@@ -54996,7 +55635,7 @@ MultiLineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./linestring":348,"./point":352,"./types":354,"./zigzag.js":357,"util":267}],350:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./linestring":349,"./point":353,"./types":355,"./zigzag.js":358,"util":267}],351:[function(require,module,exports){
 module.exports = MultiPoint;
 
 var util = require('util');
@@ -55165,7 +55804,7 @@ MultiPoint.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./point":352,"./types":354,"./zigzag":357,"util":267}],351:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./point":353,"./types":355,"./zigzag":358,"util":267}],352:[function(require,module,exports){
 module.exports = MultiPolygon;
 
 var util = require('util');
@@ -55388,7 +56027,7 @@ MultiPolygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./point":352,"./polygon":353,"./types":354,"./zigzag.js":357,"util":267}],352:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./point":353,"./polygon":354,"./types":355,"./zigzag.js":358,"util":267}],353:[function(require,module,exports){
 module.exports = Point;
 
 var util = require('util');
@@ -55604,7 +56243,7 @@ Point.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./types":354,"./zigzag.js":357,"util":267}],353:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./types":355,"./zigzag.js":358,"util":267}],354:[function(require,module,exports){
 module.exports = Polygon;
 
 var util = require('util');
@@ -55894,7 +56533,7 @@ Polygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":345,"./geometry":346,"./point":352,"./types":354,"./zigzag":357,"util":267}],354:[function(require,module,exports){
+},{"./binarywriter":346,"./geometry":347,"./point":353,"./types":355,"./zigzag":358,"util":267}],355:[function(require,module,exports){
 module.exports = {
     wkt: {
         Point: 'POINT',
@@ -55925,7 +56564,7 @@ module.exports = {
     }
 };
 
-},{}],355:[function(require,module,exports){
+},{}],356:[function(require,module,exports){
 module.exports = WktParser;
 
 var Types = require('./types');
@@ -56051,7 +56690,7 @@ WktParser.prototype.skipWhitespaces = function () {
         this.position++;
 };
 
-},{"./point":352,"./types":354}],356:[function(require,module,exports){
+},{"./point":353,"./types":355}],357:[function(require,module,exports){
 exports.Types = require('./types');
 exports.Geometry = require('./geometry');
 exports.Point = require('./point');
@@ -56061,7 +56700,7 @@ exports.MultiPoint = require('./multipoint');
 exports.MultiLineString = require('./multilinestring');
 exports.MultiPolygon = require('./multipolygon');
 exports.GeometryCollection = require('./geometrycollection');
-},{"./geometry":346,"./geometrycollection":347,"./linestring":348,"./multilinestring":349,"./multipoint":350,"./multipolygon":351,"./point":352,"./polygon":353,"./types":354}],357:[function(require,module,exports){
+},{"./geometry":347,"./geometrycollection":348,"./linestring":349,"./multilinestring":350,"./multipoint":351,"./multipolygon":352,"./point":353,"./polygon":354,"./types":355}],358:[function(require,module,exports){
 module.exports = {
     encode: function (value) {
         return (value << 1) ^ (value >> 31);
