@@ -61,6 +61,10 @@ body {
   padding-left: 7px;
 }
 
+.column {
+  padding: 4px;
+}
+
 .label {
   color: #777;
 }
