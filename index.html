@@ -28,9 +28,9 @@
         <div style="padding: 3px;">
           <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/simple_sewer_features.gpkg')">Simple Sewers test data set (http://www.geopackage.org/data/simple_sewer_features.gpkg)</a>
         </div>
-        <div style="padding: 3px;">
+        <!-- <div style="padding: 3px;">
           <a href="javascript:void(0);" onclick="loadUrl('https://portal.opengeospatial.org/files/63156')">ERDC Whitehorse GeoPackage (https://portal.opengeospatial.org/files/63156)</a>
-        </div>
+        </div> -->
         <!-- <div style="padding: 3px;">
           <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/geonames_belgium.gpkg')">Geonames data for Belgium (http://www.geopackage.org/data/geonames_belgium.gpkg)</a>
         </div> -->
@@ -64,7 +64,7 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a></div>
+    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organizationCoordsysId}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
       <div class="srs">
         <div class="section-title">Spatial Reference System</div>
@@ -128,7 +128,7 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a></div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a> <a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organizationCoordsysId}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
       <div class="tiles">
         <div class="section-title">Tile Information</div>
