@@ -39,7 +39,10 @@ var GeoPackage = require('./lib/geopackage')
     $('#choose-label').text(f.name);
 
     var tileTableNode = $('#tile-tables');
+    tileTableNode.empty();
     var featureTableNode = $('#feature-tables');
+    featureTableNode.empty();
+
     $('#information').removeClass('hidden').addClass('visible');
 
     var featureTableTemplate = $('#feature-table-template').html();
