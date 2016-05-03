@@ -9,8 +9,31 @@ var GeoPackage = require('./lib/geopackage')
   , reproject = require('reproject')
   , L = require('leaflet')
   , $ = require('jquery')
+  , proj4 = require('proj4')
   , Mustache = require('mustache')
   , fileType = require('file-type');
+
+  (function (window, document, undefined) {
+
+    L.Control.ZoomIndicator = L.Control.extend({
+    	options: {
+    		position: 'topleft',
+    		enabled: true
+    	},
+
+    	onAdd: function (map) {
+    		var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-zoom-indicator');
+        this._link = L.DomUtil.create('a', '', container);
+        this._link.innerHTML = map.getZoom();
+        map.on('zoomend', function() {
+          this._link.innerHTML = map.getZoom();
+        }, this);
+
+        return container;
+      }
+    });
+
+  }(this, document));
 
   window.$ = $;
   L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
@@ -25,6 +48,8 @@ var GeoPackage = require('./lib/geopackage')
     attributionControl: false
   });
 
+  map.addControl(new L.Control.ZoomIndicator());
+
   var credits = L.control.attribution().addTo(map);
   credits.addAttribution("&copy; <a href='https://www.mapbox.com/map-feedback/'>Mapbox</a> &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>");
 
@@ -37,13 +62,23 @@ var GeoPackage = require('./lib/geopackage')
   module.exports.loadGeoPackage = function(files) {
     var f = files[0];
     $('#choose-label').text(f.name);
+    var r = new FileReader();
+    r.onload = function() {
+      var array = new Uint8Array(r.result);
+      loadByteArray(array);
+    }
+    r.readAsArrayBuffer(f);
+  }
 
+  function loadByteArray(array) {
     var tileTableNode = $('#tile-tables');
     tileTableNode.empty();
     var featureTableNode = $('#feature-tables');
     featureTableNode.empty();
 
-    $('#information').removeClass('hidden').addClass('visible');
+    for (layerName in tableLayers) {
+      map.removeLayer(tableLayers[layerName]);
+    }
 
     var featureTableTemplate = $('#feature-table-template').html();
     Mustache.parse(featureTableTemplate);
@@ -51,47 +86,53 @@ var GeoPackage = require('./lib/geopackage')
     var tileTableTemplate = $('#tile-table-template').html();
     Mustache.parse(tileTableTemplate);
 
+    $('#information').removeClass('hidden').addClass('visible');
 
-    var r = new FileReader();
-    r.onload = function() {
-      var Uints = new Uint8Array(r.result);
-      db = new SQL.Database(Uints);
-      GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
-        geoPackage = new GeoPackage('', '', connection);
+    var db = new SQL.Database(array);
+    GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
+      geoPackage = new GeoPackage('', '', connection);
 
-        async.parallel([
-          function(callback) {
-            geoPackage.getTileTables(function(err, tables) {
-              async.eachSeries(tables, function(table, callback) {
-                geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
-                  geoPackage.getInfoForTable(tileDao, function(err, info) {
-                    var rendered = Mustache.render(tileTableTemplate, info);
-                    tileTableNode.append(rendered);
-                    callback();
-                  });
+      async.parallel([
+        function(callback) {
+          geoPackage.getTileTables(function(err, tables) {
+            async.eachSeries(tables, function(table, callback) {
+              geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+                geoPackage.getInfoForTable(tileDao, function(err, info) {
+                  var rendered = Mustache.render(tileTableTemplate, info);
+                  tileTableNode.append(rendered);
+                  callback();
                 });
-              }, callback);
-            });
-          }, function(callback) {
-            geoPackage.getFeatureTables(function(err, tables) {
-              async.eachSeries(tables, function(table, callback) {
-                geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-                  if (err) {
-                    return callback();
-                  }
-                  geoPackage.getInfoForTable(featureDao, function(err, info) {
-                    var rendered = Mustache.render(featureTableTemplate, info);
-                    featureTableNode.append(rendered);
-                    callback();
-                  });
+              });
+            }, callback);
+          });
+        }, function(callback) {
+          geoPackage.getFeatureTables(function(err, tables) {
+            async.eachSeries(tables, function(table, callback) {
+              geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+                if (err) {
+                  return callback();
+                }
+                geoPackage.getInfoForTable(featureDao, function(err, info) {
+                  var rendered = Mustache.render(featureTableTemplate, info);
+                  featureTableNode.append(rendered);
+                  callback();
                 });
-              }, callback);
-            });
-          }
-        ]);
-      });
+              });
+            }, callback);
+          });
+        }
+      ]);
+    });
+  }
+
+  window.zoomTo = function(minX, minY, maxX, maxY, projection) {
+    try {
+      var sw = proj4(projection, 'EPSG:4326', [minX, minY]);
+      var ne = proj4(projection, 'EPSG:4326', [maxX, maxY]);
+      map.fitBounds([[sw[1], sw[0]], [ne[1], ne[0]]]);
+    } catch (e) {
+      map.fitBounds([[minY, minX], [maxY, maxX]]);
     }
-    r.readAsArrayBuffer(f);
   }
 
   window.toggleLayer = function(layerType, table) {
@@ -117,7 +158,22 @@ var GeoPackage = require('./lib/geopackage')
         tableLayers[table] = tableLayer;
       });
     } else if (layerType === 'feature') {
-      var geojsonLayer = L.geoJson();
+      var geojsonLayer = L.geoJson([], {
+          style: function (feature) {
+              return {
+                color: "#00F",
+                weight: 2,
+                opacity: 1
+              };
+          },
+          onEachFeature: function (feature, layer) {
+            var string = "";
+            for (var key in feature.properties) {
+              string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+            }
+            layer.bindPopup(string);
+          }
+      });
       geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
         if (err) {
           return;
@@ -128,11 +184,17 @@ var GeoPackage = require('./lib/geopackage')
             features++;
             var currentRow = featureDao.getFeatureRow(row);
             var geometry = currentRow.getGeometry();
-            if (geometry ) {
+            if (geometry) {
               var geom = geometry.geometry;
               var geoJson = geometry.geometry.toGeoJSON();
               if (srs.definition && srs.definition !== 'undefined') {
                 geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+              }
+              geoJson.properties = {};
+              for (var key in currentRow.values) {
+                if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
+                  geoJson.properties[key] = currentRow.values[key];
+                }
               }
               geojsonLayer.addData(geoJson);
             }
@@ -145,4 +207,16 @@ var GeoPackage = require('./lib/geopackage')
         });
       });
     }
+  }
+
+  window.loadUrl = function(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+      var uInt8Array = new Uint8Array(this.response);
+      loadByteArray(uInt8Array);
+    };
+    xhr.send();
   }
