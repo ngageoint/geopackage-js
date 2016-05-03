@@ -45,6 +45,9 @@ var GeoPackage = require('./lib/geopackage')
     tileTableNode.empty();
     var featureTableNode = $('#feature-tables');
     featureTableNode.empty();
+    for (layerName in tableLayers) {
+      map.removeLayer(tableLayers[layerName]);
+    }
 
     $('#information').removeClass('hidden').addClass('visible');
 
