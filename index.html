@@ -35,6 +35,7 @@
 
   <script type="text/javascript" src="static/geopackage.js"></script>
   <script id="feature-table-template" type="x-tmpl-mustache">
+  <div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
       <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -95,8 +96,10 @@
         </div>
       </div>
     </div>
+  </div>
   </script>
   <script id="tile-table-template" type="x-tmpl-mustache">
+  <div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('tile', '{{tableName}}')">
       <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -156,6 +159,7 @@
         </div>
       </div>
     </div>
+  </div>
   </script>
 </body>
 </html>
