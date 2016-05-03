@@ -17,124 +17,143 @@
   <div id="map" class="map"></div>
 
   <div class="side-bar">
-    <div>
+    <div style="padding-right: 100px">
       <span>This opens the GeoPackage in the browser with no server side component.  Be aware that large GeoPackages may not work at this time.</span>
       <span>Sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
     </div>
-  <div id="information" class="information hidden">
-    <div id="title" class="title"></div>
-    <div class="tableGroup">
-    <div id="tile-tables"></div>
+    <div id="information" class="information hidden">
+      <div class="tableGroup">
+      <div id="tile-tables"></div>
+      </div>
+      <div class="tableGroup">
+      <div id="feature-tables"></div>
     </div>
-    <div class="tableGroup">
-    <div id="feature-tables"></div>
-  </div>
   </div>
 </div>
 
+  <a href="https://github.com/ngageoint/geopackage-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
   <script type="text/javascript" src="static/geopackage.js"></script>
   <script id="feature-table-template" type="x-tmpl-mustache">
-    <div id="feature-{{tableName}}" class="table-name">Feature Table: {{tableName}} (<span class="count">{{count}}</span>)</div>
-    <div class="srs">
-      <div class="section-title">Spatial Reference System</div>
-      <div class="section">
-        <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
-        <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
-        <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
-        <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
-        <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
-        <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
-      </div>
+    <div class="onoffswitch" style="display: inline-block;">
+      <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
+      <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+      </label>
     </div>
-    <div class="contents">
-      <div class="section-title">Contents</div>
-      <div class="section">
-        <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
-        <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
-        <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
-        <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
-        <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
-        <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
-        <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
-        <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
-        <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
-      </div>
-    </div>
-    <div class="geometryColumns">
-      <div class="section-title">Geometry Columns</div>
-      <div class="section">
-        <div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
-        <div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
-        <div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
-        <div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
-        <div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="section-title">{{tableName}} columns:</div>
-      <div class="section">
-        {{#columns}}
-        <div class="column">
-          <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
-          <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
-          <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
-          <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
-          <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
-          <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a></div>
+    <div class="table-info" style="display: none;">
+      <div class="srs">
+        <div class="section-title">Spatial Reference System</div>
+        <div class="section">
+          <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+          <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+          <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+          <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
+          <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+          <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
         </div>
-        {{/columns}}
+      </div>
+      <div class="contents">
+        <div class="section-title">Contents</div>
+        <div class="section">
+          <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+          <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+          <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+          <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+          <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+          <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+          <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
+          <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+          <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+        </div>
+      </div>
+      <div class="geometryColumns">
+        <div class="section-title">Geometry Columns</div>
+        <div class="section">
+          <div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
+          <div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
+          <div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
+          <div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
+          <div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="section-title">{{tableName}} columns:</div>
+        <div class="section">
+          {{#columns}}
+          <div class="column">
+            <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+            <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+            <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+            <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+            <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+            <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+          </div>
+          {{/columns}}
+        </div>
       </div>
     </div>
   </script>
   <script id="tile-table-template" type="x-tmpl-mustache">
-    <div id="tile-{{tableName}}" class="table-name">Tile Table: {{tableName}} (<span class="count">{{count}}</span>)</div>
-    <div class="tiles">
-      <div class="section-title">Tile Information</div>
-      <div class="section">
-        <div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
-        <div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
-        <div class="item"><span class="label">Min Zoom: </span><span class="value">{{minZoom}}</span></div>
-        <div class="item"><span class="label">Max Zoom: </span><span class="value">{{maxZoom}}</span></div>
-      </div>
+    <div class="onoffswitch" style="display: inline-block;">
+      <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('tile', '{{tableName}}')">
+      <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+      </label>
     </div>
-    <div class="srs">
-      <div class="section-title">Spatial Reference System</div>
-      <div class="section">
-        <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
-        <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
-        <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
-        <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
-        <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
-        <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
-      </div>
-    </div>
-    <div class="contents">
-      <div class="section-title">Contents</div>
-      <div class="section">
-        <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
-        <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
-        <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
-        <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
-        <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
-        <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
-        <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
-        <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
-        <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="section-title">{{tableName}} columns:</div>
-      <div class="section">
-        {{#columns}}
-        <div class="column">
-          <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
-          <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
-          <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
-          <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
-          <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
-          <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a></div>
+    <div class="table-info" style="display: none;">
+      <div class="tiles">
+        <div class="section-title">Tile Information</div>
+        <div class="section">
+          <div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
+          <div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
+          <div class="item"><span class="label">Min Zoom: </span><span class="value">{{minZoom}}</span></div>
+          <div class="item"><span class="label">Max Zoom: </span><span class="value">{{maxZoom}}</span></div>
         </div>
-        {{/columns}}
+      </div>
+      <div class="srs">
+        <div class="section-title">Spatial Reference System</div>
+        <div class="section">
+          <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+          <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+          <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+          <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
+          <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+          <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
+        </div>
+      </div>
+      <div class="contents">
+        <div class="section-title">Contents</div>
+        <div class="section">
+          <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+          <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+          <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+          <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+          <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+          <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+          <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
+          <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+          <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="section-title">{{tableName}} columns:</div>
+        <div class="section">
+          {{#columns}}
+          <div class="column">
+            <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+            <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+            <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+            <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+            <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+            <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+          </div>
+          {{/columns}}
+        </div>
       </div>
     </div>
   </script>
