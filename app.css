@@ -118,6 +118,48 @@ body {
   cursor: pointer; /* "hand" cursor */
 }
 
+table {
+  border: 1px solid #DDD;
+}
+
+tr:hover {
+  background-color: #CCC;
+}
+
+td {
+  font-size: 11px;
+  color: #777;
+  border-bottom: 1px solid #EFEFEF;
+}
+
+th {
+  font-weight: bold;
+  font-size: 11px;
+  font-color: #222;
+}
+
+.metadata {
+  padding: 4px;
+  border: 1px solid #DDD;
+}
+
+.tab {
+  color: #FFF;
+  background-color: #DDD;
+  cursor: pointer; /* "hand" cursor */
+  padding: 8px;
+  border-top: 1px solid #999;
+  border-left: 1px solid #999;
+  border-right: 1px solid #999;
+}
+
+.tab.active {
+  color: #222;
+  background-color: #EFEFEF;
+}
+
+/* https://proto.io/freebies/onoff/ */
+
 .onoffswitch {
     position: relative; width: 75px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;

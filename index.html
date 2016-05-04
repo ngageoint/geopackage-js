@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>geopackage</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
   <link rel="stylesheet" type="text/css" href="app.css"/>
 </head>
 
@@ -17,16 +18,18 @@
   <div id="map" class="map"></div>
 
   <div class="side-bar">
-    <div style="padding-right: 100px">
+    <div style="padding-right: 100px; padding-left: 4px;">
       <span>This opens the GeoPackage in the browser with no server side component.  Be aware that large GeoPackages may not work at this time.</span>
       <span>Sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
       <div style="font-size: 12px;">
         Here are some example GeoPackages which can be loaded directly into the tool.  Click on one of these links initiates a download into the app and will then show the data.  Please be patient if you are on a slower connection.
         <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg')">Natural Earth Rivers (http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)</a>
+          <a href="javascript:void(0);" onclick="loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg', $(this).next())">Natural Earth Rivers (http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)</a>
+          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
         </div>
         <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/simple_sewer_features.gpkg')">Simple Sewers test data set (http://www.geopackage.org/data/simple_sewer_features.gpkg)</a>
+          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/simple_sewer_features.gpkg', $(this).next())">Simple Sewers test data set (http://www.geopackage.org/data/simple_sewer_features.gpkg)</a>
+          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
         </div>
         <!-- <div style="padding: 3px;">
           <a href="javascript:void(0);" onclick="loadUrl('https://portal.opengeospatial.org/files/63156')">ERDC Whitehorse GeoPackage (https://portal.opengeospatial.org/files/63156)</a>
@@ -38,7 +41,8 @@
           <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/haiti-vectors-split.gpkg')">Haiti OpenStreetMap tiles and point features (http://www.geopackage.org/data/haiti-vectors-split.gpkg)</a>
         </div> -->
         <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/gdal_sample.gpkg')">Technology Test Data Set (http://www.geopackage.org/data/gdal_sample.gpkg)</a>
+          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/gdal_sample.gpkg', $(this).next())">Technology Test Data Set (http://www.geopackage.org/data/gdal_sample.gpkg)</a>
+          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
         </div>
       </div>
     </div>
@@ -66,58 +70,82 @@
     </div>
     <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="console.log($(this).parent().next());$(this).parent().next().toggle()">details</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organizationCoordsysId}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
-      <div class="srs">
-        <div class="section-title">Spatial Reference System</div>
-        <div class="section">
-          <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
-          <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
-          <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
-          <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
-          <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
-          <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
-        </div>
-      </div>
-      <div class="contents">
-        <div class="section-title">Contents</div>
-        <div class="section">
-          <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
-          <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
-          <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
-          <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
-          <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
-          <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
-          <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
-          <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
-          <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
-        </div>
-      </div>
-      <div class="geometryColumns">
-        <div class="section-title">Geometry Columns</div>
-        <div class="section">
-          <div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
-          <div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
-          <div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
-          <div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
-          <div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="section-title">{{tableName}} columns:</div>
-        <div class="section">
-          {{#columns}}
-          <div class="column">
-            <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
-            <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
-            <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
-            <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
-            <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
-            <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+      <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
+      <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
+      <div class="metadata">
+        <div class="srs">
+          <div class="section-title">Spatial Reference System</div>
+          <div class="section">
+            <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+            <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+            <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+            <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organizationCoordsysId}}</span></div>
+            <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
           </div>
-          {{/columns}}
         </div>
+        <div class="contents">
+          <div class="section-title">Contents</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+            <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+            <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+            <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+            <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+            <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
+            <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+            <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+          </div>
+        </div>
+        <div class="geometryColumns">
+          <div class="section-title">Geometry Columns</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
+            <div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
+            <div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
+            <div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
+            <div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="section-title">{{tableName}} columns:</div>
+          <div class="section">
+            {{#columns}}
+            <div class="column">
+              <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+              <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+              <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+              <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+              <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+              <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+            </div>
+            {{/columns}}
+          </div>
+        </div>
+      </div>
+      <div class="features" style="display: none;">
       </div>
     </div>
   </div>
+  </script>
+  <script id="all-features-template" type="x-tmpl-mustache">
+    <table>
+      <thead>
+        <tr>
+          {{#columns}}
+            <th>{{name}}</th>
+          {{/columns}}
+        </tr>
+      </thead>
+      {{#features}}
+      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')">
+        {{#values}}
+          <td>{{.}}</td>
+        {{/values}}
+      </tr>
+      {{/features}}
+    </table>
   </script>
   <script id="tile-table-template" type="x-tmpl-mustache">
   <div>
