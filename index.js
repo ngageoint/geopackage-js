@@ -330,3 +330,23 @@ var GeoPackage = require('./lib/geopackage')
       });
     });
   }
+
+  window.zoomToFeature = function(featureId, tableName) {
+    geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
+      featureDao.getSrs(function(err, srs) {
+        featureDao.queryForIdObject(featureId, function(err, thing, feature) {
+          feature = featureDao.getFeatureRow(feature);
+          var geometry = feature.getGeometry();
+          if (geometry) {
+            var geom = geometry.geometry;
+            var geoJson = geometry.geometry.toGeoJSON();
+            if (srs.definition && srs.definition !== 'undefined') {
+              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+            }
+            var l = L.geoJson([geoJson]);
+            map.fitBounds(l.getBounds());
+          }
+        });
+      });
+    });
+  }

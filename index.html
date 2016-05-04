@@ -139,7 +139,7 @@
         </tr>
       </thead>
       {{#features}}
-      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')">
+      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')" ondblclick="zoomToFeature({{id}}, '{{tableName}}')">
         {{#values}}
           <td>{{.}}</td>
         {{/values}}
