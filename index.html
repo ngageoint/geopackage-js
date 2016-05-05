@@ -8,21 +8,24 @@
 
 <body>
 
-  <div class="top-bar">
-    <div>
-      <input type="file" name="file" id="file" class="inputfile" onchange="geopackage.loadGeoPackage(this.files)"/>
-      <label id="choose-label" for="file">Choose a GeoPackage file to open</label>
-    </div>
-  </div>
-
   <div id="map" class="map"></div>
 
   <div class="side-bar">
-    <div style="padding-right: 100px; padding-left: 4px;">
-      <span>This opens the GeoPackage in the browser with no server side component.  Be aware that large GeoPackages may not work at this time.</span>
-      <span>Sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
+    <div style="padding-top: 7px; padding-right: 100px; padding-left: 4px; padding-bottom: 7px;">
+      <div style="padding: 7px;">
+        <input type="file" name="file" id="file" class="inputfile" onchange="geopackage.loadGeoPackage(this.files)"/>
+        <label id="choose-label" for="file">Open a GeoPackage</label>
+      </div>
+
+      <div style="padding: 7px;">
+        - or -
+      </div>
+
+      <div style="padding: 7px;">
+        Open one of these samples:
+      </div>
+
       <div style="font-size: 12px;">
-        Here are some example GeoPackages which can be loaded directly into the tool.  Click on one of these links initiates a download into the app and will then show the data.  Please be patient if you are on a slower connection.
         <div style="padding: 3px;">
           <a href="javascript:void(0);" onclick="loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg', $(this).next())">Natural Earth Rivers (http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)</a>
           <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
@@ -44,6 +47,8 @@
           <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/gdal_sample.gpkg', $(this).next())">Technology Test Data Set (http://www.geopackage.org/data/gdal_sample.gpkg)</a>
           <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
         </div>
+
+        <span>More sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
       </div>
     </div>
     <div id="information" class="information hidden">
