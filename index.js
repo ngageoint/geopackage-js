@@ -4,6 +4,7 @@ var GeoPackage = require('./lib/geopackage')
   , GeoPackageManager = require('./lib/geoPackageManager')
   , GeoPackageConnection = require('./lib/db/GeoPackageConnection')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
+  , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
   , async = require('async')
   , SQL = require('sql.js')
   , reproject = require('reproject')
@@ -183,7 +184,6 @@ var GeoPackage = require('./lib/geopackage')
           featureDao.queryForEach(function(err, row, rowDone) {
             features++;
             var currentRow = featureDao.getFeatureRow(row);
-            console.log('currentRow ID', currentRow.getId());
             var geometry = currentRow.getGeometry();
             if (geometry) {
               var geom = geometry.geometry;
@@ -223,6 +223,137 @@ var GeoPackage = require('./lib/geopackage')
       });
     };
     xhr.send();
+  }
+
+  window.loadZooms = function(tableName, tilesElement) {
+    var zoomsTemplate = $('#tile-zoom-levels-template').html();
+    Mustache.parse(zoomsTemplate);
+
+    geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+      var zooms = [];
+      for (var i = tileDao.minZoom; i <= tileDao.maxZoom; i++) {
+        zooms.push({zoom: i, tableName: tableName});
+      }
+      var zoomLevels = {
+        zooms: zooms
+      };
+      var rendered = Mustache.render(zoomsTemplate, zoomLevels);
+      tilesElement.empty();
+      tilesElement.append(rendered);
+    });
+  }
+
+  window.loadTiles = function(tableName, zoom, tilesElement) {
+    var tilesTableTemplate = $('#all-tiles-template').html();
+    Mustache.parse(tilesTableTemplate);
+
+    var tiles = {};
+
+    geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+      if (err) {
+        return callback();
+      }
+
+      tiles.columns = [];
+      for (var i = 0; i < tileDao.table.columns.length; i++) {
+        var column = tileDao.table.columns[i];
+        tiles.columns.push({
+          index: column.index,
+          name: column.name,
+          max: column.max,
+          min: column.min,
+          notNull: column.notNull,
+          primaryKey: column.primaryKey
+        });
+      }
+      tileDao.getSrs(function(err, srs) {
+        tiles.srs = srs;
+        tiles.tiles = [];
+
+        tileDao.queryForTilesWithZoomLevel(zoom, function(err, row, rowDone) {
+          var tile = {};
+          tile.tableName = tableName;
+          tile.id = row.getId();
+          var tms = tileDao.tileMatrixSet;
+          var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
+
+          var tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
+          tile.minLongitude = tileBB.minLongitude;
+          tile.maxLongitude = tileBB.maxLongitude;
+          tile.minLatitude = tileBB.minLatitude;
+          tile.maxLatitude = tileBB.maxLatitude;
+          tile.projection = tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organizationCoordsysId;
+          tile.values = [];
+          for (var i = 0; i < tiles.columns.length; i++) {
+            var value = row.values[tiles.columns[i].name];
+            if (tiles.columns[i].name === 'tile_data') {
+              tile.values.push('data');
+            } else
+            if (value === null || value === 'null') {
+              tile.values.push('');
+            } else {
+              tile.values.push(value.toString());
+              tile[tiles.columns[i].name] = value;
+            }
+          }
+          tiles.tiles.push(tile);
+          rowDone();
+        }, function(err) {
+          var rendered = Mustache.render(tilesTableTemplate, tiles);
+          tilesElement.empty();
+          tilesElement.append(rendered);
+        });
+      });
+    });
+  }
+
+  var imageOverlay;
+
+  window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
+    if (imageOverlay) map.removeLayer(imageOverlay);
+    var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
+    var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
+    map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
+
+    geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+      tileDao.queryForTile(tileColumn, tileRow, zoom, function(err, tile) {
+        var tileData = tile.getTileData();
+        var type = fileType(tileData);
+        var binary = '';
+        var bytes = tileData;
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+          binary += String.fromCharCode( bytes[ i ] );
+        }
+        var base64Data = btoa( binary );
+        var url = 'data:'+type.mime+';base64,' + base64Data;
+        imageOverlay = L.imageOverlay(url, [[sw[1], sw[0]], [ne[1], ne[0]]]);
+        imageOverlay.addTo(map);
+      });
+    });
+  }
+
+  window.highlightTile = function(minLongitude, minLatitude, maxLongitude, maxLatitude, projection) {
+
+    var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
+    var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
+    var poly =  {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [[sw[0], sw[1]],
+          [sw[0], ne[1]],
+          [ne[0], ne[1]],
+          [ne[0], sw[1]],
+          [sw[0], sw[1]]]
+        ]
+      }
+    };
+
+    highlightLayer.clearLayers();
+    highlightLayer.addData(poly);
+    highlightLayer.bringToFront();
   }
 
   window.loadFeatures = function(tableName, featuresElement) {
