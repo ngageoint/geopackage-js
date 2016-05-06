@@ -485,7 +485,7 @@ var GeoPackage = require('./lib/geopackage')
   var featureLayer = L.geoJson([], {
       style: function (feature) {
           return {
-            color: "#FF0",
+            color: "#8000FF",
             weight: 3,
             opacity: 1
           };
@@ -507,7 +507,7 @@ var GeoPackage = require('./lib/geopackage')
       currentFeature = undefined;
       return;
     }
-    
+
     currentFeature = featureId;
     geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
       featureDao.getSrs(function(err, srs) {
