@@ -5,6 +5,7 @@ var GeoPackage = require('./lib/geopackage')
   , GeoPackageConnection = require('./lib/db/GeoPackageConnection')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
+  , BoundingBox = require('./lib/boundingBox')
   , async = require('async')
   , SQL = require('sql.js')
   , reproject = require('reproject')
@@ -243,7 +244,32 @@ var GeoPackage = require('./lib/geopackage')
     });
   }
 
+  var visibleTileTables = {};
+
+  window.zoomMap = function(zoom) {
+    map.setZoom(zoom);
+  }
+
+  window.registerTileTable = function(tableName, tilesElement) {
+    visibleTileTables[tableName] = tilesElement;
+    loadTiles(tableName, map.getZoom(), tilesElement);
+  }
+
+  window.unregisterTileTable = function(tableName) {
+    delete visibleTileTables[tableName];
+  }
+
+  map.on('moveend', function() {
+    for (var table in visibleTileTables) {
+      window.loadTiles(table, map.getZoom(), visibleTileTables[table]);
+    }
+  });
+
   window.loadTiles = function(tableName, zoom, tilesElement) {
+    map.setZoom(zoom);
+    if (imageOverlay) map.removeLayer(imageOverlay);
+    currentTile = {};
+
     var tilesTableTemplate = $('#all-tiles-template').html();
     Mustache.parse(tilesTableTemplate);
 
@@ -252,6 +278,9 @@ var GeoPackage = require('./lib/geopackage')
     geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
       if (err) {
         return callback();
+      }
+      if (zoom < tileDao.minZoom || zoom > tileDao.maxZoom) {
+        return tilesElement.empty();
       }
 
       tiles.columns = [];
@@ -270,12 +299,23 @@ var GeoPackage = require('./lib/geopackage')
         tiles.srs = srs;
         tiles.tiles = [];
 
-        tileDao.queryForTilesWithZoomLevel(zoom, function(err, row, rowDone) {
+        var tms = tileDao.tileMatrixSet;
+        var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
+        var mapBounds = map.getBounds();
+        var mapBoundingBox = new BoundingBox(Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
+        tiles.west = Math.max(-180, mapBounds.getWest()).toFixed(2);
+        tiles.east = Math.min(mapBounds.getEast(), 180).toFixed(2);
+        tiles.south = mapBounds.getSouth().toFixed(2);
+        tiles.north = mapBounds.getNorth().toFixed(2);
+        tiles.zoom = zoom;
+        mapBoundingBox = mapBoundingBox.projectBoundingBox('EPSG:4326', tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organizationCoordsysId);
+
+        var grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(tms.getBoundingBox(), tm.matrixWidth, tm.matrixHeight, mapBoundingBox);
+
+        tileDao.queryByTileGrid(grid, zoom, function(err, row, rowDone) {
           var tile = {};
           tile.tableName = tableName;
           tile.id = row.getId();
-          var tms = tileDao.tileMatrixSet;
-          var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
 
           var tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
           tile.minLongitude = tileBB.minLongitude;
@@ -308,12 +348,20 @@ var GeoPackage = require('./lib/geopackage')
   }
 
   var imageOverlay;
+  var currentTile = {};
 
   window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
     if (imageOverlay) map.removeLayer(imageOverlay);
+    if (tileColumn === currentTile.tileColumn
+    && tileRow === currentTile.tileRow
+    && zoom === currentTile.zoom
+    && tableName === currentTile.tableName) {
+      currentTile = {};
+      return;
+    }
     var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
     var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
-    map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
+    // map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
 
     geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
       tileDao.queryForTile(tileColumn, tileRow, zoom, function(err, tile) {
@@ -328,6 +376,10 @@ var GeoPackage = require('./lib/geopackage')
         var base64Data = btoa( binary );
         var url = 'data:'+type.mime+';base64,' + base64Data;
         imageOverlay = L.imageOverlay(url, [[sw[1], sw[0]], [ne[1], ne[0]]]);
+        currentTile.tileColumn = tileColumn;
+        currentTile.tileRow = tileRow;
+        currentTile.zoom = zoom;
+        currentTile.tableName = tableName;
         imageOverlay.addTo(map);
       });
     });
@@ -463,6 +515,37 @@ var GeoPackage = require('./lib/geopackage')
   }
 
   window.zoomToFeature = function(featureId, tableName) {
+    window.toggleFeature(featureId, tableName, true, true);
+  }
+
+  var currentFeature;
+  var featureLayer = L.geoJson([], {
+      style: function (feature) {
+          return {
+            color: "#8000FF",
+            weight: 3,
+            opacity: 1
+          };
+      },
+      onEachFeature: function (feature, layer) {
+        var string = "";
+        for (var key in feature.properties) {
+          string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+        }
+        layer.bindPopup(string);
+      }
+  });
+  map.addLayer(featureLayer);
+
+  window.toggleFeature = function(featureId, tableName, zoom, force) {
+    featureLayer.clearLayers();
+
+    if (currentFeature === featureId && !force) {
+      currentFeature = undefined;
+      return;
+    }
+
+    currentFeature = featureId;
     geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
       featureDao.getSrs(function(err, srs) {
         featureDao.queryForIdObject(featureId, function(err, thing, feature) {
@@ -474,10 +557,17 @@ var GeoPackage = require('./lib/geopackage')
             if (srs.definition && srs.definition !== 'undefined') {
               geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
             }
-            var l = L.geoJson([geoJson]);
-            map.fitBounds(l.getBounds());
+            featureLayer.addData(geoJson);
+            featureLayer.bringToFront();
+            if (zoom) {
+              map.fitBounds(featureLayer.getBounds());
+            }
           }
         });
       });
     });
+  }
+
+  window.clearHighlights = function() {
+    highlightLayer.clearLayers();
   }

@@ -52,6 +52,7 @@
       </div>
     </div>
     <div id="information" class="information hidden">
+      <hr>
       <div class="tableGroup">
       <div id="tile-tables"></div>
       </div>
@@ -132,10 +133,11 @@
       <div class="features" style="display: none;">
       </div>
     </div>
+    <hr>
   </div>
   </script>
   <script id="all-features-template" type="x-tmpl-mustache">
-    <table>
+    <table onmouseout="clearHighlights()">
       <thead>
         <tr>
           {{#columns}}
@@ -144,7 +146,8 @@
         </tr>
       </thead>
       {{#features}}
-      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')" ondblclick="zoomToFeature({{id}}, '{{tableName}}')">
+      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')" ondblclick="zoomToFeature({{id}}, '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
+      <td><i class="fa fa-circle-o" onclick="toggleFeature({{id}}, '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
         {{#values}}
           <td>{{.}}</td>
         {{/values}}
@@ -163,8 +166,8 @@
     </div>
     <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organizationCoordsysId}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
-      <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
-      <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tab').toggleClass('active');">Tiles</div>
+      <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
+      <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
       <div class="metadata">
         <div class="tiles">
           <div class="section-title">Tile Information</div>
@@ -216,9 +219,11 @@
           </div>
         </div>
       </div>
-      <div class="tileListing" style="display: none;">
+      <div class="section-title">Tiles in the current map view (zoom and pan in the map to see other tiles)</div>
+      <div class="tileListing">
       </div>
     </div>
+    <hr>
   </div>
   </script>
   <script id="tile-zoom-levels-template" type="x-tmpl-mustache">
@@ -230,16 +235,25 @@
   </div>
   </script>
   <script id="all-tiles-template" type="x-tmpl-mustache">
-    <table>
+  <div class="section">
+    <div class="item"><span class="label">West: </span><span class="value">{{west}}</span></div>
+    <div class="item"><span class="label">South: </span><span class="value">{{south}}</span></div>
+    <div class="item"><span class="label">East: </span><span class="value">{{east}}</span></div>
+    <div class="item"><span class="label">North: </span><span class="value">{{north}}</span></div>
+    <div class="item"><span class="label">Zoom: </span><span class="value">{{zoom}}</span></div>
+  </div>
+    <table onmouseout="clearHighlights()">
       <thead>
         <tr>
+          <th></th>
           {{#columns}}
             <th>{{name}}</th>
           {{/columns}}
         </tr>
       </thead>
       {{#tiles}}
-      <tr onmouseover="highlightTile({{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}')" ondblclick="zoomToTile({{tile_column}}, {{tile_row}}, {{zoom_level}}, {{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}', '{{tableName}}')">
+      <tr onmouseover="highlightTile({{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}')" ondblclick="zoomToTile({{tile_column}}, {{tile_row}}, {{zoom_level}}, {{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}', '{{tableName}}'); if($(this).find('.fa').hasClass('fa-circle-o')) {$(this).parent().find('.fa').removeClass('fa-check-circle').addClass('fa-circle-o')} $(this).find('.fa').toggleClass('fa-circle-o').toggleClass('fa-check-circle')">
+        <td><i class="fa fa-circle-o" onclick="zoomToTile({{tile_column}}, {{tile_row}}, {{zoom_level}}, {{minLongitude}}, {{minLatitude}}, {{maxLongitude}}, {{maxLatitude}}, '{{projection}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');}$(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle')"></i></td>
         {{#values}}
           <td>{{.}}</td>
         {{/values}}
