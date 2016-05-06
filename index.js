@@ -5,6 +5,7 @@ var GeoPackage = require('./lib/geopackage')
   , GeoPackageConnection = require('./lib/db/GeoPackageConnection')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
+  , BoundingBox = require('./lib/boundingBox')
   , async = require('async')
   , SQL = require('sql.js')
   , reproject = require('reproject')
@@ -243,7 +244,29 @@ var GeoPackage = require('./lib/geopackage')
     });
   }
 
+  var visibleTileTables = {};
+
+  window.zoomMap = function(zoom) {
+    map.setZoom(zoom);
+  }
+
+  window.registerTileTable = function(tableName, tilesElement) {
+    visibleTileTables[tableName] = tilesElement;
+    loadTiles(tableName, map.getZoom(), tilesElement);
+  }
+
+  window.unregisterTileTable = function(tableName) {
+    delete visibleTileTables[tableName];
+  }
+
+  map.on('moveend', function() {
+    for (var table in visibleTileTables) {
+      window.loadTiles(table, map.getZoom(), visibleTileTables[table]);
+    }
+  });
+
   window.loadTiles = function(tableName, zoom, tilesElement) {
+    map.setZoom(zoom);
     if (imageOverlay) map.removeLayer(imageOverlay);
     currentTile = {};
 
@@ -255,6 +278,9 @@ var GeoPackage = require('./lib/geopackage')
     geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
       if (err) {
         return callback();
+      }
+      if (zoom < tileDao.minZoom || zoom > tileDao.maxZoom) {
+        return tilesElement.empty();
       }
 
       tiles.columns = [];
@@ -273,12 +299,23 @@ var GeoPackage = require('./lib/geopackage')
         tiles.srs = srs;
         tiles.tiles = [];
 
-        tileDao.queryForTilesWithZoomLevel(zoom, function(err, row, rowDone) {
+        var tms = tileDao.tileMatrixSet;
+        var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
+        var mapBounds = map.getBounds();
+        var mapBoundingBox = new BoundingBox(Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
+        tiles.west = Math.max(-180, mapBounds.getWest()).toFixed(2);
+        tiles.east = Math.min(mapBounds.getEast(), 180).toFixed(2);
+        tiles.south = mapBounds.getSouth().toFixed(2);
+        tiles.north = mapBounds.getNorth().toFixed(2);
+        tiles.zoom = zoom;
+        mapBoundingBox = mapBoundingBox.projectBoundingBox('EPSG:4326', tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organizationCoordsysId);
+
+        var grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(tms.getBoundingBox(), tm.matrixWidth, tm.matrixHeight, mapBoundingBox);
+
+        tileDao.queryByTileGrid(grid, zoom, function(err, row, rowDone) {
           var tile = {};
           tile.tableName = tableName;
           tile.id = row.getId();
-          var tms = tileDao.tileMatrixSet;
-          var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
 
           var tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
           tile.minLongitude = tileBB.minLongitude;
@@ -324,7 +361,7 @@ var GeoPackage = require('./lib/geopackage')
     }
     var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
     var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
-    map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
+    // map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
 
     geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
       tileDao.queryForTile(tileColumn, tileRow, zoom, function(err, tile) {
