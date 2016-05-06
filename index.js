@@ -244,6 +244,9 @@ var GeoPackage = require('./lib/geopackage')
   }
 
   window.loadTiles = function(tableName, zoom, tilesElement) {
+    if (imageOverlay) map.removeLayer(imageOverlay);
+    currentTile = {};
+
     var tilesTableTemplate = $('#all-tiles-template').html();
     Mustache.parse(tilesTableTemplate);
 
@@ -308,9 +311,17 @@ var GeoPackage = require('./lib/geopackage')
   }
 
   var imageOverlay;
+  var currentTile = {};
 
   window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
     if (imageOverlay) map.removeLayer(imageOverlay);
+    if (tileColumn === currentTile.tileColumn
+    && tileRow === currentTile.tileRow
+    && zoom === currentTile.zoom
+    && tableName === currentTile.tableName) {
+      currentTile = {};
+      return;
+    }
     var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
     var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
     map.setView([((ne[1] - sw[1])/2) + sw[1], ((ne[0] - sw[0])/2) + sw[0]], zoom);
@@ -328,6 +339,10 @@ var GeoPackage = require('./lib/geopackage')
         var base64Data = btoa( binary );
         var url = 'data:'+type.mime+';base64,' + base64Data;
         imageOverlay = L.imageOverlay(url, [[sw[1], sw[0]], [ne[1], ne[0]]]);
+        currentTile.tileColumn = tileColumn;
+        currentTile.tileRow = tileRow;
+        currentTile.zoom = zoom;
+        currentTile.tableName = tableName;
         imageOverlay.addTo(map);
       });
     });
@@ -463,6 +478,37 @@ var GeoPackage = require('./lib/geopackage')
   }
 
   window.zoomToFeature = function(featureId, tableName) {
+    window.toggleFeature(featureId, tableName, true, true);
+  }
+
+  var currentFeature;
+  var featureLayer = L.geoJson([], {
+      style: function (feature) {
+          return {
+            color: "#FF0",
+            weight: 3,
+            opacity: 1
+          };
+      },
+      onEachFeature: function (feature, layer) {
+        var string = "";
+        for (var key in feature.properties) {
+          string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+        }
+        layer.bindPopup(string);
+      }
+  });
+  map.addLayer(featureLayer);
+
+  window.toggleFeature = function(featureId, tableName, zoom, force) {
+    featureLayer.clearLayers();
+
+    if (currentFeature === featureId && !force) {
+      currentFeature = undefined;
+      return;
+    }
+    
+    currentFeature = featureId;
     geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
       featureDao.getSrs(function(err, srs) {
         featureDao.queryForIdObject(featureId, function(err, thing, feature) {
@@ -474,10 +520,17 @@ var GeoPackage = require('./lib/geopackage')
             if (srs.definition && srs.definition !== 'undefined') {
               geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
             }
-            var l = L.geoJson([geoJson]);
-            map.fitBounds(l.getBounds());
+            featureLayer.addData(geoJson);
+            featureLayer.bringToFront();
+            if (zoom) {
+              map.fitBounds(featureLayer.getBounds());
+            }
           }
         });
       });
     });
+  }
+
+  window.clearHighlights = function() {
+    highlightLayer.clearLayers();
   }
