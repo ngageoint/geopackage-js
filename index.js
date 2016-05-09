@@ -149,7 +149,6 @@ var GeoPackage = require('./lib/geopackage')
 
         var maxZoom = tileDao.maxZoom;
         var minZoom = tileDao.minZoom;
-
         var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
         var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
         tableLayer.drawTile = function(canvas, tilePoint, zoom) {
@@ -157,6 +156,7 @@ var GeoPackage = require('./lib/geopackage')
           });
         };
         tableLayer.addTo(map);
+        tableLayer.bringToFront();
         tableLayers[table] = tableLayer;
       });
     } else if (layerType === 'feature') {
@@ -280,7 +280,9 @@ var GeoPackage = require('./lib/geopackage')
         return callback();
       }
       if (zoom < tileDao.minZoom || zoom > tileDao.maxZoom) {
-        return tilesElement.empty();
+        tilesElement.empty();
+        tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level. Min zoom: ' + tileDao.minZoom + ' Max Zoom: ' + tileDao.maxZoom + '</div>')
+        return;
       }
 
       tiles.columns = [];
