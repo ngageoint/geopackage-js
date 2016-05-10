@@ -72,7 +72,10 @@ var GeoPackage = require('./lib/geopackage')
     r.readAsArrayBuffer(f);
   }
 
+  var tableInfos;
+
   function loadByteArray(array, callback) {
+    tableInfos = {};
     var tileTableNode = $('#tile-tables');
     tileTableNode.empty();
     var featureTableNode = $('#feature-tables');
@@ -100,6 +103,7 @@ var GeoPackage = require('./lib/geopackage')
             async.eachSeries(tables, function(table, callback) {
               geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
                 geoPackage.getInfoForTable(tileDao, function(err, info) {
+                  tableInfos[table] = info;
                   var rendered = Mustache.render(tileTableTemplate, info);
                   tileTableNode.append(rendered);
                   callback();
@@ -115,6 +119,7 @@ var GeoPackage = require('./lib/geopackage')
                   return callback();
                 }
                 geoPackage.getInfoForTable(featureDao, function(err, info) {
+                  tableInfos[table] = info;
                   var rendered = Mustache.render(featureTableTemplate, info);
                   featureTableNode.append(rendered);
                   callback();
@@ -176,36 +181,37 @@ var GeoPackage = require('./lib/geopackage')
             layer.bindPopup(string);
           }
       });
+      var tableInfo = tableInfos[table];
       geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
         if (err) {
           return;
         }
         var features = 0;
-        featureDao.getSrs(function(err, srs) {
-          featureDao.queryForEach(function(err, row, rowDone) {
-            features++;
-            var currentRow = featureDao.getFeatureRow(row);
-            var geometry = currentRow.getGeometry();
-            if (geometry) {
-              var geom = geometry.geometry;
-              var geoJson = geometry.geometry.toGeoJSON();
-              if (srs.definition && srs.definition !== 'undefined') {
-                geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
-              }
-              geoJson.properties = {};
-              for (var key in currentRow.values) {
-                if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
-                  geoJson.properties[key] = currentRow.values[key];
-                }
-              }
-              geojsonLayer.addData(geoJson);
+        var srs = tableInfo.srs;
+        featureDao.queryForEach(function(err, row, rowDone) {
+          features++;
+          var currentRow = featureDao.getFeatureRow(row);
+          var geometry = currentRow.getGeometry();
+          if (geometry) {
+            var geom = geometry.geometry;
+            var geoJson = geometry.geometry.toGeoJSON();
+            if (srs.definition && srs.definition !== 'undefined') {
+              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
             }
-            rowDone();
-          }, function(err) {
-            geojsonLayer.addTo(map);
-            geojsonLayer.bringToFront();
-            tableLayers[table] = geojsonLayer;
-          });
+            geoJson.properties = {};
+            for (var key in currentRow.values) {
+              if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
+                var column = tableInfo.columnMap[key];
+                geoJson.properties[column.displayName] = currentRow.values[key];
+              }
+            }
+            geojsonLayer.addData(geoJson);
+          }
+          rowDone();
+        }, function(err) {
+          geojsonLayer.addTo(map);
+          geojsonLayer.bringToFront();
+          tableLayers[table] = geojsonLayer;
         });
       });
     }
@@ -414,60 +420,51 @@ var GeoPackage = require('./lib/geopackage')
     var featuresTableTemplate = $('#all-features-template').html();
     Mustache.parse(featuresTableTemplate);
 
-    var features = {};
+    var features = {
+      columns: [],
+      features: []
+    };
 
-    geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
-      if (err) {
-        return callback();
-      }
-
-      features.columns = [];
-      for (var i = 0; i < featureDao.table.columns.length; i++) {
-        var column = featureDao.table.columns[i];
-        features.columns.push({
-          index: column.index,
-          name: column.name,
-          max: column.max,
-          min: column.min,
-          notNull: column.notNull,
-          primaryKey: column.primaryKey
-        });
-      }
-
-      featureDao.getSrs(function(err, srs) {
-        features.srs = srs;
-        features.features = [];
-
-        featureDao.queryForEach(function(err, row, rowDone) {
-          var feature = {};
-          var currentRow = featureDao.getFeatureRow(row);
-          feature.tableName = tableName;
-          feature.id = currentRow.getId();
-          var geometry = currentRow.getGeometry();
-          if (geometry) {
-            var geom = geometry.geometry;
-            var geoJson = geometry.geometry.toGeoJSON();
-            feature.geometry = geoJson;
-          }
-          feature.values = [];
-          for (var i = 0; i < features.columns.length; i++) {
-            var value = currentRow.values[features.columns[i].name];
-            if (features.columns[i].name === currentRow.getGeometryColumn().name) {
-              feature.values.push('geom');
-            } else if (value === null || value === 'null') {
-              feature.values.push('');
+    async.waterfall([function(callback) {
+      geoPackage.getFeatureDaoWithTableName(tableName, callback);
+    }, function(featureDao, callback) {
+      features.columns = tableInfos[tableName].columns;
+      features.srs = tableInfos[tableName].srs;
+      callback(null, featureDao);
+    }, function(featureDao, callback) {
+      featureDao.queryForEach(function(err, row, rowDone) {
+        var feature = {};
+        var currentRow = featureDao.getFeatureRow(row);
+        feature.tableName = tableName;
+        feature.id = currentRow.getId();
+        var geometry = currentRow.getGeometry();
+        if (geometry) {
+          var geom = geometry.geometry;
+          var geoJson = geometry.geometry.toGeoJSON();
+          feature.geometry = geoJson;
+        }
+        feature.values = [];
+        for (var i = 0; i < features.columns.length; i++) {
+          var value = currentRow.values[features.columns[i].name];
+          if (features.columns[i].name === currentRow.getGeometryColumn().name) {
+            if (geometry) {
+              feature.values.push('Valid');
             } else {
-              feature.values.push(value.toString());
+              feature.values.push('No Geometry');
             }
+          } else if (value === null || value === 'null') {
+            feature.values.push('');
+          } else {
+            feature.values.push(value.toString());
           }
-          features.features.push(feature);
-          rowDone();
-        }, function(err) {
-          var rendered = Mustache.render(featuresTableTemplate, features);
-          featuresElement.empty();
-          featuresElement.append(rendered);
-        });
-      });
+        }
+        features.features.push(feature);
+        rowDone();
+      }, callback);
+    }], function() {
+      var rendered = Mustache.render(featuresTableTemplate, features);
+      featuresElement.empty();
+      featuresElement.append(rendered);
     });
   }
 
@@ -490,28 +487,29 @@ var GeoPackage = require('./lib/geopackage')
   map.addLayer(highlightLayer);
 
   window.highlightFeature = function(featureId, tableName) {
+    var tableInfo = tableInfos[tableName];
     geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
-      featureDao.getSrs(function(err, srs) {
-        featureDao.queryForIdObject(featureId, function(err, thing, feature) {
-          feature = featureDao.getFeatureRow(feature);
-          var geometry = feature.getGeometry();
-          if (geometry) {
-            var geom = geometry.geometry;
-            var geoJson = geometry.geometry.toGeoJSON();
-            if (srs.definition && srs.definition !== 'undefined') {
-              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
-            }
-            geoJson.properties = {};
-            for (var key in feature.values) {
-              if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
-                geoJson.properties[key] = feature.values[key];
-              }
-            }
-            highlightLayer.clearLayers();
-            highlightLayer.addData(geoJson);
-            highlightLayer.bringToFront();
+      var srs = tableInfo.srs;
+      featureDao.queryForIdObject(featureId, function(err, thing, feature) {
+        feature = featureDao.getFeatureRow(feature);
+        var geometry = feature.getGeometry();
+        if (geometry) {
+          var geom = geometry.geometry;
+          var geoJson = geometry.geometry.toGeoJSON();
+          if (srs.definition && srs.definition !== 'undefined') {
+            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
           }
-        });
+          geoJson.properties = {};
+          for (var key in feature.values) {
+            if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
+              var column = tableInfo.columnMap[key];
+              geoJson.properties[column.displayName] = feature.values[key];
+            }
+          }
+          highlightLayer.clearLayers();
+          highlightLayer.addData(geoJson);
+          highlightLayer.bringToFront();
+        }
       });
     });
   }
@@ -548,24 +546,32 @@ var GeoPackage = require('./lib/geopackage')
     }
 
     currentFeature = featureId;
+    var tableInfo = tableInfos[tableName];
+
     geoPackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
-      featureDao.getSrs(function(err, srs) {
-        featureDao.queryForIdObject(featureId, function(err, thing, feature) {
-          feature = featureDao.getFeatureRow(feature);
-          var geometry = feature.getGeometry();
-          if (geometry) {
-            var geom = geometry.geometry;
-            var geoJson = geometry.geometry.toGeoJSON();
-            if (srs.definition && srs.definition !== 'undefined') {
-              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
-            }
-            featureLayer.addData(geoJson);
-            featureLayer.bringToFront();
-            if (zoom) {
-              map.fitBounds(featureLayer.getBounds());
+      var srs = tableInfo.srs;
+      featureDao.queryForIdObject(featureId, function(err, thing, feature) {
+        feature = featureDao.getFeatureRow(feature);
+        var geometry = feature.getGeometry();
+        if (geometry) {
+          var geom = geometry.geometry;
+          var geoJson = geometry.geometry.toGeoJSON();
+          if (srs.definition && srs.definition !== 'undefined') {
+            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+          }
+          geoJson.properties = {};
+          for (var key in feature.values) {
+            if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
+              var column = tableInfo.columnMap[key];
+              geoJson.properties[column.displayName] = feature.values[key];
             }
           }
-        });
+          featureLayer.addData(geoJson);
+          featureLayer.bringToFront();
+          if (zoom) {
+            map.fitBounds(featureLayer.getBounds());
+          }
+        }
       });
     });
   }

@@ -1,7 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>geopackage</title>
+  <title>GeoPackage JS</title>
+  <meta name="twitter:site" content="@nga_geoint">
+  <meta property="og:site_name" content="NGA">
+  <meta name="twitter:url" content="http://ngageoint.github.io/geopackage-js/">
+  <meta property="og:url" content="http://ngageoint.github.io/geopackage-js/">
+  <meta name="twitter:title" content="GeoPackage JS">
+  <meta property="og:title" content="GeoPackage JS">
+  <meta name="twitter:description" content="JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
+  <meta property="og:description" content="JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
+  <meta name="twitter:image" content="http://ngageoint.github.io/geopackage-js/geopackage-js.png">
+  <meta property="og:image" content="http://ngageoint.github.io/geopackage-js/geopackage-js.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
   <link rel="stylesheet" type="text/css" href="app.css"/>
 </head>
@@ -125,6 +137,17 @@
               <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
               <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
               <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+              {{#dataColumn}}
+              <div class="section-title">Data Column:</div>
+              <div class="section">
+                <div class="dataColumn">
+                  <div class="item"><span class="label">Name: </span><span class="value">{{dataColumn.name}}</span></div>
+                  <div class="item"><span class="label">Title: </span><span class="value">{{dataColumn.title}}</span></div>
+                  <div class="item"><span class="label">Description: </span><span class="value">{{dataColumn.description}}</span></div>
+                  <div class="item"><span class="label">Mime Type: </span><span class="value">{{dataColumn.mime_type}}</span></div>
+                </div>
+              </div>
+              {{/dataColumn}}
             </div>
             {{/columns}}
           </div>
@@ -140,8 +163,9 @@
     <table onmouseout="clearHighlights()">
       <thead>
         <tr>
+          <th></th>
           {{#columns}}
-            <th>{{name}}</th>
+            <th>{{displayName}}</th>
           {{/columns}}
         </tr>
       </thead>
