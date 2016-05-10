@@ -137,6 +137,17 @@
               <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
               <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
               <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+              {{#dataColumn}}
+              <div class="section-title">Data Column:</div>
+              <div class="section">
+                <div class="dataColumn">
+                  <div class="item"><span class="label">Name: </span><span class="value">{{dataColumn.name}}</span></div>
+                  <div class="item"><span class="label">Title: </span><span class="value">{{dataColumn.title}}</span></div>
+                  <div class="item"><span class="label">Description: </span><span class="value">{{dataColumn.description}}</span></div>
+                  <div class="item"><span class="label">Mime Type: </span><span class="value">{{dataColumn.mime_type}}</span></div>
+                </div>
+              </div>
+              {{/dataColumn}}
             </div>
             {{/columns}}
           </div>
@@ -154,7 +165,7 @@
         <tr>
           <th></th>
           {{#columns}}
-            <th>{{name}}</th>
+            <th>{{displayName}}</th>
           {{/columns}}
         </tr>
       </thead>
