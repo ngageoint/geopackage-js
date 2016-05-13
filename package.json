@@ -38,6 +38,7 @@
     "sqlite3": "^3.1.2",
     "stream-to-array": "^2.1.0",
     "uglify-js": "^2.6.2",
+    "webworkify": "^1.1.0",
     "wkx": "^0.2.0"
   },
   "java": {
