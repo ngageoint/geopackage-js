@@ -164,6 +164,7 @@ var GeoPackage = require('./lib/geopackage')
           console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + zoom);
           gpr.drawTileIn(tilePoint.x, tilePoint.y, zoom, canvas, function(err, tile) {
             console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + zoom);
+            tableLayer.tileDrawn(canvas);
           });
         };
         tableLayer.addTo(map);
