@@ -1,6 +1,7 @@
 var css = require('./includes.css');
 
-var GeoPackage = require('./lib/geopackage')
+var GeoPackageAPI = require('./geopackage')
+  , GeoPackage = require('./lib/geopackage')
   , GeoPackageManager = require('./lib/geoPackageManager')
   , GeoPackageConnection = require('./lib/db/GeoPackageConnection')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
