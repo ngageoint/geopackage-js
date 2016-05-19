@@ -1,0 +1,28 @@
+{
+  "name": "geopackage",
+  "version": "1.0.0",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "lib",
+    "docs",
+    "coverage"
+  ],
+  "main": [
+    "static/geopackage.js"
+  ],
+  "homepage": "http://ngageoint.github.io/geopackage-js/",
+  "authors": [
+    "Dan Barela <daniel.barela@gmail.com>"
+  ],
+  "description": "JavaScript GeoPackage library",
+  "keywords": [
+    "NGA",
+    "GeoPackage"
+  ],
+  "private": true
+}
