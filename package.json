@@ -36,7 +36,7 @@
   "private": true,
   "main": "geopackage.js",
   "files": ["static/geopackage.js", "lib"],
-  "browser": "static/geopackage.js",
+  "browser": "geopackage.js",
   "devDependencies": {
     "browserify": "^13.0.0",
     "browserify-css": "^0.9.1",
