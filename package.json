@@ -14,10 +14,13 @@
     "name": "Daniel Barela",
     "email": "daniel.barela@gmail.com"
   },
-  "homepage": "https://www1.nga.mil",
-  "engines": {
-    "node": ">= 0.10.0",
-    "npm": ">= 1.2.0"
+  "homepage": "http://ngageoint.github.io/geopackage-js/",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/ngageoint/geopackage-js.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
     "async": "^1.5.0",
@@ -34,9 +37,10 @@
     "webworkify": "^1.1.0",
     "wkx": "^0.2.0"
   },
-  "bundleDependencies": [],
   "private": true,
   "main": "geopackage.js",
+  "files": ["static/geopackage.js"],
+  "browser": "static/geopackage.js",
   "devDependencies": {
     "browserify": "^13.0.0",
     "browserify-css": "^0.9.1",
