@@ -23,7 +23,6 @@
     "async": "^1.5.0",
     "file-type": "^3.8.0",
     "jquery": "^2.2.3",
-    "geopackage": "ngageoint/geopackage-js#develop",
     "leaflet": "^0.7.7",
     "lwip": "0.0.8",
     "mustache": "^2.2.1",
