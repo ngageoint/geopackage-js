@@ -37,5 +37,7 @@ mochawesome-reports
 
 .tern-project
 
+bower_components
+
 test/private
 test/fixtures/private
