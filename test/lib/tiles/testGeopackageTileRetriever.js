@@ -28,9 +28,6 @@ describe('GeoPackage Tile Retriever tests', function() {
 
   it('should get the x: 2, y: 1, z: 2 tile', function(done) {
     this.timeout(0);
-    var maxZoom = tileDao.maxZoom;
-    var minZoom = tileDao.minZoom;
-
     var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
     gpr.getTile(2,1,2, function(err, tile) {
       fs.writeFileSync('/tmp/gptile.png', tile);

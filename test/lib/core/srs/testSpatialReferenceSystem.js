@@ -22,10 +22,10 @@ describe('SpatialReferenceSystem tests', function() {
   it('should get the 4326 SRS', function(done) {
     geoPackage.getSpatialReferenceSystemDao().getBySrsId(4326, function(err, srs) {
       should.exist(srs);
-      srs.should.have.property('srsName')
-      srs.should.have.property('srsId');
+      srs.should.have.property('srs_name')
+      srs.should.have.property('srs_id');
       srs.should.have.property('organization');
-      srs.should.have.property('organizationCoordsysId', 4326);
+      srs.should.have.property('organization_coordsys_id', 4326);
       srs.should.have.property('definition');
       should.not.exist(err);
       done();
@@ -36,10 +36,10 @@ describe('SpatialReferenceSystem tests', function() {
     geoPackage.getSpatialReferenceSystemDao().getBySrsId(0, function(err, srs) {
       should.not.exist(err);
       should.exist(srs);
-      srs.should.have.property('srsName')
-      srs.should.have.property('srsId');
+      srs.should.have.property('srs_name')
+      srs.should.have.property('srs_id');
       srs.should.have.property('organization');
-      srs.should.have.property('organizationCoordsysId', 0);
+      srs.should.have.property('organization_coordsys_id', 0);
       srs.should.have.property('definition');
       done();
     });

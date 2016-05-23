@@ -188,7 +188,7 @@ var GeoPackage = GeoPackageAPI.GeoPackage
             var geom = geometry.geometry;
             var geoJson = geometry.geometry.toGeoJSON();
             if (srs.definition && srs.definition !== 'undefined') {
-              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+              geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
             }
             geoJson.properties = {};
             for (var key in currentRow.values) {
@@ -308,9 +308,9 @@ var GeoPackage = GeoPackageAPI.GeoPackage
         tiles.south = mapBounds.getSouth().toFixed(2);
         tiles.north = mapBounds.getNorth().toFixed(2);
         tiles.zoom = zoom;
-        mapBoundingBox = mapBoundingBox.projectBoundingBox('EPSG:4326', tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organizationCoordsysId);
+        mapBoundingBox = mapBoundingBox.projectBoundingBox('EPSG:4326', tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id);
 
-        var grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(tms.getBoundingBox(), tm.matrixWidth, tm.matrixHeight, mapBoundingBox);
+        var grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(tms.getBoundingBox(), tm.matrix_width, tm.matrix_height, mapBoundingBox);
 
         tileDao.queryByTileGrid(grid, zoom, function(err, row, rowDone) {
           var tile = {};
@@ -322,7 +322,7 @@ var GeoPackage = GeoPackageAPI.GeoPackage
           tile.maxLongitude = tileBB.maxLongitude;
           tile.minLatitude = tileBB.minLatitude;
           tile.maxLatitude = tileBB.maxLatitude;
-          tile.projection = tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organizationCoordsysId;
+          tile.projection = tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id;
           tile.values = [];
           for (var i = 0; i < tiles.columns.length; i++) {
             var value = row.values[tiles.columns[i].name];
@@ -489,7 +489,7 @@ var GeoPackage = GeoPackageAPI.GeoPackage
           var geom = geometry.geometry;
           var geoJson = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
           geoJson.properties = {};
           for (var key in feature.values) {
@@ -549,7 +549,7 @@ var GeoPackage = GeoPackageAPI.GeoPackage
           var geom = geometry.geometry;
           var geoJson = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organizationCoordsysId, 'EPSG:4326');
+            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
           geoJson.properties = {};
           for (var key in feature.values) {

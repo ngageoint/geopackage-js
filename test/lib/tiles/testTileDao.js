@@ -56,10 +56,10 @@ describe('TileDao tests', function() {
         if (zoom === 4) {
           should.not.exist(grid);
         } else {
-          grid.minX.should.be.equal(0);
-          grid.minY.should.be.equal(0);
-          grid.maxX.should.be.equal(Math.pow(2, zoom)-1);
-          grid.maxX.should.be.equal(Math.pow(2, zoom)-1);
+          grid.min_x.should.be.equal(0);
+          grid.min_y.should.be.equal(0);
+          grid.max_x.should.be.equal(Math.pow(2, zoom)-1);
+          grid.max_x.should.be.equal(Math.pow(2, zoom)-1);
         }
         callback();
       }, function(err) {
@@ -69,7 +69,7 @@ describe('TileDao tests', function() {
 
     it('should get the table', function() {
       var tileTable = tileDao.getTileTable();
-      tileTable.tableName.should.be.equal('TILESosmds');
+      tileTable.table_name.should.be.equal('TILESosmds');
       should.exist(tileTable.getTileDataColumn);
     });
 
@@ -132,10 +132,10 @@ describe('TileDao tests', function() {
 
     it('should query for tiles in the tile grid', function(done) {
       var tileGrid = {
-        minX: 0,
-        maxX: 1,
-        minY: 0,
-        maxY: 0
+        min_x: 0,
+        max_x: 1,
+        min_y: 0,
+        max_y: 0
       };
       tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);

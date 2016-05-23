@@ -17,7 +17,7 @@ describe('UserTableReader tests', function() {
   it('should read the table', function(done) {
     var reader = new UserTableReader('point2d');
     reader.readTable(connection, function(err, table) {
-      table.tableName.should.be.equal('point2d');
+      table.table_name.should.be.equal('point2d');
       table.columns.length.should.be.equal(8);
       table.columns[0].name.should.be.equal('fid');
       table.columns[1].name.should.be.equal('geom');

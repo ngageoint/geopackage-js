@@ -140,7 +140,7 @@ var Contents = function() {
    * the name of the tiles, or feature table
    * @member {string}
    */
-  this.tableName;
+  this.table_name;
 
   /**
    * Type of data stored in the table:. “features” per clause Features,
@@ -148,7 +148,7 @@ var Contents = function() {
    * tables per clause in an Extended GeoPackage.
    * @member {string}
    */
-  this.dataType;
+  this.data_type;
 
   /**
    * A human-readable identifier (e.g. short name) for the table_name content
@@ -160,44 +160,44 @@ var Contents = function() {
    * A human-readable description for the table_name content
    * @member {string}
    */
-  this.theDescription;
+  this.description;
 
   /**
    * timestamp value in ISO 8601 format as defined by the strftime function
    * %Y-%m-%dT%H:%M:%fZ format string applied to the current time
    * @member {Date}
    */
-  this.lastChange;
+  this.last_change;
 
   /**
    * Bounding box minimum easting or longitude for all content in table_name
    * @member {Number}
    */
-  this.minX;
+  this.min_x;
 
   /**
    * Bounding box minimum northing or latitude for all content in table_name
    * @member {Number}
    */
-  this.minY;
+  this.min_y;
 
   /**
    * Bounding box maximum easting or longitude for all content in table_name
    * @member {Number}
    */
-  this.maxX;
+  this.max_x;
 
   /**
    * Bounding box maximum northing or latitude for all content in table_name
    * @member {Number}
    */
-  this.maxY;
+  this.max_y;
 
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
    * @member {Number}
    */
-  this.srsId;
+  this.srs_id;
 }
 
 /**
@@ -265,7 +265,7 @@ ContentsDao.prototype.deleteByIdsCascade = function (idCollection) {
   throw new Error('not implemented');
 };
 
-ContentsDao.prototype.deleteByIdsCascadeWithUserTable = function (idColleciton, userTable) {
+ContentsDao.prototype.deleteByIdsCascadeWithUserTable = function (idCollection, userTable) {
   throw new Error('not implemented');
 };
 
@@ -275,14 +275,14 @@ ContentsDao.prototype.deleteTable = function (tableName) {
 
 ContentsDao.prototype.getSrs = function (contents, callback) {
   var dao = this.getSpatialReferenceSystemDao();
-  dao.queryForIdObject(contents.srsId, callback);
+  dao.queryForIdObject(contents.srs_id, callback);
 };
 
 ContentsDao.prototype.getGeometryColumns = function (contents, callback) {
   var dao = this.getGeometryColumnsDao();
   // TODO what is causing this to need to be here and not up in the require section
   var GeometryColumnsDao = require('../../features/columns').GeometryColumnsDao;
-  dao.queryForEqWithFieldAndValue(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.tableName, function(err, results) {
+  dao.queryForEqWithFieldAndValue(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name, function(err, results) {
     if (err || !results || !results.length) return callback(err);
     var gc = dao.createObject();
     dao.populateObjectFromResult(gc, results[0]);
@@ -292,7 +292,7 @@ ContentsDao.prototype.getGeometryColumns = function (contents, callback) {
 
 ContentsDao.prototype.getTileMatrixSet = function (contents, callback) {
   var dao = this.getTileMatrixSetDao();
-  dao.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.tableName, function(err, results) {
+  dao.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name, function(err, results) {
     if (err || !results || !results.length) return callback(err);
     var gc = dao.createObject();
     dao.populateObjectFromResult(gc, results[0]);
@@ -302,7 +302,7 @@ ContentsDao.prototype.getTileMatrixSet = function (contents, callback) {
 
 ContentsDao.prototype.getTileMatrix = function (contents, callback) {
   var dao = this.getTileMatrixDao();
-  dao.queryForEqWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, contents.tableName, function(err, results) {
+  dao.queryForEqWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, contents.table_name, function(err, results) {
     if (err || !results || !results.length) return callback(err);
     var tileMatricies = [];
     for (var i = 0; i < results.length; i++) {
@@ -359,7 +359,7 @@ ContentsDao.GPKG_CON_COLUMN_SRS_ID = "srs_id";
 ContentsDao.GPKG_CDT_FEATURES_NAME = "features";
 ContentsDao.GPKG_CDT_TILES_NAME = "tiles";
 
-ContentsDao.prototype.tableName = ContentsDao.GPKG_CON_TABLE_NAME;
+ContentsDao.prototype.gpkgTableName = ContentsDao.GPKG_CON_TABLE_NAME;
 ContentsDao.prototype.idColumns = [ContentsDao.GPKG_CON_COLUMN_PK];
 ContentsDao.prototype.columns = [ContentsDao.GPKG_CON_COLUMN_TABLE_NAME, ContentsDao.GPKG_CON_COLUMN_DATA_TYPE, ContentsDao.GPKG_CON_COLUMN_IDENTIFIER, ContentsDao.GPKG_CON_COLUMN_DESCRIPTION, ContentsDao.GPKG_CON_COLUMN_LAST_CHANGE, ContentsDao.GPKG_CON_COLUMN_MIN_X, ContentsDao.GPKG_CON_COLUMN_MIN_Y, ContentsDao.GPKG_CON_COLUMN_MAX_X, ContentsDao.GPKG_CON_COLUMN_MAX_Y, ContentsDao.GPKG_CON_COLUMN_SRS_ID];
 
@@ -402,12 +402,12 @@ var SpatialReferenceSystem = function() {
    * Human readable name of this SRS
    * @member {string}
    */
-  this.srsName;
+  this.srs_name;
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
    * @member {Number}
    */
-  this.srsId;
+  this.srs_id;
 
   /**
    * Case-insensitive name of the defining organization e.g. EPSG or epsg
@@ -419,7 +419,7 @@ var SpatialReferenceSystem = function() {
    * Numeric ID of the Spatial Reference System assigned by the organization
    * @member {Number}
    */
-  this.organizationCoordsysId;
+  this.organization_coordsys_id;
 
   /**
    * Well-known Text [32] Representation of the Spatial Reference System
@@ -479,12 +479,12 @@ SpatialReferenceSystemDao.prototype.getBySrsId = function(srsId, callback) {
 };
 
 SpatialReferenceSystemDao.prototype.getProjection = function (srs) {
-  if(srs.organizationCoordsysId === 4326 && (srs.organization === 'EPSG' || srs.organization === 'epsg')) {
+  if(srs.organization_coordsys_id === 4326 && (srs.organization === 'EPSG' || srs.organization === 'epsg')) {
     return proj4('EPSG:4326');
   } else if (srs.definition && srs.definition !== '' && srs.definition !== 'undefined') {
       return proj4(srs.definition);
-  } else if (srs.organization && srs.organizationCoordsysId) {
-    return proj4(srs.organization.toUpperCase() + ':' + srs.organizationCoordsysId);
+  } else if (srs.organization && srs.organization_coordsys_id) {
+    return proj4(srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id);
   } else {
     return {};
   }
@@ -605,7 +605,7 @@ SpatialReferenceSystemDao.prototype.getTileMatrixSet = function (srs, callback) 
  * Table Name
  * @type {String}
  */
-SpatialReferenceSystemDao.prototype.tableName = 'gpkg_spatial_ref_sys';
+SpatialReferenceSystemDao.prototype.gpkgTableName = 'gpkg_spatial_ref_sys';
 
 /**
  * srsName field name
@@ -708,35 +708,35 @@ var Dao = function(connection) {
 
 Dao.prototype.populateObjectFromResult = function (object, result) {
   if (!result) return;
-  for (var key in this.columnToPropertyMap) {
-    object[this.columnToPropertyMap[key]] = result[key];
+  for (var key in result) {
+    object[key] = result[key];
   }
 };
 
-Dao.prototype.setValueInObject = function (object, columnName, value) {
-  var propertyName = object.columnToPropertyMap[columnName];
-  if (!propertyName) {
-    throw new Error('Unsupported column name: ' + columnName);
-  }
-  object[propertyName] = value;
-};
-
-Dao.prototype.getValueFromObject = function (object, columnName) {
-  var propertyName = object.columnIndexToPropertyMap[columnName];
-  if (!propertyName) {
-    throw new Error('Unsupported column name: ' + columnName);
-  }
-  return object[property];
-};
+// Dao.prototype.setValueInObject = function (object, columnName, value) {
+//   var propertyName = object.columnToPropertyMap[columnName];
+//   if (!propertyName) {
+//     throw new Error('Unsupported column name: ' + columnName);
+//   }
+//   object[propertyName] = value;
+// };
+//
+// Dao.prototype.getValueFromObject = function (object, columnName) {
+//   var propertyName = object.columnIndexToPropertyMap[columnName];
+//   if (!propertyName) {
+//     throw new Error('Unsupported column name: ' + columnName);
+//   }
+//   return object[property];
+// };
 
 /**
  * Checks if the table exists
  * @param  {validationCallback} callback - Callback to call with the results of if the table exists or not
  */
 Dao.prototype.isTableExists = function (callback) {
-  this.connection.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [this.tableName], function(err, results) {
+  this.connection.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [this.gpkgTableName], function(err, results) {
     if(!results) {
-      return callback(new Error('Table ' + this.tableName + ' does not exist'), false);
+      return callback(new Error('Table ' + this.gpkgTableName + ' does not exist'), false);
     }
     return callback(err, results);
   });
@@ -745,7 +745,7 @@ Dao.prototype.isTableExists = function (callback) {
 Dao.prototype.queryForIdObject = function(id, callback) {
   var whereString = this.buildPkWhereWithValue(id);
   var whereArgs = this.buildPkWhereArgsWithValue(id);
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName, undefined, whereString);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName, undefined, whereString);
 
   this.connection.get(query, whereArgs, function(err, result) {
     if (err) return callback(err);
@@ -762,24 +762,24 @@ Dao.prototype.queryForIdObject = function(id, callback) {
  * @param  {Function} callback called with an error if one occurred and the array of results
  */
 Dao.prototype.queryForAll = function (callback) {
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName);
   this.connection.all(query, callback);
 };
 
 Dao.prototype.queryForEach = function (rowCallback, callback) {
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName);
   this.connection.each(query, rowCallback, callback);
 };
 
 Dao.prototype.queryForFieldValues = function (fieldValues, rowCallback, callback) {
   var whereString = this.buildWhereWithFields(fieldValues);
   var whereArgs = this.buildWhereArgsWithValues(fieldValues);
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName, undefined, whereString);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName, undefined, whereString);
   this.connection.each(query, whereArgs, rowCallback, callback);
 };
 
 Dao.prototype.queryWhereWithArgsDistinct = function(where, whereArgs, rowCallback, doneCallback) {
-  var query = sqliteQueryBuilder.buildQuery(true, this.tableName, undefined, where, undefined, undefined, undefined, undefined);
+  var query = sqliteQueryBuilder.buildQuery(true, this.gpkgTableName, undefined, where, undefined, undefined, undefined, undefined);
   this.connection.each(query, whereArgs, rowCallback, doneCallback);
 }
 
@@ -788,7 +788,7 @@ Dao.prototype.queryWhereWithArgs = function(where, whereArgs, rowCallback, doneC
 }
 
 Dao.prototype.queryWhere = function (where, whereArgs, groupBy, having, orderBy, limit, rowCallback, doneCallback) {
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName, undefined, where, groupBy, having, orderBy, limit);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName, undefined, where, groupBy, having, orderBy, limit);
   this.connection.each(query, whereArgs, rowCallback, doneCallback);
 };
 
@@ -877,7 +877,7 @@ Dao.prototype.queryForEqWithFieldAndValue = function (field, value, callback1, c
 Dao.prototype.queryForEqWithField = function(field, value, groupBy, having, orderBy, callback1, callback2) {
   var whereString = this.buildWhereWithFieldAndValue(field, value);
   var whereArgs = this.buildWhereArgsWithValue(value);
-  var query = sqliteQueryBuilder.buildQuery(false, this.tableName, undefined, whereString);
+  var query = sqliteQueryBuilder.buildQuery(false, this.gpkgTableName, undefined, whereString);
   if (callback2) {
     this.connection.each(query, whereArgs, callback1, callback2);
   } else {
@@ -901,11 +901,11 @@ Dao.prototype.getValueFromObjectWithColumnName = function (object, column) {
 };
 
 Dao.prototype.minOfColumn = function (column, where, whereArgs, callback) {
-  this.connection.minOfColumn(this.tableName, column, where, whereArgs, callback);
+  this.connection.minOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
 };
 
 Dao.prototype.maxOfColumn = function (column, where, whereArgs, callback) {
-  this.connection.maxOfColumn(this.tableName, column, where, whereArgs, callback);
+  this.connection.maxOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
 };
 
 /**
@@ -948,13 +948,13 @@ var DataColumns = function() {
    * the name of the tiles, or feature table
    * @member {string}
    */
-  this.tableName;
+  this.table_name;
 
   /**
    * the name of the table column
    * @member {string}
    */
-  this.columnName;
+  this.column_name;
 
   /**
    * A human-readable identifier (e.g. short name) for the column_name content
@@ -972,18 +972,18 @@ var DataColumns = function() {
    * A human-readable description for the table_name contente
    * @member {string}
    */
-  this.theDescription;
+  this.description;
 
   /**
    * MIME type of columnName if BLOB type or NULL for other types
    * @member {string}
    */
-  this.mimeType;
+  this.mime_type;
 
   /**
    * Case sensitive column value constraint name specified
    */
-  this.constraintName;
+  this.constraint_name;
 }
 
 /**
@@ -1023,7 +1023,7 @@ util.inherits(DataColumnsDao, Dao);
  */
 DataColumnsDao.prototype.getContents = function (dataColumns, callback) {
   var cd = new ContentsDao(this.connection);
-  cd.queryForIdObject(dataColumns.tableName, callback);
+  cd.queryForIdObject(dataColumns.table_name, callback);
 };
 
 /**
@@ -1082,7 +1082,7 @@ DataColumnsDao.COLUMN_DESCRIPTION = "description";
 DataColumnsDao.COLUMN_MIME_TYPE = "mime_type";
 DataColumnsDao.COLUMN_CONSTRAINT_NAME = "constraint_name";
 
-DataColumnsDao.prototype.tableName = DataColumnsDao.TABLE_NAME;
+DataColumnsDao.prototype.gpkgTableName = DataColumnsDao.TABLE_NAME;
 DataColumnsDao.prototype.idColumns = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
 DataColumnsDao.prototype.columns = [DataColumnsDao.COLUMN_TABLE_NAME, DataColumnsDao.COLUMN_COLUMN_NAME, DataColumnsDao.COLUMN_NAME, DataColumnsDao.COLUMN_NAME, DataColumnsDao.COLUMN_TITLE, DataColumnsDao.COLUMN_DESCRIPTION, DataColumnsDao.COLUMN_MIME_TYPE, DataColumnsDao.COLUMN_CONSTRAINT_NAME];
 
@@ -1579,7 +1579,8 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     eachCallback = params;
     params = [];
   }
-
+  console.log('sql', sql);
+  console.log('params', params);
   var statement = this.db.prepare(sql);
   statement.bind(params);
 
@@ -1629,20 +1630,20 @@ var GeometryColumns = function() {
 	 * Name of the table containing the geometry column
 	 * @member {string}
 	 */
-	this.tableName;
+	this.table_name;
 
 	/**
 	 * Name of a column in the feature table that is a Geometry Column
 	 * @member {string}
 	 */
-	this.columnName;
+	this.column_name;
 
 	/**
 	 * Name from Geometry Type Codes (Core) or Geometry Type Codes (Extension)
 	 * in Geometry Types (Normative)
 	 * @member {string}
 	 */
-	this.geometryTypeName;
+	this.geometry_type_name;
 
 	/**
 	 * Spatial Reference System ID: gpkg_spatial_ref_sys.srs_id
@@ -1654,7 +1655,7 @@ var GeometryColumns = function() {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 * @member {Number}
 	 */
-	this.srsId;
+	this.srs_id;
 
 	/**
 	 * 0: z values prohibited; 1: z values mandatory; 2: z values optional
@@ -1730,7 +1731,7 @@ GeometryColumnsDao.prototype.queryForTableName = function (tableName, callback) 
  */
 GeometryColumnsDao.prototype.getFeatureTables = function (callback) {
   var tableNames = [];
-  this.connection.each('select ' + GeometryColumnsDao.COLUMN_TABLE_NAME + ' from ' + this.tableName, function(err, result, rowDone) {
+  this.connection.each('select ' + GeometryColumnsDao.COLUMN_TABLE_NAME + ' from ' + this.gpkgTableName, function(err, result, rowDone) {
     if (err) return rowDone(err);
     tableNames.push(result[GeometryColumnsDao.COLUMN_TABLE_NAME]);
     rowDone();
@@ -1747,7 +1748,7 @@ GeometryColumnsDao.prototype.getFeatureTables = function (callback) {
  */
 GeometryColumnsDao.prototype.getSrs = function (geometryColumns, callback) {
   var dao = this.getSpatialReferenceSystemDao();
-  return dao.queryForIdObject(geometryColumns.srsId, callback);
+  return dao.queryForIdObject(geometryColumns.srs_id, callback);
 };
 
 /**
@@ -1758,7 +1759,7 @@ GeometryColumnsDao.prototype.getSrs = function (geometryColumns, callback) {
  */
 GeometryColumnsDao.prototype.getContents = function (geometryColumns, callback) {
   var dao = this.getContentsDao();
-  return dao.queryForIdObject(geometryColumns.tableName, callback);
+  return dao.queryForIdObject(geometryColumns.table_name, callback);
 };
 
 GeometryColumnsDao.prototype.getSpatialReferenceSystemDao = function () {
@@ -1829,7 +1830,7 @@ GeometryColumnsDao.COLUMN_M = "m";
  * Table Name
  * @type {String}
  */
-GeometryColumnsDao.prototype.tableName = 'gpkg_geometry_columns';
+GeometryColumnsDao.prototype.gpkgTableName = 'gpkg_geometry_columns';
 
 GeometryColumnsDao.prototype.idColumns = [GeometryColumnsDao.COLUMN_ID_1, GeometryColumnsDao.COLUMN_ID_2];
 GeometryColumnsDao.prototype.columns =
@@ -2039,7 +2040,7 @@ FeatureDao.prototype.newRow = function () {
  * @return {string} the geometry column name
  */
 FeatureDao.prototype.getGeometryColumnName = function () {
-  return this.geometryColumns.columnName;
+  return this.geometryColumns.column_name;
 };
 
 /**
@@ -2230,7 +2231,7 @@ var FeatureTableReader = function(tableNameOrGeometryColumns) {
   if (util.isString(tableNameOrGeometryColumns)) {
     UserTableReader.call(this, tableNameOrGeometryColumns);
   } else {
-    UserTableReader.call(this, tableNameOrGeometryColumns.tableName);
+    UserTableReader.call(this, tableNameOrGeometryColumns.table_name);
     this.geometryColumns = tableNameOrGeometryColumns;
   }
 }
@@ -2239,7 +2240,7 @@ util.inherits(FeatureTableReader, UserTableReader);
 
 FeatureTableReader.prototype.readFeatureTable = function (db, callback) {
   if (!this.geometryColumns) {
-    new GeometryColumnsDao(db).queryForTableName(this.tableName, function(err, geometryColumns) {
+    new GeometryColumnsDao(db).queryForTableName(this.table_name, function(err, geometryColumns) {
       this.geometryColumns = geometryColumns;
       this.readTable(db, callback);
     }.bind(this));
@@ -2253,7 +2254,7 @@ FeatureTableReader.prototype.createTableWithNameAndColumns = function (tableName
 };
 
 FeatureTableReader.prototype.createColumnWithResults = function (results, index, name, type, max, notNull, defaultValueIndex, primaryKey) {
-  var geometry = name === this.geometryColumns.columnName;
+  var geometry = name === this.geometryColumns.column_name;
   var geometryType = undefined;
   var dataType = undefined;
   if (geometry) {
@@ -2395,7 +2396,7 @@ GeoPackage.prototype.getSrs = function(srsId) {
 GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
   var tileMatrices = [];
   var tileMatrixDao = this.getTileMatrixDao();
-  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.tableName, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
     async.eachSeries(results, function(result, callback) {
       var tm = new TileMatrix();
       tileMatrixDao.populateObjectFromResult(tm, result);
@@ -2421,6 +2422,8 @@ GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
   tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
     if (results.length > 1) {
       return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));
+    } else if (results.length === 0) {
+      return callback(new Error('No Tile Matrix found for table name: ' + tableName));
     }
     var tileMatrixSet = new TileMatrixSet();
     tms.populateObjectFromResult(tileMatrixSet, results[0]);
@@ -2529,7 +2532,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
   async.waterfall([
     function(callback) {
       var info = {};
-      info.tableName = tableDao.tableName;
+      info.tableName = tableDao.table_name;
       info.tableType = tableDao.table.getTableType();
       callback(null, info);
     },
@@ -2541,9 +2544,9 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
     }, function(info, callback) {
       if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
       info.geometryColumns = {};
-      info.geometryColumns.tableName = tableDao.geometryColumns.tableName;
-      info.geometryColumns.geometryColumn = tableDao.geometryColumns.columnName;
-      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometryTypeName;
+      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
       info.geometryColumns.z = tableDao.geometryColumns.z;
       info.geometryColumns.m = tableDao.geometryColumns.m;
       callback(null, info);
@@ -2565,24 +2568,24 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
       }
       dao.getContents(contentsRetriever, function(err, contents) {
         info.contents = {};
-        info.contents.tableName = contents.tableName;
-        info.contents.dataType = contents.dataType;
+        info.contents.tableName = contents.table_name;
+        info.contents.dataType = contents.data_type;
         info.contents.identifier = contents.identifier;
-        info.contents.description = contents.theDescription;
-        info.contents.lastChange = contents.lastChange;
-        info.contents.minX = contents.minX;
-        info.contents.maxX = contents.maxX;
-        info.contents.minY = contents.minY;
-        info.contents.maxY = contents.maxY;
+        info.contents.description = contents.description;
+        info.contents.lastChange = contents.last_change;
+        info.contents.minX = contents.min_x;
+        info.contents.maxX = contents.max_x;
+        info.contents.minY = contents.min_y;
+        info.contents.maxY = contents.max_y;
         var contentsDao = tableDao.getContentsDao();
         contentsDao.getSrs(contents, function(err, srs){
           info.srs = {
-            name:srs.srsName,
-            id:srs.srsId,
+            name:srs.srs_name,
+            id:srs.srs_id,
             organization:srs.organization,
-            organizationCoordsysId:srs.organizationCoordsysId,
+            organization_coordsys_id:srs.organization_coordsys_id,
             definition:srs.definition,
-            description:srs.theDescription
+            description:srs.description
           };
           callback(null, info);
         });
@@ -2592,7 +2595,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
       info.columnMap = {};
       async.eachSeries(tableDao.table.columns, function(column, columnDone) {
         var dcd = gp.getDataColumnsDao();
-        dcd.getDataColumns(tableDao.table.tableName, column.name, function(err, dataColumn) {
+        dcd.getDataColumns(tableDao.table.table_name, column.name, function(err, dataColumn) {
           info.columns.push({
             index: column.index,
             name: column.name,
@@ -2812,8 +2815,322 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 
 }).call(this,require("buffer").Buffer)
 },{"../geoPackageConstants":20,"buffer":51,"wkx":357}],23:[function(require,module,exports){
-arguments[4][19][0].apply(exports,arguments)
-},{"./core/contents":3,"./core/srs":4,"./dataColumns":7,"./features/columns":13,"./features/user/featureDao":15,"./features/user/featureTableReader":18,"./tiles/matrix":29,"./tiles/matrixset":30,"./tiles/user/tileDao":35,"./tiles/user/tileTableReader":39,"./user/userTable":45,"async":48,"dup":19,"proj4":309,"proj4js-defs":342}],24:[function(require,module,exports){
+/**
+ * GeoPackage module.
+ * @module geoPackage
+ */
+
+var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
+  , GeometryColumnsDao = require('./features/columns').GeometryColumnsDao
+  , FeatureDao = require('./features/user/featureDao')
+  , FeatureTableReader = require('./features/user/featureTableReader')
+  , ContentsDao = require('./core/contents').ContentsDao
+  , TileMatrixSetDao = require('./tiles/matrixset').TileMatrixSetDao
+  , TileMatrixSet = require('./tiles/matrixset').TileMatrixSet
+  , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
+  , TileMatrix = require('./tiles/matrix').TileMatrix
+  , TileTableReader = require('./tiles/user/tileTableReader')
+  , TileDao = require('./tiles/user/tileDao')
+  , UserTable = require('./user/userTable')
+  , DataColumnsDao = require('./dataColumns').DataColumnsDao;
+
+var async = require('async')
+  , proj4 = require('proj4');
+
+var defs = {
+  defs: {}
+};
+require('proj4js-defs')(defs);
+for (var name in defs.defs) {
+  if (defs.defs[name]) {
+    proj4.defs(name, defs.defs[name]);
+  }
+}
+
+/**
+ * GeoPackage database
+ * @class GeoPackage
+ */
+var GeoPackage = function(name, path, connection) {
+  this.name = name;
+  this.path = path;
+  this.connection = connection;
+}
+
+GeoPackage.prototype.getDatabase = function() {
+  return this.connection;
+}
+
+GeoPackage.prototype.getPath = function() {
+  return this.path;
+}
+
+/**
+ * Get the GeoPackage name
+ * @return {String} the GeoPackage name
+ */
+GeoPackage.prototype.getName = function() {
+  return this.name;
+}
+
+GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
+  return new SpatialReferenceSystemDao(this.connection);
+}
+
+GeoPackage.prototype.getContentsDao = function() {
+  return new ContentsDao(this.connection);
+}
+
+GeoPackage.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+
+GeoPackage.prototype.getTileMatrixDao = function() {
+  return new TileMatrixDao(this.connection);
+}
+
+GeoPackage.prototype.getDataColumnsDao = function() {
+  return new DataColumnsDao(this.connection);
+}
+
+GeoPackage.prototype.createDao = function () {
+
+};
+
+GeoPackage.prototype.getSrs = function(srsId) {
+
+}
+
+GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
+  var tileMatrices = [];
+  var tileMatrixDao = this.getTileMatrixDao();
+  console.log('tileMatrixSet.table_name', tileMatrixSet);
+  console.trace();
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+    async.eachSeries(results, function(result, callback) {
+      console.log('result', result);
+      var tm = new TileMatrix();
+      tileMatrixDao.populateObjectFromResult(tm, result);
+      console.log('tm', tm);
+      tileMatrices.push(tm);
+      callback();
+    }, function(err) {
+      var tableReader = new TileTableReader(tileMatrixSet);
+      tableReader.readTileTable(this.connection, function(err, tileTable) {
+        new TileDao(this.connection, tileTable, tileMatrixSet, tileMatrices, function(err, tileDao){
+          callback(err, tileDao);
+        });
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithContents = function (contents, callback) {
+
+};
+
+GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
+    if (results.length > 1) {
+      return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));
+    } else if (results.length === 0) {
+      return callback(new Error('No Tile Matrix found for table name: ' + tableName));
+    }
+    var tileMatrixSet = new TileMatrixSet();
+    tms.populateObjectFromResult(tileMatrixSet, results[0]);
+    this.getTileDaoWithTileMatrixSet(tileMatrixSet, callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileTables = function (callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    tms.getTileTables(callback);
+  });
+};
+
+/**
+ *  Get the feature tables
+ *  @param {callback} callback called with an error if one occurred and the array of {FeatureTable} names
+ */
+GeoPackage.prototype.getFeatureTables = function (callback) {
+  var gcd = this.getGeometryColumnsDao();
+  gcd.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    gcd.getFeatureTables(callback);
+  });
+};
+
+GeoPackage.prototype.getGeometryColumnsDao = function () {
+  return new GeometryColumnsDao(this.connection);
+};
+
+/**
+ *  Get a Feature DAO from Geometry Columns
+ *
+ *  @param {GeometryColumns} geometryColumns Geometry Columns
+ *  @param {callback} callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns = function (geometryColumns, callback) {
+  if (!geometryColumns) {
+    return callback(new Error('Non null Geometry Columns is required to create Feature DAO'));
+  }
+
+  var tableReader = new FeatureTableReader(geometryColumns);
+  var featureTable = tableReader.readFeatureTable(this.connection, function(err, featureTable) {
+    if (err) {
+      return callback(err);
+    }
+    var dao = new FeatureDao(this.connection, featureTable, geometryColumns, this.metadataDb);
+
+    // TODO
+    // [self dropSQLiteTriggers:geometryColumns]
+
+    callback(null, dao);
+  }.bind(this));
+
+  /*
+  if(geometryColumns == nil){
+      [NSException raise:@"Illegal Argument" format:@"Non null Geometry Columns is required to create Feature DAO"];
+  }
+
+  // Read the existing table and create the dao
+  GPKGFeatureTableReader * tableReader = [[GPKGFeatureTableReader alloc] initWithGeometryColumns:geometryColumns];
+  GPKGFeatureTable * featureTable = [tableReader readFeatureTableWithConnection:self.database];
+  GPKGFeatureDao * dao = [[GPKGFeatureDao alloc] initWithDatabase:self.database andTable:featureTable andGeometryColumns:geometryColumns andMetadataDb:self.metadataDb];
+
+  // TODO
+  // GeoPackages created with SQLite version 4.2.0+ with GeoPackage
+  // support are not fully supported in previous sqlite versions
+  [self dropSQLiteTriggers:geometryColumns];
+
+  return dao;
+  */
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {Contents}   contents Contents
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithContents = function (contents, callback) {
+
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {string}   tableName table name
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback) {
+  var self = this;
+  var dao = this.getGeometryColumnsDao();
+  var geometryColumns = dao.queryForTableName(tableName, function(err, geometryColumns) {
+    if (!geometryColumns) {
+      return callback(new Error('No Feature Table exists for table name: ' + tableName));
+    }
+    self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
+  });
+};
+
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  var gp = this;
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      info.tableName = tableDao.tableName;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.table_name;
+        info.contents.dataType = contents.data_type;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.description;
+        info.contents.lastChange = contents.last_change;
+        info.contents.minX = contents.min_x;
+        info.contents.maxX = contents.max_x;
+        info.contents.minY = contents.min_y;
+        info.contents.maxY = contents.max_y;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, srs){
+          info.srs = {
+            name:srs.srs_name,
+            id:srs.srs_id,
+            organization:srs.organization,
+            organizationCoordsysId:srs.organization_coordsys_id,
+            definition:srs.definition,
+            description:srs.description
+          };
+          callback(null, info);
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      info.columnMap = {};
+      async.eachSeries(tableDao.table.columns, function(column, columnDone) {
+        var dcd = gp.getDataColumnsDao();
+        dcd.getDataColumns(tableDao.table.table_name, column.name, function(err, dataColumn) {
+          info.columns.push({
+            index: column.index,
+            name: column.name,
+            max: column.max,
+            min: column.min,
+            notNull: column.notNull,
+            primaryKey: column.primaryKey,
+            displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
+            dataColumn: dataColumn
+          });
+          info.columnMap[column.name] = info.columns[info.columns.length-1];
+          columnDone();
+        });
+      }, function(err) {
+        callback(null, info);
+      });
+    }
+  ], callback);
+};
+
+module.exports = GeoPackage;
+
+},{"./core/contents":3,"./core/srs":4,"./dataColumns":7,"./features/columns":13,"./features/user/featureDao":15,"./features/user/featureTableReader":18,"./tiles/matrix":29,"./tiles/matrixset":30,"./tiles/user/tileDao":35,"./tiles/user/tileTableReader":39,"./user/userTable":45,"async":48,"proj4":309,"proj4js-defs":342}],24:[function(require,module,exports){
 var util = require('util')
   , async = require('async')
   , fileType = require('file-type')
@@ -3104,7 +3421,7 @@ LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, cal
         async.eachSeries(this.chunks, function(chunk, chunkDone) {
           var type = fileType(chunk.chunk);
           this.lwip.open(chunk.chunk, type.ext, function(err, tile) {
-            tile.crop(Math.abs(Math.min(0, chunk.x)), Math.abs(Math.min(0, chunk.y)), Math.min(this.tileMatrix.tileWidth-1, this.tileMatrix.tileWidth - chunk.x), Math.min(this.tileMatrix.tileHeight-1, this.tileMatrix.tileHeight - chunk.y), function(err, tile) {
+            tile.crop(Math.abs(Math.min(0, chunk.x)), Math.abs(Math.min(0, chunk.y)), Math.min(this.tileMatrix.tile_width-1, this.tileMatrix.tile_width - chunk.x), Math.min(this.tileMatrix.tile_height-1, this.tileMatrix.tile_height - chunk.y), function(err, tile) {
               this.image.paste(Math.max(0, chunk.x), Math.max(0, chunk.y), tile, chunkDone);
             }.bind(this));
           }.bind(this));
@@ -3288,49 +3605,49 @@ var TileMatrix = function() {
    * Tile Pyramid User Data Table Name
    * @member {string}
    */
-  this.tableName;
+  this.table_name;
 
   /**
    * 0 ⇐ zoom_level ⇐ max_level for table_name
    * @member {Number}
    */
-  this.zoomLevel;
+  this.zoom_level;
 
   /**
    * Number of columns (>= 1) in tile matrix at this zoom level
    * @member {Number}
    */
-  this.matrixWidth;
+  this.matrix_width;
 
   /**
    * Number of rows (>= 1) in tile matrix at this zoom level
    * @member {Number}
    */
-  this.matrixHeight;
+  this.matrix_height;
 
   /**
    * Tile width in pixels (>= 1)for this zoom level
    * @member {Number}
    */
-  this.tileWidth;
+  this.tile_width;
 
   /**
    * Tile height in pixels (>= 1)for this zoom level
    * @member {Number}
    */
-  this.tileHeight;
+  this.tile_height;
 
   /**
    * In t_table_name srid units or default meters for srid 0 (>0)
    * @member {Number}
    */
-  this.pixelXSize;
+  this.pixel_x_size;
 
   /**
    * In t_table_name srid units or default meters for srid 0 (>0)
    * @member {Number}
    */
-  this.pixelYSize;
+  this.pixel_y_size;
 };
 
 // TileMatrix.prototype.populateFromResult = function (result) {
@@ -3418,7 +3735,7 @@ TileMatrixDao.prototype.createObject = function () {
  */
 TileMatrixDao.prototype.getContents = function (tileMatrix, callback) {
   var dao = this.getContentsDao();
-  return dao.queryForIdObject(tileMatrix.tableName, callback);
+  return dao.queryForIdObject(tileMatrix.table_name, callback);
 };
 
 TileMatrixDao.prototype.getContentsDao = function () {
@@ -3429,7 +3746,7 @@ TileMatrixDao.prototype.getContentsDao = function () {
 
 TileMatrixDao.prototype.getTileMatrixSet = function (tileMatrix, callback) {
   var dao = this.getTileMatrixSetDao();
-  return dao.queryForIdObject(tileMatrix.tableName, callback);
+  return dao.queryForIdObject(tileMatrix.table_name, callback);
 };
 
 TileMatrixDao.prototype.getTileMatrixSetDao = function () {
@@ -3458,7 +3775,7 @@ TileMatrix.PIXEL_X_SIZE = 'pixelXSize';
 TileMatrix.PIXEL_Y_SIZE = 'pixelYSize';
 
 
-TileMatrixDao.prototype.tableName = 'gpkg_tile_matrix';
+TileMatrixDao.prototype.gpkgTableName = 'gpkg_tile_matrix';
 TileMatrixDao.prototype.idColumns = [TileMatrixDao.COLUMN_PK1, TileMatrixDao.COLUMN_PK2];
 TileMatrixDao.prototype.columns = [TileMatrixDao.COLUMN_TABLE_NAME, TileMatrixDao.COLUMN_ZOOM_LEVEL, TileMatrixDao.COLUMN_MATRIX_WIDTH, TileMatrixDao.COLUMN_MATRIX_HEIGHT, TileMatrixDao.COLUMN_TILE_WIDTH, TileMatrixDao.COLUMN_TILE_HEIGHT, TileMatrixDao.COLUMN_PIXEL_X_SIZE, TileMatrixDao.COLUMN_PIXEL_Y_SIZE];
 
@@ -3503,48 +3820,48 @@ var TileMatrixSet = function() {
    * TilePayramid User Data Table Name
    * @member {string}
    */
-  this.tableName;
+  this.table_name;
 
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
    * @member {Number}
    */
-  this.srsId;
+  this.srs_id;
 
   /**
    * Bounding box minimum easting or longitude for all content in table_name
    * @member {Number}
    */
-  this.minX;
+  this.min_x;
 
   /**
    * Bounding box minimum northing or latitude for all content in table_name
    * @member {Number}
    */
-  this.minY;
+  this.min_y;
 
   /**
    * Bounding box maximum easting or longitude for all content in table_name
    * @member {Number}
    */
-  this.maxX;
+  this.max_x;
 
   /**
    * Bounding box maximum northing or latitude for all content in table_name
    * @member {Number}
    */
-  this.maxY;
+  this.max_y;
 };
 
 TileMatrixSet.prototype.setBoundingBox = function (boundingBox) {
-  this.minX = boundingBox.minLongitude;
-  this.maxX = boundingBox.maxLongitude;
-  this.minY = boundingBox.minLatitude;
-  this.maxY = boundingBox.maxLatitude;
+  this.min_x = boundingBox.minLongitude;
+  this.max_x = boundingBox.maxLongitude;
+  this.min_y = boundingBox.minLatitude;
+  this.max_y = boundingBox.maxLatitude;
 };
 
 TileMatrixSet.prototype.getBoundingBox = function () {
-  return new BoundingBox(this.minX, this.maxX, this.minY, this.maxY);
+  return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
 };
 
 // /**
@@ -3624,12 +3941,12 @@ TileMatrixSetDao.prototype.getProjection = function (tileMatrixSet, callback) {
  */
 TileMatrixSetDao.prototype.getSrs = function (tileMatrixSet, callback) {
   var dao = this.getSpatialReferenceSystemDao();
-  dao.queryForIdObject(tileMatrixSet.srsId, callback);
+  dao.queryForIdObject(tileMatrixSet.srs_id, callback);
 };
 
 TileMatrixSetDao.prototype.getContents = function (tileMatrixSet, callback) {
   var dao = this.getContentsDao();
-  dao.queryForIdObject(tileMatrixSet.tableName, callback);
+  dao.queryForIdObject(tileMatrixSet.table_name, callback);
 };
 
 TileMatrixSetDao.prototype.getSpatialReferenceSystemDao = function () {
@@ -3657,7 +3974,7 @@ TileMatrixSetDao.COLUMN_MIN_Y = "min_y";
 TileMatrixSetDao.COLUMN_MAX_X = "max_x";
 TileMatrixSetDao.COLUMN_MAX_Y = "max_y";
 
-TileMatrixSetDao.prototype.tableName = 'gpkg_tile_matrix_set';
+TileMatrixSetDao.prototype.gpkgTableName = 'gpkg_tile_matrix_set';
 TileMatrixSetDao.prototype.idColumns = [TileMatrixSetDao.COLUMN_PK];
 TileMatrixSetDao.prototype.columns = [TileMatrixSetDao.COLUMN_TABLE_NAME, TileMatrixSetDao.COLUMN_SRS_ID, TileMatrixSetDao.COLUMN_MIN_X, TileMatrixSetDao.COLUMN_MIN_Y, TileMatrixSetDao.COLUMN_MAX_X, TileMatrixSetDao.COLUMN_MAX_Y];
 
@@ -3759,15 +4076,15 @@ GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBo
   var tiles = [];
   var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
 
-  var tileWidth = tileMatrix.tileWidth;
-  var tileHeight = tileMatrix.tileHeight;
+  var tileWidth = tileMatrix.tile_width;
+  var tileHeight = tileMatrix.tile_height;
 
   var matrixSetBoundsInTargetProjection = this.tileDao.tileMatrixSet.getBoundingBox().projectBoundingBox(this.tileDao.projection, targetProjection);
 
   var matrixTotalBoundingBox = this.tileDao.tileMatrixSet.getBoundingBox();
   var targetBoundingBoxInMatrixSetProjection = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
 
-  var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixTotalBoundingBox, tileMatrix.matrixWidth, tileMatrix.matrixHeight, targetBoundingBoxInMatrixSetProjection);
+  var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixTotalBoundingBox, tileMatrix.matrix_width, tileMatrix.matrix_height, targetBoundingBoxInMatrixSetProjection);
 
   TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.projection, targetProjection, canvas, function(err, creator) {
     this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix, function(err, tile, tileDone) {
@@ -3800,8 +4117,8 @@ GeoPackageTileRetriever.prototype.getTileMatrixWithWebMercatorBoundingBox = func
 
 GeoPackageTileRetriever.prototype.retrieveTileResults = function (tileMatrixProjectionBoundingBox, tileMatrix, tileCallback, doneCallback) {
   if(tileMatrix) {
-    var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrixWidth, tileMatrix.matrixHeight, tileMatrixProjectionBoundingBox);
-    this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoomLevel, tileCallback, doneCallback);
+    var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, tileMatrixProjectionBoundingBox);
+    this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoom_level, tileCallback, doneCallback);
   } else {
     doneCallback();
   }
@@ -4245,8 +4562,8 @@ module.exports.getTileRowWithTotalBoundingBox = function(webMercatorTotalBox, ma
 // +(GPKGBoundingBox *) getWebMercatorBoundingBoxWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andTileMatrix: (GPKGTileMatrix *) tileMatrix andTileColumn: (int) tileColumn andTileRow: (int) tileRow;
 
 module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRow) {
-  var tileMatrixWidth = tileMatrix.matrixWidth;
-  var tileMatrixHeight = tileMatrix.matrixHeight;
+  var tileMatrixWidth = tileMatrix.matrix_width;
+  var tileMatrixHeight = tileMatrix.matrix_height;
   var tileGrid = new TileGrid(tileColumn, tileColumn, tileRow, tileRow);
   var matrixMinX = box.minLongitude;
   var matrixMaxX = box.maxLongitude;
@@ -4254,8 +4571,8 @@ module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRo
   var tileWidth = matrixWidth / tileMatrixWidth;
 
   // Find the longitude range
-  var minLon = matrixMinX + (tileWidth * tileGrid.minX);
-  var maxLon = minLon + (tileWidth * (tileGrid.maxX + 1 - tileGrid.minX));
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
 
   // Get the tile height
   var matrixMinY = box.minLatitude;
@@ -4264,8 +4581,8 @@ module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRo
   var tileHeight = matrixHeight / tileMatrixHeight;
 
   // Find the latitude range
-  var maxLat = matrixMaxY - (tileHeight * tileGrid.minY);
-  var minLat = maxLat - (tileHeight * (tileGrid.maxY + 1 - tileGrid.minY));
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
 
   var boundingBox = new BoundingBox(minLon, maxLon, minLat, maxLat);
 
@@ -4280,8 +4597,8 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
   var tileWidth = matrixWidth / tileMatrixWidth;
 
   // Find the longitude range
-  var minLon = matrixMinX + (tileWidth * tileGrid.minX);
-  var maxLon = minLon + (tileWidth * (tileGrid.maxX + 1 - tileGrid.minX));
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
 
   // Get the tile height
   var matrixMinY = matrixSetBoundingBox.minLatitude;
@@ -4290,8 +4607,8 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
   var tileHeight = matrixHeight / tileMatrixHeight;
 
   // Find the latitude range
-  var maxLat = matrixMaxY - (tileHeight * tileGrid.minY);
-  var minLat = maxLat - (tileHeight * (tileGrid.maxY + 1 - tileGrid.minY));
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
 
   return new BoundingBox(minLon, maxLon, minLat, maxLat);
 }
@@ -4402,22 +4719,22 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
  *  Tile grid with x and y ranges
  */
 var TileGrid = function(minX, maxX, minY, maxY) {
-  this.minX = minX;
-  this.maxX = maxX;
-  this.minY = minY;
-  this.maxY = maxY;
+  this.min_x = minX;
+  this.max_x = maxX;
+  this.min_y = minY;
+  this.max_y = maxY;
 }
 
 TileGrid.prototype.count = function () {
-  return ((this.maxX + 1) - this.minX) * ((this.maxY + 1) - this.minY);
+  return ((this.max_x + 1) - this.min_x) * ((this.max_y + 1) - this.min_y);
 };
 
 TileGrid.prototype.equals = function (tileGrid) {
   if (!tileGrid) return false;
-  return this.minX === tileGrid.minX
-    && this.maxX === tileGrid.maxX
-    && this.minY === tileGrid.minY
-    && this.maxY === tileGrid.maxY;
+  return this.min_x === tileGrid.min_x
+    && this.max_x === tileGrid.max_x
+    && this.min_y === tileGrid.min_y
+    && this.max_y === tileGrid.max_y;
 };
 
 module.exports = TileGrid;
@@ -4535,14 +4852,14 @@ var TileDao = function(connection, table, tileMatrixSet, tileMatrices, callback)
     this.minZoom = 0;
     this.maxZoom = 0;
   } else {
-    this.minZoom = this.tileMatrices[0].zoomLevel;
-    this.maxZoom = this.tileMatrices[this.tileMatrices.length-1].zoomLevel;
+    this.minZoom = this.tileMatrices[0].zoom_level;
+    this.maxZoom = this.tileMatrices[this.tileMatrices.length-1].zoom_level;
   }
 
   // Populate the zoom level to tile matrix and the sorted tile widths and heights
   for (var i = this.tileMatrices.length-1; i >= 0; i--) {
     var tileMatrix = this.tileMatrices[i];
-    this.zoomLevelToTileMatrix[tileMatrix.zoomLevel] = tileMatrix;
+    this.zoomLevelToTileMatrix[tileMatrix.zoom_level] = tileMatrix;
   }
 
   this.initialize(callback);
@@ -4554,18 +4871,18 @@ TileDao.prototype.initialize = function(callback) {
   var tileMatrixSetDao = this.getTileMatrixSetDao();
   tileMatrixSetDao.getSrs(this.tileMatrixSet, function(err, srs) {
     this.srs = srs;
-    this.projection = srs.organization.toUpperCase() + ':' + srs.organizationCoordsysId;
+    this.projection = srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id;
 
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
     for (var i = this.tileMatrices.length-1; i >= 0; i--) {
       var tileMatrix = this.tileMatrices[i];
 
-      var width = tileMatrix.pixelXSize * parseInt(tileMatrix.tileWidth);
-      var height = tileMatrix.pixelYSize * parseInt(tileMatrix.tileHeight);
+      var width = tileMatrix.pixel_x_size * parseInt(tileMatrix.tile_width);
+      var height = tileMatrix.pixel_y_size * parseInt(tileMatrix.tile_height);
       var proj4Projection = proj4(this.projection);
       if (proj4Projection.to_meter) {
-        width = proj4Projection.to_meter * tileMatrix.pixelXSize * parseInt(tileMatrix.tileWidth);
-        height = proj4Projection.to_meter * tileMatrix.pixelYSize * parseInt(tileMatrix.tileHeight);
+        width = proj4Projection.to_meter * tileMatrix.pixel_x_size * parseInt(tileMatrix.tile_width);
+        height = proj4Projection.to_meter * tileMatrix.pixel_y_size * parseInt(tileMatrix.tile_height);
       }
       this.widths.push(width);
       this.heights.push(height);
@@ -4592,7 +4909,7 @@ TileDao.prototype.getBoundingBoxWithZoomLevel = function (zoomLevel, callback) {
 
       if (tileGrid) {
         var matrixSetBoundingBox = this.getBoundingBox();
-        boundingBox = BoundingBoxUtils.getTileGridBoundingBox(matrixSetBoundingBox, tileMatrix.matrixWidth, tileMatrix.matrixHeight, tileGrid);
+        boundingBox = BoundingBoxUtils.getTileGridBoundingBox(matrixSetBoundingBox, tileMatrix.matrix_width, tileMatrix.matrix_height, tileGrid);
       }
       callback(err, boundingBox);
     }.bind(this));
@@ -4609,23 +4926,23 @@ TileDao.prototype.queryForTileGridWithZoomLevel = function (zoomLevel, callback)
   var where = this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
   var whereArgs = this.buildWhereArgsWithValue(zoomLevel);
   async.series({
-    minX: function(callback){
+    min_x: function(callback){
       this.minOfColumn(TileTable.COLUMN_TILE_COLUMN, where, whereArgs, callback);
     }.bind(this),
-    maxX: function(callback){
+    max_x: function(callback){
       this.maxOfColumn(TileTable.COLUMN_TILE_COLUMN, where, whereArgs, callback);
     }.bind(this),
-    minY: function(callback){
+    min_y: function(callback){
       this.minOfColumn(TileTable.COLUMN_TILE_ROW, where, whereArgs, callback);
     }.bind(this),
-    maxY: function(callback){
+    max_y: function(callback){
       this.maxOfColumn(TileTable.COLUMN_TILE_ROW, where, whereArgs, callback);
     }.bind(this)
   }, function(err, results) {
     if (err) return callback(err);
     var tileGrid;
-    if (results.minX != null && results.minY != null && results.maxX != null && results.maxY != null) {
-      tileGrid = new TileGrid(results.minX, results.maxX, results.minY, results.maxY);
+    if (results.min_x != null && results.min_y != null && results.max_x != null && results.max_y != null) {
+      tileGrid = new TileGrid(results.min_x, results.max_x, results.min_y, results.max_y);
     }
     callback(err, tileGrid);
   });
@@ -4641,7 +4958,7 @@ TileDao.prototype.getTileGridWithZoomLevel = function (zoomLevel) {
   var tileGrid;
   var tileMatrix = this.getTileMatrixWithZoomLevel(zoomLevel);
   if (tileMatrix) {
-    tileGrid = new TileGrid(0, parseInt(tileMatrix.matrixWidth) - 1, 0, parseInt(tileMatrix.matrixHeight) - 1);
+    tileGrid = new TileGrid(0, parseInt(tileMatrix.matrix_width) - 1, 0, parseInt(tileMatrix.matrix_height) - 1);
   }
   return tileGrid;
 };
@@ -4793,16 +5110,16 @@ TileDao.prototype.queryForTilesInRow = function (row, zoomLevel, tileCallback, d
 TileDao.prototype.queryByTileGrid = function (tileGrid, zoomLevel, tileCallback, doneCallback) {
   if (!tileGrid) return doneCallback();
   var tileCount = 0;
-  var x = tileGrid.minX;
+  var x = tileGrid.min_x;
 
   async.whilst(
     function() {
-      return x <= tileGrid.maxX;
+      return x <= tileGrid.max_x;
     }, function(xCallback) {
-      var y = tileGrid.minY;
+      var y = tileGrid.min_y;
       async.whilst(
         function() {
-          return y <= tileGrid.maxY;
+          return y <= tileGrid.max_y;
         },
         function(yCallback) {
           var where = '';
@@ -5233,7 +5550,7 @@ var util = require('util');
 * @extends {module:user~UserTableReader}
 */
 var TileTableReader = function(tileMatrixSet) {
-  UserTableReader.call(this, tileMatrixSet.tableName);
+  UserTableReader.call(this, tileMatrixSet.table_name);
   this.tileMatrixSet = tileMatrixSet;
 }
 
@@ -5287,7 +5604,8 @@ var util = require('util');
 var UserDao = function(connection, table) {
   Dao.call(this, connection);
   this.table = table;
-  this.tableName = table.tableName;
+  this.table_name = table.table_name;
+  this.gpkgTableName = table.table_name;
   this.idColumns = table.getPkColumn().name;
   this.columns = table.columnNames;
   this.initializeColumnIndex();
@@ -5359,7 +5677,7 @@ UserDao.prototype.getZoomLevel = function () {
 };
 
 UserDao.prototype.getCount = function (callback) {
-  this.connection.count(this.tableName, callback);
+  this.connection.count(this.table_name, callback);
 };
 
 module.exports = UserDao;
@@ -5601,7 +5919,7 @@ var UserColumn = require('./userColumn')
 
 /** @class UserTableReader */
 var UserTableReader = function(tableName) {
-  this.tableName = tableName;
+  this.table_name = tableName;
 }
 
 var GPKG_UTR_CID = "cid";
@@ -5618,7 +5936,7 @@ var GPKG_UTR_DFLT_VALUE = "dflt_value";
  */
 UserTableReader.prototype.readTable = function (db, callback) {
   var columnList = [];
-  db.all('PRAGMA table_info('+this.tableName+')', function(err, results) {
+  db.all('PRAGMA table_info('+this.table_name+')', function(err, results) {
     for (var i =0; i < results.length; i++) {
       var result = results[i];
       var index = result[GPKG_UTR_CID];
@@ -5649,9 +5967,9 @@ UserTableReader.prototype.readTable = function (db, callback) {
     }
 
     if (columnList.length === 0) {
-      return callback(new Error('Table does not exist: ' + this.tableName));
+      return callback(new Error('Table does not exist: ' + this.table_name));
     }
-    var table = this.createTableWithNameAndColumns(this.tableName, columnList);
+    var table = this.createTableWithNameAndColumns(this.table_name, columnList);
     callback(null, table);
   }.bind(this));
 };
@@ -5731,7 +6049,7 @@ arguments[4][41][0].apply(exports,arguments)
  * @param  {array} columns   feature columns
  */
 var UserTable = function(tableName, columns) {
-  this.tableName = tableName;
+  this.table_name = tableName;
 
   // Sort the columns by index
   columns.sort(function(a, b) {
@@ -5741,9 +6059,9 @@ var UserTable = function(tableName, columns) {
   for (var i = 0; i < columns.length; i++) {
     var column = columns[i];
     if (!column) {
-      throw new Error('No column found at index: ' + i + ', Table Name: ' + this.tableName);
+      throw new Error('No column found at index: ' + i + ', Table Name: ' + this.table_name);
     } else if (column.index != i) {
-      throw new Error('Column has wrong index of ' + column.index + ', found at index: ' + i + ', Table Name: ' + this.tableName);
+      throw new Error('Column has wrong index of ' + column.index + ', found at index: ' + i + ', Table Name: ' + this.table_name);
     }
   }
 
@@ -5756,7 +6074,7 @@ var UserTable = function(tableName, columns) {
     var index = column.index;
     if (column.primaryKey) {
       if (pk) {
-        throw new Error('More than one primary key column was found for table \'' + this.tableName + '\'. Index ' + pk + ' and ' + index);
+        throw new Error('More than one primary key column was found for table \'' + this.table_name + '\'. Index ' + pk + ' and ' + index);
       }
       pk = index;
     }
@@ -5769,7 +6087,7 @@ var UserTable = function(tableName, columns) {
   this.nameToIndex = tempNameToIndex;
 
   if (pk === undefined) {
-    throw new Error('No primary key column was found for table \'' + this.tableName + '\'');
+    throw new Error('No primary key column was found for table \'' + this.table_name + '\'');
   }
   this.pkIndex = pk;
 }
@@ -5782,7 +6100,7 @@ var UserTable = function(tableName, columns) {
  */
 UserTable.prototype.duplicateCheck = function (index, previousIndex, column) {
   if(previousIndex) {
-    throw new Error('More than one ' + column + ' column was found for table \'' + this.tableName + '\'. Index ' + previousIndex + ' and ' + index);
+    throw new Error('More than one ' + column + ' column was found for table \'' + this.table_name + '\'. Index ' + previousIndex + ' and ' + index);
   }
 };
 
@@ -5794,7 +6112,7 @@ UserTable.prototype.duplicateCheck = function (index, previousIndex, column) {
 UserTable.prototype.typeCheck = function (expected, column) {
   var actual = column.dataType;
   if (!actual || actual !== expected) {
-    throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.tableName + '\', expected: ' + DataTypes.name(expected) + ', actual: ' + column.dataType);
+    throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.table_name + '\', expected: ' + DataTypes.name(expected) + ', actual: ' + column.dataType);
   }
 };
 
@@ -5805,7 +6123,7 @@ UserTable.prototype.typeCheck = function (expected, column) {
  */
 UserTable.prototype.missingCheck = function (index, column) {
   if (index === undefined || index === null) {
-    throw new Error('No ' + column + ' column was found for table \'' + this.tableName +'\'');
+    throw new Error('No ' + column + ' column was found for table \'' + this.table_name +'\'');
   }
 };
 
@@ -5817,7 +6135,7 @@ UserTable.prototype.missingCheck = function (index, column) {
 UserTable.prototype.getColumnIndex = function (columnName) {
   var index = this.nameToIndex[columnName];
   if (index === undefined || index === null) {
-    throw new Error('Column does not exist in table \'' + this.tableName + '\', column: ' + columnName);
+    throw new Error('Column does not exist in table \'' + this.table_name + '\', column: ' + columnName);
   }
   return index;
 };
