@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>GeoPackage JS Class: SpatialReferenceSystemDao</title>
+	<title>GeoPackage JS Class: GeoPackage</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -77,15 +77,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: SpatialReferenceSystemDao</h1>
+	<h1 class="page-title">Class: GeoPackage</h1>
 <section>
 
 <header>
     
         <h2>
-            <span class="ancestors"><a href="module-dao_spatialReferenceSystem.html">dao/spatialReferenceSystem</a>~</span>
-        
-        SpatialReferenceSystemDao
+        GeoPackage
         </h2>
         
     
@@ -98,7 +96,7 @@
         
 <hr>
 <dt>
-    <h4 class="name" id="SpatialReferenceSystemDao"><span class="type-signature"></span>new SpatialReferenceSystemDao()</h4>
+    <h4 class="name" id="GeoPackage"><span class="type-signature"></span>new GeoPackage(configuration)</h4>
     
     
 </dt>
@@ -106,7 +104,7 @@
 
     
     <div class="description">
-        Spatial Reference System Data Access Object
+        Constructor for the GeoPackage API object that can be used to operate on the GeoPackage.
     </div>
     
 
@@ -116,115 +114,55 @@
 
     
     
+        <h5>Parameters:</h5>
+        
 
-    
-<dl class="details">
-    
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-    
-    </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
+        <th>Type</th>
 
         
 
+        
 
-    <ul>
-        <li><a href="module-dao_dao-Dao.html">module:dao/dao~Dao</a></li>
-    </ul>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
 
-
+    <tbody>
     
 
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
+        <tr>
             
-<hr>
-<dt class="name" id=".COLUMN_DEFINITION">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_DEFINITION<span class="type-signature"> :String</span></h4>
+                <td class="name"><code>configuration</code></td>
+            
 
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        definition field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
+            <td class="type">
+            
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
 
-            </li>
-        </ul>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -268,506 +206,57 @@
 
 
     
-</dd>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    GeoPackage API object.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+
+    </dd>
+</dl>
+
 
         
-            
-<hr>
-<dt class="name" id=".COLUMN_DESCRIPTION">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_DESCRIPTION<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        description field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
 </dd>
 
-        
-            
-<hr>
-<dt class="name" id=".COLUMN_ID">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_ID<span class="type-signature"> :String</span></h4>
-
     
-</dt>
-<dd>
-    
-    <div class="description">
-        id field name, srsId
     </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id=".COLUMN_ORGANIZATION">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_ORGANIZATION<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        organization field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id=".COLUMN_ORGANIZATION_COORDSYS_ID">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_ORGANIZATION_COORDSYS_ID<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        organizationCoordsysId field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
 
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id=".COLUMN_SRS_ID">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_SRS_ID<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        srsId field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id=".COLUMN_SRS_NAME">
-    <h4><span class="type-signature">&lt;static> </span>COLUMN_SRS_NAME<span class="type-signature"> :String</span></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        srsName field name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="gpkgTableName">
-    <h4><span class="type-signature"></span>gpkgTableName<span class="type-signature"> :String</span></h4>
-
     
-</dt>
-<dd>
-    
-    <div class="description">
-        Table Name
-    </div>
-    
-
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type">String</span>
-
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
 
     
 
     
 
     
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
 
     
-</dd>
 
-        </dl>
     
 
     
@@ -777,7 +266,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="createUndefinedCartesian"><span class="type-signature"></span>createUndefinedCartesian(callback)</h4>
+    <h4 class="name" id="addFeaturesToGeoPackage"><span class="type-signature"></span>addFeaturesToGeoPackage(features, tableName, callback, <span class="optional">progressCallback</span>)</h4>
     
     
 </dt>
@@ -785,8 +274,7 @@
 
     
     <div class="description">
-        Creates the required Undefined Cartesian Spatial Reference System (spec
-Requirement 11)
+        Adds an array of GeoJSON features to the GeoPackage
     </div>
     
 
@@ -809,6 +297,8 @@ Requirement 11)
         <th>Type</th>
 
         
+        <th>Argument</th>
+        
 
         
 
@@ -821,13 +311,13 @@ Requirement 11)
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>features</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type">array</span>
 
 
 
@@ -835,10 +325,116 @@ Requirement 11)
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">called with an error if one occurred and the undefined cartesian srs</td>
+            <td class="description last">GeoJSON features to add</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Name of the table to add the feature to</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">function to call when complete</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>progressCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#progressCallback">progressCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">function to call to report progress</td>
         </tr>
 
     
@@ -898,6 +494,30 @@ Requirement 11)
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -906,7 +526,7 @@ Requirement 11)
             
 <hr>
 <dt>
-    <h4 class="name" id="createUndefinedGeographic"><span class="type-signature"></span>createUndefinedGeographic(callback)</h4>
+    <h4 class="name" id="addTileMatrices"><span class="type-signature"></span>addTileMatrices(extent, tableName, minZoom, maxZoom, callback)</h4>
     
     
 </dt>
@@ -914,8 +534,7 @@ Requirement 11)
 
     
     <div class="description">
-        Creates the required Undefined Geographic Spatial Reference System (spec
-Requirement 11)
+        Adds the tile matricies for the tile table
     </div>
     
 
@@ -950,13 +569,13 @@ Requirement 11)
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>extent</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type">Object</span>
 
 
 
@@ -967,125 +586,20 @@ Requirement 11)
 
             
 
-            <td class="description last">called with an error if one occurred and the undefined Geographic srs</td>
+            <td class="description last">extent of the tile table</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createWebMercator"><span class="type-signature"></span>createWebMercator(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Creates the Web Mercator Spatial Reference System if it does not already
-exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>tableName</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type">string</span>
 
 
 
@@ -1096,247 +610,14 @@ exist
 
             
 
-            <td class="description last">called with an error if one occurred and the Web Mercator srs</td>
+            <td class="description last">name of the table</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createWgs84"><span class="type-signature"></span>createWgs84(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Creates the required EPSG WGS84 Spatial Reference System (spec
-Requirement 11)
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the wgs84 srs</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="deleteByIdCascade"><span class="type-signature"></span>deleteByIdCascade(id, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Delete the Spatial Reference System by id, cascading
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
+                <td class="name"><code>minZoom</code></td>
             
 
             <td class="type">
@@ -1353,7 +634,31 @@ Requirement 11)
 
             
 
-            <td class="description last"></td>
+            <td class="description last">minimum zoom level of the table</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">maxiumum zoom level of the table</td>
         </tr>
 
     
@@ -1366,7 +671,7 @@ Requirement 11)
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
 
 
 
@@ -1377,7 +682,7 @@ Requirement 11)
 
             
 
-            <td class="description last">called with an error if one occurred and rows deleted</td>
+            <td class="description last">called when the matricies are complete</td>
         </tr>
 
     
@@ -1437,6 +742,30 @@ Requirement 11)
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
@@ -1445,7 +774,7 @@ Requirement 11)
             
 <hr>
 <dt>
-    <h4 class="name" id="deleteByIdsCascade"><span class="type-signature"></span>deleteByIdsCascade(ids, callback)</h4>
+    <h4 class="name" id="addTileToGeoPackage"><span class="type-signature"></span>addTileToGeoPackage(tileStream, tableName, zoom, tileRow, tileColumn, callback)</h4>
     
     
 </dt>
@@ -1453,7 +782,7 @@ Requirement 11)
 
     
     <div class="description">
-        Delete the Spatial Reference System by ids, cascading
+        Adds a tile to the GeoPackage
     </div>
     
 
@@ -1488,7 +817,503 @@ Requirement 11)
 
         <tr>
             
-                <td class="name"><code>ids</code></td>
+                <td class="name"><code>tileStream</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Stream to the tile file</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Name of the table to add the tile to</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>zoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Zoom level of the tile</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileRow</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Tile row</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileColumn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Tile columns</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">function to call when complete</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createAndOpenGeoPackageFile"><span class="type-signature"></span>createAndOpenGeoPackageFile(filePath, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Creates a new GeoPackage at the path specified and opens that GeoPackage for editing
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filePath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Absolute path to the GeoPackage to create</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">function to callback when created</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createFeatureTable"><span class="type-signature"></span>createFeatureTable(extent, tableName, propertyColumnNames, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Creates a feature table in the GeoPackage
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>extent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">extent of the table</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">name of the table</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>propertyColumnNames</code></td>
             
 
             <td class="type">
@@ -1505,7 +1330,7 @@ Requirement 11)
 
             
 
-            <td class="description last"></td>
+            <td class="description last">names of the properties</td>
         </tr>
 
     
@@ -1518,7 +1343,7 @@ Requirement 11)
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
 
 
 
@@ -1529,7 +1354,7 @@ Requirement 11)
 
             
 
-            <td class="description last">called with an error if one occurred and rows deleted</td>
+            <td class="description last">called when the feature table is created</td>
         </tr>
 
     
@@ -1589,158 +1414,30 @@ Requirement 11)
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
+            
+<div class="param-desc">
+    calls callback
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="deleteCascade"><span class="type-signature"></span>deleteCascade(srs, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Delete the Spatial Reference System, cascading
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>srs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SpatialReferenceSystem</span>
+<span class="param-type">undefined</span>
 
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and rows deleted</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
+    </dd>
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+        
 
     
 </dd>
@@ -1749,7 +1446,7 @@ Requirement 11)
             
 <hr>
 <dt>
-    <h4 class="name" id="deleteCascadeWhere"><span class="type-signature"></span>deleteCascadeWhere(where, where, callback)</h4>
+    <h4 class="name" id="createTileTable"><span class="type-signature"></span>createTileTable(extent, tableName, minZoom, maxZoom, callback)</h4>
     
     
 </dt>
@@ -1757,7 +1454,7 @@ Requirement 11)
 
     
     <div class="description">
-        Delete the Spatial Reference System where, cascading
+        Creates a tile table in the GeoPackage
     </div>
     
 
@@ -1792,7 +1489,31 @@ Requirement 11)
 
         <tr>
             
-                <td class="name"><code>where</code></td>
+                <td class="name"><code>extent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">extent of the tile table</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
             
 
             <td class="type">
@@ -1809,166 +1530,14 @@ Requirement 11)
 
             
 
-            <td class="description last">clause</td>
+            <td class="description last">name of the tile table</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>where</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">args</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and rows deleted</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getBySrsId"><span class="type-signature"></span>getBySrsId(srsId, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the Spatial Reference System for the provided id
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>srsId</code></td>
+                <td class="name"><code>minZoom</code></td>
             
 
             <td class="type">
@@ -1985,7 +1554,31 @@ Requirement 11)
 
             
 
-            <td class="description last">srs id</td>
+            <td class="description last">minimum zoom level of the table</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">maxiumum zoom level of the table</td>
         </tr>
 
     
@@ -1998,7 +1591,7 @@ Requirement 11)
             <td class="type">
             
                 
-<span class="param-type">callback</span>
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
 
 
 
@@ -2009,7 +1602,7 @@ Requirement 11)
 
             
 
-            <td class="description last">called with an error if one occurred and the SpatialReferenceSystem if one exists in this GeoPackage with the id</td>
+            <td class="description last">called when the table is created</td>
         </tr>
 
     
@@ -2069,158 +1662,30 @@ Requirement 11)
     
 
     
-
+    <h5>Returns:</h5>
     
-</dd>
+            
+<div class="param-desc">
+    calls callback
+</div>
 
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-            
-<hr>
-<dt>
-    <h4 class="name" id="getContents"><span class="type-signature"></span>getContents(srs, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get Contents referencing the SRS
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>srs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SpatialReferenceSystem</span>
+<span class="param-type">undefined</span>
 
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {Contents}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
+    </dd>
 </dl>
 
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+        
 
     
 </dd>
@@ -2229,7 +1694,7 @@ Requirement 11)
             
 <hr>
 <dt>
-    <h4 class="name" id="getGeometryColumns"><span class="type-signature"></span>getGeometryColumns(srs, callback)</h4>
+    <h4 class="name" id="getFeatureTables"><span class="type-signature"></span>getFeatureTables(callback)</h4>
     
     
 </dt>
@@ -2237,448 +1702,7 @@ Requirement 11)
 
     
     <div class="description">
-        Get Geometry Columns referencing the SRS
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>srs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SpatialReferenceSystem</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {module:dao/geometryColumns~GeometryColumns}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getTileMatrixSet"><span class="type-signature"></span>getTileMatrixSet(srs, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get Tile Matrix Sets referencing the SRS
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>srs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">SpatialReferenceSystem</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {TileMatrixSet}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="isTableExists"><span class="type-signature"></span>isTableExists(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Checks if the table exists
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">validationCallback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Callback to call with the results of if the table exists or not</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="module-dao_dao-Dao.html#isTableExists">module:dao/dao~Dao#isTableExists</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="queryForAll"><span class="type-signature"></span>queryForAll(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory
+        Gets the names of all the feature tables in the GeoPackage
     </div>
     
 
@@ -2730,7 +1754,7 @@ Requirement 11)
 
             
 
-            <td class="description last">called with an error if one occurred and the array of results</td>
+            <td class="description last">called with err, array of table names</td>
         </tr>
 
     
@@ -2747,15 +1771,6 @@ Requirement 11)
 
 	
 
-	
-	<dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-	<dd class="inherited-from">
-		<ul class="dummy">
-			<li>
-				<a href="module-dao_dao-Dao.html#queryForAll">module:dao/dao~Dao#queryForAll</a>
-			</li>
-		</ul>
-	</dd>
 	
 
     
@@ -2799,6 +1814,982 @@ Requirement 11)
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTileFromTable"><span class="type-signature"></span>getTileFromTable(table, z, x, y, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Gets the tile bytes as a stream for the xyz tile specified
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>table</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">table name to get the tile from</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>z</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">zoom level of tile</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">x coordinate of tile</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">y coordinate of tile</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">called with err, stream</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="getTileTables"><span class="type-signature"></span>getTileTables(callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Gets the names of all tile tables in the GeoPackage
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">called with err, array of tile table names</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="indexGeoPackage"><span class="type-signature"></span>indexGeoPackage(tableName, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Indexes the GeoPackage using the NGA Table Index extension
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>tableName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">table to index</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">called when complete</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="iterateFeaturesFromTable"><span class="type-signature"></span>iterateFeaturesFromTable(table, featureCallback, doneCallback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Iterates the features from a table and calls the callback with the GeoJSON feature
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>table</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">table to Iterates</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>featureCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">called with err, GeoJSON feature, callback.  Callback must be called to continue processing</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>doneCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">called when iteration is complete</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="openGeoPackageFile"><span class="type-signature"></span>openGeoPackageFile(filePath, callback)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        Opens an existing GeoPackage at the path specified for reading and writing
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filePath</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Absolute path to the GeoPackage to create</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#geoPackageCallback">geoPackageCallback</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">function to callback when created</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    calls callback
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+
+    </dd>
+</dl>
+
+
+        
 
     
 </dd>
