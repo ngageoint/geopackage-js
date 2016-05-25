@@ -209,7 +209,6 @@ var Contents = function() {
  */
 var ContentsDao = function(db) {
   Dao.call(this, db);
-  this.initializeColumnIndex();
 }
 
 util.inherits(ContentsDao, Dao);
@@ -332,51 +331,24 @@ ContentsDao.prototype.getTileMatrixDao = function () {
   return new TileMatrixDao(this.connection);
 };
 
-Contents.TABLE_NAME = "tableName";
-Contents.DATA_TYPE = "dataType";
-Contents.IDENTIFIER = "identifier";
-Contents.DESCRIPTION = "description";
-Contents.LAST_CHANGE = "lastChange";
-Contents.MIN_X = "minX";
-Contents.MIN_Y = "minY";
-Contents.MAX_X = "maxX";
-Contents.MAX_Y = "maxY";
-Contents.SRS_ID = "srsId";
-
-ContentsDao.GPKG_CON_TABLE_NAME = "gpkg_contents";
-ContentsDao.GPKG_CON_COLUMN_PK = "table_name";
-ContentsDao.GPKG_CON_COLUMN_TABLE_NAME = "table_name";
-ContentsDao.GPKG_CON_COLUMN_DATA_TYPE = "data_type";
-ContentsDao.GPKG_CON_COLUMN_IDENTIFIER = "identifier";
-ContentsDao.GPKG_CON_COLUMN_DESCRIPTION = "description";
-ContentsDao.GPKG_CON_COLUMN_LAST_CHANGE = "last_change";
-ContentsDao.GPKG_CON_COLUMN_MIN_X = "min_x";
-ContentsDao.GPKG_CON_COLUMN_MIN_Y = "min_y";
-ContentsDao.GPKG_CON_COLUMN_MAX_X = "max_x";
-ContentsDao.GPKG_CON_COLUMN_MAX_Y = "max_y";
-ContentsDao.GPKG_CON_COLUMN_SRS_ID = "srs_id";
+ContentsDao.TABLE_NAME = "gpkg_contents";
+ContentsDao.COLUMN_PK = "table_name";
+ContentsDao.COLUMN_TABLE_NAME = "table_name";
+ContentsDao.COLUMN_DATA_TYPE = "data_type";
+ContentsDao.COLUMN_IDENTIFIER = "identifier";
+ContentsDao.COLUMN_DESCRIPTION = "description";
+ContentsDao.COLUMN_LAST_CHANGE = "last_change";
+ContentsDao.COLUMN_MIN_X = "min_x";
+ContentsDao.COLUMN_MIN_Y = "min_y";
+ContentsDao.COLUMN_MAX_X = "max_x";
+ContentsDao.COLUMN_MAX_Y = "max_y";
+ContentsDao.COLUMN_SRS_ID = "srs_id";
 
 ContentsDao.GPKG_CDT_FEATURES_NAME = "features";
 ContentsDao.GPKG_CDT_TILES_NAME = "tiles";
 
-ContentsDao.prototype.gpkgTableName = ContentsDao.GPKG_CON_TABLE_NAME;
-ContentsDao.prototype.idColumns = [ContentsDao.GPKG_CON_COLUMN_PK];
-ContentsDao.prototype.columns = [ContentsDao.GPKG_CON_COLUMN_TABLE_NAME, ContentsDao.GPKG_CON_COLUMN_DATA_TYPE, ContentsDao.GPKG_CON_COLUMN_IDENTIFIER, ContentsDao.GPKG_CON_COLUMN_DESCRIPTION, ContentsDao.GPKG_CON_COLUMN_LAST_CHANGE, ContentsDao.GPKG_CON_COLUMN_MIN_X, ContentsDao.GPKG_CON_COLUMN_MIN_Y, ContentsDao.GPKG_CON_COLUMN_MAX_X, ContentsDao.GPKG_CON_COLUMN_MAX_Y, ContentsDao.GPKG_CON_COLUMN_SRS_ID];
-
-ContentsDao.prototype.columnToPropertyMap = {};
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_TABLE_NAME] = Contents.TABLE_NAME;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_DATA_TYPE] = Contents.DATA_TYPE;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_IDENTIFIER] = Contents.IDENTIFIER;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_DESCRIPTION] = Contents.DESCRIPTION;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_LAST_CHANGE] = Contents.LAST_CHANGE;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_MIN_X] = Contents.MIN_X;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_MIN_Y] = Contents.MIN_Y;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_MAX_X] = Contents.MAX_X;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_MAX_Y] = Contents.MAX_Y;
-ContentsDao.prototype.columnToPropertyMap[ContentsDao.GPKG_CON_COLUMN_SRS_ID] = Contents.SRS_ID;
-
-
-ContentsDao.columnIndexToPropertyMap = [Contents.TABLE_NAME, Contents.DATA_TYPE, Contents.IDENTIFIER, Contents.DESCRIPTION, Contents.LAST_CHANGE, Contents.MIN_X, Contents.MIN_Y, Contents.MAX_X, Contents.MAX_Y, Contents.SRS_ID];
+ContentsDao.prototype.gpkgTableName = ContentsDao.TABLE_NAME;
+ContentsDao.prototype.idColumns = [ContentsDao.COLUMN_PK];
 
 module.exports.ContentsDao = ContentsDao;
 module.exports.Contents = Contents;
@@ -649,24 +621,8 @@ SpatialReferenceSystemDao.COLUMN_DEFINITION = "definition";
  */
 SpatialReferenceSystemDao.COLUMN_DESCRIPTION = "description";
 
-SpatialReferenceSystem.SRS_NAME = "srsName";
-SpatialReferenceSystem.SRS_ID = "srsId";
-SpatialReferenceSystem.ORGANIZATION = "organization";
-SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID = "organizationCoordsysId";
-SpatialReferenceSystem.DEFINITION = "definition";
-SpatialReferenceSystem.DESCRIPTION = "description";
 
 SpatialReferenceSystemDao.prototype.idColumns = [SpatialReferenceSystemDao.COLUMN_SRS_ID];
-SpatialReferenceSystemDao.prototype.columns =
-  [SpatialReferenceSystemDao.COLUMN_SRS_NAME, SpatialReferenceSystemDao.COLUMN_SRS_ID, SpatialReferenceSystemDao.COLUMN_ORGANIZATION, SpatialReferenceSystemDao.COLUMN_ORGANIZATION_COORDSYS_ID, SpatialReferenceSystemDao.COLUMN_DEFINITION, SpatialReferenceSystemDao.COLUMN_DESCRIPTION];
-
-SpatialReferenceSystemDao.prototype.columnToPropertyMap = {};
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_SRS_NAME] = SpatialReferenceSystem.SRS_NAME;
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_SRS_ID] = SpatialReferenceSystem.SRS_ID;
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_ORGANIZATION] = SpatialReferenceSystem.ORGANIZATION;
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_ORGANIZATION_COORDSYS_ID] = SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID;
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_DEFINITION] = SpatialReferenceSystem.DEFINITION;
-SpatialReferenceSystemDao.prototype.columnToPropertyMap[SpatialReferenceSystemDao.COLUMN_DESCRIPTION] = SpatialReferenceSystem.DESCRIPTION;
 
 module.exports.SpatialReferenceSystemDao = SpatialReferenceSystemDao;
 module.exports.SpatialReferenceSystem = SpatialReferenceSystem;
@@ -712,22 +668,6 @@ Dao.prototype.populateObjectFromResult = function (object, result) {
     object[key] = result[key];
   }
 };
-
-// Dao.prototype.setValueInObject = function (object, columnName, value) {
-//   var propertyName = object.columnToPropertyMap[columnName];
-//   if (!propertyName) {
-//     throw new Error('Unsupported column name: ' + columnName);
-//   }
-//   object[propertyName] = value;
-// };
-//
-// Dao.prototype.getValueFromObject = function (object, columnName) {
-//   var propertyName = object.columnIndexToPropertyMap[columnName];
-//   if (!propertyName) {
-//     throw new Error('Unsupported column name: ' + columnName);
-//   }
-//   return object[property];
-// };
 
 /**
  * Checks if the table exists
@@ -885,20 +825,17 @@ Dao.prototype.queryForEqWithField = function(field, value, groupBy, having, orde
   }
 };
 
-Dao.prototype.initializeColumnIndex = function () {
-  this.columnIndex = {};
-  for (var i = 0; i < this.columns.length; i++) {
-    this.columnIndex[this.columns[i]] = i;
-  }
-};
-
 Dao.prototype.getId = function (object) {
   return this.getValueFromObjectWithColumnName(object, this.idColumns[0]);
 };
 
 Dao.prototype.getValueFromObjectWithColumnName = function (object, column) {
-  return this.getValueFromObject(object, this.columnIndex[column]);
+  return object[column];
 };
+
+Dao.prototype.getValue = function(column) {
+  return this[column];
+}
 
 Dao.prototype.minOfColumn = function (column, where, whereArgs, callback) {
   this.connection.minOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
@@ -1011,7 +948,6 @@ DataColumns.prototype.setConstraint = function (constraint) {
  */
 var DataColumnsDao = function(connection) {
   Dao.call(this, connection);
-  this.initializeColumnIndex();
 }
 
 util.inherits(DataColumnsDao, Dao);
@@ -1063,14 +999,6 @@ DataColumnsDao.prototype.getDataColumns = function (tableName, columnName, callb
   }.bind(this));
 };
 
-DataColumns.TABLE_NAME = "tableName";
-DataColumns.COLUMN_NAME = "columnName";
-DataColumns.NAME = "name";
-DataColumns.TITLE = "title";
-DataColumns.DESCRIPTION = "theDescription";
-DataColumns.MIME_TYPE = "mimeType";
-DataColumns.CONSTRAINT_NAME = "constraintName";
-
 DataColumnsDao.TABLE_NAME = "gpkg_data_columns";
 DataColumnsDao.COLUMN_PK1 = "table_name";
 DataColumnsDao.COLUMN_PK2 = "column_name";
@@ -1084,16 +1012,6 @@ DataColumnsDao.COLUMN_CONSTRAINT_NAME = "constraint_name";
 
 DataColumnsDao.prototype.gpkgTableName = DataColumnsDao.TABLE_NAME;
 DataColumnsDao.prototype.idColumns = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
-DataColumnsDao.prototype.columns = [DataColumnsDao.COLUMN_TABLE_NAME, DataColumnsDao.COLUMN_COLUMN_NAME, DataColumnsDao.COLUMN_NAME, DataColumnsDao.COLUMN_NAME, DataColumnsDao.COLUMN_TITLE, DataColumnsDao.COLUMN_DESCRIPTION, DataColumnsDao.COLUMN_MIME_TYPE, DataColumnsDao.COLUMN_CONSTRAINT_NAME];
-
-DataColumnsDao.prototype.columnToPropertyMap = {};
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_TABLE_NAME] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_COLUMN_NAME] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_NAME] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_TITLE] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_DESCRIPTION] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_MIME_TYPE] = DataColumns.TABLE_NAME;
-DataColumnsDao.prototype.columnToPropertyMap[DataColumnsDao.COLUMN_CONSTRAINT_NAME] = DataColumns.TABLE_NAME;
 
 module.exports.DataColumnsDao = DataColumnsDao;
 module.exports.DataColumns = DataColumns;
@@ -1579,8 +1497,6 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     eachCallback = params;
     params = [];
   }
-  console.log('sql', sql);
-  console.log('params', params);
   var statement = this.db.prepare(sql);
   statement.bind(params);
 
@@ -1698,7 +1614,6 @@ var GeometryColumns = function() {
  */
 var GeometryColumnsDao = function(connection) {
   Dao.call(this, connection);
-  this.initializeColumnIndex();
 }
 
 util.inherits(GeometryColumnsDao, Dao);
@@ -1842,14 +1757,6 @@ GeometryColumns.GEOMETRY_TYPE_NAME = "geometryTypeName";
 GeometryColumns.SRS_ID = "srsId";
 GeometryColumns.Z = "z";
 GeometryColumns.M = "m";
-
-GeometryColumnsDao.prototype.columnToPropertyMap = {};
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_TABLE_NAME] = GeometryColumns.TABLE_NAME;
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_COLUMN_NAME] = GeometryColumns.COLUMN_NAME;
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_GEOMETRY_TYPE_NAME] = GeometryColumns.GEOMETRY_TYPE_NAME;
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_SRS_ID] = GeometryColumns.SRS_ID;
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_Z] = GeometryColumns.Z;
-GeometryColumnsDao.prototype.columnToPropertyMap[GeometryColumnsDao.COLUMN_M] = GeometryColumns.M;
 
 module.exports.GeometryColumnsDao = GeometryColumnsDao;
 module.exports.GeometryColumns = GeometryColumns;
@@ -2578,16 +2485,26 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
         info.contents.minY = contents.min_y;
         info.contents.maxY = contents.max_y;
         var contentsDao = tableDao.getContentsDao();
-        contentsDao.getSrs(contents, function(err, srs){
-          info.srs = {
-            name:srs.srs_name,
-            id:srs.srs_id,
-            organization:srs.organization,
-            organization_coordsys_id:srs.organization_coordsys_id,
-            definition:srs.definition,
-            description:srs.description
+        contentsDao.getSrs(contents, function(err, contentsSrs) {
+          info.contents.srs = {
+            name:contentsSrs.srs_name,
+            id:contentsSrs.srs_id,
+            organization:contentsSrs.organization,
+            organization_coordsys_id:contentsSrs.organization_coordsys_id,
+            definition:contentsSrs.definition,
+            description:contentsSrs.description
           };
-          callback(null, info);
+          tableDao.getSrs(function(err, srs){
+            info.srs = {
+              name:srs.srs_name,
+              id:srs.srs_id,
+              organization:srs.organization,
+              organization_coordsys_id:srs.organization_coordsys_id,
+              definition:srs.definition,
+              description:srs.description
+            };
+            callback(null, info);
+          });
         });
       });
     }, function(info, callback) {
@@ -2904,14 +2821,10 @@ GeoPackage.prototype.getSrs = function(srsId) {
 GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
   var tileMatrices = [];
   var tileMatrixDao = this.getTileMatrixDao();
-  console.log('tileMatrixSet.table_name', tileMatrixSet);
-  console.trace();
   tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
     async.eachSeries(results, function(result, callback) {
-      console.log('result', result);
       var tm = new TileMatrix();
       tileMatrixDao.populateObjectFromResult(tm, result);
-      console.log('tm', tm);
       tileMatrices.push(tm);
       callback();
     }, function(err) {
@@ -3044,7 +2957,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
   async.waterfall([
     function(callback) {
       var info = {};
-      info.tableName = tableDao.tableName;
+      info.tableName = tableDao.table_name;
       info.tableType = tableDao.table.getTableType();
       callback(null, info);
     },
@@ -3089,13 +3002,12 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
         info.contents.maxX = contents.max_x;
         info.contents.minY = contents.min_y;
         info.contents.maxY = contents.max_y;
-        var contentsDao = tableDao.getContentsDao();
-        contentsDao.getSrs(contents, function(err, srs){
+        tableDao.getSrs(function(err, srs){
           info.srs = {
             name:srs.srs_name,
             id:srs.srs_id,
             organization:srs.organization,
-            organizationCoordsysId:srs.organization_coordsys_id,
+            organization_coordsys_id:srs.organization_coordsys_id,
             definition:srs.definition,
             description:srs.description
           };
@@ -3152,8 +3064,8 @@ function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundin
 
   this.tileCanvas = document.createElement('canvas');
   this.tileContext = this.tileCanvas.getContext('2d');
-  this.tileCanvas.width = tileMatrix.tileWidth;
-  this.tileCanvas.height = tileMatrix.tileHeight;
+  this.tileCanvas.width = tileMatrix.tile_width;
+  this.tileCanvas.height = tileMatrix.tile_height;
 
   this.imageData = new Uint8ClampedArray(width * height * 4);
 
@@ -3161,14 +3073,6 @@ function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundin
 }
 
 util.inherits(CanvasTileCreator, TileCreator);
-
-CanvasTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
-  this.chunks.push({
-    chunk: chunk,
-    x: xOffset,
-    y: yOffset
-  });
-};
 
 CanvasTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, sourceY) {
   var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
@@ -3191,15 +3095,25 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
       this.tileContext.drawImage(this.image, 0, 0);
       this.projectTile(tileData, gridColumn, gridRow, function(err, imageData) {
         async.eachSeries(this.chunks, function(chunk, chunkDone) {
-          var type = fileType(tileData);
+          async.setImmediate(function() {
+            var type = fileType(tileData);
 
-          var base64Data = btoa(String.fromCharCode.apply(null, chunk.chunk));
-          var image = document.createElement('img');
-          image.onload = function() {
-            this.ctx.drawImage(image, chunk.x, chunk.y);
-            chunkDone();
-          }.bind(this);
-          image.src = 'data:'+type.mime+';base64,' + base64Data;
+            var binary = '';
+            var bytes = chunk.chunk;
+            var len = bytes.byteLength;
+            for (var i = 0; i < len; i++) {
+              binary += String.fromCharCode( bytes[ i ] );
+            }
+
+            var base64DataChunk = btoa( binary );
+            var image = document.createElement('img');
+            image.onload = function() {
+              var p = chunk.position;
+              this.ctx.drawImage(image, p.tileCropXStart, p.tileCropYStart, (p.tileCropXEnd - p.tileCropXStart), (p.tileCropYEnd - p.tileCropYStart), p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart), (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart));
+              chunkDone();
+            }.bind(this);
+            image.src = 'data:'+type.mime+';base64,' + base64DataChunk;
+          }.bind(this));
         }.bind(this), callback);
       }.bind(this));
     }.bind(this));
@@ -3217,7 +3131,7 @@ CanvasTileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox
   var height = this.height;
   var cb = callback;
 
-  var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, this.tileBoundingBox, this.height, this.width, this.projectionTo, this.projectionFrom, this.tileHeightUnitsPerPixel, this.tileWidthUnitsPerPixel, this.tileMatrix.pixelXSize, this.tileMatrix.pixelYSize);
+  var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, this.tileBoundingBox, this.height, this.width, this.projectionTo, this.projectionFrom, this.tileHeightUnitsPerPixel, this.tileWidthUnitsPerPixel, this.tileMatrix.pixel_x_size, this.tileMatrix.pixel_y_size);
 
   var worker = work(require('./tileWorker.js'));
 
@@ -3247,15 +3161,15 @@ CanvasTileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox
     tileHeightUnitsPerPixel: this.tileHeightUnitsPerPixel,
     projectionTo: this.projectionTo,
     projectionFrom: this.projectionFrom,
-    tileWidth: this.tileMatrix.tileWidth,
-    tileHeight: this.tileMatrix.tileHeight,
-    pixelYSize: this.tileMatrix.pixelYSize,
-    pixelXSize: this.tileMatrix.pixelXSize,
+    tileWidth: this.tileMatrix.tile_width,
+    tileHeight: this.tileMatrix.tile_height,
+    pixelYSize: this.tileMatrix.pixel_y_size,
+    pixelXSize: this.tileMatrix.pixel_x_size,
     height: this.height,
     width: this.width,
     tilePieceBoundingBox: JSON.stringify(tilePieceBoundingBox),
-    imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tileWidth, this.tileMatrix.tileHeight).data.buffer
-  }, [this.tileContext.getImageData(0, 0, this.tileMatrix.tileWidth, this.tileMatrix.tileHeight).data.buffer]);
+    imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer
+  }, [this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer]);
 
 };
 
@@ -3310,16 +3224,22 @@ TileCreator.prototype.projectTile = function(tileData, gridColumn, gridRow, call
 
 TileCreator.prototype.cutAndScale = function (tileData, tilePieceBoundingBox, callback) {
 
-  var xOffset = Math.round(TileBoundingBoxUtils.getXPixelOffset(this.width || tileWidth, tilePieceBoundingBox, this.tileBoundingBox.minLongitude));
-  var yOffset = Math.round(TileBoundingBoxUtils.getYPixelOffset(this.height || tileHeight, tilePieceBoundingBox, this.tileBoundingBox.maxLatitude));
+  var position = TileBoundingBoxUtils.determinePositionAndScale(tilePieceBoundingBox, this.tileMatrix.tile_height, this.tileMatrix.tile_width, this.tileBoundingBox, this.height, this.width);
 
-  if (xOffset <= -(this.height || tileHeight) || xOffset >= (this.height || tileHeight) || yOffset <= -(this.width || tileWidth) || yOffset >= (this.width || tileWidth)) {
+  if (position.xPositionInFinalTileStart >= this.width || position.xPositionInFinalTileEnd <= 0 || position.yPositionInFinalTileStart >= this.height || position.yPositionInFinalTileEnd <= 0) {
     // this tile doesn't belong just skip it
     callback();
   } else {
-    this.addChunk(tileData, xOffset, yOffset);
+    this.addChunk(tileData, position);
     callback();
   }
+};
+
+TileCreator.prototype.addChunk = function (chunk, position) {
+  this.chunks.push({
+    chunk: chunk,
+    position: position
+  });
 };
 
 TileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox, callback) {
@@ -3349,10 +3269,10 @@ TileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox, call
               var projectedLongitude = projected[0];
               var projectedLatitude = projected[1];
 
-              var xPixel = this.tileMatrix.tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixelXSize);
-              var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixelYSize);
-              if (xPixel >= 0 && xPixel < this.tileMatrix.tileWidth
-              && yPixel >= 0 && yPixel < this.tileMatrix.tileHeight) {
+              var xPixel = this.tileMatrix.tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
+              var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixel_y_size);
+              if (xPixel >= 0 && xPixel < this.tileMatrix.tile_width
+              && yPixel >= 0 && yPixel < this.tileMatrix.tile_height) {
                 this.addPixel(x, y, xPixel, yPixel);
               }
               x++;
@@ -3402,14 +3322,6 @@ LwipTileCreator.prototype.addPixel = function (targetX, targetY, sourceX, source
   });
 };
 
-LwipTileCreator.prototype.addChunk = function (chunk, xOffset, yOffset) {
-  this.chunks.push({
-    chunk: chunk,
-    x: xOffset,
-    y: yOffset
-  });
-};
-
 LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
   var type = fileType(tileData);
   this.lwip.open(tileData, type.ext, function(err, tile) {
@@ -3420,10 +3332,16 @@ LwipTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, cal
       }.bind(this), function(err) {
         async.eachSeries(this.chunks, function(chunk, chunkDone) {
           var type = fileType(chunk.chunk);
+          var image = this.image;
           this.lwip.open(chunk.chunk, type.ext, function(err, tile) {
-            tile.crop(Math.abs(Math.min(0, chunk.x)), Math.abs(Math.min(0, chunk.y)), Math.min(this.tileMatrix.tile_width-1, this.tileMatrix.tile_width - chunk.x), Math.min(this.tileMatrix.tile_height-1, this.tileMatrix.tile_height - chunk.y), function(err, tile) {
-              this.image.paste(Math.max(0, chunk.x), Math.max(0, chunk.y), tile, chunkDone);
-            }.bind(this));
+            var p = chunk.position;
+            var batch = tile.batch();
+            batch
+            .crop(p.tileCropXStart, p.tileCropYStart, p.tileCropXEnd, p.tileCropYEnd)
+            .scale(p.xScale, p.yScale)
+            .exec(function(err, scaledTile) {
+              image.paste(p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, scaledTile, chunkDone);
+            });
           }.bind(this));
         }.bind(this), function(err) {
           callback(err, this.image);
@@ -3650,11 +3568,6 @@ var TileMatrix = function() {
   this.pixel_y_size;
 };
 
-// TileMatrix.prototype.populateFromResult = function (result) {
-//   for (var key in TileMatrixDao.columnToPropertyMap) {
-//     this[TileMatrixDao.columnToPropertyMap[key]] = result[key];
-//   }
-// };
 // /**
 //  *  Set the Contents
 //  *
@@ -3778,18 +3691,6 @@ TileMatrix.PIXEL_Y_SIZE = 'pixelYSize';
 TileMatrixDao.prototype.gpkgTableName = 'gpkg_tile_matrix';
 TileMatrixDao.prototype.idColumns = [TileMatrixDao.COLUMN_PK1, TileMatrixDao.COLUMN_PK2];
 TileMatrixDao.prototype.columns = [TileMatrixDao.COLUMN_TABLE_NAME, TileMatrixDao.COLUMN_ZOOM_LEVEL, TileMatrixDao.COLUMN_MATRIX_WIDTH, TileMatrixDao.COLUMN_MATRIX_HEIGHT, TileMatrixDao.COLUMN_TILE_WIDTH, TileMatrixDao.COLUMN_TILE_HEIGHT, TileMatrixDao.COLUMN_PIXEL_X_SIZE, TileMatrixDao.COLUMN_PIXEL_Y_SIZE];
-
-TileMatrixDao.prototype.columnToPropertyMap = {};
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_TABLE_NAME] = TileMatrix.TABLE_NAME;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_ZOOM_LEVEL] = TileMatrix.ZOOM_LEVEL;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_MATRIX_WIDTH] = TileMatrix.MATRIX_WIDTH;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_MATRIX_HEIGHT] = TileMatrix.MATRIX_HEIGHT;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_TILE_WIDTH] = TileMatrix.TILE_WIDTH;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_TILE_HEIGHT] = TileMatrix.TILE_HEIGHT;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_PIXEL_X_SIZE] = TileMatrix.PIXEL_X_SIZE;
-TileMatrixDao.prototype.columnToPropertyMap[TileMatrixDao.COLUMN_PIXEL_Y_SIZE] = TileMatrix.PIXEL_Y_SIZE;
-
-TileMatrixDao.columnIndexToPropertyMap = [TileMatrix.TABLE_NAME, TileMatrix.ZOOM_LEVEL, TileMatrix.MATRIX_WIDTH, TileMatrix.MATRIX_HEIGHT, TileMatrix.TILE_WIDTH, TileMatrix.TILE_HEIGHT, TileMatrix.PIXEL_X_SIZE, TileMatrix.PIXEL_Y_SIZE];
 
 module.exports.TileMatrixDao = TileMatrixDao;
 module.exports.TileMatrix = TileMatrix;
@@ -3985,9 +3886,6 @@ TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_X] = 
 TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_Y] = TileMatrixSet.MIN_Y;
 TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_X] = TileMatrixSet.MAX_X;
 TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
-
-
-TileMatrixSetDao.columnIndexToPropertyMap = [TileMatrixSet.TABLE_NAME, TileMatrixSet.SRS_ID, TileMatrixSet.MIN_X, TileMatrixSet.MIN_Y, TileMatrixSet.MAX_X, TileMatrixSet.MAX_Y];
 
 module.exports.TileMatrixSetDao = TileMatrixSetDao;
 module.exports.TileMatrixSet = TileMatrixSet;
@@ -4226,29 +4124,42 @@ module.exports.getYPixelOffset = function(height, boundingBox, latitude) {
 
   return pixel;
 }
-// /**
-//  *  Get the latitude from the pixel location, bounding box, and image height
-//  *
-//  *  @param height      height
-//  *  @param boundingBox bounding box
-//  *  @param pixel       y pixel
-//  *
-//  *  @return latitude
-//  */
-// +(double) getLatitudeFromPixelWithHeight: (int) height andBoundingBox: (GPKGBoundingBox *) boundingBox andPixel: (double) pixel;
-//
-// /**
-//  * Get the tile bounding box from the Standard Maps API tile coordinates and
-//  * zoom level
-//  *
-//  *  @param x    x
-//  *  @param y    y
-//  *  @param zoom zoom level
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) getBoundingBoxWithX: (int) x andY: (int) y andZoom: (int) zoom;
-//
+
+module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth) {
+  var p = {};
+
+  var boxWidth = totalBoundingBox.maxLongitude - totalBoundingBox.minLongitude;
+  var xoffsetMin = geoPackageTileBoundingBox.minLongitude - totalBoundingBox.minLongitude;
+  var xpercentageMin = xoffsetMin / boxWidth;
+  var xoffsetMax = totalBoundingBox.maxLongitude - geoPackageTileBoundingBox.maxLongitude;
+  var xpercentageMax = xoffsetMax / boxWidth;
+  var xcropMax = geoPackageTileBoundingBox.maxLongitude - totalBoundingBox.maxLongitude;
+  var xcropPercentageMax = xcropMax / boxWidth;
+
+  p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
+  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth - 1, totalWidth - 1 - (xpercentageMax * totalWidth)));
+  p.tileCropXStart = Math.round(Math.max(0, 0 - xpercentageMin * tileWidth));
+  p.tileCropXEnd = Math.round(Math.min(tileWidth - 1, tileWidth - 1 - (xcropPercentageMax * tileWidth)));
+  p.xScale = (1 + p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
+
+
+  var boxHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
+  var yoffsetMax = totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude;
+  var ypercentageMax = yoffsetMax / boxHeight;
+  var yoffsetMin = geoPackageTileBoundingBox.minLatitude - totalBoundingBox.minLatitude;
+  var ypercentageMin = yoffsetMin / boxHeight;
+  var ycropMin = totalBoundingBox.minLatitude - geoPackageTileBoundingBox.minLatitude;
+  var ycropPercentageMin = ycropMin / boxHeight;
+
+  p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
+  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight - 1, totalHeight - 1 - ypercentageMin * totalHeight));
+  p.tileCropYStart = Math.round(Math.max(0, 0 - ypercentageMax * tileHeight));
+  p.tileCropYEnd = Math.round(Math.min(tileHeight - 1, tileHeight - 1 - (ycropPercentageMin * tileHeight)));
+  p.yScale = (1 + p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
+
+  return p;
+}
+
 /**
  * Get the Web Mercator tile bounding box from the Standard Maps API tile
  * coordinates and zoom level
@@ -4276,180 +4187,39 @@ module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom) {
 
 		return box;
 }
-//
-// /**
-//  * Get the Web Mercator tile bounding box from the Standard Maps API tile grid
-//  * and zoom level
-//  *
-//  *  @param tileGrid tile grid
-//  *  @param zoom     zoom
-//  *
-//  *  @return web mercator bounding box
-//  */
-// +(GPKGBoundingBox *) getWebMercatorBoundingBoxWithTileGrid: (GPKGTileGrid *) tileGrid andZoom: (int) zoom;
-//
-// /**
-//  * Get the Projected tile bounding box from the Standard Maps API tile
-//  * coordinates and zoom level
-//  *
-//  *  @param projectionEpsg projection epsg code
-//  *  @param x              x
-//  *  @param y              y
-//  *  @param zoom           zoom level
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) getProjectedBoundingBoxWithProjectionEpsg: (NSNumber *) projectionEpsg andX: (int) x andY: (int) y andZoom: (int) zoom;
-//
-// /**
-//  * Get the Projected tile bounding box from the Standard Maps API tile
-//  * coordinates and zoom level
-//  *
-//  *  @param projection     projection
-//  *  @param x              x
-//  *  @param y              y
-//  *  @param zoom           zoom level
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) getProjectedBoundingBoxWithProjection: (GPKGProjection *) projection andX: (int) x andY: (int) y andZoom: (int) zoom;
-//
-// /**
-//  * Get the Projected tile bounding box from the Standard Maps API tile
-//  * tileGrid and zoom level
-//  *
-//  *  @param projectionEpsg projection epsg code
-//  *  @param tileGrid       tile grid
-//  *  @param zoom           zoom level
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) getProjectedBoundingBoxWithProjectionEpsg: (NSNumber *) projectionEpsg andTileGrid: (GPKGTileGrid *) tileGrid andZoom: (int) zoom;
-//
-// /**
-//  * Get the Projected tile bounding box from the Standard Maps API tile
-//  * tileGrid and zoom level
-//  *
-//  *  @param projection projection
-//  *  @param tileGrid   tile grid
-//  *  @param zoom       zoom level
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) getProjectedBoundingBoxWithProjection: (GPKGProjection *) projection andTileGrid: (GPKGTileGrid *) tileGrid andZoom: (int) zoom;
-//
-// /**
-//  *  Get the tile grid for the location specified as WGS84
-//  *
-//  *  @param point  WGS84 point
-//  *  @param zoom   zoom level
-//  *
-//  *  @return tile grid
-//  */
-// +(GPKGTileGrid *) getTileGridFromWGS84Point: (WKBPoint *) point andZoom: (int) zoom;
-//
-// /**
-//  *  Get the tile grid for the location specified as the projection
-//  *
-//  *  @param point        point
-//  *  @param zoom         zoom level
-//  *  @param projection   point projection
-//  *
-//  *  @return tile grid
-//  */
-// +(GPKGTileGrid *) getTileGridFromPoint: (WKBPoint *) point andZoom: (int) zoom andProjection: (GPKGProjection *) projection;
-//
-// /**
-//  *  Get the tile grid that includes the entire tile bounding box
-//  *
-//  *  @param webMercatorBoundingBox web mercator bounding box
-//  *  @param zoom                   zoom level
-//  *
-//  *  @return tile grid
-//  */
-// +(GPKGTileGrid *) getTileGridWithWebMercatorBoundingBox: (GPKGBoundingBox *) webMercatorBoundingBox andZoom: (int) zoom;
-//
-// /**
-//  *  Convert the bounding box coordinates to a new web mercator bounding box
-//  *
-//  *  @param boundingBox bounding box
-//  *
-//  *  @return web mercator bounding box
-//  */
-// +(GPKGBoundingBox *) toWebMercatorWithBoundingBox: (GPKGBoundingBox *) boundingBox;
-//
-// /**
-//  *  Get the tile size in meters
-//  *
-//  *  @param tilesPerSide tiles per side
-//  *
-//  *  @return meters
-//  */
-// +(double) tileSizeWithTilesPerSide: (int) tilesPerSide;
+
+/**
+ *  Get the tile size in meters
+ *
+ *  @param tilesPerSide tiles per side
+ *
+ *  @return meters
+ */
 module.exports.tileSizeWithTilesPerSide = function(tilesPerSide) {
   return (2*WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
 }
-// /**
-//  *  Get the tile width in degrees
-//  *
-//  *  @param tilesPerSide tiles per side
-//  *
-//  *  @return degrees
-//  */
-// +(double) tileWidthDegreesWithTilesPerSide: (int) tilesPerSide;
-//
-// /**
-//  *  Get the tile height in degrees
-//  *
-//  *  @param tilesPerSide tiles per side
-//  *
-//  *  @return degrees
-//  */
-// +(double) tileHeightDegreesWithTilesPerSide: (int) tilesPerSide;
-//
-// /**
-//  *  Get the tiles per side, width and height, at the zoom level
-//  *
-//  *  @param zoom zoom level
-//  *
-//  *  @return tiles per side
-//  */
-// +(int) tilesPerSideWithZoom: (int) zoom;
+
+/**
+ *  Get the tiles per side, width and height, at the zoom level
+ *
+ *  @param zoom zoom level
+ *
+ *  @return tiles per side
+ */
 module.exports.tilesPerSideWithZoom = function(zoom) {
   return Math.pow(2,zoom);
 }
-// /**
-//  *  Get the standard y tile location as TMS or a TMS y location as standard
-//  *
-//  *  @param zoom zoom
-//  *  @param y    y
-//  *
-//  *  @return opposite y format
-//  */
-// +(int) getYAsOppositeTileFormatWithZoom: (int) zoom andY: (int) y;
-//
-// /**
-//  *  Get the zoom level from the tiles per side
-//  *
-//  *  @param tilesPerSide tiles per side
-//  *
-//  *  @return zoom level
-//  */
-// +(int) zoomFromTilesPerSide: (int) tilesPerSide;
-//
-// /**
-//  *  Get the tile grid
-//  *
-//  *  @param webMercatorTotalBox    web mercator total bounding box
-//  *  @param matrixWidth            matrix width
-//  *  @param matrixHeight           matrix height
-//  *  @param webMercatorBoundingBox web mercator bounding box
-//  *
-//  *  @return tile grid
-//  */
-// +(GPKGTileGrid *) getTileGridWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andMatrixWidth: (int) matrixWidth andMatrixHeight: (int) matrixHeight andWebMercatorBoundingBox: (GPKGBoundingBox *) webMercatorBoundingBox;
-//
 
+/**
+ *  Get the tile grid
+ *
+ *  @param webMercatorTotalBox    web mercator total bounding box
+ *  @param matrixWidth            matrix width
+ *  @param matrixHeight           matrix height
+ *  @param boundingBox            bounding box
+ *
+ *  @return tile grid
+ */
 module.exports.getTileGridWithTotalBoundingBox = function(totalBoundingBox, matrixWidth, matrixHeight, boundingBox) {
   var minColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.minLongitude);
   var maxColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.maxLongitude, true);
@@ -4480,16 +4250,15 @@ module.exports.getTileGridWithTotalBoundingBox = function(totalBoundingBox, matr
   return tileGrid;
 }
 
-// /**
-//  *  Get the tile column of the longitude in degrees
-//  *
-//  *  @param webMercatorTotalBox web mercator total bounding box
-//  *  @param matrixWidth         matrix width
-//  *  @param longitude           longitude
-//  *
-//  *  @return tile column
-//  */
-// +(int) getTileColumnWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andMatrixWidth: (int) matrixWidth andLongitude: (double) longitude;
+/**
+ *  Get the tile column of the longitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixWidth         matrix width
+ *  @param longitude           longitude
+ *
+ *  @return tile column
+ */
 module.exports.getTileColumnWithTotalBoundingBox = function(webMercatorTotalBox, matrixWidth, longitude, max) {
   var minX = webMercatorTotalBox.minLongitude;
   var maxX = webMercatorTotalBox.maxLongitude;
@@ -4513,18 +4282,16 @@ module.exports.getTileColumnWithTotalBoundingBox = function(webMercatorTotalBox,
   }
   return tileId;
 }
-//
-// /**
-//  *  Get the tile row of the latitude in degrees
-//  *
-//  *  @param webMercatorTotalBox web mercator total bounding box
-//  *  @param matrixHeight        matrix height
-//  *  @param latitude            latitude
-//  *
-//  *  @return tile row
-//  */
-// +(int) getTileRowWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andMatrixHeight: (int) matrixHeight andLatitude: (double) latitude;
-//
+
+/**
+ *  Get the tile row of the latitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixHeight        matrix height
+ *  @param latitude            latitude
+ *
+ *  @return tile row
+ */
 module.exports.getTileRowWithTotalBoundingBox = function(webMercatorTotalBox, matrixHeight, latitude, max) {
   var minY = webMercatorTotalBox.minLatitude;
   var maxY = webMercatorTotalBox.maxLatitude;
@@ -4548,19 +4315,18 @@ module.exports.getTileRowWithTotalBoundingBox = function(webMercatorTotalBox, ma
   }
   return tileId;
 }
-// /**
-//  *  Get the web mercator bounding box of the tile column and row in the tile
-//  *  matrix using the total bounding box
-//  *
-//  *  @param webMercatorTotalBox web mercator total bounding box
-//  *  @param tileMatrix          tile matrix
-//  *  @param tileColumn          tile column
-//  *  @param tileRow             tile row
-//  *
-//  *  @return web mercator bounding box
-//  */
-// +(GPKGBoundingBox *) getWebMercatorBoundingBoxWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andTileMatrix: (GPKGTileMatrix *) tileMatrix andTileColumn: (int) tileColumn andTileRow: (int) tileRow;
 
+/**
+ *  Get the web mercator bounding box of the tile column and row in the tile
+ *  matrix using the total bounding box
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param tileMatrix          tile matrix
+ *  @param tileColumn          tile column
+ *  @param tileRow             tile row
+ *
+ *  @return web mercator bounding box
+ */
 module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRow) {
   var tileMatrixWidth = tileMatrix.matrix_width;
   var tileMatrixHeight = tileMatrix.matrix_height;
@@ -4612,106 +4378,6 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
 
   return new BoundingBox(minLon, maxLon, minLat, maxLat);
 }
-
-// /**
-//  *  Get the web mercator bounding box of the tile column and row in the tile
-//  *  width and height bounds using the total bounding box
-//  *
-//  *  @param webMercatorTotalBox web mercator total bounding box
-//  *  @param tileMatrixWidth     matrix width
-//  *  @param tileMatrixHeight    matrix height
-//  *  @param tileColumn          tile column
-//  *  @param tileRow             tile row
-//  *
-//  *  @return web mercator bounding box
-//  */
-// +(GPKGBoundingBox *) getWebMercatorBoundingBoxWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andTileMatrixWidth: (int) tileMatrixWidth andTileMatrixHeight: (int) tileMatrixHeight andTileColumn: (int) tileColumn andTileRow: (int) tileRow;
-//
-/**
- *  Get the web mercator bounding box of the tile grid in the tile matrix
- *  using the total bounding box
- *
- *  @param webMercatorTotalBox web mercator total bounding box
- *  @param tileMatrixWidth     matrix width
- *  @param tileMatrixHeight    matrix height
- *  @param tileGrid            tile grid
- *
- *  @return web mercator bounding box
- */
-
-
-// /**
-//  *  Get the web mercator bounding box of the tile grid in the tile width and
-//  *  height bounds using the total bounding box
-//  *
-//  *  @param webMercatorTotalBox web mercator total bounding box
-//  *  @param tileMatrixWidth     matrix width
-//  *  @param tileMatrixHeight    matrix height
-//  *  @param tileGrid            tile grid
-//  *
-//  *  @return web mercator bounding box
-//  */
-// +(GPKGBoundingBox *) getWebMercatorBoundingBoxWithWebMercatorTotalBoundingBox: (GPKGBoundingBox *) webMercatorTotalBox andTileMatrixWidth: (int) tileMatrixWidth andTileMatrixHeight: (int) tileMatrixHeight andTileGrid: (GPKGTileGrid *) tileGrid;
-//
-// /**
-//  * Get the zoom level of where the web mercator bounding box fits into the
-//  * complete world
-//  *
-//  *  @param webMercatorBoundingBox web mercator bounding box
-//  *
-//  *  @return zoom level
-//  */
-// +(int) getZoomLevelWithWebMercatorBoundingBox: (GPKGBoundingBox *) webMercatorBoundingBox;
-//
-// /**
-//  *  Get the location bearing a distance from a current location
-//  *
-//  *  @param bearing  bearing
-//  *  @param meters   meters
-//  *  @param location from location
-//  *
-//  *  @return to location
-//  */
-// +(CLLocationCoordinate2D) locationWithBearing: (double) bearing andDistance: (double) meters fromLocation: (CLLocationCoordinate2D) location;
-//
-// /**
-//  *  Get the bearing from a location to a location
-//  *
-//  *  @param from from location
-//  *  @param to   to location
-//  *
-//  *  @return bearing
-//  */
-// +(double) bearingFromLocation: (CLLocationCoordinate2D) from andToLocation: (CLLocationCoordinate2D) to;
-//
-// /**
-//  *  Get the distance between two locations
-//  *
-//  *  @param location1 location 1
-//  *  @param location2 location 2
-//  *
-//  *  @return distance in meters
-//  */
-// +(double) distanceBetweenLocation: (CLLocationCoordinate2D) location1 andLocation: (CLLocationCoordinate2D) location2;
-//
-// /**
-//  *  Get the location point between two locations
-//  *
-//  *  @param from from location
-//  *  @param to   to location
-//  *
-//  *  @return between point
-//  */
-// +(CLLocationCoordinate2D) pointBetweenFromLocation: (CLLocationCoordinate2D) from andToLocation: (CLLocationCoordinate2D) to;
-//
-// /**
-//  *  Bound the uppper and lower bounds of the WGS84 bounding box with web mercator limits
-//  *
-//  *  @param boundingBox wgs84 bounding box
-//  *
-//  *  @return bounding box
-//  */
-// +(GPKGBoundingBox *) boundWgs84BoundingBoxWithWebMercatorLimits: (GPKGBoundingBox *) boundingBox;
 
 },{"../boundingBox":2,"./tileGrid":33,"proj4":309}],33:[function(require,module,exports){
 
@@ -5608,7 +5274,6 @@ var UserDao = function(connection, table) {
   this.gpkgTableName = table.table_name;
   this.idColumns = table.getPkColumn().name;
   this.columns = table.columnNames;
-  this.initializeColumnIndex();
 }
 
 util.inherits(UserDao, Dao);

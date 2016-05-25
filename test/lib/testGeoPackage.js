@@ -138,4 +138,18 @@ describe('GeoPackage tests', function() {
     });
   });
 
+  it('should get the info for the Imagery table', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getTileDaoWithTableName('imagery', function(err, dao) {
+        geoPackage.getInfoForTable(dao, function(err, info) {
+          should.not.exist(err);
+          should.exist(info);
+          info.srs.id.should.be.equal(3857);
+          done(err);
+        });
+      });
+    });
+  });
+
 });

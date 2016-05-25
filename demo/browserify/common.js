@@ -48,7 +48,10 @@ var GeoPackage = GeoPackageAPI.GeoPackage
   baseLayer.addTo(map);
 
   var geoPackage;
-  var tableLayers = {};
+  var tableLayers;
+  var imageOverlay;
+  var currentTile = {};
+  var tableInfos;
 
   window.loadGeoPackage = function(files) {
     var f = files[0];
@@ -61,8 +64,6 @@ var GeoPackage = GeoPackageAPI.GeoPackage
     r.readAsArrayBuffer(f);
   }
 
-  var tableInfos;
-
   function loadByteArray(array, callback) {
     tableInfos = {};
     var tileTableNode = $('#tile-tables');
@@ -72,6 +73,10 @@ var GeoPackage = GeoPackageAPI.GeoPackage
 
     for (layerName in tableLayers) {
       map.removeLayer(tableLayers[layerName]);
+    }
+    tableLayers = {};
+    if (imageOverlay) {
+      map.removeLayer(imageOverlay);
     }
 
     var featureTableTemplate = $('#feature-table-template').html();
@@ -209,11 +214,13 @@ var GeoPackage = GeoPackageAPI.GeoPackage
     }
   }
 
-  window.loadUrl = function(url, loadingElement) {
+  window.loadUrl = function(url, loadingElement, gpName) {
     loadingElement.toggle();
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
+
+    $('#choose-label').text(gpName);
 
     xhr.onload = function(e) {
       var uInt8Array = new Uint8Array(this.response);
@@ -346,9 +353,6 @@ var GeoPackage = GeoPackageAPI.GeoPackage
       });
     });
   }
-
-  var imageOverlay;
-  var currentTile = {};
 
   window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
     if (imageOverlay) map.removeLayer(imageOverlay);

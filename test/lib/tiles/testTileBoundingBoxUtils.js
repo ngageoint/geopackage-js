@@ -47,4 +47,211 @@ describe('TileBoundingBoxUtils tests', function() {
     done();
   });
 
+  it('should determine the position and scale for same bounds and 2x scale', function() {
+    var geoPackageBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 512;
+    var tileWidth = 512;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.equal(511);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.equal(511);
+
+    p.yScale.should.be.equal(.5);
+    p.xScale.should.be.equal(.5);
+  });
+
+  it('should determine the position and scale for same scale and bounds', function() {
+    var geoPackageBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.equal(255);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.equal(255);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
+  it('should determine the position and scale for same scale and left shift', function() {
+    var geoPackageBoundingBox = new BoundingBox(-140.0, -95, 40.979, 66.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.lessThan(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.greaterThan(0);
+    p.tileCropXEnd.should.be.equal(255);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.equal(255);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
+  it('should determine the position and scale for same scale and right shift', function() {
+    var geoPackageBoundingBox = new BoundingBox(-130.0, -85, 40.979, 66.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.greaterThan(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.lessThan(255);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.equal(255);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
+  it('should determine the position and scale for same scale and shift up', function() {
+    var geoPackageBoundingBox = new BoundingBox(-135.0, -90, 45.979, 71.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.lessThan(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.equal(255);
+    p.tileCropYStart.should.be.greaterThan(0);
+    p.tileCropYEnd.should.be.equal(255);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
+  it('should determine the position and scale for same scale and shift down', function() {
+    var geoPackageBoundingBox = new BoundingBox(-135.0, -90, 35.979, 61.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.greaterThan(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.equal(255);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.lessThan(255);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
+  it('should determine the position and scale for same scale and bigger bounds', function() {
+    var geoPackageBoundingBox = new BoundingBox(-140.0, -85, 35.979, 71.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.greaterThan(0);
+    p.tileCropXEnd.should.be.lessThan(255);
+    p.tileCropYStart.should.be.greaterThan(0);
+    p.tileCropYEnd.should.be.lessThan(255);
+
+    p.yScale.should.be.greaterThan(1);
+    p.xScale.should.be.greaterThan(1);
+  });
+
+  it('should determine the position and scale for same scale and smaller bounds', function() {
+    var geoPackageBoundingBox = new BoundingBox(-130.0, -95, 45.979, 61.513);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.greaterThan(0);
+    p.xPositionInFinalTileEnd.should.be.lessThan(255);
+    p.yPositionInFinalTileStart.should.be.greaterThan(0);
+    p.yPositionInFinalTileEnd.should.be.lessThan(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.equal(255);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.equal(255);
+
+    p.yScale.should.be.lessThan(1);
+    p.xScale.should.be.lessThan(1);
+  });
+
+  it('should determine the position and scale for same scale and not contained in the bounds', function() {
+    var geoPackageBoundingBox = new BoundingBox(90, 135.0, -66.513, -40.979);
+    var totalBoundingBox = new BoundingBox(-135.0, -90, 40.979, 66.513);
+    var totalHeight = 256;
+    var totalWidth = 256;
+    var tileHeight = 256;
+    var tileWidth = 256;
+
+    var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
+
+    p.xPositionInFinalTileStart.should.be.greaterThan(255);
+    p.xPositionInFinalTileEnd.should.be.equal(255);
+    p.yPositionInFinalTileStart.should.be.greaterThan(255);
+    p.yPositionInFinalTileEnd.should.be.equal(255);
+    p.tileCropXStart.should.be.equal(0);
+    p.tileCropXEnd.should.be.lessThan(0);
+    p.tileCropYStart.should.be.equal(0);
+    p.tileCropYEnd.should.be.lessThan(0);
+
+    p.yScale.should.be.equal(1);
+    p.xScale.should.be.equal(1);
+  });
+
 });
