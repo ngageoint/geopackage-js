@@ -214,11 +214,13 @@ var GeoPackage = GeoPackageAPI.GeoPackage
     }
   }
 
-  window.loadUrl = function(url, loadingElement) {
+  window.loadUrl = function(url, loadingElement, gpName) {
     loadingElement.toggle();
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
+
+    $('#choose-label').text(gpName);
 
     xhr.onload = function(e) {
       var uInt8Array = new Uint8Array(this.response);
