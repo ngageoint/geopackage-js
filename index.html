@@ -79,13 +79,13 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organization_coordsys_id}}')">zoom to</a></div>
+    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
       <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
       <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
       <div class="metadata">
         <div class="srs">
-          <div class="section-title">Spatial Reference System</div>
+          <div class="section-title">Features Spatial Reference System</div>
           <div class="section">
             <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
             <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
@@ -107,6 +107,17 @@
             <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
             <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
             <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+            <div class="srs">
+              <div class="section-title">Contents Spatial Reference System</div>
+              <div class="section">
+                <div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
+                <div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
+                <div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
+                <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
+                <div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
+                <div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="geometryColumns">
@@ -181,7 +192,7 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{srs.organization}}:{{srs.organization_coordsys_id}}')">zoom to</a></div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
       <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
       <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
@@ -196,7 +207,7 @@
           </div>
         </div>
         <div class="srs">
-          <div class="section-title">Spatial Reference System</div>
+          <div class="section-title">Tile Matrix Spatial Reference System</div>
           <div class="section">
             <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
             <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
@@ -218,6 +229,17 @@
             <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
             <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
             <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+            <div class="srs">
+              <div class="section-title">Contents Spatial Reference System</div>
+              <div class="section">
+                <div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
+                <div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
+                <div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
+                <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
+                <div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
+                <div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="columns">
