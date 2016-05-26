@@ -15,13 +15,14 @@
     "Daniel Barela <daniel.barela@gmail.com>"
   ],
   "homepage": "http://ngageoint.github.io/geopackage-js/",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/ngageoint/geopackage-js.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngageoint/geopackage-js.git"
   },
   "bugs": {
-    "url" : "https://github.com/ngageoint/geopackage-js/issues"
+    "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
+  "bin": "./cli",
   "dependencies": {
     "async": "^1.5.0",
     "file-type": "^3.8.0",
@@ -55,12 +56,19 @@
     "webworkify": "^1.1.0"
   },
   "optionalDependencies": {
-    "sqlite3": "^3.1.2",
-    "lwip": "0.0.8"
+    "asciify-image": "0.0.7",
+    "chalk": "^1.1.3",
+    "inquirer": "^1.0.2",
+    "lwip": "0.0.8",
+    "sqlite3": "^3.1.2"
   },
   "private": true,
   "main": "geopackage.js",
-  "files": ["geopackage.js", "static/geopackage.js", "lib"],
+  "files": [
+    "geopackage.js",
+    "static/geopackage.js",
+    "lib"
+  ],
   "browser": {
     "lwip": false,
     "sqlite3": false
@@ -85,7 +93,7 @@
     "btest": "karma start",
     "predoc": "rm -rf docs/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
-    "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js",
-    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip -o static/geopackage.js"
+    "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
+    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js"
   }
 }
