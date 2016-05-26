@@ -42,14 +42,14 @@ describe('Tile Matrix tests', function() {
 
       var tileMatrix = tileMatrixDao.createObject();
       tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
-      tileMatrix.should.have.property('matrixWidth', 1);
-      tileMatrix.should.have.property('matrixHeight', 1);
-      tileMatrix.should.have.property('zoomLevel', 0);
-      tileMatrix.should.have.property('tableName', 'TILESosmds');
-      tileMatrix.should.have.property('tileWidth', 256);
-      tileMatrix.should.have.property('tileHeight', 256);
-      tileMatrix.should.have.property('pixelXSize', 156543.03392804097);
-      tileMatrix.should.have.property('pixelYSize', 156543.033928041);
+      tileMatrix.should.have.property('matrix_width', 1);
+      tileMatrix.should.have.property('matrix_height', 1);
+      tileMatrix.should.have.property('zoom_level', 0);
+      tileMatrix.should.have.property('table_name', 'TILESosmds');
+      tileMatrix.should.have.property('tile_width', 256);
+      tileMatrix.should.have.property('tile_height', 256);
+      tileMatrix.should.have.property('pixel_x_size', 156543.03392804097);
+      tileMatrix.should.have.property('pixel_y_size', 156543.033928041);
 
       done();
     });
@@ -62,16 +62,16 @@ describe('Tile Matrix tests', function() {
       tileMatrixDao.getContents(tileMatrix, function(err, contents) {
         should.not.exist(err);
         should.exist(contents);
-        contents.should.have.property('tableName', 'TILESosmds');
-        contents.should.have.property('dataType', 'tiles');
+        contents.should.have.property('table_name', 'TILESosmds');
+        contents.should.have.property('data_type', 'tiles');
         contents.should.have.property('identifier', 'TILESosmds');
         contents.should.have.property('description', null);
-        contents.should.have.property('lastChange', '2015-12-04T15:28:53.871Z');
-        contents.should.have.property('minX', -180);
-        contents.should.have.property('minY', -85.0511287798066);
-        contents.should.have.property('maxX', 180);
-        contents.should.have.property('maxY', 85.0511287798066);
-        contents.should.have.property('srsId', 4326);
+        contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+        contents.should.have.property('min_x', -180);
+        contents.should.have.property('min_y', -85.0511287798066);
+        contents.should.have.property('max_x', 180);
+        contents.should.have.property('max_y', 85.0511287798066);
+        contents.should.have.property('srs_id', 4326);
         done();
       });
     });
@@ -84,12 +84,12 @@ describe('Tile Matrix tests', function() {
       tileMatrixDao.getTileMatrixSet(tileMatrix, function(err, tileMatrixSet) {
         should.exist(tileMatrixSet);
         should.not.exist(err);
-        tileMatrixSet.should.have.property('srsId', 3857);
-        tileMatrixSet.should.have.property('tableName', 'TILESosmds');
-        tileMatrixSet.should.have.property('minX', -20037508.342789244);
-        tileMatrixSet.should.have.property('minY', -20037508.342789244);
-        tileMatrixSet.should.have.property('maxX', 20037508.342789244);
-        tileMatrixSet.should.have.property('maxY', 20037508.342789244);
+        tileMatrixSet.should.have.property('srs_id', 3857);
+        tileMatrixSet.should.have.property('table_name', 'TILESosmds');
+        tileMatrixSet.should.have.property('min_x', -20037508.342789244);
+        tileMatrixSet.should.have.property('min_y', -20037508.342789244);
+        tileMatrixSet.should.have.property('max_x', 20037508.342789244);
+        tileMatrixSet.should.have.property('max_y', 20037508.342789244);
         done();
       });
     });

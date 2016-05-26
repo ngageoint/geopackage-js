@@ -34,12 +34,12 @@ describe('Tile Matrix Set tests', function() {
     tileMatrixSetDao.queryForIdObject('TILESosmds', function(err, tileMatrixSet) {
       should.not.exist(err);
       should.exist(tileMatrixSet);
-      tileMatrixSet.should.have.property('tableName', 'TILESosmds');
-      tileMatrixSet.should.have.property('srsId', 3857);
-      tileMatrixSet.should.have.property('minX', -20037508.342789244);
-      tileMatrixSet.should.have.property('minY', -20037508.342789244);
-      tileMatrixSet.should.have.property('maxX', 20037508.342789244);
-      tileMatrixSet.should.have.property('maxY', 20037508.342789244);
+      tileMatrixSet.should.have.property('table_name', 'TILESosmds');
+      tileMatrixSet.should.have.property('srs_id', 3857);
+      tileMatrixSet.should.have.property('min_x', -20037508.342789244);
+      tileMatrixSet.should.have.property('min_y', -20037508.342789244);
+      tileMatrixSet.should.have.property('max_x', 20037508.342789244);
+      tileMatrixSet.should.have.property('max_y', 20037508.342789244);
       done();
     });
   });
@@ -73,16 +73,16 @@ describe('Tile Matrix Set tests', function() {
       tileMatrixSetDao.getContents(tileMatrixSet, function(err, contents) {
         should.exist(contents);
         should.not.exist(err);
-        contents.should.have.property('tableName', 'TILESosmds');
-        contents.should.have.property('dataType', 'tiles');
+        contents.should.have.property('table_name', 'TILESosmds');
+        contents.should.have.property('data_type', 'tiles');
         contents.should.have.property('identifier', 'TILESosmds');
         contents.should.have.property('description', null);
-        contents.should.have.property('lastChange', '2015-12-04T15:28:53.871Z');
-        contents.should.have.property('minX', -180);
-        contents.should.have.property('minY', -85.0511287798066);
-        contents.should.have.property('maxX', 180);
-        contents.should.have.property('maxY', 85.0511287798066);
-        contents.should.have.property('srsId', 4326);
+        contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+        contents.should.have.property('min_x', -180);
+        contents.should.have.property('min_y', -85.0511287798066);
+        contents.should.have.property('max_x', 180);
+        contents.should.have.property('max_y', 85.0511287798066);
+        contents.should.have.property('srs_id', 4326);
         done();
       });
     });
@@ -107,10 +107,10 @@ describe('Tile Matrix Set tests', function() {
       should.exist(tileMatrixSet);
       var bb = new BoundingBox(-1, 1, -1, 1);
       tileMatrixSet.setBoundingBox(bb);
-      tileMatrixSet.should.have.property('minX', -1);
-      tileMatrixSet.should.have.property('minY', -1);
-      tileMatrixSet.should.have.property('maxX', 1);
-      tileMatrixSet.should.have.property('maxY', 1);
+      tileMatrixSet.should.have.property('min_x', -1);
+      tileMatrixSet.should.have.property('min_y', -1);
+      tileMatrixSet.should.have.property('max_x', 1);
+      tileMatrixSet.should.have.property('max_y', 1);
       done();
     });
   });

@@ -17,7 +17,7 @@ describe('FeatureTableReader tests', function() {
   it('should read the table', function(done) {
     var reader = new FeatureTableReader('point2d');
     reader.readFeatureTable(connection, function(err, table) {
-      table.tableName.should.be.equal('point2d');
+      table.table_name.should.be.equal('point2d');
       table.columns.length.should.be.equal(8);
       table.columns[0].name.should.be.equal('fid');
       table.columns[1].name.should.be.equal('geom');
@@ -39,7 +39,7 @@ describe('FeatureTableReader tests', function() {
       var reader = new FeatureTableReader(geometryColumns);
 
       reader.readFeatureTable(connection, function(err, table) {
-        table.tableName.should.be.equal('point2d');
+        table.table_name.should.be.equal('point2d');
         table.columns.length.should.be.equal(8);
         table.columns[0].name.should.be.equal('fid');
         table.columns[1].name.should.be.equal('geom');

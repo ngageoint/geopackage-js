@@ -3,8 +3,7 @@
 ### Demo ###
 [GeoPackage JS Demo Page](http://ngageoint.github.io/geopackage-js/)
 
-#### Current Refactor ####
-This library is currently being refactored to remove the reliance on  [GeoPackage Java](http://ngageoint.github.io/geopackage-java/).  The goal of this refactor is to open and edit GeoPackage files in the browser and Node.  Cloning this project and opening the index.html file in your browser allows you to open a GeoPackage.
+Cloning this repository and opening the demo/browserify/index.html in your browser will run the demo locally.
 
 #### GeoPackage JS Library ####
 
@@ -17,54 +16,202 @@ Software source code previously released under an open source license and then m
 
 ### About ###
 
-[GeoPackage Node](https://github.com/ngageoint/geopackage-node) uses [GeoPackage Java](http://ngageoint.github.io/geopackage-java/) which is a [GeoPackage Library](http://ngageoint.github.io/GeoPackage/) Java implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations_nga) by the National Geospatial-Intelligence Agency.
+[GeoPackage JS](https://github.com/ngageoint/geopackage-js) is a [GeoPackage Library](http://ngageoint.github.io/GeoPackage/) JavaScript implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations_nga) by the National Geospatial-Intelligence Agency.
 
-The GeoPackage Java library provides the ability to read, create, and edit GeoPackage files.
+The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using [sql.js](https://github.com/kripken/sql.js/).  In Node tiles are rendered using [Light Weight Image Processor for NodeJS](https://github.com/EyalAr/lwip) and GeoPackages are read using [node-sqlite3](https://github.com/mapbox/node-sqlite3).
 
 ### Usage ###
 
-    var GeoPackage = require('geopackage');
+View examples using [Bower](tree/master/demo/bower) and [Browserify](tree/master/demo/browserify)
 
-    // var newGeoPackage = '...';
-    // var existingGeoPackage = '...';
+View the latest [docs](http://ngageoint.github.io/geopackage-js/docs/module-geoPackage-GeoPackage.html) (currently being updated).
 
-    // Create a new GeoPackage
-    var geoPackage = new GeoPackage();
-    geoPackage.createAndOpenGeoPackageFile(newGeoPackage, function(geoPackage) {
-      // file is created and open
+#### Browser Usage ####
+```javascript
+
+// attach this method to a file input onchange event
+window.loadGeoPackage = function(files) {
+  var f = files[0];
+  var r = new FileReader();
+  r.onload = function() {
+    var array = new Uint8Array(r.result);
+    loadByteArray(array);
+  }
+  r.readAsArrayBuffer(f);
+}
+
+function loadByteArray(array, callback) {
+  var db = new SQL.Database(array);
+  GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
+    var geoPackage = new GeoPackage('', '', connection);
+
+    // Now you can operate on the GeoPackage
+
+    // get the tile table names
+    geoPackage.getTileTables(function(err, tileTableNames) {
+      // tileTableNames is an array of all tile table names
+
+      // get the info for the first table
+      geoPackage.getTileDaoWithTableName(tileTableNames[0], function(err, tileDao) {
+        geoPackage.getInfoForTable(tileDao, function(err, info) {
+          // do something with the tile table info
+        });
+
+        // draw a tile into a canvas for an XYZ tile
+        var canvas = canvasFromSomewhere;
+        var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+        var x = 0;
+        var y = 0;
+        var zoom = 0;
+
+        console.time('Draw tile ' + x + ', ' + y + ' zoom: ' + zoom);
+        gpr.drawTileIn(x, y, zoom, canvas, function() {
+          console.timeEnd('Draw tile ' + x + ', ' + y + ' zoom: ' + zoom);
+        });
+
+        // or get a tile base64 data URL for an XYZ tile
+        gpr.getTile(x, y, zoom, function(err, tileBase64DataURL) {
+          console.log('got the base64 data url');
+        });
+
+        // or get a tile from a GeoPackage tile column and tile row
+        tileDao.queryForTile(tileColumn, tileRow, zoom, function(err, tile) {
+          var tileData = tile.getTileData();  // the raw bytes from the GeoPackage
+        });
+
+      });
     });
 
-    // Open a GeoPackage
-    var geoPackage = new GeoPackage();
-    geoPackage.openGeoPackageFile(existingGeoPackage, function(err) {
-      // file is open
-    });
+    // get the feature table names
+    geoPackage.getFeatureTables(function(err, featureTableNames) {
+      // featureTableNames is an array of all feature table names
 
-    // Feature and tile tables
-    var featureTableNameArray = geoPackage.getFeatureTables();
-    var tileTableNameArray = geoPackage.getTileTables();
+      // get the info for the first table
+      geoPackage.getFeatureDaoWithTableName(featureTableNames[0], function(err, featureDao) {
+        geoPackage.getInfoForTable(featureDao, function(err, info) {
+          // do something with the feature table info
+        });
 
-    // Query Features
-    geoPackage.iterateFeaturesFromTable(featureTable, function(err, feature, callback) {
-      // feature is GeoJSON
-      // call the callback when you are done processing the feature
-      callback();
-    });
+        // query for all features
+        featureDao.queryForEach(function(err, row, rowDone) {
+          var feature = featureDao.getFeatureRow(row);
+          var geometry = currentRow.getGeometry();
+          if (geometry) {
+            var geom = geometry.geometry;
+            var geoJson = geometry.geometry.toGeoJSON();
 
-    // Query Tiles
-    geoPackage.getTileFromTable(tileTableName, z, x, y, function(err, tileStream) {
-      // do something with the tileStream which is a png stream
+            geoJson.properties = {};
+            for (var key in feature.values) {
+              if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
+                var column = info.columnMap[key];
+                geoJson.properties[column.displayName] = currentRow.values[key];
+              }
+            }
+          }
+          rowDone();
+        });
+      });
     });
+  });
+}
+
+```
+
+#### NodeJS Usage ####
+
+```javascript
+var geopackage = require('geopackage')
+  , GeoPackageManager = geopackage.GeoPackageManager
+  , GeoPackageConnection = geopackage.GeoPackageConnection
+  , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
+
+GeoPackageManager.open(filename, function(err, geoPackage) {
+
+  // Now you can operate on the GeoPackage
+
+  // get the tile table names
+  geoPackage.getTileTables(function(err, tileTableNames) {
+    // tileTableNames is an array of all tile table names
+
+    // get the info for the first table
+    geoPackage.getTileDaoWithTableName(tileTableNames[0], function(err, tileDao) {
+      geoPackage.getInfoForTable(tileDao, function(err, info) {
+        // do something with the tile table info
+      });
+
+      // draw a tile into a canvas for an XYZ tile
+      var canvas = canvasFromSomewhere;
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      var x = 0;
+      var y = 0;
+      var zoom = 0;
+
+      console.time('Draw tile ' + x + ', ' + y + ' zoom: ' + zoom);
+      gpr.drawTileIn(x, y, zoom, canvas, function() {
+        console.timeEnd('Draw tile ' + x + ', ' + y + ' zoom: ' + zoom);
+      });
+
+      // or get a tile base64 data URL for an XYZ tile
+      gpr.getTile(x, y, zoom, function(err, tileBase64DataURL) {
+        console.log('got the base64 data url');
+      });
+
+      // or get a tile from a GeoPackage tile column and tile row
+      tileDao.queryForTile(tileColumn, tileRow, zoom, function(err, tile) {
+        var tileData = tile.getTileData();  // the raw bytes from the GeoPackage
+      });
+
+    });
+  });
+
+  // get the feature table names
+  geoPackage.getFeatureTables(function(err, featureTableNames) {
+    // featureTableNames is an array of all feature table names
+
+    // get the info for the first table
+    geoPackage.getFeatureDaoWithTableName(featureTableNames[0], function(err, featureDao) {
+      geoPackage.getInfoForTable(featureDao, function(err, info) {
+        // do something with the feature table info
+      });
+
+      // query for all features
+      featureDao.queryForEach(function(err, row, rowDone) {
+        var feature = featureDao.getFeatureRow(row);
+        var geometry = currentRow.getGeometry();
+        if (geometry) {
+          var geom = geometry.geometry;
+          var geoJson = geometry.geometry.toGeoJSON();
+
+          geoJson.properties = {};
+          for (var key in feature.values) {
+            if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
+              var column = info.columnMap[key];
+              geoJson.properties[column.displayName] = currentRow.values[key];
+            }
+          }
+        }
+        rowDone();
+      });
+    });
+  });
+});
+
+```
 
 ### Installation ###
 
-Will update when this is out on npm
+This will install the package from github
+
+npm install ngageoint/geopackage-js
 
 ### Dependencies ###
 
-#### Remote ####
+#### NPM Modules ####
 
-* [GeoPackage Core Java](https://github.com/ngageoint/geopackage-core-java) (The MIT License (MIT)) - GeoPackage Library
-* [WKB](https://github.com/ngageoint/geopackage-wkb-java) (The MIT License (MIT)) - GeoPackage Well Known Binary Lib
-* [OrmLite](http://ormlite.com/) (Open Source License) - Object Relational Mapping (ORM) Library
-* [SQLite JDBC](https://bitbucket.org/xerial/sqlite-jdbc) (Apache License, Version 2.0) - SQLiteJDBC library
+* [async](https://github.com/caolan/async) (The MIT License (MIT)) Async utilities for node and the browser
+* [file-type](https://github.com/sindresorhus/file-type) (The MIT License (MIT)) Detect the file type of a Buffer/Uint8Array
+* [proj4](http://proj4js.org/) (The MIT License (MIT)) JavaScript library to transform coordinates from one coordinate system to another, including datum transformations
+* [lwip](https://github.com/EyalAr/lwip) (The MIT License (MIT)) Light-weight image processor for NodeJS
+* [sql.js](https://github.com/kripken/sql.js/) (The MIT License (MIT)) SQLite compiled to javascript
+* [sqlite3](https://github.com/mapbox/node-sqlite3) (BSD-3-Clause) Asynchronous, non-blocking SQLite3 bindings for Node.js.
+* [wkx](https://github.com/cschwarz/wkx) (The MIT License (MIT)) A WKT/WKB/EWKT/EWKB/TWKB/GeoJSON parser and serializer

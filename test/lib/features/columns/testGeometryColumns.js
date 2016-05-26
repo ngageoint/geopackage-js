@@ -49,10 +49,11 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({ tableName: 'point2d',
-        columnName: 'geom',
-        geometryTypeName: 'POINT',
-        srsId: 0,
+      table.should.be.deep.equal({
+        table_name: 'point2d',
+        column_name: 'geom',
+        geometry_type_name: 'POINT',
+        srs_id: 0,
         z: 0,
         m: 0
       });
@@ -84,10 +85,11 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({ tableName: 'point2d',
-        columnName: 'geom',
-        geometryTypeName: 'POINT',
-        srsId: 0,
+      table.should.be.deep.equal({
+        table_name: 'point2d',
+        column_name: 'geom',
+        geometry_type_name: 'POINT',
+        srs_id: 0,
         z: 0,
         m: 0
       });
@@ -100,19 +102,20 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({ tableName: 'point2d',
-        columnName: 'geom',
-        geometryTypeName: 'POINT',
-        srsId: 0,
+      table.should.be.deep.equal({
+        table_name: 'point2d',
+        column_name: 'geom',
+        geometry_type_name: 'POINT',
+        srs_id: 0,
         z: 0,
         m: 0
       });
       gcd.getSrs(table, function(err, srs) {
         srs.should.be.deep.equal({
-          srsName: 'Undefined geographic SRS',
-          srsId: 0,
+          srs_name: 'Undefined geographic SRS',
+          srs_id: 0,
           organization: 'NONE',
-          organizationCoordsysId: 0,
+          organization_coordsys_id: 0,
           definition: 'undefined',
           description: 'undefined geographic coordinate reference system'
         });
@@ -126,25 +129,26 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({ tableName: 'point2d',
-        columnName: 'geom',
-        geometryTypeName: 'POINT',
-        srsId: 0,
+      table.should.be.deep.equal({
+        table_name: 'point2d',
+        column_name: 'geom',
+        geometry_type_name: 'POINT',
+        srs_id: 0,
         z: 0,
         m: 0
       });
       gcd.getContents(table, function(err, contents) {
         contents.should.be.deep.equal({
-          tableName: 'point2d',
-          dataType: 'features',
+          table_name: 'point2d',
+          data_type: 'features',
           identifier: 'point2d',
           description: '',
-          lastChange: '2014-08-27T15:36:41.000Z',
-          minX: 1,
-          minY: 2,
-          maxX: 1,
-          maxY: 2,
-          srsId: 0
+          last_change: '2014-08-27T15:36:41.000Z',
+          min_x: 1,
+          min_y: 2,
+          max_x: 1,
+          max_y: 2,
+          srs_id: 0
         });
         done();
       });
@@ -156,10 +160,11 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({ tableName: 'point2d',
-        columnName: 'geom',
-        geometryTypeName: 'POINT',
-        srsId: 0,
+      table.should.be.deep.equal({
+        table_name: 'point2d',
+        column_name: 'geom',
+        geometry_type_name: 'POINT',
+        srs_id: 0,
         z: 0,
         m: 0
       });
