@@ -2,7 +2,6 @@ var GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackageTileRetriever = require('../../lib/tiles/retriever')
   , proj4 = require('proj4')
-  , reproject = require('reproject')
   , should = require('chai').should()
   , path = require('path')
   , async = require('async')
@@ -72,9 +71,6 @@ describe('GeoPackage tests', function() {
                 }
                 var geom = geometry.geometry;
                 var geoJson = projectedJson = geom.toGeoJSON();
-                if (srs.definition && srs.definition !== 'undefined') {
-                  projectedJson = reproject.reproject(geoJson, srs.definition, 'EPSG:4326');
-                }
               }, function(err) {
                 callback();
               });
