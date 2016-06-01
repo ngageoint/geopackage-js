@@ -469,7 +469,16 @@ SpatialReferenceSystemDao.prototype.getProjection = function (srs) {
  * @param {callback} callback called with an error if one occurred and the wgs84 srs
  */
 SpatialReferenceSystemDao.prototype.createWgs84 = function(callback) {
-  callback(new Error("not implemented"));
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'WGS 84 geodetic';
+  srs.srs_id = 4326;
+  srs.organization = 'EPSG';
+  srs.organization_coordsys_id = 4326;
+  srs.definition = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+  srs.description = 'longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid';
+  // TODO implement GeoPackage 1.1
+  // srs.definition_12_163 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+  this.create(srs, callback);
 }
 
 /**
@@ -479,7 +488,16 @@ SpatialReferenceSystemDao.prototype.createWgs84 = function(callback) {
  * @param {callback} callback called with an error if one occurred and the undefined cartesian srs
  */
 SpatialReferenceSystemDao.prototype.createUndefinedCartesian = function(callback) {
-  callback(new Error("not implemented"));
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'Undefined cartesian SRS';
+  srs.srs_id = -1;
+  srs.organization = 'NONE';
+  srs.organization_coordsys_id = -1;
+  srs.definition = 'undefined';
+  srs.description = 'undefined cartesian coordinate reference system';
+  // TODO implement GeoPackage 1.1
+  // srs.definition_12_163 = 'undefined';
+  this.create(srs, callback);
 }
 
 /**
@@ -489,7 +507,16 @@ SpatialReferenceSystemDao.prototype.createUndefinedCartesian = function(callback
  * @param {callback} callback called with an error if one occurred and the undefined Geographic srs
  */
 SpatialReferenceSystemDao.prototype.createUndefinedGeographic = function(callback) {
-  callback(new Error("not implemented"));
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'Undefined geographic SRS';
+  srs.srs_id = 0;
+  srs.organization = 'NONE';
+  srs.organization_coordsys_id = 0;
+  srs.definition = 'undefined';
+  srs.description = 'undefined geographic coordinate reference system';
+  // TODO implement GeoPackage 1.1
+  // srs.definition_12_163 = 'undefined';
+  this.create(srs, callback);
 }
 
 /**
@@ -499,7 +526,16 @@ SpatialReferenceSystemDao.prototype.createUndefinedGeographic = function(callbac
  * @param {callback} callback called with an error if one occurred and the Web Mercator srs
  */
 SpatialReferenceSystemDao.prototype.createWebMercator = function(callback) {
-  callback(new Error("not implemented"));
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'WGS 84 / Pseudo-Mercator';
+  srs.srs_id = 3857;
+  srs.organization = 'EPSG';
+  srs.organization_coordsys_id = 3857;
+  srs.definition = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+  srs.description = 'Spherical Mercator projection coordinate system';
+  // TODO implement GeoPackage 1.1
+  // srs.definition_12_163 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+  this.create(srs, callback);
 }
 
 /**
@@ -844,6 +880,15 @@ Dao.prototype.minOfColumn = function (column, where, whereArgs, callback) {
 Dao.prototype.maxOfColumn = function (column, where, whereArgs, callback) {
   this.connection.maxOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
 };
+
+Dao.prototype.create = function(object, callback) {
+  var sql = sqliteQueryBuilder.buildInsert(this.gpkgTableName, object);
+  var insertObject = {};
+  for (var key in object) {
+    insertObject['$' + key] = object[key];
+  }
+  this.connection.insert(sql, insertObject, callback);
+}
 
 /**
  * The Dao
@@ -1318,6 +1363,10 @@ GeoPackageConnection.prototype.count = function(table, callback) {
   this.adapter.count(table, callback);
 };
 
+GeoPackageConnection.prototype.insert = function (sql, params, callback) {
+  this.adapter.insert(sql, params, callback);
+};
+
 GeoPackageConnection.prototype.setApplicationId = function(callback) {
   var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
   var applicationId = buff.readUInt32BE();
@@ -1390,6 +1439,13 @@ Adapter.prototype.run = function(sql, callback) {
   this.db.run(sql, callback);
 }
 
+Adapter.prototype.insert = function(sql, params, callback) {
+  this.db.run(sql, params, function(err) {
+    if(err) return callback(err);
+    return callback(err, this.lastID);
+  });
+}
+
 Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   if (eachCallback) {
     var rowCallback = function(err, result) {
@@ -1436,6 +1492,25 @@ module.exports.buildQuery = function(distinct, tables, columns, where, groupBy, 
   query = appendClauseToString(query, ' limit ', limit);
 
   return query;
+}
+
+module.exports.buildInsert = function(table, object) {
+  var insert = 'insert into ' + table + '(';
+  var keys = '';
+  var values = '';
+  var first = true;
+  for (var key in object) {
+    if (!first) {
+      keys += ',';
+      values += ',';
+    }
+    first = false;
+    keys += key;
+    values += '$' + key;
+  }
+
+  insert += keys + ') values (' + values + ')';
+  return insert;
 }
 
 function appendClauseToString(string, name, clause) {
@@ -1544,6 +1619,11 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
 Adapter.prototype.run = function(sql, callback) {
   this.db.run(sql);
   callback();
+}
+
+Adapter.prototype.insert = function(sql, params, callback) {
+  var response = this.db.exec(sql, params);
+  console.log('response', response);
 }
 
 Adapter.prototype.count = function (tableName, callback) {
