@@ -7813,7 +7813,7 @@ TileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox, call
               var projectedLongitude = projected[0];
               var projectedLatitude = projected[1];
 
-              var xPixel = this.tileMatrix.tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
+              var xPixel = this.tileMatrix.tile_width - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
               var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixel_y_size);
               if (xPixel >= 0 && xPixel < this.tileMatrix.tile_width
               && yPixel >= 0 && yPixel < this.tileMatrix.tile_height) {
@@ -8460,7 +8460,7 @@ GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox = function (callback
     var tileMatrixSet = this.tileDao.tileMatrixSet;
     tileMatrixSetDao.getSrs(tileMatrixSet, function(err, srs) {
       this.setProjectionBoundingBox = tileMatrixSet.getBoundingBox();
-      if (srs.organizationCoordsysId === 4326 && srs.organization === 'EPSG') {
+      if (srs.organization_coordsys_id === 4326 && srs.organization === 'EPSG') {
         this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
         this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
       }
