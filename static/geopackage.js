@@ -1892,7 +1892,7 @@ var FeatureColumn = function(index, name, dataType, max, notNull, defaultValue, 
   UserColumn.call(this, index, name, dataType, max, notNull, defaultValue, primaryKey);
   this.geometryType = geometryType;
 
-  if (!geometryType && dataType === DataTypes.GPKG_DT_GEOMETRY) {
+  if (!geometryType && dataType === DataTypes.GPKGDataType.GPKG_DT_GEOMETRY) {
     throw new Error('Data or Geometry Type is required to create column: ' + name);
   }
 }
@@ -1908,7 +1908,7 @@ util.inherits(FeatureColumn, UserColumn);
  *  @return feature column
  */
 FeatureColumn.createPrimaryKeyColumnWithIndexAndName = function(index, name) {
-  return new FeatureColumn(index, name, DataTypes.GPKG_DT_INTEGER, undefined, true, undefined, true, /*WKB_NONE*/ 0);
+  return new FeatureColumn(index, name, DataTypes.GPKGDataType.GPKG_DT_INTEGER, undefined, true, undefined, true);
 }
 
 /**
@@ -1923,7 +1923,7 @@ FeatureColumn.createPrimaryKeyColumnWithIndexAndName = function(index, name) {
  *  @return feature column
  */
 FeatureColumn.createGeometryColumn = function(index, name, type, notNull, defaultValue) {
-  return new FeatureColumn(index, name, DataTypes.GPKG_DT_GEOMETRY, undefined, notNull, defaultValue, false, type);
+  return new FeatureColumn(index, name, DataTypes.GPKGDataType.GPKG_DT_GEOMETRY, undefined, notNull, defaultValue, false, type);
 }
 
 /**
@@ -1954,7 +1954,7 @@ FeatureColumn.createColumnWithIndex = function(index, name, type, notNull, defau
  *  @return feature column
  */
 FeatureColumn.createColumnWithIndexAndMax = function(index, name, type, max, notNull, defaultValue) {
-  return new FeatureColumn(index, name, type, max, notNull, defaultValue, false, /*WKB_NONE*/ 0);
+  return new FeatureColumn(index, name, type, max, notNull, defaultValue, false);
 }
 
 /**
@@ -10230,15 +10230,15 @@ function UserColumn(index, name, dataType, max, notNull, defaultValue, primaryKe
 
 UserColumn.prototype.getTypeName = function () {
   var type = undefined;
-  if (this.dataType !== DataTypes.GPKG_DT_GEOMETRY) {
+  if (this.dataType !== DataTypes.GPKGDataType.GPKG_DT_GEOMETRY) {
     type = DataTypes.name(this.dataType);
   }
   return type;
 };
 
 UserColumn.prototype.validateMax = function () {
-  if(this.max && this.dataType !== 'TEXT' && this.dataType !== 'BLOB') {
-    throw new Error('Column max is only supported for TEXT and BLOB columns. column: ' + self.name + ', max: ' + self.max + ', type: ' + self.dataType)
+  if(this.max && this.dataType !== DataTypes.GPKGDataType.GPKG_DT_TEXT && this.dataType !== DataTypes.GPKGDataType.GPKG_DT_BLOB) {
+    throw new Error('Column max is only supported for TEXT and BLOB columns. column: ' + this.name + ', max: ' + this.max + ', type: ' + this.dataType)
   }
 };
 

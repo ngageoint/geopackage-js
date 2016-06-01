@@ -3,6 +3,8 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , TableCreator = require('../../../lib/db/tableCreator')
   , TileTable = require('../../../lib/tiles/user/tileTable')
   , TileDao = require('../../../lib/tiles/user/tileDao')
+  , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
+  , wkx = require('wkx')
   , should = require('chai').should()
   , path = require('path')
   , async = require('async')
@@ -333,12 +335,20 @@ describe.only('TableCreator tests', function() {
     });
   }
 
-  it('should create a user table', function(done) {
+  it('should create a user tile table', function(done) {
     var columns = TileTable.createRequiredColumns();
     var tileTable = new TileTable('test_tiles', columns);
     var tc = new TableCreator(geopackage);
     tc.createUserTable(tileTable, function(err, result) {
       verifyTableExists('test_tiles', done);
+    });
+  });
+
+  it('should create a user feature table', function(done) {
+    var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom', wkx.Types.wkt.Point);
+    var tc = new TableCreator(geopackage);
+    tc.createUserTable(featureTable, function(err, result) {
+      verifyTableExists('test_features', done);
     });
   });
 
