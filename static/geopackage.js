@@ -710,7 +710,7 @@ Dao.prototype.populateObjectFromResult = function (object, result) {
  * @param  {validationCallback} callback - Callback to call with the results of if the table exists or not
  */
 Dao.prototype.isTableExists = function (callback) {
-  this.connection.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [this.gpkgTableName], function(err, results) {
+  this.connection.tableExists(this.gpkgTableName, function(err, results) {
     if(!results) {
       return callback(new Error('Table ' + this.gpkgTableName + ' does not exist'), false);
     }
@@ -1366,6 +1366,10 @@ GeoPackageConnection.prototype.count = function(table, callback) {
 GeoPackageConnection.prototype.insert = function (sql, params, callback) {
   this.adapter.insert(sql, params, callback);
 };
+
+GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
+  this.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
+}
 
 GeoPackageConnection.prototype.setApplicationId = function(callback) {
   var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
@@ -8953,8 +8957,7 @@ module.exports = TileGrid;
  */
 
 var UserColumn = require('../../user/userColumn')
-  , DataTypes = require('../../db/dataTypes')
-  , TileTable = require('./tileTable');
+  , DataTypes = require('../../db/dataTypes');
 
 var util = require('util');
 
@@ -8962,7 +8965,6 @@ var util = require('util');
  * Represents a user tile column
  */
 var TileColumn = function(index, name, dataType, max, notNull, defaultValue, primaryKey) {
-
   UserColumn.call(this, index, name, dataType, max, notNull, defaultValue, primaryKey);
   if (dataType === DataTypes.GPKG_DT_GEOMETRY) {
     throw new Error('Data Type is required to create column: ' + name);
@@ -8976,7 +8978,7 @@ util.inherits(TileColumn, UserColumn);
  * @param  {number} index Index
  */
 TileColumn.createIdColumn = function(index) {
-  return new TileColumn(index, TileTable.COLUMN_ID, DataTypes.GPKG_DT_INTEGER, null, false, null, true);
+  return new TileColumn(index, TileColumn.COLUMN_ID, DataTypes.GPKGDataType.GPKG_DT_INTEGER, null, false, null, true);
 }
 
 /**
@@ -8984,7 +8986,7 @@ TileColumn.createIdColumn = function(index) {
  * @param  {number} index Index
  */
 TileColumn.createZoomLevelColumn = function(index) {
-  return new TileColumn(index, TileTable.COLUMN_ZOOM_LEVEL, DataTypes.GPKG_DT_INTEGER, null, true, null, false);
+  return new TileColumn(index, TileColumn.COLUMN_ZOOM_LEVEL, DataTypes.GPKGDataType.GPKG_DT_INTEGER, null, true, null, false);
 }
 
 /**
@@ -8993,7 +8995,7 @@ TileColumn.createZoomLevelColumn = function(index) {
  *  @param {number} index column index
  */
 TileColumn.createTileColumnColumn = function(index) {
-  return new TileColumn(index, TileTable.COLUMN_TILE_COLUMN, DataTypes.GPKG_DT_INTEGER, null, true, null, false);
+  return new TileColumn(index, TileColumn.COLUMN_TILE_COLUMN, DataTypes.GPKGDataType.GPKG_DT_INTEGER, null, true, null, false);
 }
 
 /**
@@ -9003,7 +9005,7 @@ TileColumn.createTileColumnColumn = function(index) {
  *
  */
 TileColumn.createTileRowColumn = function(index) {
-  return new TileColumn(index, TileTable.COLUMN_TILE_ROW, DataTypes.GPKG_DT_INTEGER, null, true, null, false);
+  return new TileColumn(index, TileColumn.COLUMN_TILE_ROW, DataTypes.GPKGDataType.GPKG_DT_INTEGER, null, true, null, false);
 }
 
 /**
@@ -9012,12 +9014,18 @@ TileColumn.createTileRowColumn = function(index) {
  *  @param {number} index column index
  */
 TileColumn.createTileDataColumn = function(index) {
-  return new TileColumn(index, TileTable.COLUMN_TILE_DATA, DataTypes.GPKG_DT_BLOB, null, true, null, false);
+  return new TileColumn(index, TileColumn.COLUMN_TILE_DATA, DataTypes.GPKGDataType.GPKG_DT_BLOB, null, true, null, false);
 }
+
+TileColumn.COLUMN_ID = "id";
+TileColumn.COLUMN_ZOOM_LEVEL = "zoom_level";
+TileColumn.COLUMN_TILE_COLUMN = "tile_column";
+TileColumn.COLUMN_TILE_ROW = "tile_row";
+TileColumn.COLUMN_TILE_DATA = "tile_data";
 
 module.exports = TileColumn;
 
-},{"../../db/dataTypes":8,"../../user/userColumn":44,"./tileTable":39,"util":270}],36:[function(require,module,exports){
+},{"../../db/dataTypes":8,"../../user/userColumn":44,"util":270}],36:[function(require,module,exports){
 /**
  * tileDao module.
  * @module tiles/user/tileDao
@@ -9631,7 +9639,8 @@ module.exports = TileRow;
  * @module tiles/user/tileTable
  */
 
-var UserTable = require('../../user/userTable');
+var UserTable = require('../../user/userTable')
+  , TileColumn = require('./tileColumn');
 
 var util = require('util');
 
@@ -9657,39 +9666,45 @@ var TileTable = function(tableName, columns) {
     var columnIndex = column.index;
 
     switch(columnName) {
-      case TileTable.COLUMN_ZOOM_LEVEL:
-      this.duplicateCheck(columnIndex, zoomLevel, TileTable.COLUMN_ZOOM_LEVEL);
+      case TileColumn.COLUMN_ZOOM_LEVEL:
+      this.duplicateCheck(columnIndex, zoomLevel, TileColumn.COLUMN_ZOOM_LEVEL);
       zoomLevel = columnIndex;
       break;
-      case TileTable.COLUMN_TILE_COLUMN:
-      this.duplicateCheck(columnIndex, tileColumn, TileTable.COLUMN_TILE_COLUMN);
+      case TileColumn.COLUMN_TILE_COLUMN:
+      this.duplicateCheck(columnIndex, tileColumn, TileColumn.COLUMN_TILE_COLUMN);
       tileColumn = columnIndex;
       break;
-      case TileTable.COLUMN_TILE_ROW:
-      this.duplicateCheck(columnIndex, tileRow, TileTable.COLUMN_TILE_ROW);
+      case TileColumn.COLUMN_TILE_ROW:
+      this.duplicateCheck(columnIndex, tileRow, TileColumn.COLUMN_TILE_ROW);
       tileRow = columnIndex;
       break;
-      case TileTable.COLUMN_TILE_DATA:
-      this.duplicateCheck(columnIndex, tileData, TileTable.COLUMN_TILE_DATA);
+      case TileColumn.COLUMN_TILE_DATA:
+      this.duplicateCheck(columnIndex, tileData, TileColumn.COLUMN_TILE_DATA);
       tileData = columnIndex;
       break;
     }
   }
 
-  this.missingCheck(zoomLevel, TileTable.COLUMN_ZOOM_LEVEL);
+  this.missingCheck(zoomLevel, TileColumn.COLUMN_ZOOM_LEVEL);
   this.zoomLevelIndex = zoomLevel;
 
-  this.missingCheck(tileColumn, TileTable.COLUMN_TILE_COLUMN);
+  this.missingCheck(tileColumn, TileColumn.COLUMN_TILE_COLUMN);
   this.tileColumnIndex = tileColumn;
 
-  this.missingCheck(tileRow, TileTable.COLUMN_TILE_ROW);
+  this.missingCheck(tileRow, TileColumn.COLUMN_TILE_ROW);
   this.tileRowIndex = tileRow;
 
-  this.missingCheck(tileData, TileTable.COLUMN_TILE_DATA);
+  this.missingCheck(tileData, TileColumn.COLUMN_TILE_DATA);
   this.tileDataIndex = tileData;
 }
 
 util.inherits(TileTable, UserTable);
+
+/**
+ * The TileTable
+ * @type {TileTable}
+ */
+module.exports = TileTable;
 
 TileTable.prototype.getZoomLevelColumn = function() {
   return this.getColumnWithIndex(this.zoomLevelIndex);
@@ -9725,19 +9740,7 @@ TileTable.createRequiredColumnsWithStartingIndex = function(startingIndex) {
   return columns;
 }
 
-TileTable.COLUMN_ID = "id";
-TileTable.COLUMN_ZOOM_LEVEL = "zoom_level";
-TileTable.COLUMN_TILE_COLUMN = "tile_column";
-TileTable.COLUMN_TILE_ROW = "tile_row";
-TileTable.COLUMN_TILE_DATA = "tile_data";
-
-/**
- * The TileTable
- * @type {TileTable}
- */
-module.exports = TileTable;
-
-},{"../../user/userTable":46,"util":270}],40:[function(require,module,exports){
+},{"../../user/userTable":46,"./tileColumn":35,"util":270}],40:[function(require,module,exports){
 /**
  * tileTableReader module.
  * @module tiles/user/tileTableReader
@@ -10291,6 +10294,7 @@ var UserTable = function(tableName, columns) {
   this.columns = columns;
   this.columnNames = tempColumnNames;
   this.nameToIndex = tempNameToIndex;
+  this.uniqueConstraints = [];
 
   if (pk === undefined) {
     throw new Error('No primary key column was found for table \'' + this.table_name + '\'');
@@ -10389,13 +10393,12 @@ UserTable.prototype.getPkColumn = function () {
   return this.columns[this.pkIndex];
 };
 
+UserTable.prototype.addUniqueConstraint = function (uniqueConstraint) {
+  this.uniqueConstraints.push(uniqueConstraint);
+};
+
 UserTable.FEATURE_TABLE = 'FEATURE';
 UserTable.TILE_TABLE = 'TILE';
-
-
-// -(void) addUniqueConstraint: (GPKGUserUniqueConstraint *) uniqueConstraint{
-//     [GPKGUtils addObject:uniqueConstraint toArray:self.uniqueConstraints];
-// }
 
 module.exports = UserTable;
 

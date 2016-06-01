@@ -1,6 +1,8 @@
 var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../lib/geoPackage')
   , TableCreator = require('../../../lib/db/tableCreator')
+  , TileTable = require('../../../lib/tiles/user/tileTable')
+  , TileDao = require('../../../lib/tiles/user/tileDao')
   , should = require('chai').should()
   , path = require('path')
   , async = require('async')
@@ -319,6 +321,24 @@ describe.only('TableCreator tests', function() {
       ], function() {
         done();
       });
+    });
+  });
+
+  function verifyTableExists(table, done) {
+    geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [table], function(err, results) {
+      if(!results) {
+        return done(new Error('Table ' + table + ' does not exist'), false);
+      }
+      done();
+    });
+  }
+
+  it('should create a user table', function(done) {
+    var columns = TileTable.createRequiredColumns();
+    var tileTable = new TileTable('test_tiles', columns);
+    var tc = new TableCreator(geopackage);
+    tc.createUserTable(tileTable, function(err, result) {
+      verifyTableExists('test_tiles', done);
     });
   });
 
