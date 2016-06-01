@@ -255,7 +255,7 @@ describe('GeoPackage Tile Retriever tests', function() {
           diffImage: '/tmp/diff.png',
         }, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
-          // fs.unlinkSync('/tmp/imageryTile.png');
+          fs.unlinkSync('/tmp/reprojectTile.png');
           done(err);
         });
       });
