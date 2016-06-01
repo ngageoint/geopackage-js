@@ -710,7 +710,7 @@ Dao.prototype.populateObjectFromResult = function (object, result) {
  * @param  {validationCallback} callback - Callback to call with the results of if the table exists or not
  */
 Dao.prototype.isTableExists = function (callback) {
-  this.connection.tableExists(this.gpkgTableName, function(err, results) {
+  this.connection.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [this.gpkgTableName], function(err, results) {
     if(!results) {
       return callback(new Error('Table ' + this.gpkgTableName + ' does not exist'), false);
     }
@@ -1368,8 +1368,8 @@ GeoPackageConnection.prototype.insert = function (sql, params, callback) {
 };
 
 GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
-  this.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
-}
+  this.adapter.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
+};
 
 GeoPackageConnection.prototype.setApplicationId = function(callback) {
   var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
@@ -2749,7 +2749,6 @@ module.exports.create = function(filePath, callback) {
       }
     }, function(filePath, callback) {
       GeoPackageConnection.connect(filePath, function(err, connection) {
-        console.log('connected', connection);
         callback(err, connection);
       });
     }, function(connection, callback) {
@@ -9038,7 +9037,7 @@ var UserDao = require('../../user/UserDao')
   , ContentsDao = require('../../core/contents').ContentsDao
   , BoundingBoxUtils = require('../tileBoundingBoxUtils')
   , ColumnValues = require('../../dao/columnValues')
-  , TileTable = require('./tileTable')
+  , TileColumn = require('./tileColumn')
   , TileDaoUtils = require('./tileDaoUtils');
 
 var util = require('util')
@@ -9138,20 +9137,20 @@ TileDao.prototype.getBoundingBox = function () {
 };
 
 TileDao.prototype.queryForTileGridWithZoomLevel = function (zoomLevel, callback) {
-  var where = this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  var where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
   var whereArgs = this.buildWhereArgsWithValue(zoomLevel);
   async.series({
     min_x: function(callback){
-      this.minOfColumn(TileTable.COLUMN_TILE_COLUMN, where, whereArgs, callback);
+      this.minOfColumn(TileColumn.COLUMN_TILE_COLUMN, where, whereArgs, callback);
     }.bind(this),
     max_x: function(callback){
-      this.maxOfColumn(TileTable.COLUMN_TILE_COLUMN, where, whereArgs, callback);
+      this.maxOfColumn(TileColumn.COLUMN_TILE_COLUMN, where, whereArgs, callback);
     }.bind(this),
     min_y: function(callback){
-      this.minOfColumn(TileTable.COLUMN_TILE_ROW, where, whereArgs, callback);
+      this.minOfColumn(TileColumn.COLUMN_TILE_ROW, where, whereArgs, callback);
     }.bind(this),
     max_y: function(callback){
-      this.maxOfColumn(TileTable.COLUMN_TILE_ROW, where, whereArgs, callback);
+      this.maxOfColumn(TileColumn.COLUMN_TILE_ROW, where, whereArgs, callback);
     }.bind(this)
   }, function(err, results) {
     if (err) return callback(err);
@@ -9241,9 +9240,9 @@ TileDao.prototype.getTileMatrixWithZoomLevel = function (zoomLevel) {
 TileDao.prototype.queryForTile = function (column, row, zoomLevel, callback) {
 
   var fieldValues = new ColumnValues();
-  fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
-  fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
-  fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
+  fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
+  fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
   var tileRow;
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     tileRow = this.getTileRow(result);
@@ -9254,7 +9253,7 @@ TileDao.prototype.queryForTile = function (column, row, zoomLevel, callback) {
 };
 
 TileDao.prototype.queryForTilesWithZoomLevel = function (zoomLevel, tileCallback, doneCallback) {
-  this.queryForEqWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel, function(err, result, rowDone) {
+  this.queryForEqWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
     tileCallback(err, this.getTileRow(result), rowDone);
@@ -9268,7 +9267,7 @@ TileDao.prototype.queryForTilesWithZoomLevel = function (zoomLevel, tileCallback
  * @param  {Function} doneCallback called when all tiles are retrieved
  */
 TileDao.prototype.queryForTilesDescending = function (zoomLevel, tileCallback, doneCallback) {
-  this.queryForEqWithField(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileTable.COLUMN_TILE_COLUMN + ' DESC, ' + TileTable.COLUMN_TILE_ROW + ', DESC', function(err, result) {
+  this.queryForEqWithField(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ', DESC', function(err, result) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
     tileCallback(err, this.getTileRow(result));
@@ -9284,8 +9283,8 @@ TileDao.prototype.queryForTilesDescending = function (zoomLevel, tileCallback, d
  */
 TileDao.prototype.queryForTilesInColumn = function (column, zoomLevel, tileCallback, doneCallback) {
   var fieldValues = new ColumnValues();
-  fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
-  fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
+  fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
 
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
@@ -9304,8 +9303,8 @@ TileDao.prototype.queryForTilesInColumn = function (column, zoomLevel, tileCallb
  */
 TileDao.prototype.queryForTilesInRow = function (row, zoomLevel, tileCallback, doneCallback) {
   var fieldValues = new ColumnValues();
-  fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
-  fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+  fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
+  fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
 
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
@@ -9338,11 +9337,11 @@ TileDao.prototype.queryByTileGrid = function (tileGrid, zoomLevel, tileCallback,
         },
         function(yCallback) {
           var where = '';
-          where += this.buildWhereWithFieldAndValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+          where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
           where += ' and ';
-          where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_COLUMN, x, '=');
+          where += this.buildWhereWithFieldAndValueAndOperation(TileColumn.COLUMN_TILE_COLUMN, x, '=');
           where += ' and ';
-          where += this.buildWhereWithFieldAndValueAndOperation(TileTable.COLUMN_TILE_ROW, y, '=');
+          where += this.buildWhereWithFieldAndValueAndOperation(TileColumn.COLUMN_TILE_ROW, y, '=');
           var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, x, y]);
 
           this.queryWhereWithArgsDistinct(where, whereArgs, function(err, result, rowDone) {
@@ -9418,7 +9417,7 @@ TileDao.prototype.getSrs = function(callback) {
 
 module.exports = TileDao;
 
-},{"../../core/contents":3,"../../dao/columnValues":5,"../../user/UserDao":41,"../matrixset":31,"../tileBoundingBoxUtils":33,"../tileGrid":34,"./tileDaoUtils":37,"./tileRow":38,"./tileTable":39,"async":49,"proj4":310,"util":270}],37:[function(require,module,exports){
+},{"../../core/contents":3,"../../dao/columnValues":5,"../../user/UserDao":41,"../matrixset":31,"../tileBoundingBoxUtils":33,"../tileGrid":34,"./tileColumn":35,"./tileDaoUtils":37,"./tileRow":38,"async":49,"proj4":310,"util":270}],37:[function(require,module,exports){
 
 module.exports.adjustTileMatrixLengths = function(tileMatrixSet, tileMatrices) {
   var tileMatrixWidth = tileMatrixSet.maxX - tileMatrixSet.minX;

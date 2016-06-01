@@ -10,7 +10,7 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , async = require('async')
   , fs = require('fs');
 
-describe.only('TableCreator tests', function() {
+describe('TableCreator tests', function() {
 
   var testGeoPackage = path.join('/tmp', 'test.gpkg');
   var geopackage;
