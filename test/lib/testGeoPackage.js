@@ -98,6 +98,48 @@ describe('GeoPackage tests', function() {
     });
   });
 
+  it('should get the srs 3857', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getSrs(3857, function(err, srs) {
+        should.not.exist(err);
+        should.exist(srs);
+        srs.srs_id.should.be.equal(3857);
+        done();
+      });
+    });
+  });
+
+  it('should get the feature dao from the contents', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      var dao = geoPackage.getContentsDao();
+      dao.queryForIdObject('FEATURESriversds', function(err, contents) {
+        geoPackage.getFeatureDaoWithContents(contents, function(err, featureDao) {
+          should.not.exist(err);
+          should.exist(featureDao);
+          featureDao.table_name.should.be.equal('FEATURESriversds');
+          done();
+        });
+      });
+    });
+  });
+
+  it('should get the TILE dao from the contents', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      var dao = geoPackage.getContentsDao();
+      dao.queryForIdObject('TILESosmds', function(err, contents) {
+        geoPackage.getTileDaoWithContents(contents, function(err, tileDao) {
+          should.not.exist(err);
+          should.exist(tileDao);
+          tileDao.table_name.should.be.equal('TILESosmds');
+          done();
+        });
+      });
+    });
+  });
+
   it('should get the tiles', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
