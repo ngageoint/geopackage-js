@@ -9,7 +9,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , async = require('async')
   , fs = require('fs');
 
-describe.only('GeoPacakge create tests', function() {
+describe('GeoPackage create tests', function() {
 
   var testGeoPackage = path.join('/tmp', 'test.gpkg');
   var geopackage;
@@ -107,30 +107,27 @@ describe.only('GeoPacakge create tests', function() {
       Verification.verifyExtensions(geopackage, done);
     });
   });
-  //
-  // it('should create the table index table', function(done) {
-  //   var tc = new TableCreator(geopackage);
-  //   tc.createTableIndex(function(err, result) {
-  //     should.not.exist(err);
-  //     Verification.verifyTableIndex(geopackage, done);
-  //   });
-  // });
-  //
-  // it('should create the geometry index table', function(done) {
-  //   var tc = new TableCreator(geopackage);
-  //   tc.createGeometryIndex(function(err, result) {
-  //     should.not.exist(err);
-  //     Verification.verifyGeometryIndex(geopackage, done);
-  //   });
-  // });
-  //
-  // it('should create the feature tile link table', function(done) {
-  //   var tc = new TableCreator(geopackage);
-  //   tc.createFeatureTileLink(function(err, result) {
-  //     should.not.exist(err);
-  //     Verification.verifyFeatureTileLink(geopackage, done);
-  //   });
-  // });
+
+  it('should create the table index table', function(done) {
+    geopackage.createTableIndexTable(function(err, result) {
+      should.not.exist(err);
+      Verification.verifyTableIndex(geopackage, done);
+    });
+  });
+
+  it('should create the geometry index table', function(done) {
+    geopackage.createGeometryIndexTable(function(err, result) {
+      should.not.exist(err);
+      Verification.verifyGeometryIndex(geopackage, done);
+    });
+  });
+
+  it('should create the feature tile link table', function(done) {
+    geopackage.createFeatureTileLinkTable(function(err, result) {
+      should.not.exist(err);
+      Verification.verifyFeatureTileLink(geopackage, done);
+    });
+  });
   //
   // it('should create the required tables', function(done) {
   //   var tc = new TableCreator(geopackage);
