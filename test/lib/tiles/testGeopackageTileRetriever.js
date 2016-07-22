@@ -28,6 +28,17 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
+    it('should get the web mercator bounding box', function(done) {
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getWebMercatorBoundingBox(function(err, result) {
+        result.minLongitude.should.be.equal(-20037508.342789244);
+        result.maxLongitude.should.be.equal(20037508.342789244);
+        result.minLatitude.should.be.equal(-20037508.342789255);
+        result.maxLatitude.should.be.equal(20037508.342789244);
+        done();
+      });
+    });
+
     it('should get the x: 2, y: 1, z: 2 tile', function(done) {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
@@ -199,6 +210,52 @@ describe('GeoPackage Tile Retriever tests', function() {
         }, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
           fs.unlinkSync('/tmp/imageryTile.png');
+          done(err);
+        });
+      });
+    });
+  });
+
+  describe('4326 tile tests', function() {
+    beforeEach('should open the geopackage', function(done) {
+      var filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
+      GeoPackageManager.open(filename, function(err, gp) {
+        geoPackage = gp;
+        should.not.exist(err);
+        should.exist(gp);
+        should.exist(gp.getDatabase().getDBConnection());
+        gp.getPath().should.be.equal(filename);
+        geoPackage.getTileDaoWithTableName('imagery', function(err, osmTileDao) {
+          tileDao = osmTileDao;
+          done();
+        });
+      });
+    });
+
+    it('should get the web mercator bounding box', function(done) {
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getWebMercatorBoundingBox(function(err, result) {
+        result.minLongitude.should.be.equal(-20037508.342789244);
+        result.maxLongitude.should.be.equal(-15028131.257091932);
+        result.minLatitude.should.be.equal(5621521.486192066);
+        result.maxLatitude.should.be.equal(20036051.91933679);
+        done();
+      });
+    });
+
+    it('should get the x: 0, y: 4, z: 4 tile', function(done) {
+      this.timeout(0);
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getTile(0, 4, 4, function(err, tile) {
+        fs.writeFileSync('/tmp/reprojectTile.png', tile);
+        var imageDiff = require('image-diff');
+        imageDiff({
+          actualImage: '/tmp/reprojectTile.png',
+          expectedImage: path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png'),
+          diffImage: '/tmp/diff.png',
+        }, function (err, imagesAreSame) {
+          imagesAreSame.should.be.equal(true);
+          fs.unlinkSync('/tmp/reprojectTile.png');
           done(err);
         });
       });

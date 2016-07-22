@@ -202,7 +202,9 @@ GeoPackageManager.open(filename, function(err, geoPackage) {
 
 This will install the package from github
 
+```
 npm install ngageoint/geopackage-js
+```
 
 ### Dependencies ###
 
