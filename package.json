@@ -67,6 +67,7 @@
   "files": [
     "geopackage.js",
     "static/geopackage.js",
+    "cli",
     "lib"
   ],
   "browser": {

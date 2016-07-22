@@ -28,6 +28,20 @@ module.exports.verifyContents = function(geopackage, done) {
   });
 }
 
+module.exports.verifyContentsForTable = function(geopackage, tableName, done) {
+  module.exports.verifyContents(geopackage, function(err, results) {
+    if(err) {
+      return done(err, false);
+    }
+    geopackage.getDatabase().get("SELECT * from gpkg_contents where table_name = ?", [tableName], function(err, results) {
+      if (!results) {
+        return done(new Error('Contents do not exist for the table "' + tableName + '"'), false);
+      }
+      done();
+    });
+  });
+}
+
 module.exports.verifyGeometryColumns = function(geopackage, done) {
   geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_geometry_columns'], function(err, results) {
     if(!results) {
@@ -46,6 +60,19 @@ module.exports.verifyGeometryColumns = function(geopackage, done) {
     });
   });
 }
+
+module.exports.verifyGeometryColumnsForTable = function(geopackage, tableName, done) {
+  module.exports.verifyGeometryColumns(geopackage, function(err) {
+    if (err) return done(err, false);
+    geopackage.getDatabase().get("SELECT * from gpkg_geometry_columns where table_name = ?", [tableName], function(err, results) {
+      if (!results) {
+        return done(new Error('Geometry Columns do not exist for the table"' + tableName + '"'), false);
+      }
+      done();
+    });
+  });
+}
+
 
 module.exports.verifyTileMatrixSet = function(geopackage, done) {
   geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_tile_matrix_set'], function(err, results) {

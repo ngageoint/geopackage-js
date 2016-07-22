@@ -243,4 +243,8 @@ describe('Geometry Data tests', function() {
     done();
   });
 
+  // it('should create a point geometry data', function(done) {
+  //
+  // });
+
 });
