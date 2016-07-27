@@ -109,13 +109,39 @@ describe('GeoPackage Feature table create tests', function() {
 
     it('should create a feature', function(done) {
       geopackage.getFeatureDaoWithTableName('test_features', function(err, featureDao) {
-        console.log('featureDao', featureDao);
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(4326);
-        featureRow.setGeometry('doop');
-        console.log('featureRow', featureRow);
-        done();
+        var point = new wkx.Point(1, 2).toWkb();
+        geometryData.setGeometry(point);
+        featureRow.setGeometry(geometryData);
+        featureRow.setValueWithColumnName('test_text', 'hello');
+        featureRow.setValueWithColumnName('test_real', 3.0);
+        featureRow.setValueWithColumnName('test_boolean', true);
+        featureRow.setValueWithColumnName('test_blob', new Buffer('test'));
+        featureRow.setValueWithColumnName('test_integer', 5);
+        featureRow.setValueWithColumnName('test_text_limited', 'testt');
+        featureRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+
+        featureDao.create(featureRow, function(err, result) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(1);
+            featureDao.queryForAll(function(err, rows) {
+              var fr = featureDao.getFeatureRow(rows[0]);
+              var geom = fr.getGeometry();
+              geom.geometry.x.should.be.equal(1);
+              geom.geometry.y.should.be.equal(2);
+              fr.getValueWithColumnName('test_text').should.be.equal('hello');
+              fr.getValueWithColumnName('test_real').should.be.equal(3.0);
+              fr.getValueWithColumnName('test_boolean').should.be.equal(true);
+              fr.getValueWithColumnName('test_integer').should.be.equal(5);
+              fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
+              fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
+              fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+              done();
+            });
+          });
+        });
       });
     });
   });

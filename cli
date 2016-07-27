@@ -87,6 +87,13 @@ inquirer.prompt([fileQuestion]).then(function (answers) {
           console.log(chalk.gray('Min Zoom: ') + info.minZoom);
           console.log(chalk.gray('Max Zoom: ') + info.maxZoom);
 
+          console.log('\n' + chalk.bold('Tile Matrix Set Bounds'));
+          console.log(chalk.gray('SRS ID: ') + info.tileMatrixSet.srsId);
+          console.log(chalk.gray('Min X: ') + info.tileMatrixSet.minX);
+          console.log(chalk.gray('Min Y : ') + info.tileMatrixSet.minY);
+          console.log(chalk.gray('Max X: ') + info.tileMatrixSet.maxX);
+          console.log(chalk.gray('Max Y: ') + info.tileMatrixSet.maxY);
+
           console.log('\n'+chalk.bold('Tile Matrix Spatial Reference System'));
           console.log(chalk.gray('SRS Name: ') + info.srs.count);
           console.log(chalk.gray('SRS ID: ') + info.srs.id);

@@ -254,4 +254,65 @@ describe('TileBoundingBoxUtils tests', function() {
     p.xScale.should.be.equal(1);
   });
 
+  it('should get the web mercator tile box for each zoom level', function() {
+    var webMercatorBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(0);
+      box.minY.should.be.equal(0);
+      box.maxX.should.be.equal(Math.pow(2, i)-1);
+      box.maxY.should.be.equal(Math.pow(2, i)-1);
+    }
+  });
+
+  it('should get the web mercator tile box for each zoom level for the eastern hemisphere', function() {
+    var webMercatorBox = new BoundingBox(0, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(Math.floor(Math.pow(2, i)/2));
+      box.minY.should.be.equal(0);
+      box.maxX.should.be.equal(Math.pow(2, i)-1);
+      box.maxY.should.be.equal(Math.pow(2, i)-1);
+    }
+  });
+
+  it('should get the web mercator tile box for each zoom level for the western hemisphere', function() {
+    var webMercatorBox = new BoundingBox(-20037508.342789244, 0, -20037508.342789244, 20037508.342789244);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(0);
+      box.minY.should.be.equal(0);
+      box.maxX.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
+      box.maxY.should.be.equal(Math.pow(2, i)-1);
+    }
+  });
+
+  it('should get the web mercator tile box for each zoom level for the northern hemisphere', function() {
+    var webMercatorBox = new BoundingBox(-20037508.342789244, 20037508.342789244, 0, 20037508.342789244);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(0);
+      box.minY.should.be.equal(0);
+      box.maxX.should.be.equal(Math.pow(2, i)-1);
+      box.maxY.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
+    }
+  });
+
+  it('should get the web mercator tile box for each zoom level for the southern hemisphere', function() {
+    var webMercatorBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 0);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(0);
+      box.minY.should.be.equal(Math.floor(Math.pow(2, i)/2));
+      box.maxX.should.be.equal(Math.pow(2, i)-1);
+      box.maxY.should.be.equal(Math.pow(2, i)-1);
+    }
+  });
+
+
 });
