@@ -938,8 +938,17 @@ Dao.prototype.maxOfColumn = function (column, where, whereArgs, callback) {
 Dao.prototype.create = function(object, callback) {
   var sql = sqliteQueryBuilder.buildInsert(this.gpkgTableName, object);
   var insertObject = {};
-  for (var key in object) {
-    insertObject['$' + key] = object[key];
+  if (object.getColumnNames) {
+    var columnNames = object.getColumnNames();
+    for (var i = 0; i < columnNames.length; i++) {
+      insertObject['$'+columnNames[i]] = object.toDatabaseValue(columnNames[i]);
+    }
+  } else {
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        insertObject['$' + key] = object[key];
+      }
+    }
   }
   this.connection.insert(sql, insertObject, callback);
 }
@@ -1678,11 +1687,37 @@ module.exports.buildCount = function(tables, where) {
 }
 
 module.exports.buildInsert = function(table, object) {
+  if (object.getColumnNames) {
+    return module.exports.buildInsertFromColumnNames(table, object);
+  }
   var insert = 'insert into ' + table + '(';
   var keys = '';
   var values = '';
   var first = true;
   for (var key in object) {
+    if (object.hasOwnProperty(key)) {
+      if (!first) {
+        keys += ',';
+        values += ',';
+      }
+      first = false;
+      keys += key;
+      values += '$' + key;
+    }
+  }
+
+  insert += keys + ') values (' + values + ')';
+  return insert;
+}
+
+module.exports.buildInsertFromColumnNames = function(table, object) {
+  var insert = 'insert into ' + table + '(';
+  var keys = '';
+  var values = '';
+  var first = true;
+  var columnNames = object.getColumnNames();
+  for (var i = 0; i < columnNames.length; i++) {
+    var key = columnNames[i];
     if (!first) {
       keys += ',';
       values += ',';
@@ -1942,6 +1977,8 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
     if(err || result) {
       return callback(new Error('Table already exists and cannot be created: ' + userTable.table_name));
     }
+    var check = '';
+
     var sql = 'create table ' + userTable.table_name + ' (';
     for (var i = 0; i < userTable.columns.length; i++) {
       var tc = userTable.columns[i];
@@ -1951,6 +1988,10 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
       sql += '\n' + tc.name + ' ' + DataTypes.name(tc.dataType);
       if (tc.max != null) {
         sql += '(' + tc.max + ')';
+        if (check.length) {
+          check += ' AND\n';
+        }
+        check += '\tlength("'+tc.name+'") <= ' + tc.max;
       }
       if (tc.notNull) {
         sql += ' not null'
@@ -1971,6 +2012,10 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
         sql += uniqueColumn.name;
       }
       sql += ')';
+    }
+
+    if (check.length) {
+      sql += '\nCHECK(\n' + check + '\n)';
     }
 
     sql += '\n);';
@@ -3330,6 +3375,16 @@ FeatureRow.prototype.toObjectValue = function (index, value) {
   return objectValue;
 };
 
+FeatureRow.prototype.toDatabaseValue = function(columnName) {
+  var column = this.getColumnWithColumnName(columnName);
+  var value = this.getValueWithColumnName(columnName);
+  if (column.isGeometry()) {
+    return value.toData();
+  }
+
+  return value;
+}
+
 module.exports = FeatureRow;
 
 },{"../../geom/geometryData":27,"../../user/UserRow":49,"./featureColumn":19,"util":277}],22:[function(require,module,exports){
@@ -3498,6 +3553,8 @@ var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
   , TileMatrix = require('./tiles/matrix').TileMatrix
   , TileTableReader = require('./tiles/user/tileTableReader')
   , TileDao = require('./tiles/user/tileDao')
+  , TileTable = require('./tiles/user/tileTable')
+  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , TableCreator = require('./db/tableCreator')
   , UserTable = require('./user/userTable')
   , FeatureTable = require('./features/user/featureTable')
@@ -3510,7 +3567,8 @@ var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
   , GeometryIndexDao = require('./extension/index/geometryIndex').GeometryIndexDao;
 
 var async = require('async')
-  , proj4 = require('proj4');
+  , proj4 = require('proj4')
+  , toArray = require('stream-to-array');
 
 var defs = require('./proj4Defs');
 for (var name in defs) {
@@ -3749,7 +3807,6 @@ GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryCo
   this.createGeometryColumnsTable(function(err, result) {
     var featureTable = new FeatureTable(geometryColumns.table_name, columns);
     this.createFeatureTable(featureTable, function(err, result) {
-      console.log('result', result);
       var contents = new Contents();
       contents.table_name = geometryColumns.table_name;
       contents.data_type = 'features';
@@ -3804,6 +3861,100 @@ GeoPackage.prototype.createTileMatrixTable = function(callback) {
  */
 GeoPackage.prototype.createTileTable = function(tileTable, callback) {
   this.tableCreator.createUserTable(tileTable, callback);
+};
+
+/**
+ * Create a new tile table
+ * @param  {String}   tableName    tile table name
+ * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
+ * @param  {Number} contentsSrsId srs id of the contents table
+ * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
+ * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+  var tileMatrixSet;
+
+  async.series([
+    this.createTileMatrixSetTable.bind(this),
+    this.createTileMatrixTable.bind(this),
+    function(callback) {
+      var columns = TileTable.createRequiredColumns();
+      var tileTable = new TileTable(tableName, columns);
+      this.createTileTable(tileTable, callback);
+    }.bind(this),
+    function(callback) {
+      var contents = new Contents();
+      contents.table_name = tableName;
+      contents.data_type = 'tiles';
+      contents.identifier = tableName;
+      contents.last_change = new Date();
+      contents.min_x = contentsBoundingBox.minLongitude;
+      contents.min_y = contentsBoundingBox.minLatitude;
+      contents.max_x = contentsBoundingBox.maxLongitude;
+      contents.max_y = contentsBoundingBox.maxLatitude;
+      contents.srs_id = contentsSrsId;
+
+      tileMatrixSet = new TileMatrixSet();
+      tileMatrixSet.setContents(contents);
+      tileMatrixSet.srs_id = tileMatrixSetSrsId;
+      tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
+      tileMatrixSet.min_y = tileMatrixSetBoundingBox.minLatitude;
+      tileMatrixSet.max_x = tileMatrixSetBoundingBox.maxLongitude;
+      tileMatrixSet.max_y = tileMatrixSetBoundingBox.maxLatitude;
+      this.getContentsDao().create(contents, function(err, result) {
+        this.getTileMatrixSetDao().create(tileMatrixSet, callback);
+      }.bind(this));
+    }.bind(this)
+  ], function(err, results) {
+    callback(err, tileMatrixSet);
+  });
+};
+
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, callback) {
+  var tileMatrixDao = this.getTileMatrixDao();
+
+  var zoom = minZoom;
+
+  async.whilst(
+    function() {
+      return zoom <= maxZoom;
+    },
+    function(callback) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      var matrixWidth = (box.maxX - box.minX) + 1;
+      var matrixHeight = (box.maxY - box.minY) + 1;
+
+      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
+      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+
+      var tileMatrix = new TileMatrix();
+      tileMatrix.table_name = tileMatrixSet.table_name;
+      tileMatrix.zoom_level = zoom;
+      tileMatrix.matrix_width = matrixWidth;
+      tileMatrix.matrix_height = matrixHeight;
+      tileMatrix.tile_width = 256;
+      tileMatrix.tile_height = 256;
+      tileMatrix.pixel_x_size = pixelXSize;
+      tileMatrix.pixel_y_size = pixelYSize;
+
+      zoom++;
+
+      tileMatrixDao.create(tileMatrix, callback);
+    },
+    callback
+  )
+};
+
+GeoPackage.prototype.addTile = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
+  this.getTileDaoWithTableName(tableName, function(err, tileDao) {
+    var newRow = tileDao.newRow();
+    newRow.setZoomLevel(zoom);
+    newRow.setTileColumn(tileColumn);
+    newRow.setTileRow(tileRow);
+    newRow.setTileData(tileStream);
+    tileDao.create(newRow, callback);
+  });
 };
 
 /**
@@ -3935,6 +4086,12 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
       } else if (info.tableType === UserTable.TILE_TABLE) {
         dao = tableDao.getTileMatrixSetDao();
         contentsRetriever = tableDao.tileMatrixSet;
+        info.tileMatrixSet = {};
+        info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
+        info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
+        info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
+        info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
+        info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
       }
       dao.getContents(contentsRetriever, function(err, contents) {
         info.contents = {};
@@ -3998,7 +4155,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
 
 module.exports = GeoPackage;
 
-},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/user/tileDao":43,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317}],25:[function(require,module,exports){
+},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317,"stream-to-array":351}],25:[function(require,module,exports){
 /**
  * GeoPackage Constants module.
  * @module dao/geoPackageConstants
@@ -4141,6 +4298,10 @@ GeometryData.prototype.setGeometry = function(wkbGeometry) {
   this.geometry = wkbGeometry;
 }
 
+GeometryData.prototype.setEnvelope = function(envelope) {
+  this.envelope = envelope;
+}
+
 GeometryData.prototype.fromData = function (buffer) {
   this.buffer = buffer;
   if (buffer instanceof Uint8Array) {
@@ -4170,13 +4331,57 @@ GeometryData.prototype.fromData = function (buffer) {
 };
 
 GeometryData.prototype.toData = function() {
-  this.buffer = Buffer.alloc(8);
+  var header = new Buffer(8);
 
   // Write GP as the 2 byte magic number
-  this.buffer.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
+  header.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
 
   // Write a byte as the version value of 0 = version 1
-  this.buffer.writeUInt8(GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
+  header.writeUInt8(GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1, 2);
+
+  // Build and write a flags byte
+  var flags = this.buildFlagsByte();
+  header.writeUInt8(flags, 3);
+
+  // write the 4 byte srs id
+  header[this.byteOrder ? 'writeUInt32LE' : 'writeUInt32BE'](this.srsId, 4);
+
+  var envelopeBuffer = this.writeEnvelope(this.envelope);
+
+  this.buffer = Buffer.concat([header, envelopeBuffer, this.geometry]);
+  return this.buffer;
+};
+
+GeometryData.prototype.writeEnvelope = function() {
+  if (!this.envelope) return new Buffer(0);
+
+  var writeDoubleMethod = 'writeDouble' + (this.byteOrder ? 'LE' : 'BE');
+
+  var length = 32;
+  if (this.envelope.hasZ) {
+    length += 16;
+  }
+  if (this.envelope.hasM) {
+    length += 16;
+  }
+  var envelopeBuffer = new Buffer(length);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minX, 0);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxX, 8);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minY, 16);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxY, 24);
+
+  var position = 32;
+  if (this.envelope.hasZ) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minZ, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxZ, position+8);
+    position = 48;
+  }
+  if (this.envelope.hasM) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minM, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxM, position+8);
+  }
+
+  return envelopeBuffer;
 };
 
 GeometryData.prototype.buildFlagsByte = function() {
@@ -4191,11 +4396,25 @@ GeometryData.prototype.buildFlagsByte = function() {
   flag += (emptyValue << 4);
 
   // Add the envelope contents indicator code (3-bit unsigned integer to bits 3, 2, and 1)
-  var envelopeIndicator = !this.envelope ? 0 : this.getIndcatorWithEnvelope(this.envelope);
+  var envelopeIndicator = !this.envelope ? 0 : this.getIndicatorWithEnvelope(this.envelope);
+  flag += (envelopeIndicator << 1);
+
+  // Add the byte order to bit 0, 0 for Big Endian and 1 for Little Endian
+  var byteOrderValue = (this.byteOrder === BIG_ENDIAN) ? 0 : 1;
+  flag += byteOrderValue;
+
+  return flag;
 };
 
 GeometryData.prototype.getIndicatorWithEnvelope = function(envelope) {
-
+  var indicator = 1;
+  if (envelope.hasZ) {
+    indicator++;
+  }
+  if (envelope.hasM) {
+    indicator += 2;
+  }
+  return indicator;
 };
 
 GeometryData.prototype.readFlags = function (flagsInt) {
@@ -4272,9 +4491,9 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../geoPackageConstants":25,"buffer":59,"wkx":364}],28:[function(require,module,exports){
+},{"../geoPackageConstants":25,"buffer":59,"wkx":368}],28:[function(require,module,exports){
 arguments[4][24][0].apply(exports,arguments)
-},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/user/tileDao":43,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"dup":24,"proj4":317}],29:[function(require,module,exports){
+},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"dup":24,"proj4":317,"stream-to-array":351}],29:[function(require,module,exports){
 /**
  * Metadata module.
  * @module metadata
@@ -9126,6 +9345,7 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
             var image = document.createElement('img');
             image.onload = function() {
               var p = chunk.position;
+              console.log('p', p);
               this.ctx.drawImage(image, p.tileCropXStart, p.tileCropYStart, (p.tileCropXEnd - p.tileCropXStart), (p.tileCropYEnd - p.tileCropYStart), p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart), (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart));
               chunkDone();
             }.bind(this);
@@ -9193,7 +9413,7 @@ CanvasTileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox
 
 module.exports = CanvasTileCreator;
 
-},{"../tileBoundingBoxUtils":40,"./index":33,"./tileUtilities":35,"./tileWorker.js":36,"async":56,"file-type":280,"util":277,"webworkify":351}],33:[function(require,module,exports){
+},{"../tileBoundingBoxUtils":40,"./index":33,"./tileUtilities":35,"./tileWorker.js":36,"async":56,"file-type":280,"util":277,"webworkify":355}],33:[function(require,module,exports){
 (function (process){
 var proj4 = require('proj4')
   , async = require('async');
@@ -9585,63 +9805,11 @@ var TileMatrix = function() {
   this.pixel_y_size;
 };
 
-// /**
-//  *  Set the Contents
-//  *
-//  *  @param contents contents
-//  */
-// -(void) setContents: (GPKGContents *) contents;
-//
-// /**
-//  *  Set the zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  */
-// -(void) setZoomLevel:(NSNumber *)zoomLevel;
-//
-// /**
-//  *  Set the matrix width
-//  *
-//  *  @param matrixWidth matrix width
-//  */
-// -(void) setMatrixWidth:(NSNumber *)matrixWidth;
-//
-// /**
-//  *  Set the matrix height
-//  *
-//  *  @param matrixHeight matrix height
-//  */
-// -(void) setMatrixHeight:(NSNumber *)matrixHeight;
-//
-// /**
-//  *  Set the tile width
-//  *
-//  *  @param tileWidth tile width
-//  */
-// -(void) setTileWidth:(NSNumber *)tileWidth;
-//
-// /**
-//  *  Set the tile height
-//  *
-//  *  @param tileHeight tile height
-//  */
-// -(void) setTileHeight:(NSNumber *)tileHeight;
-//
-// /**
-//  *  Set the pixel x size
-//  *
-//  *  @param pixelXSize pixel x size
-//  */
-// -(void) setPixelXSize:(NSDecimalNumber *)pixelXSize;
-//
-// /**
-//  *  Set the pixel y size
-//  *
-//  *  @param pixelYSize pixel y size
-//  */
-// -(void) setPixelYSize:(NSDecimalNumber *)pixelYSize;
-
-
+TileMatrix.prototype.setContents = function (contents) {
+  if (contents && contents.data_type == 'tiles') {
+    this.table_name = contents.table_name;
+  }
+};
 
 /**
  * Tile Matrix Set Data Access Object
@@ -9782,35 +9950,17 @@ TileMatrixSet.prototype.getBoundingBox = function () {
   return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
 };
 
-// /**
-//  *  Set the Contents
-//  *
-//  *  @param contents contents
-//  */
-// -(void) setContents: (GPKGContents *) contents;
-//
-// /**
-//  *  Set the Spatial Reference System
-//  *
-//  *  @param srs srs
-//  */
-// -(void) setSrs: (GPKGSpatialReferenceSystem *) srs;
-//
-// /**
-//  *  Get a bounding box
-//  *
-//  *  @return bounding box
-//  */
-// -(GPKGBoundingBox *) getBoundingBox;
-//
-// /**
-//  *  Set a bounding box
-//  *
-//  *  @param boundingBox bounding box
-//  */
-// -(void) setBoundingBox: (GPKGBoundingBox *) boundingBox;
+TileMatrixSet.prototype.setContents = function(contents) {
+  if (contents && contents.data_type === 'tiles') {
+    this.table_name = contents.table_name;
+  }
+}
 
-
+TileMatrixSet.prototype.setSrs = function(srs) {
+  if (srs) {
+    this.srs_id = srs.srs_id;
+  }
+}
 
 /**
  * Tile Matrix Set Data Access Object
@@ -10067,6 +10217,25 @@ module.exports.overlapWithBoundingBox = function(boundingBox, boundingBox2) {
 
   return overlap;
 }
+
+module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
+  var totalBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+  var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+
+  var minX = Math.floor((webMercatorBoundingBox.minLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+  var maxX = Math.max(0,Math.floor(((webMercatorBoundingBox.maxLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var maxY = Math.max(0,Math.floor(((-1 * (webMercatorBoundingBox.minLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var minY = Math.floor((-1 * (webMercatorBoundingBox.maxLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+
+  return {
+    minX: minX,
+    maxX: maxX,
+    minY: minY,
+    maxY: maxY
+  };
+}
 //
 //
 // /**
@@ -10154,10 +10323,12 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
   var xcropPercentageMax = xcropMax / boxWidth;
 
   p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
-  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth - 1, totalWidth - 1 - (xpercentageMax * totalWidth)));
+  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth, totalWidth - (xpercentageMax * totalWidth)));
+  // p.xPositionInFinalTileEnd = 256;
   p.tileCropXStart = Math.round(Math.max(0, 0 - xpercentageMin * tileWidth));
-  p.tileCropXEnd = Math.round(Math.min(tileWidth - 1, tileWidth - 1 - (xcropPercentageMax * tileWidth)));
-  p.xScale = (1 + p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
+  p.tileCropXEnd = Math.round(Math.min(tileWidth-1, tileWidth-1 - (xcropPercentageMax * tileWidth)));
+  // p.tileCropXEnd = 256;
+  p.xScale = (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
 
 
   var boxHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
@@ -10169,10 +10340,12 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
   var ycropPercentageMin = ycropMin / boxHeight;
 
   p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
-  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight - 1, totalHeight - 1 - ypercentageMin * totalHeight));
+  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight, totalHeight - ypercentageMin * totalHeight));
+  // p.yPositionInFinalTileEnd = 256;
   p.tileCropYStart = Math.round(Math.max(0, 0 - ypercentageMax * tileHeight));
-  p.tileCropYEnd = Math.round(Math.min(tileHeight - 1, tileHeight - 1 - (ycropPercentageMin * tileHeight)));
-  p.yScale = (1 + p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
+  p.tileCropYEnd = Math.round(Math.min(tileHeight-1, tileHeight-1 - (ycropPercentageMin * tileHeight)));
+  // p.tileCropYEnd = 256;
+  p.yScale = (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
 
   return p;
 }
@@ -10189,20 +10362,20 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
  */
 module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom) {
   var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
-		var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+	var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
 
-		var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
-				+ (x * tileSize);
-		var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
-				+ ((x + 1) * tileSize);
-		var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
-				- ((y + 1) * tileSize);
-		var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
-				- (y * tileSize);
+	var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ (x * tileSize);
+	var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ ((x + 1) * tileSize);
+	var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- ((y + 1) * tileSize);
+	var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- (y * tileSize);
 
-		var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
+	var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
 
-		return box;
+	return box;
 }
 
 /**
@@ -10935,8 +11108,8 @@ TileRow.prototype.toObjectValue = function (value) {
   return value;
 };
 
-TileRow.prototype.toDatabaseValue = function (value) {
-  return value;
+TileRow.prototype.toDatabaseValue = function (columnName) {
+  return this.getValueWithColumnName(columnName);
 };
 
 /**
@@ -11369,6 +11542,8 @@ module.exports = UserDao;
  * @module user/userRow
  */
 
+var DataTypes = require('../db/dataTypes');
+
 /**
  * User Row containing the values from a single result row
  * @class UserRow
@@ -11384,23 +11559,23 @@ var UserRow = function(table, columnTypes, values) {
   this.table = table;
   /**
    * Column types of this row, based upon the data values
-   * @type {Array}
+   * @type {Object}
    */
   this.columnTypes = columnTypes;
   /**
    * Array of row values
-   * @type {Array}
+   * @type {Object}
    */
   this.values = values;
 
   if (!this.columnTypes) {
     var columnCount = this.table.columnCount();
-    this.columnTypes = [];
-    this.values = [];
-    for (var i = 0; i < columnCount; i++) {
-      this.columnTypes.push(null);
-      this.values.push(null);
-    }
+    this.columnTypes = {};
+    this.values = {};
+    // for (var i = 0; i < columnCount; i++) {
+    //   this.columnTypes.push(null);
+    //   this.values.push(null);
+    // }
   }
 }
 
@@ -11459,6 +11634,10 @@ UserRow.prototype.getValueWithIndex = function (index) {
  * @return {Object}            value
  */
 UserRow.prototype.getValueWithColumnName = function (columnName) {
+  var dataType = this.getRowColumnTypeWithColumnName(columnName);
+  if (dataType === DataTypes.GPKGDataType.BOOLEAN) {
+    return this.values[columnName] === 1 ? true : false;
+  }
   return this.values[columnName];
 };
 
@@ -11551,7 +11730,7 @@ UserRow.prototype.setValueWithIndex = function (index, value) {
  * @param {Object} value value
  */
 UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
-  this.values[index] = value;
+  this.values[this.getColumnNameWithIndex(index)] = value;
 };
 
 /**
@@ -11560,7 +11739,8 @@ UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
  * @param {Object} value      value
  */
 UserRow.prototype.setValueWithColumnName = function (columnName, value) {
-  this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
+  this.values[columnName] = value;
+  // this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
 };
 
 /**
@@ -11588,7 +11768,7 @@ UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes)
   // TODO implement validation
 };
 
-},{}],50:[function(require,module,exports){
+},{"../db/dataTypes":9}],50:[function(require,module,exports){
 /**
  * userTableReader module.
  * @module user/userTableReader
@@ -11718,7 +11898,7 @@ module.exports = UserColumn;
 
 },{"../db/dataTypes":9}],52:[function(require,module,exports){
 arguments[4][49][0].apply(exports,arguments)
-},{"dup":49}],53:[function(require,module,exports){
+},{"../db/dataTypes":9,"dup":49}],53:[function(require,module,exports){
 /**
  * userTable module.
  * @module user/userTable
@@ -11976,7 +12156,7 @@ module.exports.fromName = function(name) {
   return wktToEnum[name];
 }
 
-},{"wkx":364}],56:[function(require,module,exports){
+},{"wkx":368}],56:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -41102,6 +41282,173 @@ if (typeof define === 'function') define(SQL);
 
 }).call(this,require('_process'),require("buffer").Buffer,"/node_modules/sql.js/js")
 },{"_process":259,"buffer":59,"crypto":63,"fs":57,"path":258}],351:[function(require,module,exports){
+(function (process){
+
+var Promise = require('any-promise')
+
+module.exports = function (stream, done) {
+  if (!stream) {
+    // no arguments, meaning stream = this
+    stream = this
+  } else if (typeof stream === 'function') {
+    // stream = this, callback passed
+    done = stream
+    stream = this
+  }
+
+  var deferred
+  if (!stream.readable) deferred = Promise.resolve([])
+  else deferred = new Promise(function (resolve, reject) {
+    // stream is already ended
+    if (!stream.readable) return resolve([])
+
+    var arr = []
+
+    stream.on('data', onData)
+    stream.on('end', onEnd)
+    stream.on('error', onEnd)
+    stream.on('close', onClose)
+
+    function onData(doc) {
+      arr.push(doc)
+    }
+
+    function onEnd(err) {
+      if (err) reject(err)
+      else resolve(arr)
+      cleanup()
+    }
+
+    function onClose() {
+      resolve(arr)
+      cleanup()
+    }
+
+    function cleanup() {
+      arr = null
+      stream.removeListener('data', onData)
+      stream.removeListener('end', onEnd)
+      stream.removeListener('error', onEnd)
+      stream.removeListener('close', onClose)
+    }
+  })
+
+  if (typeof done === 'function') {
+    deferred.then(function (arr) {
+      process.nextTick(function() {
+        done(null, arr)
+      })
+    }, done)
+  }
+
+  return deferred
+}
+
+}).call(this,require('_process'))
+},{"_process":259,"any-promise":352}],352:[function(require,module,exports){
+module.exports = require('./register')().Promise
+
+},{"./register":354}],353:[function(require,module,exports){
+"use strict"
+    // global key for user preferred registration
+var REGISTRATION_KEY = '@@any-promise/REGISTRATION',
+    // Prior registration (preferred or detected)
+    registered = null
+
+/**
+ * Registers the given implementation.  An implementation must
+ * be registered prior to any call to `require("any-promise")`,
+ * typically on application load.
+ *
+ * If called with no arguments, will return registration in
+ * following priority:
+ *
+ * For Node.js:
+ *
+ * 1. Previous registration
+ * 2. global.Promise if node.js version >= 0.12
+ * 3. Auto detected promise based on first sucessful require of
+ *    known promise libraries. Note this is a last resort, as the
+ *    loaded library is non-deterministic. node.js >= 0.12 will
+ *    always use global.Promise over this priority list.
+ * 4. Throws error.
+ *
+ * For Browser:
+ *
+ * 1. Previous registration
+ * 2. window.Promise
+ * 3. Throws error.
+ *
+ * Options:
+ *
+ * Promise: Desired Promise constructor
+ * global: Boolean - Should the registration be cached in a global variable to
+ * allow cross dependency/bundle registration?  (default true)
+ */
+module.exports = function(root, loadImplementation){
+  return function register(implementation, opts){
+    implementation = implementation || null
+    opts = opts || {}
+    // global registration unless explicitly  {global: false} in options (default true)
+    var registerGlobal = opts.global !== false;
+
+    // load any previous global registration
+    if(registered === null && registerGlobal){
+      registered = root[REGISTRATION_KEY] || null
+    }
+
+    if(registered !== null
+        && implementation !== null
+        && registered.implementation !== implementation){
+      // Throw error if attempting to redefine implementation
+      throw new Error('any-promise already defined as "'+registered.implementation+
+        '".  You can only register an implementation before the first '+
+        ' call to require("any-promise") and an implementation cannot be changed')
+    }
+
+    if(registered === null){
+      // use provided implementation
+      if(implementation !== null && typeof opts.Promise !== 'undefined'){
+        registered = {
+          Promise: opts.Promise,
+          implementation: implementation
+        }
+      } else {
+        // require implementation if implementation is specified but not provided
+        registered = loadImplementation(implementation)
+      }
+
+      if(registerGlobal){
+        // register preference globally in case multiple installations
+        root[REGISTRATION_KEY] = registered
+      }
+    }
+
+    return registered
+  }
+}
+
+},{}],354:[function(require,module,exports){
+"use strict";
+module.exports = require('./loader')(window, loadImplementation)
+
+/**
+ * Browser specific loadImplementation.  Always uses `window.Promise`
+ *
+ * To register a custom implementation, must register with `Promise` option.
+ */
+function loadImplementation(){
+  if(typeof window.Promise === 'undefined'){
+    throw new Error("any-promise browser requires a polyfill or explicit registration"+
+      " e.g: require('any-promise/register/bluebird')")
+  }
+  return {
+    Promise: window.Promise,
+    implementation: 'window.Promise'
+  }
+}
+
+},{"./loader":353}],355:[function(require,module,exports){
 var bundleFn = arguments[3];
 var sources = arguments[4];
 var cache = arguments[5];
@@ -41175,7 +41522,7 @@ module.exports = function (fn) {
     return worker;
 };
 
-},{}],352:[function(require,module,exports){
+},{}],356:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryReader;
 
@@ -41226,7 +41573,7 @@ BinaryReader.prototype.readVarInt = function () {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":59}],353:[function(require,module,exports){
+},{"buffer":59}],357:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryWriter;
 
@@ -41295,7 +41642,7 @@ BinaryWriter.prototype.ensureSize = function (size) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":59}],354:[function(require,module,exports){
+},{"buffer":59}],358:[function(require,module,exports){
 (function (Buffer){
 module.exports = Geometry;
 
@@ -41677,7 +42024,7 @@ Geometry.prototype.toGeoJSON = function (options) {
 };
 
 }).call(this,{"isBuffer":require("../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":257,"./binaryreader":352,"./binarywriter":353,"./geometrycollection":355,"./linestring":356,"./multilinestring":357,"./multipoint":358,"./multipolygon":359,"./point":360,"./polygon":361,"./types":362,"./wktparser":363,"./zigzag.js":365}],355:[function(require,module,exports){
+},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":257,"./binaryreader":356,"./binarywriter":357,"./geometrycollection":359,"./linestring":360,"./multilinestring":361,"./multipoint":362,"./multipolygon":363,"./point":364,"./polygon":365,"./types":366,"./wktparser":367,"./zigzag.js":369}],359:[function(require,module,exports){
 module.exports = GeometryCollection;
 
 var util = require('util');
@@ -41842,7 +42189,7 @@ GeometryCollection.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./types":362,"util":277}],356:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./types":366,"util":277}],360:[function(require,module,exports){
 module.exports = LineString;
 
 var util = require('util');
@@ -42022,7 +42369,7 @@ LineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag.js":365,"util":277}],357:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag.js":369,"util":277}],361:[function(require,module,exports){
 module.exports = MultiLineString;
 
 var util = require('util');
@@ -42208,7 +42555,7 @@ MultiLineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./linestring":356,"./point":360,"./types":362,"./zigzag.js":365,"util":277}],358:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./linestring":360,"./point":364,"./types":366,"./zigzag.js":369,"util":277}],362:[function(require,module,exports){
 module.exports = MultiPoint;
 
 var util = require('util');
@@ -42377,7 +42724,7 @@ MultiPoint.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag":365,"util":277}],359:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag":369,"util":277}],363:[function(require,module,exports){
 module.exports = MultiPolygon;
 
 var util = require('util');
@@ -42600,7 +42947,7 @@ MultiPolygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./polygon":361,"./types":362,"./zigzag.js":365,"util":277}],360:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./polygon":365,"./types":366,"./zigzag.js":369,"util":277}],364:[function(require,module,exports){
 module.exports = Point;
 
 var util = require('util');
@@ -42816,7 +43163,7 @@ Point.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./types":362,"./zigzag.js":365,"util":277}],361:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./types":366,"./zigzag.js":369,"util":277}],365:[function(require,module,exports){
 module.exports = Polygon;
 
 var util = require('util');
@@ -43106,7 +43453,7 @@ Polygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag":365,"util":277}],362:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag":369,"util":277}],366:[function(require,module,exports){
 module.exports = {
     wkt: {
         Point: 'POINT',
@@ -43137,7 +43484,7 @@ module.exports = {
     }
 };
 
-},{}],363:[function(require,module,exports){
+},{}],367:[function(require,module,exports){
 module.exports = WktParser;
 
 var Types = require('./types');
@@ -43263,7 +43610,7 @@ WktParser.prototype.skipWhitespaces = function () {
         this.position++;
 };
 
-},{"./point":360,"./types":362}],364:[function(require,module,exports){
+},{"./point":364,"./types":366}],368:[function(require,module,exports){
 exports.Types = require('./types');
 exports.Geometry = require('./geometry');
 exports.Point = require('./point');
@@ -43273,7 +43620,7 @@ exports.MultiPoint = require('./multipoint');
 exports.MultiLineString = require('./multilinestring');
 exports.MultiPolygon = require('./multipolygon');
 exports.GeometryCollection = require('./geometrycollection');
-},{"./geometry":354,"./geometrycollection":355,"./linestring":356,"./multilinestring":357,"./multipoint":358,"./multipolygon":359,"./point":360,"./polygon":361,"./types":362}],365:[function(require,module,exports){
+},{"./geometry":358,"./geometrycollection":359,"./linestring":360,"./multilinestring":361,"./multipoint":362,"./multipolygon":363,"./point":364,"./polygon":365,"./types":366}],369:[function(require,module,exports){
 module.exports = {
     encode: function (value) {
         return (value << 1) ^ (value >> 31);
