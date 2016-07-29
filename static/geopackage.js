@@ -691,7 +691,8 @@ ColumnValues.prototype.getValue = function (column) {
  * @module dao/dao
  */
 
-var sqliteQueryBuilder = require('../db/sqliteQueryBuilder');
+var sqliteQueryBuilder = require('../db/sqliteQueryBuilder')
+  , ColumnValues = require('./columnValues');
 
 /** @class Dao */
 var Dao = function(connection) {
@@ -935,6 +936,36 @@ Dao.prototype.maxOfColumn = function (column, where, whereArgs, callback) {
   this.connection.maxOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
 };
 
+Dao.prototype.delete = function(object, callback) {
+  if (object.getId) {
+    return this.deleteById(object.getId(), callback);
+  }
+  var multiId = this.getMultiId(object);
+  this.deleteByMultiId(this.getMultiId(object), callback);
+};
+
+Dao.prototype.deleteById = function(idValue, callback) {
+  var where = this.buildPkWhereWithValue(idValue);
+  var whereArgs = this.buildPkWhereArgsWithValue(idValue);
+
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteByMultiId = function(idValues, callback) {
+  var where = this.buildPkWhereWithValues(idValues);
+  var whereArgs = this.buildPkWhereArgsWithValues(idValues);
+
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteWhere = function(where, whereArgs, callback) {
+  this.conneciton.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteAll = function(callback) {
+  this.connection.delete(this.gpkgTableName, null, null, callback);
+}
+
 Dao.prototype.create = function(object, callback) {
   var sql = sqliteQueryBuilder.buildInsert(this.gpkgTableName, object);
   var insertObject = {};
@@ -965,7 +996,7 @@ module.exports = Dao;
  * @param {Error} null if no error, otherwise describes the error
  */
 
-},{"../db/sqliteQueryBuilder":12}],7:[function(require,module,exports){
+},{"../db/sqliteQueryBuilder":12,"./columnValues":5}],7:[function(require,module,exports){
 /**
  * DataColumnConstraints module.
  * @module dataColumnConstraints
@@ -1473,6 +1504,10 @@ var GeoPackageConnection = function(filePath, callback) {
   }
 }
 
+GeoPackageConnection.prototype.export = function(callback) {
+  this.adapter.export(callback);
+}
+
 GeoPackageConnection.prototype.getDBConnection = function () {
   return this.adapter.db;
 };
@@ -1549,6 +1584,16 @@ GeoPackageConnection.prototype.insert = function (sql, params, callback) {
   this.adapter.insert(sql, params, callback);
 };
 
+GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs, callback) {
+  var deleteStatement = 'DELETE FROM ' + tableName;
+
+  if (where) {
+    deleteStatement += ' WHERE ' + where;
+  }
+
+  this.adapter.delete(deleteStatement, whereArgs, callback);
+}
+
 GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
   this.adapter.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
 };
@@ -1583,10 +1628,12 @@ GeoPackageConnection.connectWithDatabase = function(db, callback) {
 
 }).call(this,require('_process'),require("buffer").Buffer)
 },{"../geoPackageConstants":25,"./sqliteAdapter":11,"./sqljsAdapter":13,"_process":259,"buffer":59}],11:[function(require,module,exports){
-var async = require('async');
+var async = require('async')
+  , fs = require('fs');
 
 module.exports.createAdapter = function(filePath, callback) {
   var sqlite3 = require('sqlite3').verbose();
+  this.filePath = filePath;
   var db = new sqlite3.Database(filePath, function(err) {
     if (err) {
       console.log('cannot open ' + filePath);
@@ -1603,6 +1650,10 @@ module.exports.createAdapterFromDb = function(db) {
 
 function Adapter(db) {
   this.db = db;
+}
+
+Adapter.prototype.export = function(callback) {
+  fs.readFile(filePath, callback);
 }
 
 Adapter.prototype.getDBConnection = function () {
@@ -1630,7 +1681,13 @@ Adapter.prototype.insert = function(sql, params, callback) {
     if(err) return callback(err);
     return callback(err, this.lastID);
   });
-}
+};
+
+Adapter.prototype.delete = function(sql, params, callback) {
+  console.log('sql', sql);
+  console.log('params', params);
+  this.db.run(sql, params, callback);
+};
 
 Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   if (eachCallback) {
@@ -1647,7 +1704,7 @@ Adapter.prototype.count = function (tableName, callback) {
   });
 };
 
-},{"async":56,"sqlite3":undefined}],12:[function(require,module,exports){
+},{"async":56,"fs":57,"sqlite3":undefined}],12:[function(require,module,exports){
 /**
  * SQLite query builder module.
  * @module db/sqliteQueryBuilder
@@ -1804,6 +1861,10 @@ Adapter.prototype.getDBConnection = function () {
   return this.db;
 };
 
+Adapter.prototype.export = function(callback) {
+  callback(null, this.db.export());
+}
+
 Adapter.prototype.get = function (sql, params, callback) {
   if (typeof params === 'function') {
     callback = params;
@@ -1869,7 +1930,14 @@ Adapter.prototype.run = function(sql, callback) {
 
 Adapter.prototype.insert = function(sql, params, callback) {
   var response = this.db.exec(sql, params);
-  console.log('response', response);
+  console.log('insert response', response);
+  callback(null, response);
+}
+
+Adapter.prototype.delete = function(sql, params, callback) {
+  var response = this.db.exec(sql, params);
+  console.log('delete response', response);
+  callback(null, response);
 }
 
 Adapter.prototype.count = function (tableName, callback) {
@@ -3596,6 +3664,10 @@ GeoPackage.prototype.getPath = function() {
   return this.path;
 }
 
+GeoPackage.prototype.export = function(callback) {
+  this.connection.export(callback);
+}
+
 /**
  * Get the GeoPackage name
  * @return {String} the GeoPackage name
@@ -4492,8 +4564,626 @@ GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
 
 }).call(this,require("buffer").Buffer)
 },{"../geoPackageConstants":25,"buffer":59,"wkx":368}],28:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"dup":24,"proj4":317,"stream-to-array":351}],29:[function(require,module,exports){
+/**
+ * GeoPackage module.
+ * @module geoPackage
+ */
+
+var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
+  , GeometryColumnsDao = require('./features/columns').GeometryColumnsDao
+  , FeatureDao = require('./features/user/featureDao')
+  , FeatureTableReader = require('./features/user/featureTableReader')
+  , ContentsDao = require('./core/contents').ContentsDao
+  , Contents = require('./core/contents').Contents
+  , TileMatrixSetDao = require('./tiles/matrixset').TileMatrixSetDao
+  , TileMatrixSet = require('./tiles/matrixset').TileMatrixSet
+  , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
+  , TileMatrix = require('./tiles/matrix').TileMatrix
+  , TileTableReader = require('./tiles/user/tileTableReader')
+  , TileDao = require('./tiles/user/tileDao')
+  , TileTable = require('./tiles/user/tileTable')
+  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
+  , TableCreator = require('./db/tableCreator')
+  , UserTable = require('./user/userTable')
+  , FeatureTable = require('./features/user/featureTable')
+  , DataColumnsDao = require('./dataColumns').DataColumnsDao
+  , DataColumnConstraintsDao = require('./dataColumnConstraints').DataColumnConstraintsDao
+  , MetadataDao = require('./metadata').MetadataDao
+  , MetadataReferenceDao = require('./metadata/reference').MetadataReferenceDao
+  , ExtensionDao = require('./extension').ExtensionDao
+  , TableIndexDao = require('./extension/index/tableIndex').TableIndexDao
+  , GeometryIndexDao = require('./extension/index/geometryIndex').GeometryIndexDao;
+
+var async = require('async')
+  , proj4 = require('proj4')
+  , toArray = require('stream-to-array');
+
+var defs = require('./proj4Defs');
+for (var name in defs) {
+  if (defs[name]) {
+    proj4.defs(name, defs[name]);
+  }
+}
+
+/**
+ * GeoPackage database
+ * @class GeoPackage
+ */
+var GeoPackage = function(name, path, connection) {
+  this.name = name;
+  this.path = path;
+  this.connection = connection;
+  this.tableCreator = new TableCreator(this);
+}
+
+GeoPackage.prototype.getDatabase = function() {
+  return this.connection;
+}
+
+GeoPackage.prototype.getPath = function() {
+  return this.path;
+}
+
+/**
+ * Get the GeoPackage name
+ * @return {String} the GeoPackage name
+ */
+GeoPackage.prototype.getName = function() {
+  return this.name;
+}
+
+GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
+  return new SpatialReferenceSystemDao(this.connection);
+}
+
+GeoPackage.prototype.getContentsDao = function() {
+  return new ContentsDao(this.connection);
+}
+
+GeoPackage.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+
+GeoPackage.prototype.getTileMatrixDao = function() {
+  return new TileMatrixDao(this.connection);
+}
+
+GeoPackage.prototype.getDataColumnsDao = function() {
+  return new DataColumnsDao(this.connection);
+}
+
+GeoPackage.prototype.getExtensionDao = function() {
+  return new ExtensionDao(this.connection);
+}
+
+GeoPackage.prototype.getTableIndexDao = function() {
+  return new TableIndexDao(this.connection);
+}
+
+GeoPackage.prototype.getGeometryIndexDao = function() {
+  return new GeometryIndexDao(this.connection);
+}
+
+GeoPackage.prototype.createDao = function () {
+
+};
+
+GeoPackage.prototype.getSrs = function(srsId, callback) {
+  var dao = this.getSpatialReferenceSystemDao();
+  dao.queryForIdObject(srsId, callback);
+}
+
+GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
+  var tileMatrices = [];
+  var tileMatrixDao = this.getTileMatrixDao();
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+    async.eachSeries(results, function(result, callback) {
+      var tm = new TileMatrix();
+      tileMatrixDao.populateObjectFromResult(tm, result);
+      tileMatrices.push(tm);
+      callback();
+    }, function(err) {
+      var tableReader = new TileTableReader(tileMatrixSet);
+      tableReader.readTileTable(this.connection, function(err, tileTable) {
+        new TileDao(this.connection, tileTable, tileMatrixSet, tileMatrices, function(err, tileDao){
+          callback(err, tileDao);
+        });
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getTileMatrixSet(contents, function(err, columns) {
+    this.getTileDaoWithTileMatrixSet(columns, callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
+    if (results.length > 1) {
+      return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));
+    } else if (results.length === 0) {
+      return callback(new Error('No Tile Matrix found for table name: ' + tableName));
+    }
+    var tileMatrixSet = new TileMatrixSet();
+    tms.populateObjectFromResult(tileMatrixSet, results[0]);
+    this.getTileDaoWithTileMatrixSet(tileMatrixSet, callback);
+  }.bind(this));
+};
+
+/**
+ *  Get the tile tables
+ *  @param {callback} callback called with an error if one occurred and the array of {TileTable} names
+ */
+GeoPackage.prototype.getTileTables = function (callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    tms.getTileTables(callback);
+  });
+};
+
+/**
+ *  Get the feature tables
+ *  @param {callback} callback called with an error if one occurred and the array of {FeatureTable} names
+ */
+GeoPackage.prototype.getFeatureTables = function (callback) {
+  var gcd = this.getGeometryColumnsDao();
+  gcd.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    gcd.getFeatureTables(callback);
+  });
+};
+
+GeoPackage.prototype.getGeometryColumnsDao = function () {
+  return new GeometryColumnsDao(this.connection);
+};
+
+GeoPackage.prototype.getDataColumnConstraintsDao = function () {
+  return new DataColumnConstraintsDao(this.connection);
+};
+
+GeoPackage.prototype.getMetadataReferenceDao = function () {
+  return new MetadataReferenceDao(this.connection);
+};
+
+GeoPackage.prototype.getMetadataDao = function () {
+  return new MetadataDao(this.connection);
+};
+
+/**
+ *  Get a Feature DAO from Geometry Columns
+ *
+ *  @param {GeometryColumns} geometryColumns Geometry Columns
+ *  @param {callback} callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns = function (geometryColumns, callback) {
+  if (!geometryColumns) {
+    return callback(new Error('Non null Geometry Columns is required to create Feature DAO'));
+  }
+
+  var tableReader = new FeatureTableReader(geometryColumns);
+  var featureTable = tableReader.readFeatureTable(this.connection, function(err, featureTable) {
+    if (err) {
+      return callback(err);
+    }
+    var dao = new FeatureDao(this.connection, featureTable, geometryColumns, this.metadataDb);
+
+    callback(null, dao);
+  }.bind(this));
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {Contents}   contents Contents
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getGeometryColumns(contents, function(err, columns) {
+    this.getFeatureDaoWithGeometryColumns(columns, callback);
+  }.bind(this));
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {string}   tableName table name
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback) {
+  var self = this;
+  var dao = this.getGeometryColumnsDao();
+  var geometryColumns = dao.queryForTableName(tableName, function(err, geometryColumns) {
+    if (!geometryColumns) {
+      return callback(new Error('No Feature Table exists for table name: ' + tableName));
+    }
+    self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
+  });
+};
+
+/**
+ * Create the Geometry Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createGeometryColumnsTable = function (callback) {
+  var dao = this.getGeometryColumnsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createGeometryColumns(callback);
+  }.bind(this));
+};
+
+/**
+ * Create a new feature table
+ * @param  {FeatureTable}   featureTable    feature table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createFeatureTable = function(featureTable, callback) {
+  this.tableCreator.createUserTable(featureTable, callback);
+};
+
+GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryColumns, boundingBox, srsId, columns, callback) {
+  this.createGeometryColumnsTable(function(err, result) {
+    var featureTable = new FeatureTable(geometryColumns.table_name, columns);
+    this.createFeatureTable(featureTable, function(err, result) {
+      var contents = new Contents();
+      contents.table_name = geometryColumns.table_name;
+      contents.data_type = 'features';
+      contents.identifier = geometryColumns.table_name;
+      contents.last_change = new Date();
+      contents.min_x = boundingBox.minLongitude;
+      contents.min_y = boundingBox.minLatitude;
+      contents.max_x = boundingBox.maxLongitude;
+      contents.max_y = boundingBox.maxLatitude;
+      contents.srs_id = srsId;
+
+      this.getContentsDao().create(contents, function(err, result) {
+        geometryColumns.srs_id = srsId;
+        this.getGeometryColumnsDao().create(geometryColumns, callback);
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+/**
+ * Create the Tile Matrix Set table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixSetTable = function(callback) {
+  var dao = this.getTileMatrixSetDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTileMatrixSet(callback);
+  }.bind(this));
+}
+
+/**
+ * Create the Tile Matrix table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixTable = function(callback) {
+  var dao = this.getTileMatrixDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTileMatrix(callback);
+  }.bind(this));
+};
+
+/**
+ * Create a new tile table
+ * @param  {TileTable}   tileTable    tile table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTable = function(tileTable, callback) {
+  this.tableCreator.createUserTable(tileTable, callback);
+};
+
+/**
+ * Create a new tile table
+ * @param  {String}   tableName    tile table name
+ * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
+ * @param  {Number} contentsSrsId srs id of the contents table
+ * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
+ * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+  var tileMatrixSet;
+
+  async.series([
+    this.createTileMatrixSetTable.bind(this),
+    this.createTileMatrixTable.bind(this),
+    function(callback) {
+      var columns = TileTable.createRequiredColumns();
+      var tileTable = new TileTable(tableName, columns);
+      this.createTileTable(tileTable, callback);
+    }.bind(this),
+    function(callback) {
+      var contents = new Contents();
+      contents.table_name = tableName;
+      contents.data_type = 'tiles';
+      contents.identifier = tableName;
+      contents.last_change = new Date();
+      contents.min_x = contentsBoundingBox.minLongitude;
+      contents.min_y = contentsBoundingBox.minLatitude;
+      contents.max_x = contentsBoundingBox.maxLongitude;
+      contents.max_y = contentsBoundingBox.maxLatitude;
+      contents.srs_id = contentsSrsId;
+
+      tileMatrixSet = new TileMatrixSet();
+      tileMatrixSet.setContents(contents);
+      tileMatrixSet.srs_id = tileMatrixSetSrsId;
+      tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
+      tileMatrixSet.min_y = tileMatrixSetBoundingBox.minLatitude;
+      tileMatrixSet.max_x = tileMatrixSetBoundingBox.maxLongitude;
+      tileMatrixSet.max_y = tileMatrixSetBoundingBox.maxLatitude;
+      this.getContentsDao().create(contents, function(err, result) {
+        this.getTileMatrixSetDao().create(tileMatrixSet, callback);
+      }.bind(this));
+    }.bind(this)
+  ], function(err, results) {
+    callback(err, tileMatrixSet);
+  });
+};
+
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, callback) {
+  var tileMatrixDao = this.getTileMatrixDao();
+
+  var zoom = minZoom;
+
+  async.whilst(
+    function() {
+      return zoom <= maxZoom;
+    },
+    function(callback) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      var matrixWidth = (box.maxX - box.minX) + 1;
+      var matrixHeight = (box.maxY - box.minY) + 1;
+
+      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
+      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+
+      var tileMatrix = new TileMatrix();
+      tileMatrix.table_name = tileMatrixSet.table_name;
+      tileMatrix.zoom_level = zoom;
+      tileMatrix.matrix_width = matrixWidth;
+      tileMatrix.matrix_height = matrixHeight;
+      tileMatrix.tile_width = 256;
+      tileMatrix.tile_height = 256;
+      tileMatrix.pixel_x_size = pixelXSize;
+      tileMatrix.pixel_y_size = pixelYSize;
+
+      zoom++;
+
+      tileMatrixDao.create(tileMatrix, callback);
+    },
+    callback
+  )
+};
+
+GeoPackage.prototype.addTile = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
+  this.getTileDaoWithTableName(tableName, function(err, tileDao) {
+    var newRow = tileDao.newRow();
+    newRow.setZoomLevel(zoom);
+    newRow.setTileColumn(tileColumn);
+    newRow.setTileRow(tileRow);
+    newRow.setTileData(tileStream);
+    tileDao.create(newRow, callback);
+  });
+};
+
+/**
+ * Create the Data Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumns = function(callback) {
+  var dao = this.getDataColumnsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createDataColumns(callback);
+  }.bind(this));
+};
+
+/**
+ * Create the Data Column Constraints table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumnConstraintsTable = function (callback) {
+  var dao = this.getDataColumnConstraintsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createDataColumnConstraints(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createMetadataTable = function (callback) {
+  var dao = this.getMetadataDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createMetadata(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createMetadataReferenceTable = function (callback) {
+  var dao = this.getMetadataReferenceDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createMetadataReference(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createExtensionTable = function (callback) {
+  var dao = this.getExtensionDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createExtensions(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createTableIndexTable = function (callback) {
+  var dao = this.getTableIndexDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTableIndex(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createGeometryIndexTable = function(callback) {
+  var dao = this.getGeometryIndexDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createGeometryIndex(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createFeatureTileLinkTable = function(callback) {
+  callback(new Error('not implemented'));
+};
+
+/**
+ * Get the application id of the GeoPackage
+ * @param  {Function} callback callback called with the application id
+ */
+GeoPackage.prototype.getApplicationId = function(callback) {
+  var connection = this.getDatabase();
+  connection.getApplicationId(callback);
+}
+
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  var gp = this;
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      info.tableName = tableDao.table_name;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+        info.tileMatrixSet = {};
+        info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
+        info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
+        info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
+        info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
+        info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.table_name;
+        info.contents.dataType = contents.data_type;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.description;
+        info.contents.lastChange = contents.last_change;
+        info.contents.minX = contents.min_x;
+        info.contents.maxX = contents.max_x;
+        info.contents.minY = contents.min_y;
+        info.contents.maxY = contents.max_y;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, contentsSrs) {
+          info.contents.srs = {
+            name:contentsSrs.srs_name,
+            id:contentsSrs.srs_id,
+            organization:contentsSrs.organization,
+            organization_coordsys_id:contentsSrs.organization_coordsys_id,
+            definition:contentsSrs.definition,
+            description:contentsSrs.description
+          };
+          tableDao.getSrs(function(err, srs){
+            info.srs = {
+              name:srs.srs_name,
+              id:srs.srs_id,
+              organization:srs.organization,
+              organization_coordsys_id:srs.organization_coordsys_id,
+              definition:srs.definition,
+              description:srs.description
+            };
+            callback(null, info);
+          });
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      info.columnMap = {};
+      async.eachSeries(tableDao.table.columns, function(column, columnDone) {
+        var dcd = gp.getDataColumnsDao();
+        dcd.getDataColumns(tableDao.table.table_name, column.name, function(err, dataColumn) {
+          info.columns.push({
+            index: column.index,
+            name: column.name,
+            max: column.max,
+            min: column.min,
+            notNull: column.notNull,
+            primaryKey: column.primaryKey,
+            displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
+            dataColumn: dataColumn
+          });
+          info.columnMap[column.name] = info.columns[info.columns.length-1];
+          columnDone();
+        });
+      }, function(err) {
+        callback(null, info);
+      });
+    }
+  ], callback);
+};
+
+module.exports = GeoPackage;
+
+},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317,"stream-to-array":351}],29:[function(require,module,exports){
 /**
  * Metadata module.
  * @module metadata
@@ -9345,7 +10035,6 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
             var image = document.createElement('img');
             image.onload = function() {
               var p = chunk.position;
-              console.log('p', p);
               this.ctx.drawImage(image, p.tileCropXStart, p.tileCropYStart, (p.tileCropXEnd - p.tileCropXStart), (p.tileCropYEnd - p.tileCropYStart), p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart), (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart));
               chunkDone();
             }.bind(this);
@@ -10272,7 +10961,6 @@ module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
 //  *
 //  *  @return x pixel
 //  */
-// +(double) getXPixelWithWidth: (int) width andBoundingBox: (GPKGBoundingBox *) boundingBox andLongitude: (double) longitude;
 module.exports.getXPixelOffset = function(width, boundingBox, longitude) {
   var boxWidth = boundingBox.maxLongitude - boundingBox.minLongitude;
   var offset = longitude - boundingBox.minLongitude;
@@ -10301,7 +10989,6 @@ module.exports.getXPixelOffset = function(width, boundingBox, longitude) {
 //  *
 //  *  @return y pixel
 //  */
-// +(double) getYPixelWithHeight: (int) height andBoundingBox: (GPKGBoundingBox *) boundingBox andLatitude: (double) latitude;
 module.exports.getYPixelOffset = function(height, boundingBox, latitude) {
   var boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;
   var offset = boundingBox.maxLatitude - latitude;
@@ -10324,12 +11011,9 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
 
   p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
   p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth, totalWidth - (xpercentageMax * totalWidth)));
-  // p.xPositionInFinalTileEnd = 256;
   p.tileCropXStart = Math.round(Math.max(0, 0 - xpercentageMin * tileWidth));
   p.tileCropXEnd = Math.round(Math.min(tileWidth-1, tileWidth-1 - (xcropPercentageMax * tileWidth)));
-  // p.tileCropXEnd = 256;
   p.xScale = (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
-
 
   var boxHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
   var yoffsetMax = totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude;
@@ -10341,10 +11025,8 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
 
   p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
   p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight, totalHeight - ypercentageMin * totalHeight));
-  // p.yPositionInFinalTileEnd = 256;
   p.tileCropYStart = Math.round(Math.max(0, 0 - ypercentageMax * tileHeight));
   p.tileCropYEnd = Math.round(Math.min(tileHeight-1, tileHeight-1 - (ycropPercentageMin * tileHeight)));
-  // p.tileCropYEnd = 256;
   p.yScale = (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
 
   return p;
