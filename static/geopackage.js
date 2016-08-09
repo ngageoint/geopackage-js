@@ -742,7 +742,7 @@ Dao.prototype.queryForSameId = function (object, callback) {
 Dao.prototype.getMultiId = function (object) {
   var idValues = [];
   for (var i = 0; i < this.idColumns.length; i++) {
-    idValues.push(this[this.idColumns[i]]);
+    idValues.push(object[this.idColumns[i]]);
   }
   return idValues;
 };
@@ -817,7 +817,7 @@ Dao.prototype.buildPkWhereWithValues = function (idValuesArray) {
 Dao.prototype.buildPkWhereArgsWithValues = function (idValuesArray) {
   var values = [];
   for (var i = 0; i < idValuesArray.length; i++) {
-    values.push(this.buildWhereArgsWithValue(idValuesArray[i]));
+    values = values.concat(this.buildWhereArgsWithValue(idValuesArray[i]));
   }
   return values;
 };
@@ -940,7 +940,6 @@ Dao.prototype.delete = function(object, callback) {
   if (object.getId) {
     return this.deleteById(object.getId(), callback);
   }
-  var multiId = this.getMultiId(object);
   this.deleteByMultiId(this.getMultiId(object), callback);
 };
 
@@ -959,12 +958,12 @@ Dao.prototype.deleteByMultiId = function(idValues, callback) {
 };
 
 Dao.prototype.deleteWhere = function(where, whereArgs, callback) {
-  this.conneciton.delete(this.gpkgTableName, where, whereArgs, callback);
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
 };
 
 Dao.prototype.deleteAll = function(callback) {
   this.connection.delete(this.gpkgTableName, null, null, callback);
-}
+};
 
 Dao.prototype.create = function(object, callback) {
   var sql = sqliteQueryBuilder.buildInsert(this.gpkgTableName, object);
@@ -982,7 +981,11 @@ Dao.prototype.create = function(object, callback) {
     }
   }
   this.connection.insert(sql, insertObject, callback);
-}
+};
+
+Dao.prototype.dropTable = function(callback) {
+  this.connection.dropTable(this.gpkgTableName, callback);
+};
 
 /**
  * The Dao
@@ -1592,7 +1595,11 @@ GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs, ca
   }
 
   this.adapter.delete(deleteStatement, whereArgs, callback);
-}
+};
+
+GeoPackageConnection.prototype.dropTable = function(tableName, callback) {
+  this.adapter.dropTable(tableName, callback);
+};
 
 GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
   this.adapter.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
@@ -1684,9 +1691,9 @@ Adapter.prototype.insert = function(sql, params, callback) {
 };
 
 Adapter.prototype.delete = function(sql, params, callback) {
-  console.log('sql', sql);
-  console.log('params', params);
-  this.db.run(sql, params, callback);
+  this.db.run(sql, params, function(err) {
+    callback(err, this.changes);
+  });
 };
 
 Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
@@ -1696,6 +1703,13 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     }
   }
   this.db.each(sql, params, rowCallback, doneCallback);
+};
+
+Adapter.prototype.dropTable = function(table, callback) {
+  this.db.run('DROP TABLE IF EXISTS ' + table, function(err) {
+    if(err) return callback(err);
+    return callback(err, !!this.changes);
+  });
 };
 
 Adapter.prototype.count = function (tableName, callback) {
@@ -1926,19 +1940,25 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
 Adapter.prototype.run = function(sql, callback) {
   this.db.run(sql);
   callback();
-}
+};
 
 Adapter.prototype.insert = function(sql, params, callback) {
   var response = this.db.exec(sql, params);
   console.log('insert response', response);
   callback(null, response);
-}
+};
 
 Adapter.prototype.delete = function(sql, params, callback) {
   var response = this.db.exec(sql, params);
   console.log('delete response', response);
   callback(null, response);
-}
+};
+
+Adapter.prototype.dropTable = function(table, callback) {
+  var response = this.db.exec('DROP TABLE IF EXISTS ' + table);
+  console.log('drop table response', response);
+  return callback(err, response);
+};
 
 Adapter.prototype.count = function (tableName, callback) {
   this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
@@ -11694,42 +11714,21 @@ TileDao.prototype.queryByTileGrid = function (tileGrid, zoomLevel, tileCallback,
   );
 };
 
+TileDao.prototype.deleteTile = function(column, row, zoomLevel, callback) {
+  var where = '';
 
-// /**
-//  *  Query for the bounding tile grid with tiles at the zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return tile grid of tiles at the zoom level
-//  */
-// -(GPKGTileGrid *) queryForTileGridWithZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Delete a Tile
-//  *
-//  *  @param column    column
-//  *  @param row       row
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return number deleted, should be 0 or 1
-//  */
-// -(int) deleteTileWithColumn: (int) column andRow: (int) row andZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Count of Tiles at a zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return count
-//  */
-// -(int) countWithZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Determine if the tiles are in the standard web mercator coordinate tile format
-//  *
-//  *  @return true if standard web mercator format
-//  */
-// -(BOOL) isStandardWebMercatorFormat;
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, column);
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, row);
+
+  var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, column, row]);
+
+  this.deleteWhere(where, whereArgs, function(err, result) {
+    callback(err, result);
+  });
+};
 
 TileDao.prototype.getTileMatrixSetDao = function () {
   return new TileMatrixSetDao(this.connection);

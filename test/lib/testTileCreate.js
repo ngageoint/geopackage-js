@@ -37,8 +37,6 @@ describe('GeoPackage Tile table create tests', function() {
     var tileTable = new TileTable('test_tiles', requiredColumns);
 
     geopackage.createTileTable(tileTable, function(err, result) {
-      console.log('err', err);
-      console.log('result', result);
       Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
         if (err) return done(err);
         done();
@@ -115,10 +113,86 @@ describe('GeoPackage Tile table create tests', function() {
             }, xDone);
           }, zoomDone);
         }, function(err) {
-          done(err);
+          geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+            tileDao.getCount(function(err, result) {
+              result.should.be.equal(85);
+              done(err);
+            });
+          });
         });
       });
     });
   });
 
+  describe('delete tile tests', function(done) {
+
+    var tileMatrixSet;
+    var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+
+    beforeEach(function(done) {
+      var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
+      var contentsSrsId = 4326;
+      var tileMatrixSetSrsId = 3857;
+      geopackage.getSpatialReferenceSystemDao().createWebMercator(function(err, result) {
+        geopackage.createTileTableWithTableName('test_tiles', contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+          tileMatrixSet = result;
+          Verification.verifyTileMatrixSet(geopackage, function(err) {
+            if (err) return done(err);
+            Verification.verifyContentsForTable(geopackage, 'test_tiles', function(err) {
+              if (err) return done(err);
+              Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
+                geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
+
+                  async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
+                    var tiles = [];
+                    var tileCount = Math.pow(2,zoom);
+                    for (var i = 0; i < tileCount; i++) {
+                      tiles.push(i);
+                    }
+                    async.eachSeries(tiles, function(xTile, xDone) {
+                      async.eachSeries(tiles, function(yTile, yDone) {
+                        var image = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'));
+                        geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
+                          yDone();
+                        });
+                      }, xDone);
+                    }, zoomDone);
+                  }, function(err) {
+                    geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+                      tileDao.getCount(function(err, result) {
+                        result.should.be.equal(85);
+                        done(err);
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should delete the tiles', function(done) {
+      geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+        tileDao.getCount(function(err, result) {
+          result.should.be.equal(85);
+          tileDao.deleteTile(0, 0, 0, function(err, result) {
+            result.should.be.equal(1);
+            tileDao.getCount(function(err, result) {
+              result.should.be.equal(84);
+              tileDao.dropTable(function(err, result) {
+                result.should.be.equal(true);
+                var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
+                tileMatrixSetDao.delete(tileMatrixSet, function(err, results) {
+                  results.should.be.equal(1);
+                  done(err);
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 });

@@ -187,7 +187,7 @@ describe('GeoPackage Feature table create tests', function() {
         });
       });
 
-      it.only('should delete the feature', function(done) {
+      it('should delete the feature', function(done) {
         featureDao.getCount(function(err, count) {
           count.should.be.equal(1);
 
