@@ -976,7 +976,11 @@ Dao.prototype.create = function(object, callback) {
   } else {
     for (var key in object) {
       if (object.hasOwnProperty(key)) {
-        insertObject['$' + key] = object[key];
+        if (object.toDatabaseValue) {
+          insertObject['$' + key] = object.toDatabaseValue(key);
+        } else {
+          insertObject['$' + key] = object[key];
+        }
       }
     }
   }
@@ -1679,8 +1683,11 @@ Adapter.prototype.all = function (sql, params, callback) {
   this.db.all.apply(this.db, arguments);
 };
 
-Adapter.prototype.run = function(sql, callback) {
-  this.db.run(sql, callback);
+Adapter.prototype.run = function(sql, params, callback) {
+  if (callback) {
+    return this.db.run(sql, params, callback);
+  }
+  this.db.run(sql, params);
 }
 
 Adapter.prototype.insert = function(sql, params, callback) {
@@ -2479,10 +2486,9 @@ var tableCreationScripts = {
     "FOR EACH ROW BEGIN "+
     "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
     "violates constraint: timestamp must be a valid time in ISO 8601 "+
-    "\"yyyy-mm-ddThh-mm-ss.cccZ\" form') "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
     "WHERE NOT (NEW.timestamp GLOB "+
-    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[1-3][0-9]T[0-2][0-9]:[0-5][0- "+
-    "9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
     "AND strftime('%s',NEW.timestamp) NOT NULL); "+
     "END",
 
@@ -2491,10 +2497,9 @@ var tableCreationScripts = {
     "FOR EACH ROW BEGIN "+
     "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
     "violates constraint: timestamp must be a valid time in ISO 8601 "+
-    "\"yyyy-mm-ddThh-mm-ss.cccZ\" form') "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
     "WHERE NOT (NEW.timestamp GLOB "+
-    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[1-3][0-9]T[0-2][0-9]:[0-5][0- "+
-    "9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
     "AND strftime('%s',NEW.timestamp) NOT NULL); "+
     "END "
   ],
@@ -5252,157 +5257,157 @@ var Metadata = function() {
   this.metadata;
 }
 
-Metadata.UNDEFINED_NAME = "undefined";
-Metadata.FIELD_SESSION_NAME = "fieldSession";
-Metadata.COLLECTION_SESSION_NAME = "collectionSession";
-Metadata.SERIES_NAME = "series";
-Metadata.DATASET_NAME = "dataset";
-Metadata.FEATURE_TYPE_NAME = "featureType";
-Metadata.FEATURE_NAME = "feature";
-Metadata.ATTRIBUTE_TYPE_NAME = "attributeType";
-Metadata.ATTRIBUTE_NAME = "attribute";
-Metadata.TILE_NAME = "tile";
-Metadata.MODEL_NAME = "model";
-Metadata.CATALOG_NAME = "catalog";
-Metadata.SCHEMA_NAME = "schema";
-Metadata.TAXONOMY_NAME = "taxonomy";
-Metadata.SOFTWARE_NAME = "software";
-Metadata.SERVICE_NAME = "service";
-Metadata.COLLECTION_HARDWARE_NAME = "collectionHardware";
-Metadata.NON_GEOGRAPHIC_DATASET_NAME = "nonGeographicDataset";
-Metadata.DIMENSION_GROUP_NAME = "dimensionGroup";
+Metadata.UNDEFINED = "undefined";
+Metadata.FIELD_SESSION = "fieldSession";
+Metadata.COLLECTION_SESSION = "collectionSession";
+Metadata.SERIES = "series";
+Metadata.DATASET = "dataset";
+Metadata.FEATURE_TYPE = "featureType";
+Metadata.FEATURE = "feature";
+Metadata.ATTRIBUTE_TYPE = "attributeType";
+Metadata.ATTRIBUTE = "attribute";
+Metadata.TILE = "tile";
+Metadata.MODEL = "model";
+Metadata.CATALOG = "catalog";
+Metadata.SCHEMA = "schema";
+Metadata.TAXONOMY = "taxonomy";
+Metadata.SOFTWARE = "software";
+Metadata.SERVICE = "service";
+Metadata.COLLECTION_HARDWARE = "collectionHardware";
+Metadata.NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
+Metadata.DIMENSION_GROUP = "dimensionGroup";
 
 Metadata.prototype.getScopeInformation = function(type) {
   switch(type) {
-    case Metadata.UNDEFINED_NAME:
+    case Metadata.UNDEFINED:
       return {
-        name: Metadata.UNDEFINED_NAME,
+        name: Metadata.UNDEFINED,
         code: 'NA',
         definition: 'Metadata information scope is undefined'
       };
     break;
-    case Metadata.FIELD_SESSION_NAME:
+    case Metadata.FIELD_SESSION:
       return {
-        name: Metadata.FIELD_SESSION_NAME,
+        name: Metadata.FIELD_SESSION,
         code: '012',
         definition: 'Information applies to the field session'
       };
     break;
-    case Metadata.COLLECTION_SESSION_NAME:
+    case Metadata.COLLECTION_SESSION:
       return {
-        name: Metadata.COLLECTION_SESSION_NAME,
+        name: Metadata.COLLECTION_SESSION,
         code: '004',
         definition: 'Information applies to the collection session'
       };
     break;
-    case Metadata.SERIES_NAME:
+    case Metadata.SERIES:
       return {
-        name: Metadata.SERIES_NAME,
+        name: Metadata.SERIES,
         code: '006',
         definition: 'Information applies to the (dataset) series'
       };
     break;
-    case Metadata.DATASET_NAME:
+    case Metadata.DATASET:
       return {
-        name: Metadata.DATASET_NAME,
+        name: Metadata.DATASET,
         code: '005',
         definition: 'Information applies to the (geographic feature) dataset'
       };
     break;
-    case Metadata.FEATURE_TYPE_NAME:
+    case Metadata.FEATURE_TYPE:
       return {
-        name: Metadata.FEATURE_TYPE_NAME,
+        name: Metadata.FEATURE_TYPE,
         code: '010',
         definition: 'Information applies to a feature type (class)'
       };
     break;
-    case Metadata.FEATURE_NAME:
+    case Metadata.FEATURE:
       return {
-        name: Metadata.FEATURE_NAME,
+        name: Metadata.FEATURE,
         code: '009',
         definition: 'Information applies to a feature (instance)'
       };
     break;
-    case Metadata.ATTRIBUTE_TYPE_NAME:
+    case Metadata.ATTRIBUTE_TYPE:
       return {
-        name: Metadata.ATTRIBUTE_TYPE_NAME,
+        name: Metadata.ATTRIBUTE_TYPE,
         code: '002',
         definition: 'Information applies to the attribute class'
       };
     break;
-    case Metadata.ATTRIBUTE_NAME:
+    case Metadata.ATTRIBUTE:
       return {
-        name: Metadata.ATTRIBUTE_NAME,
+        name: Metadata.ATTRIBUTE,
         code: '001',
         definition: 'Information applies to the characteristic of a feature (instance)'
       };
     break;
-    case Metadata.TILE_NAME:
+    case Metadata.TILE:
       return {
-        name: Metadata.TILE_NAME,
+        name: Metadata.TILE,
         code: '016',
         definition: 'Information applies to a tile, a spatial subset of geographic data'
       };
     break;
-    case Metadata.MODEL_NAME:
+    case Metadata.MODEL:
       return {
-        name: Metadata.MODEL_NAME,
+        name: Metadata.MODEL,
         code: '015',
         definition: 'Information applies to a copy or imitation of an existing or hypothetical object'
       };
     break;
-    case Metadata.CATALOG_NAME:
+    case Metadata.CATALOG:
       return {
-        name: Metadata.CATALOG_NAME,
+        name: Metadata.CATALOG,
         code: 'NA',
         definition: 'Metadata applies to a feature catalog'
       };
     break;
-    case Metadata.SCHEMA_NAME:
+    case Metadata.SCHEMA:
       return {
-        name: Metadata.SCHEMA_NAME,
+        name: Metadata.SCHEMA,
         code: 'NA',
         definition: 'Metadata applies to an application schema'
       };
     break;
-    case Metadata.TAXONOMY_NAME:
+    case Metadata.TAXONOMY:
       return {
-        name: Metadata.TAXONOMY_NAME,
+        name: Metadata.TAXONOMY,
         code: 'NA',
         definition: 'Metadata applies to a taxonomy or knowledge system'
       };
     break;
-    case Metadata.SOFTWARE_NAME:
+    case Metadata.SOFTWARE:
       return {
-        name: Metadata.SOFTWARE_NAME,
+        name: Metadata.SOFTWARE,
         code: '013',
         definition: 'Information applies to a computer program or routine'
       };
     break;
-    case Metadata.SERVICE_NAME:
+    case Metadata.SERVICE:
       return {
-        name: Metadata.SERVICE_NAME,
+        name: Metadata.SERVICE,
         code: '014',
         definition: 'Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case'
       };
     break;
-    case Metadata.COLLECTION_HARDWARE_NAME:
+    case Metadata.COLLECTION_HARDWARE:
       return {
-        name: Metadata.COLLECTION_HARDWARE_NAME,
+        name: Metadata.COLLECTION_HARDWARE,
         code: '003',
         definition: 'Information applies to the collection hardware class'
       };
     break;
-    case Metadata.NON_GEOGRAPHIC_DATASET_NAME:
+    case Metadata.NON_GEOGRAPHIC_DATASET:
       return {
-        name: Metadata.NON_GEOGRAPHIC_DATASET_NAME,
+        name: Metadata.NON_GEOGRAPHIC_DATASET,
         code: '007',
         definition: 'Information applies to non-geographic data'
       };
     break;
-    case Metadata.DIMENSION_GROUP_NAME:
+    case Metadata.DIMENSION_GROUP:
       return {
-        name: Metadata.DIMENSION_GROUP_NAME,
+        name: Metadata.DIMENSION_GROUP,
         code: '008',
         definition: 'Information applies to a dimension group'
       };
@@ -5507,6 +5512,13 @@ var MetadataReference = function() {
   this.md_parent_id;
 }
 
+MetadataReference.prototype.toDatabaseValue = function(columnName) {
+  if (columnName === 'timestamp') {
+    return this.timestamp.toISOString();
+  }
+  return this[columnName];
+}
+
 /**
  * Set the metadata
  * @param  {Metadata} metadata metadata
@@ -5534,29 +5546,29 @@ MetadataReference.prototype.setParentMetadata = function(metadata) {
 MetadataReference.prototype.setReferenceScopeType = function(referenceScopeType) {
   this.reference_scope = referenceScopeType;
   switch(referenceScopeType) {
-    case MetadataReference.GEOPACKAGE_NAME:
+    case MetadataReference.GEOPACKAGE:
       this.table_name = undefined;
       this.column_name = undefined;
       this.row_id_value = undefined;
       break;
-    case MetadataReference.TABLE_NAME:
+    case MetadataReference.TABLE:
       this.column_name = undefined;
       this.row_id_value = undefined;
       break;
-    case MetadataReference.ROW_NAME:
+    case MetadataReference.ROW:
       this.column_name = undefined;
       break;
-    case MetadataReference.COLUMN_NAME:
+    case MetadataReference.COLUMN:
       this.row_id_value = undefined;
       break;
   }
 }
 
-MetadataReference.GEOPACKAGE_NAME = "geopackage";
-MetadataReference.TABLE_NAME = "table";
-MetadataReference.COLUMN_NAME = "column";
-MetadataReference.ROW_NAME = "row";
-MetadataReference.ROW_COL_NAME = "row/col";
+MetadataReference.GEOPACKAGE = "geopackage";
+MetadataReference.TABLE = "table";
+MetadataReference.COLUMN = "column";
+MetadataReference.ROW = "row";
+MetadataReference.ROW_COL = "row/col";
 
 /**
  * Metadata Reference Data Access Object
@@ -5585,21 +5597,21 @@ MetadataReferenceDao.prototype.removeMetadataParent = function(parentId, callbac
 
 MetadataReferenceDao.prototype.queryByMetadataAndParent = function (fileId, parentId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.prototype.queryByMetadata = function(fileId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.prototype.queryByMetadataParent = function(parentId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, fileId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.TABLE_NAME = "gpkg_metadata_reference";
