@@ -43,9 +43,10 @@ describe('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
-        featureDao.queryForEach(function(err, row) {
+        featureDao.queryForEach(function(err, row, rowDone) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
+          rowDone();
         }, function(err) {
           done();
         });
@@ -63,14 +64,15 @@ describe('GeoPackage tests', function() {
               return callback(err);
             }
             featureDao.getSrs(function(err, srs) {
-              featureDao.queryForEach(function(err, row) {
+              featureDao.queryForEach(function(err, row, rowDone) {
                 var currentRow = featureDao.getFeatureRow(row);
                 var geometry = currentRow.getGeometry();
                 if (!geometry) {
-                  return;
+                  return rowDone();
                 }
                 var geom = geometry.geometry;
                 var geoJson = projectedJson = geom.toGeoJSON();
+                rowDone();
               }, function(err) {
                 callback();
               });
@@ -152,7 +154,7 @@ describe('GeoPackage tests', function() {
 
             var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
             gpr.getTile(0, 0, 1, function(err, tileData) {
-              fs.writeFileSync('/tmp/gptile.png', tileData);
+              should.exist(tileData);
               callback();
             });
           });
@@ -164,6 +166,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the info for the table', function(done) {
+    this.timeout(30000);
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, dao) {

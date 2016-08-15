@@ -215,7 +215,6 @@ describe('Metadata Reference tests', function() {
                 });
               }, function() {
                 metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row, rowDone) {
-                  console.log('arguments', arguments);
                   should.not.exist(err);
                   row.table_name.should.be.equal('TEST_TABLE_NAME_2');
                   row.md_file_id.should.be.equal(metadata2.id);

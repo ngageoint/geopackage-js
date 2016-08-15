@@ -8,26 +8,28 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , BoundingBox = require('../../lib/boundingBox')
   , DataTypes = require('../../lib/db/dataTypes')
   , GeometryData = require('../../lib/geom/geometryData')
+  , UserTableReader = require('../../lib/user/userTableReader')
+  , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkx = require('wkx')
   , path = require('path')
-  , async = require('async')
-  , fs = require('fs');
+  , async = require('async');
 
 describe('GeoPackage Feature table create tests', function() {
-
-  var testGeoPackage = path.join('/tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
-    fs.unlink(testGeoPackage, function() {
-      fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-      GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-        geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
-        var tc = new TableCreator(geopackage);
-        tc.createRequired(done);
+    testSetup.deleteGeoPackage(testGeoPackage, function() {
+      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+        geopackage = gp;
+        done();
       });
     });
+  });
+
+  afterEach(function(done) {
+    testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
   it('should create a feature table', function(done) {
@@ -63,41 +65,113 @@ describe('GeoPackage Feature table create tests', function() {
     });
   });
 
+  it('should create a feature table and read the information about it', function(done) {
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns('test_features', 'geom', wkx.Types.wkt.Point);
+    var boundingBox = new BoundingBox(-180, 180, -80, 80);
+
+    var columns = [];
+
+    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, "default"));
+    columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, 5));
+
+    geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+      var reader = new UserTableReader('test_features');
+      reader.readTable(geopackage.connection, function(err, result) {
+        var columns = result.columns;
+
+        var plainObject = JSON.parse(JSON.stringify(columns));
+        plainObject.should.deep.include.members([{ index: 0,
+           name: 'id',
+           dataType: 5,
+           notNull: true,
+           primaryKey: true },
+         { index: 1,
+           name: 'geom',
+           dataType: 13,
+           notNull: false,
+           primaryKey: false },
+         { index: 2,
+           name: 'test_text',
+           dataType: 9,
+           notNull: false,
+           defaultValue: "\'default\'",
+           primaryKey: false },
+         { index: 3,
+           name: 'test_real',
+           dataType: 8,
+           notNull: false,
+           primaryKey: false },
+         { index: 4,
+           name: 'test_boolean',
+           dataType: 0,
+           notNull: false,
+           primaryKey: false },
+         { index: 5,
+           name: 'test_blob',
+           dataType: 10,
+           notNull: false,
+           primaryKey: false },
+         { index: 6,
+           name: 'test_integer',
+           dataType: 5,
+           notNull: false,
+           defaultValue: '5',
+           primaryKey: false },
+         { index: 7,
+           name: 'test_text_limited',
+           dataType: 9,
+           max: 5,
+           notNull: false,
+           primaryKey: false },
+         { index: 8,
+           name: 'test_blob_limited',
+           dataType: 10,
+           max: 7,
+           notNull: false,
+           primaryKey: false } ]);
+        done();
+      });
+    });
+  });
+
   describe('GeoPackage feature CRUD tests', function(done) {
     beforeEach(function(done) {
-      fs.unlink(testGeoPackage, function() {
-        fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-        GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-          geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
-          var tc = new TableCreator(geopackage);
-          tc.createRequired(function(err) {
+      testSetup.deleteGeoPackage(testGeoPackage, function() {
+        testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+          geopackage = gp;
 
-            var geometryColumns = SetupFeatureTable.buildGeometryColumns('test_features', 'geom', wkx.Types.wkt.Point);
-            var boundingBox = new BoundingBox(-180, 180, -80, 80);
+          var geometryColumns = SetupFeatureTable.buildGeometryColumns('test_features', 'geom', wkx.Types.wkt.Point);
+          var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
-            var columns = [];
+          var columns = [];
 
-            columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-            columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-            columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-            columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-            columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-            columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-            columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-            columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-            columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+          columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+          columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
+          columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+          columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
+          columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+          columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
+          columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
+          columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
+          columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
-            geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
-              Verification.verifyGeometryColumns(geopackage, function(err) {
+          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+            Verification.verifyGeometryColumns(geopackage, function(err) {
+              if (err) return done(err);
+              Verification.verifyTableExists(geopackage, 'test_features', function(err) {
                 if (err) return done(err);
-                Verification.verifyTableExists(geopackage, 'test_features', function(err) {
+                Verification.verifyContentsForTable(geopackage, 'test_features', function(err) {
                   if (err) return done(err);
-                  Verification.verifyContentsForTable(geopackage, 'test_features', function(err) {
+                  Verification.verifyGeometryColumnsForTable(geopackage, 'test_features', function(err) {
                     if (err) return done(err);
-                    Verification.verifyGeometryColumnsForTable(geopackage, 'test_features', function(err) {
-                      if (err) return done(err);
-                      done();
-                    });
+                    done();
                   });
                 });
               });
@@ -194,10 +268,7 @@ describe('GeoPackage Feature table create tests', function() {
           featureDao.queryForAll(function(err, rows) {
             var fr = featureDao.getFeatureRow(rows[0]);
             featureDao.delete(fr, function(err, result) {
-              console.log('err', err);
-              console.log('result', result);
               featureDao.getCount(function(err, count) {
-                console.log('count', count);
                 count.should.be.equal(0);
                 done();
               });

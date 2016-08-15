@@ -1860,14 +1860,36 @@ function isEmpty(string) {
 },{}],13:[function(require,module,exports){
 var async = require('async');
 
+var sqljs = require('sql.js');
+
 module.exports.createAdapter = function(filePath, callback) {
-  var fs = require('fs');
-  var sqljs = require('sql.js');
-  fs.readFile(filePath, function(err, fileBuffer) {
-    var db = new sqljs.Database(fileBuffer);
+  if (filePath) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', filePath, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+      if (xhr.status !== 200) {
+        var db = new sqljs.Database();
+        var adapter = new Adapter(db);
+        return callback(null, adapter);
+      }
+      var uInt8Array = new Uint8Array(this.response);
+      var db = new sqljs.Database(uInt8Array);
+      var adapter = new Adapter(db);
+      callback(null, adapter);
+    };
+    xhr.onerror = function(e) {
+      var db = new sqljs.Database();
+      var adapter = new Adapter(db);
+      return callback(null, adapter);
+    };
+    xhr.send();
+  } else {
+    var db = new sqljs.Database();
     var adapter = new Adapter(db);
-    callback(err, adapter);
-  });
+    callback(null, adapter);
+  }
 }
 
 module.exports.createAdapterFromDb = function(db) {
@@ -1950,15 +1972,34 @@ Adapter.prototype.run = function(sql, callback) {
 };
 
 Adapter.prototype.insert = function(sql, params, callback) {
-  var response = this.db.exec(sql, params);
-  console.log('insert response', response);
-  callback(null, response);
+  try {
+    var statement = this.db.prepare(sql, params);
+    statement.step();
+  } catch (e) {
+    console.trace();
+    return callback(e);
+  }
+  statement.free();
+  var lastId = this.db.exec('select last_insert_rowid();');
+  if (lastId) {
+    return callback(null, lastId[0].values[0][0]);
+  } else {
+    return callback();
+  }
 };
 
 Adapter.prototype.delete = function(sql, params, callback) {
-  var response = this.db.exec(sql, params);
-  console.log('delete response', response);
-  callback(null, response);
+  var rowsModified = 0;
+  try {
+    var statement = this.db.prepare(sql, params);
+    statement.step();
+    rowsModified = statement.getRowsModified();
+    statement.free();
+  } catch (e) {
+    console.trace();
+    return callback(e);
+  }
+  return callback(null, rowsModified);
 };
 
 Adapter.prototype.dropTable = function(table, callback) {
@@ -1973,7 +2014,7 @@ Adapter.prototype.count = function (tableName, callback) {
   });
 };
 
-},{"async":56,"fs":57,"sql.js":350}],14:[function(require,module,exports){
+},{"async":56,"sql.js":350}],14:[function(require,module,exports){
 var async = require('async');
 
 var SpatialReferenceSystemDao = require('../core/srs').SpatialReferenceSystemDao
@@ -1996,9 +2037,9 @@ TableCreator.prototype.createRequired = function (callback) {
     this.createContents.bind(this),
 
     // Create the required Spatial Reference Systems (spec Requirement 11)
+    dao.createUndefinedGeographic.bind(dao),
     dao.createWgs84.bind(dao),
-  	dao.createUndefinedCartesian.bind(dao),
-  	dao.createUndefinedGeographic.bind(dao)
+  	dao.createUndefinedCartesian.bind(dao)
   ], function(err, results) {
     if (err) {
       return callback(new Error("Error creating default required tables " + err.message));
@@ -2067,6 +2108,7 @@ TableCreator.prototype.createTable = function(tableName, callback) {
 }
 
 TableCreator.prototype.createUserTable = function (userTable, callback) {
+  console.log('userTable', userTable);
   var connection = this.geopackage.getDatabase();
   connection.tableExists(userTable.table_name, function(err, result) {
     if(err || result) {
@@ -2093,6 +2135,13 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
       }
       if (tc.primaryKey) {
         sql += ' primary key autoincrement';
+      }
+      if (tc.defaultValue) {
+        if (tc.dataType === DataTypes.GPKGDataType.GPKG_DT_TEXT) {
+          sql += ' default \'' + tc.defaultValue + '\'';
+        } else {
+          sql += ' default ' + tc.defaultValue;
+        }
       }
     }
 
@@ -3908,7 +3957,7 @@ GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryCo
       contents.table_name = geometryColumns.table_name;
       contents.data_type = 'features';
       contents.identifier = geometryColumns.table_name;
-      contents.last_change = new Date();
+      contents.last_change = new Date().toISOString();
       contents.min_x = boundingBox.minLongitude;
       contents.min_y = boundingBox.minLatitude;
       contents.max_x = boundingBox.maxLongitude;
@@ -3916,6 +3965,8 @@ GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryCo
       contents.srs_id = srsId;
 
       this.getContentsDao().create(contents, function(err, result) {
+        console.log('err', err);
+        console.log('result', result);
         geometryColumns.srs_id = srsId;
         this.getGeometryColumnsDao().create(geometryColumns, callback);
       }.bind(this));
@@ -5285,133 +5336,114 @@ Metadata.prototype.getScopeInformation = function(type) {
         code: 'NA',
         definition: 'Metadata information scope is undefined'
       };
-    break;
     case Metadata.FIELD_SESSION:
       return {
         name: Metadata.FIELD_SESSION,
         code: '012',
         definition: 'Information applies to the field session'
       };
-    break;
     case Metadata.COLLECTION_SESSION:
       return {
         name: Metadata.COLLECTION_SESSION,
         code: '004',
         definition: 'Information applies to the collection session'
       };
-    break;
     case Metadata.SERIES:
       return {
         name: Metadata.SERIES,
         code: '006',
         definition: 'Information applies to the (dataset) series'
       };
-    break;
     case Metadata.DATASET:
       return {
         name: Metadata.DATASET,
         code: '005',
         definition: 'Information applies to the (geographic feature) dataset'
       };
-    break;
     case Metadata.FEATURE_TYPE:
       return {
         name: Metadata.FEATURE_TYPE,
         code: '010',
         definition: 'Information applies to a feature type (class)'
       };
-    break;
     case Metadata.FEATURE:
       return {
         name: Metadata.FEATURE,
         code: '009',
         definition: 'Information applies to a feature (instance)'
       };
-    break;
     case Metadata.ATTRIBUTE_TYPE:
       return {
         name: Metadata.ATTRIBUTE_TYPE,
         code: '002',
         definition: 'Information applies to the attribute class'
       };
-    break;
     case Metadata.ATTRIBUTE:
       return {
         name: Metadata.ATTRIBUTE,
         code: '001',
         definition: 'Information applies to the characteristic of a feature (instance)'
       };
-    break;
     case Metadata.TILE:
       return {
         name: Metadata.TILE,
         code: '016',
         definition: 'Information applies to a tile, a spatial subset of geographic data'
       };
-    break;
     case Metadata.MODEL:
       return {
         name: Metadata.MODEL,
         code: '015',
         definition: 'Information applies to a copy or imitation of an existing or hypothetical object'
       };
-    break;
     case Metadata.CATALOG:
       return {
         name: Metadata.CATALOG,
         code: 'NA',
         definition: 'Metadata applies to a feature catalog'
       };
-    break;
     case Metadata.SCHEMA:
       return {
         name: Metadata.SCHEMA,
         code: 'NA',
         definition: 'Metadata applies to an application schema'
       };
-    break;
     case Metadata.TAXONOMY:
       return {
         name: Metadata.TAXONOMY,
         code: 'NA',
         definition: 'Metadata applies to a taxonomy or knowledge system'
       };
-    break;
     case Metadata.SOFTWARE:
       return {
         name: Metadata.SOFTWARE,
         code: '013',
         definition: 'Information applies to a computer program or routine'
       };
-    break;
     case Metadata.SERVICE:
       return {
         name: Metadata.SERVICE,
         code: '014',
         definition: 'Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case'
       };
-    break;
     case Metadata.COLLECTION_HARDWARE:
       return {
         name: Metadata.COLLECTION_HARDWARE,
         code: '003',
         definition: 'Information applies to the collection hardware class'
       };
-    break;
     case Metadata.NON_GEOGRAPHIC_DATASET:
       return {
         name: Metadata.NON_GEOGRAPHIC_DATASET,
         code: '007',
         definition: 'Information applies to non-geographic data'
       };
-    break;
     case Metadata.DIMENSION_GROUP:
       return {
         name: Metadata.DIMENSION_GROUP,
         code: '008',
         definition: 'Information applies to a dimension group'
       };
-    break;
   }
 }
 
@@ -10526,12 +10558,6 @@ var TileMatrix = function() {
   this.pixel_y_size;
 };
 
-TileMatrix.prototype.setContents = function (contents) {
-  if (contents && contents.data_type == 'tiles') {
-    this.table_name = contents.table_name;
-  }
-};
-
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixSetDao
@@ -12590,8 +12616,242 @@ UserColumn.prototype.validateMax = function () {
 module.exports = UserColumn;
 
 },{"../db/dataTypes":9}],52:[function(require,module,exports){
-arguments[4][49][0].apply(exports,arguments)
-},{"../db/dataTypes":9,"dup":49}],53:[function(require,module,exports){
+(function (Buffer){
+/**
+ * UserRow module.
+ * @module user/userRow
+ */
+
+var DataTypes = require('../db/dataTypes');
+
+/**
+ * User Row containing the values from a single result row
+ * @class UserRow
+ * @param  {UserTable} table       user table
+ * @param  {Array} columnTypes column types
+ * @param  {Array} values      values
+ */
+var UserRow = function(table, columnTypes, values) {
+  /**
+   * User table
+   * @type {UserTable}
+   */
+  this.table = table;
+  /**
+   * Column types of this row, based upon the data values
+   * @type {Object}
+   */
+  this.columnTypes = columnTypes;
+  /**
+   * Array of row values
+   * @type {Object}
+   */
+  this.values = values;
+
+  if (!this.columnTypes) {
+    var columnCount = this.table.columnCount();
+    this.columnTypes = {};
+    this.values = {};
+    // for (var i = 0; i < columnCount; i++) {
+    //   this.columnTypes.push(null);
+    //   this.values.push(null);
+    // }
+  }
+}
+
+module.exports = UserRow;
+
+/**
+ * Get the column count
+ * @return {number} column count
+ */
+UserRow.prototype.columnCount = function () {
+  return this.table.columnCount();
+};
+
+/**
+ * Get the column names
+ * @return {Array} column names
+ */
+UserRow.prototype.getColumnNames = function () {
+  return this.table.columnNames;
+};
+
+/**
+ * Get the column name at the index
+ * @param  {Number} index index
+ * @return {string}       column name
+ */
+UserRow.prototype.getColumnNameWithIndex = function (index) {
+  return this.table.getColumnNameWithIndex(index);
+};
+
+/**
+ * Get the column index of the column name
+ * @param  {string} columnName column name
+ * @return {Number}            column index
+ */
+UserRow.prototype.getColumnIndexWithColumnName = function (columnName) {
+  return this.table.getColumnIndex(columnName);
+};
+
+/**
+ * Get the value at the index
+ * @param  {Number} index index
+ * @return {object}       value
+ */
+UserRow.prototype.getValueWithIndex = function (index) {
+  var value = this.values[this.getColumnNameWithIndex(index)];
+  if (value !== undefined) {
+    value = this.toObjectValue(index, value);
+  }
+  return value;
+};
+
+/**
+ * Get the value of the column name
+ * @param  {string} columnName column name
+ * @return {Object}            value
+ */
+UserRow.prototype.getValueWithColumnName = function (columnName) {
+  var dataType = this.getRowColumnTypeWithColumnName(columnName);
+  if (dataType === DataTypes.GPKGDataType.BOOLEAN) {
+    return this.values[columnName] === 1 ? true : false;
+  } else if (dataType === DataTypes.GPKGDataType.BLOB) {
+    return new Buffer(this.values[columnName]);
+  }
+  return this.values[columnName];
+};
+
+UserRow.prototype.toObjectValue = function (index, value) {
+  return value;
+};
+
+/**
+ * Get the row column type at the index
+ * @param  {Number} index index
+ * @return {Number}       row column type
+ */
+UserRow.prototype.getRowColumnTypeWithIndex = function (index) {
+  return this.columnTypes[this.getColumnNameWithIndex(index)];
+};
+
+/**
+ * Get the row column type of the column name
+ * @param  {string} columnName column name
+ * @return {Number}            row column type
+ */
+UserRow.prototype.getRowColumnTypeWithColumnName = function (columnName) {
+  return this.columnTypes[columnName];
+};
+
+/**
+ * Get the column at the index
+ * @param  {Number} index index
+ * @return {UserColumn}       column
+ */
+UserRow.prototype.getColumnWithIndex = function (index) {
+  return this.table.getColumnWithIndex(index);
+};
+
+/**
+ * Get the column of the column name
+ * @param  {string} columnName column name
+ * @return {UserColumn}            column
+ */
+UserRow.prototype.getColumnWithColumnName = function (columnName) {
+  return this.table.getColumnWithColumnName(columnName);
+};
+
+/**
+ * Get the id value, which is the value of the primary key
+ * @return {Number} id value
+ */
+UserRow.prototype.getId = function () {
+  var id = undefined;
+  var objectValue = this.getValueWithIndex(this.getPkColumnIndex());
+  if (objectValue == undefined) {
+    throw new Error('Row Id was null. Table: ' + this.table.tableName + ', Column Index: ' + this.getPkColumnIndex() + ', Column Name: ' + this.getPkColumn().name);
+  }
+  // TODO ensure the id was a number
+  id = objectValue;
+  return id;
+};
+
+/**
+ * Get the primary key column Index
+ * @return {Number} pk index
+ */
+UserRow.prototype.getPkColumnIndex = function () {
+  return this.table.pkIndex;
+};
+
+/**
+ * Get the primary key column
+ * @return {UserColumn} pk column
+ */
+UserRow.prototype.getPkColumn = function () {
+  return this.table.getPkColumn();
+};
+
+/**
+ * Set the value at the index
+ * @param {Number} index index
+ * @param {object} value value
+ */
+UserRow.prototype.setValueWithIndex = function (index, value) {
+  if (index === this.table.pkIndex) {
+    throw new Error('Cannot update the primary key of the row.  Table Name: ' + this.table.tableName + ', Index: ' + index + ', Name: ' + this.table.getPkColumn().name);
+  }
+  this.setValueNoValidationWithIndex(index, value);
+};
+
+/**
+ * Set the value at the index without validation
+ * @param {Number} index index
+ * @param {Object} value value
+ */
+UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
+  this.values[this.getColumnNameWithIndex(index)] = value;
+};
+
+/**
+ * Set the value of the column name
+ * @param {string} columnName column name
+ * @param {Object} value      value
+ */
+UserRow.prototype.setValueWithColumnName = function (columnName, value) {
+  this.values[columnName] = value;
+  // this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
+};
+
+/**
+ * Set the primary key id value
+ * @param {Number} id id
+ */
+UserRow.prototype.setId = function (id) {
+  this.values[this.getPkColumnIndex()] = id;
+};
+
+/**
+ * Clears the id so the row can be used as part of an insert or create
+ */
+UserRow.prototype.resetId = function () {
+  this.values[this.getPkColumnIndex()] = undefined;
+};
+
+/**
+ * Validate the value and its actual value types against eh column data type class
+ * @param  {UserColumn} column     column
+ * @param  {Object} value      value
+ * @param  {Array} valueTypes value types
+ */
+UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes) {
+  // TODO implement validation
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../db/dataTypes":9,"buffer":59}],53:[function(require,module,exports){
 /**
  * userTable module.
  * @module user/userTable

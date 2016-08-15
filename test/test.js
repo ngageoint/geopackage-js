@@ -1,4 +1,10 @@
+require('chai').should();
 require('../lib/geopackage');
+
+require('./lib/testBoundingBox');
+require('./lib/wkb/testWkb');
+require('./lib/testFeatureCreate');
+require('./lib/testGeoPackage');
 
 describe('Array', function() {
   describe('#indexOf()', function() {
