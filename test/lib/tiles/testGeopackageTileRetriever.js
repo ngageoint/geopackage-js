@@ -184,7 +184,24 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
-        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png'), function (err, imagesAreSame) {
+        var expectedPath;
+        if (typeof(process) !== 'undefined' && process.version) {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png');
+        } else {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTileWeb.png');
+        }
+        testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
+          imagesAreSame.should.be.equal(true);
+          done(err);
+        });
+      });
+    });
+
+    it('should get the x: 0, y: 4, z: 4 tile without scaling', function(done) {
+      this.timeout(0);
+      var gpr = new GeoPackageTileRetriever(tileDao, 450, 450);
+      gpr.getTile(0, 4, 4, function(err, tile) {
+        testSetup.diffImagesWithDimensions(tile, path.join(__dirname, '..','..','fixtures','tiles','450tile.png'), 450, 450, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
           done(err);
         });
@@ -224,7 +241,13 @@ describe('GeoPackage Tile Retriever tests', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
         gpr.getTile(0, 4, 4, function(err, tile) {
-          testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png'), function (err, imagesAreSame) {
+          var expectedPath;
+          if (typeof(process) !== 'undefined' && process.version) {
+            expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png');
+          } else {
+            expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
+          }
+          testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
             imagesAreSame.should.be.equal(true);
             done(err);
           });

@@ -77,6 +77,10 @@ module.exports.loadTile = function(tilePath, callback) {
 }
 
 module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
+  module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
+};
+
+module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
     fs.writeFileSync('/tmp/gptile.png', actualTile);
     var imageDiff = require('image-diff');
@@ -89,7 +93,7 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
       callback(err, imagesAreSame);
     });
   } else {
-    var actual = imagediff.createCanvas(256, 256);
+    var actual = imagediff.createCanvas(width, height);
     var ctx = actual.getContext('2d');
 
     var image = new Image();
@@ -97,13 +101,14 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
       ctx.drawImage(image, 0, 0);
       module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
         var expectedBase64 = new Buffer(expectedTile).toString('base64');
-        var expected = imagediff.createCanvas(256, 256);
+
+        var expected = imagediff.createCanvas(width, height);
         var ctx2 = expected.getContext('2d');
         var image2 = new Image();
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
-          var diff = imagediff.diff(image, image2);
-          var equal = imagediff.equal(image, image2);
+          var diff = imagediff.diff(actual, expected);
+          var equal = imagediff.equal(actual, expected, 2);
 
           if (!equal) {
             var diffCanvas = imagediff.createCanvas(diff.width, diff.height);

@@ -10125,7 +10125,26 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
             var image = document.createElement('img');
             image.onload = function() {
               var p = chunk.position;
-              this.ctx.drawImage(image, p.tileCropXStart, p.tileCropYStart, (p.tileCropXEnd - p.tileCropXStart), (p.tileCropYEnd - p.tileCropYStart), p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart), (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart));
+              
+              var xPositionOfImageToDrawFrom = p.tileCropXStart;
+              var yPositionOfImageToDrawFrom = p.tileCropYStart;
+              var widthOfImageToDraw = 1 + p.tileCropXEnd - p.tileCropXStart;
+              var heightOfImageToDraw = 1 + p.tileCropYEnd - p.tileCropYStart;
+              var xPositionToPlaceImageInCanvas = p.xPositionInFinalTileStart;
+              var yPositionToPlaceImageInCanvas = p.yPositionInFinalTileStart;
+              var imageWidth = p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart;
+              var imageHeight = p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart;
+
+              this.ctx.drawImage(image,
+                xPositionOfImageToDrawFrom,
+                yPositionOfImageToDrawFrom,
+                widthOfImageToDraw,
+                heightOfImageToDraw,
+                xPositionToPlaceImageInCanvas,
+                yPositionToPlaceImageInCanvas,
+                imageWidth,
+                imageHeight
+              );
               chunkDone();
             }.bind(this);
             image.src = 'data:'+type.mime+';base64,' + base64DataChunk;
