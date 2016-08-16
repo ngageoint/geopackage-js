@@ -16,6 +16,10 @@ describe('GeometryColumns tests', function() {
     });
   });
 
+  afterEach('should close the geopackage', function() {
+    connection.close();
+  });
+
   it('should get the feature tables', function(done) {
     var gcd = new GeometryColumnsDao(connection);
     gcd.getFeatureTables(function(err, tables) {

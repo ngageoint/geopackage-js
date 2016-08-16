@@ -11,6 +11,7 @@ describe('GeoPackageManager tests', function() {
       should.exist(gp);
       should.exist(gp.getDatabase().getDBConnection());
       gp.getPath().should.be.equal(filename);
+      gp.close();
       done();
     });
   });

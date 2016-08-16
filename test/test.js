@@ -1,10 +1,33 @@
 require('chai').should();
-require('../lib/geopackage');
 
+require('./lib/core/contents/testContents');
+require('./lib/core/srs/testSpatialReferenceSystem');
+require('./lib/dataColumns/testDataColumns');
+require('./lib/db/testDataTypes');
+require('./lib/db/testTableCreator');
+require('./lib/features/columns/testGeometryColumns');
+require('./lib/features/user/testFeatureDao');
+require('./lib/features/user/testFeatureTableReader');
+require('./lib/geom/testGeometryData');
+require('./lib/metadata/reference/testMetadataReference.js');
+require('./lib/metadata/testMetadata');
+require('./lib/tiles/testGeopackageTileRetriever');
+require('./lib/tiles/testTileBoundingBoxUtils');
+require('./lib/tiles/testTileDao');
+require('./lib/tiles/testTileGrid');
+require('./lib/tiles/testTileMatrix');
+require('./lib/tiles/testTileMatrixSet');
+require('./lib/user/testUserTableReader');
+require('./lib/validate/testGeoPackageValidate');
+require('./lib/wkb/testWkb');
 require('./lib/testBoundingBox');
 require('./lib/wkb/testWkb');
 require('./lib/testFeatureCreate');
 require('./lib/testGeoPackage');
+require('./lib/testGeoPackageCreate');
+require('./lib/testGeoPackageManager');
+require('./lib/testGeoPackageManagerCreate');
+require('./lib/testTileCreate');
 
 describe('Array', function() {
   describe('#indexOf()', function() {

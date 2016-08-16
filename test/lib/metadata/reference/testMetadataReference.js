@@ -7,21 +7,25 @@ var fs = require('fs')
   , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../../lib/geoPackage')
   , TableCreator = require('../../../../lib/db/tableCreator')
-  , Verification = require('../../../fixtures/verification');
+  , Verification = require('../../../fixtures/verification')
+  , testSetup = require('../../../fixtures/testSetup');
 
 describe('Metadata Reference tests', function() {
-  var testGeoPackage = path.join('/tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
-    fs.unlink(testGeoPackage, function() {
-      fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-      GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-        geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
-        var tc = new TableCreator(geopackage);
-        tc.createRequired(done);
+    testSetup.deleteGeoPackage(testGeoPackage, function() {
+      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+        geopackage = gp;
+        done();
       });
     });
+  });
+
+  afterEach(function(done) {
+    geopackage.close();
+    testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
   it('should create metadata and reference', function(done) {

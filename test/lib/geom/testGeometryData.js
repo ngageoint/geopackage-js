@@ -95,7 +95,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(2);
     var envelope = new Buffer(32);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -117,7 +117,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(4);
     var envelope = new Buffer(48);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -143,7 +143,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(6);
     var envelope = new Buffer(48);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -169,7 +169,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -199,7 +199,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);

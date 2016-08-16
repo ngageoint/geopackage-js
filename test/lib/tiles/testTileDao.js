@@ -26,6 +26,10 @@ describe('TileDao tests', function() {
       });
     });
 
+    afterEach('should close the geopackage', function() {
+      geoPackage.close();
+    });
+
     it('should get the zoom levels', function(done) {
       tileDao.minZoom.should.be.equal(0);
       tileDao.maxZoom.should.be.equal(3);
@@ -85,10 +89,11 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level', function(done) {
-      tileDao.queryForTilesWithZoomLevel(1, function(err, tileRow) {
+      tileDao.queryForTilesWithZoomLevel(1, function(err, tileRow, tileDone) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
+        tileDone();
       }, function(err, count) {
         count.should.be.equal(4);
         done();
@@ -96,10 +101,11 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level descending order', function(done) {
-      tileDao.queryForTilesDescending(1, function(err, tileRow) {
+      tileDao.queryForTilesDescending(1, function(err, tileRow, tileDone) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
+        tileDone();
       }, function(err, count) {
         count.should.be.equal(4);
         done();
@@ -107,11 +113,12 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level and column', function(done) {
-      tileDao.queryForTilesInColumn(1, 1, function(err, tileRow) {
+      tileDao.queryForTilesInColumn(1, 1, function(err, tileRow, tileDone) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileColumn().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
+        tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();
@@ -119,11 +126,12 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level and row', function(done) {
-      tileDao.queryForTilesInRow(1, 1, function(err, tileRow) {
+      tileDao.queryForTilesInRow(1, 1, function(err, tileRow, tileDone) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
+        tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();
@@ -137,11 +145,12 @@ describe('TileDao tests', function() {
         min_y: 0,
         max_y: 0
       };
-      tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow) {
+      tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow, tileDone) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
+        tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();

@@ -23,6 +23,10 @@ describe('Tile Matrix Set tests', function() {
     });
   });
 
+  afterEach('should close the geopackage', function() {
+    geoPackage.close();
+  });
+
   it('should get the tile matrixes', function(done) {
     tileMatrixSetDao.queryForAll(function(err, tileMatrixSets) {
       tileMatrixSets.should.have.property('length', 1);

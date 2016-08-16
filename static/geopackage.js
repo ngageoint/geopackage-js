@@ -1511,6 +1511,10 @@ var GeoPackageConnection = function(filePath, callback) {
   }
 }
 
+GeoPackageConnection.prototype.close = function() {
+  this.adapter.close();
+}
+
 GeoPackageConnection.prototype.export = function(callback) {
   this.adapter.export(callback);
 }
@@ -1611,7 +1615,7 @@ GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
 
 GeoPackageConnection.prototype.setApplicationId = function(callback) {
   var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
-  var applicationId = buff.readUInt32BE();
+  var applicationId = buff.readUInt32BE(0);
   this.adapter.run('PRAGMA application_id = ' + applicationId, callback);
 }
 
@@ -1661,6 +1665,10 @@ module.exports.createAdapterFromDb = function(db) {
 
 function Adapter(db) {
   this.db = db;
+}
+
+Adapter.prototype.close = function() {
+  this.db.close();
 }
 
 Adapter.prototype.export = function(callback) {
@@ -1900,6 +1908,10 @@ function Adapter(db) {
   this.db = db;
 }
 
+Adapter.prototype.close = function() {
+  this.db.close();
+}
+
 Adapter.prototype.getDBConnection = function () {
   return this.db;
 };
@@ -1948,6 +1960,7 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   }
   var statement = this.db.prepare(sql);
   statement.bind(params);
+  var count = 0;
 
   async.whilst(
     function() {
@@ -1956,19 +1969,24 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     function(callback) {
       async.setImmediate(function() {
         var row = statement.getAsObject();
+        count++;
         eachCallback(null, row, callback);
       });
     },
     function() {
       statement.free();
-      doneCallback();
+      doneCallback(null, count);
     }
   );
 };
 
-Adapter.prototype.run = function(sql, callback) {
+Adapter.prototype.run = function(sql, params, callback) {
+  if (callback) {
+    this.db.run(sql, params);
+    return callback();
+  }
   this.db.run(sql);
-  callback();
+  params();
 };
 
 Adapter.prototype.insert = function(sql, params, callback) {
@@ -1991,9 +2009,11 @@ Adapter.prototype.insert = function(sql, params, callback) {
 Adapter.prototype.delete = function(sql, params, callback) {
   var rowsModified = 0;
   try {
+    console.log('sql', sql);
+    console.log('params', params);
     var statement = this.db.prepare(sql, params);
     statement.step();
-    rowsModified = statement.getRowsModified();
+    rowsModified = this.db.getRowsModified();
     statement.free();
   } catch (e) {
     console.trace();
@@ -2004,13 +2024,12 @@ Adapter.prototype.delete = function(sql, params, callback) {
 
 Adapter.prototype.dropTable = function(table, callback) {
   var response = this.db.exec('DROP TABLE IF EXISTS ' + table);
-  console.log('drop table response', response);
-  return callback(err, response);
+  return callback(null, !!response);
 };
 
 Adapter.prototype.count = function (tableName, callback) {
   this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
-    callback(err, result.count);
+    callback(null, result.count);
   });
 };
 
@@ -3730,6 +3749,10 @@ var GeoPackage = function(name, path, connection) {
   this.tableCreator = new TableCreator(this);
 }
 
+GeoPackage.prototype.close = function() {
+  this.connection.close();
+}
+
 GeoPackage.prototype.getDatabase = function() {
   return this.connection;
 }
@@ -3965,8 +3988,6 @@ GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryCo
       contents.srs_id = srsId;
 
       this.getContentsDao().create(contents, function(err, result) {
-        console.log('err', err);
-        console.log('result', result);
         geometryColumns.srs_id = srsId;
         this.getGeometryColumnsDao().create(geometryColumns, callback);
       }.bind(this));
@@ -4036,7 +4057,7 @@ GeoPackage.prototype.createTileTableWithTableName = function(tableName, contents
       contents.table_name = tableName;
       contents.data_type = 'tiles';
       contents.identifier = tableName;
-      contents.last_change = new Date();
+      contents.last_change = new Date().toISOString();
       contents.min_x = contentsBoundingBox.minLongitude;
       contents.min_y = contentsBoundingBox.minLatitude;
       contents.max_x = contentsBoundingBox.maxLongitude;
@@ -4327,6 +4348,7 @@ exports.GEOPACKAGE_GEOMETRY_VERSION_1 = 0;
 exports.SQLITE_HEADER_PREFIX = 'SQLite format 3';
 
 },{}],26:[function(require,module,exports){
+(function (process){
 /**
  * GeoPackage Manager used to create and open GeoPackages
  * @module geoPackageManager
@@ -4384,13 +4406,16 @@ module.exports.create = function(filePath, callback) {
       if (filePath) {
         var error = GeoPackageValidate.validateGeoPackageExtension(filePath);
         if (error) return callback(error);
-
-        fs.stat(filePath, function(err, stats) {
-          if (err || !stats) {
-            callback(err);
-          }
+        if (typeof(process) !== 'undefined' && process.version) {
+          fs.stat(filePath, function(err, stats) {
+            if (err || !stats) {
+              callback(err);
+            }
+            callback(null, filePath);
+          });
+        } else {
           callback(null, filePath);
-        });
+        }
       }
     }, function(filePath, callback) {
       GeoPackageConnection.connect(filePath, function(err, connection) {
@@ -4411,7 +4436,8 @@ module.exports.create = function(filePath, callback) {
   });
 }
 
-},{"./db/geoPackageConnection":10,"./geoPackage":24,"./validate/geoPackageValidate":54,"async":56,"fs":57,"path":258}],27:[function(require,module,exports){
+}).call(this,require('_process'))
+},{"./db/geoPackageConnection":10,"./geoPackage":24,"./validate/geoPackageValidate":54,"_process":259,"async":56,"fs":57,"path":258}],27:[function(require,module,exports){
 (function (Buffer){
 /**
  * GeometryData module.
@@ -4455,7 +4481,7 @@ GeometryData.prototype.fromData = function (buffer) {
   if (buffer instanceof Uint8Array) {
     this.buffer = buffer = new Buffer(buffer);
   }
-
+  console.log('this.buffer', this.buffer);
   var magicString = buffer.toString('ascii', 0, 2);
   if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
     throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
@@ -4473,7 +4499,7 @@ GeometryData.prototype.fromData = function (buffer) {
   this.envelope = this.readEnvelope(envelopeIndicator, buffer);
 
   var offset = this.envelope.offset;
-
+  
   var wkbBuffer = buffer.slice(offset);
   this.geometry = wkx.Geometry.parse(wkbBuffer);
 };
@@ -10845,8 +10871,9 @@ GeoPackageTileRetriever.prototype.hasTile = function (x, y, zoom, callback) {
   var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
   var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
   var tileResults = [];
-  this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, result) {
+  this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, result, done) {
     tileResults.push(result);
+    done();
   }, function(err) {
     if(tileResults && tileResults.length > 0) {
       return callback(err, true);
@@ -11653,10 +11680,10 @@ TileDao.prototype.queryForTilesWithZoomLevel = function (zoomLevel, tileCallback
  * @param  {Function} doneCallback called when all tiles are retrieved
  */
 TileDao.prototype.queryForTilesDescending = function (zoomLevel, tileCallback, doneCallback) {
-  this.queryForEqWithField(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ', DESC', function(err, result) {
+  this.queryForEqWithField(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ', DESC', function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 
@@ -11675,8 +11702,7 @@ TileDao.prototype.queryForTilesInColumn = function (column, zoomLevel, tileCallb
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
-    rowDone();
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 
@@ -11695,8 +11721,7 @@ TileDao.prototype.queryForTilesInRow = function (row, zoomLevel, tileCallback, d
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
-    rowDone();
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 

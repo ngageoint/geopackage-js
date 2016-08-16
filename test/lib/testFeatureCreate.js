@@ -29,6 +29,7 @@ describe('GeoPackage Feature table create tests', function() {
   });
 
   afterEach(function(done) {
+    geopackage.close();
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 

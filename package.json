@@ -39,6 +39,7 @@
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
     "image-diff": "^1.5.1",
+    "imagediff": "^1.0.8",
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",

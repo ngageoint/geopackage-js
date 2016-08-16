@@ -1,6 +1,7 @@
 var GeoPackageManager = require('../../../lib/geoPackageManager')
   , GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
   , BoundingBox = require('../../../lib/boundingBox')
+  , testSetup = require('../../fixtures/testSetup')
   , fs = require('fs')
   , async = require('async')
   , should = require('chai').should()
@@ -28,6 +29,10 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
+    afterEach('should close the geopackage', function() {
+      geoPackage.close();
+    });
+
     it('should get the web mercator bounding box', function(done) {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getWebMercatorBoundingBox(function(err, result) {
@@ -40,23 +45,12 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should get the x: 2, y: 1, z: 2 tile', function(done) {
-      this.timeout(0);
+      this.timeout(30000);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(2,1,2, function(err, tile) {
-        fs.writeFileSync('/tmp/gptile.png', tile);
-        var imageDiff = require('image-diff');
-        imageDiff({
-          actualImage: '/tmp/gptile.png',
-          expectedImage: path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'),
-          diffImage: '/tmp/diff.png',
-        }, function (err, imagesAreSame) {
-          imagesAreSame.should.be.equal(true);
-          fs.unlinkSync('/tmp/gptile.png');
+        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+          equal.should.be.equal(true);
           done();
-          // error will be any errors that occurred
-          // imagesAreSame is a boolean whether the images were the same or not
-          // diffImage will have an image which highlights differences
-          //
         });
       });
     });
@@ -74,21 +68,10 @@ describe('GeoPackage Tile Retriever tests', function() {
         async.eachSeries(tiles, function(xTile, xDone) {
           async.eachSeries(tiles, function(yTile, yDone) {
             gpr.getTile(xTile,yTile,zoom, function(err, tile) {
-              fs.writeFileSync('/tmp/gptile.png', tile);
-              var imageDiff = require('image-diff');
-              imageDiff({
-                actualImage: '/tmp/gptile.png',
-                expectedImage: path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'),
-                diffImage: '/tmp/diff.png',
-              }, function (err, imagesAreSame) {
-                console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', imagesAreSame);
-                imagesAreSame.should.be.equal(true);
-                fs.unlinkSync('/tmp/gptile.png');
+              testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, equal) {
+                console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', equal);
+                equal.should.be.equal(true);
                 yDone();
-                // error will be any errors that occurred
-                // imagesAreSame is a boolean whether the images were the same or not
-                // diffImage will have an image which highlights differences
-                //
               });
             });
           }, xDone);
@@ -144,7 +127,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTileWithWgs84Bounds(wgs84BoundingBox, 2, function(err, tile) {
         should.not.exist(err);
         should.exist(tile);
-        fs.writeFileSync('/tmp/wgs84tile.png', tile);
+        // fs.writeFileSync('/tmp/wgs84tile.png', tile);
         done();
       });
     });
@@ -201,15 +184,8 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
-        fs.writeFileSync('/tmp/imageryTile.png', tile);
-        var imageDiff = require('image-diff');
-        imageDiff({
-          actualImage: '/tmp/imageryTile.png',
-          expectedImage: path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png'),
-          diffImage: '/tmp/diff.png',
-        }, function (err, imagesAreSame) {
+        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png'), function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
-          fs.unlinkSync('/tmp/imageryTile.png');
           done(err);
         });
       });
@@ -247,16 +223,11 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
-        fs.writeFileSync('/tmp/reprojectTile.png', tile);
-        var imageDiff = require('image-diff');
-        imageDiff({
-          actualImage: '/tmp/reprojectTile.png',
-          expectedImage: path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png'),
-          diffImage: '/tmp/diff.png',
-        }, function (err, imagesAreSame) {
-          imagesAreSame.should.be.equal(true);
-          fs.unlinkSync('/tmp/reprojectTile.png');
-          done(err);
+        gpr.getTile(0, 4, 4, function(err, tile) {
+          testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png'), function (err, imagesAreSame) {
+            imagesAreSame.should.be.equal(true);
+            done(err);
+          });
         });
       });
     });

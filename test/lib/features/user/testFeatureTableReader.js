@@ -14,6 +14,10 @@ describe('FeatureTableReader tests', function() {
     });
   });
 
+  afterEach('close the geopackage connection', function() {
+    connection.close();
+  });
+
   it('should read the table', function(done) {
     var reader = new FeatureTableReader('point2d');
     reader.readFeatureTable(connection, function(err, table) {

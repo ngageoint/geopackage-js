@@ -13,22 +13,26 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , wkx = require('wkx')
   , path = require('path')
   , async = require('async')
+  , testSetup = require('../fixtures/testSetup')
   , fs = require('fs');
 
 describe('GeoPackage Tile table create tests', function() {
 
-  var testGeoPackage = path.join('/tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
-    fs.unlink(testGeoPackage, function() {
-      fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-      GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-        geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
-        var tc = new TableCreator(geopackage);
-        tc.createRequired(done);
+    testSetup.deleteGeoPackage(testGeoPackage, function() {
+      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+        geopackage = gp;
+        done();
       });
     });
+  });
+
+  afterEach(function(done) {
+    geopackage.close();
+    testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
   it('should create a tile table', function(done) {
@@ -106,9 +110,10 @@ describe('GeoPackage Tile table create tests', function() {
           }
           async.eachSeries(tiles, function(xTile, xDone) {
             async.eachSeries(tiles, function(yTile, yDone) {
-              var image = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'));
-              geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
-                yDone();
+              testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
+                geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
+                  yDone();
+                });
               });
             }, xDone);
           }, zoomDone);
@@ -130,6 +135,7 @@ describe('GeoPackage Tile table create tests', function() {
     var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
 
     beforeEach(function(done) {
+      this.timeout(5000);
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
@@ -151,15 +157,18 @@ describe('GeoPackage Tile table create tests', function() {
                     }
                     async.eachSeries(tiles, function(xTile, xDone) {
                       async.eachSeries(tiles, function(yTile, yDone) {
-                        var image = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'));
-                        geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
-                          yDone();
+                        testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
+                          console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
+                          geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
+                            yDone();
+                          });
                         });
                       }, xDone);
                     }, zoomDone);
                   }, function(err) {
                     geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
                       tileDao.getCount(function(err, result) {
+                        console.log('result', result);
                         result.should.be.equal(85);
                         done(err);
                       });

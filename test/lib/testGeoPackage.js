@@ -34,6 +34,7 @@ describe('GeoPackage tests', function() {
            'geomcollection3d',
            'geometry3d'
         ]);
+        connection.close();
         done();
       });
     });
@@ -48,6 +49,7 @@ describe('GeoPackage tests', function() {
           var geometry = currentRow.getGeometry();
           rowDone();
         }, function(err) {
+          connection.close();
           done();
         });
       });
@@ -79,6 +81,7 @@ describe('GeoPackage tests', function() {
             });
           });
         }, function(err) {
+          connection.close();
           done(err);
         });
       });
@@ -95,6 +98,7 @@ describe('GeoPackage tests', function() {
         tables.should.have.members([
            'TILESosmds'
         ]);
+        connection.close();
         done();
       });
     });
@@ -107,6 +111,7 @@ describe('GeoPackage tests', function() {
         should.not.exist(err);
         should.exist(srs);
         srs.srs_id.should.be.equal(3857);
+        connection.close();
         done();
       });
     });
@@ -121,6 +126,7 @@ describe('GeoPackage tests', function() {
           should.not.exist(err);
           should.exist(featureDao);
           featureDao.table_name.should.be.equal('FEATURESriversds');
+          connection.close();
           done();
         });
       });
@@ -136,6 +142,7 @@ describe('GeoPackage tests', function() {
           should.not.exist(err);
           should.exist(tileDao);
           tileDao.table_name.should.be.equal('TILESosmds');
+          connection.close();
           done();
         });
       });
@@ -159,6 +166,7 @@ describe('GeoPackage tests', function() {
             });
           });
         }, function(err) {
+          connection.close();
           done(err);
         });
       });
@@ -173,6 +181,7 @@ describe('GeoPackage tests', function() {
         geoPackage.getInfoForTable(dao, function(err, info) {
           should.not.exist(err);
           should.exist(info);
+          connection.close();
           done(err);
         });
       });
@@ -187,6 +196,7 @@ describe('GeoPackage tests', function() {
           should.not.exist(err);
           should.exist(info);
           info.srs.id.should.be.equal(3857);
+          connection.close();
           done(err);
         });
       });

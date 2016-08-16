@@ -23,6 +23,10 @@ describe('Contents tests', function() {
     });
   });
 
+  afterEach('should close the geopackage', function(){
+    geoPackage.close();
+  });
+
   it('should get the contents', function(done) {
     contentsDao.queryForAll(function(err, contents) {
       should.exist(contents);
