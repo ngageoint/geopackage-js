@@ -2009,8 +2009,6 @@ Adapter.prototype.insert = function(sql, params, callback) {
 Adapter.prototype.delete = function(sql, params, callback) {
   var rowsModified = 0;
   try {
-    console.log('sql', sql);
-    console.log('params', params);
     var statement = this.db.prepare(sql, params);
     statement.step();
     rowsModified = this.db.getRowsModified();
@@ -2127,7 +2125,6 @@ TableCreator.prototype.createTable = function(tableName, callback) {
 }
 
 TableCreator.prototype.createUserTable = function (userTable, callback) {
-  console.log('userTable', userTable);
   var connection = this.geopackage.getDatabase();
   connection.tableExists(userTable.table_name, function(err, result) {
     if(err || result) {
@@ -3654,8 +3651,6 @@ FeatureTableReader.prototype.createColumnWithResults = function (results, index,
   }
   var defaultValue = undefined;
   if (defaultValueIndex) {
-    // console.log('default value index', defaultValueIndex);
-    // console.log('result', results);
   }
   var column = new FeatureColumn(index, name, dataType, max, notNull, defaultValue, primaryKey, geometryType);
 
@@ -4481,7 +4476,6 @@ GeometryData.prototype.fromData = function (buffer) {
   if (buffer instanceof Uint8Array) {
     this.buffer = buffer = new Buffer(buffer);
   }
-  console.log('this.buffer', this.buffer);
   var magicString = buffer.toString('ascii', 0, 2);
   if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
     throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
@@ -4499,7 +4493,7 @@ GeometryData.prototype.fromData = function (buffer) {
   this.envelope = this.readEnvelope(envelopeIndicator, buffer);
 
   var offset = this.envelope.offset;
-  
+
   var wkbBuffer = buffer.slice(offset);
   this.geometry = wkx.Geometry.parse(wkbBuffer);
 };

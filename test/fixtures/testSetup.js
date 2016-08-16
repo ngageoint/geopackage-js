@@ -124,15 +124,15 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             }
             var div = document.createElement('div');
             var span1 = document.createElement('span');
-            span1.style.width = '256px';
+            span1.style.width = width + 'px';
             span1.style.display = 'inline-block';
             span1.innerHTML = 'Actual';
             var span2 = document.createElement('span');
-            span2.style.width = '256px';
+            span2.style.width = width + 'px';
             span2.style.display = 'inline-block';
             span2.innerHTML = 'Expected';
             var span3 = document.createElement('span');
-            span3.style.width = '256px';
+            span3.style.width = width + 'px';
             span3.style.display = 'inline-block';
             span3.innerHTML = 'Diff';
 

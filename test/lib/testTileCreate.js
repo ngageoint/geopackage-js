@@ -168,7 +168,6 @@ describe('GeoPackage Tile table create tests', function() {
                   }, function(err) {
                     geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
                       tileDao.getCount(function(err, result) {
-                        console.log('result', result);
                         result.should.be.equal(85);
                         done(err);
                       });
