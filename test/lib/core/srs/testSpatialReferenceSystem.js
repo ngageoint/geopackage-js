@@ -19,6 +19,10 @@ describe('SpatialReferenceSystem tests', function() {
     });
   });
 
+  afterEach('should close the geopackage', function(){
+    geoPackage.close();
+  });
+
   it('should get the 4326 SRS', function(done) {
     geoPackage.getSpatialReferenceSystemDao().getBySrsId(4326, function(err, srs) {
       should.exist(srs);

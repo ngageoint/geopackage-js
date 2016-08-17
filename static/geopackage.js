@@ -691,7 +691,8 @@ ColumnValues.prototype.getValue = function (column) {
  * @module dao/dao
  */
 
-var sqliteQueryBuilder = require('../db/sqliteQueryBuilder');
+var sqliteQueryBuilder = require('../db/sqliteQueryBuilder')
+  , ColumnValues = require('./columnValues');
 
 /** @class Dao */
 var Dao = function(connection) {
@@ -741,7 +742,7 @@ Dao.prototype.queryForSameId = function (object, callback) {
 Dao.prototype.getMultiId = function (object) {
   var idValues = [];
   for (var i = 0; i < this.idColumns.length; i++) {
-    idValues.push(this[this.idColumns[i]]);
+    idValues.push(object[this.idColumns[i]]);
   }
   return idValues;
 };
@@ -816,7 +817,7 @@ Dao.prototype.buildPkWhereWithValues = function (idValuesArray) {
 Dao.prototype.buildPkWhereArgsWithValues = function (idValuesArray) {
   var values = [];
   for (var i = 0; i < idValuesArray.length; i++) {
-    values.push(this.buildWhereArgsWithValue(idValuesArray[i]));
+    values = values.concat(this.buildWhereArgsWithValue(idValuesArray[i]));
   }
   return values;
 };
@@ -935,14 +936,60 @@ Dao.prototype.maxOfColumn = function (column, where, whereArgs, callback) {
   this.connection.maxOfColumn(this.gpkgTableName, column, where, whereArgs, callback);
 };
 
+Dao.prototype.delete = function(object, callback) {
+  if (object.getId) {
+    return this.deleteById(object.getId(), callback);
+  }
+  this.deleteByMultiId(this.getMultiId(object), callback);
+};
+
+Dao.prototype.deleteById = function(idValue, callback) {
+  var where = this.buildPkWhereWithValue(idValue);
+  var whereArgs = this.buildPkWhereArgsWithValue(idValue);
+
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteByMultiId = function(idValues, callback) {
+  var where = this.buildPkWhereWithValues(idValues);
+  var whereArgs = this.buildPkWhereArgsWithValues(idValues);
+
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteWhere = function(where, whereArgs, callback) {
+  this.connection.delete(this.gpkgTableName, where, whereArgs, callback);
+};
+
+Dao.prototype.deleteAll = function(callback) {
+  this.connection.delete(this.gpkgTableName, null, null, callback);
+};
+
 Dao.prototype.create = function(object, callback) {
   var sql = sqliteQueryBuilder.buildInsert(this.gpkgTableName, object);
   var insertObject = {};
-  for (var key in object) {
-    insertObject['$' + key] = object[key];
+  if (object.getColumnNames) {
+    var columnNames = object.getColumnNames();
+    for (var i = 0; i < columnNames.length; i++) {
+      insertObject['$'+columnNames[i]] = object.toDatabaseValue(columnNames[i]);
+    }
+  } else {
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        if (object.toDatabaseValue) {
+          insertObject['$' + key] = object.toDatabaseValue(key);
+        } else {
+          insertObject['$' + key] = object[key];
+        }
+      }
+    }
   }
   this.connection.insert(sql, insertObject, callback);
-}
+};
+
+Dao.prototype.dropTable = function(callback) {
+  this.connection.dropTable(this.gpkgTableName, callback);
+};
 
 /**
  * The Dao
@@ -956,7 +1003,7 @@ module.exports = Dao;
  * @param {Error} null if no error, otherwise describes the error
  */
 
-},{"../db/sqliteQueryBuilder":12}],7:[function(require,module,exports){
+},{"../db/sqliteQueryBuilder":12,"./columnValues":5}],7:[function(require,module,exports){
 /**
  * DataColumnConstraints module.
  * @module dataColumnConstraints
@@ -1464,6 +1511,14 @@ var GeoPackageConnection = function(filePath, callback) {
   }
 }
 
+GeoPackageConnection.prototype.close = function() {
+  this.adapter.close();
+}
+
+GeoPackageConnection.prototype.export = function(callback) {
+  this.adapter.export(callback);
+}
+
 GeoPackageConnection.prototype.getDBConnection = function () {
   return this.adapter.db;
 };
@@ -1540,13 +1595,27 @@ GeoPackageConnection.prototype.insert = function (sql, params, callback) {
   this.adapter.insert(sql, params, callback);
 };
 
+GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs, callback) {
+  var deleteStatement = 'DELETE FROM ' + tableName;
+
+  if (where) {
+    deleteStatement += ' WHERE ' + where;
+  }
+
+  this.adapter.delete(deleteStatement, whereArgs, callback);
+};
+
+GeoPackageConnection.prototype.dropTable = function(tableName, callback) {
+  this.adapter.dropTable(tableName, callback);
+};
+
 GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
   this.adapter.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [tableName], callback);
 };
 
 GeoPackageConnection.prototype.setApplicationId = function(callback) {
   var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
-  var applicationId = buff.readUInt32BE();
+  var applicationId = buff.readUInt32BE(0);
   this.adapter.run('PRAGMA application_id = ' + applicationId, callback);
 }
 
@@ -1574,10 +1643,12 @@ GeoPackageConnection.connectWithDatabase = function(db, callback) {
 
 }).call(this,require('_process'),require("buffer").Buffer)
 },{"../geoPackageConstants":25,"./sqliteAdapter":11,"./sqljsAdapter":13,"_process":259,"buffer":59}],11:[function(require,module,exports){
-var async = require('async');
+var async = require('async')
+  , fs = require('fs');
 
 module.exports.createAdapter = function(filePath, callback) {
   var sqlite3 = require('sqlite3').verbose();
+  this.filePath = filePath;
   var db = new sqlite3.Database(filePath, function(err) {
     if (err) {
       console.log('cannot open ' + filePath);
@@ -1596,6 +1667,14 @@ function Adapter(db) {
   this.db = db;
 }
 
+Adapter.prototype.close = function() {
+  this.db.close();
+}
+
+Adapter.prototype.export = function(callback) {
+  fs.readFile(filePath, callback);
+}
+
 Adapter.prototype.getDBConnection = function () {
   return this.db;
 };
@@ -1612,8 +1691,11 @@ Adapter.prototype.all = function (sql, params, callback) {
   this.db.all.apply(this.db, arguments);
 };
 
-Adapter.prototype.run = function(sql, callback) {
-  this.db.run(sql, callback);
+Adapter.prototype.run = function(sql, params, callback) {
+  if (callback) {
+    return this.db.run(sql, params, callback);
+  }
+  this.db.run(sql, params);
 }
 
 Adapter.prototype.insert = function(sql, params, callback) {
@@ -1621,7 +1703,13 @@ Adapter.prototype.insert = function(sql, params, callback) {
     if(err) return callback(err);
     return callback(err, this.lastID);
   });
-}
+};
+
+Adapter.prototype.delete = function(sql, params, callback) {
+  this.db.run(sql, params, function(err) {
+    callback(err, this.changes);
+  });
+};
 
 Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   if (eachCallback) {
@@ -1632,13 +1720,20 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   this.db.each(sql, params, rowCallback, doneCallback);
 };
 
+Adapter.prototype.dropTable = function(table, callback) {
+  this.db.run('DROP TABLE IF EXISTS ' + table, function(err) {
+    if(err) return callback(err);
+    return callback(err, !!this.changes);
+  });
+};
+
 Adapter.prototype.count = function (tableName, callback) {
   this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
     callback(err, result.count);
   });
 };
 
-},{"async":56,"sqlite3":undefined}],12:[function(require,module,exports){
+},{"async":56,"fs":57,"sqlite3":undefined}],12:[function(require,module,exports){
 /**
  * SQLite query builder module.
  * @module db/sqliteQueryBuilder
@@ -1678,11 +1773,37 @@ module.exports.buildCount = function(tables, where) {
 }
 
 module.exports.buildInsert = function(table, object) {
+  if (object.getColumnNames) {
+    return module.exports.buildInsertFromColumnNames(table, object);
+  }
   var insert = 'insert into ' + table + '(';
   var keys = '';
   var values = '';
   var first = true;
   for (var key in object) {
+    if (object.hasOwnProperty(key)) {
+      if (!first) {
+        keys += ',';
+        values += ',';
+      }
+      first = false;
+      keys += key;
+      values += '$' + key;
+    }
+  }
+
+  insert += keys + ') values (' + values + ')';
+  return insert;
+}
+
+module.exports.buildInsertFromColumnNames = function(table, object) {
+  var insert = 'insert into ' + table + '(';
+  var keys = '';
+  var values = '';
+  var first = true;
+  var columnNames = object.getColumnNames();
+  for (var i = 0; i < columnNames.length; i++) {
+    var key = columnNames[i];
     if (!first) {
       keys += ',';
       values += ',';
@@ -1747,14 +1868,36 @@ function isEmpty(string) {
 },{}],13:[function(require,module,exports){
 var async = require('async');
 
+var sqljs = require('sql.js');
+
 module.exports.createAdapter = function(filePath, callback) {
-  var fs = require('fs');
-  var sqljs = require('sql.js');
-  fs.readFile(filePath, function(err, fileBuffer) {
-    var db = new sqljs.Database(fileBuffer);
+  if (filePath) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', filePath, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onload = function(e) {
+      if (xhr.status !== 200) {
+        var db = new sqljs.Database();
+        var adapter = new Adapter(db);
+        return callback(null, adapter);
+      }
+      var uInt8Array = new Uint8Array(this.response);
+      var db = new sqljs.Database(uInt8Array);
+      var adapter = new Adapter(db);
+      callback(null, adapter);
+    };
+    xhr.onerror = function(e) {
+      var db = new sqljs.Database();
+      var adapter = new Adapter(db);
+      return callback(null, adapter);
+    };
+    xhr.send();
+  } else {
+    var db = new sqljs.Database();
     var adapter = new Adapter(db);
-    callback(err, adapter);
-  });
+    callback(null, adapter);
+  }
 }
 
 module.exports.createAdapterFromDb = function(db) {
@@ -1765,9 +1908,17 @@ function Adapter(db) {
   this.db = db;
 }
 
+Adapter.prototype.close = function() {
+  this.db.close();
+}
+
 Adapter.prototype.getDBConnection = function () {
   return this.db;
 };
+
+Adapter.prototype.export = function(callback) {
+  callback(null, this.db.export());
+}
 
 Adapter.prototype.get = function (sql, params, callback) {
   if (typeof params === 'function') {
@@ -1809,6 +1960,7 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
   }
   var statement = this.db.prepare(sql);
   statement.bind(params);
+  var count = 0;
 
   async.whilst(
     function() {
@@ -1817,33 +1969,69 @@ Adapter.prototype.each = function (sql, params, eachCallback, doneCallback) {
     function(callback) {
       async.setImmediate(function() {
         var row = statement.getAsObject();
+        count++;
         eachCallback(null, row, callback);
       });
     },
     function() {
       statement.free();
-      doneCallback();
+      doneCallback(null, count);
     }
   );
 };
 
-Adapter.prototype.run = function(sql, callback) {
+Adapter.prototype.run = function(sql, params, callback) {
+  if (callback) {
+    this.db.run(sql, params);
+    return callback();
+  }
   this.db.run(sql);
-  callback();
-}
+  params();
+};
 
 Adapter.prototype.insert = function(sql, params, callback) {
-  var response = this.db.exec(sql, params);
-  console.log('response', response);
-}
+  try {
+    var statement = this.db.prepare(sql, params);
+    statement.step();
+  } catch (e) {
+    console.trace();
+    return callback(e);
+  }
+  statement.free();
+  var lastId = this.db.exec('select last_insert_rowid();');
+  if (lastId) {
+    return callback(null, lastId[0].values[0][0]);
+  } else {
+    return callback();
+  }
+};
+
+Adapter.prototype.delete = function(sql, params, callback) {
+  var rowsModified = 0;
+  try {
+    var statement = this.db.prepare(sql, params);
+    statement.step();
+    rowsModified = this.db.getRowsModified();
+    statement.free();
+  } catch (e) {
+    console.trace();
+    return callback(e);
+  }
+  return callback(null, rowsModified);
+};
+
+Adapter.prototype.dropTable = function(table, callback) {
+  var response = this.db.exec('DROP TABLE IF EXISTS ' + table);
+  return callback(null, !!response);
+};
 
 Adapter.prototype.count = function (tableName, callback) {
   this.get('SELECT COUNT(*) as count FROM ' + tableName, function(err, result) {
-    callback(err, result.count);
+    callback(null, result.count);
   });
 };
 
-},{"async":56,"fs":57,"sql.js":350}],14:[function(require,module,exports){
+},{"async":56,"sql.js":350}],14:[function(require,module,exports){
 var async = require('async');
 
 var SpatialReferenceSystemDao = require('../core/srs').SpatialReferenceSystemDao
@@ -1866,9 +2054,9 @@ TableCreator.prototype.createRequired = function (callback) {
     this.createContents.bind(this),
 
     // Create the required Spatial Reference Systems (spec Requirement 11)
+    dao.createUndefinedGeographic.bind(dao),
     dao.createWgs84.bind(dao),
-  	dao.createUndefinedCartesian.bind(dao),
-  	dao.createUndefinedGeographic.bind(dao)
+  	dao.createUndefinedCartesian.bind(dao)
   ], function(err, results) {
     if (err) {
       return callback(new Error("Error creating default required tables " + err.message));
@@ -1942,6 +2130,8 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
     if(err || result) {
       return callback(new Error('Table already exists and cannot be created: ' + userTable.table_name));
     }
+    var check = '';
+
     var sql = 'create table ' + userTable.table_name + ' (';
     for (var i = 0; i < userTable.columns.length; i++) {
       var tc = userTable.columns[i];
@@ -1951,12 +2141,23 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
       sql += '\n' + tc.name + ' ' + DataTypes.name(tc.dataType);
       if (tc.max != null) {
         sql += '(' + tc.max + ')';
+        if (check.length) {
+          check += ' AND\n';
+        }
+        check += '\tlength("'+tc.name+'") <= ' + tc.max;
       }
       if (tc.notNull) {
         sql += ' not null'
       }
       if (tc.primaryKey) {
         sql += ' primary key autoincrement';
+      }
+      if (tc.defaultValue) {
+        if (tc.dataType === DataTypes.GPKGDataType.GPKG_DT_TEXT) {
+          sql += ' default \'' + tc.defaultValue + '\'';
+        } else {
+          sql += ' default ' + tc.defaultValue;
+        }
       }
     }
 
@@ -1971,6 +2172,10 @@ TableCreator.prototype.createUserTable = function (userTable, callback) {
         sql += uniqueColumn.name;
       }
       sql += ')';
+    }
+
+    if (check.length) {
+      sql += '\nCHECK(\n' + check + '\n)';
     }
 
     sql += '\n);';
@@ -2346,10 +2551,9 @@ var tableCreationScripts = {
     "FOR EACH ROW BEGIN "+
     "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
     "violates constraint: timestamp must be a valid time in ISO 8601 "+
-    "\"yyyy-mm-ddThh-mm-ss.cccZ\" form') "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
     "WHERE NOT (NEW.timestamp GLOB "+
-    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[1-3][0-9]T[0-2][0-9]:[0-5][0- "+
-    "9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
     "AND strftime('%s',NEW.timestamp) NOT NULL); "+
     "END",
 
@@ -2358,10 +2562,9 @@ var tableCreationScripts = {
     "FOR EACH ROW BEGIN "+
     "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
     "violates constraint: timestamp must be a valid time in ISO 8601 "+
-    "\"yyyy-mm-ddThh-mm-ss.cccZ\" form') "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
     "WHERE NOT (NEW.timestamp GLOB "+
-    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[1-3][0-9]T[0-2][0-9]:[0-5][0- "+
-    "9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
     "AND strftime('%s',NEW.timestamp) NOT NULL); "+
     "END "
   ],
@@ -3330,6 +3533,16 @@ FeatureRow.prototype.toObjectValue = function (index, value) {
   return objectValue;
 };
 
+FeatureRow.prototype.toDatabaseValue = function(columnName) {
+  var column = this.getColumnWithColumnName(columnName);
+  var value = this.getValueWithColumnName(columnName);
+  if (column.isGeometry()) {
+    return value.toData();
+  }
+
+  return value;
+}
+
 module.exports = FeatureRow;
 
 },{"../../geom/geometryData":27,"../../user/UserRow":49,"./featureColumn":19,"util":277}],22:[function(require,module,exports){
@@ -3438,8 +3651,6 @@ FeatureTableReader.prototype.createColumnWithResults = function (results, index,
   }
   var defaultValue = undefined;
   if (defaultValueIndex) {
-    // console.log('default value index', defaultValueIndex);
-    // console.log('result', results);
   }
   var column = new FeatureColumn(index, name, dataType, max, notNull, defaultValue, primaryKey, geometryType);
 
@@ -3498,6 +3709,8 @@ var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
   , TileMatrix = require('./tiles/matrix').TileMatrix
   , TileTableReader = require('./tiles/user/tileTableReader')
   , TileDao = require('./tiles/user/tileDao')
+  , TileTable = require('./tiles/user/tileTable')
+  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , TableCreator = require('./db/tableCreator')
   , UserTable = require('./user/userTable')
   , FeatureTable = require('./features/user/featureTable')
@@ -3510,7 +3723,976 @@ var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
   , GeometryIndexDao = require('./extension/index/geometryIndex').GeometryIndexDao;
 
 var async = require('async')
-  , proj4 = require('proj4');
+  , proj4 = require('proj4')
+  , toArray = require('stream-to-array');
+
+var defs = require('./proj4Defs');
+for (var name in defs) {
+  if (defs[name]) {
+    proj4.defs(name, defs[name]);
+  }
+}
+
+/**
+ * GeoPackage database
+ * @class GeoPackage
+ */
+var GeoPackage = function(name, path, connection) {
+  this.name = name;
+  this.path = path;
+  this.connection = connection;
+  this.tableCreator = new TableCreator(this);
+}
+
+GeoPackage.prototype.close = function() {
+  this.connection.close();
+}
+
+GeoPackage.prototype.getDatabase = function() {
+  return this.connection;
+}
+
+GeoPackage.prototype.getPath = function() {
+  return this.path;
+}
+
+GeoPackage.prototype.export = function(callback) {
+  this.connection.export(callback);
+}
+
+/**
+ * Get the GeoPackage name
+ * @return {String} the GeoPackage name
+ */
+GeoPackage.prototype.getName = function() {
+  return this.name;
+}
+
+GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
+  return new SpatialReferenceSystemDao(this.connection);
+}
+
+GeoPackage.prototype.getContentsDao = function() {
+  return new ContentsDao(this.connection);
+}
+
+GeoPackage.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+
+GeoPackage.prototype.getTileMatrixDao = function() {
+  return new TileMatrixDao(this.connection);
+}
+
+GeoPackage.prototype.getDataColumnsDao = function() {
+  return new DataColumnsDao(this.connection);
+}
+
+GeoPackage.prototype.getExtensionDao = function() {
+  return new ExtensionDao(this.connection);
+}
+
+GeoPackage.prototype.getTableIndexDao = function() {
+  return new TableIndexDao(this.connection);
+}
+
+GeoPackage.prototype.getGeometryIndexDao = function() {
+  return new GeometryIndexDao(this.connection);
+}
+
+GeoPackage.prototype.createDao = function () {
+
+};
+
+GeoPackage.prototype.getSrs = function(srsId, callback) {
+  var dao = this.getSpatialReferenceSystemDao();
+  dao.queryForIdObject(srsId, callback);
+}
+
+GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
+  var tileMatrices = [];
+  var tileMatrixDao = this.getTileMatrixDao();
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+    async.eachSeries(results, function(result, callback) {
+      var tm = new TileMatrix();
+      tileMatrixDao.populateObjectFromResult(tm, result);
+      tileMatrices.push(tm);
+      callback();
+    }, function(err) {
+      var tableReader = new TileTableReader(tileMatrixSet);
+      tableReader.readTileTable(this.connection, function(err, tileTable) {
+        new TileDao(this.connection, tileTable, tileMatrixSet, tileMatrices, function(err, tileDao){
+          callback(err, tileDao);
+        });
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getTileMatrixSet(contents, function(err, columns) {
+    this.getTileDaoWithTileMatrixSet(columns, callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
+    if (results.length > 1) {
+      return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));
+    } else if (results.length === 0) {
+      return callback(new Error('No Tile Matrix found for table name: ' + tableName));
+    }
+    var tileMatrixSet = new TileMatrixSet();
+    tms.populateObjectFromResult(tileMatrixSet, results[0]);
+    this.getTileDaoWithTileMatrixSet(tileMatrixSet, callback);
+  }.bind(this));
+};
+
+/**
+ *  Get the tile tables
+ *  @param {callback} callback called with an error if one occurred and the array of {TileTable} names
+ */
+GeoPackage.prototype.getTileTables = function (callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    tms.getTileTables(callback);
+  });
+};
+
+/**
+ *  Get the feature tables
+ *  @param {callback} callback called with an error if one occurred and the array of {FeatureTable} names
+ */
+GeoPackage.prototype.getFeatureTables = function (callback) {
+  var gcd = this.getGeometryColumnsDao();
+  gcd.isTableExists(function(err, exists) {
+    if (!exists) {
+      return callback(null, []);
+    }
+    gcd.getFeatureTables(callback);
+  });
+};
+
+GeoPackage.prototype.getGeometryColumnsDao = function () {
+  return new GeometryColumnsDao(this.connection);
+};
+
+GeoPackage.prototype.getDataColumnConstraintsDao = function () {
+  return new DataColumnConstraintsDao(this.connection);
+};
+
+GeoPackage.prototype.getMetadataReferenceDao = function () {
+  return new MetadataReferenceDao(this.connection);
+};
+
+GeoPackage.prototype.getMetadataDao = function () {
+  return new MetadataDao(this.connection);
+};
+
+/**
+ *  Get a Feature DAO from Geometry Columns
+ *
+ *  @param {GeometryColumns} geometryColumns Geometry Columns
+ *  @param {callback} callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns = function (geometryColumns, callback) {
+  if (!geometryColumns) {
+    return callback(new Error('Non null Geometry Columns is required to create Feature DAO'));
+  }
+
+  var tableReader = new FeatureTableReader(geometryColumns);
+  var featureTable = tableReader.readFeatureTable(this.connection, function(err, featureTable) {
+    if (err) {
+      return callback(err);
+    }
+    var dao = new FeatureDao(this.connection, featureTable, geometryColumns, this.metadataDb);
+
+    callback(null, dao);
+  }.bind(this));
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {Contents}   contents Contents
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getGeometryColumns(contents, function(err, columns) {
+    this.getFeatureDaoWithGeometryColumns(columns, callback);
+  }.bind(this));
+};
+
+/**
+ * Get a Feature DAO from Contents
+ * @param  {string}   tableName table name
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback) {
+  var self = this;
+  var dao = this.getGeometryColumnsDao();
+  var geometryColumns = dao.queryForTableName(tableName, function(err, geometryColumns) {
+    if (!geometryColumns) {
+      return callback(new Error('No Feature Table exists for table name: ' + tableName));
+    }
+    self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
+  });
+};
+
+/**
+ * Create the Geometry Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createGeometryColumnsTable = function (callback) {
+  var dao = this.getGeometryColumnsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createGeometryColumns(callback);
+  }.bind(this));
+};
+
+/**
+ * Create a new feature table
+ * @param  {FeatureTable}   featureTable    feature table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createFeatureTable = function(featureTable, callback) {
+  this.tableCreator.createUserTable(featureTable, callback);
+};
+
+GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryColumns, boundingBox, srsId, columns, callback) {
+  this.createGeometryColumnsTable(function(err, result) {
+    var featureTable = new FeatureTable(geometryColumns.table_name, columns);
+    this.createFeatureTable(featureTable, function(err, result) {
+      var contents = new Contents();
+      contents.table_name = geometryColumns.table_name;
+      contents.data_type = 'features';
+      contents.identifier = geometryColumns.table_name;
+      contents.last_change = new Date().toISOString();
+      contents.min_x = boundingBox.minLongitude;
+      contents.min_y = boundingBox.minLatitude;
+      contents.max_x = boundingBox.maxLongitude;
+      contents.max_y = boundingBox.maxLatitude;
+      contents.srs_id = srsId;
+
+      this.getContentsDao().create(contents, function(err, result) {
+        geometryColumns.srs_id = srsId;
+        this.getGeometryColumnsDao().create(geometryColumns, callback);
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+
+/**
+ * Create the Tile Matrix Set table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixSetTable = function(callback) {
+  var dao = this.getTileMatrixSetDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTileMatrixSet(callback);
+  }.bind(this));
+}
+
+/**
+ * Create the Tile Matrix table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixTable = function(callback) {
+  var dao = this.getTileMatrixDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTileMatrix(callback);
+  }.bind(this));
+};
+
+/**
+ * Create a new tile table
+ * @param  {TileTable}   tileTable    tile table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTable = function(tileTable, callback) {
+  this.tableCreator.createUserTable(tileTable, callback);
+};
+
+/**
+ * Create a new tile table
+ * @param  {String}   tableName    tile table name
+ * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
+ * @param  {Number} contentsSrsId srs id of the contents table
+ * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
+ * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+  var tileMatrixSet;
+
+  async.series([
+    this.createTileMatrixSetTable.bind(this),
+    this.createTileMatrixTable.bind(this),
+    function(callback) {
+      var columns = TileTable.createRequiredColumns();
+      var tileTable = new TileTable(tableName, columns);
+      this.createTileTable(tileTable, callback);
+    }.bind(this),
+    function(callback) {
+      var contents = new Contents();
+      contents.table_name = tableName;
+      contents.data_type = 'tiles';
+      contents.identifier = tableName;
+      contents.last_change = new Date().toISOString();
+      contents.min_x = contentsBoundingBox.minLongitude;
+      contents.min_y = contentsBoundingBox.minLatitude;
+      contents.max_x = contentsBoundingBox.maxLongitude;
+      contents.max_y = contentsBoundingBox.maxLatitude;
+      contents.srs_id = contentsSrsId;
+
+      tileMatrixSet = new TileMatrixSet();
+      tileMatrixSet.setContents(contents);
+      tileMatrixSet.srs_id = tileMatrixSetSrsId;
+      tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
+      tileMatrixSet.min_y = tileMatrixSetBoundingBox.minLatitude;
+      tileMatrixSet.max_x = tileMatrixSetBoundingBox.maxLongitude;
+      tileMatrixSet.max_y = tileMatrixSetBoundingBox.maxLatitude;
+      this.getContentsDao().create(contents, function(err, result) {
+        this.getTileMatrixSetDao().create(tileMatrixSet, callback);
+      }.bind(this));
+    }.bind(this)
+  ], function(err, results) {
+    callback(err, tileMatrixSet);
+  });
+};
+
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, callback) {
+  var tileMatrixDao = this.getTileMatrixDao();
+
+  var zoom = minZoom;
+
+  async.whilst(
+    function() {
+      return zoom <= maxZoom;
+    },
+    function(callback) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      var matrixWidth = (box.maxX - box.minX) + 1;
+      var matrixHeight = (box.maxY - box.minY) + 1;
+
+      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
+      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+
+      var tileMatrix = new TileMatrix();
+      tileMatrix.table_name = tileMatrixSet.table_name;
+      tileMatrix.zoom_level = zoom;
+      tileMatrix.matrix_width = matrixWidth;
+      tileMatrix.matrix_height = matrixHeight;
+      tileMatrix.tile_width = 256;
+      tileMatrix.tile_height = 256;
+      tileMatrix.pixel_x_size = pixelXSize;
+      tileMatrix.pixel_y_size = pixelYSize;
+
+      zoom++;
+
+      tileMatrixDao.create(tileMatrix, callback);
+    },
+    callback
+  )
+};
+
+GeoPackage.prototype.addTile = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
+  this.getTileDaoWithTableName(tableName, function(err, tileDao) {
+    var newRow = tileDao.newRow();
+    newRow.setZoomLevel(zoom);
+    newRow.setTileColumn(tileColumn);
+    newRow.setTileRow(tileRow);
+    newRow.setTileData(tileStream);
+    tileDao.create(newRow, callback);
+  });
+};
+
+/**
+ * Create the Data Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumns = function(callback) {
+  var dao = this.getDataColumnsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createDataColumns(callback);
+  }.bind(this));
+};
+
+/**
+ * Create the Data Column Constraints table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumnConstraintsTable = function (callback) {
+  var dao = this.getDataColumnConstraintsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createDataColumnConstraints(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createMetadataTable = function (callback) {
+  var dao = this.getMetadataDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createMetadata(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createMetadataReferenceTable = function (callback) {
+  var dao = this.getMetadataReferenceDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createMetadataReference(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createExtensionTable = function (callback) {
+  var dao = this.getExtensionDao()
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createExtensions(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createTableIndexTable = function (callback) {
+  var dao = this.getTableIndexDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createTableIndex(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createGeometryIndexTable = function(callback) {
+  var dao = this.getGeometryIndexDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createGeometryIndex(callback);
+  }.bind(this));
+};
+
+GeoPackage.prototype.createFeatureTileLinkTable = function(callback) {
+  callback(new Error('not implemented'));
+};
+
+/**
+ * Get the application id of the GeoPackage
+ * @param  {Function} callback callback called with the application id
+ */
+GeoPackage.prototype.getApplicationId = function(callback) {
+  var connection = this.getDatabase();
+  connection.getApplicationId(callback);
+}
+
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  var gp = this;
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      info.tableName = tableDao.table_name;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+        info.tileMatrixSet = {};
+        info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
+        info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
+        info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
+        info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
+        info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.table_name;
+        info.contents.dataType = contents.data_type;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.description;
+        info.contents.lastChange = contents.last_change;
+        info.contents.minX = contents.min_x;
+        info.contents.maxX = contents.max_x;
+        info.contents.minY = contents.min_y;
+        info.contents.maxY = contents.max_y;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, contentsSrs) {
+          info.contents.srs = {
+            name:contentsSrs.srs_name,
+            id:contentsSrs.srs_id,
+            organization:contentsSrs.organization,
+            organization_coordsys_id:contentsSrs.organization_coordsys_id,
+            definition:contentsSrs.definition,
+            description:contentsSrs.description
+          };
+          tableDao.getSrs(function(err, srs){
+            info.srs = {
+              name:srs.srs_name,
+              id:srs.srs_id,
+              organization:srs.organization,
+              organization_coordsys_id:srs.organization_coordsys_id,
+              definition:srs.definition,
+              description:srs.description
+            };
+            callback(null, info);
+          });
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      info.columnMap = {};
+      async.eachSeries(tableDao.table.columns, function(column, columnDone) {
+        var dcd = gp.getDataColumnsDao();
+        dcd.getDataColumns(tableDao.table.table_name, column.name, function(err, dataColumn) {
+          info.columns.push({
+            index: column.index,
+            name: column.name,
+            max: column.max,
+            min: column.min,
+            notNull: column.notNull,
+            primaryKey: column.primaryKey,
+            displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
+            dataColumn: dataColumn
+          });
+          info.columnMap[column.name] = info.columns[info.columns.length-1];
+          columnDone();
+        });
+      }, function(err) {
+        callback(null, info);
+      });
+    }
+  ], callback);
+};
+
+module.exports = GeoPackage;
+
+},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317,"stream-to-array":351}],25:[function(require,module,exports){
+/**
+ * GeoPackage Constants module.
+ * @module dao/geoPackageConstants
+ */
+
+/** @constant {string} GEOPACKAGE_EXTENSION Extension to GeoPackage files */
+exports.GEOPACKAGE_EXTENSION = 'gpkg';
+/** @constant {string} GEOPACKAGE_EXTENDED_EXTENSION Extension to GeoPackage extension files */
+exports.GEOPACKAGE_EXTENDED_EXTENSION = 'gpkx';
+/** @constant {string} APPLICATION_ID GeoPackage application id */
+exports.APPLICATION_ID = 'GP10';
+/** @constant {string} GEOPACKAGE_EXTENSION_AUTHOR GeoPackage author */
+exports.GEOPACKAGE_EXTENSION_AUTHOR = exports.GEOPACKAGE_EXTENSION;
+/** @constant {string} GEOMETRY_EXTENSION_PREFIX Geometry extension prefix */
+exports.GEOMETRY_EXTENSION_PREFIX = 'geom';
+/** @constant {string} GEOPACKAGE_GEOMETRY_MAGIX_NUMBER Expected magic number */
+exports.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER = 'GP';
+/** @constant {string} GEOPACKAGE_GEOMETRY_VERSION_1 Expected version 1 value */
+exports.GEOPACKAGE_GEOMETRY_VERSION_1 = 0;
+/** @constant {string} SQLITE_HEADER_PREFIX SQLite header string prefix */
+exports.SQLITE_HEADER_PREFIX = 'SQLite format 3';
+
+},{}],26:[function(require,module,exports){
+(function (process){
+/**
+ * GeoPackage Manager used to create and open GeoPackages
+ * @module geoPackageManager
+ */
+
+var async = require('async')
+  , path = require('path')
+  , fs = require('fs');
+
+var GeoPackage = require('./geoPackage')
+  , GeoPackageValidate = require('./validate/geoPackageValidate')
+  , GeoPackageConnection = require('./db/geoPackageConnection');
+
+/**
+ * Open a GeoPackage
+ * @param  {string}   filePath Absolute path to the GeoPackage to open
+ * @param {callback} callback which gets passed an error and the GeoPackage
+ */
+module.exports.open = function(filePath, callback) {
+  var error = GeoPackageValidate.validateGeoPackageExtension(filePath);
+  if (error) return callback(error);
+
+  var results = {};
+  async.waterfall([function(callback) {
+    GeoPackageConnection.connect(filePath, function(err, connection) {
+      if (err) {
+        console.log('cannot open ' + filePath);
+        return callback(err);
+      }
+      results.connection = connection;
+      callback(err, results);
+    });
+  }, function(results, callback) {
+    results.geoPackage = new GeoPackage(path.basename(filePath), filePath, results.connection);
+    callback(null, results);
+  }, function(results, callback) {
+    GeoPackageValidate.hasMinimumTables(results.geoPackage, function(err) {
+      callback(err, results);
+    });
+  }], function(err, results) {
+    if (err) {
+      return callback(err);
+    }
+    callback(err, results.geoPackage);
+  });
+}
+
+module.exports.create = function(filePath, callback) {
+  if (!callback) {
+    callback = filePath;
+    filePath = undefined;
+  }
+  async.waterfall([
+    function(callback) {
+      if (filePath) {
+        var error = GeoPackageValidate.validateGeoPackageExtension(filePath);
+        if (error) return callback(error);
+        if (typeof(process) !== 'undefined' && process.version) {
+          fs.stat(filePath, function(err, stats) {
+            if (err || !stats) {
+              callback(err);
+            }
+            callback(null, filePath);
+          });
+        } else {
+          callback(null, filePath);
+        }
+      }
+    }, function(filePath, callback) {
+      GeoPackageConnection.connect(filePath, function(err, connection) {
+        callback(err, connection);
+      });
+    }, function(connection, callback) {
+      connection.setApplicationId(function(err) {
+        callback(err, connection);
+      });
+    }, function(connection, callback) {
+      callback(null, new GeoPackage(path.basename(filePath), filePath, connection));
+    }
+  ], function(err, geopackage) {
+    if (err || !geopackage) {
+      return callback(err);
+    }
+    callback(err, geopackage);
+  });
+}
+
+}).call(this,require('_process'))
+},{"./db/geoPackageConnection":10,"./geoPackage":24,"./validate/geoPackageValidate":54,"_process":259,"async":56,"fs":57,"path":258}],27:[function(require,module,exports){
+(function (Buffer){
+/**
+ * GeometryData module.
+ * @module geom/geometryData
+ */
+
+var GeoPackageConstants = require('../geoPackageConstants');
+
+var wkx = require('wkx');
+
+var BIG_ENDIAN = 0;
+var LITTLE_ENDIAN = 1;
+
+/**
+ * GeoPackage Geometry Data
+ */
+var GeometryData = function(buffer) {
+  this.empty = true;
+  this.byteOrder = BIG_ENDIAN;
+  if (buffer) {
+    this.fromData(buffer);
+  }
+}
+
+module.exports = GeometryData;
+
+GeometryData.prototype.setSrsId = function(srsId) {
+  this.srsId = srsId;
+}
+
+GeometryData.prototype.setGeometry = function(wkbGeometry) {
+  this.geometry = wkbGeometry;
+}
+
+GeometryData.prototype.setEnvelope = function(envelope) {
+  this.envelope = envelope;
+}
+
+GeometryData.prototype.fromData = function (buffer) {
+  this.buffer = buffer;
+  if (buffer instanceof Uint8Array) {
+    this.buffer = buffer = new Buffer(buffer);
+  }
+  var magicString = buffer.toString('ascii', 0, 2);
+  if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
+    throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
+  }
+
+  var version = buffer.readUInt8(2);
+  if (version !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1) {
+    throw new Error('Unexpected GeoPackage Geometry version ' + version + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
+  }
+
+  var flags = buffer.readUInt8(3);
+  var envelopeIndicator = this.readFlags(flags);
+
+  this.srsId = buffer[this.byteOrder ? 'readUInt32LE' : 'readUInt32BE'](4);
+  this.envelope = this.readEnvelope(envelopeIndicator, buffer);
+
+  var offset = this.envelope.offset;
+
+  var wkbBuffer = buffer.slice(offset);
+  this.geometry = wkx.Geometry.parse(wkbBuffer);
+};
+
+GeometryData.prototype.toData = function() {
+  var header = new Buffer(8);
+
+  // Write GP as the 2 byte magic number
+  header.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
+
+  // Write a byte as the version value of 0 = version 1
+  header.writeUInt8(GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1, 2);
+
+  // Build and write a flags byte
+  var flags = this.buildFlagsByte();
+  header.writeUInt8(flags, 3);
+
+  // write the 4 byte srs id
+  header[this.byteOrder ? 'writeUInt32LE' : 'writeUInt32BE'](this.srsId, 4);
+
+  var envelopeBuffer = this.writeEnvelope(this.envelope);
+
+  this.buffer = Buffer.concat([header, envelopeBuffer, this.geometry]);
+  return this.buffer;
+};
+
+GeometryData.prototype.writeEnvelope = function() {
+  if (!this.envelope) return new Buffer(0);
+
+  var writeDoubleMethod = 'writeDouble' + (this.byteOrder ? 'LE' : 'BE');
+
+  var length = 32;
+  if (this.envelope.hasZ) {
+    length += 16;
+  }
+  if (this.envelope.hasM) {
+    length += 16;
+  }
+  var envelopeBuffer = new Buffer(length);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minX, 0);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxX, 8);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minY, 16);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxY, 24);
+
+  var position = 32;
+  if (this.envelope.hasZ) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minZ, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxZ, position+8);
+    position = 48;
+  }
+  if (this.envelope.hasM) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minM, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxM, position+8);
+  }
+
+  return envelopeBuffer;
+};
+
+GeometryData.prototype.buildFlagsByte = function() {
+  var flag = 0;
+
+  // Add the binary type to bit 5, 0 for standard and 1 for extended
+  var binaryType = this.extended ? 1 : 0;
+  flag += (binaryType << 5);
+
+  // Add the empty geometry flag to bit 4, 0 for non-empty and 1 for empty
+  var emptyValue = this.empty ? 1 : 0;
+  flag += (emptyValue << 4);
+
+  // Add the envelope contents indicator code (3-bit unsigned integer to bits 3, 2, and 1)
+  var envelopeIndicator = !this.envelope ? 0 : this.getIndicatorWithEnvelope(this.envelope);
+  flag += (envelopeIndicator << 1);
+
+  // Add the byte order to bit 0, 0 for Big Endian and 1 for Little Endian
+  var byteOrderValue = (this.byteOrder === BIG_ENDIAN) ? 0 : 1;
+  flag += byteOrderValue;
+
+  return flag;
+};
+
+GeometryData.prototype.getIndicatorWithEnvelope = function(envelope) {
+  var indicator = 1;
+  if (envelope.hasZ) {
+    indicator++;
+  }
+  if (envelope.hasM) {
+    indicator += 2;
+  }
+  return indicator;
+};
+
+GeometryData.prototype.readFlags = function (flagsInt) {
+  // Verify the reserved bits at 7 and 6 are 0
+  var reserved7 = (flagsInt >> 7) & 1;
+  var reserved6 = (flagsInt >> 6) & 1;
+  if (reserved7 !== 0 || reserved6 !== 0) {
+      throw new Error('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7='+reserved7+', 6='+ reserved6);
+  }
+
+  // Get the binary type from bit 5, 0 for standard and 1 for extended
+  var binaryType = (flagsInt >> 5) & 1;
+  this.extended = binaryType == 1;
+
+  // Get the empty geometry flag from bit 4, 0 for non-empty and 1 for
+  // empty
+  var emptyValue = (flagsInt >> 4) & 1;
+  this.empty = emptyValue == 1;
+
+  // Get the envelope contents indicator code (3-bit unsigned integer from
+  // bits 3, 2, and 1)
+  var envelopeIndicator = (flagsInt >> 1) & 7;
+  if (envelopeIndicator > 4) {
+      throw new Error('Unexpected GeoPackage Geometry flags. Envelope contents indicator must be between 0 and 4. Actual: ' + envelopeIndicator);
+  }
+
+  // Get the byte order from bit 0, 0 for Big Endian and 1 for Little Endian
+  var byteOrderValue = flagsInt & 1;
+  this.byteOrder = byteOrderValue;
+  return envelopeIndicator;
+};
+
+GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
+  var readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
+
+  var envelopeByteOffset = 8;
+  reads = 0;
+  var envelope = {};
+
+  if (envelopeIndicator <= 0) {
+    envelope.offset = envelopeByteOffset;
+    return envelope;
+  }
+  // Read x and y values and create envelope
+  envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.minY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.maxY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+
+  envelope.hasZ = false;
+  var minZ = undefined;
+  var maxZ = undefined;
+
+  envelope.hasM = false;
+  var minM = undefined;
+  var maxM = undefined;
+
+  // Read z values
+  if (envelopeIndicator === 2 || envelopeIndicator === 4) {
+    envelope.hasZ = true;
+    envelope.minZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+    envelope.maxZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  }
+
+  // Read m values
+  if (envelopeIndicator === 3 || envelopeIndicator === 4) {
+    envelope.hasM = true;
+    envelope.minM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+    envelope.maxM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  }
+
+  envelope.offset = envelopeByteOffset + (8 * reads);
+  return envelope;
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../geoPackageConstants":25,"buffer":59,"wkx":368}],28:[function(require,module,exports){
+/**
+ * GeoPackage module.
+ * @module geoPackage
+ */
+
+var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
+  , GeometryColumnsDao = require('./features/columns').GeometryColumnsDao
+  , FeatureDao = require('./features/user/featureDao')
+  , FeatureTableReader = require('./features/user/featureTableReader')
+  , ContentsDao = require('./core/contents').ContentsDao
+  , Contents = require('./core/contents').Contents
+  , TileMatrixSetDao = require('./tiles/matrixset').TileMatrixSetDao
+  , TileMatrixSet = require('./tiles/matrixset').TileMatrixSet
+  , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
+  , TileMatrix = require('./tiles/matrix').TileMatrix
+  , TileTableReader = require('./tiles/user/tileTableReader')
+  , TileDao = require('./tiles/user/tileDao')
+  , TileTable = require('./tiles/user/tileTable')
+  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
+  , TableCreator = require('./db/tableCreator')
+  , UserTable = require('./user/userTable')
+  , FeatureTable = require('./features/user/featureTable')
+  , DataColumnsDao = require('./dataColumns').DataColumnsDao
+  , DataColumnConstraintsDao = require('./dataColumnConstraints').DataColumnConstraintsDao
+  , MetadataDao = require('./metadata').MetadataDao
+  , MetadataReferenceDao = require('./metadata/reference').MetadataReferenceDao
+  , ExtensionDao = require('./extension').ExtensionDao
+  , TableIndexDao = require('./extension/index/tableIndex').TableIndexDao
+  , GeometryIndexDao = require('./extension/index/geometryIndex').GeometryIndexDao;
+
+var async = require('async')
+  , proj4 = require('proj4')
+  , toArray = require('stream-to-array');
 
 var defs = require('./proj4Defs');
 for (var name in defs) {
@@ -3749,7 +4931,6 @@ GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryCo
   this.createGeometryColumnsTable(function(err, result) {
     var featureTable = new FeatureTable(geometryColumns.table_name, columns);
     this.createFeatureTable(featureTable, function(err, result) {
-      console.log('result', result);
       var contents = new Contents();
       contents.table_name = geometryColumns.table_name;
       contents.data_type = 'features';
@@ -3804,6 +4985,100 @@ GeoPackage.prototype.createTileMatrixTable = function(callback) {
  */
 GeoPackage.prototype.createTileTable = function(tileTable, callback) {
   this.tableCreator.createUserTable(tileTable, callback);
+};
+
+/**
+ * Create a new tile table
+ * @param  {String}   tableName    tile table name
+ * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
+ * @param  {Number} contentsSrsId srs id of the contents table
+ * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
+ * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+  var tileMatrixSet;
+
+  async.series([
+    this.createTileMatrixSetTable.bind(this),
+    this.createTileMatrixTable.bind(this),
+    function(callback) {
+      var columns = TileTable.createRequiredColumns();
+      var tileTable = new TileTable(tableName, columns);
+      this.createTileTable(tileTable, callback);
+    }.bind(this),
+    function(callback) {
+      var contents = new Contents();
+      contents.table_name = tableName;
+      contents.data_type = 'tiles';
+      contents.identifier = tableName;
+      contents.last_change = new Date();
+      contents.min_x = contentsBoundingBox.minLongitude;
+      contents.min_y = contentsBoundingBox.minLatitude;
+      contents.max_x = contentsBoundingBox.maxLongitude;
+      contents.max_y = contentsBoundingBox.maxLatitude;
+      contents.srs_id = contentsSrsId;
+
+      tileMatrixSet = new TileMatrixSet();
+      tileMatrixSet.setContents(contents);
+      tileMatrixSet.srs_id = tileMatrixSetSrsId;
+      tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
+      tileMatrixSet.min_y = tileMatrixSetBoundingBox.minLatitude;
+      tileMatrixSet.max_x = tileMatrixSetBoundingBox.maxLongitude;
+      tileMatrixSet.max_y = tileMatrixSetBoundingBox.maxLatitude;
+      this.getContentsDao().create(contents, function(err, result) {
+        this.getTileMatrixSetDao().create(tileMatrixSet, callback);
+      }.bind(this));
+    }.bind(this)
+  ], function(err, results) {
+    callback(err, tileMatrixSet);
+  });
+};
+
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, callback) {
+  var tileMatrixDao = this.getTileMatrixDao();
+
+  var zoom = minZoom;
+
+  async.whilst(
+    function() {
+      return zoom <= maxZoom;
+    },
+    function(callback) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      var matrixWidth = (box.maxX - box.minX) + 1;
+      var matrixHeight = (box.maxY - box.minY) + 1;
+
+      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
+      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+
+      var tileMatrix = new TileMatrix();
+      tileMatrix.table_name = tileMatrixSet.table_name;
+      tileMatrix.zoom_level = zoom;
+      tileMatrix.matrix_width = matrixWidth;
+      tileMatrix.matrix_height = matrixHeight;
+      tileMatrix.tile_width = 256;
+      tileMatrix.tile_height = 256;
+      tileMatrix.pixel_x_size = pixelXSize;
+      tileMatrix.pixel_y_size = pixelYSize;
+
+      zoom++;
+
+      tileMatrixDao.create(tileMatrix, callback);
+    },
+    callback
+  )
+};
+
+GeoPackage.prototype.addTile = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
+  this.getTileDaoWithTableName(tableName, function(err, tileDao) {
+    var newRow = tileDao.newRow();
+    newRow.setZoomLevel(zoom);
+    newRow.setTileColumn(tileColumn);
+    newRow.setTileRow(tileRow);
+    newRow.setTileData(tileStream);
+    tileDao.create(newRow, callback);
+  });
 };
 
 /**
@@ -3935,6 +5210,12 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
       } else if (info.tableType === UserTable.TILE_TABLE) {
         dao = tableDao.getTileMatrixSetDao();
         contentsRetriever = tableDao.tileMatrixSet;
+        info.tileMatrixSet = {};
+        info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
+        info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
+        info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
+        info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
+        info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
       }
       dao.getContents(contentsRetriever, function(err, contents) {
         info.contents = {};
@@ -3998,283 +5279,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
 
 module.exports = GeoPackage;
 
-},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/user/tileDao":43,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317}],25:[function(require,module,exports){
-/**
- * GeoPackage Constants module.
- * @module dao/geoPackageConstants
- */
-
-/** @constant {string} GEOPACKAGE_EXTENSION Extension to GeoPackage files */
-exports.GEOPACKAGE_EXTENSION = 'gpkg';
-/** @constant {string} GEOPACKAGE_EXTENDED_EXTENSION Extension to GeoPackage extension files */
-exports.GEOPACKAGE_EXTENDED_EXTENSION = 'gpkx';
-/** @constant {string} APPLICATION_ID GeoPackage application id */
-exports.APPLICATION_ID = 'GP10';
-/** @constant {string} GEOPACKAGE_EXTENSION_AUTHOR GeoPackage author */
-exports.GEOPACKAGE_EXTENSION_AUTHOR = exports.GEOPACKAGE_EXTENSION;
-/** @constant {string} GEOMETRY_EXTENSION_PREFIX Geometry extension prefix */
-exports.GEOMETRY_EXTENSION_PREFIX = 'geom';
-/** @constant {string} GEOPACKAGE_GEOMETRY_MAGIX_NUMBER Expected magic number */
-exports.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER = 'GP';
-/** @constant {string} GEOPACKAGE_GEOMETRY_VERSION_1 Expected version 1 value */
-exports.GEOPACKAGE_GEOMETRY_VERSION_1 = 0;
-/** @constant {string} SQLITE_HEADER_PREFIX SQLite header string prefix */
-exports.SQLITE_HEADER_PREFIX = 'SQLite format 3';
-
-},{}],26:[function(require,module,exports){
-/**
- * GeoPackage Manager used to create and open GeoPackages
- * @module geoPackageManager
- */
-
-var async = require('async')
-  , path = require('path')
-  , fs = require('fs');
-
-var GeoPackage = require('./geoPackage')
-  , GeoPackageValidate = require('./validate/geoPackageValidate')
-  , GeoPackageConnection = require('./db/geoPackageConnection');
-
-/**
- * Open a GeoPackage
- * @param  {string}   filePath Absolute path to the GeoPackage to open
- * @param {callback} callback which gets passed an error and the GeoPackage
- */
-module.exports.open = function(filePath, callback) {
-  var error = GeoPackageValidate.validateGeoPackageExtension(filePath);
-  if (error) return callback(error);
-
-  var results = {};
-  async.waterfall([function(callback) {
-    GeoPackageConnection.connect(filePath, function(err, connection) {
-      if (err) {
-        console.log('cannot open ' + filePath);
-        return callback(err);
-      }
-      results.connection = connection;
-      callback(err, results);
-    });
-  }, function(results, callback) {
-    results.geoPackage = new GeoPackage(path.basename(filePath), filePath, results.connection);
-    callback(null, results);
-  }, function(results, callback) {
-    GeoPackageValidate.hasMinimumTables(results.geoPackage, function(err) {
-      callback(err, results);
-    });
-  }], function(err, results) {
-    if (err) {
-      return callback(err);
-    }
-    callback(err, results.geoPackage);
-  });
-}
-
-module.exports.create = function(filePath, callback) {
-  if (!callback) {
-    callback = filePath;
-    filePath = undefined;
-  }
-  async.waterfall([
-    function(callback) {
-      if (filePath) {
-        var error = GeoPackageValidate.validateGeoPackageExtension(filePath);
-        if (error) return callback(error);
-
-        fs.stat(filePath, function(err, stats) {
-          if (err || !stats) {
-            callback(err);
-          }
-          callback(null, filePath);
-        });
-      }
-    }, function(filePath, callback) {
-      GeoPackageConnection.connect(filePath, function(err, connection) {
-        callback(err, connection);
-      });
-    }, function(connection, callback) {
-      connection.setApplicationId(function(err) {
-        callback(err, connection);
-      });
-    }, function(connection, callback) {
-      callback(null, new GeoPackage(path.basename(filePath), filePath, connection));
-    }
-  ], function(err, geopackage) {
-    if (err || !geopackage) {
-      return callback(err);
-    }
-    callback(err, geopackage);
-  });
-}
-
-},{"./db/geoPackageConnection":10,"./geoPackage":24,"./validate/geoPackageValidate":54,"async":56,"fs":57,"path":258}],27:[function(require,module,exports){
-(function (Buffer){
-/**
- * GeometryData module.
- * @module geom/geometryData
- */
-
-var GeoPackageConstants = require('../geoPackageConstants');
-
-var wkx = require('wkx');
-
-var BIG_ENDIAN = 0;
-var LITTLE_ENDIAN = 1;
-
-/**
- * GeoPackage Geometry Data
- */
-var GeometryData = function(buffer) {
-  this.empty = true;
-  this.byteOrder = BIG_ENDIAN;
-  if (buffer) {
-    this.fromData(buffer);
-  }
-}
-
-module.exports = GeometryData;
-
-GeometryData.prototype.setSrsId = function(srsId) {
-  this.srsId = srsId;
-}
-
-GeometryData.prototype.setGeometry = function(wkbGeometry) {
-  this.geometry = wkbGeometry;
-}
-
-GeometryData.prototype.fromData = function (buffer) {
-  this.buffer = buffer;
-  if (buffer instanceof Uint8Array) {
-    this.buffer = buffer = new Buffer(buffer);
-  }
-
-  var magicString = buffer.toString('ascii', 0, 2);
-  if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
-    throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
-  }
-
-  var version = buffer.readUInt8(2);
-  if (version !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1) {
-    throw new Error('Unexpected GeoPackage Geometry version ' + version + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
-  }
-
-  var flags = buffer.readUInt8(3);
-  var envelopeIndicator = this.readFlags(flags);
-
-  this.srsId = buffer[this.byteOrder ? 'readUInt32LE' : 'readUInt32BE'](4);
-  this.envelope = this.readEnvelope(envelopeIndicator, buffer);
-
-  var offset = this.envelope.offset;
-
-  var wkbBuffer = buffer.slice(offset);
-  this.geometry = wkx.Geometry.parse(wkbBuffer);
-};
-
-GeometryData.prototype.toData = function() {
-  this.buffer = Buffer.alloc(8);
-
-  // Write GP as the 2 byte magic number
-  this.buffer.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
-
-  // Write a byte as the version value of 0 = version 1
-  this.buffer.writeUInt8(GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
-};
-
-GeometryData.prototype.buildFlagsByte = function() {
-  var flag = 0;
-
-  // Add the binary type to bit 5, 0 for standard and 1 for extended
-  var binaryType = this.extended ? 1 : 0;
-  flag += (binaryType << 5);
-
-  // Add the empty geometry flag to bit 4, 0 for non-empty and 1 for empty
-  var emptyValue = this.empty ? 1 : 0;
-  flag += (emptyValue << 4);
-
-  // Add the envelope contents indicator code (3-bit unsigned integer to bits 3, 2, and 1)
-  var envelopeIndicator = !this.envelope ? 0 : this.getIndcatorWithEnvelope(this.envelope);
-};
-
-GeometryData.prototype.getIndicatorWithEnvelope = function(envelope) {
-
-};
-
-GeometryData.prototype.readFlags = function (flagsInt) {
-  // Verify the reserved bits at 7 and 6 are 0
-  var reserved7 = (flagsInt >> 7) & 1;
-  var reserved6 = (flagsInt >> 6) & 1;
-  if (reserved7 !== 0 || reserved6 !== 0) {
-      throw new Error('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7='+reserved7+', 6='+ reserved6);
-  }
-
-  // Get the binary type from bit 5, 0 for standard and 1 for extended
-  var binaryType = (flagsInt >> 5) & 1;
-  this.extended = binaryType == 1;
-
-  // Get the empty geometry flag from bit 4, 0 for non-empty and 1 for
-  // empty
-  var emptyValue = (flagsInt >> 4) & 1;
-  this.empty = emptyValue == 1;
-
-  // Get the envelope contents indicator code (3-bit unsigned integer from
-  // bits 3, 2, and 1)
-  var envelopeIndicator = (flagsInt >> 1) & 7;
-  if (envelopeIndicator > 4) {
-      throw new Error('Unexpected GeoPackage Geometry flags. Envelope contents indicator must be between 0 and 4. Actual: ' + envelopeIndicator);
-  }
-
-  // Get the byte order from bit 0, 0 for Big Endian and 1 for Little Endian
-  var byteOrderValue = flagsInt & 1;
-  this.byteOrder = byteOrderValue;
-  return envelopeIndicator;
-};
-
-GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
-  var readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
-
-  var envelopeByteOffset = 8;
-  reads = 0;
-  var envelope = {};
-
-  if (envelopeIndicator <= 0) {
-    envelope.offset = envelopeByteOffset;
-    return envelope;
-  }
-  // Read x and y values and create envelope
-  envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-  envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-  envelope.minY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-  envelope.maxY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-
-  envelope.hasZ = false;
-  var minZ = undefined;
-  var maxZ = undefined;
-
-  envelope.hasM = false;
-  var minM = undefined;
-  var maxM = undefined;
-
-  // Read z values
-  if (envelopeIndicator === 2 || envelopeIndicator === 4) {
-    envelope.hasZ = true;
-    envelope.minZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-    envelope.maxZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-  }
-
-  // Read m values
-  if (envelopeIndicator === 3 || envelopeIndicator === 4) {
-    envelope.hasM = true;
-    envelope.minM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-    envelope.maxM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
-  }
-
-  envelope.offset = envelopeByteOffset + (8 * reads);
-  return envelope;
-};
-
-}).call(this,require("buffer").Buffer)
-},{"../geoPackageConstants":25,"buffer":59,"wkx":364}],28:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/user/tileDao":43,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"dup":24,"proj4":317}],29:[function(require,module,exports){
+},{"./core/contents":3,"./core/srs":4,"./dataColumnConstraints":7,"./dataColumns":8,"./db/tableCreator":14,"./extension":15,"./extension/index/geometryIndex":16,"./extension/index/tableIndex":17,"./features/columns":18,"./features/user/featureDao":20,"./features/user/featureTable":22,"./features/user/featureTableReader":23,"./metadata":29,"./metadata/reference":30,"./proj4Defs":31,"./tiles/matrix":37,"./tiles/matrixset":38,"./tiles/tileBoundingBoxUtils":40,"./tiles/user/tileDao":43,"./tiles/user/tileTable":46,"./tiles/user/tileTableReader":47,"./user/userTable":53,"async":56,"proj4":317,"stream-to-array":351}],29:[function(require,module,exports){
 /**
  * Metadata module.
  * @module metadata
@@ -4323,161 +5328,142 @@ var Metadata = function() {
   this.metadata;
 }
 
-Metadata.UNDEFINED_NAME = "undefined";
-Metadata.FIELD_SESSION_NAME = "fieldSession";
-Metadata.COLLECTION_SESSION_NAME = "collectionSession";
-Metadata.SERIES_NAME = "series";
-Metadata.DATASET_NAME = "dataset";
-Metadata.FEATURE_TYPE_NAME = "featureType";
-Metadata.FEATURE_NAME = "feature";
-Metadata.ATTRIBUTE_TYPE_NAME = "attributeType";
-Metadata.ATTRIBUTE_NAME = "attribute";
-Metadata.TILE_NAME = "tile";
-Metadata.MODEL_NAME = "model";
-Metadata.CATALOG_NAME = "catalog";
-Metadata.SCHEMA_NAME = "schema";
-Metadata.TAXONOMY_NAME = "taxonomy";
-Metadata.SOFTWARE_NAME = "software";
-Metadata.SERVICE_NAME = "service";
-Metadata.COLLECTION_HARDWARE_NAME = "collectionHardware";
-Metadata.NON_GEOGRAPHIC_DATASET_NAME = "nonGeographicDataset";
-Metadata.DIMENSION_GROUP_NAME = "dimensionGroup";
+Metadata.UNDEFINED = "undefined";
+Metadata.FIELD_SESSION = "fieldSession";
+Metadata.COLLECTION_SESSION = "collectionSession";
+Metadata.SERIES = "series";
+Metadata.DATASET = "dataset";
+Metadata.FEATURE_TYPE = "featureType";
+Metadata.FEATURE = "feature";
+Metadata.ATTRIBUTE_TYPE = "attributeType";
+Metadata.ATTRIBUTE = "attribute";
+Metadata.TILE = "tile";
+Metadata.MODEL = "model";
+Metadata.CATALOG = "catalog";
+Metadata.SCHEMA = "schema";
+Metadata.TAXONOMY = "taxonomy";
+Metadata.SOFTWARE = "software";
+Metadata.SERVICE = "service";
+Metadata.COLLECTION_HARDWARE = "collectionHardware";
+Metadata.NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
+Metadata.DIMENSION_GROUP = "dimensionGroup";
 
 Metadata.prototype.getScopeInformation = function(type) {
   switch(type) {
-    case Metadata.UNDEFINED_NAME:
+    case Metadata.UNDEFINED:
       return {
-        name: Metadata.UNDEFINED_NAME,
+        name: Metadata.UNDEFINED,
         code: 'NA',
         definition: 'Metadata information scope is undefined'
       };
-    break;
-    case Metadata.FIELD_SESSION_NAME:
+    case Metadata.FIELD_SESSION:
       return {
-        name: Metadata.FIELD_SESSION_NAME,
+        name: Metadata.FIELD_SESSION,
         code: '012',
         definition: 'Information applies to the field session'
       };
-    break;
-    case Metadata.COLLECTION_SESSION_NAME:
+    case Metadata.COLLECTION_SESSION:
       return {
-        name: Metadata.COLLECTION_SESSION_NAME,
+        name: Metadata.COLLECTION_SESSION,
         code: '004',
         definition: 'Information applies to the collection session'
       };
-    break;
-    case Metadata.SERIES_NAME:
+    case Metadata.SERIES:
       return {
-        name: Metadata.SERIES_NAME,
+        name: Metadata.SERIES,
         code: '006',
         definition: 'Information applies to the (dataset) series'
       };
-    break;
-    case Metadata.DATASET_NAME:
+    case Metadata.DATASET:
       return {
-        name: Metadata.DATASET_NAME,
+        name: Metadata.DATASET,
         code: '005',
         definition: 'Information applies to the (geographic feature) dataset'
       };
-    break;
-    case Metadata.FEATURE_TYPE_NAME:
+    case Metadata.FEATURE_TYPE:
       return {
-        name: Metadata.FEATURE_TYPE_NAME,
+        name: Metadata.FEATURE_TYPE,
         code: '010',
         definition: 'Information applies to a feature type (class)'
       };
-    break;
-    case Metadata.FEATURE_NAME:
+    case Metadata.FEATURE:
       return {
-        name: Metadata.FEATURE_NAME,
+        name: Metadata.FEATURE,
         code: '009',
         definition: 'Information applies to a feature (instance)'
       };
-    break;
-    case Metadata.ATTRIBUTE_TYPE_NAME:
+    case Metadata.ATTRIBUTE_TYPE:
       return {
-        name: Metadata.ATTRIBUTE_TYPE_NAME,
+        name: Metadata.ATTRIBUTE_TYPE,
         code: '002',
         definition: 'Information applies to the attribute class'
       };
-    break;
-    case Metadata.ATTRIBUTE_NAME:
+    case Metadata.ATTRIBUTE:
       return {
-        name: Metadata.ATTRIBUTE_NAME,
+        name: Metadata.ATTRIBUTE,
         code: '001',
         definition: 'Information applies to the characteristic of a feature (instance)'
       };
-    break;
-    case Metadata.TILE_NAME:
+    case Metadata.TILE:
       return {
-        name: Metadata.TILE_NAME,
+        name: Metadata.TILE,
         code: '016',
         definition: 'Information applies to a tile, a spatial subset of geographic data'
       };
-    break;
-    case Metadata.MODEL_NAME:
+    case Metadata.MODEL:
       return {
-        name: Metadata.MODEL_NAME,
+        name: Metadata.MODEL,
         code: '015',
         definition: 'Information applies to a copy or imitation of an existing or hypothetical object'
       };
-    break;
-    case Metadata.CATALOG_NAME:
+    case Metadata.CATALOG:
       return {
-        name: Metadata.CATALOG_NAME,
+        name: Metadata.CATALOG,
         code: 'NA',
         definition: 'Metadata applies to a feature catalog'
       };
-    break;
-    case Metadata.SCHEMA_NAME:
+    case Metadata.SCHEMA:
       return {
-        name: Metadata.SCHEMA_NAME,
+        name: Metadata.SCHEMA,
         code: 'NA',
         definition: 'Metadata applies to an application schema'
       };
-    break;
-    case Metadata.TAXONOMY_NAME:
+    case Metadata.TAXONOMY:
       return {
-        name: Metadata.TAXONOMY_NAME,
+        name: Metadata.TAXONOMY,
         code: 'NA',
         definition: 'Metadata applies to a taxonomy or knowledge system'
       };
-    break;
-    case Metadata.SOFTWARE_NAME:
+    case Metadata.SOFTWARE:
       return {
-        name: Metadata.SOFTWARE_NAME,
+        name: Metadata.SOFTWARE,
         code: '013',
         definition: 'Information applies to a computer program or routine'
       };
-    break;
-    case Metadata.SERVICE_NAME:
+    case Metadata.SERVICE:
       return {
-        name: Metadata.SERVICE_NAME,
+        name: Metadata.SERVICE,
         code: '014',
         definition: 'Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case'
       };
-    break;
-    case Metadata.COLLECTION_HARDWARE_NAME:
+    case Metadata.COLLECTION_HARDWARE:
       return {
-        name: Metadata.COLLECTION_HARDWARE_NAME,
+        name: Metadata.COLLECTION_HARDWARE,
         code: '003',
         definition: 'Information applies to the collection hardware class'
       };
-    break;
-    case Metadata.NON_GEOGRAPHIC_DATASET_NAME:
+    case Metadata.NON_GEOGRAPHIC_DATASET:
       return {
-        name: Metadata.NON_GEOGRAPHIC_DATASET_NAME,
+        name: Metadata.NON_GEOGRAPHIC_DATASET,
         code: '007',
         definition: 'Information applies to non-geographic data'
       };
-    break;
-    case Metadata.DIMENSION_GROUP_NAME:
+    case Metadata.DIMENSION_GROUP:
       return {
-        name: Metadata.DIMENSION_GROUP_NAME,
+        name: Metadata.DIMENSION_GROUP,
         code: '008',
         definition: 'Information applies to a dimension group'
       };
-    break;
   }
 }
 
@@ -4578,6 +5564,13 @@ var MetadataReference = function() {
   this.md_parent_id;
 }
 
+MetadataReference.prototype.toDatabaseValue = function(columnName) {
+  if (columnName === 'timestamp') {
+    return this.timestamp.toISOString();
+  }
+  return this[columnName];
+}
+
 /**
  * Set the metadata
  * @param  {Metadata} metadata metadata
@@ -4605,29 +5598,29 @@ MetadataReference.prototype.setParentMetadata = function(metadata) {
 MetadataReference.prototype.setReferenceScopeType = function(referenceScopeType) {
   this.reference_scope = referenceScopeType;
   switch(referenceScopeType) {
-    case MetadataReference.GEOPACKAGE_NAME:
+    case MetadataReference.GEOPACKAGE:
       this.table_name = undefined;
       this.column_name = undefined;
       this.row_id_value = undefined;
       break;
-    case MetadataReference.TABLE_NAME:
+    case MetadataReference.TABLE:
       this.column_name = undefined;
       this.row_id_value = undefined;
       break;
-    case MetadataReference.ROW_NAME:
+    case MetadataReference.ROW:
       this.column_name = undefined;
       break;
-    case MetadataReference.COLUMN_NAME:
+    case MetadataReference.COLUMN:
       this.row_id_value = undefined;
       break;
   }
 }
 
-MetadataReference.GEOPACKAGE_NAME = "geopackage";
-MetadataReference.TABLE_NAME = "table";
-MetadataReference.COLUMN_NAME = "column";
-MetadataReference.ROW_NAME = "row";
-MetadataReference.ROW_COL_NAME = "row/col";
+MetadataReference.GEOPACKAGE = "geopackage";
+MetadataReference.TABLE = "table";
+MetadataReference.COLUMN = "column";
+MetadataReference.ROW = "row";
+MetadataReference.ROW_COL = "row/col";
 
 /**
  * Metadata Reference Data Access Object
@@ -4656,21 +5649,21 @@ MetadataReferenceDao.prototype.removeMetadataParent = function(parentId, callbac
 
 MetadataReferenceDao.prototype.queryByMetadataAndParent = function (fileId, parentId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.prototype.queryByMetadata = function(fileId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.prototype.queryByMetadataParent = function(parentId, rowCallback, doneCallback) {
   var columnValues = new ColumnValues();
-  values.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, fileId);
-  this.queryForFieldValues(values, rowCallback, doneCallback);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  this.queryForFieldValues(columnValues, rowCallback, doneCallback);
 };
 
 MetadataReferenceDao.TABLE_NAME = "gpkg_metadata_reference";
@@ -9126,7 +10119,26 @@ CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, c
             var image = document.createElement('img');
             image.onload = function() {
               var p = chunk.position;
-              this.ctx.drawImage(image, p.tileCropXStart, p.tileCropYStart, (p.tileCropXEnd - p.tileCropXStart), (p.tileCropYEnd - p.tileCropYStart), p.xPositionInFinalTileStart, p.yPositionInFinalTileStart, (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart), (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart));
+              
+              var xPositionOfImageToDrawFrom = p.tileCropXStart;
+              var yPositionOfImageToDrawFrom = p.tileCropYStart;
+              var widthOfImageToDraw = 1 + p.tileCropXEnd - p.tileCropXStart;
+              var heightOfImageToDraw = 1 + p.tileCropYEnd - p.tileCropYStart;
+              var xPositionToPlaceImageInCanvas = p.xPositionInFinalTileStart;
+              var yPositionToPlaceImageInCanvas = p.yPositionInFinalTileStart;
+              var imageWidth = p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart;
+              var imageHeight = p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart;
+
+              this.ctx.drawImage(image,
+                xPositionOfImageToDrawFrom,
+                yPositionOfImageToDrawFrom,
+                widthOfImageToDraw,
+                heightOfImageToDraw,
+                xPositionToPlaceImageInCanvas,
+                yPositionToPlaceImageInCanvas,
+                imageWidth,
+                imageHeight
+              );
               chunkDone();
             }.bind(this);
             image.src = 'data:'+type.mime+';base64,' + base64DataChunk;
@@ -9193,7 +10205,7 @@ CanvasTileCreator.prototype.reproject = function (tileData, tilePieceBoundingBox
 
 module.exports = CanvasTileCreator;
 
-},{"../tileBoundingBoxUtils":40,"./index":33,"./tileUtilities":35,"./tileWorker.js":36,"async":56,"file-type":280,"util":277,"webworkify":351}],33:[function(require,module,exports){
+},{"../tileBoundingBoxUtils":40,"./index":33,"./tileUtilities":35,"./tileWorker.js":36,"async":56,"file-type":280,"util":277,"webworkify":355}],33:[function(require,module,exports){
 (function (process){
 var proj4 = require('proj4')
   , async = require('async');
@@ -9585,64 +10597,6 @@ var TileMatrix = function() {
   this.pixel_y_size;
 };
 
-// /**
-//  *  Set the Contents
-//  *
-//  *  @param contents contents
-//  */
-// -(void) setContents: (GPKGContents *) contents;
-//
-// /**
-//  *  Set the zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  */
-// -(void) setZoomLevel:(NSNumber *)zoomLevel;
-//
-// /**
-//  *  Set the matrix width
-//  *
-//  *  @param matrixWidth matrix width
-//  */
-// -(void) setMatrixWidth:(NSNumber *)matrixWidth;
-//
-// /**
-//  *  Set the matrix height
-//  *
-//  *  @param matrixHeight matrix height
-//  */
-// -(void) setMatrixHeight:(NSNumber *)matrixHeight;
-//
-// /**
-//  *  Set the tile width
-//  *
-//  *  @param tileWidth tile width
-//  */
-// -(void) setTileWidth:(NSNumber *)tileWidth;
-//
-// /**
-//  *  Set the tile height
-//  *
-//  *  @param tileHeight tile height
-//  */
-// -(void) setTileHeight:(NSNumber *)tileHeight;
-//
-// /**
-//  *  Set the pixel x size
-//  *
-//  *  @param pixelXSize pixel x size
-//  */
-// -(void) setPixelXSize:(NSDecimalNumber *)pixelXSize;
-//
-// /**
-//  *  Set the pixel y size
-//  *
-//  *  @param pixelYSize pixel y size
-//  */
-// -(void) setPixelYSize:(NSDecimalNumber *)pixelYSize;
-
-
-
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixSetDao
@@ -9782,35 +10736,17 @@ TileMatrixSet.prototype.getBoundingBox = function () {
   return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
 };
 
-// /**
-//  *  Set the Contents
-//  *
-//  *  @param contents contents
-//  */
-// -(void) setContents: (GPKGContents *) contents;
-//
-// /**
-//  *  Set the Spatial Reference System
-//  *
-//  *  @param srs srs
-//  */
-// -(void) setSrs: (GPKGSpatialReferenceSystem *) srs;
-//
-// /**
-//  *  Get a bounding box
-//  *
-//  *  @return bounding box
-//  */
-// -(GPKGBoundingBox *) getBoundingBox;
-//
-// /**
-//  *  Set a bounding box
-//  *
-//  *  @param boundingBox bounding box
-//  */
-// -(void) setBoundingBox: (GPKGBoundingBox *) boundingBox;
+TileMatrixSet.prototype.setContents = function(contents) {
+  if (contents && contents.data_type === 'tiles') {
+    this.table_name = contents.table_name;
+  }
+}
 
-
+TileMatrixSet.prototype.setSrs = function(srs) {
+  if (srs) {
+    this.srs_id = srs.srs_id;
+  }
+}
 
 /**
  * Tile Matrix Set Data Access Object
@@ -9948,8 +10884,9 @@ GeoPackageTileRetriever.prototype.hasTile = function (x, y, zoom, callback) {
   var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
   var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
   var tileResults = [];
-  this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, result) {
+  this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, result, done) {
     tileResults.push(result);
+    done();
   }, function(err) {
     if(tileResults && tileResults.length > 0) {
       return callback(err, true);
@@ -10067,6 +11004,25 @@ module.exports.overlapWithBoundingBox = function(boundingBox, boundingBox2) {
 
   return overlap;
 }
+
+module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
+  var totalBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+  var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+
+  var minX = Math.floor((webMercatorBoundingBox.minLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+  var maxX = Math.max(0,Math.floor(((webMercatorBoundingBox.maxLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var maxY = Math.max(0,Math.floor(((-1 * (webMercatorBoundingBox.minLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var minY = Math.floor((-1 * (webMercatorBoundingBox.maxLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+
+  return {
+    minX: minX,
+    maxX: maxX,
+    minY: minY,
+    maxY: maxY
+  };
+}
 //
 //
 // /**
@@ -10103,7 +11059,6 @@ module.exports.overlapWithBoundingBox = function(boundingBox, boundingBox2) {
 //  *
 //  *  @return x pixel
 //  */
-// +(double) getXPixelWithWidth: (int) width andBoundingBox: (GPKGBoundingBox *) boundingBox andLongitude: (double) longitude;
 module.exports.getXPixelOffset = function(width, boundingBox, longitude) {
   var boxWidth = boundingBox.maxLongitude - boundingBox.minLongitude;
   var offset = longitude - boundingBox.minLongitude;
@@ -10132,7 +11087,6 @@ module.exports.getXPixelOffset = function(width, boundingBox, longitude) {
 //  *
 //  *  @return y pixel
 //  */
-// +(double) getYPixelWithHeight: (int) height andBoundingBox: (GPKGBoundingBox *) boundingBox andLatitude: (double) latitude;
 module.exports.getYPixelOffset = function(height, boundingBox, latitude) {
   var boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;
   var offset = boundingBox.maxLatitude - latitude;
@@ -10154,11 +11108,10 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
   var xcropPercentageMax = xcropMax / boxWidth;
 
   p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
-  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth - 1, totalWidth - 1 - (xpercentageMax * totalWidth)));
+  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth, totalWidth - (xpercentageMax * totalWidth)));
   p.tileCropXStart = Math.round(Math.max(0, 0 - xpercentageMin * tileWidth));
-  p.tileCropXEnd = Math.round(Math.min(tileWidth - 1, tileWidth - 1 - (xcropPercentageMax * tileWidth)));
-  p.xScale = (1 + p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
-
+  p.tileCropXEnd = Math.round(Math.min(tileWidth-1, tileWidth-1 - (xcropPercentageMax * tileWidth)));
+  p.xScale = (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
 
   var boxHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
   var yoffsetMax = totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude;
@@ -10169,10 +11122,10 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
   var ycropPercentageMin = ycropMin / boxHeight;
 
   p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
-  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight - 1, totalHeight - 1 - ypercentageMin * totalHeight));
+  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight, totalHeight - ypercentageMin * totalHeight));
   p.tileCropYStart = Math.round(Math.max(0, 0 - ypercentageMax * tileHeight));
-  p.tileCropYEnd = Math.round(Math.min(tileHeight - 1, tileHeight - 1 - (ycropPercentageMin * tileHeight)));
-  p.yScale = (1 + p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
+  p.tileCropYEnd = Math.round(Math.min(tileHeight-1, tileHeight-1 - (ycropPercentageMin * tileHeight)));
+  p.yScale = (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
 
   return p;
 }
@@ -10189,20 +11142,20 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
  */
 module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom) {
   var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
-		var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+	var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
 
-		var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
-				+ (x * tileSize);
-		var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
-				+ ((x + 1) * tileSize);
-		var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
-				- ((y + 1) * tileSize);
-		var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
-				- (y * tileSize);
+	var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ (x * tileSize);
+	var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ ((x + 1) * tileSize);
+	var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- ((y + 1) * tileSize);
+	var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- (y * tileSize);
 
-		var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
+	var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
 
-		return box;
+	return box;
 }
 
 /**
@@ -10740,10 +11693,10 @@ TileDao.prototype.queryForTilesWithZoomLevel = function (zoomLevel, tileCallback
  * @param  {Function} doneCallback called when all tiles are retrieved
  */
 TileDao.prototype.queryForTilesDescending = function (zoomLevel, tileCallback, doneCallback) {
-  this.queryForEqWithField(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ', DESC', function(err, result) {
+  this.queryForEqWithField(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ', DESC', function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 
@@ -10762,8 +11715,7 @@ TileDao.prototype.queryForTilesInColumn = function (column, zoomLevel, tileCallb
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
-    rowDone();
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 
@@ -10782,8 +11734,7 @@ TileDao.prototype.queryForTilesInRow = function (row, zoomLevel, tileCallback, d
   this.queryForFieldValues(fieldValues, function(err, result, rowDone) {
     if(!tileCallback) return;
     if (err || !result) return tileCallback(err);
-    tileCallback(err, this.getTileRow(result));
-    rowDone();
+    tileCallback(err, this.getTileRow(result), rowDone);
   }.bind(this), doneCallback);
 };
 
@@ -10839,42 +11790,21 @@ TileDao.prototype.queryByTileGrid = function (tileGrid, zoomLevel, tileCallback,
   );
 };
 
+TileDao.prototype.deleteTile = function(column, row, zoomLevel, callback) {
+  var where = '';
 
-// /**
-//  *  Query for the bounding tile grid with tiles at the zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return tile grid of tiles at the zoom level
-//  */
-// -(GPKGTileGrid *) queryForTileGridWithZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Delete a Tile
-//  *
-//  *  @param column    column
-//  *  @param row       row
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return number deleted, should be 0 or 1
-//  */
-// -(int) deleteTileWithColumn: (int) column andRow: (int) row andZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Count of Tiles at a zoom level
-//  *
-//  *  @param zoomLevel zoom level
-//  *
-//  *  @return count
-//  */
-// -(int) countWithZoomLevel: (int) zoomLevel;
-//
-// /**
-//  *  Determine if the tiles are in the standard web mercator coordinate tile format
-//  *
-//  *  @return true if standard web mercator format
-//  */
-// -(BOOL) isStandardWebMercatorFormat;
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_COLUMN, column);
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, row);
+
+  var whereArgs = this.buildWhereArgsWithValueArray([zoomLevel, column, row]);
+
+  this.deleteWhere(where, whereArgs, function(err, result) {
+    callback(err, result);
+  });
+};
 
 TileDao.prototype.getTileMatrixSetDao = function () {
   return new TileMatrixSetDao(this.connection);
@@ -10935,8 +11865,8 @@ TileRow.prototype.toObjectValue = function (value) {
   return value;
 };
 
-TileRow.prototype.toDatabaseValue = function (value) {
-  return value;
+TileRow.prototype.toDatabaseValue = function (columnName) {
+  return this.getValueWithColumnName(columnName);
 };
 
 /**
@@ -11369,6 +12299,8 @@ module.exports = UserDao;
  * @module user/userRow
  */
 
+var DataTypes = require('../db/dataTypes');
+
 /**
  * User Row containing the values from a single result row
  * @class UserRow
@@ -11384,23 +12316,23 @@ var UserRow = function(table, columnTypes, values) {
   this.table = table;
   /**
    * Column types of this row, based upon the data values
-   * @type {Array}
+   * @type {Object}
    */
   this.columnTypes = columnTypes;
   /**
    * Array of row values
-   * @type {Array}
+   * @type {Object}
    */
   this.values = values;
 
   if (!this.columnTypes) {
     var columnCount = this.table.columnCount();
-    this.columnTypes = [];
-    this.values = [];
-    for (var i = 0; i < columnCount; i++) {
-      this.columnTypes.push(null);
-      this.values.push(null);
-    }
+    this.columnTypes = {};
+    this.values = {};
+    // for (var i = 0; i < columnCount; i++) {
+    //   this.columnTypes.push(null);
+    //   this.values.push(null);
+    // }
   }
 }
 
@@ -11459,6 +12391,10 @@ UserRow.prototype.getValueWithIndex = function (index) {
  * @return {Object}            value
  */
 UserRow.prototype.getValueWithColumnName = function (columnName) {
+  var dataType = this.getRowColumnTypeWithColumnName(columnName);
+  if (dataType === DataTypes.GPKGDataType.BOOLEAN) {
+    return this.values[columnName] === 1 ? true : false;
+  }
   return this.values[columnName];
 };
 
@@ -11551,7 +12487,7 @@ UserRow.prototype.setValueWithIndex = function (index, value) {
  * @param {Object} value value
  */
 UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
-  this.values[index] = value;
+  this.values[this.getColumnNameWithIndex(index)] = value;
 };
 
 /**
@@ -11560,7 +12496,8 @@ UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
  * @param {Object} value      value
  */
 UserRow.prototype.setValueWithColumnName = function (columnName, value) {
-  this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
+  this.values[columnName] = value;
+  // this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
 };
 
 /**
@@ -11588,7 +12525,7 @@ UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes)
   // TODO implement validation
 };
 
-},{}],50:[function(require,module,exports){
+},{"../db/dataTypes":9}],50:[function(require,module,exports){
 /**
  * userTableReader module.
  * @module user/userTableReader
@@ -11717,8 +12654,242 @@ UserColumn.prototype.validateMax = function () {
 module.exports = UserColumn;
 
 },{"../db/dataTypes":9}],52:[function(require,module,exports){
-arguments[4][49][0].apply(exports,arguments)
-},{"dup":49}],53:[function(require,module,exports){
+(function (Buffer){
+/**
+ * UserRow module.
+ * @module user/userRow
+ */
+
+var DataTypes = require('../db/dataTypes');
+
+/**
+ * User Row containing the values from a single result row
+ * @class UserRow
+ * @param  {UserTable} table       user table
+ * @param  {Array} columnTypes column types
+ * @param  {Array} values      values
+ */
+var UserRow = function(table, columnTypes, values) {
+  /**
+   * User table
+   * @type {UserTable}
+   */
+  this.table = table;
+  /**
+   * Column types of this row, based upon the data values
+   * @type {Object}
+   */
+  this.columnTypes = columnTypes;
+  /**
+   * Array of row values
+   * @type {Object}
+   */
+  this.values = values;
+
+  if (!this.columnTypes) {
+    var columnCount = this.table.columnCount();
+    this.columnTypes = {};
+    this.values = {};
+    // for (var i = 0; i < columnCount; i++) {
+    //   this.columnTypes.push(null);
+    //   this.values.push(null);
+    // }
+  }
+}
+
+module.exports = UserRow;
+
+/**
+ * Get the column count
+ * @return {number} column count
+ */
+UserRow.prototype.columnCount = function () {
+  return this.table.columnCount();
+};
+
+/**
+ * Get the column names
+ * @return {Array} column names
+ */
+UserRow.prototype.getColumnNames = function () {
+  return this.table.columnNames;
+};
+
+/**
+ * Get the column name at the index
+ * @param  {Number} index index
+ * @return {string}       column name
+ */
+UserRow.prototype.getColumnNameWithIndex = function (index) {
+  return this.table.getColumnNameWithIndex(index);
+};
+
+/**
+ * Get the column index of the column name
+ * @param  {string} columnName column name
+ * @return {Number}            column index
+ */
+UserRow.prototype.getColumnIndexWithColumnName = function (columnName) {
+  return this.table.getColumnIndex(columnName);
+};
+
+/**
+ * Get the value at the index
+ * @param  {Number} index index
+ * @return {object}       value
+ */
+UserRow.prototype.getValueWithIndex = function (index) {
+  var value = this.values[this.getColumnNameWithIndex(index)];
+  if (value !== undefined) {
+    value = this.toObjectValue(index, value);
+  }
+  return value;
+};
+
+/**
+ * Get the value of the column name
+ * @param  {string} columnName column name
+ * @return {Object}            value
+ */
+UserRow.prototype.getValueWithColumnName = function (columnName) {
+  var dataType = this.getRowColumnTypeWithColumnName(columnName);
+  if (dataType === DataTypes.GPKGDataType.BOOLEAN) {
+    return this.values[columnName] === 1 ? true : false;
+  } else if (dataType === DataTypes.GPKGDataType.BLOB) {
+    return new Buffer(this.values[columnName]);
+  }
+  return this.values[columnName];
+};
+
+UserRow.prototype.toObjectValue = function (index, value) {
+  return value;
+};
+
+/**
+ * Get the row column type at the index
+ * @param  {Number} index index
+ * @return {Number}       row column type
+ */
+UserRow.prototype.getRowColumnTypeWithIndex = function (index) {
+  return this.columnTypes[this.getColumnNameWithIndex(index)];
+};
+
+/**
+ * Get the row column type of the column name
+ * @param  {string} columnName column name
+ * @return {Number}            row column type
+ */
+UserRow.prototype.getRowColumnTypeWithColumnName = function (columnName) {
+  return this.columnTypes[columnName];
+};
+
+/**
+ * Get the column at the index
+ * @param  {Number} index index
+ * @return {UserColumn}       column
+ */
+UserRow.prototype.getColumnWithIndex = function (index) {
+  return this.table.getColumnWithIndex(index);
+};
+
+/**
+ * Get the column of the column name
+ * @param  {string} columnName column name
+ * @return {UserColumn}            column
+ */
+UserRow.prototype.getColumnWithColumnName = function (columnName) {
+  return this.table.getColumnWithColumnName(columnName);
+};
+
+/**
+ * Get the id value, which is the value of the primary key
+ * @return {Number} id value
+ */
+UserRow.prototype.getId = function () {
+  var id = undefined;
+  var objectValue = this.getValueWithIndex(this.getPkColumnIndex());
+  if (objectValue == undefined) {
+    throw new Error('Row Id was null. Table: ' + this.table.tableName + ', Column Index: ' + this.getPkColumnIndex() + ', Column Name: ' + this.getPkColumn().name);
+  }
+  // TODO ensure the id was a number
+  id = objectValue;
+  return id;
+};
+
+/**
+ * Get the primary key column Index
+ * @return {Number} pk index
+ */
+UserRow.prototype.getPkColumnIndex = function () {
+  return this.table.pkIndex;
+};
+
+/**
+ * Get the primary key column
+ * @return {UserColumn} pk column
+ */
+UserRow.prototype.getPkColumn = function () {
+  return this.table.getPkColumn();
+};
+
+/**
+ * Set the value at the index
+ * @param {Number} index index
+ * @param {object} value value
+ */
+UserRow.prototype.setValueWithIndex = function (index, value) {
+  if (index === this.table.pkIndex) {
+    throw new Error('Cannot update the primary key of the row.  Table Name: ' + this.table.tableName + ', Index: ' + index + ', Name: ' + this.table.getPkColumn().name);
+  }
+  this.setValueNoValidationWithIndex(index, value);
+};
+
+/**
+ * Set the value at the index without validation
+ * @param {Number} index index
+ * @param {Object} value value
+ */
+UserRow.prototype.setValueNoValidationWithIndex = function (index, value) {
+  this.values[this.getColumnNameWithIndex(index)] = value;
+};
+
+/**
+ * Set the value of the column name
+ * @param {string} columnName column name
+ * @param {Object} value      value
+ */
+UserRow.prototype.setValueWithColumnName = function (columnName, value) {
+  this.values[columnName] = value;
+  // this.setValueWithIndex(this.getColumnIndexWithColumnName(columnName), value);
+};
+
+/**
+ * Set the primary key id value
+ * @param {Number} id id
+ */
+UserRow.prototype.setId = function (id) {
+  this.values[this.getPkColumnIndex()] = id;
+};
+
+/**
+ * Clears the id so the row can be used as part of an insert or create
+ */
+UserRow.prototype.resetId = function () {
+  this.values[this.getPkColumnIndex()] = undefined;
+};
+
+/**
+ * Validate the value and its actual value types against eh column data type class
+ * @param  {UserColumn} column     column
+ * @param  {Object} value      value
+ * @param  {Array} valueTypes value types
+ */
+UserRow.prototype.validateValueWithColumn = function (column, value, valueTypes) {
+  // TODO implement validation
+};
+
+}).call(this,require("buffer").Buffer)
+},{"../db/dataTypes":9,"buffer":59}],53:[function(require,module,exports){
 /**
  * userTable module.
  * @module user/userTable
@@ -11976,7 +13147,7 @@ module.exports.fromName = function(name) {
   return wktToEnum[name];
 }
 
-},{"wkx":364}],56:[function(require,module,exports){
+},{"wkx":368}],56:[function(require,module,exports){
 (function (process,global){
 /*!
  * async
@@ -41102,6 +42273,173 @@ if (typeof define === 'function') define(SQL);
 
 }).call(this,require('_process'),require("buffer").Buffer,"/node_modules/sql.js/js")
 },{"_process":259,"buffer":59,"crypto":63,"fs":57,"path":258}],351:[function(require,module,exports){
+(function (process){
+
+var Promise = require('any-promise')
+
+module.exports = function (stream, done) {
+  if (!stream) {
+    // no arguments, meaning stream = this
+    stream = this
+  } else if (typeof stream === 'function') {
+    // stream = this, callback passed
+    done = stream
+    stream = this
+  }
+
+  var deferred
+  if (!stream.readable) deferred = Promise.resolve([])
+  else deferred = new Promise(function (resolve, reject) {
+    // stream is already ended
+    if (!stream.readable) return resolve([])
+
+    var arr = []
+
+    stream.on('data', onData)
+    stream.on('end', onEnd)
+    stream.on('error', onEnd)
+    stream.on('close', onClose)
+
+    function onData(doc) {
+      arr.push(doc)
+    }
+
+    function onEnd(err) {
+      if (err) reject(err)
+      else resolve(arr)
+      cleanup()
+    }
+
+    function onClose() {
+      resolve(arr)
+      cleanup()
+    }
+
+    function cleanup() {
+      arr = null
+      stream.removeListener('data', onData)
+      stream.removeListener('end', onEnd)
+      stream.removeListener('error', onEnd)
+      stream.removeListener('close', onClose)
+    }
+  })
+
+  if (typeof done === 'function') {
+    deferred.then(function (arr) {
+      process.nextTick(function() {
+        done(null, arr)
+      })
+    }, done)
+  }
+
+  return deferred
+}
+
+}).call(this,require('_process'))
+},{"_process":259,"any-promise":352}],352:[function(require,module,exports){
+module.exports = require('./register')().Promise
+
+},{"./register":354}],353:[function(require,module,exports){
+"use strict"
+    // global key for user preferred registration
+var REGISTRATION_KEY = '@@any-promise/REGISTRATION',
+    // Prior registration (preferred or detected)
+    registered = null
+
+/**
+ * Registers the given implementation.  An implementation must
+ * be registered prior to any call to `require("any-promise")`,
+ * typically on application load.
+ *
+ * If called with no arguments, will return registration in
+ * following priority:
+ *
+ * For Node.js:
+ *
+ * 1. Previous registration
+ * 2. global.Promise if node.js version >= 0.12
+ * 3. Auto detected promise based on first sucessful require of
+ *    known promise libraries. Note this is a last resort, as the
+ *    loaded library is non-deterministic. node.js >= 0.12 will
+ *    always use global.Promise over this priority list.
+ * 4. Throws error.
+ *
+ * For Browser:
+ *
+ * 1. Previous registration
+ * 2. window.Promise
+ * 3. Throws error.
+ *
+ * Options:
+ *
+ * Promise: Desired Promise constructor
+ * global: Boolean - Should the registration be cached in a global variable to
+ * allow cross dependency/bundle registration?  (default true)
+ */
+module.exports = function(root, loadImplementation){
+  return function register(implementation, opts){
+    implementation = implementation || null
+    opts = opts || {}
+    // global registration unless explicitly  {global: false} in options (default true)
+    var registerGlobal = opts.global !== false;
+
+    // load any previous global registration
+    if(registered === null && registerGlobal){
+      registered = root[REGISTRATION_KEY] || null
+    }
+
+    if(registered !== null
+        && implementation !== null
+        && registered.implementation !== implementation){
+      // Throw error if attempting to redefine implementation
+      throw new Error('any-promise already defined as "'+registered.implementation+
+        '".  You can only register an implementation before the first '+
+        ' call to require("any-promise") and an implementation cannot be changed')
+    }
+
+    if(registered === null){
+      // use provided implementation
+      if(implementation !== null && typeof opts.Promise !== 'undefined'){
+        registered = {
+          Promise: opts.Promise,
+          implementation: implementation
+        }
+      } else {
+        // require implementation if implementation is specified but not provided
+        registered = loadImplementation(implementation)
+      }
+
+      if(registerGlobal){
+        // register preference globally in case multiple installations
+        root[REGISTRATION_KEY] = registered
+      }
+    }
+
+    return registered
+  }
+}
+
+},{}],354:[function(require,module,exports){
+"use strict";
+module.exports = require('./loader')(window, loadImplementation)
+
+/**
+ * Browser specific loadImplementation.  Always uses `window.Promise`
+ *
+ * To register a custom implementation, must register with `Promise` option.
+ */
+function loadImplementation(){
+  if(typeof window.Promise === 'undefined'){
+    throw new Error("any-promise browser requires a polyfill or explicit registration"+
+      " e.g: require('any-promise/register/bluebird')")
+  }
+  return {
+    Promise: window.Promise,
+    implementation: 'window.Promise'
+  }
+}
+
+},{"./loader":353}],355:[function(require,module,exports){
 var bundleFn = arguments[3];
 var sources = arguments[4];
 var cache = arguments[5];
@@ -41175,7 +42513,7 @@ module.exports = function (fn) {
     return worker;
 };
 
-},{}],352:[function(require,module,exports){
+},{}],356:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryReader;
 
@@ -41226,7 +42564,7 @@ BinaryReader.prototype.readVarInt = function () {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":59}],353:[function(require,module,exports){
+},{"buffer":59}],357:[function(require,module,exports){
 (function (Buffer){
 module.exports = BinaryWriter;
 
@@ -41295,7 +42633,7 @@ BinaryWriter.prototype.ensureSize = function (size) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":59}],354:[function(require,module,exports){
+},{"buffer":59}],358:[function(require,module,exports){
 (function (Buffer){
 module.exports = Geometry;
 
@@ -41677,7 +43015,7 @@ Geometry.prototype.toGeoJSON = function (options) {
 };
 
 }).call(this,{"isBuffer":require("../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":257,"./binaryreader":352,"./binarywriter":353,"./geometrycollection":355,"./linestring":356,"./multilinestring":357,"./multipoint":358,"./multipolygon":359,"./point":360,"./polygon":361,"./types":362,"./wktparser":363,"./zigzag.js":365}],355:[function(require,module,exports){
+},{"../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":257,"./binaryreader":356,"./binarywriter":357,"./geometrycollection":359,"./linestring":360,"./multilinestring":361,"./multipoint":362,"./multipolygon":363,"./point":364,"./polygon":365,"./types":366,"./wktparser":367,"./zigzag.js":369}],359:[function(require,module,exports){
 module.exports = GeometryCollection;
 
 var util = require('util');
@@ -41842,7 +43180,7 @@ GeometryCollection.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./types":362,"util":277}],356:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./types":366,"util":277}],360:[function(require,module,exports){
 module.exports = LineString;
 
 var util = require('util');
@@ -42022,7 +43360,7 @@ LineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag.js":365,"util":277}],357:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag.js":369,"util":277}],361:[function(require,module,exports){
 module.exports = MultiLineString;
 
 var util = require('util');
@@ -42208,7 +43546,7 @@ MultiLineString.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./linestring":356,"./point":360,"./types":362,"./zigzag.js":365,"util":277}],358:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./linestring":360,"./point":364,"./types":366,"./zigzag.js":369,"util":277}],362:[function(require,module,exports){
 module.exports = MultiPoint;
 
 var util = require('util');
@@ -42377,7 +43715,7 @@ MultiPoint.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag":365,"util":277}],359:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag":369,"util":277}],363:[function(require,module,exports){
 module.exports = MultiPolygon;
 
 var util = require('util');
@@ -42600,7 +43938,7 @@ MultiPolygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./polygon":361,"./types":362,"./zigzag.js":365,"util":277}],360:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./polygon":365,"./types":366,"./zigzag.js":369,"util":277}],364:[function(require,module,exports){
 module.exports = Point;
 
 var util = require('util');
@@ -42816,7 +44154,7 @@ Point.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./types":362,"./zigzag.js":365,"util":277}],361:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./types":366,"./zigzag.js":369,"util":277}],365:[function(require,module,exports){
 module.exports = Polygon;
 
 var util = require('util');
@@ -43106,7 +44444,7 @@ Polygon.prototype.toGeoJSON = function (options) {
     return geoJSON;
 };
 
-},{"./binarywriter":353,"./geometry":354,"./point":360,"./types":362,"./zigzag":365,"util":277}],362:[function(require,module,exports){
+},{"./binarywriter":357,"./geometry":358,"./point":364,"./types":366,"./zigzag":369,"util":277}],366:[function(require,module,exports){
 module.exports = {
     wkt: {
         Point: 'POINT',
@@ -43137,7 +44475,7 @@ module.exports = {
     }
 };
 
-},{}],363:[function(require,module,exports){
+},{}],367:[function(require,module,exports){
 module.exports = WktParser;
 
 var Types = require('./types');
@@ -43263,7 +44601,7 @@ WktParser.prototype.skipWhitespaces = function () {
         this.position++;
 };
 
-},{"./point":360,"./types":362}],364:[function(require,module,exports){
+},{"./point":364,"./types":366}],368:[function(require,module,exports){
 exports.Types = require('./types');
 exports.Geometry = require('./geometry');
 exports.Point = require('./point');
@@ -43273,7 +44611,7 @@ exports.MultiPoint = require('./multipoint');
 exports.MultiLineString = require('./multilinestring');
 exports.MultiPolygon = require('./multipolygon');
 exports.GeometryCollection = require('./geometrycollection');
-},{"./geometry":354,"./geometrycollection":355,"./linestring":356,"./multilinestring":357,"./multipoint":358,"./multipolygon":359,"./point":360,"./polygon":361,"./types":362}],365:[function(require,module,exports){
+},{"./geometry":358,"./geometrycollection":359,"./linestring":360,"./multilinestring":361,"./multipoint":362,"./multipolygon":363,"./point":364,"./polygon":365,"./types":366}],369:[function(require,module,exports){
 module.exports = {
     encode: function (value) {
         return (value << 1) ^ (value >> 31);

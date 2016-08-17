@@ -5,25 +5,29 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , TileDao = require('../../../lib/tiles/user/tileDao')
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
+  , testSetup = require('../../fixtures/testSetup')
   , wkx = require('wkx')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async')
-  , fs = require('fs');
+  , async = require('async');
 
 describe('TableCreator tests', function() {
 
-  var testGeoPackage = path.join('/tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
-    fs.unlink(testGeoPackage, function() {
-      fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-      GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-        geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
+    testSetup.deleteGeoPackage(testGeoPackage, function() {
+      testSetup.createBareGeoPackage(testGeoPackage, function(err, gp) {
+        geopackage = gp;
         done();
       });
     });
+  });
+
+  afterEach(function(done) {
+    geopackage.close();
+    testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
   it('should create the spatial reference system table', function(done) {

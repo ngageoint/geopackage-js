@@ -1,6 +1,7 @@
 var GeoPackageManager = require('../../../../lib/geoPackageManager')
   , ContentsDao = require('../../../../lib/core/contents').ContentsDao
   , Contents = require('../../../../lib/core/contents').Contents
+  , TileMatrix = require('../../../../lib/tiles/matrix').TileMatrix
   , should = require('chai').should()
   , path = require('path');
 
@@ -20,6 +21,10 @@ describe('Contents tests', function() {
       contentsDao = new ContentsDao(gp.getDatabase());
       done();
     });
+  });
+
+  afterEach('should close the geopackage', function(){
+    geoPackage.close();
   });
 
   it('should get the contents', function(done) {
@@ -180,16 +185,18 @@ describe('Contents tests', function() {
         should.not.exist(err);
         should.exist(matrix);
         matrix.should.have.property('length', 4);
-        matrix[0].should.be.deep.equal({
-          table_name: 'TILESosmds',
-          zoom_level: 0,
-          matrix_width: 1,
-          matrix_height: 1,
-          tile_width: 256,
-          tile_height: 256,
-          pixel_x_size: 156543.03392804097,
-          pixel_y_size: 156543.033928041
-        });
+
+        var tm = new TileMatrix();
+        tm.table_name ='TILESosmds';
+        tm.zoom_level = 0;
+        tm.matrix_width = 1;
+        tm.matrix_height = 1;
+        tm.tile_width = 256;
+        tm.tile_height = 256;
+        tm.pixel_x_size = 156543.03392804097;
+        tm.pixel_y_size = 156543.033928041;
+
+        matrix[0].should.be.deep.equal(tm);
         done();
       });
     });

@@ -14,6 +14,10 @@ describe('UserTableReader tests', function() {
     });
   });
 
+  afterEach('close the geopackage connection', function() {
+    connection.close();
+  });
+
   it('should read the table', function(done) {
     var reader = new UserTableReader('point2d');
     reader.readTable(connection, function(err, table) {

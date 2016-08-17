@@ -95,7 +95,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(2);
     var envelope = new Buffer(32);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -117,7 +117,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(4);
     var envelope = new Buffer(48);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -143,7 +143,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(6);
     var envelope = new Buffer(48);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -169,7 +169,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -199,7 +199,7 @@ describe('Geometry Data tests', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
-    envelope.writeDoubleBE(Number(5.0));
+    envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
     envelope.writeDoubleBE(Number(12.0), 24);
@@ -243,8 +243,50 @@ describe('Geometry Data tests', function() {
     done();
   });
 
-  // it('should create a point geometry data', function(done) {
-  //
-  // });
+  it('should create a point geometry data with an envelope', function(done) {
+    var geometryData = new GeometryData();
+    geometryData.setSrsId(4326);
+    geometryData.setGeometry(point);
+    geometryData.setEnvelope({
+      minX: 5.0,
+      maxX: 78.0,
+      minY: 12.0,
+      maxY: 29.0,
+      hasZ: true,
+      minZ: 87.0,
+      maxZ: 99.0,
+      hasM: true,
+      minM: 45.0,
+      maxM: 55.0
+    });
+    var buffer = geometryData.toData();
+    var geometryData2 = new GeometryData(buffer);
+    geometryData2.byteOrder.should.be.equal(0);
+    geometryData2.envelope.minX.should.be.equal(5.0);
+    geometryData2.envelope.maxX.should.be.equal(78.0);
+    geometryData2.envelope.minY.should.be.equal(12.0);
+    geometryData2.envelope.maxY.should.be.equal(29.0);
+    geometryData2.envelope.hasZ.should.be.equal(true);
+    geometryData2.envelope.minZ.should.be.equal(87.0);
+    geometryData2.envelope.maxZ.should.be.equal(99.0);
+    geometryData2.envelope.hasM.should.be.equal(true);
+    geometryData2.envelope.minM.should.be.equal(45.0);
+    geometryData2.envelope.maxM.should.be.equal(55.0);
+    geometryData2.geometry.x.should.be.equal(1);
+    geometryData2.geometry.y.should.be.equal(2);
+    done();
+  });
+
+  it('should create a point geometry data without an envelope', function(done) {
+    var geometryData = new GeometryData();
+    geometryData.setSrsId(4326);
+    geometryData.setGeometry(point);
+    var buffer = geometryData.toData();
+    var geometryData2 = new GeometryData(buffer);
+    geometryData2.byteOrder.should.be.equal(0);
+    geometryData2.geometry.x.should.be.equal(1);
+    geometryData2.geometry.y.should.be.equal(2);
+    done();
+  });
 
 });

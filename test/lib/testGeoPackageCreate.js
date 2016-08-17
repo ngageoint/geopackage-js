@@ -3,25 +3,29 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable')
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
+  , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkx = require('wkx')
   , path = require('path')
-  , async = require('async')
-  , fs = require('fs');
+  , async = require('async');
 
 describe('GeoPackage create tests', function() {
 
-  var testGeoPackage = path.join('/tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
-    fs.unlink(testGeoPackage, function() {
-      fs.closeSync(fs.openSync(testGeoPackage, 'w'));
-      GeoPackageConnection.connect(testGeoPackage, function(err, connection) {
-        geopackage = new GeoPackage(path.basename(testGeoPackage), testGeoPackage, connection);
+    testSetup.deleteGeoPackage(testGeoPackage, function() {
+      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+        geopackage = gp;
         done();
       });
     });
+  });
+
+  afterEach(function(done) {
+    geopackage.close();
+    testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
   it('should create the geometry columns table', function(done) {

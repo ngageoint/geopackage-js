@@ -15,6 +15,10 @@ describe('Data Columns tests', function() {
     });
   });
 
+  afterEach('should close the geopackage', function(){
+    connection.close();
+  });
+
   it('should get the data column for property_0', function(done) {
     var dc = new DataColumnsDao(connection);
     dc.getDataColumns('FEATURESriversds', 'property_0', function(err, dataColumn) {
