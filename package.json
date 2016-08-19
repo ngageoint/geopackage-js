@@ -98,7 +98,7 @@
     "karma": "karma start",
     "btest": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js",
     "btestwatch": "watchify ./test/test.js -d -v --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js",
-    "predoc": "rm -rf docs/*",
+    "predoc": "rm -rf docs/jsdoc/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
     "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
     "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js"
