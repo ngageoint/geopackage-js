@@ -1,7 +1,6 @@
 var css = require('./includes.css');
 
 var async = require('async')
-  , SQL = require('sql.js')
   , reproject = require('reproject')
   , L = require('leaflet')
   , $ = require('jquery')
@@ -16,7 +15,6 @@ window.$ = $;
 window.L = L;
 window.fileType = fileType;
 window.reproject = reproject;
-window.SQL = SQL;
 window.Mustache = Mustache;
 
 window.GeoPackageAPI = require('geopackage');
