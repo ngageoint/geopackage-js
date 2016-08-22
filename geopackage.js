@@ -3,7 +3,6 @@
  * @module GeoPackage
  */
 
-
 var wkx = require('wkx')
   , reproject = require('reproject')
   , SQL = require('sql.js');
@@ -144,8 +143,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           }
         }
         geoJson.id = currentRow.getId();
-        featureCallback(err, geoJson);
-        rowDone();
+        featureCallback(err, geoJson, rowDone);
       }, doneCallback);
     });
   });
