@@ -1,3 +1,9 @@
+/**
+ * GeoPackage module.
+ * @module GeoPackage
+ */
+
+
 var wkx = require('wkx')
   , reproject = require('reproject')
   , SQL = require('sql.js');
@@ -9,10 +15,20 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , BoundingBox = require('./lib/boundingBox')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
+/**
+ * Open a GeoPackage at the path specified
+ * @param  {String}   gppath   path where the GeoPackage exists
+ * @param  {Function} callback called with an error and the GeoPackage object if opened
+ */
 module.exports.openGeoPackage = function(gppath, callback) {
   GeoPackageManager.open(gppath, callback);
 };
 
+/**
+ * Open a GeoPackage from the byte array
+ * @param  {Uint8Array}   array    Array of GeoPackage bytes
+ * @param  {Function} callback called with an error if it occurred and the open GeoPackage object
+ */
 module.exports.openGeoPackageByteArray = function(array, callback) {
   var db = new SQL.Database(array);
   GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
@@ -21,6 +37,11 @@ module.exports.openGeoPackageByteArray = function(array, callback) {
   });
 };
 
+/**
+ * Creates a GeoPackage file at the path specified in node or opens an in memory GeoPackage on the browser
+ * @param  {String}   gppath   path to GeoPackage fileType
+ * @param  {Function} callback called with an error if one occurred and the open GeoPackage object
+ */
 module.exports.createGeoPackage = function(gppath, callback) {
   async.series([
     function(callback) {
@@ -43,10 +64,27 @@ module.exports.createGeoPackage = function(gppath, callback) {
   });
 };
 
+/**
+ * Adds a tile to the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {object}   tile       Byte array or Buffer containing the tile bytes
+ * @param  {String}   tableName  Table name to add the tile to
+ * @param  {Number}   zoom       zoom level of this tile
+ * @param  {Number}   tileRow    row of this tile
+ * @param  {Number}   tileColumn column of this tile
+ * @param  {Function} callback   called with an eror if one occurred and the inserted row
+ */
 module.exports.addTileToGeoPackage = function(geopackage, tile, tableName, zoom, tileRow, tileColumn, callback) {
   geopackage.addTile(tile, tableName, zoom, tileRow, tileColumn, callback);
 };
 
+/**
+ * Adds a GeoJSON feature to the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {object}   feature    GeoJSON feature to add
+ * @param  {String}   tableName  Table name to add the tile to
+ * @param  {Function} callback   called with an error if one occurred and the inserted row
+ */
 module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tableName, callback) {
   geopacakge.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
     var featureRow = featureDao.newRow();
@@ -65,10 +103,22 @@ module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tab
   });
 };
 
+/**
+ * Gets the feature tables from the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {Function} callback   called with an error if one occurred and the array of feature table names
+ */
 module.exports.getFeatureTables = function(geopackage, callback) {
   geopackage.getFeatureTables(callback);
 };
 
+/**
+ * Iterate GeoJSON features from table
+ * @param  {GeoPackage} geopackage      open GeoPackage object
+ * @param  {String} table           Table name to Iterate
+ * @param  {Function} featureCallback called with an error if one occurred and the next GeoJSON feature in the table
+ * @param  {Function} doneCallback    called when all rows are complete
+ */
 module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, featureCallback, doneCallback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err) {
@@ -101,6 +151,13 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
   });
 };
 
+/**
+ * Gets a GeoJSON feature from the table by id
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the table to get the feature from
+ * @param  {Number}   featureId  ID of the feature
+ * @param  {Function} callback   called with an error if one occurred and the GeoJSON feature
+ */
 module.exports.getFeature = function(geopackage, table, featureId, callback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     featureDao.getSrs(function(err, srs) {
@@ -129,10 +186,24 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
   });
 };
 
+/**
+ * Gets the tile table names from the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {Function} callback   called with an error if one occurred and the array of tile table names
+ */
 module.exports.getTileTables = function(geopackage, callback) {
   geopackage.getTileTables(callback);
 };
 
+/**
+ * Gets a tile from the specified table
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the table to get the tile from
+ * @param  {Number}   zoom       zoom level of the tile
+ * @param  {Number}   tileRow    row of the tile
+ * @param  {Number}   tileColumn column of the tile
+ * @param  {Function} callback   called with an error if one occurred and the TileRow object
+ */
 module.exports.getTileFromTable = function(geopackage, table, zoom, tileRow, tileColumn, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     if (err) return callback();
@@ -140,6 +211,17 @@ module.exports.getTileFromTable = function(geopackage, table, zoom, tileRow, til
   });
 };
 
+/**
+ * Gets the tiles in the EPSG:4326 bounding box
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the tile table
+ * @param  {Number}   zoom       Zoom of the tiles to query for
+ * @param  {Number}   west       EPSG:4326 western boundary
+ * @param  {Number}   east       EPSG:4326 eastern boundary
+ * @param  {Number}   south      EPSG:4326 southern boundary
+ * @param  {Number}   north      EPSG:4326 northern boundary
+ * @param  {Function} callback   called with an error if one occurred and a tiles object describing the tiles
+ */
 module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, east, south, north, callback) {
   var tiles = {};
 
@@ -212,6 +294,17 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
   });
 };
 
+/**
+ * Gets a tile image for an XYZ tile pyramid location
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the table containing the tiles
+ * @param  {Number}   x          x index of the tile
+ * @param  {Number}   y          y index of the tile
+ * @param  {Number}   z          zoom level of the tile
+ * @param  {Number}   width      width of the resulting tile
+ * @param  {Number}   height     height of the resulting tile
+ * @param  {Function} callback   Called with an error if one occurred and the tile buffer
+ */
 module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
@@ -219,6 +312,18 @@ module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, heig
   });
 };
 
+/**
+ * Draws an XYZ tile pyramid location into the provided canvas
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the table containing the tiles
+ * @param  {Number}   x          x index of the tile
+ * @param  {Number}   y          y index of the tile
+ * @param  {Number}   z          zoom level of the tile
+ * @param  {Number}   width      width of the resulting tile
+ * @param  {Number}   height     height of the resulting tile
+ * @param  {Canvas}   canvas     canvas element to draw the tile into
+ * @param  {Function} callback   Called with an error if one occurred
+ */
 module.exports.drawXYZTileInCanvas = function(geopackage, table, x, y, z, width, height, canvas, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
