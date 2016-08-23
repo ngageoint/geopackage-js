@@ -19,6 +19,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
 describe('GeoPackage Tile table create tests', function() {
 
   var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
+  var tableName = 'test_tiles.test';
   var geopackage;
 
   beforeEach(function(done) {
@@ -38,10 +39,10 @@ describe('GeoPackage Tile table create tests', function() {
   it('should create a tile table', function(done) {
 
     var requiredColumns = TileTable.createRequiredColumns();
-    var tileTable = new TileTable('test_tiles', requiredColumns);
+    var tileTable = new TileTable(tableName, requiredColumns);
 
     geopackage.createTileTable(tileTable, function(err, result) {
-      Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
+      Verification.verifyTableExists(geopackage, tableName, function(err) {
         if (err) return done(err);
         done();
       });
@@ -53,12 +54,12 @@ describe('GeoPackage Tile table create tests', function() {
     var contentsSrsId = 4326;
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
-    geopackage.createTileTableWithTableName('test_tiles', contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
       Verification.verifyTileMatrixSet(geopackage, function(err) {
         if (err) return done(err);
-        Verification.verifyContentsForTable(geopackage, 'test_tiles', function(err) {
+        Verification.verifyContentsForTable(geopackage, tableName, function(err) {
           if (err) return done(err);
-          Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
+          Verification.verifyTableExists(geopackage, tableName, function(err) {
             done(err);
           });
         });
@@ -76,13 +77,13 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.getSpatialReferenceSystemDao().createWebMercator(function(err, result) {
-        geopackage.createTileTableWithTableName('test_tiles', contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+        geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
           tileMatrixSet = result;
           Verification.verifyTileMatrixSet(geopackage, function(err) {
             if (err) return done(err);
-            Verification.verifyContentsForTable(geopackage, 'test_tiles', function(err) {
+            Verification.verifyContentsForTable(geopackage, tableName, function(err) {
               if (err) return done(err);
-              Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
+              Verification.verifyTableExists(geopackage, tableName, function(err) {
                 done(err);
               });
             });
@@ -111,14 +112,14 @@ describe('GeoPackage Tile table create tests', function() {
           async.eachSeries(tiles, function(xTile, xDone) {
             async.eachSeries(tiles, function(yTile, yDone) {
               testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
-                geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
+                geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
                   yDone();
                 });
               });
             }, xDone);
           }, zoomDone);
         }, function(err) {
-          geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+          geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
             tileDao.getCount(function(err, result) {
               result.should.be.equal(85);
               done(err);
@@ -140,13 +141,13 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.getSpatialReferenceSystemDao().createWebMercator(function(err, result) {
-        geopackage.createTileTableWithTableName('test_tiles', contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+        geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
           tileMatrixSet = result;
           Verification.verifyTileMatrixSet(geopackage, function(err) {
             if (err) return done(err);
-            Verification.verifyContentsForTable(geopackage, 'test_tiles', function(err) {
+            Verification.verifyContentsForTable(geopackage, tableName, function(err) {
               if (err) return done(err);
-              Verification.verifyTableExists(geopackage, 'test_tiles', function(err) {
+              Verification.verifyTableExists(geopackage, tableName, function(err) {
                 geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
 
                   async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
@@ -159,14 +160,14 @@ describe('GeoPackage Tile table create tests', function() {
                       async.eachSeries(tiles, function(yTile, yDone) {
                         testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
                           console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
-                          geopackage.addTile(image, 'test_tiles', zoom, yTile, xTile, function(err, result) {
+                          geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
                             yDone();
                           });
                         });
                       }, xDone);
                     }, zoomDone);
                   }, function(err) {
-                    geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+                    geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
                       tileDao.getCount(function(err, result) {
                         result.should.be.equal(85);
                         done(err);
@@ -182,7 +183,7 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should delete the tiles', function(done) {
-      geopackage.getTileDaoWithTableName('test_tiles', function(err, tileDao) {
+      geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
         tileDao.getCount(function(err, result) {
           result.should.be.equal(85);
           tileDao.deleteTile(0, 0, 0, function(err, result) {

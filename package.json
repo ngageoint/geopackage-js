@@ -1,6 +1,6 @@
 {
   "name": "geopackage",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "geopackage",
   "keywords": [
     "NGA",
@@ -67,9 +67,9 @@
     "sqlite3": "^3.1.2"
   },
   "private": true,
-  "main": "geopackage.js",
+  "main": "index.js",
   "files": [
-    "geopackage.js",
+    "index.js",
     "static/geopackage.js",
     "cli",
     "lib"
