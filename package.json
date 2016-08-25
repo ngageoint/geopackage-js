@@ -1,6 +1,6 @@
 {
   "name": "geopackage",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "geopackage",
   "keywords": [
     "NGA",
@@ -26,6 +26,7 @@
   "dependencies": {
     "async": "^1.5.0",
     "file-type": "^3.8.0",
+    "geojson-to-geopackage": "file:converters/geojson",
     "mocha": "^3.0.2",
     "proj4": "^2.3.14",
     "reproject": "^1.1.1",
@@ -72,7 +73,8 @@
     "index.js",
     "static/geopackage.js",
     "cli",
-    "lib"
+    "lib",
+    "converters"
   ],
   "browser": {
     "lwip": false,
