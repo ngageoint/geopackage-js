@@ -41,3 +41,5 @@ bower_components
 
 test/private
 test/fixtures/private
+**/*/tmp
+
