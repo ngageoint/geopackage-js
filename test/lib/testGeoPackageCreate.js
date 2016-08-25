@@ -126,7 +126,7 @@ describe('GeoPackage create tests', function() {
     });
   });
 
-  it('should create the feature tile link table', function(done) {
+  it.skip('should create the feature tile link table', function(done) {
     geopackage.createFeatureTileLinkTable(function(err, result) {
       should.not.exist(err);
       Verification.verifyFeatureTileLink(geopackage, done);

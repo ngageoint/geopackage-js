@@ -748,7 +748,6 @@ GeoPackage.prototype.createFeatureTable = function(extent, tableName, propertyCo
     contents.setSrsSync(srsEpsg3857);
     self.geoPackage.getContentsDaoSync().createSync(contents);
 
-
     var geometryColumns = new GeometryColumns();
     geometryColumns.setContentsSync(contents);
     geometryColumns.setSrsSync(contents.getSrsSync());

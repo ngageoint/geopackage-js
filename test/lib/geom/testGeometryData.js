@@ -13,7 +13,8 @@ describe('Geometry Data tests', function() {
   var srs = new Buffer(4);
   srs.writeUInt32BE(4326);
 
-  var point = new wkx.Point(1, 2).toWkb();
+  var rawPoint = new wkx.Point(1, 2);
+  var point = rawPoint.toWkb();
 
   it('should fail the magic number check', function(done) {
     var buffer = new Buffer('HI');
@@ -246,7 +247,7 @@ describe('Geometry Data tests', function() {
   it('should create a point geometry data with an envelope', function(done) {
     var geometryData = new GeometryData();
     geometryData.setSrsId(4326);
-    geometryData.setGeometry(point);
+    geometryData.setGeometry(rawPoint);
     geometryData.setEnvelope({
       minX: 5.0,
       maxX: 78.0,
@@ -280,7 +281,7 @@ describe('Geometry Data tests', function() {
   it('should create a point geometry data without an envelope', function(done) {
     var geometryData = new GeometryData();
     geometryData.setSrsId(4326);
-    geometryData.setGeometry(point);
+    geometryData.setGeometry(rawPoint);
     var buffer = geometryData.toData();
     var geometryData2 = new GeometryData(buffer);
     geometryData2.byteOrder.should.be.equal(0);

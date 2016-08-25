@@ -125,6 +125,7 @@ describe('GeoPackage tests', function() {
         geoPackage.getFeatureDaoWithContents(contents, function(err, featureDao) {
           should.not.exist(err);
           should.exist(featureDao);
+          featureDao.getGeometryType().should.be.equal('GEOMETRY');
           featureDao.table_name.should.be.equal('FEATURESriversds');
           connection.close();
           done();
