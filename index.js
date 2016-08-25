@@ -19,7 +19,7 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
-module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+// module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
 
 /**
  * Open a GeoPackage at the path specified
