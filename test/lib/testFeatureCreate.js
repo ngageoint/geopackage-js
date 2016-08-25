@@ -188,7 +188,7 @@ describe('GeoPackage Feature table create tests', function() {
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(4326);
-        var point = new wkx.Point(1, 2).toWkb();
+        var point = new wkx.Point(1, 2);
         geometryData.setGeometry(point);
         featureRow.setGeometry(geometryData);
         featureRow.setValueWithColumnName('test_text.test', 'hello');
@@ -230,7 +230,7 @@ describe('GeoPackage Feature table create tests', function() {
           var featureRow = featureDao.newRow();
           var geometryData = new GeometryData();
           geometryData.setSrsId(4326);
-          var point = new wkx.Point(1, 2).toWkb();
+          var point = new wkx.Point(1, 2);
           geometryData.setGeometry(point);
           featureRow.setGeometry(geometryData);
           featureRow.setValueWithColumnName('test_text.test', 'hello');

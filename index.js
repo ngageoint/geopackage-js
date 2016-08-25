@@ -15,6 +15,7 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
   , GeoPackageConnection = require('./lib/db/geoPackageConnection')
   , BoundingBox = require('./lib/boundingBox')
+  , GeometryData = require('./lib/geom/geometryData')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
@@ -67,9 +68,20 @@ module.exports.createGeoPackage = function(gppath, callback) {
   });
 };
 
+module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
+module.exports.BoundingBox = require('./lib/boundingBox');
+
 module.exports.createTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
   geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback);
 };
+
+module.exports.createStandardWebMercatorTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, minZoom, maxZoom, callback) {
+  module.exports.createTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
+    geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, function(err, result) {
+      callback(err, tileMatrixSet);
+    });
+  });
+}
 
 /**
  * Adds a tile to the GeoPackage
@@ -85,8 +97,20 @@ module.exports.addTileToGeoPackage = function(geopackage, tile, tableName, zoom,
   geopackage.addTile(tile, tableName, zoom, tileRow, tileColumn, callback);
 };
 
-module.exports.createFeatureTable = function(geopackage, tableName, callback) {
+module.exports.FeatureColumn = require('./lib/features/user/featureColumn');
+module.exports.GeometryColumns = require('./lib/features/columns').GeometryColumns;
+module.exports.DataColumns = require('./lib/dataColumns').DataColumns;
+module.exports.DataTypes = require('./lib/db/dataTypes');
 
+module.exports.createFeatureTable = function(geopackage, tableName, geometryColumn, featureColumns, callback) {
+  module.exports.createFeatureTableWithDataColumns(geopackage, tableName, geometryColumn, featureColumns, null, callback);
+};
+
+module.exports.createFeatureTableWithDataColumns = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, callback) {
+  var boundingBox = new BoundingBox(-180, 180, -90, 90);
+  geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumn, boundingBox, 4326, featureColumns, dataColumns, function(err, result) {
+    geopackage.getFeatureDaoWithTableName(tableName, callback);
+  });
 };
 
 /**
@@ -97,13 +121,14 @@ module.exports.createFeatureTable = function(geopackage, tableName, callback) {
  * @param  {Function} callback   called with an error if one occurred and the inserted row
  */
 module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tableName, callback) {
-  geopacakge.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
+  geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
     var featureRow = featureDao.newRow();
     var geometryData = new GeometryData();
     geometryData.setSrsId(4326);
     var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
     var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
-    featureRow.setGeometry(geometry);
+    geometryData.setGeometry(geometry);
+    featureRow.setGeometry(geometryData);
     for (var propertyKey in feature.properties) {
       if (feature.properties.hasOwnProperty(propertyKey)) {
         featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
@@ -174,12 +199,13 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
       featureDao.queryForIdObject(featureId, function(err, object, feature) {
         var currentRow = featureDao.getFeatureRow(feature);
         var geometry = currentRow.getGeometry();
+        var geoJson = {};
         if (geometry) {
-          var geom = geometry.geometry;
-          var geoJson = geometry.geometry.toGeoJSON();
+          var geom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
+            geom = reproject.reproject(geom, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
+          geoJson.geometry = geom;
         }
         geoJson.properties = {};
         for (var key in currentRow.values) {

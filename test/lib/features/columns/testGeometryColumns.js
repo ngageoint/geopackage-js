@@ -1,6 +1,7 @@
 var GeoPackageManager = require('../../../../lib/geoPackageManager')
   , GeometryColumnsDao = require('../../../../lib/features/columns').GeometryColumnsDao
   , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
+  , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
   , path = require('path');
 
@@ -53,9 +54,9 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({
-        table_name: 'point2d',
+      TestUtils.compareProperties(table, {
         column_name: 'geom',
+        table_name: 'point2d',
         geometry_type_name: 'POINT',
         srs_id: 0,
         z: 0,
@@ -89,7 +90,7 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({
+      TestUtils.compareProperties(table, {
         table_name: 'point2d',
         column_name: 'geom',
         geometry_type_name: 'POINT',
@@ -106,7 +107,7 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({
+      TestUtils.compareProperties(table, {
         table_name: 'point2d',
         column_name: 'geom',
         geometry_type_name: 'POINT',
@@ -115,7 +116,7 @@ describe('GeometryColumns tests', function() {
         m: 0
       });
       gcd.getSrs(table, function(err, srs) {
-        srs.should.be.deep.equal({
+        TestUtils.compareProperties(srs, {
           srs_name: 'Undefined geographic SRS',
           srs_id: 0,
           organization: 'NONE',
@@ -133,7 +134,7 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({
+      TestUtils.compareProperties(table, {
         table_name: 'point2d',
         column_name: 'geom',
         geometry_type_name: 'POINT',
@@ -164,7 +165,7 @@ describe('GeometryColumns tests', function() {
     gcd.queryForTableName('point2d', function(err, table) {
       should.not.exist(err);
       should.exist(table);
-      table.should.be.deep.equal({
+      TestUtils.compareProperties(table, {
         table_name: 'point2d',
         column_name: 'geom',
         geometry_type_name: 'POINT',
