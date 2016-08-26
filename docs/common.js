@@ -20,7 +20,6 @@
 
 }(this, document));
 
-  L.Icon.Default.imagePath = 'node_modules/leaflet/dist/images/';
 var map = L.map('map', {
   center: [45,0],
   zoom: 3,
@@ -71,7 +70,9 @@ window.saveGeoPackage = function() {
 window.loadGeoPackage = function(files) {
   var f = files[0];
   fileName = f.name;
-  $('#choose-label').text(f.name);
+  $('#choose-label').find('i').toggle();
+  $('#choose-label').find('span').text(f.name);
+
   var r = new FileReader();
   r.onload = function() {
     var array = new Uint8Array(r.result);
@@ -79,6 +80,7 @@ window.loadGeoPackage = function(files) {
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
       loadByteArray(array, function() {
+        $('#choose-label').find('i').toggle();
         $('#download').removeClass('gone');
       });
     }
@@ -94,6 +96,7 @@ window.loadGeoPackage = function(files) {
         geoPackage = gp;
         clearInfo();
         readGeoPackage(function() {
+          $('#choose-label').find('i').toggle();
           $('#download').removeClass('gone');
         });
       });
@@ -209,11 +212,16 @@ window.toggleLayer = function(layerType, table) {
   } else if (layerType === 'feature') {
     var geojsonLayer = L.geoJson([], {
         style: function (feature) {
-            return {
-              color: "#00F",
-              weight: 2,
-              opacity: 1
-            };
+          return {
+            color: "#00F",
+            weight: 2,
+            opacity: 1
+          };
+        },
+        pointToLayer: function(feature, latlng) {
+          return L.circleMarker(latlng, {
+            radius: 2
+          });
         },
         onEachFeature: function (feature, layer) {
           var string = "";
@@ -242,12 +250,13 @@ window.loadUrl = function(url, loadingElement, gpName) {
   xhr.open('GET', url, true);
   xhr.responseType = 'arraybuffer';
 
-  $('#choose-label').text(gpName);
+  $('#choose-label').find('span').text(gpName);
 
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
     loadByteArray(uInt8Array, function() {
       $('#download').removeClass('gone');
+      $('#choose-label').find('i').toggle();
       loadingElement.toggle();
     });
   };
