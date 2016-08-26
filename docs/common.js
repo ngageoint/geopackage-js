@@ -91,7 +91,7 @@ window.loadGeoPackage = function(files) {
         geoPackage = gp;
         clearInfo();
         readGeoPackage(function() {
-          $('#download').removeClass('hidden');
+          $('#download').removeClass('gone');
         });
       });
     }
