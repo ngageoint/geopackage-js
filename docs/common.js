@@ -246,6 +246,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
     loadByteArray(uInt8Array, function() {
+      $('#download').removeClass('gone');
       loadingElement.toggle();
     });
   };
