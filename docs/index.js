@@ -18,3 +18,4 @@ window.reproject = reproject;
 window.Mustache = Mustache;
 
 window.GeoPackageAPI = require('geopackage');
+window.GeoJSONToGeoPackage = require('geojson-to-geopackage');

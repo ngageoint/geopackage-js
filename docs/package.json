@@ -3,7 +3,8 @@
   "dependencies": {
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
-    "geopackage": "../..",
+    "geopackage": "..",
+    "geojson-to-geopackage": "../converters/geojson",
     "jquery": "^2.2.3",
     "leaflet": "^0.7.7",
     "mustache": "^2.2.1",

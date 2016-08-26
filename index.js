@@ -55,7 +55,7 @@ module.exports.createGeoPackage = function(gppath, callback) {
   }
   async.series([
     function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
+      if (typeof(process) !== 'undefined' && process.version && gppath) {
         fs.mkdir(path.dirname(gppath), function() {
           fs.open(gppath, 'w', callback);
         });
