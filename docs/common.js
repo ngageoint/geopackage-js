@@ -77,7 +77,9 @@ window.loadGeoPackage = function(files) {
 
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
-      loadByteArray(array);
+      loadByteArray(array, function() {
+        $('#download').removeClass('gone');
+      });
     }
     // if it is a GeoJSON file
     else if (f.name.lastIndexOf('json') > f.name.lastIndexOf('.')) {
