@@ -73,6 +73,11 @@ body {
   color: #222;
 }
 
+.gone {
+  visibility: hidden;
+  height: 0px;
+}
+
 .hidden {
   visibility: hidden;
 }
