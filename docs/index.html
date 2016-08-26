@@ -31,7 +31,10 @@
       </div>
       <div style="padding: 7px;">
         <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
-        <label id="choose-label" for="file">Open a GeoPackage</label>
+        <label id="choose-label" for="file">Open a GeoPackage or GeoJSON file</label>
+      </div>
+      <div style="padding: 7px;" id="download" class="hidden">
+        <a href="javascript:void(0);" onclick="saveGeoPackage()">Download As GeoPackage</a>
       </div>
 
       <div style="padding: 7px;">

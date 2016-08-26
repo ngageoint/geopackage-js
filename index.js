@@ -19,6 +19,8 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
+// module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+
 /**
  * Open a GeoPackage at the path specified
  * @param  {String}   gppath   path where the GeoPackage exists
@@ -47,9 +49,13 @@ module.exports.openGeoPackageByteArray = function(array, callback) {
  * @param  {Function} callback called with an error if one occurred and the open GeoPackage object
  */
 module.exports.createGeoPackage = function(gppath, callback) {
+  if (!callback) {
+    callback = gppath;
+    gppath = undefined;
+  }
   async.series([
     function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
+      if (typeof(process) !== 'undefined' && process.version && gppath) {
         fs.mkdir(path.dirname(gppath), function() {
           fs.open(gppath, 'w', callback);
         });
@@ -59,7 +65,8 @@ module.exports.createGeoPackage = function(gppath, callback) {
     }
   ], function() {
     GeoPackageConnection.connect(gppath, function(err, connection) {
-      var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
+      var name = gppath ? path.basename(gppath) : 'geopackage';
+      var geopackage = new GeoPackage(name, gppath, connection);
       var tc = new TableCreator(geopackage);
       tc.createRequired(function() {
         callback(null, geopackage);

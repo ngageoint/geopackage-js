@@ -8,7 +8,8 @@ describe('GeoPackageAPI tests', function() {
   var existingPath = path.join(__dirname, 'fixtures', 'rivers.gpkg');
   var geopackageToCreate = path.join(__dirname, 'tmp', 'tmp.gpkg');
 
-  it('should open the geopackage', function(done) {
+
+  it.only('should open the geopackage', function(done) {
     GeoPackage.openGeoPackage(existingPath, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);

@@ -45,20 +45,61 @@ var tableLayers;
 var imageOverlay;
 var currentTile = {};
 var tableInfos;
+var fileName;
+
+var saveByteArray = (function () {
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    return function (data, name) {
+        var blob = new Blob(data, {type: "octet/stream"}),
+            url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+}());
+
+window.saveGeoPackage = function() {
+  geoPackage.export(function(err, data) {
+    saveByteArray([data.buffer], fileName.substring(0, fileName.lastIndexOf('.')) + '.gpkg');
+  });
+}
 
 window.loadGeoPackage = function(files) {
   var f = files[0];
+  fileName = f.name;
   $('#choose-label').text(f.name);
   var r = new FileReader();
   r.onload = function() {
     var array = new Uint8Array(r.result);
-    loadByteArray(array);
+
+    // if it is a GeoPackage file
+    if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
+      loadByteArray(array);
+    }
+    // if it is a GeoJSON file
+    else if (f.name.lastIndexOf('json') > f.name.lastIndexOf('.')) {
+      var jsonString = '';
+      var len = array.byteLength;
+      for (var i = 0; i < len; i++) {
+        jsonString += String.fromCharCode( array[ i ] );
+      }
+      var json = JSON.parse(jsonString);
+      GeoJSONToGeoPackage.convert(json, function(err, gp) {
+        geoPackage = gp;
+        clearInfo();
+        readGeoPackage(function() {
+          $('#download').removeClass('hidden');
+        });
+      });
+    }
   }
   r.readAsArrayBuffer(f);
 }
 
-function loadByteArray(array, callback) {
-  tableInfos = {};
+function clearInfo() {
   var tileTableNode = $('#tile-tables');
   tileTableNode.empty();
   var featureTableNode = $('#feature-tables');
@@ -71,51 +112,61 @@ function loadByteArray(array, callback) {
   if (imageOverlay) {
     map.removeLayer(imageOverlay);
   }
+  $('#information').removeClass('hidden').addClass('visible');
+}
 
+function loadByteArray(array, callback) {
+  clearInfo();
+
+  GeoPackageAPI.openGeoPackageByteArray(array, function(err, gp) {
+    geoPackage = gp;
+    readGeoPackage(callback);
+  });
+}
+
+function readGeoPackage(callback) {
+  tableInfos = {};
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
 
   var tileTableTemplate = $('#tile-table-template').html();
   Mustache.parse(tileTableTemplate);
 
-  $('#information').removeClass('hidden').addClass('visible');
+  var tileTableNode = $('#tile-tables');
+  var featureTableNode = $('#feature-tables');
 
-  GeoPackageAPI.openGeoPackageByteArray(array, function(err, gp) {
-    geoPackage = gp;
-
-    async.parallel([
-      function(callback) {
-        geoPackage.getTileTables(function(err, tables) {
-          async.eachSeries(tables, function(table, callback) {
-            geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
-              geoPackage.getInfoForTable(tileDao, function(err, info) {
-                tableInfos[table] = info;
-                var rendered = Mustache.render(tileTableTemplate, info);
-                tileTableNode.append(rendered);
-                callback();
-              });
+  async.parallel([
+    function(callback) {
+      geoPackage.getTileTables(function(err, tables) {
+        async.eachSeries(tables, function(table, callback) {
+          geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+            geoPackage.getInfoForTable(tileDao, function(err, info) {
+              tableInfos[table] = info;
+              var rendered = Mustache.render(tileTableTemplate, info);
+              tileTableNode.append(rendered);
+              callback();
             });
-          }, callback);
-        });
-      }, function(callback) {
-        geoPackage.getFeatureTables(function(err, tables) {
-          async.eachSeries(tables, function(table, callback) {
-            geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-              if (err) {
-                return callback();
-              }
-              geoPackage.getInfoForTable(featureDao, function(err, info) {
-                tableInfos[table] = info;
-                var rendered = Mustache.render(featureTableTemplate, info);
-                featureTableNode.append(rendered);
-                callback();
-              });
+          });
+        }, callback);
+      });
+    }, function(callback) {
+      geoPackage.getFeatureTables(function(err, tables) {
+        async.eachSeries(tables, function(table, callback) {
+          geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+            if (err) {
+              return callback();
+            }
+            geoPackage.getInfoForTable(featureDao, function(err, info) {
+              tableInfos[table] = info;
+              var rendered = Mustache.render(featureTableTemplate, info);
+              featureTableNode.append(rendered);
+              callback();
             });
-          }, callback);
-        });
-      }
-    ], callback);
-  });
+          });
+        }, callback);
+      });
+    }
+  ], callback);
 }
 
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
@@ -171,8 +222,9 @@ window.toggleLayer = function(layerType, table) {
     });
     var tableInfo = tableInfos[table];
 
-    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson) {
+    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson, done) {
       geojsonLayer.addData(geoJson);
+      done();
     }, function(err) {
       geojsonLayer.addTo(map);
       geojsonLayer.bringToFront();
@@ -323,7 +375,7 @@ window.loadFeatures = function(tableName, featuresElement) {
     features: []
   };
   console.log('columns', features.columns);
-  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature) {
+  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature, featureDone) {
     feature.tableName = tableName;
     feature.values = [];
     console.log('feature.properties', feature.properties);
@@ -336,6 +388,7 @@ window.loadFeatures = function(tableName, featuresElement) {
       }
     }
     features.features.push(feature);
+    featureDone();
   }, function() {
     var rendered = Mustache.render(featuresTableTemplate, features);
     featuresElement.empty();

@@ -1,4 +1,2 @@
 --recursive
 --require chai
---reporter mochawesome
---reporter-options reportName=geopackage
