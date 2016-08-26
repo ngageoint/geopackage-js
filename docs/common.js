@@ -63,7 +63,7 @@ var saveByteArray = (function () {
 
 window.saveGeoPackage = function() {
   geoPackage.export(function(err, data) {
-    fileName = fileName || 'geopackage';
+    fileName = fileName || 'geopackage.gpkg';
     saveByteArray([data.buffer], fileName.substring(0, fileName.lastIndexOf('.')) + '.gpkg');
   });
 }
