@@ -237,6 +237,8 @@ window.toggleLayer = function(layerType, table) {
 }
 
 window.loadUrl = function(url, loadingElement, gpName) {
+  fileName = url.split('/').pop();
+  console.log(fileName)
   loadingElement.toggle();
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
