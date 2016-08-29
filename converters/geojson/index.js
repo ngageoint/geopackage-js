@@ -14,15 +14,23 @@ module.exports.convert = function(geoJson, geopackage, progressCallback, doneCal
 
 function setupConversion(geoJson, geopackage, progressCallback, doneCallback, append) {
   if (typeof geopackage === 'function') {
-    callback = progressCallback;
+    doneCallback = progressCallback;
     progressCallback = geopackage;
     geopackage = undefined;
+  }
+  if (!doneCallback) {
+    doneCallback = progressCallback;
+    progressCallback = function(status, cb) {
+      cb();
+    }
   }
   async.waterfall([
     // create or open the geopackage
     function(callback) {
       if (typeof geopackage === 'object') {
-        return callback(null, geopackage);
+        return progressCallback({status: 'Opening GeoPackage'}, function() {
+          callback(null, geopackage);
+        });
       }
 
       try {
@@ -34,7 +42,9 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
           return GeoPackage.openGeoPackage(geopackage, callback);
         }
       } catch (e) {}
-      return GeoPackage.createGeoPackage(geopackage, callback);
+      return progressCallback({status: 'Creating GeoPackage'}, function() {
+        GeoPackage.createGeoPackage(geopackage, callback);
+      });
     },
     // figure out the table name to put the data into
     function(geopackage, callback) {
@@ -54,9 +64,11 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
     // get the GeoJSON data
     function(geopackage, tableName, callback) {
       if (typeof geoJson === 'string') {
-        fs.readFile(geoJson, 'utf8', function(err, data) {
-          geoJson = JSON.parse(data);
-          callback(null, geopackage, tableName, geoJson);
+        progressCallback({status: 'Reading GeoJSON file'}, function() {
+          fs.readFile(geoJson, 'utf8', function(err, data) {
+            geoJson = JSON.parse(data);
+            callback(null, geopackage, tableName, geoJson);
+          });
         });
       } else {
         callback(null, geopackage, tableName, geoJson);
@@ -67,61 +79,64 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
       convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, doneCallback);
     }
   ], function done(err) {
-    callback(err, geopackage);
+    doneCallback(err, geopackage);
   });
 };
 
 function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
-  if (!callback) {
-    callback = progressCallback;
-    progressCallback = function(status, cb) {
-      cb();
-    }
-  }
-
   async.waterfall([function(callback) {
     var properties = {};
     var count = 0;
     var featureCount = geoJson.features.length;
-    // first loop to find all properties of all features.  Has to be a better way...
-    async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
-      async.setImmediate(function() {
-        for (var key in feature.properties) {
-          if (!properties[key]) {
-            var type = typeof feature.properties[key];
-            if (type === 'object') {
-              if (feature.properties[key] instanceof Date) {
-                type = 'Date';
+    var fivePercent = Math.floor(featureCount/20);
+    progressCallback({status: 'Reading GeoJSON feature properties'}, function() {
+      // first loop to find all properties of all features.  Has to be a better way...
+      async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
+        async.setImmediate(function() {
+          for (var key in feature.properties) {
+            if (!properties[key]) {
+              var type = typeof feature.properties[key];
+              if (type === 'object') {
+                if (feature.properties[key] instanceof Date) {
+                  type = 'Date';
+                }
               }
+              switch(type) {
+                case 'Date':
+                  type = 'DATETIME';
+                  break;
+                case 'number':
+                  type = 'DOUBLE';
+                  break;
+                case 'string':
+                  type = 'TEXT';
+                  break;
+                case 'boolean':
+                  type = 'BOOLEAN';
+                  break;
+              }
+              properties[key] = {
+                name: key,
+                type: type
+              };
             }
-            switch(type) {
-              case 'Date':
-                type = 'DATETIME';
-                break;
-              case 'number':
-                type = 'DOUBLE';
-                break;
-              case 'string':
-                type = 'TEXT';
-                break;
-              case 'boolean':
-                type = 'BOOLEAN';
-                break;
-            }
-            properties[key] = {
-              name: key,
-              type: type
-            };
           }
-        }
+          if (count++ % fivePercent === 0) {
+            progressCallback({
+              status: 'Reading GeoJSON feature properties',
+              completed: count,
+              total: featureCount
+            }, callback);
+          } else {
+            callback();
+          }
+        });
+      }, function done(err) {
         progressCallback({
-          status: 'Parsing properties',
-          completed: count++,
-          total: featureCount
-        }, callback);
+          status: 'Done reading GeoJSON properties'
+        });
+        callback(err, properties);
       });
-    }, function done(err) {
-      callback(err, properties);
     });
   }, function(properties, callback) {
     var FeatureColumn = GeoPackage.FeatureColumn;
@@ -144,23 +159,31 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
       index++;
     }
-
-    GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, callback);
+    progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
+      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, callback);
+    });
   }, function(featureDao, callback) {
     var count = 0;
     var featureCount = geoJson.features.length;
+    var fivePercent = Math.floor(featureCount / 20);
     async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
       async.setImmediate(function() {
         GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
-          progressCallback({
-            status: 'Parsing properties',
-            completed: count++,
-            total: featureCount
-          }, callback);
+          if (count++ % fivePercent === 0) {
+            progressCallback({
+              status: 'Inserting features into table "' + tableName + '"',
+              completed: count,
+              total: featureCount
+            }, callback);
+          } else {
+            callback();
+          }
         });
       });
     }, function done() {
-      callback();
+      progressCallback({
+        status: 'Done inserted features into table "' + tableName + '"'
+      }, callback);
     });
   }
 

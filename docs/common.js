@@ -72,6 +72,7 @@ window.loadGeoPackage = function(files) {
   fileName = f.name;
   $('#choose-label').find('i').toggle();
   $('#choose-label').find('span').text(f.name);
+  $('#status').removeClass('gone');
 
   var r = new FileReader();
   r.onload = function() {
@@ -92,12 +93,20 @@ window.loadGeoPackage = function(files) {
         jsonString += String.fromCharCode( array[ i ] );
       }
       var json = JSON.parse(jsonString);
-      GeoJSONToGeoPackage.convert(json, function(err, gp) {
+      GeoJSONToGeoPackage.convert(json, function(status, callback) {
+        var text = status.status;
+        if (status.completed) {
+          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+        }
+        $('#status').text(text);
+        setTimeout(callback, 0);
+      }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
         readGeoPackage(function() {
           $('#choose-label').find('i').toggle();
           $('#download').removeClass('gone');
+          $('#status').addClass('gone');
         });
       });
     }
