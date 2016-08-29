@@ -187,7 +187,9 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           }
         }
         geoJson.id = currentRow.getId();
-        featureCallback(err, geoJson, rowDone);
+        async.setImmediate(function() {
+          featureCallback(err, geoJson, rowDone);
+        });
       }, doneCallback);
     });
   });
