@@ -216,6 +216,7 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
           }
           geoJson.geometry = geom;
         }
+        geoJson.type = 'Feature';
         geoJson.properties = {};
         for (var key in currentRow.values) {
           if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
