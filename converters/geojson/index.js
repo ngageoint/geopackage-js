@@ -134,8 +134,9 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       }, function done(err) {
         progressCallback({
           status: 'Done reading GeoJSON properties'
+        }, function() {
+          callback(err, properties);
         });
-        callback(err, properties);
       });
     });
   }, function(properties, callback) {
