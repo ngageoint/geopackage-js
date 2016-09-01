@@ -74,6 +74,43 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
         callback(null, geopackage, tableName, geoJson);
       }
     },
+    function(geopackage, tableName, geoJson, callback) {
+      var correctedGeoJson = {
+        type: 'FeatureCollection',
+        features: []
+      };
+      async.eachSeries(geoJson.features, function featureIterator(feature, featureCallback) {
+        async.setImmediate(function() {
+          var splitType = '';
+          if (feature.geometry.type === 'MultiPolygon') {
+            splitType = 'Polygon';
+          } else if (feature.geometry.type === 'MultiLineString') {
+            splitType = 'LineString';
+          } else {
+            correctedGeoJson.features.push(feature);
+            return featureCallback();
+          }
+
+          // split if necessary
+          async.eachSeries(feature.geometry.coordinates, function splitIterator(coords, splitCallback) {
+            async.setImmediate(function() {
+              correctedGeoJson.features.push({
+                type: 'Feature',
+                properties: feature.properties,
+                geometry: {
+                  type: splitType,
+                  coordinates: coords
+                }
+              });
+              splitCallback();
+            });
+          }, featureCallback);
+
+        });
+      }, function done() {
+        callback(null, geopackage, tableName, correctedGeoJson);
+      });
+    },
     // Go
     function(geopackage, tableName, geoJson, callback) {
       convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, doneCallback);

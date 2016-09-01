@@ -30,6 +30,7 @@ describe('GeoJSON to GeoPackage tests', function() {
   });
 
   it('should convert the natural earth 10m file', function(done) {
+    this.timeout(10000);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_10m_land.gpkg'));
     } catch (e) {}
@@ -44,7 +45,7 @@ describe('GeoJSON to GeoPackage tests', function() {
         tables[0].should.be.equal('ne_10m_land');
         geopackage.getFeatureDaoWithTableName('ne_10m_land', function(err, featureDao) {
           featureDao.getCount(function(err, count) {
-            count.should.be.equal(1);
+            count.should.be.equal(4063);
             done();
           });
         });
