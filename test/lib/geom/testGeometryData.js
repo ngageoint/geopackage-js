@@ -244,7 +244,7 @@ describe('Geometry Data tests', function() {
     done();
   });
 
-  it.only('should create a point geometry data with an envelope', function(done) {
+  it('should create a point geometry data with an envelope', function(done) {
     var geometryData = new GeometryData();
     geometryData.empty.should.be.equal(true);
     geometryData.setSrsId(4326);
