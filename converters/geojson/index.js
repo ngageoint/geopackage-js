@@ -74,6 +74,43 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
         callback(null, geopackage, tableName, geoJson);
       }
     },
+    function(geopackage, tableName, geoJson, callback) {
+      var correctedGeoJson = {
+        type: 'FeatureCollection',
+        features: []
+      };
+      async.eachSeries(geoJson.features, function featureIterator(feature, featureCallback) {
+        async.setImmediate(function() {
+          var splitType = '';
+          if (feature.geometry.type === 'MultiPolygon') {
+            splitType = 'Polygon';
+          } else if (feature.geometry.type === 'MultiLineString') {
+            splitType = 'LineString';
+          } else {
+            correctedGeoJson.features.push(feature);
+            return featureCallback();
+          }
+
+          // split if necessary
+          async.eachSeries(feature.geometry.coordinates, function splitIterator(coords, splitCallback) {
+            async.setImmediate(function() {
+              correctedGeoJson.features.push({
+                type: 'Feature',
+                properties: feature.properties,
+                geometry: {
+                  type: splitType,
+                  coordinates: coords
+                }
+              });
+              splitCallback();
+            });
+          }, featureCallback);
+
+        });
+      }, function done() {
+        callback(null, geopackage, tableName, correctedGeoJson);
+      });
+    },
     // Go
     function(geopackage, tableName, geoJson, callback) {
       convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, doneCallback);
@@ -95,30 +132,36 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
         async.setImmediate(function() {
           for (var key in feature.properties) {
             if (!properties[key]) {
-              var type = typeof feature.properties[key];
-              if (type === 'object') {
-                if (feature.properties[key] instanceof Date) {
-                  type = 'Date';
-                }
-              }
-              switch(type) {
-                case 'Date':
-                  type = 'DATETIME';
-                  break;
-                case 'number':
-                  type = 'DOUBLE';
-                  break;
-                case 'string':
-                  type = 'TEXT';
-                  break;
-                case 'boolean':
-                  type = 'BOOLEAN';
-                  break;
-              }
-              properties[key] = {
-                name: key,
-                type: type
+              properties[key] = properties[key] || {
+                name: key
               };
+
+              var type = typeof feature.properties[key];
+              if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
+                if (type === 'object') {
+                  if (feature.properties[key] instanceof Date) {
+                    type = 'Date';
+                  }
+                }
+                switch(type) {
+                  case 'Date':
+                    type = 'DATETIME';
+                    break;
+                  case 'number':
+                    type = 'DOUBLE';
+                    break;
+                  case 'string':
+                    type = 'TEXT';
+                    break;
+                  case 'boolean':
+                    type = 'BOOLEAN';
+                    break;
+                }
+                properties[key] = {
+                  name: key,
+                  type: type
+                };
+              }
             }
           }
           if (count++ % fivePercent === 0) {
