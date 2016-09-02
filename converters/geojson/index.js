@@ -132,30 +132,36 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
         async.setImmediate(function() {
           for (var key in feature.properties) {
             if (!properties[key]) {
-              var type = typeof feature.properties[key];
-              if (type === 'object') {
-                if (feature.properties[key] instanceof Date) {
-                  type = 'Date';
-                }
-              }
-              switch(type) {
-                case 'Date':
-                  type = 'DATETIME';
-                  break;
-                case 'number':
-                  type = 'DOUBLE';
-                  break;
-                case 'string':
-                  type = 'TEXT';
-                  break;
-                case 'boolean':
-                  type = 'BOOLEAN';
-                  break;
-              }
-              properties[key] = {
-                name: key,
-                type: type
+              properties[key] = properties[key] || {
+                name: key
               };
+
+              var type = typeof feature.properties[key];
+              if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
+                if (type === 'object') {
+                  if (feature.properties[key] instanceof Date) {
+                    type = 'Date';
+                  }
+                }
+                switch(type) {
+                  case 'Date':
+                    type = 'DATETIME';
+                    break;
+                  case 'number':
+                    type = 'DOUBLE';
+                    break;
+                  case 'string':
+                    type = 'TEXT';
+                    break;
+                  case 'boolean':
+                    type = 'BOOLEAN';
+                    break;
+                }
+                properties[key] = {
+                  name: key,
+                  type: type
+                };
+              }
             }
           }
           if (count++ % fivePercent === 0) {
