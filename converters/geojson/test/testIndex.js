@@ -142,4 +142,28 @@ describe('GeoJSON to GeoPackage tests', function() {
       });
     });
   });
+
+  it('should convert the natural earth 110m file and add read it out as geojson', function(done) {
+    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    GeoJSONToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('ne_110m_land');
+        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(127);
+
+            GeoJSONToGeoPackage.extract(geopackage, 'ne_110m_land', function(err, geoJson) {
+              geoJson.features.length.should.be.equal(127);
+              done();
+            });
+          });
+        });
+      });
+    });
+  });
 });

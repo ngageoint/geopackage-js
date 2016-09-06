@@ -244,7 +244,9 @@ window.toggleLayer = function(layerType, table) {
 
     GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson, done) {
       geojsonLayer.addData(geoJson);
-      done();
+      async.setImmediate(function(){
+        done();
+      });
     }, function(err) {
       geojsonLayer.addTo(map);
       geojsonLayer.bringToFront();
@@ -410,7 +412,9 @@ window.loadFeatures = function(tableName, featuresElement) {
       }
     }
     features.features.push(feature);
-    featureDone();
+    async.setImmediate(function(){
+      featureDone();
+    });
   }, function() {
     var rendered = Mustache.render(featuresTableTemplate, features);
     featuresElement.empty();

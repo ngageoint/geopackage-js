@@ -165,7 +165,7 @@ module.exports.getFeatureTables = function(geopackage, callback) {
 module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, featureCallback, doneCallback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err) {
-      return doneCallback();
+      return doneCallback(err);
     }
     featureDao.getSrs(function(err, srs) {
       featureDao.queryForEach(function(err, row, rowDone) {
@@ -187,9 +187,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           }
         }
         geoJson.id = currentRow.getId();
-        async.setImmediate(function() {
-          featureCallback(err, geoJson, rowDone);
-        });
+        featureCallback(err, geoJson, rowDone);
       }, doneCallback);
     });
   });
