@@ -3,8 +3,10 @@ var GeoPackage = require('geopackage');
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
+  , stream = require('stream')
   , shp = require('shp-stream')
-  , shpwrite = require('shp-write');
+  , shpwrite = require('shp-write')
+  , jszip = require('jszip');
 
 module.exports.addLayer = function(shapefile, dbfStream, eopackage, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
@@ -35,7 +37,6 @@ module.exports.extract = function(geopackage, tableName, callback) {
     geoJson.features.push(feature);
     done();
   }, function(err) {
-    console.log('geojson', geoJson);
     var zip = shpwrite.zip(geoJson);
     callback(err, zip);
   });
@@ -51,26 +52,55 @@ function setupConversion(shapefile, dbfStream, geopackage, progressCallback, don
   var reader;
   var features = [];
 
-  if (typeof shapefile !== 'string') {
-    reader = shp.reader({
-      dbf: dbfStream,
-      "ignore-properties": !!dbfStream,
-      shp: shapefile
-    });
-  } else {
-    var dbf = path.basename(shapefile, path.extname(shapefile)) + '.dbf';
-    try {
-      var stats = fs.statSync(dbf);
-      reader = shp.reader(shapefile);
-    } catch (e) {
-      reader = shp.reader(shapefile, {
-        "ignore-properties": true
-      });
-    }
-
-  }
-
   async.waterfall([
+    function(callback) {
+      if (typeof shapefile !== 'string') {
+        reader = shp.reader({
+          dbf: dbfStream,
+          "ignore-properties": !!dbfStream,
+          shp: shapefile
+        });
+        callback();
+      } else {
+        var extension = path.extname(shapefile);
+
+        if (extension.toLowerCase() === '.zip') {
+          fs.readFile(shapefile, function(err, data) {
+            var zip = new jszip();
+            zip.load(data);
+            var shpfile = zip.filter(function (relativePath, file){
+              return path.extname(relativePath) === '.shp';
+            });
+            var dbffile = zip.filter(function (relativePath, file){
+              return path.extname(relativePath) === '.dbf';
+            });
+            var shpBuffer = shpfile[0].asNodeBuffer();
+            var shpStream = new stream.PassThrough();
+            shpStream.end(shpBuffer);
+
+            var dbfBuffer = dbffile[0].asNodeBuffer();
+            var dbfStream = new stream.PassThrough();
+            dbfStream.end(dbfBuffer);
+            reader = shp.reader({
+              shp: shpStream,
+              dbf: dbfStream
+            });
+            callback();
+          });
+        } else {
+          var dbf = path.basename(shapefile, path.extname(shapefile)) + '.dbf';
+          try {
+            var stats = fs.statSync(dbf);
+            reader = shp.reader(shapefile);
+          } catch (e) {
+            reader = shp.reader(shapefile, {
+              "ignore-properties": true
+            });
+          }
+          callback();
+        }
+      }
+    },
     // create or open the geopackage
     function(callback) {
       if (typeof geopackage === 'object') {

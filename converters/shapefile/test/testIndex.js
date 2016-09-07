@@ -50,6 +50,29 @@ describe('Shapefile to GeoPackage tests', function() {
     });
   });
 
+  it('should convert the natural earth 110m zip', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+
+    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land.zip'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('ne_110m_land');
+        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(127);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   it('should convert the shapefile buffer', function(done) {
 
     try {
@@ -149,7 +172,7 @@ describe('Shapefile to GeoPackage tests', function() {
     });
   });
 
-  it.only('should convert the natural earth 110m file and add read it out as geojson', function(done) {
+  it('should convert the natural earth 110m file and add read it out as geojson', function(done) {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
       callback();

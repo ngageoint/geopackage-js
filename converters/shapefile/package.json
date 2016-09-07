@@ -25,6 +25,7 @@
   "bin": "./cli",
   "dependencies": {
     "geopackage": "file:../..",
+    "jszip": "^2.5.0",
     "shp-stream": "^1.0.0",
     "shp-write": "^0.2.6"
   },
