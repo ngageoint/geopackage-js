@@ -213,8 +213,10 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
     var index = 2;
     for (var key in properties) {
       var prop = properties[key];
-      columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
-      index++;
+      if (prop.name.toLowerCase() !== 'id') {
+        columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
+        index++;
+      }
     }
     progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
       GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, callback);

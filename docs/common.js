@@ -420,11 +420,9 @@ window.loadFeatures = function(tableName, featuresElement) {
     srs: tableInfos[tableName].srs,
     features: []
   };
-  console.log('columns', features.columns);
   GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature, featureDone) {
     feature.tableName = tableName;
     feature.values = [];
-    console.log('feature.properties', feature.properties);
     for (var i = 0; i < features.columns.length; i++) {
       var value = feature.properties[features.columns[i].name];
       if (value === null || value === 'null') {
