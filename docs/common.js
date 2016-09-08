@@ -110,6 +110,27 @@ window.loadGeoPackage = function(files) {
         });
       });
     }
+    // if it is a Shapefile
+    else if (f.name.lastIndexOf('zip') > f.name.lastIndexOf('.')) {
+      ShapefileToGeoPackage.convert({
+        shapezipData: array
+      }, function(status, callback) {
+        var text = status.status;
+        if (status.completed) {
+          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+        }
+        $('#status').text(text);
+        setTimeout(callback, 0);
+      }, function(err, gp) {
+        geoPackage = gp;
+        clearInfo();
+        readGeoPackage(function() {
+          $('#choose-label').find('i').toggle();
+          $('#download').removeClass('gone');
+          $('#status').addClass('gone');
+        });
+      });
+    }
   }
   r.readAsArrayBuffer(f);
 }
@@ -244,7 +265,9 @@ window.toggleLayer = function(layerType, table) {
 
     GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson, done) {
       geojsonLayer.addData(geoJson);
-      done();
+      async.setImmediate(function(){
+        done();
+      });
     }, function(err) {
       geojsonLayer.addTo(map);
       geojsonLayer.bringToFront();
@@ -411,7 +434,9 @@ window.loadFeatures = function(tableName, featuresElement) {
       }
     }
     features.features.push(feature);
-    featureDone();
+    async.setImmediate(function(){
+      featureDone();
+    });
   }, function() {
     var rendered = Mustache.render(featuresTableTemplate, features);
     featuresElement.empty();

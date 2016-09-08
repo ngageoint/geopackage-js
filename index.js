@@ -165,7 +165,7 @@ module.exports.getFeatureTables = function(geopackage, callback) {
 module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, featureCallback, doneCallback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err) {
-      return doneCallback();
+      return doneCallback(err);
     }
     featureDao.getSrs(function(err, srs) {
       featureDao.queryForEach(function(err, row, rowDone) {
@@ -173,12 +173,16 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
         var geometry = currentRow.getGeometry();
         if (geometry) {
           var geom = geometry.geometry;
-          var geoJson = geometry.geometry.toGeoJSON();
+          var geoJsonGeom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
             geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
         }
-        geoJson.properties = {};
+        var geoJson = {
+          geometry: geoJsonGeom,
+          type: 'Feature',
+          properties: {}
+        };
         for (var key in currentRow.values) {
           if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
             geoJson.properties[key] = currentRow.values[key];
@@ -187,9 +191,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           }
         }
         geoJson.id = currentRow.getId();
-        async.setImmediate(function() {
-          featureCallback(err, geoJson, rowDone);
-        });
+        featureCallback(err, geoJson, rowDone);
       }, doneCallback);
     });
   });

@@ -6,11 +6,24 @@ var fs = require('fs')
 
 module.exports.addLayer = function(geoJson, geopackage, progressCallback, doneCallback) {
   setupConversion(geoJson, geopackage, progressCallback, doneCallback, true);
-}
+};
 
 module.exports.convert = function(geoJson, geopackage, progressCallback, doneCallback) {
   setupConversion(geoJson, geopackage, progressCallback, doneCallback, false);
-}
+};
+
+module.exports.extract = function(geopackage, tableName, callback) {
+  var geoJson = {
+    type: 'FeatureCollection',
+    features: []
+  };
+  GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
+    geoJson.features.push(feature);
+    done();
+  }, function(err) {
+    callback(err, geoJson);
+  });
+};
 
 function setupConversion(geoJson, geopackage, progressCallback, doneCallback, append) {
   if (typeof geopackage === 'function') {
