@@ -11,7 +11,10 @@ describe('Shapefile to GeoPackage tests', function() {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);
@@ -34,7 +37,10 @@ describe('Shapefile to GeoPackage tests', function() {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(err, geopackage) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
       geopackage.getFeatureTables(function(err, tables) {
@@ -55,7 +61,10 @@ describe('Shapefile to GeoPackage tests', function() {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land.zip'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land.zip'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);
@@ -73,6 +82,61 @@ describe('Shapefile to GeoPackage tests', function() {
     });
   });
 
+  it('should convert the natural earth 110m zip buffer', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+
+    var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'ne_110m_land.zip'));
+
+    ShapefileToGeoPackage.convert({
+      shapezipData: zipData,
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(127);
+            done();
+          });
+        });
+      });
+    });
+  });
+
+  it('should convert the natural earth 110m zip buffer with no geopackage argument', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+
+    var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'ne_110m_land.zip'));
+
+    ShapefileToGeoPackage.convert({
+      shapezipData: zipData
+    }, function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(127);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   it('should convert the shapefile buffer', function(done) {
 
     try {
@@ -81,7 +145,11 @@ describe('Shapefile to GeoPackage tests', function() {
 
     var shpStream = fs.createReadStream(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'));
     var dbfStream = fs.createReadStream(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.dbf'));
-    ShapefileToGeoPackage.convert(shpStream, dbfStream, path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapeData: shpStream,
+      dbfData: dbfStream,
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);
@@ -102,7 +170,10 @@ describe('Shapefile to GeoPackage tests', function() {
   it('should convert the natural earth 110m file and add the layer twice', function(done) {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
 
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);
@@ -113,7 +184,10 @@ describe('Shapefile to GeoPackage tests', function() {
         geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
           featureDao.getCount(function(err, count) {
             count.should.be.equal(127);
-            ShapefileToGeoPackage.addLayer(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+            ShapefileToGeoPackage.addLayer({
+              shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+              geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+            }, function(status, callback) {
               callback();
             }, function(err, geopackage) {
               should.not.exist(err);
@@ -138,7 +212,10 @@ describe('Shapefile to GeoPackage tests', function() {
 
   it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function(done) {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);
@@ -149,7 +226,10 @@ describe('Shapefile to GeoPackage tests', function() {
         geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
           featureDao.getCount(function(err, count) {
             count.should.be.equal(127);
-            ShapefileToGeoPackage.addLayer(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), geopackage, function(status, callback) {
+            ShapefileToGeoPackage.addLayer({
+              shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+              geopackage: geopackage
+            }, function(status, callback) {
               callback();
             }, function(err, geopackage) {
               should.not.exist(err);
@@ -174,7 +254,10 @@ describe('Shapefile to GeoPackage tests', function() {
 
   it('should convert the natural earth 110m file and add read it out as geojson', function(done) {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
-    ShapefileToGeoPackage.convert(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'), path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'), function(status, callback) {
+    ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
       should.not.exist(err);

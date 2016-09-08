@@ -19,3 +19,4 @@ window.Mustache = Mustache;
 
 window.GeoPackageAPI = require('geopackage');
 window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+window.ShapefileToGeoPackage = require('shapefile-to-geopackage');

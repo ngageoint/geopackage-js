@@ -8,24 +8,22 @@ var fs = require('fs')
   , shpwrite = require('shp-write')
   , jszip = require('jszip');
 
-module.exports.addLayer = function(shapefile, dbfStream, eopackage, progressCallback, doneCallback) {
+module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
   progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
-  geopackage = progressCallback ? arguments[arguments.length - 3] : arguments[arguments.length - 2];
-  if (dbfStream === geopackage) {
-    dbfStream = undefined;
-  }
-  setupConversion(shapefile, dbfStream, geopackage, progressCallback, doneCallback, true);
+
+  options.append = true;
+
+  setupConversion(options, progressCallback, doneCallback);
 };
 
-module.exports.convert = function(shapefile, dbfStream, geopackage, progressCallback, doneCallback) {
+module.exports.convert = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
   progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
-  geopackage = progressCallback ? arguments[arguments.length - 3] : arguments[arguments.length - 2];
-  if (dbfStream === geopackage) {
-    dbfStream = undefined;
-  }
-  setupConversion(shapefile, dbfStream, geopackage, progressCallback, doneCallback, false);
+
+  options.append = false;
+
+  setupConversion(options, progressCallback, doneCallback);
 };
 
 module.exports.extract = function(geopackage, tableName, callback) {
@@ -42,30 +40,51 @@ module.exports.extract = function(geopackage, tableName, callback) {
   });
 };
 
-function setupConversion(shapefile, dbfStream, geopackage, progressCallback, doneCallback, append) {
+function setupConversion(options, progressCallback, doneCallback) {
   if (!progressCallback) {
     progressCallback = function(status, cb) {
       cb();
     }
   }
 
+  var geopackage = options.geopackage;
+
   var reader;
   var features = [];
 
   async.waterfall([
     function(callback) {
-      if (typeof shapefile !== 'string') {
-        reader = shp.reader({
-          dbf: dbfStream,
-          "ignore-properties": !!dbfStream,
-          shp: shapefile
+      if (options.shapezipData) {
+        var zip = new jszip();
+        zip.load(options.shapezipData);
+        var shpfile = zip.filter(function (relativePath, file){
+          return path.extname(relativePath) === '.shp';
         });
-        callback();
+        var dbffile = zip.filter(function (relativePath, file){
+          return path.extname(relativePath) === '.dbf';
+        });
+        var shpBuffer = shpfile[0].asNodeBuffer();
+        var shpStream = new stream.PassThrough();
+        shpStream.end(shpBuffer);
+
+        var dbfBuffer = dbffile[0].asNodeBuffer();
+        var dbfStream = new stream.PassThrough();
+        dbfStream.end(dbfBuffer);
+        reader = shp.reader({
+          shp: shpStream,
+          dbf: dbfStream
+        });
+      } else if (options.shapeData) {
+        reader = shp.reader({
+          dbf: options.dbfData,
+          "ignore-properties": !!options.dbfData,
+          shp: options.shapeData
+        });
       } else {
-        var extension = path.extname(shapefile);
+        var extension = path.extname(options.shapefile);
 
         if (extension.toLowerCase() === '.zip') {
-          fs.readFile(shapefile, function(err, data) {
+          fs.readFile(options.shapefile, function(err, data) {
             var zip = new jszip();
             zip.load(data);
             var shpfile = zip.filter(function (relativePath, file){
@@ -85,21 +104,20 @@ function setupConversion(shapefile, dbfStream, geopackage, progressCallback, don
               shp: shpStream,
               dbf: dbfStream
             });
-            callback();
           });
         } else {
-          var dbf = path.basename(shapefile, path.extname(shapefile)) + '.dbf';
+          dbf = path.basename(options.shapefile, path.extname(options.shapefile)) + '.dbf';
           try {
             var stats = fs.statSync(dbf);
-            reader = shp.reader(shapefile);
+            reader = shp.reader(options.shapefile);
           } catch (e) {
-            reader = shp.reader(shapefile, {
+            reader = shp.reader(options.shapefile, {
               "ignore-properties": true
             });
           }
-          callback();
         }
       }
+      callback();
     },
     // create or open the geopackage
     function(callback) {
@@ -111,7 +129,7 @@ function setupConversion(shapefile, dbfStream, geopackage, progressCallback, don
 
       try {
         var stats = fs.statSync(geopackage);
-        if (!append) {
+        if (!options.append) {
           console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
           return callback(new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage));
         } else {
@@ -125,8 +143,8 @@ function setupConversion(shapefile, dbfStream, geopackage, progressCallback, don
     // figure out the table name to put the data into
     function(geopackage, callback) {
       var name = 'features';
-      if (typeof shapefile === 'string') {
-        name = path.basename(shapefile, path.extname(shapefile));
+      if (typeof options.shapefile === 'string') {
+        name = path.basename(options.shapefile, path.extname(options.shapefile));
       }
       geopackage.getFeatureTables(function(err, tables) {
         var count = 1;

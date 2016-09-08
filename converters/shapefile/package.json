@@ -22,7 +22,6 @@
   "bugs": {
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
-  "bin": "./cli",
   "dependencies": {
     "geopackage": "file:../..",
     "jszip": "^2.5.0",
