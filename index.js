@@ -21,6 +21,9 @@ var GeoPackageManager = require('./lib/geoPackageManager')
 
 // module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
 
+var proj4Defs = require('./lib/proj4Defs');
+module.exports.proj4Defs = proj4Defs;
+
 /**
  * Open a GeoPackage at the path specified
  * @param  {String}   gppath   path where the GeoPackage exists
@@ -77,6 +80,7 @@ module.exports.createGeoPackage = function(gppath, callback) {
 
 module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
 module.exports.BoundingBox = require('./lib/boundingBox');
+module.exports.TileUtilities = require('./lib/tiles/creator/tileUtilities');
 
 module.exports.createTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
   geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback);

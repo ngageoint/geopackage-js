@@ -347,7 +347,7 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   GeoPackageAPI.getTilesInBoundingBox(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth(), function(err, tiles) {
     if (!tiles || !tiles.tiles || !tiles.tiles.length) {
       tilesElement.empty();
-      tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level. Min zoom: ' + tileDao.minZoom + ' Max Zoom: ' + tileDao.maxZoom + '</div>')
+      tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
       return;
     }
     var rendered = Mustache.render(tilesTableTemplate, tiles);
