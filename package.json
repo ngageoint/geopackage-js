@@ -70,7 +70,8 @@
     "index.js",
     "static/geopackage.js",
     "cli",
-    "lib"
+    "lib",
+    "converters"
   ],
   "browser": {
     "lwip": false,
@@ -91,6 +92,7 @@
     ]
   },
   "scripts": {
+    "postinstall": "npm install converters/geojson; npm install converters/shapefile",
     "test": "istanbul cover  _mocha",
     "mocha": "mocha",
     "karma": "karma start",
