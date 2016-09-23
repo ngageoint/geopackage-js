@@ -27,10 +27,6 @@ module.exports.convert = function(options, progressCallback, doneCallback) {
 };
 
 module.exports.extract = function(geopackage, tableName, callback) {
-  var geoJson = {
-    type: 'FeatureCollection',
-    features: []
-  };
   if (!tableName) {
     geopackage.getFeatureTables(function(err, tables) {
       createShapefile(geopackage, tables, callback);
@@ -41,11 +37,15 @@ module.exports.extract = function(geopackage, tableName, callback) {
 };
 
 function createShapefile(geopackage, tableName, callback) {
+  var geoJson = {
+    type: 'FeatureCollection',
+    features: []
+  };
   if (!(tableName instanceof Array)) {
     tableName = [tableName];
   }
   async.eachSeries(tableName, function(name, callback) {
-    GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
+    GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, name, function(err, feature, done) {
       geoJson.features.push(feature);
       done();
     }, callback);
