@@ -31,14 +31,29 @@ module.exports.extract = function(geopackage, tableName, callback) {
     type: 'FeatureCollection',
     features: []
   };
-  GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
-    geoJson.features.push(feature);
-    done();
+  if (!tableName) {
+    geopackage.getFeatureTables(function(err, tables) {
+      createShapefile(geopackage, tables, callback);
+    });
+  } else {
+    createShapefile(geopackage, tableName, callback);
+  }
+};
+
+function createShapefile(geopackage, tableName, callback) {
+  if (!(tableName instanceof Array)) {
+    tableName = [tableName];
+  }
+  async.eachSeries(tableName, function(name, callback) {
+    GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
+      geoJson.features.push(feature);
+      done();
+    }, callback);
   }, function(err) {
     var zip = shpwrite.zip(geoJson);
     callback(err, zip);
   });
-};
+}
 
 function setupConversion(options, progressCallback, doneCallback) {
   if (!progressCallback) {
