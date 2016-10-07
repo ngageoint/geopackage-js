@@ -361,7 +361,7 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
 module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
-    retriever.getTile(x, z, z, callback);
+    retriever.getTile(x, y, z, callback);
   });
 };
 
