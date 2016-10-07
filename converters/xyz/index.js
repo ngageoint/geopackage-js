@@ -5,7 +5,6 @@ var GeoPackage = require('geopackage')
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
-  , stream = require('stream')
   , JSZip = require('jszip');
 
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
