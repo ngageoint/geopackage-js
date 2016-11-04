@@ -11,7 +11,7 @@ var wkx = require('wkx')
   , fs = require('fs');
 
 var GeoPackageManager = require('./lib/geoPackageManager')
-  , GeoPackage = require('./lib/geopackage')
+  , GeoPackage = require('./lib/geoPackage')
   , GeoPackageTileRetriever = require('./lib/tiles/retriever')
   , GeoPackageConnection = require('./lib/db/geoPackageConnection')
   , BoundingBox = require('./lib/boundingBox')
