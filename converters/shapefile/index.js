@@ -6,6 +6,8 @@ var fs = require('fs')
   , stream = require('stream')
   , shp = require('shp-stream')
   , shpwrite = require('shp-write')
+  , proj4 = require('proj4')
+  , reproject = require('reproject')
   , jszip = require('jszip');
 
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
@@ -63,6 +65,7 @@ function setupConversion(options, progressCallback, doneCallback) {
   }
 
   var geopackage = options.geopackage;
+  var projection;
 
   var reader;
   var features = [];
@@ -78,6 +81,9 @@ function setupConversion(options, progressCallback, doneCallback) {
         var dbffile = zip.filter(function (relativePath, file){
           return path.extname(relativePath) === '.dbf';
         });
+        var prjfile = zip.filter(function (relativePath, file){
+          return path.extname(relativePath) === '.prj';
+        });
         var shpBuffer = shpfile[0].asNodeBuffer();
         var shpStream = new stream.PassThrough();
         shpStream.end(shpBuffer);
@@ -85,6 +91,12 @@ function setupConversion(options, progressCallback, doneCallback) {
         var dbfBuffer = dbffile[0].asNodeBuffer();
         var dbfStream = new stream.PassThrough();
         dbfStream.end(dbfBuffer);
+
+        if (prjfile.length) {
+          var prjBuffer = prjfile[0].asNodeBuffer();
+          projection = proj4.Proj(prjBuffer.toString());
+        }
+
         reader = shp.reader({
           shp: shpStream,
           dbf: dbfStream
@@ -108,9 +120,18 @@ function setupConversion(options, progressCallback, doneCallback) {
             var dbffile = zip.filter(function (relativePath, file){
               return path.extname(relativePath) === '.dbf';
             });
+            var prjfile = zip.filter(function (relativePath, file){
+              return path.extname(relativePath) === '.prj';
+            });
+
             var shpBuffer = shpfile[0].asNodeBuffer();
             var shpStream = new stream.PassThrough();
             shpStream.end(shpBuffer);
+
+            if (prjfile.length) {
+              var prjBuffer = prjfile[0].asNodeBuffer();
+              projection = proj4.Proj(prjBuffer.toString());
+            }
 
             var dbfBuffer = dbffile[0].asNodeBuffer();
             var dbfStream = new stream.PassThrough();
@@ -268,6 +289,9 @@ function setupConversion(options, progressCallback, doneCallback) {
       var fivePercent = Math.floor(featureCount / 20);
       async.eachSeries(features, function featureIterator(feature, callback) {
         async.setImmediate(function() {
+          if (projection) {
+            feature = reproject.reproject(feature, projection, 'EPSG:4326');
+          }
           GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
             if (count++ % fivePercent === 0) {
               progressCallback({
