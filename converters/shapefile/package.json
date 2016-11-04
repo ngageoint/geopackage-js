@@ -25,6 +25,8 @@
   "dependencies": {
     "geopackage": "file:../..",
     "jszip": "^2.5.0",
+    "proj4": "^2.3.14",
+    "reproject": "^1.1.1",
     "shp-stream": "^1.0.0",
     "shp-write": "^0.2.6"
   },

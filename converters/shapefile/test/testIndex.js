@@ -281,4 +281,37 @@ describe('Shapefile to GeoPackage tests', function() {
       });
     });
   });
+
+  it('should convert the MGRS_100kmSQ_ID file with features defined as 3857', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'MGRS_100kmSQ_ID.gpkg'));
+    } catch (e) {}
+
+    var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'MGRS_100kmSQ_ID_60K.zip'));
+
+
+    ShapefileToGeoPackage.convert({
+      shapezipData: zipData,
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'MGRS_100kmSQ_ID.gpkg')
+    }, function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
+          featureDao.getSrs(function(err, srs) {
+            srs.srs_id.should.be.equal(4326);
+            featureDao.getCount(function(err, count) {
+              count.should.be.equal(80);
+              done();
+            });
+          });
+
+        });
+      });
+    });
+  });
 });

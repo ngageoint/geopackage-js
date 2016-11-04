@@ -19,7 +19,11 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
-// module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+module.exports.ShapefileToGeoPackage = require('shapefile-to-geopackage');
+
+var proj4Defs = require('./lib/proj4Defs');
+module.exports.proj4Defs = proj4Defs;
 
 /**
  * Open a GeoPackage at the path specified
@@ -77,6 +81,7 @@ module.exports.createGeoPackage = function(gppath, callback) {
 
 module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
 module.exports.BoundingBox = require('./lib/boundingBox');
+module.exports.TileUtilities = require('./lib/tiles/creator/tileUtilities');
 
 module.exports.createTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
   geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback);
@@ -356,7 +361,7 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
 module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
-    retriever.getTile(x, z, z, callback);
+    retriever.getTile(x, y, z, callback);
   });
 };
 
