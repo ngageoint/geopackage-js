@@ -3,7 +3,7 @@
 ### Demo ###
 [GeoPackage JS Demo Page](http://ngageoint.github.io/geopackage-js/)
 
-Cloning this repository and opening the demo/browserify/index.html in your browser will run the demo locally.
+Cloning this repository and opening the docs/index.html in your browser will run the demo locally.
 
 #### GeoPackage JS Library ####
 
@@ -22,7 +22,7 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Usage ###
 
-View examples using [Bower](tree/master/demo/bower) and [Browserify](tree/master/demo/browserify)
+View examples using [Bower](tree/master/docs/bower) and [Browserify](tree/master/docs)
 
 View the latest [docs](http://ngageoint.github.io/geopackage-js/docs/module-geoPackage-GeoPackage.html) (currently being updated).
 
