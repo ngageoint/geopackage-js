@@ -6,7 +6,8 @@ var fs = require('fs')
   , async = require('async')
   , path = require('path')
   , MBTiles = require('mbtiles')
-  , JSZip = require('jszip');
+  , JSZip = require('jszip')
+  , Buffer = require('buffer').Buffer;
 
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
@@ -203,7 +204,7 @@ function setupConversion(options, progressCallback, doneCallback) {
       });
     },
     function(geopackage, tableName, callback) {
-      new MBTiles(options.mbtiles, function(err, mbtiles) {
+      new MBTiles(options.mbtiles || new Buffer(options.mbtilesData), function(err, mbtiles) {
         callback(err, geopackage, tableName, mbtiles);
       });
     },

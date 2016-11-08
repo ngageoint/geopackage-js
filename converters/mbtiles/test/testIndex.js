@@ -70,6 +70,37 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
+  it('should convert the mbtiles data into a geopackage', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
+    } catch (e) {}
+    try {
+      fs.mkdirSync(path.join(__dirname, 'fixtures', 'tmp'));
+    } catch (e) {}
+
+    var mbtilesData = fs.readFileSync(path.join(__dirname, 'fixtures', 'osm.mbtiles'));
+
+    MBTilesToGeoPackage.convert({
+      mbtilesData: mbtilesData,
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg')
+    }, function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getTileTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('tiles');
+        geopackage.getTileDaoWithTableName('tiles', function(err, tileDao){
+          tileDao.getCount(function(err, count) {
+            count.should.be.equal(85);
+            done();
+          });
+        });
+      });
+    });
+  });
+
 
   it('should convert the mbtiles file and add the layer twice', function(done) {
 
@@ -119,7 +150,7 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
-  it('should convert the xyz zip file and add the layer twice using the geopackage object the second time', function(done) {
+  it('should convert the mbtiles file and add the layer twice using the geopackage object the second time', function(done) {
 
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm2.gpkg'));

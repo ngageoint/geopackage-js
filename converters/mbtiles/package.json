@@ -22,9 +22,11 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
+    "brfs": "^1.4.3",
+    "derequire": "^2.0.3",
     "geopackage": "file:../..",
-    "mbtiles": "danielbarela/node-mbtiles",
-    "jszip": "^3.1.3"
+    "jszip": "^3.1.3",
+    "mbtiles": "danielbarela/node-mbtiles"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -42,6 +44,11 @@
   "babel": {
     "presets": [
       "es2015"
+    ]
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
     ]
   },
   "scripts": {
