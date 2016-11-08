@@ -131,6 +131,27 @@ window.loadGeoPackage = function(files) {
         });
       });
     }
+    // if it is a MBTiles file
+    else if (f.name.lastIndexOf('mbtiles') > f.name.lastIndexOf('.')) {
+      MBTilesToGeoPackage.convert({
+        mbtilesData: array
+      }, function(status, callback) {
+        var text = status.status;
+        if (status.completed) {
+          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+        }
+        $('#status').text(text);
+        setTimeout(callback, 0);
+      }, function(err, gp) {
+        geoPackage = gp;
+        clearInfo();
+        readGeoPackage(function() {
+          $('#choose-label').find('i').toggle();
+          $('#download').removeClass('gone');
+          $('#status').addClass('gone');
+        });
+      });
+    }
   }
   r.readAsArrayBuffer(f);
 }

@@ -142,7 +142,7 @@ describe('TableCreator tests', function() {
         Verification.verifySRS.bind(this, geopackage),
         function(callback) {
           geopackage.getDatabase().count('gpkg_spatial_ref_sys', function(err, count) {
-            count.should.be.equal(3);
+            count.should.be.equal(4);
             callback();
           });
         }

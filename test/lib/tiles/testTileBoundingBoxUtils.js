@@ -266,6 +266,18 @@ describe('TileBoundingBoxUtils tests', function() {
     }
   });
 
+  it('should get the web mercator tile box for each zoom level with smaller box', function() {
+    var webMercatorBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.34278924, 20037508.342789244);
+
+    for (var i = 0; i <= 18; i++) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
+      box.minX.should.be.equal(0);
+      box.minY.should.be.equal(0);
+      box.maxX.should.be.equal(Math.pow(2, i)-1);
+      box.maxY.should.be.equal(Math.pow(2, i)-1);
+    }
+  });
+
   it('should get the web mercator tile box for each zoom level for the eastern hemisphere', function() {
     var webMercatorBox = new BoundingBox(0, 20037508.342789244, -20037508.342789244, 20037508.342789244);
 

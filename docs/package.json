@@ -6,6 +6,7 @@
     "geopackage": "..",
     "geojson-to-geopackage": "../converters/geojson",
     "shapefile-to-geopackage": "../converters/shapefile",
+    "mbtiles-to-geopackage": "../converters/mbtiles",
     "jquery": "^2.2.3",
     "leaflet": "^0.7.7",
     "mustache": "^2.2.1",
