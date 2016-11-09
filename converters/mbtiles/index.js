@@ -211,16 +211,18 @@ function setupConversion(options, progressCallback, doneCallback) {
     function(geopackage, tableName, mbtiles, callback) {
 
       mbtiles.getInfo(function(err, info) {
-        var boundingBox = new BoundingBox(info.bounds[0], info.bounds[2], info.bounds[1], info.bounds[3]);
-        boundingBox = boundingBox.projectBoundingBox('EPSG:4236','EPSG:3857');
-        if (info.bounds[2] === 180) {
-          boundingBox.maxLongitude = 20037508.342789244;
-        }
-        if (info.bounds[0] === -180) {
-          boundingBox.minLongitude = -20037508.342789244;
-        }
-        boundingBox.minLatitude = Math.max(-20037508.342789244, boundingBox.minLatitude);
-        boundingBox.maxLatitude = Math.min(20037508.342789244, boundingBox.maxLatitude);
+        // var boundingBox = new BoundingBox(info.bounds[0], info.bounds[2], info.bounds[1], info.bounds[3]);
+        // boundingBox = boundingBox.projectBoundingBox('EPSG:4236','EPSG:3857');
+        // if (info.bounds[2] === 180) {
+        //   boundingBox.maxLongitude = 20037508.342789244;
+        // }
+        // if (info.bounds[0] === -180) {
+        //   boundingBox.minLongitude = -20037508.342789244;
+        // }
+        // boundingBox.minLatitude = Math.max(-20037508.342789244, boundingBox.minLatitude);
+        // boundingBox.maxLatitude = Math.min(20037508.342789244, boundingBox.maxLatitude);
+        //
+        var boundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
         var minZoom = info.minzoom;
         var maxZoom = info.maxzoom;
         var boundingBoxSrsId = 3857;
@@ -241,27 +243,30 @@ function setupConversion(options, progressCallback, doneCallback) {
 
       var stream = mbtiles.createZXYStream({batch:10});
       var output = '';
-      var called = 0;
+      var count = 0;
 
       stream.on('data', function(lines) {
           output += lines;
       });
       stream.on('end', function() {
           var queue = output.toString().split('\n');
-          // assert.equal(queue.length, 270);
-          // assert.equal(called, 27, 'emitted data x27 times');
-          async.eachSeries(queue, function(zxy, tileDone) {
-            zxy = zxy.split('/');
-            console.log('getting the tile ', zxy);
-            mbtiles.getTile(zxy[0], zxy[1], zxy[2], function(err, buffer, headers) {
-              console.log('saving the tile ', zxy);
+          var fivePercent = Math.floor(queue.length / 20);
 
-              var tile = tileDao.newRow();
-              tile.setZoomLevel(parseInt(zxy[0]));
-              tile.setTileColumn(parseInt(zxy[1]));
-              tile.setTileRow(parseInt(zxy[2]));
-              tile.setTileData(buffer);
-              tileDao.create(tile, tileDone);
+          async.eachSeries(queue, function(zxy, tileDone) {
+            async.setImmediate(function() {
+              zxy = zxy.split('/');
+              if (count++ % fivePercent === 0) {
+
+                progressCallback({
+                  status: 'Inserting tile into table "' + tileDao.table_name + '"',
+                  completed: count,
+                  total: queue.length
+                }, function() {
+                  getAndSaveTile(mbtiles, zxy[0], zxy[1], zxy[2], tileDao, tileDone);
+                });
+              } else {
+                getAndSaveTile(mbtiles, zxy[0], zxy[1], zxy[2], tileDao, tileDone);
+              }
             });
           }, function() {
             callback(null, geopackage);
@@ -272,3 +277,17 @@ function setupConversion(options, progressCallback, doneCallback) {
     doneCallback(err, geopackage);
   });
 };
+
+function getAndSaveTile(mbtiles, zoom, x, y, tileDao, callback) {
+  console.log('getting the tile %s, %s, %s', zoom, x, y);
+  mbtiles.getTile(zoom, x, y, function(err, buffer, headers) {
+    console.log('saving the tile %s, %s, %s', zoom, x, y);
+
+    var tile = tileDao.newRow();
+    tile.setZoomLevel(parseInt(zoom));
+    tile.setTileColumn(parseInt(x));
+    tile.setTileRow(parseInt(y));
+    tile.setTileData(buffer);
+    tileDao.create(tile, callback);
+  });
+}
