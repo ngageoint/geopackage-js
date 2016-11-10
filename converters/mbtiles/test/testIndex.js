@@ -2,11 +2,28 @@ var MBTilesToGeoPackage = require('../index.js');
 
 var path = require('path')
   , fs = require('fs')
+  , JSZip = require('jszip')
   , should = require('chai').should();
 
 describe('MBTiles to GeoPackage tests', function() {
 
-  it('should extract the rivers geopackage TILESosmds layer', function(done) {
+  after(function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'tiles.mbtiles'));
+    } catch (e) {}
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'two_layers.zip'));
+    } catch (e) {}
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
+    } catch (e) {}
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm2.gpkg'));
+    } catch (e) {}
+    done();
+  });
+
+  it('should extract the osm geopackage TILESosmds layer', function(done) {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'tiles.mbtiles'));
@@ -24,7 +41,7 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
-  it('should extract the rivers_two_layers geopackage layers', function(done) {
+  it('should extract the two_layers geopackage layers', function(done) {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'two_layers.zip'));
@@ -35,8 +52,11 @@ describe('MBTiles to GeoPackage tests', function() {
     MBTilesToGeoPackage.extract(path.join(__dirname, 'fixtures', 'two_layers.gpkg'), undefined, function(err, stream) {
       should.not.exist(err);
       should.exist(stream);
-      fs.writeFile(path.join(__dirname, 'fixtures', 'tmp', 'two_layers.zip'), stream, function(err) {
-        console.log('err', err);
+
+      var zipFile = new JSZip();
+      zipFile.loadAsync(stream).then(function(zip) {
+        var files = zip.file(/mbtiles$/);
+        files.length.should.be.equal(2);
         done();
       });
     });

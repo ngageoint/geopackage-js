@@ -72,6 +72,11 @@ function createResult(geopackage, tables, resultCreated) {
           console.log('zipping');
           zip.file(path.basename(mbtiles.filename), file);
           console.log('zipped');
+          try {
+            if (typeof(process) !== 'undefined' && process.version) {
+              fs.unlinkSync(mbtiles.filename);
+            }
+          } catch (e) {}
           done();
         });
       }, function() {
