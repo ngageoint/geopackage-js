@@ -83,7 +83,7 @@ function createResult(geopackage, tables, resultCreated) {
         console.log('all files zipped');
         zip.generateAsync({type: 'nodebuffer', compression: 'DEFLATE'}).then(function(content) {
           console.log('content generated');
-          resultCreated(null, content);
+          resultCreated(null, content, {extension: 'zip'});
         });
       });
     }
