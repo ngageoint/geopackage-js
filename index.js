@@ -19,9 +19,9 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
 
-module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
-module.exports.ShapefileToGeoPackage = require('shapefile-to-geopackage');
-module.exports.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
+module.exports.GeoJSONToGeoPackage = require('./converters/geojson');
+module.exports.ShapefileToGeoPackage = require('./converters/shapefile');
+module.exports.MBTilesToGeoPackage = require('./converters/mbtiles');
 
 var proj4Defs = require('./lib/proj4Defs');
 module.exports.proj4Defs = proj4Defs;
