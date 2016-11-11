@@ -92,7 +92,7 @@
     ]
   },
   "scripts": {
-    "postinstall": "npm install converters/geojson; npm install converters/shapefile",
+    "postinstall": "npm install converters/geojson; npm install converters/shapefile; npm install converters/mbtiles",
     "test": "istanbul cover  _mocha",
     "mocha": "mocha",
     "karma": "karma start",
