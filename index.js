@@ -21,6 +21,7 @@ var GeoPackageManager = require('./lib/geoPackageManager')
 
 module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
 module.exports.ShapefileToGeoPackage = require('shapefile-to-geopackage');
+module.exports.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
 
 var proj4Defs = require('./lib/proj4Defs');
 module.exports.proj4Defs = proj4Defs;

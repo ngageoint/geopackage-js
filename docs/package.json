@@ -8,7 +8,7 @@
     "shapefile-to-geopackage": "../converters/shapefile",
     "mbtiles-to-geopackage": "../converters/mbtiles",
     "jquery": "^2.2.3",
-    "leaflet": "^0.7.7",
+    "leaflet": "^1.0.2",
     "mustache": "^2.2.1",
     "proj4": "^2.3.14",
     "reproject": "^1.1.1",
