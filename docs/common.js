@@ -23,11 +23,11 @@
 var map = L.map('map', {
   center: [45,0],
   zoom: 3,
-  worldCopyJump: false,
-  maxBounds: [
-    [-85, -180],
-    [85, 180]
-  ],
+  worldCopyJump: true,
+  // maxBounds: [
+  //   [-85, -180],
+  //   [85, 180]
+  // ],
   attributionControl: false
 });
 
@@ -280,6 +280,12 @@ window.toggleLayer = function(layerType, table) {
             string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
           }
           layer.bindPopup(string);
+        },
+        coordsToLatLng: function(coords) {
+          if (coords[0] < 0) {
+            coords[0] = coords[0] + 360;
+          }
+          return L.GeoJSON.coordsToLatLng(coords);
         }
     });
     var tableInfo = tableInfos[table];
@@ -477,6 +483,12 @@ var highlightLayer = L.geoJson([], {
         string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
       }
       layer.bindPopup(string);
+    },
+    coordsToLatLng: function(coords) {
+      if (coords[0] < 0) {
+        coords[0] = coords[0] + 360;
+      }
+      return L.GeoJSON.coordsToLatLng(coords);
     }
 });
 map.addLayer(highlightLayer);
@@ -509,6 +521,12 @@ var featureLayer = L.geoJson([], {
         string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
       }
       layer.bindPopup(string);
+    },
+    coordsToLatLng: function(coords) {
+      if (coords[0] < 0) {
+        coords[0] = coords[0] + 360;
+      }
+      return L.GeoJSON.coordsToLatLng(coords);
     }
 });
 map.addLayer(featureLayer);
