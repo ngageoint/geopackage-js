@@ -67,6 +67,19 @@ window.saveGeoPackage = function() {
   });
 }
 
+window.downloadGeoJSON = function(tableName) {
+  GeoJSONToGeoPackage.extract(geoPackage, tableName, function(err, geoJson) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geoJson));
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = dataStr;
+    a.download = tableName + '.geojson';
+    a.click();
+  });
+}
+
 window.loadGeoPackage = function(files) {
   var f = files[0];
   fileName = f.name;
@@ -110,10 +123,31 @@ window.loadGeoPackage = function(files) {
         });
       });
     }
-    // if it is a Shapefile
+    // if it is a Shapefile zip
     else if (f.name.lastIndexOf('zip') > f.name.lastIndexOf('.')) {
       ShapefileToGeoPackage.convert({
         shapezipData: array
+      }, function(status, callback) {
+        var text = status.status;
+        if (status.completed) {
+          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+        }
+        $('#status').text(text);
+        setTimeout(callback, 0);
+      }, function(err, gp) {
+        geoPackage = gp;
+        clearInfo();
+        readGeoPackage(function() {
+          $('#choose-label').find('i').toggle();
+          $('#download').removeClass('gone');
+          $('#status').addClass('gone');
+        });
+      });
+    }
+    // if it is a Shapefile shp
+    else if (f.name.lastIndexOf('shp') > f.name.lastIndexOf('.')) {
+      ShapefileToGeoPackage.convert({
+        shapeData: array
       }, function(status, callback) {
         var text = status.status;
         if (status.completed) {

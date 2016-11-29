@@ -143,6 +143,10 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       // first loop to find all properties of all features.  Has to be a better way...
       async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
         async.setImmediate(function() {
+          if (feature.properties.geometry) {
+            feature.properties.geometry_property = feature.properties.geometry;
+            delete feature.properties.geometry;
+          }
           for (var key in feature.properties) {
             if (!properties[key]) {
               properties[key] = properties[key] || {

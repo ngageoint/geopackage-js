@@ -89,7 +89,6 @@ function setupConversion(options, progressCallback, doneCallback) {
         shpStream.end(shpBuffer);
 
         var dbfStream;
-
         if (dbffile.length) {
           var dbfBuffer = dbffile[0].asNodeBuffer();
           dbfStream = new stream.PassThrough();
@@ -101,17 +100,27 @@ function setupConversion(options, progressCallback, doneCallback) {
           projection = proj4.Proj(prjBuffer.toString());
         }
 
-        console.log('got the shp and dbf');
-
         reader = shp.reader({
           shp: shpStream,
-          dbf: dbfStream
+          dbf: dbfStream,
+          'ignore-properties': !!dbfStream
         });
       } else if (options.shapeData) {
+        var shpStream = new stream.PassThrough();
+        var shpBuffer = new Buffer(options.shapeData);
+        shpStream.end(shpBuffer);
+
+        var dbfStream;
+        if (options.dbfData) {
+          dbfStream = new stream.PassThrough();
+          var dbfBuffer = new Buffer(options.dbfData);
+          dbfStream.end(dbfBuffer);
+        }
+
         reader = shp.reader({
-          dbf: options.dbfData,
+          dbf: dbfStream,
           "ignore-properties": !!options.dbfData,
-          shp: options.shapeData
+          shp: shpStream
         });
       } else {
         var extension = path.extname(options.shapefile);
