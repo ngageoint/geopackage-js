@@ -67,6 +67,19 @@ window.saveGeoPackage = function() {
   });
 }
 
+window.downloadGeoJSON = function(tableName) {
+  GeoJSONToGeoPackage.extract(geoPackage, tableName, function(err, geoJson) {
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geoJson));
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = dataStr;
+    a.download = tableName + '.geojson';
+    a.click();
+  });
+}
+
 window.loadGeoPackage = function(files) {
   var f = files[0];
   fileName = f.name;
