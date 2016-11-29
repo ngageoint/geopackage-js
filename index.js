@@ -121,7 +121,11 @@ module.exports.createFeatureTable = function(geopackage, tableName, geometryColu
 
 module.exports.createFeatureTableWithDataColumns = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, callback) {
   var boundingBox = new BoundingBox(-180, 180, -90, 90);
-  geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumn, boundingBox, 4326, featureColumns, dataColumns, function(err, result) {
+  module.exports.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, 4326, callback);
+};
+
+module.exports.createFeatureTableWithDataColumnsAndBoundingBox = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, boundingBoxSrsId, callback) {
+  geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumn, boundingBox, boundingBoxSrsId, featureColumns, dataColumns, function(err, result) {
     geopackage.getFeatureDaoWithTableName(tableName, callback);
   });
 };
