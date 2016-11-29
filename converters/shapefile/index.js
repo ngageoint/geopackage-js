@@ -88,14 +88,20 @@ function setupConversion(options, progressCallback, doneCallback) {
         var shpStream = new stream.PassThrough();
         shpStream.end(shpBuffer);
 
-        var dbfBuffer = dbffile[0].asNodeBuffer();
-        var dbfStream = new stream.PassThrough();
-        dbfStream.end(dbfBuffer);
+        var dbfStream;
+
+        if (dbffile.length) {
+          var dbfBuffer = dbffile[0].asNodeBuffer();
+          dbfStream = new stream.PassThrough();
+          dbfStream.end(dbfBuffer);
+        }
 
         if (prjfile.length) {
           var prjBuffer = prjfile[0].asNodeBuffer();
           projection = proj4.Proj(prjBuffer.toString());
         }
+
+        console.log('got the shp and dbf');
 
         reader = shp.reader({
           shp: shpStream,
@@ -193,11 +199,11 @@ function setupConversion(options, progressCallback, doneCallback) {
     },
     function(geopackage, tableName, callback) {
       reader.readHeader(function(err, header) {
-        callback(null, geopackage, tableName);
+        callback(null, geopackage, tableName, header ? header.bbox : undefined);
       });
     },
     // get the feature properties
-    function(geopackage, tableName, callback) {
+    function(geopackage, tableName, bbox, callback) {
 
       progressCallback({status: 'Reading Shapefile properties'}, function() {
 
@@ -250,14 +256,15 @@ function setupConversion(options, progressCallback, doneCallback) {
               cb();
             });
           }, function done(err) {
-            callback(err, geopackage, tableName, properties);
+            callback(err, geopackage, tableName, bbox, properties);
           }
         );
       });
-    }, function(geopackage, tableName, properties, callback) {
+    }, function(geopackage, tableName, bbox, properties, callback) {
       var FeatureColumn = GeoPackage.FeatureColumn;
       var GeometryColumns = GeoPackage.GeometryColumns;
       var DataTypes = GeoPackage.DataTypes;
+      var BoundingBox = GeoPackage.BoundingBox;
 
       var geometryColumns = new GeometryColumns();
       geometryColumns.table_name = tableName;
@@ -278,7 +285,14 @@ function setupConversion(options, progressCallback, doneCallback) {
         }
       }
       progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-        GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
+        var boundingBox = new BoundingBox(-180, 180, -90, 90);
+        if (projection && bbox) {
+          // bbox is xmin, ymin, xmax, ymax
+          var ll = proj4(projection).inverse([bbox[0], bbox[1]]);
+          var ur = proj4(projection).inverse([bbox[2], bbox[3]]);
+          boundingBox = new BoundingBox(ll[0], ur[0], ll[1], ur[1]);
+        }
+        GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, 4326, function(err, featureDao) {
           callback(err, geopackage, tableName, featureDao);
         });
       });

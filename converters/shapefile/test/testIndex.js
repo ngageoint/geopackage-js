@@ -314,4 +314,39 @@ describe('Shapefile to GeoPackage tests', function() {
       });
     });
   });
+
+  it.only('should convert the MGRS_worldwide file with features defined as 3857', function(done) {
+    this.timeout(0);
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'MGRS_GZD_WorldWide.gpkg'));
+    } catch (e) {}
+
+    var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'MGRS_GZD_WorldWide.zip'));
+    console.log('got the zip data');
+
+    ShapefileToGeoPackage.convert({
+      shapezipData: zipData,
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'MGRS_GZD_WorldWide.gpkg')
+    }, function(status, callback) {
+      console.log('Progress', status);
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
+          featureDao.getSrs(function(err, srs) {
+            srs.srs_id.should.be.equal(4326);
+            featureDao.getCount(function(err, count) {
+              count.should.be.equal(80);
+              done();
+            });
+          });
+
+        });
+      });
+    });
+  });
 });

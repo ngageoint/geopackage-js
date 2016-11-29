@@ -282,9 +282,9 @@ window.toggleLayer = function(layerType, table) {
           layer.bindPopup(string);
         },
         coordsToLatLng: function(coords) {
-          if (coords[0] < 0) {
-            coords[0] = coords[0] + 360;
-          }
+          // if (coords[0] < 0) {
+          //   coords[0] = coords[0] + 360;
+          // }
           return L.GeoJSON.coordsToLatLng(coords);
         }
     });
@@ -485,9 +485,9 @@ var highlightLayer = L.geoJson([], {
       layer.bindPopup(string);
     },
     coordsToLatLng: function(coords) {
-      if (coords[0] < 0) {
-        coords[0] = coords[0] + 360;
-      }
+      // if (coords[0] < 0) {
+      //   coords[0] = coords[0] + 360;
+      // }
       return L.GeoJSON.coordsToLatLng(coords);
     }
 });
@@ -523,9 +523,9 @@ var featureLayer = L.geoJson([], {
       layer.bindPopup(string);
     },
     coordsToLatLng: function(coords) {
-      if (coords[0] < 0) {
-        coords[0] = coords[0] + 360;
-      }
+      // if (coords[0] < 0) {
+      //   coords[0] = coords[0] + 360;
+      // }
       return L.GeoJSON.coordsToLatLng(coords);
     }
 });
