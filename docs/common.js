@@ -282,15 +282,22 @@ window.toggleLayer = function(layerType, table) {
 
       var maxZoom = tileDao.maxZoom;
       var minZoom = tileDao.minZoom;
-      var tableLayer = L.tileLayer.canvas({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
-      tableLayer.drawTile = function(canvas, tilePoint, zoom) {
-        console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + zoom);
-        GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, zoom, 256, 256, canvas, function(err) {
-          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + zoom);
-          tableLayer.tileDrawn(canvas);
-        });
-      };
-      tableLayer.addTo(map);
+      var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
+      tableLayer.createTile = function(tilePoint, done) {
+        var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+        var size = this.getTileSize();
+        canvas.width = size.x;
+        canvas.height = size.y;
+        setTimeout(function() {
+          console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+          GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
+            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+            done(err, canvas);
+          });
+        }, 0);
+        return canvas;
+      }
+      map.addLayer(tableLayer);
       tableLayer.bringToFront();
       tableLayers[table] = tableLayer;
     });
