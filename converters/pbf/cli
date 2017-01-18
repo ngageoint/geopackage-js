@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 
-var GeoJSONToGeoPackage = require('./index');
+var PBFToGeoPackage = require('./index');
 var path = require('path');
 
-console.log('GeoJSON to GeoPackage Converter');
+console.log('PBF to GeoPackage Converter');
 
-var geoJsonFile = path.resolve(process.cwd(), process.argv[2]);
+var pbfFile = path.resolve(process.cwd(), process.argv[2]);
 var geoPackageFile = path.resolve(process.cwd(), process.argv[3]);
 
-console.log('Converting %s to %s', geoJsonFile, geoPackageFile);
-GeoJSONToGeoPackage.convert(geoJsonFile, geoPackageFile, function(status, callback) {
+console.log('Converting %s to %s', pbfFile, geoPackageFile);
+PBFToGeoPackage.convert({
+  pbf: pbfFile,
+  geopackage: oPackageFile,
+}, function(status, callback) {
   callback();
 }, function(err, result) {
   if (err) {
     console.log('File conversion failed with error: ', err);
   } else {
     console.log('File conversion complete');
-    console.log('Converted %s to %s', geoJsonFile, geoPackageFile);
+    console.log('Converted %s to %s', pbfFile, geoPackageFile);
   }
 });

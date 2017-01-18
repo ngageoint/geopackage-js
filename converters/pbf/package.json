@@ -1,7 +1,7 @@
 {
-  "name": "geojson-to-geopackage",
+  "name": "pbf-to-geopackage",
   "version": "1.0.0",
-  "description": "GeoJSON to GeoPackage converter",
+  "description": "PBF to GeoPackage converter",
   "keywords": [
     "NGA",
     "mapcache"
