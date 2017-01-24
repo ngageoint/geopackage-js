@@ -404,7 +404,7 @@ map.on('moveend', function() {
 });
 
 window.loadTiles = function(tableName, zoom, tilesElement) {
-  map.setZoom(zoom);
+  //map.setZoom(zoom);
   var mapBounds = map.getBounds();
   if (imageOverlay) map.removeLayer(imageOverlay);
   currentTile = {};

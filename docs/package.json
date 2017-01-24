@@ -3,15 +3,15 @@
   "dependencies": {
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
-    "geopackage": "..",
     "geojson-to-geopackage": "../converters/geojson",
-    "shapefile-to-geopackage": "../converters/shapefile",
-    "mbtiles-to-geopackage": "../converters/mbtiles",
+    "geopackage": "..",
     "jquery": "^2.2.3",
     "leaflet": "^1.0.2",
+    "mbtiles-to-geopackage": "../converters/mbtiles",
     "mustache": "^2.2.1",
-    "proj4": "^2.3.14",
+    "proj4": "^2.3.17",
     "reproject": "^1.1.1",
+    "shapefile-to-geopackage": "../converters/shapefile",
     "sql.js": "^0.3.2"
   },
   "devDependencies": {
