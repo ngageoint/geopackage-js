@@ -6,14 +6,14 @@ var path = require('path')
 
 describe('PBF to GeoPackage tests', function() {
 
-  it('should convert the test pbf tile', function(done) {
+  it.only('should convert the test pbf tile', function(done) {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'example.gpkg'));
     } catch (e) {}
 
     PBFToGeoPackage.convert({
-      pbf: path.join(__dirname, 'fixtures', 'example.pbf'),
+      pbf: path.join(__dirname, 'fixtures', '6272.vector.pbf'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'example.gpkg')
     }, function(status, callback) {
       console.log('status', status);
@@ -63,7 +63,7 @@ describe('PBF to GeoPackage tests', function() {
     });
   });
 
-  it.only('should convert the test pbf tile into a table called test then add it again to the same table', function(done) {
+  it('should convert the test pbf tile into a table called test then add it again to the same table', function(done) {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'example.gpkg'));

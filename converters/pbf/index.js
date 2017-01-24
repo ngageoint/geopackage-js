@@ -105,9 +105,8 @@ function setupConversion(options, progressCallback, doneCallback) {
     function(geopackage, tableName, buffer, callback) {
       var pbf = new PBF(buffer);
       var tile = new VectorTile(pbf);
-
-      var densitymap = tile.layers.densitymap;
-      console.log('tile.layers.densitymap.length', densitymap.length);
+      var densitymap = tile.layers.traffic;
+      // console.log('tile.layers.densitymap.length', densitymap.length);
 
       var geojson = {
         "type": "FeatureCollection",
