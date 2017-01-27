@@ -1,13 +1,16 @@
 var GeoPackage = require('geopackage')
   , TileBoundingBoxUtils = require('geopackage/lib/tiles/tileBoundingBoxUtils')
-  , BoundingBox = require('geopackage/lib/boundingBox');
+  , BoundingBox = require('geopackage/lib/boundingBox')
+  , PBFToGeoPackage = require('pbf-to-geopackage');
 
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
   , MBTiles = require('mbtiles')
   , JSZip = require('jszip')
-  , Buffer = require('buffer').Buffer;
+  , GlobalMercator = require('global-mercator')
+  , Buffer = require('buffer').Buffer
+  , pako = require('pako');
 
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
@@ -193,49 +196,132 @@ function setupConversion(options, progressCallback, doneCallback) {
         GeoPackage.createGeoPackage(geopackage, callback);
       });
     },
-    // figure out the table name to put the data into
     function(geopackage, callback) {
-      var name = 'tiles';
+      var filename;
       if (typeof options.mbtiles === 'string') {
-        name = path.basename(options.mbtiles, path.extname(options.mbtiles));
+        filename = path.basename(options.mbtiles, path.extname(options.mbtiles));
       }
+
+      new MBTiles(options.mbtiles || new Buffer(options.mbtilesData), function(err, mbtiles) {
+        callback(err, geopackage, mbtiles, filename);
+      });
+    },
+    function(geopackage, mbtiles, filename, callback) {
+      mbtiles.getInfo(function(err, info) {
+        info.filename = filename;
+        callback(err, geopackage, mbtiles, info);
+      });
+    },
+    // figure out the table name to put the data into
+    function(geopackage, mbtiles, info, callback) {
+      // is this a mbtiles file with pbf tiles?
+      if (info.format === 'pbf') {
+        handlePbfMBTiles(geopackage, mbtiles, info, callback);
+      } else {
+        handleImageryMBTiles(geopackage, mbtiles, info, callback);
+      }
+    }
+  ], function done(err, geopackage) {
+    doneCallback(err, geopackage);
+  });
+};
+
+function handlePbfMBTiles(geopackage, mbtiles, info, done) {
+  async.waterfall([
+    // figure out the table name to put the data into
+    function(callback) {
+      var name = info.filename || 'features';
+
+
+      var stream = mbtiles.createZXYStream({batch:10});
+      var output = '';
+      var count = 0;
+
+      stream.on('data', function(lines) {
+          output += lines;
+      });
+      stream.on('end', function() {
+          var queue = output.toString().split('\n');
+          var fivePercent = Math.floor(queue.length / 20);
+
+          async.eachSeries(queue, function(zxy, tileDone) {
+            async.setImmediate(function() {
+              if (zxy === '') return tileDone();
+              zxy = zxy.split('/');
+              if (count++ % fivePercent === 0) {
+
+                progressCallback({
+                  status: 'Inserting tile into table "' + tileDao.table_name + '"',
+                  completed: count,
+                  total: queue.length
+                }, function() {
+                  getAndSavePbfTile(mbtiles, zxy[0], zxy[1], zxy[2], geopackage, progressCallback, tileDone);
+                });
+              } else {
+                getAndSavePbfTile(mbtiles, zxy[0], zxy[1], zxy[2], geopackage, progressCallback, tileDone);
+              }
+            });
+          }, function() {
+            callback(null, geopackage);
+          });
+      });
+
+
+    }
+  ], done);
+}
+
+function getAndSavePbfTile(mbtiles, zoom, x, y, geopackage, progressCallback, callback) {
+  console.log('getting the tile %s, %s, %s', zoom, x, y);
+  mbtiles.getTile(zoom, x, y, function(err, buffer, headers) {
+    console.log('saving the tile %s, %s, %s', zoom, x, y);
+    var bbox = GlobalMercator.tileToBBox([x, y, zoom]);
+    var center = GlobalMercator.bboxToCenter(bbox);
+
+    try {
+      var unzipped = pako.ungzip(buffer);
+
+      PBFToGeoPackage.convert({
+        pbf: unzipped,
+        geopackage: geopackage,
+        tileCenter: center,
+        zoom: zoom
+      },
+      progressCallback,
+      function(err, gp) {
+        gp.getFeatureTables(function(err, tables) {
+          callback(err, geopackage);
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  });
+}
+
+function handleImageryMBTiles(geopackage, mbtiles, info, done) {
+  async.waterfall([
+    // figure out the table name to put the data into
+    function(geopackage, mbtiles, info, callback) {
+      var name = info.filename || 'tiles';
       geopackage.getTileTables(function(err, tables) {
         var count = 1;
         while(tables.indexOf(name) !== -1) {
           name = name + '_' + count;
           count++;
         }
-        callback(null, geopackage, name);
+        callback(null, geopackage, name, mbtiles);
       });
     },
-    function(geopackage, tableName, callback) {
-      new MBTiles(options.mbtiles || new Buffer(options.mbtilesData), function(err, mbtiles) {
-        callback(err, geopackage, tableName, mbtiles);
-      });
-    },
-    function(geopackage, tableName, mbtiles, callback) {
+    function(geopackage, tableName, mbtiles, info, callback) {
+      var boundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      var minZoom = info.minzoom;
+      var maxZoom = info.maxzoom;
+      var boundingBoxSrsId = 3857;
 
-      mbtiles.getInfo(function(err, info) {
-        // var boundingBox = new BoundingBox(info.bounds[0], info.bounds[2], info.bounds[1], info.bounds[3]);
-        // boundingBox = boundingBox.projectBoundingBox('EPSG:4236','EPSG:3857');
-        // if (info.bounds[2] === 180) {
-        //   boundingBox.maxLongitude = 20037508.342789244;
-        // }
-        // if (info.bounds[0] === -180) {
-        //   boundingBox.minLongitude = -20037508.342789244;
-        // }
-        // boundingBox.minLatitude = Math.max(-20037508.342789244, boundingBox.minLatitude);
-        // boundingBox.maxLatitude = Math.min(20037508.342789244, boundingBox.maxLatitude);
-        //
-        var boundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
-        var minZoom = info.minzoom;
-        var maxZoom = info.maxzoom;
-        var boundingBoxSrsId = 3857;
-
-        progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-          GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, boundingBox, boundingBoxSrsId, boundingBox, boundingBoxSrsId, minZoom, maxZoom, function(err, tileMatrixSet) {
-            callback(err, geopackage, tableName, mbtiles, tileMatrixSet);
-          });
+      progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
+        GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, boundingBox, boundingBoxSrsId, boundingBox, boundingBoxSrsId, minZoom, maxZoom, function(err, tileMatrixSet) {
+          callback(err, geopackage, tableName, mbtiles, tileMatrixSet);
         });
       });
     },
@@ -278,10 +364,8 @@ function setupConversion(options, progressCallback, doneCallback) {
           });
       });
     }
-  ], function done(err, geopackage) {
-    doneCallback(err, geopackage);
-  });
-};
+  ], done);
+}
 
 function getAndSaveTile(mbtiles, zoom, x, y, tileDao, callback) {
   console.log('getting the tile %s, %s, %s', zoom, x, y);

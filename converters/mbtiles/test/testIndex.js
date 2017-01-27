@@ -20,6 +20,9 @@ describe('MBTiles to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm2.gpkg'));
     } catch (e) {}
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'pbf.gpkg'));
+    } catch (e) {}
     done();
   });
 
@@ -212,6 +215,35 @@ describe('MBTiles to GeoPackage tests', function() {
                 });
               });
             });
+          });
+        });
+      });
+    });
+  });
+
+  it('should convert the mbtiles file containing pbf tiles into a geopackage', function(done) {
+    this.timeout(0);
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'pbf.gpkg'));
+    } catch (e) {}
+    try {
+      fs.mkdirSync(path.join(__dirname, 'fixtures', 'tmp'));
+    } catch (e) {}
+    MBTilesToGeoPackage.convert({
+      mbtiles: path.join(__dirname, 'fixtures', 'pbf.mbtiles'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'pbf.gpkg')
+    }, function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('pbf');
+        geopackage.getFeatureDaoWithTableName('pbf', function(err, featureDao){
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(85);
+            done();
           });
         });
       });

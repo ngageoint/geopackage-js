@@ -91,7 +91,6 @@ function setupConversion(options, progressCallback, doneCallback) {
     },
     // get the PBF data
     function(geopackage, tableName, callback) {
-
       if (typeof pbf === 'string') {
         progressCallback({status: 'Reading PBF file'}, function() {
           fs.readFile(pbf, function(err, data) {
@@ -105,53 +104,69 @@ function setupConversion(options, progressCallback, doneCallback) {
     function(geopackage, tableName, buffer, callback) {
       var pbf = new PBF(buffer);
       var tile = new VectorTile(pbf);
-      var densitymap = tile.layers.traffic;
-      // console.log('tile.layers.densitymap.length', densitymap.length);
-
-      var geojson = {
-        "type": "FeatureCollection",
-        "features": []
-      };
-
-      // calculate the center of the tile in lat lon
-      var latlng = [0,0];
-      var viewport = ViewportMercator({
-        longitude: latlng[1],
-        latitude: latlng[0],
-        tileSize: densitymap.extent,
-        zoom: 0,
-        width: densitymap.extent,
-        height: densitymap.extent
-      });
-
-      for (var i = 0; i < densitymap.length; i++) {
-        var feature = densitymap.feature(i);
-        var bbox = feature.bbox();
-        var ur = viewport.unproject([bbox[0], bbox[1]]);
-        var ll = viewport.unproject([bbox[2], bbox[3]]);
-
-        var feature = {
-          "type": "Feature",
-          "properties": feature.properties,
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [
-              [ur, [ur[0],ll[1]], ll, [ll[0], ur[1]], ur]
-            ]
-          }
+      async.forEachOf(tile.layers, function(layer, layerName, layerDone){
+        console.log('layerName', layerName);
+        var geojson = {
+          "type": "FeatureCollection",
+          "features": []
         };
-        geojson.features.push(feature);
-      }
-      callback(null, geopackage, tableName, geojson);
-    },
-    // Go
-    function(geopackage, tableName, geoJson, callback) {
-      convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, doneCallback);
+
+        // calculate the center of the tile in lat lon
+        var latlng = options.tileCenter;
+        var viewport = ViewportMercator({
+          longitude: latlng[1],
+          latitude: latlng[0],
+          tileSize: layer.extent,
+          zoom: options.zoom,
+          width: layer.extent,
+          height: layer.extent
+        });
+
+        for (var i = 0; i < layer.length; i++) {
+          var feature = layer.feature(i);
+          var featureJson = feature.toGeoJSON();
+          var geom = feature.loadGeometry();
+          var coords = [];
+          if (featureJson.geometry.type === 'Polygon') {
+            coords.push(translateCoordinateArray(geom[0], viewport));
+          } else if (featureJson.geometry.type === 'LineString') {
+            coords = translateCoordinateArray(geom[0], viewport);
+          } else if (featureJson.geometry.type === 'MultiLineString') {
+            coords.push(translateCoordinateArray(geom[0], viewport));
+          } else {
+            console.log('type: ' + featureJson.geometry.type);
+            console.log('geom', geom);
+            console.log('coords', coords);
+            console.log('feature', JSON.stringify(featureJson, null, 2));
+          }
+          featureJson.geometry.coordinates = coords;
+          geojson.features.push(featureJson);
+        }
+        convertGeoJSONToGeoPackage(geojson, geopackage, layerName, progressCallback, function(err, geopackage){
+          layerDone();
+        });
+      }, function() {
+        callback(null, geopackage);
+      });
     }
-  ], function done(err) {
-    doneCallback(err, geopackage);
-  });
+  ], doneCallback);
 };
+
+function translateCoordinateArray(array, viewport) {
+  var coords = [];
+  for (var i = 0; i < array.length; i++) {
+    if (array[i].length) {
+      coords.push(translateCoordinateArray(array[i], viewport));
+    } else {
+      coords.push(translateCoordinate(array[i], viewport));
+    }
+  }
+  return coords;
+}
+
+function translateCoordinate(coordinate, viewport) {
+  return viewport.unproject([coordinate.x, coordinate.y]);
+}
 
 function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
   async.waterfall([function(callback) {
@@ -243,7 +258,9 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       }
     }
     progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, callback);
+      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
+        callback(err, featureDao);
+      });
     });
   }, function(featureDao, callback) {
     var count = 0;
@@ -266,11 +283,11 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
     }, function done() {
       progressCallback({
         status: 'Done inserted features into table "' + tableName + '"'
-      }, callback);
+      }, function() {
+        callback(null, geopackage);
+      });
     });
   }
 
-], function done(err) {
-  callback(err, geopackage);
-  });
+], callback);
 }

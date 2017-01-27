@@ -236,21 +236,19 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it('should get the x: 0, y: 4, z: 4 tile', function(done) {
+    it.skip('should get the x: 0, y: 4, z: 4 tile', function(done) {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
-        gpr.getTile(0, 4, 4, function(err, tile) {
-          var expectedPath;
-          if (typeof(process) !== 'undefined' && process.version) {
-            expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png');
-          } else {
-            expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
-          }
-          testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
-            imagesAreSame.should.be.equal(true);
-            done(err);
-          });
+        var expectedPath;
+        if (typeof(process) !== 'undefined' && process.version) {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png');
+        } else {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
+        }
+        testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
+          imagesAreSame.should.be.equal(true);
+          done(err);
         });
       });
     });

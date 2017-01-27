@@ -30,7 +30,11 @@
     "reproject": "^1.1.1",
     "sql.js": "^0.3.2",
     "stream-to-array": "^2.3.0",
-    "wkx": "^0.2.0"
+    "wkx": "^0.2.0",
+    "geojson-to-geopackage": "file:converters/geojson",
+    "shapefile-to-geopackage": "file:converters/shapefile",
+    "mbtiles-to-geopackage": "file:converters/mbtiles",
+    "pbf-to-geopackage": "file:converters/pbf"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
@@ -39,7 +43,6 @@
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
     "image-diff": "^1.5.1",
-    "imagediff": "^1.0.8",
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
@@ -58,11 +61,11 @@
     "webworkify": "^1.1.0"
   },
   "optionalDependencies": {
-    "asciify-image": "0.0.7",
+    "asciify-image": "0.0.8",
     "chalk": "^1.1.3",
     "inquirer": "^1.0.2",
-    "lwip": "0.0.8",
-    "sqlite3": "^3.1.2"
+    "lwip": "0.0.9",
+    "sqlite3": "3.1.2"
   },
   "private": true,
   "main": "index.js",
@@ -91,8 +94,9 @@
       "android-browser/latest"
     ]
   },
+  "postinstall": "npm install converters/geojson; npm install converters/shapefile; npm install converters/pbf; npm install converters/mbtiles",
+
   "scripts": {
-    "postinstall": "npm install converters/geojson; npm install converters/shapefile; npm install converters/mbtiles",
     "test": "istanbul cover  _mocha",
     "mocha": "mocha",
     "karma": "karma start",
