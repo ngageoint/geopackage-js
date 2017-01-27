@@ -6,14 +6,13 @@ var path = require('path')
 , should = require('chai').should()
 , proj4 = require('proj4');
 
-describe.only('Tests for issue 68', function() {
+describe('Tests for issue 68', function() {
 
   it('should get a tile', function(done) {
     this.timeout(0);
     GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'), function(err, connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
-        console.log('tables', tables);
         tables[0].should.be.equal('package_tiles');
         geoPackage.getTileDaoWithTableName('package_tiles', function(err, tileDao) {
           if (err) return done(err);

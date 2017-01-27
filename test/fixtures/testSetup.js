@@ -1,7 +1,6 @@
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
-  , imagediff = require('imagediff')
   , TableCreator = require('../../lib/db/tableCreator')
   , GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
