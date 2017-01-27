@@ -13,8 +13,10 @@ describe('PBF to GeoPackage tests', function() {
     } catch (e) {}
 
     PBFToGeoPackage.convert({
-      pbf: path.join(__dirname, 'fixtures', '6272.vector.pbf'),
-      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'example.gpkg')
+      pbf: path.join(__dirname, 'fixtures', 'example.pbf'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'example.gpkg'),
+      tileCenter: [0,0],
+      zoom: 0
     }, function(status, callback) {
       console.log('status', status);
       callback();
@@ -22,12 +24,18 @@ describe('PBF to GeoPackage tests', function() {
       should.not.exist(err);
       should.exist(geopackage);
       geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('example');
-        geopackage.getFeatureDaoWithTableName('example', function(err, featureDao) {
+        tables.length.should.be.equal(2);
+        tables[0].should.be.equal('admin');
+        tables[1].should.be.equal('water');
+        geopackage.getFeatureDaoWithTableName('admin', function(err, featureDao) {
           featureDao.getCount(function(err, count) {
-            count.should.be.equal(9864);
-            done();
+            count.should.be.equal(1364);
+            geopackage.getFeatureDaoWithTableName('water', function(err, featureDao) {
+              featureDao.getCount(function(err, count) {
+                count.should.be.equal(18);
+                done();
+              });
+            });
           });
         });
       });
@@ -55,7 +63,7 @@ describe('PBF to GeoPackage tests', function() {
         tables[0].should.be.equal('test');
         geopackage.getFeatureDaoWithTableName('test', function(err, featureDao) {
           featureDao.getCount(function(err, count) {
-            count.should.be.equal(9864);
+            count.should.be.equal(6);
             done();
           });
         });
