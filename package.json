@@ -30,11 +30,7 @@
     "reproject": "^1.1.1",
     "sql.js": "^0.3.2",
     "stream-to-array": "^2.3.0",
-    "wkx": "^0.2.0",
-    "geojson-to-geopackage": "file:converters/geojson",
-    "shapefile-to-geopackage": "file:converters/shapefile",
-    "mbtiles-to-geopackage": "file:converters/mbtiles",
-    "pbf-to-geopackage": "file:converters/pbf"
+    "wkx": "^0.2.0"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
