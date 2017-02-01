@@ -1,6 +1,6 @@
 {
   "name": "geopackage",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "geopackage",
   "keywords": [
     "NGA",
@@ -30,11 +30,7 @@
     "reproject": "^1.1.1",
     "sql.js": "^0.3.2",
     "stream-to-array": "^2.3.0",
-    "wkx": "^0.2.0",
-    "geojson-to-geopackage": "file:converters/geojson",
-    "shapefile-to-geopackage": "file:converters/shapefile",
-    "mbtiles-to-geopackage": "file:converters/mbtiles",
-    "pbf-to-geopackage": "file:converters/pbf"
+    "wkx": "^0.2.0"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
@@ -94,8 +90,6 @@
       "android-browser/latest"
     ]
   },
-  "postinstall": "npm install converters/geojson; npm install converters/shapefile; npm install converters/pbf; npm install converters/mbtiles",
-
   "scripts": {
     "test": "istanbul cover  _mocha",
     "mocha": "mocha",
