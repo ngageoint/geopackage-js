@@ -8,7 +8,6 @@ var fs = require('fs')
   , path = require('path')
   , MBTiles = require('mbtiles')
   , JSZip = require('jszip')
-  , GlobalMercator = require('global-mercator')
   , Buffer = require('buffer').Buffer
   , pako = require('pako');
 
@@ -208,6 +207,7 @@ function setupConversion(options, progressCallback, doneCallback) {
     },
     function(geopackage, mbtiles, filename, callback) {
       mbtiles.getInfo(function(err, info) {
+        console.log('info', info);
         info.filename = filename;
         callback(err, geopackage, mbtiles, info);
       });
@@ -216,9 +216,9 @@ function setupConversion(options, progressCallback, doneCallback) {
     function(geopackage, mbtiles, info, callback) {
       // is this a mbtiles file with pbf tiles?
       if (info.format === 'pbf') {
-        handlePbfMBTiles(geopackage, mbtiles, info, callback);
+        handlePbfMBTiles(geopackage, mbtiles, info, progressCallback, callback);
       } else {
-        handleImageryMBTiles(geopackage, mbtiles, info, callback);
+        handleImageryMBTiles(geopackage, mbtiles, info, progressCallback, callback);
       }
     }
   ], function done(err, geopackage) {
@@ -226,12 +226,11 @@ function setupConversion(options, progressCallback, doneCallback) {
   });
 };
 
-function handlePbfMBTiles(geopackage, mbtiles, info, done) {
+function handlePbfMBTiles(geopackage, mbtiles, info, progressCallback, done) {
   async.waterfall([
     // figure out the table name to put the data into
     function(callback) {
       var name = info.filename || 'features';
-
 
       var stream = mbtiles.createZXYStream({batch:10});
       var output = '';
@@ -251,22 +250,28 @@ function handlePbfMBTiles(geopackage, mbtiles, info, done) {
               if (count++ % fivePercent === 0) {
 
                 progressCallback({
-                  status: 'Inserting tile into table "' + tileDao.table_name + '"',
+                  status: 'Inserting tiles into geopackage.',
                   completed: count,
                   total: queue.length
                 }, function() {
-                  getAndSavePbfTile(mbtiles, zxy[0], zxy[1], zxy[2], geopackage, progressCallback, tileDone);
+                  if (Number(zxy[0]) === Number(info.maxzoom)) {
+                    getAndSavePbfTile(mbtiles, Number(zxy[0]), Number(zxy[1]), Number(zxy[2]), geopackage, progressCallback, tileDone);
+                  } else {
+                    tileDone();
+                  }
                 });
               } else {
-                getAndSavePbfTile(mbtiles, zxy[0], zxy[1], zxy[2], geopackage, progressCallback, tileDone);
+                if (Number(zxy[0]) === Number(info.maxzoom)) {
+                  getAndSavePbfTile(mbtiles, Number(zxy[0]), Number(zxy[1]), Number(zxy[2]), geopackage, progressCallback, tileDone);
+                } else {
+                  tileDone();
+                }
               }
             });
           }, function() {
             callback(null, geopackage);
           });
       });
-
-
     }
   ], done);
 }
@@ -275,16 +280,14 @@ function getAndSavePbfTile(mbtiles, zoom, x, y, geopackage, progressCallback, ca
   console.log('getting the tile %s, %s, %s', zoom, x, y);
   mbtiles.getTile(zoom, x, y, function(err, buffer, headers) {
     console.log('saving the tile %s, %s, %s', zoom, x, y);
-    var bbox = GlobalMercator.tileToBBox([x, y, zoom]);
-    var center = GlobalMercator.bboxToCenter(bbox);
-
     try {
       var unzipped = pako.ungzip(buffer);
 
       PBFToGeoPackage.convert({
         pbf: unzipped,
         geopackage: geopackage,
-        tileCenter: center,
+        x: x,
+        y: y,
         zoom: zoom
       },
       progressCallback,
@@ -299,10 +302,11 @@ function getAndSavePbfTile(mbtiles, zoom, x, y, geopackage, progressCallback, ca
   });
 }
 
-function handleImageryMBTiles(geopackage, mbtiles, info, done) {
+function handleImageryMBTiles(geopackage, mbtiles, info, progressCallback, done) {
+  console.log('info', info);
   async.waterfall([
     // figure out the table name to put the data into
-    function(geopackage, mbtiles, info, callback) {
+    function(callback) {
       var name = info.filename || 'tiles';
       geopackage.getTileTables(function(err, tables) {
         var count = 1;
@@ -310,7 +314,7 @@ function handleImageryMBTiles(geopackage, mbtiles, info, done) {
           name = name + '_' + count;
           count++;
         }
-        callback(null, geopackage, name, mbtiles);
+        callback(null, geopackage, name, mbtiles, info);
       });
     },
     function(geopackage, tableName, mbtiles, info, callback) {

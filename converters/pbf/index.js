@@ -4,8 +4,10 @@ var fs = require('fs')
   , async = require('async')
   , path = require('path')
   , PBF = require('pbf')
-  , VectorTile = require('vector-tile').VectorTile
-  , ViewportMercator = require('viewport-mercator-project');
+  , clip = require('geojson-clip-polygon')
+  //, intersect = require('@turf/intersect')
+  , GlobalMercator = require('global-mercator')
+  , VectorTile = require('vector-tile').VectorTile;
 
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
@@ -111,39 +113,15 @@ function setupConversion(options, progressCallback, doneCallback) {
           "features": []
         };
 
-        // calculate the center of the tile in lat lon
-        var latlng = options.tileCenter;
-        var viewport = ViewportMercator({
-          longitude: latlng[1],
-          latitude: latlng[0],
-          tileSize: layer.extent,
-          zoom: options.zoom,
-          width: layer.extent,
-          height: layer.extent
-        });
-
         for (var i = 0; i < layer.length; i++) {
           var feature = layer.feature(i);
-          var featureJson = feature.toGeoJSON();
-          var geom = feature.loadGeometry();
-          var coords = [];
-          if (featureJson.geometry.type === 'Polygon') {
-            coords.push(translateCoordinateArray(geom[0], viewport));
-          } else if (featureJson.geometry.type === 'LineString') {
-            coords = translateCoordinateArray(geom[0], viewport);
-          } else if (featureJson.geometry.type === 'MultiLineString') {
-            coords.push(translateCoordinateArray(geom[0], viewport));
-          } else {
-            console.log('type: ' + featureJson.geometry.type);
-            console.log('geom', geom);
-            console.log('coords', coords);
-            console.log('feature', JSON.stringify(featureJson, null, 2));
-          }
-          featureJson.geometry.coordinates = coords;
+          var featureJson = feature.toGeoJSON(options.x, options.y, options.zoom);
           geojson.features.push(featureJson);
         }
-        convertGeoJSONToGeoPackage(geojson, geopackage, layerName, progressCallback, function(err, geopackage){
-          layerDone();
+        correctGeoJson(geojson, options.x, options.y, options.zoom, function(err, correctedGeoJson) {
+          convertGeoJSONToGeoPackage(correctedGeoJson, geopackage, layerName, progressCallback, function(err, geopackage){
+            layerDone();
+          });
         });
       }, function() {
         callback(null, geopackage);
@@ -152,21 +130,133 @@ function setupConversion(options, progressCallback, doneCallback) {
   ], doneCallback);
 };
 
-function translateCoordinateArray(array, viewport) {
-  var coords = [];
-  for (var i = 0; i < array.length; i++) {
-    if (array[i].length) {
-      coords.push(translateCoordinateArray(array[i], viewport));
-    } else {
-      coords.push(translateCoordinate(array[i], viewport));
-    }
-  }
-  return coords;
+function correctGeoJson(geoJson, x, y, z, callback) {
+  var tileBounds = GlobalMercator.googleToBBox([x, y, z]);
+
+  var correctedGeoJson = {
+    type: 'FeatureCollection',
+    features: []
+  };
+  async.eachSeries(geoJson.features, function featureIterator(feature, featureCallback) {
+    var props = feature.properties;
+    var ogfeature = feature;
+    async.setImmediate(function() {
+      var splitType = '';
+      if (feature.geometry.type === 'MultiPolygon') {
+        splitType = 'Polygon';
+      } else if (feature.geometry.type === 'MultiLineString') {
+        splitType = 'LineString';
+      } else {
+        if (feature.geometry.type === 'Polygon') {
+          var geometry = clip({
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    tileBounds[0],
+                    tileBounds[1]
+                  ],
+                  [
+                    tileBounds[0],
+                    tileBounds[3]
+                  ],
+                  [
+                    tileBounds[2],
+                    tileBounds[3]
+                  ],
+                  [
+                    tileBounds[2],
+                    tileBounds[1]
+                  ],
+                  [
+                    tileBounds[0],
+                    tileBounds[1]
+                  ]
+                ]
+              ]
+            }
+          }, feature);
+          feature = geometry;
+        }
+        if (feature && feature.geometry) {
+          feature.properties = props;
+          correctedGeoJson.features.push(feature);
+        } else {
+          correctedGeoJson.features.push(ogfeature);
+        }
+        return featureCallback();
+      }
+
+      // split if necessary
+      async.eachSeries(feature.geometry.coordinates, function splitIterator(coords, splitCallback) {
+        async.setImmediate(function() {
+          var f = {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              type: splitType,
+              coordinates: coords
+            }
+          };
+          if (splitType === 'Polygon') {
+            f = clip({
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      tileBounds[0],
+                      tileBounds[1]
+                    ],
+                    [
+                      tileBounds[0],
+                      tileBounds[3]
+                    ],
+                    [
+                      tileBounds[2],
+                      tileBounds[3]
+                    ],
+                    [
+                      tileBounds[2],
+                      tileBounds[1]
+                    ],
+                    [
+                      tileBounds[0],
+                      tileBounds[1]
+                    ]
+                  ]
+                ]
+              }
+            }, f);
+          }
+          if (f && f.geometry) {
+            f.properties = props;
+            correctedGeoJson.features.push(f);
+          } else {
+            correctedGeoJson.features.push({
+              "type": "Feature",
+              "properties": props,
+              "geometry": {
+                type: splitType,
+                coordinates: coords
+              }
+            });
+          }
+          splitCallback();
+        });
+      }, featureCallback);
+
+    });
+  }, function done() {
+    callback(null, correctedGeoJson);
+  });
 }
 
-function translateCoordinate(coordinate, viewport) {
-  return viewport.unproject([coordinate.x, coordinate.y]);
-}
 
 function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
   async.waterfall([function(callback) {
@@ -177,6 +267,9 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
     progressCallback({status: 'Reading GeoJSON feature properties'}, function() {
       // first loop to find all properties of all features.  Has to be a better way...
       async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
+        if (!feature.geometry) {
+          console.log('feature with no geometry', feature);
+        }
         async.setImmediate(function() {
           if (feature.properties.geometry) {
             feature.properties.geometry_property = feature.properties.geometry;
