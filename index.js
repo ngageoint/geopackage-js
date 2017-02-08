@@ -26,6 +26,8 @@ var GeoPackageManager = require('./lib/geoPackageManager')
 
 var proj4Defs = require('./lib/proj4Defs');
 module.exports.proj4Defs = proj4Defs;
+module.exports.GeoPackageTileRetriever = GeoPackageTileRetriever;
+module.exports.GeoPackageConnection = GeoPackageConnection;
 
 /**
  * Open a GeoPackage at the path specified
