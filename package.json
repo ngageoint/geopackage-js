@@ -28,7 +28,7 @@
     "file-type": "^3.8.0",
     "proj4": "^2.3.17",
     "reproject": "^1.1.1",
-    "sql.js": "^0.3.2",
+    "sql.js": "kripken/sql.js",
     "stream-to-array": "^2.3.0",
     "wkx": "^0.2.0"
   },
