@@ -373,7 +373,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
   xhr.responseType = 'arraybuffer';
 
   $('#choose-label').find('span').text(gpName);
-
+  $('#choose-label').find('i').toggle();
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
     loadByteArray(uInt8Array, function() {
