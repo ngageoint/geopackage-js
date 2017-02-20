@@ -93,6 +93,13 @@ window.loadGeoPackage = function(files) {
 
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'GeoPackage',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       loadByteArray(array, function() {
         $('#choose-label').find('i').toggle();
         $('#download').removeClass('gone');
@@ -100,6 +107,13 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a GeoJSON file
     else if (f.name.lastIndexOf('json') > f.name.lastIndexOf('.')) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'GeoJSON',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       var jsonString = '';
       var len = array.byteLength;
       for (var i = 0; i < len; i++) {
@@ -125,6 +139,13 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile zip
     else if (f.name.lastIndexOf('zip') > f.name.lastIndexOf('.')) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Shapefile Zip',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       ShapefileToGeoPackage.convert({
         shapezipData: array
       }, function(status, callback) {
@@ -146,6 +167,13 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile shp
     else if (f.name.lastIndexOf('shp') > f.name.lastIndexOf('.')) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Shapefile',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       ShapefileToGeoPackage.convert({
         shapeData: array
       }, function(status, callback) {
@@ -167,6 +195,13 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a MBTiles file
     else if (f.name.lastIndexOf('mbtiles') > f.name.lastIndexOf('.')) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'MBTiles',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       MBTilesToGeoPackage.convert({
         mbtilesData: array
       }, function(status, callback) {
@@ -188,6 +223,13 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a PBF file
     else if (f.name.lastIndexOf('pbf') > f.name.lastIndexOf('.')) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'PBF',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength
+      });
       PBFToGeoPackage.convert({
         pbf: array
       }, function(status, callback) {
@@ -299,6 +341,12 @@ window.toggleLayer = function(layerType, table) {
   }
 
   if (layerType === 'tile') {
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Layer',
+      eventAction: 'load',
+      eventLabel: 'Tile Layer'
+    });
     geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
       var maxZoom = tileDao.maxZoom;
@@ -323,6 +371,12 @@ window.toggleLayer = function(layerType, table) {
       tableLayers[table] = tableLayer;
     });
   } else if (layerType === 'feature') {
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Layer',
+      eventAction: 'load',
+      eventLabel: 'Feature Layer'
+    });
     var geojsonLayer = L.geoJson([], {
         style: function (feature) {
           return {
@@ -366,6 +420,11 @@ window.toggleLayer = function(layerType, table) {
 }
 
 window.loadUrl = function(url, loadingElement, gpName) {
+  ga('send', {
+    hitType: 'event',
+    eventCategory: 'URL',
+    eventAction: 'load'
+  });
   fileName = url.split('/').pop();
   loadingElement.toggle();
   var xhr = new XMLHttpRequest();
