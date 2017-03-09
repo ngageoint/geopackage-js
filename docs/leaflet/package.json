@@ -1,0 +1,6 @@
+{
+  "name": "geopackage-leaflet-demo",
+  "scripts": {
+    "build": "cp ../../static/leaflet-geopackage.js ."
+  }
+}

@@ -99,6 +99,7 @@
     "predoc": "rm -rf docs/jsdoc/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
     "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
-    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js"
+    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
+    "buildleaflet": "browserify -t browserify-css lib/leaflet/index.js --exclude sqlite3 --exclude lwip --exclude inquirer -o static/leaflet-geopackage.js"
   }
 }
