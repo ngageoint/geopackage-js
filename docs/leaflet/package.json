@@ -1,6 +1,6 @@
 {
   "name": "geopackage-leaflet-demo",
   "scripts": {
-    "build": "cp ../../static/leaflet-geopackage.js ."
+    "build": "browserify ../../leaflet/leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o leaflet-geopackage.js"
   }
 }
