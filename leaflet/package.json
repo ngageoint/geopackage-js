@@ -31,9 +31,12 @@
     "geopackage": "github:ngageoint/geopackage-js"
   },
   "scripts": {
+    "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",
+    "build-min": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer | uglifyjs -c -m -o dist/leaflet-geopackage.min.js",
     "prepublish": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js"
   },
   "devDependencies": {
-    "browserify": "^14.1.0"
+    "browserify": "^14.1.0",
+    "uglify-js": "^2.8.12"
   }
 }
