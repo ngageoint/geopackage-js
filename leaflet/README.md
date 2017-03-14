@@ -6,6 +6,9 @@ Load GeoPackage tile and feature layers in the browser without a server.  When a
 
 [Sample Page](https://ngageoint.github.io/leaflet/index.html) which loads a tile layer and a feature layer from the [Natural Earth Rivers GeoPackage](http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)
 
+Loading a feature layer:  
+![](https://ngageoint.github.io/geopackage-js/leaflet/featurelayer.gif)
+
 ### Usage
 
 ```js
