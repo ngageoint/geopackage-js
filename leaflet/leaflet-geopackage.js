@@ -1,3 +1,7 @@
+var Promise = require('promise-polyfill');
+if (!window.Promise) {
+  window.Promise = Promise;
+}
 var GeoPackageAPI = require('geopackage');
 
 L.GeoPackageTileLayer = L.GridLayer.extend({
