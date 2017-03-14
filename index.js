@@ -188,7 +188,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           var geom = geometry.geometry;
           var geoJsonGeom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geoJson = reproject.reproject(geoJson, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
+            geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
         }
         var geoJson = {
