@@ -1,6 +1,6 @@
 var GeoPackageAPI = require('geopackage');
 
-L.GridLayer.GeoPackage = L.GridLayer.extend({
+L.GeoPackageTileLayer = L.GridLayer.extend({
 	options: {
 		layerName: '',
     geoPackageUrl: ''
@@ -57,6 +57,55 @@ function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
   }, 0);
 }
 
-L.gridLayer.geoPackage = function(opts){
-	return new L.GridLayer.GeoPackage(opts);
+L.geoPackageTileLayer = function(opts){
+	return new L.GeoPackageTileLayer(opts);
+}
+
+L.GeoPackageFeatureLayer = L.GeoJSON.extend({
+	options: {
+		layerName: '',
+    geoPackageUrl: '',
+    style: function (feature) {
+      return {
+        color: "#00F",
+        weight: 2,
+        opacity: 1
+      };
+    },
+    pointToLayer: function(feature, latlng) {
+      return L.circleMarker(latlng, {
+        radius: 2
+      });
+    }
+	},
+	initialize: function initialize(data, options) {
+		options = L.setOptions(this, options);
+		L.GeoJSON.prototype.initialize.call(this, data, options);
+	},
+	onAdd: function onAdd(map) {
+		L.GeoJSON.prototype.onAdd.call(this, map);
+    var layer = this;
+    layer.geoPackageLoaded = false;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', this.options.geoPackageUrl, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(e) {
+      var uInt8Array = new Uint8Array(this.response);
+      GeoPackageAPI.openGeoPackageByteArray(uInt8Array, function(err, gp) {
+        console.timeEnd('Loading GeoPackage ' + layer.options.geoPackageUrl);
+        layer.geoPackageLoaded = true;
+        layer.geoPackage = gp;
+        GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName, function(err, geoJson, done) {
+          layer.addData(geoJson);
+          setTimeout(done, 0);
+        });
+      });
+    };
+    console.time('Loading GeoPackage ' + layer.options.geoPackageUrl);
+    xhr.send();
+	}
+});
+
+L.geoPackageFeatureLayer = function(data, opts){
+	return new L.GeoPackageFeatureLayer(data, opts);
 }

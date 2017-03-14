@@ -6,7 +6,19 @@ var baseLayer = L.tileLayer('https://mapbox.geointservices.io/v4/mapbox.light/{z
 });
 baseLayer.addTo(map);
 
-L.gridLayer.geoPackage({
+L.geoPackageTileLayer({
     geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
     layerName: 'rivers_tiles'
+}).addTo(map);
+
+L.geoPackageFeatureLayer([], {
+    geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+    layerName: 'rivers',
+    onEachFeature: function (feature, layer) {
+      var string = "";
+      for (var key in feature.properties) {
+        string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+      }
+      layer.bindPopup(string);
+    }
 }).addTo(map);
