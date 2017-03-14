@@ -30,8 +30,8 @@ L.geoPackageFeatureLayer([], {
 
 GeoPackageTileLayer extends L.GridLayer and accepts all options for L.GridLayer in addition to the following:
 
-| option       | type    | |
-| ------------ | ------- | -------------- | -------------------------------------------------------------------------- |
+| option       | type    |  |
+| ------------ | ------- | -------------- |
 | `geoPackageUrl`     | String  | The URL to the GeoPackage
 | `layerName`   | String  | Name of the Tile Layer within the GeoPackage          |
 
@@ -40,7 +40,7 @@ GeoPackageTileLayer extends L.GridLayer and accepts all options for L.GridLayer 
 GeoPackageFeatureLayer extends L.GeoJSON and accepts all options for L.GeoJSON in addition to the following:
 
 | option       | type    | |
-| ------------ | ------- | -------------- | -------------------------------------------------------------------------- |
+| ------------ | ------- | -------------- |
 | `geoPackageUrl`     | String  | The URL to the GeoPackage
 | `layerName`   | String  | Name of the Feature Layer within the GeoPackage          |
 
