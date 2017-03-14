@@ -1,4 +1,4 @@
-## leaflet-geopackage &mdash; GeoPackage layers in Leaflet
+## leaflet-geopackage &mdash; Load GeoPackage layers in Leaflet
 
 Load GeoPackage tile and feature layers in the browser without a server.  When a layer is added to the map, the GeoPackage will be downloaded and then the specified layer will be loaded on the map.
 
