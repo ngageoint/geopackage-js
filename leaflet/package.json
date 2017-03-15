@@ -28,9 +28,7 @@
     "leaflet": "1.x"
   },
   "dependencies": {
-    "browserify": "^14.1.0",
-    "geopackage": "../",
-    "promise-polyfill": "^6.0.2"
+    "geopackage": "../"
   },
   "scripts": {
     "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",
@@ -38,6 +36,8 @@
     "prepublish": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js"
   },
   "devDependencies": {
+    "browserify": "^14.1.0",
+    "promise-polyfill": "^6.0.2",
     "uglify-js": "^2.8.12"
   }
 }

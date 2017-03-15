@@ -11,11 +11,10 @@
     "mustache": "^2.2.1",
     "proj4": "^2.3.17",
     "reproject": "^1.1.1",
-    "shapefile-to-geopackage": "../converters/shapefile",
-    "sql.js": "^0.3.2"
+    "shapefile-to-geopackage": "../converters/shapefile"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
+    "browserify": "^14.1.0",
     "browserify-css": "^0.9.1"
   },
   "scripts": {
