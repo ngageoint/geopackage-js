@@ -12,7 +12,6 @@ Loading a feature layer:
 ### Usage
 
 ```js
-
 // Load the Rivers GeoPackage and display the tile layer
 L.geoPackageTileLayer({
     geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
@@ -33,7 +32,8 @@ GeoPackageTileLayer extends L.GridLayer and accepts all options for L.GridLayer 
 | option       | type    |  |
 | ------------ | ------- | -------------- |
 | `geoPackageUrl`     | String  | The URL to the GeoPackage
-| `layerName`   | String  | Name of the Tile Layer within the GeoPackage          |
+| `layerName`   | String  | Name of the Tile Layer within the GeoPackage
+| `noCache`   | Boolean  | defaults to true set false to re-download the GeoPackage even if a previous layer has already downloaded it
 
 ### GeoPackageFeatureLayer Options
 
@@ -42,7 +42,8 @@ GeoPackageFeatureLayer extends L.GeoJSON and accepts all options for L.GeoJSON i
 | option       | type    | |
 | ------------ | ------- | -------------- |
 | `geoPackageUrl`     | String  | The URL to the GeoPackage
-| `layerName`   | String  | Name of the Feature Layer within the GeoPackage          |
+| `layerName`   | String  | Name of the Feature Layer within the GeoPackage
+| `noCache`   | Boolean  | defaults to true set false to re-download the GeoPackage even if a previous layer has already downloaded it
 
 ### Browser builds
 

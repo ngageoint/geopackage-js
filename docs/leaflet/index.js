@@ -1,3 +1,4 @@
+require('leaflet-geopackage');
 
 var map = L.map('map').setView([45, 15], 3);
 
@@ -6,19 +7,29 @@ var baseLayer = L.tileLayer('https://mapbox.geointservices.io/v4/mapbox.light/{z
 });
 baseLayer.addTo(map);
 
-L.geoPackageTileLayer({
+var tileLayer = L.geoPackageTileLayer({
     geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
     layerName: 'rivers_tiles'
 }).addTo(map);
 
-L.geoPackageFeatureLayer([], {
-    geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
-    layerName: 'rivers',
-    onEachFeature: function (feature, layer) {
-      var string = "";
-      for (var key in feature.properties) {
-        string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+tileLayer.on('load', function() {
+  tileLayer.off('load');
+  L.geoPackageFeatureLayer([], {
+      geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+      layerName: 'rivers',
+      style: function (feature) {
+        return {
+          color: "#F00",
+          weight: 2,
+          opacity: 1
+        };
+      },
+      onEachFeature: function (feature, layer) {
+        var string = "";
+        for (var key in feature.properties) {
+          string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+        }
+        layer.bindPopup(string);
       }
-      layer.bindPopup(string);
-    }
-}).addTo(map);
+  }).addTo(map);
+});

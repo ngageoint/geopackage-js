@@ -1,9 +1,10 @@
 {
   "name": "geopackage-leaflet-demo",
   "scripts": {
-    "build": "browserify ../../leaflet/leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o leaflet-geopackage.js"
+    "postinstall": "browserify index.js --exclude sqlite3 --exclude lwip --exclude inquirer -o leaflet-geopackage.js"
   },
   "dependencies": {
-    "browserify": "^14.1.0"
+    "browserify": "^14.1.0",
+    "leaflet-geopackage": "../../leaflet"
   }
 }
