@@ -1,5 +1,8 @@
 var css = require('./includes.css');
-
+var Promise = require('promise-polyfill');
+if (!window.Promise) {
+  window.Promise = Promise;
+}
 var async = require('async')
   , reproject = require('reproject')
   , L = require('leaflet')
