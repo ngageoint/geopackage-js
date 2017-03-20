@@ -25,8 +25,7 @@ describe('FeatureDao tests', function() {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
           should.exist(geometry);
-          done();
-        });
+        }, done);
       });
     });
   });
