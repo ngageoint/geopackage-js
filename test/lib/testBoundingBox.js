@@ -53,4 +53,10 @@ describe('BoundingBox tests', function() {
     projected.maxLatitude.should.be.equal(3);
   });
 
+  it('should convert', function() {
+   var bb = new BoundingBox(-1252344.2714243277,2504688.5428486555,0,3757032.814272983);
+   var projected = bb.projectBoundingBox('EPSG:3857', 'EPSG:4326')
+   console.log('projected', projected);
+  });
+
 });

@@ -17,7 +17,8 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , BoundingBox = require('./lib/boundingBox')
   , GeometryData = require('./lib/geom/geometryData')
   , TableCreator = require('./lib/db/tableCreator')
-  , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils');
+  , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
+  , FeatureTile = require('./lib/tiles/features');
 
 // module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
 // module.exports.ShapefileToGeoPackage = require('shapefile-to-geopackage');
@@ -169,6 +170,18 @@ module.exports.getFeatureTables = function(geopackage, callback) {
 };
 
 /**
+ * Checks if the feature table exists in the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String} featureTableName name of the table to query for
+ * @param  {Function} callback   called with an error if one occurred and true or false for the existence of the table
+ */
+module.exports.hasFeatureTable = function(geopackage, featureTableName, callback) {
+  geopackage.getFeatureTables(function(err, tables) {
+    return callback(err, tables && tables.indexOf(featureTableName) != -1);
+  });
+};
+
+/**
  * Iterate GeoJSON features from table
  * @param  {GeoPackage} geopackage      open GeoPackage object
  * @param  {String} table           Table name to Iterate
@@ -254,6 +267,18 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
  */
 module.exports.getTileTables = function(geopackage, callback) {
   geopackage.getTileTables(callback);
+};
+
+/**
+ * Checks if the tile table exists in the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String} tileTableName name of the table to query for
+ * @param  {Function} callback   called with an error if one occurred and true or false for the existence of the table
+ */
+module.exports.hasTileTable = function(geopackage, tileTableName, callback) {
+  geopackage.getTileTables(function(err, tables) {
+    return callback(err, tables && tables.indexOf(tileTableName) != -1);
+  });
 };
 
 /**
@@ -355,6 +380,14 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
   });
 };
 
+module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
+  geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+    if (err || !featureDao) return callback(err);
+    var ft = new FeatureTile(featureDao, width, height);
+    ft.drawTile(x, y, z, callback);
+  });
+}
+
 /**
  * Gets a tile image for an XYZ tile pyramid location
  * @param  {GeoPackage}   geopackage open GeoPackage object
@@ -368,6 +401,7 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
  */
 module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
+    if (err || !tileDao) return callback(err);
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
     retriever.getTile(x, y, z, callback);
   });

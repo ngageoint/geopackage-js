@@ -106,6 +106,7 @@ describe('TableCreator tests', function() {
     var tc = new TableCreator(geopackage);
     tc.createExtensions(function(err, result) {
       should.not.exist(err);
+      console.log('result', result);
       Verification.verifyExtensions(geopackage, done);
     });
   });

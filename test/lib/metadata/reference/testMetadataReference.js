@@ -4,7 +4,6 @@ var fs = require('fs')
   , async = require('async')
   , MetadataReference = require('../../../../lib/metadata/reference').MetadataReference
   , Metadata = require('../../../../lib/metadata').Metadata
-  , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../../lib/geoPackage')
   , TableCreator = require('../../../../lib/db/tableCreator')
   , Verification = require('../../../fixtures/verification')
