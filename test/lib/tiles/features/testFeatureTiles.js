@@ -7,7 +7,7 @@ var GeoPackageManager = require('../../../../lib/geoPackageManager')
   , should = require('chai').should()
   , path = require('path');
 
-describe('GeoPackage FeatureTiles tests', function() {
+describe.only('GeoPackage FeatureTiles tests', function() {
 
   describe('Rivers GeoPackage tests', function() {
 
@@ -63,7 +63,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'FEATURESriversds', 8, 12, 5, 256, 256, function(err, data) {
         console.timeEnd('Generating non indexed tiles');
         if (!data) return done(err);
-        done(err);
+        fs.writeFile('/tmp/5_8_12.png', data, function() {
+          done(err);
+        });
         // testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
         //   equal.should.be.equal(true);
         //   done();
@@ -107,18 +109,18 @@ describe('GeoPackage FeatureTiles tests', function() {
       });
     });
 
-    it.only('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {
+    it('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('generating indexed tile');
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 1, 0, 1, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFile('/tmp/indextest.png', data, function() {
+        // fs.writeFile('/tmp/1.png', data, function() {
+        //   done();
+        // });
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
+          equal.should.be.equal(true);
           done();
-          // testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
-          //   equal.should.be.equal(true);
-          //   done();
-          // });
         });
       });
     });
@@ -126,15 +128,18 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 8, y: 12, z: 5 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('generating indexed tile');
-      GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 5, 8, 12, 256, 256, function(err, data) {
+      GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 8, 12, 5, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        done();
+        fs.writeFile('/tmp/5_8_12.png', data, function() {
+          done();
+        });
         // testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
         //   equal.should.be.equal(true);
         //   done();
         // });
       });
     });
+
   });
 });
