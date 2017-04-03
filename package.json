@@ -30,7 +30,7 @@
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
     "proj4": "^2.4.3",
-    "pureimage": "github:danielbarela/node-pureimage",
+    "pureimage": "0.0.18",
     "reproject": "^1.1.1",
     "sql.js": "kripken/sql.js",
     "stream-to-array": "^2.3.0",
