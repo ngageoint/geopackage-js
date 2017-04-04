@@ -26,6 +26,7 @@ module.exports = function(app) {
         return res.status(404);
       }
       GeoPackage.openGeoPackage(geoPackagePath, function(err, geoPackage) {
+        console.log('Unkonwn GeoPackage %s', geoPackagePath);
         if (!geoPackage) return res.status(404);
         GeoPackage.hasTileTable(geoPackage, table, function(err, exists) {
           if (exists) {
@@ -41,6 +42,7 @@ module.exports = function(app) {
                   res.end(data, 'binary');
                 });
               } else {
+                console.log('Unknown GeoPackage Table %s', table);
                 res.status(404);
               }
             });
