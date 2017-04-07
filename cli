@@ -6,8 +6,7 @@ var async = require('async');
 var chalk = require('chalk');
 var asciify = require('asciify-image');
 
-var geopackage = require('./geopackage')
-  , GeoPackageManager = geopackage.GeoPackageManager
+var geopackage = require('.')
   , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
 
 console.log('GeoPackage Command Line');
@@ -33,7 +32,7 @@ var fileQuestion = {
         });
       },
       geoPackage: function(callback) {
-        GeoPackageManager.open(input, function(err, result) {
+        geopackage.openGeoPackage(input, function(err, result) {
           if (err || !result) {
             return callback('Invalid GeoPackage file.');
           }

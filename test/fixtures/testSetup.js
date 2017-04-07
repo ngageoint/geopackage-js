@@ -92,7 +92,9 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
       callback(err, imagesAreSame);
     });
   } else {
-    var actual = imagediff.createCanvas(width, height);
+    var CanvasImageDiff = require('imagediff');
+
+    var actual = CanvasImageDiff.createCanvas(width, height);
     var ctx = actual.getContext('2d');
 
     var image = new Image();
@@ -101,16 +103,16 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
       module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
         var expectedBase64 = new Buffer(expectedTile).toString('base64');
 
-        var expected = imagediff.createCanvas(width, height);
+        var expected = CanvasImageDiff.createCanvas(width, height);
         var ctx2 = expected.getContext('2d');
         var image2 = new Image();
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
-          var diff = imagediff.diff(actual, expected);
-          var equal = imagediff.equal(actual, expected, 2);
+          var equal = CanvasImageDiff.equal(actual, expected, 2);
 
           if (!equal) {
-            var diffCanvas = imagediff.createCanvas(diff.width, diff.height);
+            var diff = CanvasImageDiff.diff(actual, expected);
+            var diffCanvas = CanvasImageDiff.createCanvas(diff.width, diff.height);
             context = diffCanvas.getContext('2d');
             context.putImageData(diff, 0, 0);
             var h1Tags = document.getElementsByTagName('h1');
@@ -143,7 +145,13 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(expected);
             currentTag.appendChild(diffCanvas);
           }
-
+          delete ctx;
+          delete ctx2;
+          delete image;
+          delete image2;
+          delete expected;
+          delete actual;
+          
           callback(null, equal);
         }
         image2.src = 'data:image/png;base64,' + expectedBase64;

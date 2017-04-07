@@ -1,5 +1,6 @@
 var GeoPackageManager = require('../../../lib/geoPackageManager')
   , GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
+  , GeoPackage = require('../../..')
   , BoundingBox = require('../../../lib/boundingBox')
   , testSetup = require('../../fixtures/testSetup')
   , fs = require('fs')
@@ -44,6 +45,13 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
+    it('should get all the tiles in the bounding box', function(done) {
+      GeoPackage.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85, function(err, tiles) {
+        tiles.tiles.length.should.be.equal(4);
+        done(err);
+      });
+    });
+
     it('should get the x: 2, y: 1, z: 2 tile', function(done) {
       this.timeout(30000);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
@@ -71,6 +79,7 @@ describe('GeoPackage Tile Retriever tests', function() {
               testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, equal) {
                 console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', equal);
                 equal.should.be.equal(true);
+                delete tile;
                 yDone();
               });
             });
@@ -192,6 +201,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
+          delete tile;
           done(err);
         });
       });
@@ -203,6 +213,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(0, 4, 4, function(err, tile) {
         testSetup.diffImagesWithDimensions(tile, path.join(__dirname, '..','..','fixtures','tiles','450tile.png'), 450, 450, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
+          delete tile;
           done(err);
         });
       });
@@ -248,6 +259,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
+          delete tile;
           done(err);
         });
       });

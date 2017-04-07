@@ -20,11 +20,6 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
   , FeatureTile = require('./lib/tiles/features');
 
-// module.exports.GeoJSONToGeoPackage = require('geojson-to-geopackage');
-// module.exports.ShapefileToGeoPackage = require('shapefile-to-geopackage');
-// module.exports.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
-// module.exports.PBFToGeoPackage = require('pbf-to-geopackage');
-
 var proj4Defs = require('./lib/proj4Defs');
 module.exports.proj4Defs = proj4Defs;
 module.exports.GeoPackageTileRetriever = GeoPackageTileRetriever;
@@ -336,7 +331,6 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
 
       var tms = tileDao.tileMatrixSet;
       var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
-      var mapBounds = map.getBounds();
       var mapBoundingBox = new BoundingBox(Math.max(-180, west), Math.min(east, 180), south, north);
       tiles.west = Math.max(-180, west).toFixed(2);
       tiles.east = Math.min(east, 180).toFixed(2);

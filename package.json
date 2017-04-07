@@ -24,13 +24,14 @@
   },
   "bin": "./cli",
   "dependencies": {
+    "@mapbox/tilebelt": "^1.0.1",
     "@turf/bbox": "^3.14.0",
     "async": "^2.1.5",
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
     "proj4": "^2.4.3",
-    "pureimage": "0.0.18",
+    "pureimage": "github:danielbarela/node-pureimage",
     "reproject": "^1.1.1",
     "sql.js": "kripken/sql.js",
     "stream-to-array": "^2.3.0",
@@ -43,6 +44,7 @@
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
     "image-diff": "^1.5.1",
+    "imagediff": "^1.0.8",
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
@@ -82,20 +84,14 @@
   },
   "testling": {
     "harness": "mocha",
-    "files": "test/*.js",
+    "files": "bundle/test.bundle.js",
     "browsers": [
-      "ie/6..latest",
-      "chrome/22..latest",
-      "firefox/16..latest",
-      "safari/latest",
-      "opera/11.0..latest",
-      "iphone/6",
-      "ipad/6",
-      "android-browser/latest"
+      "chrome/latest"
     ]
   },
   "scripts": {
-    "test": "istanbul cover  _mocha",
+    "test": "mocha",
+    "coverage": "istanbul cover  _mocha",
     "mocha": "mocha",
     "karma": "karma start",
     "btest": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js",

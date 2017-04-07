@@ -13,8 +13,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , wkx = require('wkx')
   , path = require('path')
   , async = require('async')
-  , testSetup = require('../fixtures/testSetup')
-  , fs = require('fs');
+  , testSetup = require('../fixtures/testSetup');
 
 describe('GeoPackage Tile table create tests', function() {
 
@@ -113,6 +112,7 @@ describe('GeoPackage Tile table create tests', function() {
             async.eachSeries(tiles, function(yTile, yDone) {
               testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
                 geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                  delete image;
                   yDone();
                 });
               });
@@ -161,6 +161,7 @@ describe('GeoPackage Tile table create tests', function() {
                         testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
                           console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
                           geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                            delete image;
                             yDone();
                           });
                         });
