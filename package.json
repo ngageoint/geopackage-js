@@ -82,13 +82,6 @@
     "lwip": false,
     "sqlite3": false
   },
-  "testling": {
-    "harness": "mocha",
-    "files": "test/test.js",
-    "browsers": [
-      "chrome/latest"
-    ]
-  },
   "scripts": {
     "test": "mocha",
     "coverage": "istanbul cover  _mocha",
