@@ -26,8 +26,10 @@ module.exports = function(app) {
         return res.status(404);
       }
       GeoPackage.openGeoPackage(geoPackagePath, function(err, geoPackage) {
-        console.log('Unkonwn GeoPackage %s', geoPackagePath);
-        if (!geoPackage) return res.status(404);
+        if (!geoPackage) {
+          console.log('Unkonwn GeoPackage %s', geoPackagePath);
+          return res.status(404);
+        }
         GeoPackage.hasTileTable(geoPackage, table, function(err, exists) {
           if (exists) {
             GeoPackage.getTileFromXYZ(geoPackage, table, x, y, z, 256, 256, function(err, data) {
