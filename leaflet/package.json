@@ -28,7 +28,8 @@
     "leaflet": "1.x"
   },
   "dependencies": {
-    "geopackage": ".."
+    "geopackage": "..",
+    "webworkify": "^1.4.0"
   },
   "scripts": {
     "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",

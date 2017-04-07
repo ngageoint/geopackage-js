@@ -84,7 +84,7 @@
   },
   "testling": {
     "harness": "mocha",
-    "files": "bundle/test.bundle.js",
+    "files": "test/test.js",
     "browsers": [
       "chrome/latest"
     ]
