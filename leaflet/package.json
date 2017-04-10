@@ -39,6 +39,6 @@
   "devDependencies": {
     "browserify": "^14.1.0",
     "promise-polyfill": "^6.0.2",
-    "uglify-js": "^2.8.12"
+    "uglify-js": "mishoo/UglifyJS2.git#harmony"
   }
 }
