@@ -30,6 +30,7 @@
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
+    "lwip": "0.0.9",
     "proj4": "^2.4.3",
     "pureimage": "github:danielbarela/node-pureimage",
     "reproject": "^1.1.1",
@@ -66,7 +67,6 @@
     "asciify-image": "0.0.8",
     "chalk": "^1.1.3",
     "inquirer": "^1.0.2",
-    "lwip": "0.0.9",
     "sqlite3": "^3.1.8"
   },
   "private": true,
