@@ -15,7 +15,11 @@
 
   <script src="../bundle/test.bundle.js"></script>
   <script>
+  console.log('navigator.userAgent', navigator.userAgent);
+  console.log('user agent index', navigator.userAgent.indexOf('PhantomJS'));
+  // if (navigator.userAgent.indexOf('PhantomJS') < 0) {
     mocha.run();
+  // }
   </script>
 </body>
 </html>

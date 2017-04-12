@@ -145,13 +145,6 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(expected);
             currentTag.appendChild(diffCanvas);
           }
-          delete ctx;
-          delete ctx2;
-          delete image;
-          delete image2;
-          delete expected;
-          delete actual;
-          
           callback(null, equal);
         }
         image2.src = 'data:image/png;base64,' + expectedBase64;

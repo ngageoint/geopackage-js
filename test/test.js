@@ -1,3 +1,5 @@
+var polyfill = require('babel-polyfill');
+
 require('chai').should();
 
 require('./lib/core/contents/testContents');
@@ -28,6 +30,10 @@ require('./lib/testGeoPackageCreate');
 require('./lib/testGeoPackageManager');
 require('./lib/testGeoPackageManagerCreate');
 require('./lib/testTileCreate');
+require('./lib/issues/issue68.js');
+require('./lib/tiles/features/testFeatureTiles');
+require('./lib/extension/index/testFeatureTableIndex');
+require('./lib/extension/testExtensionDao');
 
 describe('Array', function() {
   describe('#indexOf()', function() {

@@ -79,7 +79,6 @@ describe('GeoPackage Tile Retriever tests', function() {
               testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, equal) {
                 console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', equal);
                 equal.should.be.equal(true);
-                delete tile;
                 yDone();
               });
             });
@@ -201,7 +200,6 @@ describe('GeoPackage Tile Retriever tests', function() {
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
-          delete tile;
           done(err);
         });
       });
@@ -213,7 +211,6 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(0, 4, 4, function(err, tile) {
         testSetup.diffImagesWithDimensions(tile, path.join(__dirname, '..','..','fixtures','tiles','450tile.png'), 450, 450, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
-          delete tile;
           done(err);
         });
       });
@@ -259,7 +256,6 @@ describe('GeoPackage Tile Retriever tests', function() {
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
-          delete tile;
           done(err);
         });
       });

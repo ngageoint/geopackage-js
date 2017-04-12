@@ -8,13 +8,14 @@ module.exports = function(config) {
   config.set({
 
     plugins: [
-      'karma-coverage',
-      'karma-mocha',
-      'karma-chai',
-      'karma-phantomjs-launcher',
-      'karma-browserify',
-      'karma-spec-reporter',
-      'karma-ng-html2js-preprocessor'
+      "babel-plugin-transform-es2015-arrow-functions",
+      "karma-spec-reporter",
+      "karma-coverage",
+      "karma-mocha",
+      "karma-chai",
+      "karma-chrome-launcher",
+      "karma-phantomjs-launcher",
+      "karma-browserify"
     ],
 
     basePath: '',
@@ -22,29 +23,24 @@ module.exports = function(config) {
 
     files: [
       'test/test.js',
-      'test/**/*.js',
-      '**/*.html'
+      'test/index.html'
     ],
 
     proxies: {
       '/node_modules/':'node_modules/'
     },
 
-    exclude: ['node_modules'],
-
     browserify: {
       watch: true,
       debug: true,
-      transform: [istanbul({
-        ignore: [ 'test/**/*', '**/vendor/**/*']
-      })]
+      transform: [["babelify", { "presets": ["env", "es2015"], "plugins": ["transform-es2015-arrow-functions"] }]]
     },
 
     preprocessors: {
-      'app/**/*.js': ['coverage'],
-      'test/**/*.js': ['browserify'],
-      '**/*.html': ['ng-html2js']
+      'node_modules/file-type/index.js': ['browserify'],
+      'test/test.js': ['browserify']
     },
+
     reporters: ['spec', 'coverage'],
 
     coverageReporter: {
@@ -57,16 +53,11 @@ module.exports = function(config) {
       ]
     },
 
-    ngHtml2JsPreprocessor: {
-      stripPrefix: 'public/',
-      moduleName: 'ngTemplates'
-    },
-
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DEBUG,
     autoWatch: false,
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
     singleRun: true,
     concurrency: Infinity
   });
