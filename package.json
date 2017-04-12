@@ -30,7 +30,7 @@
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
-    "lwip": "0.0.9",
+    "pajk-lwip": "^0.2.0",
     "proj4": "^2.4.3",
     "pureimage": "github:danielbarela/node-pureimage",
     "reproject": "^1.1.1",
@@ -70,20 +70,20 @@
     "converters"
   ],
   "browser": {
-    "lwip": false,
+    "pajk-lwip": false,
     "sqlite3": false
   },
   "scripts": {
     "test": "mocha",
     "coverage": "istanbul cover  _mocha",
-    "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
-    "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
+    "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude pajk-lwip --exclude inquirer -o bundle/test.bundle.js -d",
+    "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude pajk-lwip --exclude inquirer -o bundle/test.bundle.js -d",
     "browser-test": "./test/cli",
     "postbrowser-test": "istanbul report --dir coverage/browser --root coverage/browser lcov",
     "predoc": "rm -rf docs/jsdoc/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
-    "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
-    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
-    "buildleaflet": "browserify -t browserify-css leaflet/index.js --exclude sqlite3 --exclude lwip --exclude inquirer -o static/leaflet-geopackage.js"
+    "build": "browserify -t browserify-css geopackage.js --standalone geopackage --exclude sqlite3 --exclude pajk-lwip --exclude inquirer -o static/geopackage.js",
+    "watch": "watchify -t browserify-css geopackage.js -v --standalone geopackage --exclude sqlite3 --exclude pajk-lwip --exclude inquirer -o static/geopackage.js",
+    "buildleaflet": "browserify -t browserify-css leaflet/index.js --exclude sqlite3 --exclude pajk-lwip --exclude inquirer -o static/leaflet-geopackage.js"
   }
 }
