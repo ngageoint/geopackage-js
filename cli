@@ -4,7 +4,6 @@ var inquirer = require('inquirer');
 var fs = require('fs');
 var async = require('async');
 var chalk = require('chalk');
-var asciify = require('asciify-image');
 
 var geopackage = require('.')
   , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
