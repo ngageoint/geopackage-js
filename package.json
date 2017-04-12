@@ -30,7 +30,7 @@
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
-    "pajk-lwip": "^0.2.0",
+    "lwip": "0.0.9",
     "proj4": "^2.4.3",
     "pureimage": "github:danielbarela/node-pureimage",
     "reproject": "^1.1.1",
