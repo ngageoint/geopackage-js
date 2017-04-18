@@ -23,7 +23,7 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
-    "geopackage": "file:../..",
+    "@ngageoint/geopackage": "^1.0.14",
     "jszip": "^2.5.0",
     "proj4": "^2.3.14",
     "reproject": "^1.1.1",

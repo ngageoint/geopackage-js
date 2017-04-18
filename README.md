@@ -6,7 +6,12 @@
 Cloning this repository and opening the docs/index.html in your browser will run the demo locally.
 
 ### Installation ###
+
 [![NPM](https://img.shields.io/npm/v/@ngageoint/geopackage.svg)](https://www.npmjs.com/package/@ngageoint/geopackage)
+
+```sh
+$ npm install @ngageoint/geopackage
+```
 
 #### GeoPackage JS Library ####
 

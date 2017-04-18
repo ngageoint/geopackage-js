@@ -24,7 +24,7 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "geopackage": "file:../.."
+    "@ngageoint/geopackage": "^1.0.14"
   },
   "devDependencies": {
     "chai": "^3.5.0",

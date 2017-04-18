@@ -2,7 +2,7 @@ var Promise = require('promise-polyfill');
 if (!window.Promise) {
   window.Promise = Promise;
 }
-var GeoPackageAPI = require('geopackage');
+var GeoPackageAPI = require('@ngageoint/geopackage');
 
 var geoPackageCache = {};
 

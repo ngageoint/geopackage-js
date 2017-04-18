@@ -1,10 +1,10 @@
 {
   "name": "geopackage-browserify-demo",
   "dependencies": {
+    "@ngageoint/geopackage": "^1.0.14",
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
     "geojson-to-geopackage": "../converters/geojson",
-    "geopackage": "..",
     "jquery": "^2.2.3",
     "leaflet": "^1.0.2",
     "mbtiles-to-geopackage": "../converters/mbtiles",

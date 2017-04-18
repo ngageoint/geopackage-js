@@ -1,4 +1,4 @@
-var GeoPackage = require('geopackage');
+var GeoPackage = require('@ngageoint/geopackage');
 
 var fs = require('fs')
   , async = require('async')

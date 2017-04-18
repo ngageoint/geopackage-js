@@ -20,7 +20,7 @@ window.fileType = fileType;
 window.reproject = reproject;
 window.Mustache = Mustache;
 
-window.GeoPackageAPI = require('geopackage');
+window.GeoPackageAPI = require('@ngageoint/geopackage');
 window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
 window.ShapefileToGeoPackage = require('shapefile-to-geopackage');
 window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
