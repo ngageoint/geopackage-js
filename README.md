@@ -27,7 +27,7 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 View examples using [Bower](https://github.com/ngageoint/geopackage-js/tree/master/docs/bower) and [Browserify](https://github.com/ngageoint/geopackage-js/tree/master/docs)
 
-View the latest [docs](http://ngageoint.github.io/geopackage-js/jsdocs/module-geoPackage-GeoPackage.html) (currently being updated).
+View the latest [docs](http://ngageoint.github.io/geopackage-js/jsdoc/module-geoPackage-GeoPackage.html) (currently being updated).
 
 #### Browser Usage ####
 ```javascript
