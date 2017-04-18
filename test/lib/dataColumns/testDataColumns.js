@@ -101,6 +101,7 @@ describe('Data Columns tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
     dao.create(dc, function(err, result){
+      if (err) return done(err);
       dao.getDataColumns('FEATURESriversds', 'test', function(err, dataColumn) {
         dataColumn.should.be.deep.equal({
           table_name: 'FEATURESriversds',
@@ -127,6 +128,7 @@ describe('Data Columns tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
     dao.create(dc, function(err, result){
+      if (err) return done(err);
       dao.queryByConstraintName('test constraint', function(err, dataColumn, rowDone) {
         dataColumn.should.be.deep.equal({
           table_name: 'FEATURESriversds',
