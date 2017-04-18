@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
