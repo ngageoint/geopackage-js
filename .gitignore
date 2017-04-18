@@ -43,3 +43,4 @@ test/private
 test/fixtures/private
 **/*/tmp
 
+dist
