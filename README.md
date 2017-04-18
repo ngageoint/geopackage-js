@@ -5,6 +5,9 @@
 
 Cloning this repository and opening the docs/index.html in your browser will run the demo locally.
 
+### Installation ###
+[![NPM](https://nodei.co/npm/@ngageoint/geopackage.png)](https://nodei.co/npm/@ngageoint/geopackage/)
+
 #### GeoPackage JS Library ####
 
 The [GeoPackage Libraries](http://ngageoint.github.io/GeoPackage/) were developed at the [National Geospatial-Intelligence Agency (NGA)](http://www.nga.mil/) in collaboration with [BIT Systems](http://www.bit-sys.com/). The government has "unlimited rights" and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the [MIT license](http://choosealicense.com/licenses/mit/).
@@ -18,13 +21,13 @@ Software source code previously released under an open source license and then m
 
 [GeoPackage JS](https://github.com/ngageoint/geopackage-js) is a [GeoPackage Library](http://ngageoint.github.io/GeoPackage/) JavaScript implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations_nga) by the National Geospatial-Intelligence Agency.
 
-The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using [sql.js](https://github.com/kripken/sql.js/).  In Node tiles are rendered using [Light Weight Image Processor for NodeJS](https://github.com/EyalAr/lwip) and GeoPackages are read using [node-sqlite3](https://github.com/mapbox/node-sqlite3).
+The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using [sql.js](https://github.com/kripken/sql.js/).  In Node tiles are rendered using [Light Weight Image Processor for NodeJS](https://github.com/EyalAr/lwip), vector tiles are drawn as image tiles using [PureImage](https://github.com/joshmarinacci/node-pureimage) and GeoPackages are read using [node-sqlite3](https://github.com/mapbox/node-sqlite3).
 
 ### Usage ###
 
-View examples using [Bower](tree/master/docs/bower) and [Browserify](tree/master/docs)
+View examples using [Bower](https://github.com/ngageoint/geopackage-js/tree/master/docs/bower) and [Browserify](https://github.com/ngageoint/geopackage-js/tree/master/docs)
 
-View the latest [docs](http://ngageoint.github.io/geopackage-js/docs/module-geoPackage-GeoPackage.html) (currently being updated).
+View the latest [docs](http://ngageoint.github.io/jsdocs/module-geoPackage-GeoPackage.html) (currently being updated).
 
 #### Browser Usage ####
 ```javascript
@@ -197,23 +200,3 @@ GeoPackageManager.open(filename, function(err, geoPackage) {
 });
 
 ```
-
-### Installation ###
-
-This will install the package from github
-
-```
-npm install ngageoint/geopackage-js
-```
-
-### Dependencies ###
-
-#### NPM Modules ####
-
-* [async](https://github.com/caolan/async) (The MIT License (MIT)) Async utilities for node and the browser
-* [file-type](https://github.com/sindresorhus/file-type) (The MIT License (MIT)) Detect the file type of a Buffer/Uint8Array
-* [proj4](http://proj4js.org/) (The MIT License (MIT)) JavaScript library to transform coordinates from one coordinate system to another, including datum transformations
-* [lwip](https://github.com/EyalAr/lwip) (The MIT License (MIT)) Light-weight image processor for NodeJS
-* [sql.js](https://github.com/kripken/sql.js/) (The MIT License (MIT)) SQLite compiled to javascript
-* [sqlite3](https://github.com/mapbox/node-sqlite3) (BSD-3-Clause) Asynchronous, non-blocking SQLite3 bindings for Node.js.
-* [wkx](https://github.com/cschwarz/wkx) (The MIT License (MIT)) A WKT/WKB/EWKT/EWKB/TWKB/GeoJSON parser and serializer
