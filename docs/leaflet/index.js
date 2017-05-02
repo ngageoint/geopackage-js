@@ -1,4 +1,4 @@
-require('leaflet-geopackage');
+require('@ngageoint/leaflet-geopackage');
 
 var map = L.map('map').setView([45, 15], 3);
 
@@ -7,27 +7,15 @@ var baseLayer = L.tileLayer('https://osm.geointservices.io/tiles/{z}/{x}/{y}.png
 });
 baseLayer.addTo(map);
 
-// var tileLayer = L.tileLayer('http://localhost:4234/rivers_indexed/rivers/{z}/{x}/{y}.png', {
-//   attribution: 'GeoPackage JS'
-// });
-//
-// tileLayer.addTo(map);
-//
-// var tileLayer2 = L.tileLayer('http://localhost:4234/rivers_indexed/rivers_tiles/{z}/{x}/{y}.png', {
-//   attribution: 'GeoPackage JS'
-// });
-
-//tileLayer2.addTo(map);
-
 var tileLayer = L.geoPackageTileLayer({
-    geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+    geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
     layerName: 'rivers_tiles'
 }).addTo(map);
 
 tileLayer.on('load', function() {
   tileLayer.off('load');
   L.geoPackageFeatureLayer([], {
-      geoPackageUrl: 'http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+      geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
       layerName: 'rivers',
       style: function (feature) {
         return {
