@@ -22,7 +22,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
     if (!layer.options.noCache && geoPackageCache[layer.options.geoPackageUrl]) {
       console.log('GeoPackage was %s loaded, pulling from cache', layer.options.geoPackageUrl);
       layer.geoPackageLoaded = true;
-      layer.geoPackage = gp;
+      layer.geoPackage = geoPackageCache[layer.options.geoPackageUrl];
       return;
     }
 
