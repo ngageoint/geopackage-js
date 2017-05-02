@@ -1,6 +1,6 @@
 {
-  "name": "leaflet-geopackage",
-  "version": "2.0.1",
+  "name": "@ngageoint/leaflet-geopackage",
+  "version": "2.0.2",
   "description": "Load a GeoPackage layer.",
   "main": "leaflet-geopackage.js",
   "keywords": [
@@ -28,8 +28,7 @@
     "leaflet": "1.x"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "^1.0.14",
-    "webworkify": "^1.4.0"
+    "@ngageoint/geopackage": "^1.0.14"
   },
   "scripts": {
     "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",
