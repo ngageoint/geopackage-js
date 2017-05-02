@@ -4,10 +4,10 @@ Load GeoPackage tile and feature layers in the browser without a server.  When a
 
 ### Demo
 
-[Sample Page](https://ngageoint.github.io/leaflet/index.html) which loads a tile layer and a feature layer from the [Natural Earth Rivers GeoPackage](http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)
+[Sample Page](https://ngageoint.github.io/geopackage-js/leaflet/index.html) which loads a tile layer and a feature layer from the [Natural Earth Rivers GeoPackage](http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)
 
 Loading a feature layer:  
-![](../docs/leaflet/featurelayer.gif)
+![](https://github.com/ngageoint/geopackage-js/blob/master/docs/leaflet/featurelayer.gif?raw=true)
 
 ### Usage
 
@@ -54,6 +54,15 @@ npm run build-min # minified production build
 ```
 
 ### Changelog
+
+##### 2.0.3
+
+- Fixing README
+
+##### 2.0.2
+
+- First release to npm
+- Fix loading GeoPackage from the cache for tile layers
 
 ##### 2.0.0
 
