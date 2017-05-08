@@ -73,6 +73,10 @@ Software source code previously released under an open source license and then m
 
 ### Changelog
 
+##### 2.0.4
+
+- Depending on @ngageoint/geopackage v1.0.15 for web worker changes
+
 ##### 2.0.3
 
 - Fixing README

@@ -28,7 +28,7 @@
     "leaflet": "1.x"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "^1.0.14"
+    "@ngageoint/geopackage": "^1.0.15"
   },
   "scripts": {
     "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",
