@@ -29,6 +29,29 @@ describe('GeoJSON to GeoPackage tests', function() {
     });
   });
 
+  it.only('should convert the a geojson object with an id property', function(done) {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg'));
+    } catch (e) {}
+
+    GeoJSONToGeoPackage.convert(path.join(__dirname, 'fixtures', 'id.geojson'), path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg'), function(status, callback) {
+      callback();
+    }, function(err, geopackage) {
+      should.not.exist(err);
+      should.exist(geopackage);
+      geopackage.getFeatureTables(function(err, tables) {
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('id');
+        geopackage.getFeatureDaoWithTableName('id', function(err, featureDao) {
+          featureDao.getCount(function(err, count) {
+            count.should.be.equal(1);
+            done();
+          });
+        });
+      });
+    });
+  });
+
   it('should convert the natural earth 10m file', function(done) {
     this.timeout(10000);
     try {

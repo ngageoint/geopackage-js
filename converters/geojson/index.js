@@ -220,6 +220,9 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       if (prop.name.toLowerCase() !== 'id') {
         columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
         index++;
+      } else if (prop.name.toLowerCase() === 'id') {
+        columns.push(FeatureColumn.createColumnWithIndex(index, '_id', DataTypes.fromName(prop.type), false, null));
+        index++;
       }
     }
     progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
@@ -231,6 +234,10 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
     var fivePercent = Math.floor(featureCount / 20);
     async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
       async.setImmediate(function() {
+        if (feature.properties.id) {
+          feature.properties._id = feature.properties.id;
+          delete feature.properties.id;
+        }
         GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
           if (count++ % fivePercent === 0) {
             progressCallback({
