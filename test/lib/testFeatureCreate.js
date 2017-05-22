@@ -163,6 +163,7 @@ describe('GeoPackage Feature table create tests', function() {
           columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
           columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
           columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+          columns.push(FeatureColumn.createColumnWithIndex(9, 'test space', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
           geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
             Verification.verifyGeometryColumns(geopackage, function(err) {
@@ -198,6 +199,7 @@ describe('GeoPackage Feature table create tests', function() {
         featureRow.setValueWithColumnName('test_integer', 5);
         featureRow.setValueWithColumnName('test_text_limited', 'testt');
         featureRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+        featureRow.setValueWithColumnName('test space', 'space space');
 
         featureDao.create(featureRow, function(err, result) {
           featureDao.getCount(function(err, count) {
@@ -214,6 +216,7 @@ describe('GeoPackage Feature table create tests', function() {
               fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
               fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
               fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+              fr.getValueWithColumnName('test space').toString().should.be.equal('space space');
               done();
             });
           });
