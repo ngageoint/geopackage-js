@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/extension/index.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/extension/</a> index.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.18% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>43/55</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/0</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">38.46% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>5/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.18% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>43/55</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">54×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Metadata module.
+ * @module metadata
+ * @see module:dao/dao
+ */
+&nbsp;
+var Dao = require('../dao/dao')
+  , ColumnValues = require('../dao/columnValues')
+  , TableCreator = require('../db/tableCreator');
+&nbsp;
+var util = require('util');
+&nbsp;
+/**
+  * Indicates that a particular extension applies to a GeoPackage, a table in a
+  * GeoPackage or a column of a table in a GeoPackage. An application that access
+  * a GeoPackage can query the gpkg_extensions table instead of the contents of
+  * all the user data tables to determine if it has the required capabilities to
+  * read or write to tables with extensions, and to “fail fast” and return an
+  * error message if it does not.
+ * @class Extension
+ */
+var Extension = function() {
+&nbsp;
+  /**
+   * Name of the table that requires the extension. When NULL, the extension
+   * is required for the entire GeoPackage. SHALL NOT be NULL when the
+   * column_name is not NULL.
+   * @member {String}
+   */
+  this.table_name;
+&nbsp;
+  /**
+   * Name of the column that requires the extension. When NULL, the extension
+   * is required for the entire table.
+   * @member {String}
+   */
+  this.column_name;
+&nbsp;
+  /**
+   * The case sensitive name of the extension that is required, in the form
+   * &lt;author&gt;_&lt;extension_name&gt;.
+   * @member {String}
+   */
+  this.extension_name;
+&nbsp;
+  /**
+   * Definition of the extension in the form specfied by the template in
+   * GeoPackage Extension Template (Normative) or reference thereto.
+   * @member {String}
+   */
+  this.definition;
+&nbsp;
+  /**
+   * Indicates scope of extension effects on readers / writers: read-write or
+   * write-only in lowercase.
+   * @member {String}
+   */
+  this.scope;
+}
+&nbsp;
+Extension.EXTENSION_NAME_DIVIDER = "_";
+&nbsp;
+Extension.READ_WRITE = "read-write";
+Extension.WRITE_ONLY = "write-only";
+&nbsp;
+Extension.prototype.setExtensionName = <span class="fstat-no" title="function not covered" >function(author, extensionName) {</span>
+<span class="cstat-no" title="statement not covered" >  this.extension_name = Extension.buildExtensionName(author, extensionName);</span>
+};
+&nbsp;
+Extension.prototype.getAuthor = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return Extension.getAuthorWithExtensionName(this.extension_name);</span>
+}
+&nbsp;
+Extension.prototype.getExtensionNameNoAuthor = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return Extension.getExtensionNameNoAuthor(this.extension_name);</span>
+}
+&nbsp;
+Extension.buildExtensionName = function(author, extensionName) {
+  return author + Extension.EXTENSION_NAME_DIVIDER + extensionName;
+}
+&nbsp;
+Extension.getAuthorWithExtensionName = <span class="fstat-no" title="function not covered" >function(extensionName) {</span>
+<span class="cstat-no" title="statement not covered" >  return extensionName.split(Extension.EXTENSION_NAME_DIVIDER)[0];</span>
+}
+&nbsp;
+Extension.getExtensionNameNoAuthor = <span class="fstat-no" title="function not covered" >function(extensionName) {</span>
+<span class="cstat-no" title="statement not covered" >  var split = extensionName.split(Extension.EXTENSION_NAME_DIVIDER);</span>
+<span class="cstat-no" title="statement not covered" >  return split[split.length-1];</span>
+}
+&nbsp;
+/**
+ * Extension Data Access Object
+ * @class
+ * @extends {module:dao/dao~Dao}
+ */
+var ExtensionDao = function(connection) {
+  Dao.call(this, connection);
+};
+&nbsp;
+util.inherits(ExtensionDao, Dao);
+&nbsp;
+ExtensionDao.prototype.createObject = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return new Extension();</span>
+};
+&nbsp;
+ExtensionDao.prototype.queryByExtension = <span class="fstat-no" title="function not covered" >function(extensionName, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  this.queryForEqWithFieldAndValue(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName, callback);</span>
+}
+&nbsp;
+ExtensionDao.prototype.queryByExtensionAndTableName = <span class="fstat-no" title="function not covered" >function(extensionName, tableName, rowCallback, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var values = new ColumnValues();</span>
+<span class="cstat-no" title="statement not covered" >  values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);</span>
+<span class="cstat-no" title="statement not covered" >  values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);</span>
+<span class="cstat-no" title="statement not covered" >  this.queryForFieldValues(values, rowCallback, callback);</span>
+}
+&nbsp;
+ExtensionDao.prototype.queryByExtensionAndTableNameAndColumnName = function (extensionName, tableName, columnName, rowCallback, callback) {
+  var values = new ColumnValues();
+  values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
+  values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
+  values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
+  this.queryForFieldValues(values, rowCallback, callback);
+};
+&nbsp;
+ExtensionDao.prototype.createTable = function(callback) {
+  var tc = new TableCreator(this.connection);
+  tc.createExtensions(callback);
+}
+&nbsp;
+ExtensionDao.TABLE_NAME = "gpkg_extensions";
+ExtensionDao.COLUMN_TABLE_NAME = "table_name";
+ExtensionDao.COLUMN_COLUMN_NAME = "column_name";
+ExtensionDao.COLUMN_EXTENSION_NAME = "extension_name";
+ExtensionDao.COLUMN_DEFINITION = "definition";
+ExtensionDao.COLUMN_SCOPE = "scope";
+&nbsp;
+ExtensionDao.prototype.gpkgTableName = ExtensionDao.TABLE_NAME;
+ExtensionDao.prototype.idColumns = [ExtensionDao.COLUMN_TABLE_NAME, ExtensionDao.COLUMN_COLUMN_NAME, ExtensionDao.COLUMN_EXTENSION_NAME];
+&nbsp;
+module.exports.ExtensionDao = ExtensionDao;
+module.exports.Extension = Extension;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

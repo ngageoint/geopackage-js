@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/retriever/index.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/retriever/</a> index.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">85.53% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>65/76</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68.18% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>15/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>16/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">86.67% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>65/75</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">92×</span>
+<span class="cline-any cline-yes">92×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">160×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">160×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">160×</span>
+<span class="cline-any cline-yes">160×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-yes">93×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">95×</span>
+<span class="cline-any cline-yes">95×</span>
+<span class="cline-any cline-yes">95×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var TileMatrixSetDao = require('../matrixset').TileMatrixSetDao
+  , TileBoundingBoxUtils = require('../tileBoundingBoxUtils')
+  , TileCreator = require('../creator');
+&nbsp;
+var async = require('async')
+  , proj4 = require('proj4');
+&nbsp;
+var GeoPackageTileRetriever = function(tileDao, width, height) {
+  this.tileDao = tileDao;
+  this.tileDao.adjustTileMatrixLengths();
+&nbsp;
+  this.width = width;
+  this.height = height;
+}
+&nbsp;
+module.exports = GeoPackageTileRetriever;
+&nbsp;
+GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox = function (callback) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (this.setWebMercatorBoundingBox) {
+<span class="cstat-no" title="statement not covered" >    return callback(null, this.setWebMercatorBoundingBox);</span>
+  } else {
+    var tileMatrixSetDao = new TileMatrixSetDao(this.tileDao.connection);
+    var tileMatrixSet = this.tileDao.tileMatrixSet;
+    tileMatrixSetDao.getSrs(tileMatrixSet, function(err, srs) {
+      this.setProjectionBoundingBox = tileMatrixSet.getBoundingBox();
+      if (srs.organization_coordsys_id === 4326 &amp;&amp; srs.organization === 'EPSG') {
+        this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
+        this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
+      }
+      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox(this.tileDao.projection, 'EPSG:3857');
+&nbsp;
+      callback(null, this.setWebMercatorBoundingBox);
+    }.bind(this));
+  }
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.hasTile = function (x, y, zoom, callback) {
+  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+  var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
+  var tileResults = [];
+  this.retrieveTileResults(webMercatorBoundingBox, tileMatrix, function(err, result, done) {
+    tileResults.push(result);
+    done();
+  }, function(err) {
+    if(tileResults &amp;&amp; tileResults.length &gt; 0) {
+      return callback(err, true);
+    }
+    callback(err, false);
+  });
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getTile = function (x, y, zoom, callback) {
+  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+  this.getTileWithBounds(webMercatorBoundingBox, zoom, 'EPSG:3857', callback);
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.drawTileIn = <span class="fstat-no" title="function not covered" >function (x, y, zoom, canvas, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);</span>
+<span class="cstat-no" title="statement not covered" >  this.getTileWithBounds(webMercatorBoundingBox, zoom, 'EPSG:3857', canvas, callback);</span>
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getTileWithWgs84Bounds = function (wgs84BoundingBox, zoom, callback) {
+  var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
+  this.getTileWithBounds(webMercatorBoundingBox, zoom, 'EPSG:3857', callback);
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getTileWithWgs84BoundsInProjection = <span class="fstat-no" title="function not covered" >function (wgs84BoundingBox, zoom, targetProjection, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var targetBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', targetProjection);</span>
+<span class="cstat-no" title="statement not covered" >  this.getTileWithBounds(targetBoundingBox, zoom, targetProjection, callback);</span>
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getWebMercatorTile = <span class="fstat-no" title="function not covered" >function (x, y, zoom, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);</span>
+<span class="cstat-no" title="statement not covered" >  this.getTileWithBounds(webMercatorBoundingBox, zoom, 'EPSG:3857', callback);</span>
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getTileWithBounds = function (targetBoundingBox, zoom, targetProjection, canvas, callback) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!callback) {
+    callback = canvas;
+    canvas = undefined;
+  }
+&nbsp;
+  var tiles = [];
+  var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!tileMatrix) <span class="cstat-no" title="statement not covered" >return callback();</span>
+  var tileWidth = tileMatrix.tile_width;
+  var tileHeight = tileMatrix.tile_height;
+  var matrixSetBoundsInTargetProjection = this.tileDao.tileMatrixSet.getBoundingBox().projectBoundingBox(this.tileDao.projection, targetProjection);
+&nbsp;
+  var matrixTotalBoundingBox = this.tileDao.tileMatrixSet.getBoundingBox();
+  var targetBoundingBoxInMatrixSetProjection = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
+&nbsp;
+  var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(matrixTotalBoundingBox, tileMatrix.matrix_width, tileMatrix.matrix_height, targetBoundingBoxInMatrixSetProjection);
+  TileCreator.initialize(this.width || <span class="branch-1 cbranch-no" title="branch not covered" >tileWidth,</span> this.height || <span class="branch-1 cbranch-no" title="branch not covered" >tileHeight,</span> tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas, function(err, creator) {
+    this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix, function(err, tile, tileDone) {
+      // get the bounding box of the tile in the target projection
+      // var tileTargetProjectionBoundingBox = TileBoundingBoxUtils.getTileBoundingBox(matrixSetBoundsInTargetProjection, tileMatrix, tile.getTileColumn(), tile.getTileRow());
+      tiles.push({
+        data: tile.getTileData(),
+        gridColumn: tile.getTileColumn(),
+        gridRow: tile.getTileRow()
+      });
+      tileDone();
+    }.bind(this), function(err) {
+      async.eachSeries(tiles, function(tile, callback) {
+        async.setImmediate(function() {
+          creator.addTile(tile.data, tile.gridColumn, tile.gridRow, callback);
+        });
+      }, function(err) {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (!canvas) {
+          return creator.getCompleteTile('png', callback);
+        }
+<span class="cstat-no" title="statement not covered" >        callback();</span>
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.getTileMatrixWithWebMercatorBoundingBox = <span class="fstat-no" title="function not covered" >function (zoom) {</span>
+<span class="cstat-no" title="statement not covered" >  return this.tileDao.getTileMatrixWithZoomLevel(zoom);</span>
+};
+&nbsp;
+GeoPackageTileRetriever.prototype.retrieveTileResults = function (tileMatrixProjectionBoundingBox, tileMatrix, tileCallback, doneCallback) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if(tileMatrix) {
+    var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, tileMatrixProjectionBoundingBox);
+    this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoom_level, tileCallback, doneCallback);
+  } else {
+<span class="cstat-no" title="statement not covered" >    doneCallback();</span>
+  }
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

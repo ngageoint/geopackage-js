@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/extension/index/featureTableIndex.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/extension/index/</a> featureTableIndex.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">79.22% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>122/154</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.64% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>28/44</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.44% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>34/36</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">81.21% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>121/149</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">52×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-yes">714×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+var Extension = require('../index').Extension
+  , ExtensionDao = require('../index').ExtensionDao
+  , BaseExtension = require('../baseExtension')
+  , TableIndexDao = require('./tableIndex').TableIndexDao
+  , TableIndex = require('./tableIndex').TableIndex
+  , GeometryIndexDao = require('./geometryIndex').GeometryIndexDao
+  , ContentsDao = require('../../core/contents').ContentsDao
+  , EnvelopeBuilder = require('../../geom/envelopeBuilder');
+&nbsp;
+var util = require('util');
+&nbsp;
+/**
+ * Feature Table Index NGA Extension implementation. This extension is used to
+ * index Geometries within a feature table by their minimum bounding box for
+ * bounding box queries. This extension is required to provide an index
+ * implementation when a SQLite version is used before SpatialLite support
+ * (iOS).
+ */
+var FeatureTableIndex = function(connection, featureDao) {
+&nbsp;
+  /**
+   * Progress
+   */
+  this.progress;
+&nbsp;
+  this.connection = connection;
+&nbsp;
+  this.featureDao = featureDao;
+&nbsp;
+  this.extensionName = Extension.buildExtensionName(FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR, FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR);
+&nbsp;
+  this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
+&nbsp;
+  this.tableName = featureDao.table_name;
+&nbsp;
+  this.columnName = featureDao.getGeometryColumnName();
+&nbsp;
+  this.extensionsDao = new ExtensionDao(connection);
+&nbsp;
+  this.tableIndexDao = new TableIndexDao(connection);
+&nbsp;
+  this.geometryIndexDao = new GeometryIndexDao(connection);
+&nbsp;
+}
+&nbsp;
+util.inherits(FeatureTableIndex, BaseExtension);
+&nbsp;
+FeatureTableIndex.prototype.index = function(progressCallback, callback) {
+  this.indexWithForce(false, progressCallback, callback);
+};
+&nbsp;
+FeatureTableIndex.prototype.indexWithForce = function(force, progressCallback, callback) {
+  this.isIndexed(function(err, indexed) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >return callback(err);</span>
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (force || !indexed) {
+      this.getOrCreateExtension(function(err) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (err) <span class="cstat-no" title="statement not covered" >return callback(err);</span>
+        this.getOrCreateTableIndex(function(err, tableIndex) {
+          this.createOrClearGeometryIndicies(function(err) {
+            this.indexTable(tableIndex, progressCallback, callback);
+          }.bind(this));
+        }.bind(this));
+      }.bind(this));
+    }
+  }.bind(this));
+}
+&nbsp;
+FeatureTableIndex.prototype.isIndexed = function (callback) {
+  this.getFeatureTableIndexExtension(function(err, result) {
+    if (result) {
+      var contentsDao = new ContentsDao(this.connection);
+      contentsDao.queryForIdObject(this.tableName, function(err, contents) {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!contents) <span class="cstat-no" title="statement not covered" >return callback(null, false);</span>
+        var lastChange = new Date(contents.last_change);
+        this.tableIndexDao.queryForIdObject(this.tableName, function(err, tableIndex) {
+          <span class="missing-if-branch" title="if path not taken" >I</span>if (!tableIndex || !tableIndex.last_indexed) {
+<span class="cstat-no" title="statement not covered" >            return callback(null, false);</span>
+          }
+          var lastIndexed = new Date(tableIndex.last_indexed);
+          callback(null, lastIndexed &gt;= lastChange);
+        });
+      }.bind(this));
+    } else {
+      return callback(null, false);
+    }
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.getFeatureTableIndexExtension = function (callback) {
+  this.extensionsDao.isTableExists(function(err, exists) {
+    if (exists) {
+      var extension;
+      this.extensionsDao.queryByExtensionAndTableNameAndColumnName(this.extensionName, this.tableName, this.columnName, function(err, row, rowDone) {
+        extension = row;
+        rowDone();
+      }, function() {
+        callback(null, extension);
+      });
+    } else {
+      callback(err);
+    }
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.getOrCreateExtension = function(callback) {
+  this.getOrCreate(this.extensionName, this.tableName, this.columnName, this.extensionDefinition, Extension.READ_WRITE, callback);
+};
+&nbsp;
+FeatureTableIndex.prototype.getOrCreateTableIndex = function(callback) {
+  this.getTableIndex(function(err, tableIndex) {
+    if (tableIndex) return callback(err, tableIndex);
+    this.tableIndexDao.isTableExists(function(err, exists) {
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (!exists) {
+        this.tableIndexDao.createTable(function(err) {
+          this.createTableIndex(function() {
+            this.getTableIndex(callback);
+          }.bind(this));
+        }.bind(this));
+      } else {
+<span class="cstat-no" title="statement not covered" >        this.createTableIndex(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >          this.getTableIndex(callback);</span>
+        }.bind(this));
+      }
+    }.bind(this));
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.createTableIndex = function(callback) {
+  var ti = new TableIndex();
+  ti.table_name = this.tableName;
+  ti.last_indexed = this.lastIndexed;
+  this.tableIndexDao.create(ti, callback);
+};
+&nbsp;
+FeatureTableIndex.prototype.getTableIndex = function(callback) {
+  this.tableIndexDao.isTableExists(function(err, exists){
+    if (exists) {
+      this.tableIndexDao.queryForIdObject(this.tableName, callback);
+    } else {
+      callback();
+    }
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.createOrClearGeometryIndicies = function(callback) {
+  this.geometryIndexDao.createTable(function(err, exists) {
+    this.clearGeometryIndicies(callback);
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.clearGeometryIndicies = function(callback) {
+  var where = this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
+  var whereArgs = this.geometryIndexDao.buildWhereArgsWithValue(this.tableName);
+  this.geometryIndexDao.deleteWhere(where, whereArgs, callback);
+};
+&nbsp;
+FeatureTableIndex.prototype.indexTable = function(tableIndex, progressCallback, callback) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!callback) {
+<span class="cstat-no" title="statement not covered" >    callback = progressCallback;</span>
+<span class="cstat-no" title="statement not covered" >    progressCallback = <span class="fstat-no" title="function not covered" >function() {</span>}</span>
+  }
+  this.featureDao.queryForEach(function(err, row, rowDone) {
+    var fr = this.featureDao.getFeatureRow(row);
+    this.indexRow(tableIndex, fr.getId(), fr.getGeometry(), rowDone);
+  }.bind(this), function(err) {
+    this.updateLastIndexed(tableIndex, callback);
+  }.bind(this));
+};
+&nbsp;
+FeatureTableIndex.prototype.indexRow = function(tableIndex, geomId, geomData, callback) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!geomData) <span class="cstat-no" title="statement not covered" >return callback();</span>
+  var envelope = geomData.envelope;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (!envelope) {
+    var geometry = geomData.geometry;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (geometry) {
+      envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geometry);
+    }
+  }
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (envelope) {
+    var geometryIndex = this.geometryIndexDao.populate(tableIndex, geomId, envelope);
+    return this.geometryIndexDao.createOrUpdate(geometryIndex, callback);
+  } else {
+<span class="cstat-no" title="statement not covered" >    callback(null, false);</span>
+  }
+};
+&nbsp;
+FeatureTableIndex.prototype.updateLastIndexed = function(tableIndex, callback) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!tableIndex) {
+<span class="cstat-no" title="statement not covered" >    tableIndex = new TableIndex();</span>
+<span class="cstat-no" title="statement not covered" >    tableIndex.table_name = this.tableName;</span>
+  }
+  tableIndex.last_indexed = new Date().toISOString();
+  this.tableIndexDao.createOrUpdate(tableIndex, callback);
+}
+&nbsp;
+FeatureTableIndex.prototype.queryWithBoundingBox = function(boundingBox, projection, rowCallback, doneCallback) {
+  var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.getProjection());
+  var envelope = boundingBox.buildEnvelope();
+  this.queryWithGeometryEnvelope(envelope, rowCallback, doneCallback);
+}
+&nbsp;
+FeatureTableIndex.prototype.queryWithGeometryEnvelope = function(envelope, rowCallback, doneCallback) {
+  var where = '';
+  where += this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
+  where += ' and ';
+  var minXLessThanMaxX = envelope.minX &lt; envelope.maxX;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (minXLessThanMaxX) {
+    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_X, envelope.maxX, '&lt;=');
+    where += ' and ';
+    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_X, envelope.minX, '&gt;=');
+  } else {
+<span class="cstat-no" title="statement not covered" >    where += '(';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_X, envelope.maxX, '&lt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ' or ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_X, envelope.minX, '&gt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ' or ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_X, envelope.minX, '&gt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ' or ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_X, envelope.maxX, '&lt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ')';</span>
+  }
+&nbsp;
+  where += ' and ';
+  where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_Y, envelope.maxY, '&lt;=');
+  where += ' and ';
+  where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_Y, envelope.minY, '&gt;=');
+&nbsp;
+  var whereArgs = [this.tableName, envelope.maxX, envelope.minX];
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!minXLessThanMaxX) {
+<span class="cstat-no" title="statement not covered" >    whereArgs.push(envelope.minX, envelope.maxX);</span>
+  }
+  whereArgs.push(envelope.maxY, envelope.minY);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (envelope.hasZ) {
+<span class="cstat-no" title="statement not covered" >    where += ' and ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_Z, envelope.minZ, '&lt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ' and ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_Z, envelope.maxZ, '&gt;=');</span>
+<span class="cstat-no" title="statement not covered" >    whereArgs.push(envelope.maxZ, envelope.minZ);</span>
+  }
+&nbsp;
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (envelope.hasM) {
+<span class="cstat-no" title="statement not covered" >    where += ' and ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MIN_M, envelope.minM, '&lt;=');</span>
+<span class="cstat-no" title="statement not covered" >    where += ' and ';</span>
+<span class="cstat-no" title="statement not covered" >    where += this.geometryIndexDao.buildWhereWithFieldAndValueAndOperation(GeometryIndexDao.COLUMN_MAX_M, envelope.maxM, '&gt;=');</span>
+<span class="cstat-no" title="statement not covered" >    whereArgs.push(envelope.maxM, envelope.minM);</span>
+  }
+&nbsp;
+  var join = 'inner join ' + this.tableName + ' on ' + this.tableName + '.id = ' + GeometryIndexDao.COLUMN_GEOM_ID;
+&nbsp;
+  this.geometryIndexDao.queryJoinWhereWithArgs(join, where, whereArgs, [this.tableName + '.' + this.featureDao.getGeometryColumnName()], rowCallback, doneCallback);
+}
+&nbsp;
+FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR = 'nga';
+FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR = 'geometry_index';
+FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
+&nbsp;
+module.exports = FeatureTableIndex;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

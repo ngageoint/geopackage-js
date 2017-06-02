@@ -1,0 +1,2000 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/geoPackage.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/</a> geoPackage.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.9% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>301/324</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">63.46% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>33/52</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.81% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>91/97</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.86% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>299/322</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606
+607
+608
+609
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4365×</span>
+<span class="cline-any cline-yes">4365×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">106×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">458×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">76×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">82×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">225×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">218×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">800×</span>
+<span class="cline-any cline-yes">800×</span>
+<span class="cline-any cline-yes">800×</span>
+<span class="cline-any cline-yes">800×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-yes">203×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-yes">202×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">61×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-yes">172×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * GeoPackage module.
+ * @module geoPackage
+ */
+&nbsp;
+var SpatialReferenceSystemDao = require('./core/srs').SpatialReferenceSystemDao
+  , GeometryColumnsDao = require('./features/columns').GeometryColumnsDao
+  , FeatureDao = require('./features/user/featureDao')
+  , FeatureTableReader = require('./features/user/featureTableReader')
+  , ContentsDao = require('./core/contents').ContentsDao
+  , Contents = require('./core/contents').Contents
+  , TileMatrixSetDao = require('./tiles/matrixset').TileMatrixSetDao
+  , TileMatrixSet = require('./tiles/matrixset').TileMatrixSet
+  , TileMatrixDao = require('./tiles/matrix').TileMatrixDao
+  , TileMatrix = require('./tiles/matrix').TileMatrix
+  , TileTableReader = require('./tiles/user/tileTableReader')
+  , TileDao = require('./tiles/user/tileDao')
+  , TileTable = require('./tiles/user/tileTable')
+  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
+  , TableCreator = require('./db/tableCreator')
+  , UserTable = require('./user/userTable')
+  , FeatureTable = require('./features/user/featureTable')
+  , DataColumnsDao = require('./dataColumns').DataColumnsDao
+  , DataColumnConstraintsDao = require('./dataColumnConstraints').DataColumnConstraintsDao
+  , MetadataDao = require('./metadata').MetadataDao
+  , MetadataReferenceDao = require('./metadata/reference').MetadataReferenceDao
+  , ExtensionDao = require('./extension').ExtensionDao
+  , TableIndexDao = require('./extension/index/tableIndex').TableIndexDao
+  , GeometryIndexDao = require('./extension/index/geometryIndex').GeometryIndexDao
+  , DataTypes = require('./db/dataTypes');
+&nbsp;
+var async = require('async')
+  , proj4 = require('proj4')
+  , toArray = require('stream-to-array');
+&nbsp;
+var defs = require('./proj4Defs');
+for (var name in defs) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (defs[name]) {
+    proj4.defs(name, defs[name]);
+  }
+}
+&nbsp;
+/**
+ * GeoPackage database
+ * @class GeoPackage
+ */
+var GeoPackage = function(name, path, connection) {
+  this.name = name;
+  this.path = path;
+  this.connection = connection;
+  this.tableCreator = new TableCreator(this);
+}
+&nbsp;
+GeoPackage.prototype.close = function() {
+  this.connection.close();
+}
+&nbsp;
+GeoPackage.prototype.getDatabase = function() {
+  return this.connection;
+}
+&nbsp;
+GeoPackage.prototype.getPath = function() {
+  return this.path;
+}
+&nbsp;
+GeoPackage.prototype.export = <span class="fstat-no" title="function not covered" >function(callback) {</span>
+<span class="cstat-no" title="statement not covered" >  this.connection.export(callback);</span>
+}
+&nbsp;
+/**
+ * Get the GeoPackage name
+ * @return {String} the GeoPackage name
+ */
+GeoPackage.prototype.getName = function() {
+  return this.name;
+}
+&nbsp;
+GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
+  return new SpatialReferenceSystemDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getContentsDao = function() {
+  return new ContentsDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+&nbsp;
+GeoPackage.prototype.getTileMatrixDao = function() {
+  return new TileMatrixDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getDataColumnsDao = function() {
+  return new DataColumnsDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getExtensionDao = function() {
+  return new ExtensionDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getTableIndexDao = function() {
+  return new TableIndexDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.getGeometryIndexDao = function() {
+  return new GeometryIndexDao(this.connection);
+}
+&nbsp;
+GeoPackage.prototype.createDao = <span class="fstat-no" title="function not covered" >function () {</span>
+&nbsp;
+};
+&nbsp;
+GeoPackage.prototype.getSrs = function(srsId, callback) {
+  var dao = this.getSpatialReferenceSystemDao();
+  dao.queryForIdObject(srsId, callback);
+}
+&nbsp;
+GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet, callback) {
+  var tileMatrices = [];
+  var tileMatrixDao = this.getTileMatrixDao();
+  tileMatrixDao.queryForEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC', function(err, results) {
+    async.eachSeries(results, function(result, callback) {
+      var tm = new TileMatrix();
+      tileMatrixDao.populateObjectFromResult(tm, result);
+      tileMatrices.push(tm);
+      callback();
+    }, function(err) {
+      var tableReader = new TileTableReader(tileMatrixSet);
+      tableReader.readTileTable(this.connection, function(err, tileTable) {
+        new TileDao(this.connection, tileTable, tileMatrixSet, tileMatrices, function(err, tileDao){
+          callback(err, tileDao);
+        });
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.getTileDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getTileMatrixSet(contents, function(err, columns) {
+    this.getTileDaoWithTileMatrixSet(columns, callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.getTileDaoWithTableName = function (tableName, callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.queryForEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName, function(err, results) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (results.length &gt; 1) {
+<span class="cstat-no" title="statement not covered" >      return callback(new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length));</span>
+    } else <span class="missing-if-branch" title="if path not taken" >I</span>if (results.length === 0) {
+<span class="cstat-no" title="statement not covered" >      return callback(new Error('No Tile Matrix found for table name: ' + tableName));</span>
+    }
+    var tileMatrixSet = new TileMatrixSet();
+    tms.populateObjectFromResult(tileMatrixSet, results[0]);
+    this.getTileDaoWithTileMatrixSet(tileMatrixSet, callback);
+  }.bind(this));
+};
+&nbsp;
+/**
+ *  Get the tile tables
+ *  @param {callback} callback called with an error if one occurred and the array of {TileTable} names
+ */
+GeoPackage.prototype.getTileTables = function (callback) {
+  var tms = this.getTileMatrixSetDao();
+  tms.isTableExists(function(err, exists) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!exists) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, []);</span>
+    }
+    tms.getTileTables(callback);
+  });
+};
+&nbsp;
+/**
+ *  Get the feature tables
+ *  @param {callback} callback called with an error if one occurred and the array of {FeatureTable} names
+ */
+GeoPackage.prototype.getFeatureTables = function (callback) {
+  var gcd = this.getGeometryColumnsDao();
+  gcd.isTableExists(function(err, exists) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!exists) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, []);</span>
+    }
+    gcd.getFeatureTables(callback);
+  });
+};
+&nbsp;
+GeoPackage.prototype.getGeometryColumnsDao = function () {
+  return new GeometryColumnsDao(this.connection);
+};
+&nbsp;
+GeoPackage.prototype.getDataColumnConstraintsDao = function () {
+  return new DataColumnConstraintsDao(this.connection);
+};
+&nbsp;
+GeoPackage.prototype.getMetadataReferenceDao = function () {
+  return new MetadataReferenceDao(this.connection);
+};
+&nbsp;
+GeoPackage.prototype.getMetadataDao = function () {
+  return new MetadataDao(this.connection);
+};
+&nbsp;
+/**
+ *  Get a Feature DAO from Geometry Columns
+ *
+ *  @param {GeometryColumns} geometryColumns Geometry Columns
+ *  @param {callback} callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns = function (geometryColumns, callback) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!geometryColumns) {
+<span class="cstat-no" title="statement not covered" >    return callback(new Error('Non null Geometry Columns is required to create Feature DAO'));</span>
+  }
+&nbsp;
+  var tableReader = new FeatureTableReader(geometryColumns);
+  var featureTable = tableReader.readFeatureTable(this.connection, function(err, featureTable) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >      return callback(err);</span>
+    }
+    var dao = new FeatureDao(this.connection, featureTable, geometryColumns, this.metadataDb);
+&nbsp;
+    callback(null, dao);
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Get a Feature DAO from Contents
+ * @param  {Contents}   contents Contents
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithContents = function (contents, callback) {
+  var dao = this.getContentsDao();
+  dao.getGeometryColumns(contents, function(err, columns) {
+    this.getFeatureDaoWithGeometryColumns(columns, callback);
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Get a Feature DAO from Contents
+ * @param  {string}   tableName table name
+ * @param  {Function} callback callback called with an error if one occurred and the {FeatureDao}
+ */
+GeoPackage.prototype.getFeatureDaoWithTableName = function (tableName, callback) {
+  var self = this;
+  var dao = this.getGeometryColumnsDao();
+  var geometryColumns = dao.queryForTableName(tableName, function(err, geometryColumns) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!geometryColumns) {
+<span class="cstat-no" title="statement not covered" >      return callback(new Error('No Feature Table exists for table name: ' + tableName));</span>
+    }
+    self.getFeatureDaoWithGeometryColumns(geometryColumns, callback);
+  });
+};
+&nbsp;
+/**
+ * Create the Geometry Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createGeometryColumnsTable = function (callback) {
+  var dao = this.getGeometryColumnsDao();
+  dao.isTableExists(function(err, result) {
+    if (result) {
+      return callback(null, result);
+    }
+    this.tableCreator.createGeometryColumns(callback);
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Create a new feature table
+ * @param  {FeatureTable}   featureTable    feature table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createFeatureTable = function(featureTable, callback) {
+  this.tableCreator.createUserTable(featureTable, callback);
+};
+&nbsp;
+GeoPackage.prototype.createFeatureTableWithGeometryColumns = function(geometryColumns, boundingBox, srsId, columns, callback) {
+  this.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, srsId, columns, undefined, callback);
+};
+&nbsp;
+GeoPackage.prototype.createFeatureTableWithGeometryColumnsAndDataColumns = function(geometryColumns, boundingBox, srsId, columns, dataColumns, callback) {
+  this.createGeometryColumnsTable(function(err, result) {
+    var featureTable = new FeatureTable(geometryColumns.table_name, columns);
+    this.createFeatureTable(featureTable, function(err, result) {
+      var contents = new Contents();
+      contents.table_name = geometryColumns.table_name;
+      contents.data_type = 'features';
+      contents.identifier = geometryColumns.table_name;
+      contents.last_change = new Date().toISOString();
+      contents.min_x = boundingBox.minLongitude;
+      contents.min_y = boundingBox.minLatitude;
+      contents.max_x = boundingBox.maxLongitude;
+      contents.max_y = boundingBox.maxLatitude;
+      contents.srs_id = srsId;
+&nbsp;
+      this.getContentsDao().create(contents, function(err, result) {
+        geometryColumns.srs_id = srsId;
+        this.getGeometryColumnsDao().create(geometryColumns, function(err, gcdResult) {
+          <span class="missing-if-branch" title="if path not taken" >I</span>if (dataColumns) {
+<span class="cstat-no" title="statement not covered" >            this.createDataColumns(<span class="fstat-no" title="function not covered" >function(err, result) {</span></span>
+<span class="cstat-no" title="statement not covered" >              var dataColumnsDao = this.getDataColumnsDao();</span>
+<span class="cstat-no" title="statement not covered" >              async.eachSeries(dataColumns, <span class="fstat-no" title="function not covered" >function(dataColumn, callback) {</span></span>
+<span class="cstat-no" title="statement not covered" >                dataColumnsDao.create(dataColumn, callback);</span>
+              }, <span class="fstat-no" title="function not covered" >function done() {</span>
+<span class="cstat-no" title="statement not covered" >                callback(err, gcdResult);</span>
+              });
+            }.bind(this));
+          } else {
+            callback(err, gcdResult);
+          }
+        }.bind(this));
+      }.bind(this));
+    }.bind(this));
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Create the Tile Matrix Set table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixSetTable = function(callback) {
+  var dao = this.getTileMatrixSetDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createTileMatrixSet(callback);
+  }.bind(this));
+}
+&nbsp;
+/**
+ * Create the Tile Matrix table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileMatrixTable = function(callback) {
+  var dao = this.getTileMatrixDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createTileMatrix(callback);
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Create a new tile table
+ * @param  {TileTable}   tileTable    tile table
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTable = function(tileTable, callback) {
+  this.tableCreator.createUserTable(tileTable, callback);
+};
+&nbsp;
+/**
+ * Create a new tile table
+ * @param  {String}   tableName    tile table name
+ * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
+ * @param  {Number} contentsSrsId srs id of the contents table
+ * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
+ * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+  var tileMatrixSet;
+&nbsp;
+  async.series([
+    this.createTileMatrixSetTable.bind(this),
+    this.createTileMatrixTable.bind(this),
+    function(callback) {
+      var columns = TileTable.createRequiredColumns();
+      var tileTable = new TileTable(tableName, columns);
+      this.createTileTable(tileTable, callback);
+    }.bind(this),
+    function(callback) {
+      var contents = new Contents();
+      contents.table_name = tableName;
+      contents.data_type = 'tiles';
+      contents.identifier = tableName;
+      contents.last_change = new Date().toISOString();
+      contents.min_x = contentsBoundingBox.minLongitude;
+      contents.min_y = contentsBoundingBox.minLatitude;
+      contents.max_x = contentsBoundingBox.maxLongitude;
+      contents.max_y = contentsBoundingBox.maxLatitude;
+      contents.srs_id = contentsSrsId;
+&nbsp;
+      tileMatrixSet = new TileMatrixSet();
+      tileMatrixSet.setContents(contents);
+      tileMatrixSet.srs_id = tileMatrixSetSrsId;
+      tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
+      tileMatrixSet.min_y = tileMatrixSetBoundingBox.minLatitude;
+      tileMatrixSet.max_x = tileMatrixSetBoundingBox.maxLongitude;
+      tileMatrixSet.max_y = tileMatrixSetBoundingBox.maxLatitude;
+      this.getContentsDao().create(contents, function(err, result) {
+        this.getTileMatrixSetDao().create(tileMatrixSet, callback);
+      }.bind(this));
+    }.bind(this)
+  ], function(err, results) {
+    callback(err, tileMatrixSet);
+  });
+};
+&nbsp;
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, callback) {
+  var tileMatrixDao = this.getTileMatrixDao();
+&nbsp;
+  var zoom = minZoom;
+&nbsp;
+  async.whilst(
+    function() {
+      return zoom &lt;= maxZoom;
+    },
+    function(callback) {
+      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      var matrixWidth = (box.maxX - box.minX) + 1;
+      var matrixHeight = (box.maxY - box.minY) + 1;
+&nbsp;
+      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
+      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+&nbsp;
+      var tileMatrix = new TileMatrix();
+      tileMatrix.table_name = tileMatrixSet.table_name;
+      tileMatrix.zoom_level = zoom;
+      tileMatrix.matrix_width = matrixWidth;
+      tileMatrix.matrix_height = matrixHeight;
+      tileMatrix.tile_width = 256;
+      tileMatrix.tile_height = 256;
+      tileMatrix.pixel_x_size = pixelXSize;
+      tileMatrix.pixel_y_size = pixelYSize;
+&nbsp;
+      zoom++;
+&nbsp;
+      tileMatrixDao.create(tileMatrix, callback);
+    },
+    callback
+  )
+};
+&nbsp;
+GeoPackage.prototype.addTile = function(tileStream, tableName, zoom, tileRow, tileColumn, callback) {
+  this.getTileDaoWithTableName(tableName, function(err, tileDao) {
+    var newRow = tileDao.newRow();
+    newRow.setZoomLevel(zoom);
+    newRow.setTileColumn(tileColumn);
+    newRow.setTileRow(tileRow);
+    newRow.setTileData(tileStream);
+    tileDao.create(newRow, callback);
+  });
+};
+&nbsp;
+/**
+ * Create the Data Columns table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumns = function(callback) {
+  var dao = this.getDataColumnsDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createDataColumns(callback);
+  }.bind(this));
+};
+&nbsp;
+/**
+ * Create the Data Column Constraints table if it does not already exist
+ * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ */
+GeoPackage.prototype.createDataColumnConstraintsTable = function (callback) {
+  var dao = this.getDataColumnConstraintsDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createDataColumnConstraints(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createMetadataTable = function (callback) {
+  var dao = this.getMetadataDao()
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createMetadata(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createMetadataReferenceTable = function (callback) {
+  var dao = this.getMetadataReferenceDao()
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createMetadataReference(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createExtensionTable = function (callback) {
+  var dao = this.getExtensionDao()
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createExtensions(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createTableIndexTable = function (callback) {
+  var dao = this.getTableIndexDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createTableIndex(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createGeometryIndexTable = function(callback) {
+  var dao = this.getGeometryIndexDao();
+  dao.isTableExists(function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (result) {
+<span class="cstat-no" title="statement not covered" >      return callback(null, result);</span>
+    }
+    this.tableCreator.createGeometryIndex(callback);
+  }.bind(this));
+};
+&nbsp;
+GeoPackage.prototype.createFeatureTileLinkTable = <span class="fstat-no" title="function not covered" >function(callback) {</span>
+<span class="cstat-no" title="statement not covered" >  callback(new Error('not implemented'));</span>
+};
+&nbsp;
+/**
+ * Get the application id of the GeoPackage
+ * @param  {Function} callback callback called with the application id
+ */
+GeoPackage.prototype.getApplicationId = function(callback) {
+  var connection = this.getDatabase();
+  connection.getApplicationId(callback);
+}
+&nbsp;
+GeoPackage.prototype.getInfoForTable = function (tableDao, callback) {
+  var gp = this;
+  async.waterfall([
+    function(callback) {
+      var info = {};
+      info.tableName = tableDao.table_name;
+      info.tableType = tableDao.table.getTableType();
+      callback(null, info);
+    },
+    function(info, callback) {
+      tableDao.getCount(function(err, count) {
+        info.count = count;
+        callback(null, info);
+      });
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.FEATURE_TABLE) return callback(null, info);
+      info.geometryColumns = {};
+      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
+      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
+      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
+      info.geometryColumns.z = tableDao.geometryColumns.z;
+      info.geometryColumns.m = tableDao.geometryColumns.m;
+      callback(null, info);
+    }, function(info, callback) {
+      if (info.tableType !== UserTable.TILE_TABLE) return callback(null, info);
+      info.minZoom = tableDao.minZoom;
+      info.maxZoom = tableDao.maxZoom;
+      info.zoomLevels = tableDao.tileMatrices.length;
+      callback(null, info);
+    }, function(info, callback) {
+      var dao;
+      var contentsRetriever;
+      if (info.tableType === UserTable.FEATURE_TABLE) {
+        dao = tableDao.getGeometryColumnsDao();
+        contentsRetriever = tableDao.geometryColumns;
+      } else <span class="missing-if-branch" title="else path not taken" >E</span>if (info.tableType === UserTable.TILE_TABLE) {
+        dao = tableDao.getTileMatrixSetDao();
+        contentsRetriever = tableDao.tileMatrixSet;
+        info.tileMatrixSet = {};
+        info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
+        info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
+        info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
+        info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
+        info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
+      }
+      dao.getContents(contentsRetriever, function(err, contents) {
+        info.contents = {};
+        info.contents.tableName = contents.table_name;
+        info.contents.dataType = contents.data_type;
+        info.contents.identifier = contents.identifier;
+        info.contents.description = contents.description;
+        info.contents.lastChange = contents.last_change;
+        info.contents.minX = contents.min_x;
+        info.contents.maxX = contents.max_x;
+        info.contents.minY = contents.min_y;
+        info.contents.maxY = contents.max_y;
+        var contentsDao = tableDao.getContentsDao();
+        contentsDao.getSrs(contents, function(err, contentsSrs) {
+          info.contents.srs = {
+            name:contentsSrs.srs_name,
+            id:contentsSrs.srs_id,
+            organization:contentsSrs.organization,
+            organization_coordsys_id:contentsSrs.organization_coordsys_id,
+            definition:contentsSrs.definition,
+            description:contentsSrs.description
+          };
+          tableDao.getSrs(function(err, srs){
+            info.srs = {
+              name:srs.srs_name,
+              id:srs.srs_id,
+              organization:srs.organization,
+              organization_coordsys_id:srs.organization_coordsys_id,
+              definition:srs.definition,
+              description:srs.description
+            };
+            callback(null, info);
+          });
+        });
+      });
+    }, function(info, callback) {
+      info.columns = [];
+      info.columnMap = {};
+      async.eachSeries(tableDao.table.columns, function(column, columnDone) {
+        var dcd = gp.getDataColumnsDao();
+        dcd.getDataColumns(tableDao.table.table_name, column.name, function(err, dataColumn) {
+          info.columns.push({
+            index: column.index,
+            name: column.name,
+            max: column.max,
+            min: column.min,
+            notNull: column.notNull,
+            primaryKey: column.primaryKey,
+            dataType: column.dataType ? DataTypes.name(column.dataType) : '',
+            displayName: dataColumn &amp;&amp; dataColumn.name ? dataColumn.name : column.name,
+            dataColumn: dataColumn
+          });
+          info.columnMap[column.name] = info.columns[info.columns.length-1];
+          columnDone();
+        });
+      }, function(err) {
+        callback(null, info);
+      });
+    }
+  ], callback);
+};
+&nbsp;
+module.exports = GeoPackage;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

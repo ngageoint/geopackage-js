@@ -1,0 +1,1814 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/db/tableCreator.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/db/</a> tableCreator.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.8% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>72/82</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">84.62% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>22/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>20/20</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.8% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>72/82</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
+565
+566
+567
+568
+569
+570
+571
+572
+573
+574
+575
+576
+577
+578
+579
+580
+581
+582
+583
+584</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">191×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">185×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">39×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">39×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">135×</span>
+<span class="cline-any cline-yes">135×</span>
+<span class="cline-any cline-yes">389×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">104×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">51×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">122×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var async = require('async');
+&nbsp;
+var SpatialReferenceSystemDao = require('../core/srs').SpatialReferenceSystemDao
+  , DataTypes = require('./dataTypes')
+  , GeoPackageConnection = require('./geoPackageConnection');
+&nbsp;
+var TableCreator = function(geopackage) {
+  if (geopackage instanceof GeoPackageConnection) {
+    this.connection = geopackage;
+  } else {
+    this.connection = geopackage.getDatabase();
+  }
+}
+&nbsp;
+module.exports = TableCreator;
+&nbsp;
+TableCreator.prototype.createRequired = function (callback) {
+  var dao = new SpatialReferenceSystemDao(this.connection);
+&nbsp;
+  async.series([
+    // Create the Spatial Reference System table (spec Requirement 10)
+    this.createSpatialReferenceSystem.bind(this),
+&nbsp;
+    // Create the Contents table (spec Requirement 13)
+    this.createContents.bind(this),
+&nbsp;
+    // Create the required Spatial Reference Systems (spec Requirement 11)
+    dao.createUndefinedGeographic.bind(dao),
+    dao.createWgs84.bind(dao),
+  	dao.createUndefinedCartesian.bind(dao),
+    // not required but very common
+    dao.createWebMercator.bind(dao)
+  ], function(err, results) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err) {
+<span class="cstat-no" title="statement not covered" >      return callback(new Error("Error creating default required tables " + err.message));</span>
+    }
+    callback(err, results);
+  })
+};
+&nbsp;
+TableCreator.prototype.createSpatialReferenceSystem = function(callback) {
+  this.createTable('spatial_reference_system', callback);
+}
+&nbsp;
+TableCreator.prototype.createContents = function(callback) {
+  this.createTable('contents', callback);
+}
+&nbsp;
+TableCreator.prototype.createGeometryColumns = function(callback) {
+  this.createTable('geometry_columns', callback);
+}
+&nbsp;
+TableCreator.prototype.createTileMatrixSet = function(callback) {
+  this.createTable('tile_matrix_set', callback);
+}
+&nbsp;
+TableCreator.prototype.createTileMatrix = function(callback) {
+  this.createTable('tile_matrix', callback);
+}
+&nbsp;
+TableCreator.prototype.createDataColumns = function(callback) {
+  this.createTable('data_columns', callback);
+}
+&nbsp;
+TableCreator.prototype.createDataColumnConstraints = function(callback) {
+  this.createTable('data_column_constraints', callback);
+}
+&nbsp;
+TableCreator.prototype.createMetadata = function(callback) {
+  this.createTable('metadata', callback);
+}
+&nbsp;
+TableCreator.prototype.createMetadataReference = function(callback) {
+  this.createTable('metadata_reference', callback);
+}
+&nbsp;
+TableCreator.prototype.createExtensions = function(callback) {
+  this.createTable('extensions', callback);
+}
+&nbsp;
+TableCreator.prototype.createTableIndex = function(callback) {
+  this.createTable('table_index', callback);
+}
+&nbsp;
+TableCreator.prototype.createGeometryIndex = function(callback) {
+  this.createTable('geometry_index', callback);
+}
+&nbsp;
+TableCreator.prototype.createFeatureTileLink = function(callback) {
+  this.createTable('feature_tile_link', callback);
+}
+&nbsp;
+TableCreator.prototype.createTable = function(tableName, callback) {
+  var connection = this.connection;
+  async.eachSeries(tableCreationScripts[tableName], function(sql, callback) {
+    connection.run(sql, callback);
+  }, callback);
+}
+&nbsp;
+TableCreator.prototype.createUserTable = function (userTable, callback) {
+  var connection = this.connection;
+  connection.tableExists(userTable.table_name, function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(err || result) {
+<span class="cstat-no" title="statement not covered" >      return callback(new Error('Table already exists and cannot be created: ' + userTable.table_name));</span>
+    }
+    var check = '';
+&nbsp;
+    var sql = 'create table \'' + userTable.table_name + '\' (';
+    for (var i = 0; i &lt; userTable.columns.length; i++) {
+      var tc = userTable.columns[i];
+      if (i) {
+        sql += ', ';
+      }
+      sql += '\n\'' + tc.name + '\' ' + DataTypes.name(tc.dataType);
+      if (tc.max != null) {
+        sql += '(' + tc.max + ')';
+        if (check.length) {
+          check += ' AND\n';
+        }
+        check += '\tlength("'+tc.name+'") &lt;= ' + tc.max;
+      }
+      if (tc.notNull) {
+        sql += ' not null'
+      }
+      if (tc.primaryKey) {
+        sql += ' primary key autoincrement';
+      }
+      if (tc.defaultValue) {
+        if (tc.dataType === DataTypes.GPKGDataType.GPKG_DT_TEXT) {
+          sql += ' default \'' + tc.defaultValue + '\'';
+        } else {
+          sql += ' default ' + tc.defaultValue;
+        }
+      }
+    }
+&nbsp;
+    for (var i = 0; i &lt; userTable.uniqueConstraints.length; i++) {
+<span class="cstat-no" title="statement not covered" >      var uniqueConstraint = userTable.uniqueConstraints[i];</span>
+<span class="cstat-no" title="statement not covered" >      sql += ',\n unique (';</span>
+<span class="cstat-no" title="statement not covered" >      for (var j = 0; j &lt; uniqueConstraint.columns.length; j++) {</span>
+<span class="cstat-no" title="statement not covered" >        var uniqueColumn = uniqueConstraint.columns[j];</span>
+<span class="cstat-no" title="statement not covered" >        if (j) {</span>
+<span class="cstat-no" title="statement not covered" >          sql += ', ';</span>
+        }
+<span class="cstat-no" title="statement not covered" >        sql += uniqueColumn.name;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      sql += ')';</span>
+    }
+&nbsp;
+    if (check.length) {
+      sql += '\nCHECK(\n' + check + '\n)';
+    }
+&nbsp;
+    sql += '\n);';
+&nbsp;
+    connection.run(sql, callback);
+  });
+};
+&nbsp;
+var tableCreationScripts = {
+  spatial_reference_system: [
+    'CREATE TABLE gpkg_spatial_ref_sys ('+
+    '  srs_name TEXT NOT NULL,'+
+    '  srs_id INTEGER NOT NULL PRIMARY KEY,'+
+    '  organization TEXT NOT NULL,'+
+    '  organization_coordsys_id INTEGER NOT NULL,'+
+    '  definition  TEXT NOT NULL,'+
+    '  description TEXT'+
+    ')',
+&nbsp;
+    'CREATE VIEW st_spatial_ref_sys AS'+
+    ' SELECT'+
+    '   srs_name,'+
+    '   srs_id,'+
+    '   organization,'+
+    '   organization_coordsys_id,'+
+    '   definition,'+
+    '   description'+
+    ' FROM gpkg_spatial_ref_sys',
+&nbsp;
+    'CREATE VIEW spatial_ref_sys AS'+
+    ' SELECT'+
+    '   srs_id AS srid,'+
+    '   organization AS auth_name,'+
+    '   organization_coordsys_id AS auth_srid,'+
+    '   definition AS srtext'+
+    ' FROM gpkg_spatial_ref_sys'
+  ],
+  contents: [
+    'CREATE TABLE gpkg_contents ('+
+    ' table_name TEXT NOT NULL PRIMARY KEY,'+
+    ' data_type TEXT NOT NULL,'+
+    ' identifier TEXT UNIQUE,'+
+    " description TEXT DEFAULT '',"+
+    " last_change DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),"+
+    ' min_x DOUBLE,'+
+    ' min_y DOUBLE,'+
+    ' max_x DOUBLE,'+
+    ' max_y DOUBLE,'+
+    ' srs_id INTEGER,'+
+    ' CONSTRAINT fk_gc_r_srs_id FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys(srs_id)'+
+    ')'
+  ],
+  geometry_columns: [
+    'CREATE TABLE gpkg_geometry_columns ('+
+    '  table_name TEXT NOT NULL,'+
+    '  column_name TEXT NOT NULL,'+
+    '  geometry_type_name TEXT NOT NULL,'+
+    '  srs_id INTEGER NOT NULL,'+
+    '  z TINYINT NOT NULL,'+
+    '  m TINYINT NOT NULL,'+
+    '  CONSTRAINT pk_geom_cols PRIMARY KEY (table_name, column_name),'+
+    '  CONSTRAINT uk_gc_table_name UNIQUE (table_name),'+
+    '  CONSTRAINT fk_gc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name),'+
+    '  CONSTRAINT fk_gc_srs FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys (srs_id)'+
+    ')',
+&nbsp;
+    'CREATE VIEW st_geometry_columns AS'+
+    '  SELECT'+
+    '    table_name,'+
+    '    column_name,'+
+    '    "ST_" || geometry_type_name AS geometry_type_name,'+
+    '    g.srs_id,'+
+    '    srs_name'+
+    '  FROM gpkg_geometry_columns as g JOIN gpkg_spatial_ref_sys AS s'+
+    '  WHERE g.srs_id = s.srs_id',
+&nbsp;
+    'CREATE VIEW geometry_columns AS'+
+    '  SELECT'+
+    '    table_name AS f_table_name,'+
+    '    column_name AS f_geometry_column,'+
+    '    (CASE geometry_type_name'+
+    '    	WHEN "GEOMETRY" THEN 0'+
+    '    	WHEN "POINT" THEN 1'+
+    '    	WHEN "LINESTRING" THEN 2'+
+    '    	WHEN "POLYGON" THEN 3'+
+    '    	WHEN "MULTIPOINT" THEN 4'+
+    '    	WHEN "MULTILINESTRING" THEN 5'+
+    '    	WHEN "MULTIPOLYGON" THEN 6'+
+    '    	WHEN "GEOMETRYCOLLECTION" THEN 7'+
+    '    	WHEN "CIRCULARSTRING" THEN 8'+
+    '    	WHEN "COMPOUNDCURVE" THEN 9'+
+    '    	WHEN "CURVEPOLYGON" THEN 10'+
+    '    	WHEN "MULTICURVE" THEN 11'+
+    '    	WHEN "MULTISURFACE" THEN 12'+
+    '    	WHEN "CURVE" THEN 13'+
+    '    	WHEN "SURFACE" THEN 14'+
+    '    	WHEN "POLYHEDRALSURFACE" THEN 15'+
+    '    	WHEN "TIN" THEN 16'+
+    '    	WHEN "TRIANGLE" THEN 17'+
+    '    	ELSE 0 END) AS geometry_type,'+
+    '    2 + (CASE z WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) + (CASE m WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) AS coord_dimension,'+
+    '    srs_id AS srid'+
+    '  FROM gpkg_geometry_columns'
+  ],
+  tile_matrix_set: [
+    'CREATE TABLE gpkg_tile_matrix_set ('+
+    '  table_name TEXT NOT NULL PRIMARY KEY,'+
+    '  srs_id INTEGER NOT NULL,'+
+    '  min_x DOUBLE NOT NULL,'+
+    '  min_y DOUBLE NOT NULL,'+
+    '  max_x DOUBLE NOT NULL,'+
+    '  max_y DOUBLE NOT NULL,'+
+    '  CONSTRAINT fk_gtms_table_name FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name),'+
+    '  CONSTRAINT fk_gtms_srs FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys (srs_id)'+
+    ')'
+  ],
+  tile_matrix: [
+    'CREATE TABLE gpkg_tile_matrix ('+
+    '  table_name TEXT NOT NULL,'+
+    '  zoom_level INTEGER NOT NULL,'+
+    '  matrix_width INTEGER NOT NULL,'+
+    '  matrix_height INTEGER NOT NULL,'+
+    '  tile_width INTEGER NOT NULL,'+
+    '  tile_height INTEGER NOT NULL,'+
+    '  pixel_x_size DOUBLE NOT NULL,'+
+    '  pixel_y_size DOUBLE NOT NULL,'+
+    '  CONSTRAINT pk_ttm PRIMARY KEY (table_name, zoom_level),'+
+    '  CONSTRAINT fk_tmm_table_name FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)'+
+    ')',
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_zoom_level_insert'"+
+    "BEFORE INSERT ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table ''gpkg_tile_matrix'' violates constraint: zoom_level cannot be less than 0')"+
+    "WHERE (NEW.zoom_level &lt; 0);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_zoom_level_update'"+
+    "BEFORE UPDATE of zoom_level ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table ''gpkg_tile_matrix'' violates constraint: zoom_level cannot be less than 0')"+
+    "WHERE (NEW.zoom_level &lt; 0);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_matrix_width_insert'"+
+    "BEFORE INSERT ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table ''gpkg_tile_matrix'' violates constraint: matrix_width cannot be less than 1')"+
+    "WHERE (NEW.matrix_width &lt; 1);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_matrix_width_update'"+
+    "BEFORE UPDATE OF matrix_width ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table ''gpkg_tile_matrix'' violates constraint: matrix_width cannot be less than 1')"+
+    "WHERE (NEW.matrix_width &lt; 1);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_matrix_height_insert'"+
+    "BEFORE INSERT ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table ''gpkg_tile_matrix'' violates constraint: matrix_height cannot be less than 1')"+
+    "WHERE (NEW.matrix_height &lt; 1);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_matrix_height_update'"+
+    "BEFORE UPDATE OF matrix_height ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table ''gpkg_tile_matrix'' violates constraint: matrix_height cannot be less than 1')"+
+    "WHERE (NEW.matrix_height &lt; 1);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_pixel_x_size_insert'"+
+    "BEFORE INSERT ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table ''gpkg_tile_matrix'' violates constraint: pixel_x_size must be greater than 0')"+
+    "WHERE NOT (NEW.pixel_x_size &gt; 0);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_pixel_x_size_update'"+
+    "BEFORE UPDATE OF pixel_x_size ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table ''gpkg_tile_matrix'' violates constraint: pixel_x_size must be greater than 0')"+
+    "WHERE NOT (NEW.pixel_x_size &gt; 0);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_pixel_y_size_insert'"+
+    "BEFORE INSERT ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table ''gpkg_tile_matrix'' violates constraint: pixel_y_size must be greater than 0')"+
+    "WHERE NOT (NEW.pixel_y_size &gt; 0);"+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_tile_matrix_pixel_y_size_update'"+
+    "BEFORE UPDATE OF pixel_y_size ON 'gpkg_tile_matrix'"+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table ''gpkg_tile_matrix'' violates constraint: pixel_y_size must be greater than 0')"+
+    "WHERE NOT (NEW.pixel_y_size &gt; 0);"+
+    "END"
+  ],
+  data_columns: [
+    'CREATE TABLE gpkg_data_columns ('+
+    '  table_name TEXT NOT NULL,'+
+    '  column_name TEXT NOT NULL,'+
+    '  name TEXT,'+
+    '  title TEXT,'+
+    '  description TEXT,'+
+    '  mime_type TEXT,'+
+    '  constraint_name TEXT,'+
+    '  CONSTRAINT pk_gdc PRIMARY KEY (table_name, column_name),'+
+    '  CONSTRAINT fk_gdc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)'+
+    ')'
+  ],
+  data_column_constraints: [
+    'CREATE TABLE gpkg_data_column_constraints ('+
+    '  constraint_name TEXT NOT NULL,'+
+    '  constraint_type TEXT NOT NULL, /* "range" | "enum" | "glob" */'+
+    '  value TEXT,'+
+    '  min NUMERIC,'+
+    '  min_is_inclusive BOOLEAN, /* 0 = false, 1 = true */'+
+    '  max NUMERIC,'+
+    '  max_is_inclusive BOOLEAN, /* 0 = false, 1 = true */'+
+    '  description TEXT,'+
+    '  CONSTRAINT gdcc_ntv UNIQUE (constraint_name, constraint_type, value)'+
+    ')'
+  ],
+  metadata: [
+    'CREATE TABLE gpkg_metadata ('+
+    '  id INTEGER CONSTRAINT m_pk PRIMARY KEY ASC NOT NULL UNIQUE,'+
+    '  md_scope TEXT NOT NULL DEFAULT "dataset",'+
+    '  md_standard_uri TEXT NOT NULL,'+
+    '  mime_type TEXT NOT NULL DEFAULT "text/xml",'+
+    '  metadata TEXT NOT NULL'+
+    ')',
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_md_scope_insert' "+
+    "BEFORE INSERT ON 'gpkg_metadata' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata violates "+
+    "constraint: md_scope must be one of undefined | fieldSession | "+
+    "collectionSession | series | dataset | featureType | feature | "+
+    "attributeType | attribute | tile | model | catalogue | schema | "+
+    "taxonomy software | service | collectionHardware | "+
+    "nonGeographicDataset | dimensionGroup') "+
+    "WHERE NOT(NEW.md_scope IN "+
+    "('undefined','fieldSession','collectionSession','series','dataset', "+
+    "'featureType','feature','attributeType','attribute','tile','model', "+
+    "'catalogue','schema','taxonomy','software','service', "+
+    "'collectionHardware','nonGeographicDataset','dimensionGroup')); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_md_scope_update' "+
+    "BEFORE UPDATE OF 'md_scope' ON 'gpkg_metadata' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata violates "+
+    "constraint: md_scope must be one of undefined | fieldSession | "+
+    "collectionSession | series | dataset | featureType | feature | "+
+    "attributeType | attribute | tile | model | catalogue | schema | "+
+    "taxonomy software | service | collectionHardware | "+
+    "nonGeographicDataset | dimensionGroup') "+
+    "WHERE NOT(NEW.md_scope IN "+
+    "('undefined','fieldSession','collectionSession','series','dataset', "+
+    "'featureType','feature','attributeType','attribute','tile','model', "+
+    "'catalogue','schema','taxonomy','software','service', "+
+    "'collectionHardware','nonGeographicDataset','dimensionGroup')); "+
+    "END"
+  ],
+  metadata_reference: [
+    "CREATE TABLE gpkg_metadata_reference (" +
+    "  reference_scope TEXT NOT NULL," +
+    "  table_name TEXT," +
+    "  column_name TEXT," +
+    "  row_id_value INTEGER," +
+    "  timestamp DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))," +
+    "  md_file_id INTEGER NOT NULL," +
+    "  md_parent_id INTEGER," +
+    "  CONSTRAINT crmr_mfi_fk FOREIGN KEY (md_file_id) REFERENCES gpkg_metadata(id)," +
+    "  CONSTRAINT crmr_mpi_fk FOREIGN KEY (md_parent_id) REFERENCES gpkg_metadata(id)" +
+    ")",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_reference_scope_insert' "+
+    "BEFORE INSERT ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: reference_scope must be one of \"geopackage\", "+
+    "table\", \"column\", \"row\", \"row/col\"') "+
+    "WHERE NOT NEW.reference_scope IN "+
+    "('geopackage','table','column','row','row/col'); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_reference_scope_update' "+
+    "BEFORE UPDATE OF 'reference_scope' ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: referrence_scope must be one of \"geopackage\", "+
+    "\"table\", \"column\", \"row\", \"row/col\"') "+
+    "WHERE NOT NEW.reference_scope IN "+
+    "('geopackage','table','column','row','row/col'); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_column_name_insert' "+
+    "BEFORE INSERT ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: column name must be NULL when reference_scope "+
+    "is \"geopackage\", \"table\" or \"row\"') "+
+    "WHERE (NEW.reference_scope IN ('geopackage','table','row') "+
+    "AND NEW.column_name IS NOT NULL); "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: column name must be defined for the specified "+
+    "table when reference_scope is \"column\" or \"row/col\"') "+
+    "WHERE (NEW.reference_scope IN ('column','row/col') "+
+    "AND NOT NEW.table_name IN ( "+
+    "SELECT name FROM SQLITE_MASTER WHERE type = 'table' "+
+    "AND name = NEW.table_name "+
+    "AND sql LIKE ('%' || NEW.column_name || '%'))); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_column_name_update' "+
+    "BEFORE UPDATE OF column_name ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: column name must be NULL when reference_scope "+
+    "is \"geopackage\", \"table\" or \"row\"') "+
+    "WHERE (NEW.reference_scope IN ('geopackage','table','row') "+
+    "AND NEW.column_nameIS NOT NULL); "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: column name must be defined for the specified "+
+    "table when reference_scope is \"column\" or \"row/col\"') "+
+    "WHERE (NEW.reference_scope IN ('column','row/col') "+
+    "AND NOT NEW.table_name IN ( "+
+    "SELECT name FROM SQLITE_MASTER WHERE type = 'table' "+
+    "AND name = NEW.table_name "+
+    "AND sql LIKE ('%' || NEW.column_name || '%'))); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_row_id_value_insert' "+
+    "BEFORE INSERT ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: row_id_value must be NULL when reference_scope "+
+    "is \"geopackage\", \"table\" or \"column\"') "+
+    "WHERE NEW.reference_scope IN ('geopackage','table','column') "+
+    "AND NEW.row_id_value IS NOT NULL; "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: row_id_value must exist in specified table when "+
+    "reference_scope is \"row\" or \"row/col\"') "+
+    "WHERE NEW.reference_scope IN ('row','row/col') "+
+    "AND NOT EXISTS (SELECT rowid "+
+    "FROM (SELECT NEW.table_name AS table_name) WHERE rowid = "+
+    "NEW.row_id_value); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_row_id_value_update' "+
+    "BEFORE UPDATE OF 'row_id_value' ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: row_id_value must be NULL when reference_scope "+
+    "is \"geopackage\", \"table\" or \"column\"') "+
+    "WHERE NEW.reference_scope IN ('geopackage','table','column') "+
+    "AND NEW.row_id_value IS NOT NULL; "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: row_id_value must exist in specified table when "+
+    "reference_scope is \"row\" or \"row/col\"') "+
+    "WHERE NEW.reference_scope IN ('row','row/col') "+
+    "AND NOT EXISTS (SELECT rowid "+
+    "FROM (SELECT NEW.table_name AS table_name) WHERE rowid = "+
+    "NEW.row_id_value); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_timestamp_insert' "+
+    "BEFORE INSERT ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'insert on table gpkg_metadata_reference "+
+    "violates constraint: timestamp must be a valid time in ISO 8601 "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
+    "WHERE NOT (NEW.timestamp GLOB "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "AND strftime('%s',NEW.timestamp) NOT NULL); "+
+    "END",
+&nbsp;
+    "CREATE TRIGGER 'gpkg_metadata_reference_timestamp_update' "+
+    "BEFORE UPDATE OF 'timestamp' ON 'gpkg_metadata_reference' "+
+    "FOR EACH ROW BEGIN "+
+    "SELECT RAISE(ABORT, 'update on table gpkg_metadata_reference "+
+    "violates constraint: timestamp must be a valid time in ISO 8601 "+
+    "\"yyyy-mm-ddThh:mm:ss.cccZ\" form') "+
+    "WHERE NOT (NEW.timestamp GLOB "+
+    "'[1-2][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]T[0-2][0-9]:[0-5][0-9]:[0-5][0-9].[0-9][0-9][0-9]Z' "+
+    "AND strftime('%s',NEW.timestamp) NOT NULL); "+
+    "END "
+  ],
+  extensions: [
+    'CREATE TABLE gpkg_extensions ('+
+    '  table_name TEXT,'+
+    '  column_name TEXT,'+
+    '  extension_name TEXT NOT NULL,'+
+    '  definition TEXT NOT NULL,'+
+    '  scope TEXT NOT NULL,'+
+    '  CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name)'+
+    ')'
+  ],
+  table_index: [
+    'CREATE TABLE nga_table_index ('+
+    '  table_name TEXT NOT NULL PRIMARY KEY,'+
+    '  last_indexed DATETIME'+
+    ')'
+  ],
+  geometry_index: [
+    'CREATE TABLE nga_geometry_index ('+
+    '  table_name TEXT NOT NULL,'+
+    '  geom_id INTEGER NOT NULL,'+
+    '  min_x DOUBLE NOT NULL,'+
+    '  max_x DOUBLE NOT NULL,'+
+    '  min_y DOUBLE NOT NULL,'+
+    '  max_y DOUBLE NOT NULL,'+
+    '  min_z DOUBLE,'+
+    '  max_z DOUBLE,'+
+    '  min_m DOUBLE,'+
+    '  max_m DOUBLE,'+
+    '  CONSTRAINT pk_ngi PRIMARY KEY (table_name, geom_id),'+
+    '  CONSTRAINT fk_ngi_nti_tn FOREIGN KEY (table_name) REFERENCES nga_table_index(table_name)'+
+    ')'
+  ],
+  feature_tile_link: [
+    'CREATE TABLE nga_feature_tile_link ('+
+    '  feature_table_name TEXT NOT NULL,'+
+    '  tile_table_name TEXT NOT NULL,'+
+    '  CONSTRAINT pk_nftl PRIMARY KEY (feature_table_name, tile_table_name)'+
+    ')'
+  ]
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>
