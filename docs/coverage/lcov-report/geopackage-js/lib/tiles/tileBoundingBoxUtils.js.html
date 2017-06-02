@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/tileBoundingBoxUtils.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/</a> tileBoundingBoxUtils.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.74% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>136/155</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.75% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>30/32</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.43% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>10/14</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">87.74% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>136/155</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">132×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">176×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">101×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">233×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">233×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">188×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">188×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-yes">189×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">379×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">344×</span>
+<span class="cline-any cline-yes">344×</span>
+<span class="cline-any cline-yes">344×</span>
+<span class="cline-any cline-yes">344×</span>
+<span class="cline-any cline-yes">344×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">156×</span>
+<span class="cline-any cline-yes">117×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-yes">32×</span>
+<span class="cline-any cline-yes">348×</span>
+<span class="cline-any cline-yes">38×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">310×</span>
+<span class="cline-any cline-yes">310×</span>
+<span class="cline-any cline-yes">310×</span>
+<span class="cline-any cline-yes">310×</span>
+<span class="cline-any cline-yes">310×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">159×</span>
+<span class="cline-any cline-yes">80×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">380×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">164×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
+var BoundingBox = require('../boundingBox')
+  , TileGrid = require('./tileGrid');
+&nbsp;
+var proj4 = require('proj4');
+&nbsp;
+var WEB_MERCATOR_HALF_WORLD_WIDTH = 20037508.342789244;
+&nbsp;
+module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
+  var totalBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+&nbsp;
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+  var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+&nbsp;
+  var minX = Math.floor((webMercatorBoundingBox.minLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+  var maxX = Math.max(0,Math.floor(((webMercatorBoundingBox.maxLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var maxY = Math.max(0,Math.ceil(((-1 * (webMercatorBoundingBox.minLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var minY = Math.floor((-1 * (webMercatorBoundingBox.maxLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+&nbsp;
+  return {
+    minX: minX,
+    maxX: maxX,
+    minY: minY,
+    maxY: maxY
+  };
+}
+//
+//
+// /**
+//  *  Tile Bounding Box utility methods
+//  */
+// @interface GPKGTileBoundingBoxUtils : NSObject
+//
+// /**
+//  *  Get the overlapping bounding box between the two bounding boxes
+//  *
+//  *  @param boundingBox  bounding box
+//  *  @param boundingBox2 bounding box 2
+//  *
+//  *  @return bounding box
+//  */
+// +(GPKGBoundingBox *) overlapWithBoundingBox: (GPKGBoundingBox *) boundingBox andBoundingBox: (GPKGBoundingBox *) boundingBox2;
+//
+// /**
+//  *  Get the union bounding box combining the two bounding boxes
+//  *
+//  *  @param boundingBox  bounding box
+//  *  @param boundingBox2 bounding box 2
+//  *
+//  *  @return bounding box
+//  */
+// +(GPKGBoundingBox *) unionWithBoundingBox: (GPKGBoundingBox *) boundingBox andBoundingBox: (GPKGBoundingBox *) boundingBox2;
+//
+// /**
+//  *  Get the X pixel for where the longitude fits into the bounding box
+//  *
+//  *  @param width       width
+//  *  @param boundingBox bounding box
+//  *  @param longitude   longitude
+//  *
+//  *  @return x pixel
+//  */
+module.exports.getXPixelOffset = <span class="fstat-no" title="function not covered" >function(width, boundingBox, longitude) {</span>
+<span class="cstat-no" title="statement not covered" >  var boxWidth = boundingBox.maxLongitude - boundingBox.minLongitude;</span>
+<span class="cstat-no" title="statement not covered" >  var offset = longitude - boundingBox.minLongitude;</span>
+<span class="cstat-no" title="statement not covered" >  var percentage = offset / boxWidth;</span>
+<span class="cstat-no" title="statement not covered" >  var pixel = percentage * width;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return pixel;</span>
+}
+/**
+ *  Get the longitude from the pixel location, bounding box, and image width
+ *
+ *  @param width       width
+ *  @param boundingBox bounding box
+ *  @param pixel       x pixel
+ *
+ *  @return longitude
+ */
+module.exports.getLongitudeFromPixelWithWidth = <span class="fstat-no" title="function not covered" >function(width, boundingBox, pixel) {</span>
+<span class="cstat-no" title="statement not covered" >  var boxWidth = boundingBox.maxLongitude - boundingBox.minLongitude;</span>
+<span class="cstat-no" title="statement not covered" >  var percentage = pixel / width;</span>
+<span class="cstat-no" title="statement not covered" >  var offset = percentage * boxWidth;</span>
+<span class="cstat-no" title="statement not covered" >  return offset + boundingBox.minLongitude;</span>
+}
+&nbsp;
+module.exports.getLatitudeFromPixelWithHeight = <span class="fstat-no" title="function not covered" >function(height, boundingBox, pixel) {</span>
+<span class="cstat-no" title="statement not covered" >  var boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;</span>
+<span class="cstat-no" title="statement not covered" >  var percentage = pixel / height;</span>
+<span class="cstat-no" title="statement not covered" >  var offset = percentage * boxHeight;</span>
+<span class="cstat-no" title="statement not covered" >  return boundingBox.maxLatitude - offset;</span>
+}
+&nbsp;
+//
+// /**
+//  *  Get the Y pixel for where the latitude fits into the bounding box
+//  *
+//  *  @param height      height
+//  *  @param boundingBox bounding box
+//  *  @param latitude    latitude
+//  *
+//  *  @return y pixel
+//  */
+module.exports.getYPixelOffset = <span class="fstat-no" title="function not covered" >function(height, boundingBox, latitude) {</span>
+<span class="cstat-no" title="statement not covered" >  var boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;</span>
+<span class="cstat-no" title="statement not covered" >  var offset = boundingBox.maxLatitude - latitude;</span>
+<span class="cstat-no" title="statement not covered" >  var percentage = offset / boxHeight;</span>
+<span class="cstat-no" title="statement not covered" >  var pixel = percentage * height;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return pixel;</span>
+}
+&nbsp;
+module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth) {
+  var p = {};
+&nbsp;
+  var boxWidth = totalBoundingBox.maxLongitude - totalBoundingBox.minLongitude;
+  var xoffsetMin = geoPackageTileBoundingBox.minLongitude - totalBoundingBox.minLongitude;
+  var xpercentageMin = xoffsetMin / boxWidth;
+  var xoffsetMax = totalBoundingBox.maxLongitude - geoPackageTileBoundingBox.maxLongitude;
+  var xpercentageMax = xoffsetMax / boxWidth;
+  var xcropMax = geoPackageTileBoundingBox.maxLongitude - totalBoundingBox.maxLongitude;
+  var xcropPercentageMax = xcropMax / boxWidth;
+&nbsp;
+  p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
+  p.xPositionInFinalTileEnd = Math.round(Math.min(totalWidth, totalWidth - (xpercentageMax * totalWidth)));
+  p.tileCropXStart = Math.round(Math.max(0, 0 - xpercentageMin * tileWidth));
+  p.tileCropXEnd = Math.round(Math.min(tileWidth-1, tileWidth-1 - (xcropPercentageMax * tileWidth)));
+  p.xScale = (p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart) / (1 + p.tileCropXEnd - p.tileCropXStart);
+&nbsp;
+  var boxHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
+  var yoffsetMax = totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude;
+  var ypercentageMax = yoffsetMax / boxHeight;
+  var yoffsetMin = geoPackageTileBoundingBox.minLatitude - totalBoundingBox.minLatitude;
+  var ypercentageMin = yoffsetMin / boxHeight;
+  var ycropMin = totalBoundingBox.minLatitude - geoPackageTileBoundingBox.minLatitude;
+  var ycropPercentageMin = ycropMin / boxHeight;
+&nbsp;
+  p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
+  p.yPositionInFinalTileEnd = Math.round(Math.min(totalHeight, totalHeight - ypercentageMin * totalHeight));
+  p.tileCropYStart = Math.round(Math.max(0, 0 - ypercentageMax * tileHeight));
+  p.tileCropYEnd = Math.round(Math.min(tileHeight-1, tileHeight-1 - (ycropPercentageMin * tileHeight)));
+  p.yScale = (p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart) / (1 + p.tileCropYEnd - p.tileCropYStart);
+&nbsp;
+  return p;
+}
+&nbsp;
+/**
+ * Get the Web Mercator tile bounding box from the Standard Maps API tile
+ * coordinates and zoom level
+ *
+ *  @param x    x
+ *  @param y    y
+ *  @param zoom zoom level
+ *
+ *  @return web mercator bounding box
+ */
+module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom) {
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+	var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+&nbsp;
+	var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ (x * tileSize);
+	var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ ((x + 1) * tileSize);
+	var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- ((y + 1) * tileSize);
+	var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- (y * tileSize);
+&nbsp;
+	var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
+&nbsp;
+	return box;
+}
+&nbsp;
+/**
+ *  Get the tile size in meters
+ *
+ *  @param tilesPerSide tiles per side
+ *
+ *  @return meters
+ */
+module.exports.tileSizeWithTilesPerSide = function(tilesPerSide) {
+  return (2*WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+}
+&nbsp;
+/**
+ *  Get the tiles per side, width and height, at the zoom level
+ *
+ *  @param zoom zoom level
+ *
+ *  @return tiles per side
+ */
+module.exports.tilesPerSideWithZoom = function(zoom) {
+  return Math.pow(2,zoom);
+}
+&nbsp;
+/**
+ *  Get the tile grid
+ *
+ *  @param webMercatorTotalBox    web mercator total bounding box
+ *  @param matrixWidth            matrix width
+ *  @param matrixHeight           matrix height
+ *  @param boundingBox            bounding box
+ *
+ *  @return tile grid
+ */
+module.exports.getTileGridWithTotalBoundingBox = function(totalBoundingBox, matrixWidth, matrixHeight, boundingBox) {
+  var minColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.minLongitude);
+  var maxColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.maxLongitude, true);
+  if (minColumn &lt; matrixWidth &amp;&amp; maxColumn &gt;= 0) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (minColumn &lt; 0) {
+<span class="cstat-no" title="statement not covered" >      minColumn = 0;</span>
+    }
+    if (maxColumn &gt;= matrixWidth) {
+      maxColumn = matrixWidth - 1;
+    }
+  }
+&nbsp;
+  var maxRow = module.exports.getTileRowWithTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.minLatitude, true);
+  var minRow = module.exports.getTileRowWithTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.maxLatitude);
+&nbsp;
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if(minRow &lt; matrixHeight &amp;&amp; maxRow &gt;= 0){
+    if(minRow &lt; 0){
+      minRow = 0;
+    }
+    if(maxRow &gt;= matrixHeight){
+      maxRow = matrixHeight - 1;
+    }
+  }
+&nbsp;
+  var tileGrid = new TileGrid(minColumn, maxColumn, minRow, maxRow);
+  return tileGrid;
+}
+&nbsp;
+/**
+ *  Get the tile column of the longitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixWidth         matrix width
+ *  @param longitude           longitude
+ *
+ *  @return tile column
+ */
+module.exports.getTileColumnWithTotalBoundingBox = function(webMercatorTotalBox, matrixWidth, longitude, max) {
+  var minX = webMercatorTotalBox.minLongitude;
+  var maxX = webMercatorTotalBox.maxLongitude;
+  var tileId;
+  if (longitude &lt; minX) {
+    tileId = -1;
+  } else if (longitude &gt;= maxX) {
+    tileId = matrixWidth;
+  } else {
+    var matrixWidthMeters = maxX - minX;
+    var tileWidth = matrixWidthMeters / matrixWidth;
+    var tileIdDouble = ((longitude - minX) / tileWidth);
+    tileId = ~~tileIdDouble;
+    if (max) {
+      // if the edge lands right on the calculated edge, subtract one
+      if (tileIdDouble === tileId) {
+        tileId--;
+      }
+    }
+  }
+  return tileId;
+}
+&nbsp;
+/**
+ *  Get the tile row of the latitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixHeight        matrix height
+ *  @param latitude            latitude
+ *
+ *  @return tile row
+ */
+module.exports.getTileRowWithTotalBoundingBox = function(webMercatorTotalBox, matrixHeight, latitude, max) {
+  var minY = webMercatorTotalBox.minLatitude;
+  var maxY = webMercatorTotalBox.maxLatitude;
+&nbsp;
+  var tileId;
+  if (latitude &lt; minY) {
+    tileId = matrixHeight;
+  } else if (latitude &gt;= maxY) {
+    tileId = -1;
+  } else {
+    var matrixHeightMeters = maxY - minY;
+    var tileHeight = matrixHeightMeters / matrixHeight;
+    var tileIdDouble = ((maxY - latitude) / tileHeight);
+    tileId = ~~tileIdDouble;
+    if (max) {
+      // if the edge lands right on the calculated edge, add one
+      if (tileIdDouble === tileId) {
+        tileId--;
+      }
+    }
+  }
+  return tileId;
+}
+&nbsp;
+/**
+ *  Get the web mercator bounding box of the tile column and row in the tile
+ *  matrix using the total bounding box
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param tileMatrix          tile matrix
+ *  @param tileColumn          tile column
+ *  @param tileRow             tile row
+ *
+ *  @return web mercator bounding box
+ */
+module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRow) {
+  var tileMatrixWidth = tileMatrix.matrix_width;
+  var tileMatrixHeight = tileMatrix.matrix_height;
+  var tileGrid = new TileGrid(tileColumn, tileColumn, tileRow, tileRow);
+  var matrixMinX = box.minLongitude;
+  var matrixMaxX = box.maxLongitude;
+  var matrixWidth = matrixMaxX - matrixMinX;
+  var tileWidth = matrixWidth / tileMatrixWidth;
+&nbsp;
+  // Find the longitude range
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
+&nbsp;
+  // Get the tile height
+  var matrixMinY = box.minLatitude;
+  var matrixMaxY = box.maxLatitude;
+  var matrixHeight = matrixMaxY - matrixMinY;
+  var tileHeight = matrixHeight / tileMatrixHeight;
+&nbsp;
+  // Find the latitude range
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
+&nbsp;
+  var boundingBox = new BoundingBox(minLon, maxLon, minLat, maxLat);
+&nbsp;
+  return boundingBox;
+}
+&nbsp;
+module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatrixWidth, tileMatrixHeight, tileGrid) {
+  // Get the tile width
+  var matrixMinX = matrixSetBoundingBox.minLongitude;
+  var matrixMaxX = matrixSetBoundingBox.maxLongitude;
+  var matrixWidth = matrixMaxX - matrixMinX;
+  var tileWidth = matrixWidth / tileMatrixWidth;
+&nbsp;
+  // Find the longitude range
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
+&nbsp;
+  // Get the tile height
+  var matrixMinY = matrixSetBoundingBox.minLatitude;
+  var matrixMaxY = matrixSetBoundingBox.maxLatitude;
+  var matrixHeight = matrixMaxY - matrixMinY;
+  var tileHeight = matrixHeight / tileMatrixHeight;
+&nbsp;
+  // Find the latitude range
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
+&nbsp;
+  return new BoundingBox(minLon, maxLon, minLat, maxLat);
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/geom/geometryData.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/geom/</a> geometryData.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>130/130</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">77.78% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>42/54</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>11/11</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>129/129</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2960×</span>
+<span class="cline-any cline-yes">2960×</span>
+<span class="cline-any cline-yes">2960×</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-yes">2954×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2953×</span>
+<span class="cline-any cline-yes">2953×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2952×</span>
+<span class="cline-any cline-yes">2952×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2952×</span>
+<span class="cline-any cline-yes">2952×</span>
+<span class="cline-any cline-yes">2952×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-yes">2949×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2948×</span>
+<span class="cline-any cline-yes">2912×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * GeometryData module.
+ * @module geom/geometryData
+ */
+&nbsp;
+var GeoPackageConstants = require('../geoPackageConstants');
+&nbsp;
+var wkx = require('wkx');
+&nbsp;
+var BIG_ENDIAN = 0;
+var LITTLE_ENDIAN = 1;
+&nbsp;
+/**
+ * GeoPackage Geometry Data
+ */
+var GeometryData = function(buffer) {
+  this.empty = true;
+  this.byteOrder = BIG_ENDIAN;
+  if (buffer) {
+    this.fromData(buffer);
+  }
+}
+&nbsp;
+module.exports = GeometryData;
+&nbsp;
+GeometryData.prototype.setSrsId = function(srsId) {
+  this.srsId = srsId;
+}
+&nbsp;
+GeometryData.prototype.setGeometry = function(wkbGeometry) {
+  this.empty = false;
+  this.geometry = wkbGeometry;
+}
+&nbsp;
+GeometryData.prototype.setEnvelope = function(envelope) {
+  this.envelope = envelope;
+}
+&nbsp;
+GeometryData.prototype.fromData = function (buffer) {
+  this.buffer = buffer;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (buffer instanceof Uint8Array) {
+    this.buffer = buffer = new Buffer(buffer);
+  }
+  var magicString = buffer.toString('ascii', 0, 2);
+  if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
+    throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
+  }
+&nbsp;
+  var version = buffer.readUInt8(2);
+  if (version !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1) {
+    throw new Error('Unexpected GeoPackage Geometry version ' + version + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
+  }
+&nbsp;
+  var flags = buffer.readUInt8(3);
+  var envelopeIndicator = this.readFlags(flags);
+&nbsp;
+  this.srsId = buffer[this.byteOrder ? 'readUInt32LE' : 'readUInt32BE'](4);
+  var envelopeAndOffest = this.readEnvelope(envelopeIndicator, buffer);
+  this.envelope = envelopeAndOffest.envelope;
+&nbsp;
+  var offset = envelopeAndOffest.offset;
+&nbsp;
+  var wkbBuffer = buffer.slice(offset);
+  this.geometry = wkx.Geometry.parse(wkbBuffer);
+};
+&nbsp;
+GeometryData.prototype.toData = function() {
+  var header = new Buffer(8);
+&nbsp;
+  // Write GP as the 2 byte magic number
+  header.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
+&nbsp;
+  // Write a byte as the version value of 0 = version 1
+  header.writeUInt8(GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1, 2);
+&nbsp;
+  // Build and write a flags byte
+  var flags = this.buildFlagsByte();
+  header.writeUInt8(flags, 3);
+&nbsp;
+  // write the 4 byte srs id
+  header[this.byteOrder ? <span class="branch-0 cbranch-no" title="branch not covered" >'writeUInt32LE' </span>: 'writeUInt32BE'](this.srsId, 4);
+&nbsp;
+  var envelopeBuffer = this.writeEnvelope(this.envelope);
+&nbsp;
+  this.buffer = Buffer.concat([header, envelopeBuffer, this.geometry.toWkb()]);
+  return this.buffer;
+};
+&nbsp;
+GeometryData.prototype.writeEnvelope = function() {
+  if (!this.envelope) return new Buffer(0);
+&nbsp;
+  var writeDoubleMethod = 'writeDouble' + (this.byteOrder ? <span class="branch-0 cbranch-no" title="branch not covered" >'LE' </span>: 'BE');
+&nbsp;
+  var length = 32;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.envelope.hasZ) {
+    length += 16;
+  }
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.envelope.hasM) {
+    length += 16;
+  }
+  var envelopeBuffer = new Buffer(length);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minX, 0);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxX, 8);
+  envelopeBuffer[writeDoubleMethod](this.envelope.minY, 16);
+  envelopeBuffer[writeDoubleMethod](this.envelope.maxY, 24);
+&nbsp;
+  var position = 32;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.envelope.hasZ) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minZ, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxZ, position+8);
+    position = 48;
+  }
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (this.envelope.hasM) {
+    envelopeBuffer[writeDoubleMethod](this.envelope.minM, position);
+    envelopeBuffer[writeDoubleMethod](this.envelope.maxM, position+8);
+  }
+&nbsp;
+  return envelopeBuffer;
+};
+&nbsp;
+GeometryData.prototype.buildFlagsByte = function() {
+  var flag = 0;
+&nbsp;
+  // Add the binary type to bit 5, 0 for standard and 1 for extended
+  var binaryType = this.extended ? <span class="branch-0 cbranch-no" title="branch not covered" >1 </span>: 0;
+  flag += (binaryType &lt;&lt; 5);
+&nbsp;
+  // Add the empty geometry flag to bit 4, 0 for non-empty and 1 for empty
+  var emptyValue = this.empty ? <span class="branch-0 cbranch-no" title="branch not covered" >1 </span>: 0;
+  flag += (emptyValue &lt;&lt; 4);
+&nbsp;
+  // Add the envelope contents indicator code (3-bit unsigned integer to bits 3, 2, and 1)
+  var envelopeIndicator = !this.envelope ? 0 : this.getIndicatorWithEnvelope(this.envelope);
+  flag += (envelopeIndicator &lt;&lt; 1);
+&nbsp;
+  // Add the byte order to bit 0, 0 for Big Endian and 1 for Little Endian
+  var byteOrderValue = (this.byteOrder === BIG_ENDIAN) ? 0 : <span class="branch-1 cbranch-no" title="branch not covered" >1;</span>
+  flag += byteOrderValue;
+&nbsp;
+  return flag;
+};
+&nbsp;
+GeometryData.prototype.getIndicatorWithEnvelope = function(envelope) {
+  var indicator = 1;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (envelope.hasZ) {
+    indicator++;
+  }
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (envelope.hasM) {
+    indicator += 2;
+  }
+  return indicator;
+};
+&nbsp;
+GeometryData.prototype.readFlags = function (flagsInt) {
+  // Verify the reserved bits at 7 and 6 are 0
+  var reserved7 = (flagsInt &gt;&gt; 7) &amp; 1;
+  var reserved6 = (flagsInt &gt;&gt; 6) &amp; 1;
+  if (reserved7 !== 0 || reserved6 !== 0) {
+      throw new Error('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7='+reserved7+', 6='+ reserved6);
+  }
+&nbsp;
+  // Get the binary type from bit 5, 0 for standard and 1 for extended
+  var binaryType = (flagsInt &gt;&gt; 5) &amp; 1;
+  this.extended = binaryType == 1;
+&nbsp;
+  // Get the empty geometry flag from bit 4, 0 for non-empty and 1 for
+  // empty
+  var emptyValue = (flagsInt &gt;&gt; 4) &amp; 1;
+  this.empty = emptyValue == 1;
+&nbsp;
+  // Get the envelope contents indicator code (3-bit unsigned integer from
+  // bits 3, 2, and 1)
+  var envelopeIndicator = (flagsInt &gt;&gt; 1) &amp; 7;
+  if (envelopeIndicator &gt; 4) {
+      throw new Error('Unexpected GeoPackage Geometry flags. Envelope contents indicator must be between 0 and 4. Actual: ' + envelopeIndicator);
+  }
+&nbsp;
+  // Get the byte order from bit 0, 0 for Big Endian and 1 for Little Endian
+  var byteOrderValue = flagsInt &amp; 1;
+  this.byteOrder = byteOrderValue;
+  return envelopeIndicator;
+};
+&nbsp;
+GeometryData.prototype.readEnvelope = function (envelopeIndicator, buffer) {
+  var readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
+&nbsp;
+  var envelopeByteOffset = 8;
+  reads = 0;
+  var envelopeAndOffset = {
+    envelope: undefined,
+    offset: envelopeByteOffset
+  };
+&nbsp;
+  if (envelopeIndicator &lt;= 0) {
+    return envelopeAndOffset;
+  }
+  var envelope = {};
+  // Read x and y values and create envelope
+  envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.minY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  envelope.maxY = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+&nbsp;
+  envelope.hasZ = false;
+  var minZ = undefined;
+  var maxZ = undefined;
+&nbsp;
+  envelope.hasM = false;
+  var minM = undefined;
+  var maxM = undefined;
+&nbsp;
+  // Read z values
+  if (envelopeIndicator === 2 || envelopeIndicator === 4) {
+    envelope.hasZ = true;
+    envelope.minZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+    envelope.maxZ = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  }
+&nbsp;
+  // Read m values
+  if (envelopeIndicator === 3 || envelopeIndicator === 4) {
+    envelope.hasM = true;
+    envelope.minM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+    envelope.maxM = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
+  }
+  envelopeAndOffset.envelope = envelope;
+  envelopeAndOffset.offset = envelopeByteOffset + (8 * reads);
+  return envelopeAndOffset;
+};
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/matrix/index.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/matrix/</a> index.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>51/51</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/0</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>7/7</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>51/51</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">826×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">224×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * TileMatrix module.
+ * @module tiles/matrix
+ * @see module:dao/dao
+ */
+&nbsp;
+var Dao = require('../../dao/dao')
+  // , ContentsDao = require('../../core/contents').ContentsDao
+  , TileMatrixSetDao = require('../matrixset').TileMatrixSetDao;
+&nbsp;
+var util = require('util');
+&nbsp;
+/**
+ * Tile Matrix object. Documents the structure of the tile matrix at each zoom
+ * level in each tiles table. It allows GeoPackages to contain rectangular as
+ * well as square tiles (e.g. for better representation of polar regions). It
+ * allows tile pyramids with zoom levels that differ in resolution by factors of
+ * 2, irregular intervals, or regular intervals other than factors of 2.
+ * @class TileMatrix
+ */
+var TileMatrix = function() {
+&nbsp;
+  /**
+   * Tile Pyramid User Data Table Name
+   * @member {string}
+   */
+  this.table_name;
+&nbsp;
+  /**
+   * 0 ⇐ zoom_level ⇐ max_level for table_name
+   * @member {Number}
+   */
+  this.zoom_level;
+&nbsp;
+  /**
+   * Number of columns (&gt;= 1) in tile matrix at this zoom level
+   * @member {Number}
+   */
+  this.matrix_width;
+&nbsp;
+  /**
+   * Number of rows (&gt;= 1) in tile matrix at this zoom level
+   * @member {Number}
+   */
+  this.matrix_height;
+&nbsp;
+  /**
+   * Tile width in pixels (&gt;= 1)for this zoom level
+   * @member {Number}
+   */
+  this.tile_width;
+&nbsp;
+  /**
+   * Tile height in pixels (&gt;= 1)for this zoom level
+   * @member {Number}
+   */
+  this.tile_height;
+&nbsp;
+  /**
+   * In t_table_name srid units or default meters for srid 0 (&gt;0)
+   * @member {Number}
+   */
+  this.pixel_x_size;
+&nbsp;
+  /**
+   * In t_table_name srid units or default meters for srid 0 (&gt;0)
+   * @member {Number}
+   */
+  this.pixel_y_size;
+};
+&nbsp;
+/**
+ * Tile Matrix Set Data Access Object
+ * @class TileMatrixSetDao
+ * @extends {module:dao/dao~Dao}
+ */
+var TileMatrixDao = function(connection) {
+  Dao.call(this, connection);
+}
+&nbsp;
+util.inherits(TileMatrixDao, Dao);
+&nbsp;
+TileMatrixDao.prototype.createObject = function () {
+  return new TileMatrix();
+};
+&nbsp;
+/**
+ * get the Contents of the Tile matrix
+ * @param  {tileMatrix} tileMatrix the tile matrix
+ * @param  {Function} callback returns the contents
+ */
+TileMatrixDao.prototype.getContents = function (tileMatrix, callback) {
+  var dao = this.getContentsDao();
+  return dao.queryForIdObject(tileMatrix.table_name, callback);
+};
+&nbsp;
+TileMatrixDao.prototype.getContentsDao = function () {
+  var ContentsDao = require('../../core/contents').ContentsDao;
+&nbsp;
+  return new ContentsDao(this.connection);
+};
+&nbsp;
+TileMatrixDao.prototype.getTileMatrixSet = function (tileMatrix, callback) {
+  var dao = this.getTileMatrixSetDao();
+  return dao.queryForIdObject(tileMatrix.table_name, callback);
+};
+&nbsp;
+TileMatrixDao.prototype.getTileMatrixSetDao = function () {
+  return new TileMatrixSetDao(this.connection);
+};
+&nbsp;
+TileMatrixDao.TABLE_NAME = "gpkg_tile_matrix";
+TileMatrixDao.COLUMN_PK1 = "table_name";
+TileMatrixDao.COLUMN_PK2 = "zoom_level";
+TileMatrixDao.COLUMN_TABLE_NAME = "table_name";
+TileMatrixDao.COLUMN_ZOOM_LEVEL = "zoom_level";
+TileMatrixDao.COLUMN_MATRIX_WIDTH = "matrix_width";
+TileMatrixDao.COLUMN_MATRIX_HEIGHT = "matrix_height";
+TileMatrixDao.COLUMN_TILE_WIDTH = "tile_width";
+TileMatrixDao.COLUMN_TILE_HEIGHT = "tile_height";
+TileMatrixDao.COLUMN_PIXEL_X_SIZE = "pixel_x_size";
+TileMatrixDao.COLUMN_PIXEL_Y_SIZE = "pixel_y_size";
+&nbsp;
+TileMatrix.TABLE_NAME = 'tableName';
+TileMatrix.ZOOM_LEVEL = 'zoomLevel';
+TileMatrix.MATRIX_WIDTH = 'matrixWidth';
+TileMatrix.MATRIX_HEIGHT = 'matrixHeight';
+TileMatrix.TILE_WIDTH = 'tileWidth';
+TileMatrix.TILE_HEIGHT = 'tileHeight';
+TileMatrix.PIXEL_X_SIZE = 'pixelXSize';
+TileMatrix.PIXEL_Y_SIZE = 'pixelYSize';
+&nbsp;
+&nbsp;
+TileMatrixDao.prototype.gpkgTableName = 'gpkg_tile_matrix';
+TileMatrixDao.prototype.idColumns = [TileMatrixDao.COLUMN_PK1, TileMatrixDao.COLUMN_PK2];
+TileMatrixDao.prototype.columns = [TileMatrixDao.COLUMN_TABLE_NAME, TileMatrixDao.COLUMN_ZOOM_LEVEL, TileMatrixDao.COLUMN_MATRIX_WIDTH, TileMatrixDao.COLUMN_MATRIX_HEIGHT, TileMatrixDao.COLUMN_TILE_WIDTH, TileMatrixDao.COLUMN_TILE_HEIGHT, TileMatrixDao.COLUMN_PIXEL_X_SIZE, TileMatrixDao.COLUMN_PIXEL_Y_SIZE];
+&nbsp;
+module.exports.TileMatrixDao = TileMatrixDao;
+module.exports.TileMatrix = TileMatrix;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

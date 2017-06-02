@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/db/geoPackageConnection.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/db/</a> geoPackageConnection.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.02% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>80/86</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">71.88% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>23/32</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.59% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>25/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">95.18% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>79/83</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-yes">151×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">137×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">62×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1413×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">410×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">730×</span>
+<span class="cline-any cline-yes">265×</span>
+<span class="cline-any cline-yes">265×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">730×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">238×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">238×</span>
+<span class="cline-any cline-yes">238×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1113×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">18×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">150×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var GeoPackageConstants = require('../geoPackageConstants');
+&nbsp;
+var GeoPackageConnection = function(filePath, callback) {
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (typeof(process) !== 'undefined' &amp;&amp; process.version) {
+    this.adapterCreator = require('./sqliteAdapter');
+  } else {
+<span class="cstat-no" title="statement not covered" >    this.adapterCreator = require('./sqljsAdapter');</span>
+  }
+&nbsp;
+  this.adapterCreator.createAdapter(filePath, function(err, adapter) {
+    this.adapter = adapter;
+    callback(err, this);
+  }.bind(this));
+}
+&nbsp;
+GeoPackageConnection.prototype.close = function() {
+  this.adapter.close();
+}
+&nbsp;
+GeoPackageConnection.prototype.export = <span class="fstat-no" title="function not covered" >function(callback) {</span>
+<span class="cstat-no" title="statement not covered" >  this.adapter.export(callback);</span>
+}
+&nbsp;
+GeoPackageConnection.prototype.getDBConnection = function () {
+  return this.adapter.db;
+};
+&nbsp;
+GeoPackageConnection.prototype.setDBConnection = function (db) {
+  this.adapter = this.adapterCreator.createAdapterFromDb(db);
+};
+&nbsp;
+GeoPackageConnection.prototype.get = function (sql, params, callback) {
+  this.adapter.get(sql, params, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.prepare = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >  this.adapter.prepare(arguments);</span>
+};
+&nbsp;
+GeoPackageConnection.prototype.run = function () {
+  this.adapter.run.apply(this.adapter, arguments);
+};
+&nbsp;
+GeoPackageConnection.prototype.all = function (sql, params, callback) {
+  if (typeof params === 'function') {
+    callback = params;
+    params = [];
+  }
+  this.adapter.all(sql, params, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.each = function (sql, params, eachCallback, doneCallback) {
+  if (typeof params === 'function') {
+    doneCallback = eachCallback;
+    eachCallback = params;
+    params = [];
+  }
+  if (!doneCallback) doneCallback = function(){};
+  this.adapter.each(sql, params, eachCallback, doneCallback);
+};
+&nbsp;
+GeoPackageConnection.prototype.minOfColumn = function(table, column, where, whereArgs, callback) {
+  var minStatement = 'select min('+column+') as min from ' + table;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if(where) {
+    minStatement += ' ';
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    minStatement += where;
+  }
+  this.adapter.get(minStatement, whereArgs, function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err || !result) <span class="cstat-no" title="statement not covered" >return callback(err);</span>
+    callback(err, result.min);
+  });
+};
+&nbsp;
+GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, whereArgs, callback) {
+  var maxStatement = 'select max('+column+') as max from ' + table;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if(where) {
+    maxStatement += ' ';
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    maxStatement += where;
+  }
+  this.adapter.get(maxStatement, whereArgs, function(err, result) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err || !result) <span class="cstat-no" title="statement not covered" >return callback(err);</span>
+    callback(err, result.max);
+  });
+};
+&nbsp;
+GeoPackageConnection.prototype.count = function(table, callback) {
+  this.adapter.count(table, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.insert = function (sql, params, callback) {
+  this.adapter.insert(sql, params, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs, callback) {
+  var deleteStatement = 'DELETE FROM ' + tableName + '';
+&nbsp;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (where) {
+    deleteStatement += ' WHERE ' + where;
+  }
+&nbsp;
+  this.adapter.delete(deleteStatement, whereArgs, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.dropTable = function(tableName, callback) {
+  this.adapter.dropTable(tableName, callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.tableExists = function(tableName, callback) {
+  this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName], callback);
+};
+&nbsp;
+GeoPackageConnection.prototype.setApplicationId = function(callback) {
+  var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
+  var applicationId = buff.readUInt32BE(0);
+  this.adapter.run('PRAGMA application_id = ' + applicationId, callback);
+}
+&nbsp;
+GeoPackageConnection.prototype.getApplicationId = function(callback) {
+  this.adapter.get('PRAGMA application_id', function(err, results) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (err || !results) {
+<span class="cstat-no" title="statement not covered" >      return callback(err);</span>
+    }
+    callback(err, results.application_id);
+  });
+}
+&nbsp;
+module.exports = GeoPackageConnection;
+&nbsp;
+GeoPackageConnection.connect = function(filePath, callback) {
+  new GeoPackageConnection(filePath, callback);
+}
+&nbsp;
+GeoPackageConnection.connectWithDatabase = function(db, callback) {
+  new GeoPackageConnection(undefined, function(err, connection) {
+    connection.setDBConnection(db);
+    callback(err, connection);
+  });
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

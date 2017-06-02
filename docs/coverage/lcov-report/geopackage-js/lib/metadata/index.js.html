@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/metadata/index.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/metadata/</a> index.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.41% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>62/63</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>19/19</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/4</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.41% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>62/63</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Metadata module.
+ * @module metadata
+ * @see module:dao/dao
+ */
+&nbsp;
+var Dao = require('../dao/dao');
+&nbsp;
+var util = require('util');
+&nbsp;
+/**
+ * Contains metadata in MIME encodings structured in accordance with any
+ * authoritative metadata specification
+ * @class Metadata
+ */
+var Metadata = function() {
+&nbsp;
+  /**
+   * Metadata primary key
+   * @member {Number}
+   */
+  this.id;
+&nbsp;
+  /**
+   * Case sensitive name of the data scope to which this metadata applies; see Metadata Scopes below
+   * @member {string}
+   */
+  this.md_scope;
+&nbsp;
+  /**
+   * URI reference to the metadata structure definition authority
+   * @member {string}
+   */
+  this.md_standard_uri;
+&nbsp;
+  /**
+   * MIME encoding of metadata
+   * @member {string}
+   */
+  this.mime_type;
+&nbsp;
+  /**
+   * metadata
+   * @member {string}
+   */
+  this.metadata;
+}
+&nbsp;
+Metadata.UNDEFINED = "undefined";
+Metadata.FIELD_SESSION = "fieldSession";
+Metadata.COLLECTION_SESSION = "collectionSession";
+Metadata.SERIES = "series";
+Metadata.DATASET = "dataset";
+Metadata.FEATURE_TYPE = "featureType";
+Metadata.FEATURE = "feature";
+Metadata.ATTRIBUTE_TYPE = "attributeType";
+Metadata.ATTRIBUTE = "attribute";
+Metadata.TILE = "tile";
+Metadata.MODEL = "model";
+Metadata.CATALOG = "catalog";
+Metadata.SCHEMA = "schema";
+Metadata.TAXONOMY = "taxonomy";
+Metadata.SOFTWARE = "software";
+Metadata.SERVICE = "service";
+Metadata.COLLECTION_HARDWARE = "collectionHardware";
+Metadata.NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
+Metadata.DIMENSION_GROUP = "dimensionGroup";
+&nbsp;
+Metadata.prototype.getScopeInformation = function(type) {
+  switch(type) {
+    case Metadata.UNDEFINED:
+      return {
+        name: Metadata.UNDEFINED,
+        code: 'NA',
+        definition: 'Metadata information scope is undefined'
+      };
+    case Metadata.FIELD_SESSION:
+      return {
+        name: Metadata.FIELD_SESSION,
+        code: '012',
+        definition: 'Information applies to the field session'
+      };
+    case Metadata.COLLECTION_SESSION:
+      return {
+        name: Metadata.COLLECTION_SESSION,
+        code: '004',
+        definition: 'Information applies to the collection session'
+      };
+    case Metadata.SERIES:
+      return {
+        name: Metadata.SERIES,
+        code: '006',
+        definition: 'Information applies to the (dataset) series'
+      };
+    case Metadata.DATASET:
+      return {
+        name: Metadata.DATASET,
+        code: '005',
+        definition: 'Information applies to the (geographic feature) dataset'
+      };
+    case Metadata.FEATURE_TYPE:
+      return {
+        name: Metadata.FEATURE_TYPE,
+        code: '010',
+        definition: 'Information applies to a feature type (class)'
+      };
+    case Metadata.FEATURE:
+      return {
+        name: Metadata.FEATURE,
+        code: '009',
+        definition: 'Information applies to a feature (instance)'
+      };
+    case Metadata.ATTRIBUTE_TYPE:
+      return {
+        name: Metadata.ATTRIBUTE_TYPE,
+        code: '002',
+        definition: 'Information applies to the attribute class'
+      };
+    case Metadata.ATTRIBUTE:
+      return {
+        name: Metadata.ATTRIBUTE,
+        code: '001',
+        definition: 'Information applies to the characteristic of a feature (instance)'
+      };
+    case Metadata.TILE:
+      return {
+        name: Metadata.TILE,
+        code: '016',
+        definition: 'Information applies to a tile, a spatial subset of geographic data'
+      };
+    case Metadata.MODEL:
+      return {
+        name: Metadata.MODEL,
+        code: '015',
+        definition: 'Information applies to a copy or imitation of an existing or hypothetical object'
+      };
+    case Metadata.CATALOG:
+      return {
+        name: Metadata.CATALOG,
+        code: 'NA',
+        definition: 'Metadata applies to a feature catalog'
+      };
+    case Metadata.SCHEMA:
+      return {
+        name: Metadata.SCHEMA,
+        code: 'NA',
+        definition: 'Metadata applies to an application schema'
+      };
+    case Metadata.TAXONOMY:
+      return {
+        name: Metadata.TAXONOMY,
+        code: 'NA',
+        definition: 'Metadata applies to a taxonomy or knowledge system'
+      };
+    case Metadata.SOFTWARE:
+      return {
+        name: Metadata.SOFTWARE,
+        code: '013',
+        definition: 'Information applies to a computer program or routine'
+      };
+    case Metadata.SERVICE:
+      return {
+        name: Metadata.SERVICE,
+        code: '014',
+        definition: 'Information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case'
+      };
+    case Metadata.COLLECTION_HARDWARE:
+      return {
+        name: Metadata.COLLECTION_HARDWARE,
+        code: '003',
+        definition: 'Information applies to the collection hardware class'
+      };
+    case Metadata.NON_GEOGRAPHIC_DATASET:
+      return {
+        name: Metadata.NON_GEOGRAPHIC_DATASET,
+        code: '007',
+        definition: 'Information applies to non-geographic data'
+      };
+    case Metadata.DIMENSION_GROUP:
+      return {
+        name: Metadata.DIMENSION_GROUP,
+        code: '008',
+        definition: 'Information applies to a dimension group'
+      };
+  }
+}
+&nbsp;
+/**
+ * Metadata Data Access Object
+ * @class
+ * @extends {module:dao/dao~Dao}
+ */
+var MetadataDao = function(connection) {
+  Dao.call(this, connection);
+};
+&nbsp;
+util.inherits(MetadataDao, Dao);
+&nbsp;
+MetadataDao.prototype.createObject = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >  return new Metadata();</span>
+};
+&nbsp;
+MetadataDao.TABLE_NAME = "gpkg_metadata";
+MetadataDao.COLUMN_ID = "id";
+MetadataDao.COLUMN_MD_SCOPE = "md_scope";
+MetadataDao.COLUMN_MD_STANDARD_URI = "md_standard_uri";
+MetadataDao.COLUMN_MIME_TYPE = "mime_type";
+MetadataDao.COLUMN_METADATA = "metadata";
+&nbsp;
+MetadataDao.prototype.gpkgTableName = MetadataDao.TABLE_NAME;
+MetadataDao.prototype.idColumns = [MetadataDao.COLUMN_ID];
+&nbsp;
+module.exports.MetadataDao = MetadataDao;
+module.exports.Metadata = Metadata;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

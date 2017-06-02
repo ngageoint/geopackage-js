@@ -50,6 +50,7 @@
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
+    "lcov-badge": "^1.0.4",
     "mocha": "^3.0.2",
     "uglify-js": "mishoo/UglifyJS2.git#harmony",
     "watchify": "^3.7.0",
@@ -74,8 +75,8 @@
     "sqlite3": false
   },
   "scripts": {
-    "test": "mocha",
-    "coverage": "istanbul cover  _mocha",
+    "test": "istanbul cover  _mocha",
+    "posttest": "lcov-badge -o coverage.svg ./docs/coverage/lcov.info",
     "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
     "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
     "browser-test": "./test/cli",

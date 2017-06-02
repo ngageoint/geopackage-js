@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/creator/tileUtilities.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/creator/</a> tileUtilities.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">9.52% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>4/42</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/22</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/5</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">9.52% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>4/42</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var proj4 = require('proj4');
+&nbsp;
+module.exports.getPiecePosition = <span class="fstat-no" title="function not covered" >function(tilePieceBoundingBox, tileBoundingBox, height, width, projectionTo, projectionFrom, projectionFromDefinition, tileHeightUnitsPerPixel, tileWidthUnitsPerPixel, pixelXSize, pixelYSize) {</span>
+<span class="cstat-no" title="statement not covered" >  var conversion;</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    conversion = proj4(projectionTo, projectionFrom);</span>
+  } catch (e) {}
+<span class="cstat-no" title="statement not covered" >  if (!conversion) {</span>
+<span class="cstat-no" title="statement not covered" >    conversion = proj4(projectionTo, projectionFromDefinition);</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var maxLatitude = tilePieceBoundingBox.maxLatitude;</span>
+<span class="cstat-no" title="statement not covered" >  var minLatitude = tilePieceBoundingBox.minLatitude;</span>
+<span class="cstat-no" title="statement not covered" >  var minLongitude = tilePieceBoundingBox.minLongitude - pixelXSize;</span>
+<span class="cstat-no" title="statement not covered" >  var maxLongitude = tilePieceBoundingBox.maxLongitude + pixelXSize;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  if (projectionTo.toUpperCase() === 'EPSG:3857' &amp;&amp; projectionFrom.toUpperCase() === 'EPSG:4326') {</span>
+<span class="cstat-no" title="statement not covered" >    maxLatitude = maxLatitude &gt; 85.0511 ? 85.0511 : maxLatitude;</span>
+<span class="cstat-no" title="statement not covered" >    minLatitude = minLatitude &lt; -85.0511 ? -85.0511 : minLatitude;</span>
+<span class="cstat-no" title="statement not covered" >    minLongitude = minLongitude &lt; -180.0 ? -180.0 : minLongitude;</span>
+<span class="cstat-no" title="statement not covered" >    maxLongitude = maxLongitude &gt; 180.0 ? 180.0 : maxLongitude;</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var pieceBoundingBoxInTileProjectionSW = conversion.inverse([minLongitude, minLatitude]);</span>
+<span class="cstat-no" title="statement not covered" >  var pieceBoundingBoxInTileProjectionNE = conversion.inverse([maxLongitude, maxLatitude]);</span>
+<span class="cstat-no" title="statement not covered" >  var pieceBBProjected = {</span>
+    minLatitude: isNaN(pieceBoundingBoxInTileProjectionSW[1]) ? tileBoundingBox.minLatitude : pieceBoundingBoxInTileProjectionSW[1],
+    maxLatitude: isNaN(pieceBoundingBoxInTileProjectionNE[1]) ? tileBoundingBox.maxLatitude : pieceBoundingBoxInTileProjectionNE[1],
+    minLongitude: pieceBoundingBoxInTileProjectionSW[0],
+    maxLongitude: pieceBoundingBoxInTileProjectionNE[0]
+  };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var startY = y = Math.max(0, Math.floor((tileBoundingBox.maxLatitude - pieceBBProjected.maxLatitude) / tileHeightUnitsPerPixel));</span>
+<span class="cstat-no" title="statement not covered" >  var startX = x = Math.max(0, Math.floor((pieceBBProjected.minLongitude - tileBoundingBox.minLongitude) / tileWidthUnitsPerPixel));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var endY = Math.min(height, height - Math.floor((pieceBBProjected.minLatitude - tileBoundingBox.minLatitude) / tileHeightUnitsPerPixel));</span>
+<span class="cstat-no" title="statement not covered" >  var endX = Math.min(width, width - Math.floor((tileBoundingBox.maxLongitude - pieceBBProjected.maxLongitude) / tileWidthUnitsPerPixel));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return {</span>
+    startY: startY,
+    startX: startX,
+    endY: endY,
+    endX: endX
+  };
+}
+&nbsp;
+module.exports.createPNG = <span class="fstat-no" title="function not covered" >function(width, height, redArray, greenArray, blueArray, alphaOrArray, finalWidth, finalHeight, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  if (typeof(process) !== 'undefined' &amp;&amp; process.version) {</span>
+<span class="cstat-no" title="statement not covered" >    createPNGLwip(width, height, redArray, greenArray, blueArray, alphaOrArray, finalWidth, finalHeight, callback);</span>
+  } else {
+  }
+}
+&nbsp;
+<span class="fstat-no" title="function not covered" >function createPNGLwip(width, height, redArray, greenArray, blueArray, alphaOrArray, finalWidth, finalHeight, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var lwip = require('lwip');</span>
+<span class="cstat-no" title="statement not covered" >  var r = [];</span>
+<span class="cstat-no" title="statement not covered" >  var g = [];</span>
+<span class="cstat-no" title="statement not covered" >  var b = [];</span>
+<span class="cstat-no" title="statement not covered" >  var buff = new Buffer(width * height * 3);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var length = redArray.length;</span>
+<span class="cstat-no" title="statement not covered" >  for (var i = 0; i &lt; length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >    r.push(redArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    g.push(greenArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    b.push(blueArray[i]);</span>
+  }
+<span class="cstat-no" title="statement not covered" >  var buff = new Buffer(r.concat(g, b));</span>
+<span class="cstat-no" title="statement not covered" >  lwip.open(buff, {width: width, height: height}, <span class="fstat-no" title="function not covered" >function(err, image) {</span></span>
+<span class="cstat-no" title="statement not covered" >    image.resize(finalWidth, finalHeight, <span class="fstat-no" title="function not covered" >function(err, image) {</span></span>
+<span class="cstat-no" title="statement not covered" >      image.toBuffer('png', {</span>
+        transparency: true
+      }, callback);
+    });
+  });
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>
