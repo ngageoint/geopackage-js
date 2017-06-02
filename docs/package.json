@@ -1,7 +1,7 @@
 {
   "name": "geopackage-browserify-demo",
   "dependencies": {
-    "@ngageoint/geopackage": "^1.0.16",
+    "@ngageoint/geopackage": "^1.0.17",
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
     "geojson-to-geopackage": "../converters/geojson",
