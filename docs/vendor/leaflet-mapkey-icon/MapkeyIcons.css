@@ -1,0 +1,185 @@
+/**********************************
+***********************************
+   MapkeyIcons - css style
+   license: CC0 1.0 Universal
+   author: Filip Zavadil, www.mapshakers.com, 2015
+   version: 1.0.0
+***********************************
+***********************************/
+
+@font-face {
+    font-family: 'MapkeyIcons';
+    src: url("MapkeyIcons.eot"); /* IE9 */
+    src: url("MapkeyIcons.eot?#iefix") format('embedded-opentype'), /* IE6-8 */
+    url('MapkeyIcons.woff') format('woff'),
+    url('MapkeyIcons.ttf') format('truetype'),
+    url('MapkeyIcons.svg#MapkeyIcons') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.mki,.mki-medium,.mki-intext,.mki-short,.mki-tall,.mki-grande,.mki-venti  {
+    font-family: 'MapkeyIcons', sans-serif;
+    display: inline-block;
+    font-weight: normal;
+    text-decoration: none;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+.mki-intext { font-size: 1.2em; }
+
+.mki-short { font-size: small; }
+.mki-tall { font-size: large; }
+.mki-grande { font-size: 32px; }
+.mki-venti { font-size: 64px; }
+
+
+.mki-mapshakers:before { content: '\e000';}
+.mki-mapkey:before { content: '\e001';}
+.mki-bar:before { content: '\e003';}
+.mki-traffic_signal:before { content: '\e004';}
+.mki-playground_alt:before { content: '\e005';}
+.mki-dentist:before { content: '\e006';}
+.mki-fishing:before { content: '\e007';}
+.mki-wind_generator:before { content: '\e008';}
+.mki-crucifix:before { content: '\e009';}
+.mki-cave_entrance:before { content: '\e00a';}
+.mki-castle_defensive:before { content: '\e00b';}
+.mki-cinema:before { content: '\e00c';}
+.mki-water_tower:before { content: '\e00d';}
+.mki-boundary_stone:before { content: '\e00e';}
+.mki-zoo:before { content: '\e00f';}
+.mki-cinema_alt:before { content: '\e010';}
+.mki-court_house:before { content: '\e011';}
+.mki-fort:before { content: '\e012';}
+.mki-fountain:before { content: '\e013';}
+.mki-library:before { content: '\e014';}
+.mki-rocks:before { content: '\e015';}
+.mki-cemetery:before { content: '\e016';}
+.mki-pub:before { content: '\e017';}
+.mki-buddhism:before { content: '\e018';}
+.mki-triangle:before { content: '\e019';}
+.mki-police:before { content: '\e01a';}
+.mki-ice_ring:before { content: '\e01b';}
+.mki-marina:before { content: '\e01c';}
+.mki-playground:before { content: '\e01d';}
+.mki-ruins:before { content: '\e01e';}
+.mki-internet:before { content: '\e01f';}
+.mki-airport:before { content: '\e020';}
+.mki-chapel:before { content: '\e021';}
+.mki-museum:before { content: '\e022';}
+.mki-monument:before { content: '\e023';}
+.mki-sport_centre:before { content: '\e024';}
+.mki-information:before { content: '\e025';}
+.mki-hospital:before { content: '\e026';}
+.mki-golf:before { content: '\e027';}
+.mki-picnic_site:before { content: '\e028';}
+.mki-drag_lift:before { content: '\e029';}
+.mki-construction:before { content: '\e02a';}
+.mki-islamism:before { content: '\e02b';}
+.mki-vineyard:before { content: '\e02c';}
+.mki-lighthouse:before { content: '\e02d';}
+.mki-tower:before { content: '\e02e';}
+.mki-wayside_cross:before { content: '\e02f';}
+.mki-theatre:before { content: '\e030';}
+.mki-train:before { content: '\e031';}
+.mki-viewpoint:before { content: '\e032';}
+.mki-tram:before { content: '\e033';}
+.mki-tree_cinofer:before { content: '\e034';}
+.mki-university:before { content: '\e035';}
+.mki-tram_stop:before { content: '\e036';}
+.mki-underground:before { content: '\e037';}
+.mki-adit:before { content: '\e038';}
+.mki-post_office:before { content: '\e039';}
+.mki-spring:before { content: '\e03a';}
+.mki-stadium:before { content: '\e03b';}
+.mki-swimming_pool:before { content: '\e03c';}
+.mki-cityhall:before { content: '\e03d';}
+.mki-bus:before { content: '\e03e';}
+.mki-volcano:before { content: '\e03f';}
+.mki-architecture:before { content: '\e040';}
+.mki-arrow_up:before { content: '\e041';}
+.mki-archaeological:before { content: '\e042';}
+.mki-arrow_up_double:before { content: '\e043';}
+.mki-building:before { content: '\e044';}
+.mki-toilet:before { content: '\e045';}
+.mki-watermill:before { content: '\e046';}
+.mki-pharmacy:before { content: '\e047';}
+.mki-waterpark:before { content: '\e048';}
+.mki-viewtower:before { content: '\e049';}
+.mki-city:before { content: '\e04a';}
+.mki-battlefield:before { content: '\e04b';}
+.mki-clean:before { content: '\e04c';}
+.mki-judaism:before { content: '\e04d';}
+.mki-christianism:before { content: '\e04e';}
+.mki-crown:before { content: '\e04f';}
+.mki-restaurant:before { content: '\e050';}
+.mki-windmill:before { content: '\e051';}
+.mki-caravan_site:before { content: '\e052';}
+.mki-castle:before { content: '\e053';}
+.mki-camp_site:before { content: '\e054';}
+.mki-cable_car:before { content: '\e055';}
+.mki-bus_stop:before { content: '\e056';}
+.mki-bicycle:before { content: '\e057';}
+.mki-drop:before { content: '\e058';}
+.mki-beach:before { content: '\e059';}
+.mki-water_well:before { content: '\e05a';}
+.mki-tree_leaf:before { content: '\e05b';}
+.mki-bag:before { content: '\e05c';}
+.mki-barracks:before { content: '\e05d';}
+.mki-laptop:before { content: '\e05e';}
+.mki-waterwork:before { content: '\e05f';}
+.mki-mountain:before { content: '\e060';}
+.mki-home:before { content: '\e061';}
+.mki-hostel:before { content: '\e062';}
+.mki-hotel:before { content: '\e063';}
+.mki-hotel_alt:before { content: '\e064';}
+.mki-mall:before { content: '\e065';}
+.mki-market_place:before { content: '\e066';}
+.mki-cartography:before { content: '\e067';}
+.mki-pitch:before { content: '\e068';}
+.mki-shelter:before { content: '\e069';}
+.mki-saddle:before { content: '\e06a';}
+.mki-sinkhole:before { content: '\e06b';}
+.mki-supermarket:before { content: '\e06c';}
+.mki-telephone:before { content: '\e06d';}
+.mki-stupa:before { content: '\e06e';}
+.mki-magnifier:before { content: '\e06f';}
+.mki-flag:before { content: '\e070';}
+.mki-eye:before { content: '\e071';}
+.mki-gallery:before { content: '\e072';}
+.mki-gear:before { content: '\e073';}
+.mki-map:before { content: '\e074';}
+.mki-island:before { content: '\e075';}
+.mki-marker:before { content: '\e076';}
+.mki-nature:before { content: '\e077';}
+.mki-square:before { content: '\e078';}
+.mki-ticket:before { content: '\e079';}
+.mki-star:before { content: '\e07a';}
+.mki-town:before { content: '\e07b';}
+.mki-village:before { content: '\e07c';}
+.mki-unesco:before { content: '\e07d';}
+.mki-facebook:before { content: '\e07e';}
+.mki-github:before { content: '\e07f';}
+.mki-linkedin:before { content: '\e080';}
+.mki-skype:before { content: '\e081';}
+.mki-data:before { content: '\e082';}
+.mki-database:before { content: '\e083';}
+.mki-analyse:before { content: '\e084';}
+.mki-atm:before { content: '\e085';}
+.mki-avatar:before { content: '\e086';}
+.mki-burger:before { content: '\e087';}
+.mki-cash:before { content: '\e088';}
+.mki-contour:before { content: '\e089';}
+.mki-download:before { content: '\e08a';}
+.mki-upload:before { content: '\e08b';}
+.mki-heart:before { content: '\e08c';}
+.mki-invisible:before { content: '\e08d';}
+.mki-school:before { content: '\e08e';}
+.mki-mine:before { content: '\e08f';}
+.mki-smartphone:before { content: '\e090';}

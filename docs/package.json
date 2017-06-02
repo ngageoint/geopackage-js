@@ -3,7 +3,6 @@
   "dependencies": {
     "@ngageoint/geopackage": "^1.0.18",
     "async": "^2.0.0-rc.5",
-    "beautifymarker": "^1.0.5",
     "file-type": "^3.8.0",
     "geojson-to-geopackage": "../converters/geojson",
     "jquery": "^2.2.3",
@@ -23,6 +22,7 @@
   "scripts": {
     "create": "npm install --no-optional",
     "postinstall": "npm run build",
+    "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
     "build": "browserify -t browserify-css index.js --standalone gp -o gp.js"
   }
 }

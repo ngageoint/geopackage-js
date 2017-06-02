@@ -1,2 +1,2 @@
 @import url("node_modules/leaflet/dist/leaflet.css");
-@import url("node_modules/leaflet-mapkey-icon/dist/L.Icon.Mapkey.css");
+@import url("vendor/leaflet-mapkey-icon/L.Icon.Mapkey.css");
