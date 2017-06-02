@@ -6,7 +6,7 @@ var path = require('path')
 
 describe('GeoJSON to GeoPackage tests', function() {
 
-  it('should convert the natural earth 110m file', function(done) {
+  it.only('should convert the natural earth 110m file', function(done) {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
@@ -29,7 +29,7 @@ describe('GeoJSON to GeoPackage tests', function() {
     });
   });
 
-  it.only('should convert the a geojson object with an id property', function(done) {
+  it('should convert the a geojson object with an id property', function(done) {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg'));
     } catch (e) {}

@@ -24,7 +24,8 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/geopackage": "^1.0.16"
+    "@ngageoint/geopackage": "^1.0.16",
+    "@turf/bbox": "^4.3.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -377,18 +377,8 @@ window.toggleLayer = function(layerType, table) {
       eventLabel: 'Feature Layer'
     });
     var geojsonLayer = L.geoJson([], {
-        style: function (feature) {
-          return {
-            color: "#00F",
-            weight: 2,
-            opacity: 1
-          };
-        },
-        pointToLayer: function(feature, latlng) {
-          return L.circleMarker(latlng, {
-            radius: 2
-          });
-        },
+        style: featureStyle,
+        pointToLayer: pointToLayer,
         onEachFeature: function (feature, layer) {
           var string = "";
           for (var key in feature.properties) {
@@ -416,6 +406,55 @@ window.toggleLayer = function(layerType, table) {
       tableLayers[table] = geojsonLayer;
     });
   }
+}
+
+function pointToLayer(feature, latlng) {
+  // just key off of marker-symbol, otherwise create a circle marker
+  if (feature.properties.hasOwnProperty('marker-symbol')) {
+    return L.marker(latlng, {
+      icon: L.icon.mapkey(pointStyle(feature))
+    });
+  }
+  return L.circleMarker(latlng, pointStyle(feature));
+}
+
+function pointStyle(feature) {
+  var radius = 2;
+  var size = 26;
+  if (feature.properties['marker-size']) {
+    switch(feature.properties['marker-size']) {
+      case 'small':
+        radius = 2;
+        size = 26;
+        break;
+      case 'medium':
+        radius = 4;
+        size = 32;
+        break;
+      case 'large':
+        radius = 6;
+        size = 38;
+        break;
+    }
+  }
+  return {
+    icon: feature.properties['marker-symbol'] && feature.properties['marker-symbol'] !== "" ? feature.properties['marker-symbol'] : feature.properties['type'],
+    background: feature.properties['marker-color'] || "#00F",
+    weight: feature.properties['stroke-width'] ? Number(feature.properties['stroke-width']) : 2,
+    opacity: feature.properties['stroke-opacity'] ? Number(feature.properties['stroke-opacity']) : 1,
+    size: size,
+    radius: radius
+  };
+}
+
+function featureStyle(feature) {
+  return {
+    weight: feature.properties['stroke-width'] ? Number(feature.properties['stroke-width']) : 2,
+    opacity: feature.properties['stroke-opacity'] ? Number(feature.properties['stroke-opacity']) : 1,
+    fillColor: feature.properties['fill'] || "#00F",
+    fillOpacity: feature.properties['fill-opacity'] ? Number(feature.properties['fill-opacity']) : .2,
+    color: feature.properties['stroke'] || '#00F'
+  };
 }
 
 window.loadUrl = function(url, loadingElement, gpName) {

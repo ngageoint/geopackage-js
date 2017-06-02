@@ -1,12 +1,14 @@
 {
   "name": "geopackage-browserify-demo",
   "dependencies": {
-    "@ngageoint/geopackage": "^1.0.17",
+    "@ngageoint/geopackage": "^1.0.18",
     "async": "^2.0.0-rc.5",
+    "beautifymarker": "^1.0.5",
     "file-type": "^3.8.0",
     "geojson-to-geopackage": "../converters/geojson",
     "jquery": "^2.2.3",
     "leaflet": "^1.0.2",
+    "leaflet-mapkey-icon": "github:mapshakers/leaflet-mapkey-icon",
     "mbtiles-to-geopackage": "../converters/mbtiles",
     "mustache": "^2.2.1",
     "proj4": "^2.3.17",

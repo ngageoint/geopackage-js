@@ -2,7 +2,8 @@ var GeoPackage = require('@ngageoint/geopackage');
 
 var fs = require('fs')
   , async = require('async')
-  , path = require('path');
+  , path = require('path')
+  , bbox = require('@turf/bbox');
 
 module.exports.addLayer = function(geoJson, geopackage, progressCallback, doneCallback) {
   setupConversion(geoJson, geopackage, progressCallback, doneCallback, true);
@@ -226,7 +227,9 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
       }
     }
     progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, callback);
+      var tmp = bbox(geoJson);
+      var boundingBox = new GeoPackage.BoundingBox(Math.max(-180, tmp[0]), Math.min(180, tmp[2]), Math.max(-90, tmp[1]), Math.min(90, tmp[3]));
+      GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, 4326, callback);
     });
   }, function(featureDao, callback) {
     var count = 0;
