@@ -1,6 +1,8 @@
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
+  , pureimage = require('pureimage')
+  , Duplex = require('stream').Duplex
   , TableCreator = require('../../lib/db/tableCreator')
   , GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
@@ -81,15 +83,22 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
 
 module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
-    fs.writeFileSync('/tmp/gptile.png', actualTile);
-    var imageDiff = require('image-diff');
-    imageDiff({
-      actualImage: '/tmp/gptile.png',
-      expectedImage: expectedTilePath,
-      diffImage: '/tmp/diff.png',
-    }, function (err, imagesAreSame) {
-      fs.unlinkSync('/tmp/gptile.png');
-      callback(err, imagesAreSame);
+
+    var chunkStream = new Duplex();
+    chunkStream.push(actualTile);
+    chunkStream.push(null);
+    pureimage.decodePNGFromStream(chunkStream).then(function(actualImage) {
+      pureimage.decodePNGFromStream(fs.createReadStream(expectedTilePath)).then(function(expectedImage) {
+        var same = true;
+        for (var x = 0; x < actualImage.width && same; x++) {
+          for (var y = 0; y < actualImage.height && same; y++) {
+            var actualRGBA = actualImage.getPixelRGBA(x,y);
+            var expectedRGBA = expectedImage.getPixelRGBA(x,y);
+            same = actualRGBA === expectedRGBA;
+          }
+        }
+        callback(null, same);
+      });
     });
   } else {
     var CanvasImageDiff = require('imagediff');
