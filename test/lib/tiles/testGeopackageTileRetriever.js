@@ -3,6 +3,7 @@ var GeoPackageManager = require('../../../lib/geoPackageManager')
   , GeoPackage = require('../../..')
   , BoundingBox = require('../../../lib/boundingBox')
   , testSetup = require('../../fixtures/testSetup')
+  , proj4 = require('proj4')
   , fs = require('fs')
   , async = require('async')
   , should = require('chai').should()
@@ -86,6 +87,18 @@ describe('GeoPackage Tile Retriever tests', function() {
         }, zoomDone);
       }, function(err) {
         done(err);
+      });
+    });
+
+    it('should get the x: 0, y: 0, z: 3 tile', function(done) {
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getTile(0,0,3, function(err, tile) {
+        // fs.writeFile('/tmp/300.png', tile, function() {
+        //   done(err);
+        // });
+        should.not.exist(err);
+        should.exist(tile);
+        done();
       });
     });
 
@@ -218,6 +231,14 @@ describe('GeoPackage Tile Retriever tests', function() {
   });
 
   describe('4326 tile tests', function() {
+
+    var defs = require('../../../lib/proj4Defs');
+    for (var name in defs) {
+      if (defs[name]) {
+        proj4.defs(name, defs[name]);
+      }
+    }
+
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
       GeoPackageManager.open(filename, function(err, gp) {
@@ -244,10 +265,10 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it.skip('should get the x: 0, y: 0, z: 4 tile', function(done) {
+    it('should get the x: 0, y: 4, z: 4 tile', function(done) {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.getTile(0, 0, 4, function(err, tile) {
+      gpr.getTile(0, 4, 4, function(err, tile) {
         var expectedPath;
         if (typeof(process) !== 'undefined' && process.version) {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png');

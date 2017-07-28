@@ -326,5 +326,4 @@ describe('TileBoundingBoxUtils tests', function() {
     }
   });
 
-
 });

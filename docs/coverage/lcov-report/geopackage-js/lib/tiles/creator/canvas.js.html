@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/creator/canvas.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/creator/</a> canvas.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">38.1% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>40/105</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">53.85% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>14/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">20% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">38.1% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>40/105</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">5177×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var util = require('util')
+  , async = require('async')
+  , fileType = require('file-type')
+  , work = require('webworkify')
+  , pureimage = require('pureimage');
+&nbsp;
+var TileCreator = require('./index').TileCreator
+  , TileBoundingBoxUtils = require('../tileBoundingBoxUtils')
+  , TileUtilities = require('./tileUtilities')
+  , ProjectTile = require('./projectTile.js');
+&nbsp;
+function CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo, canvas, callback) {
+  TileCreator.apply(this, arguments);
+&nbsp;
+  var isPhantom = !!(typeof window != 'undefined' &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >window.callPhantom </span>&amp;&amp; <span class="branch-2 cbranch-no" title="branch not covered" >window._phantom)</span>;
+  var isNode = typeof(process) !== 'undefined' &amp;&amp; process.version;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (isNode &amp;&amp; !isPhantom) {
+    this.canvas = canvas || pureimage.make(width, height);
+    this.ctx = this.canvas.getContext('2d');
+&nbsp;
+    this.image = pureimage.make(width, height);
+&nbsp;
+    this.tileCanvas = pureimage.make(width, height);
+    this.tileContext = this.tileCanvas.getContext('2d');
+&nbsp;
+    // var LwipTileCreator = require('./lwip');
+    // new LwipTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo, callback);
+  } else {
+<span class="cstat-no" title="statement not covered" >    this.canvas = canvas || document.createElement('canvas');</span>
+<span class="cstat-no" title="statement not covered" >    this.canvas.width  = width;</span>
+<span class="cstat-no" title="statement not covered" >    this.canvas.height = height;</span>
+<span class="cstat-no" title="statement not covered" >    this.ctx = this.canvas.getContext('2d');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.image = document.createElement('img');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    this.tileCanvas = document.createElement('canvas');</span>
+<span class="cstat-no" title="statement not covered" >    this.tileContext = this.tileCanvas.getContext('2d');</span>
+&nbsp;
+    // var CanvasTileCreator = require('./canvas');
+    // new CanvasTileCreator(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo, canvas, callback);
+  }
+  this.tileCanvas.width = tileMatrix.tile_width;
+  this.tileCanvas.height = tileMatrix.tile_height;
+&nbsp;
+  this.imageData = new Uint8ClampedArray(width * height * 4);
+  callback(null, this);
+}
+&nbsp;
+util.inherits(CanvasTileCreator, TileCreator);
+&nbsp;
+CanvasTileCreator.prototype.addPixel = <span class="fstat-no" title="function not covered" >function (targetX, targetY, sourceX, sourceY) {</span>
+<span class="cstat-no" title="statement not covered" >  var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);</span>
+<span class="cstat-no" title="statement not covered" >  this.imageData.set(color.data, (targetY * this.width * 4) + (targetX * 4));</span>
+};
+&nbsp;
+function binaryToAscii(binary) {
+  var isPhantom = !!(typeof window != 'undefined' &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >window.callPhantom </span>&amp;&amp; <span class="branch-2 cbranch-no" title="branch not covered" >window._phantom)</span>;
+  var isNode = typeof(process) !== 'undefined' &amp;&amp; process.version;
+  <span class="missing-if-branch" title="else path not taken" >E</span>if (isNode &amp;&amp; !isPhantom) {
+    return new Buffer(binary).toString('base64');
+  } else {
+<span class="cstat-no" title="statement not covered" >    return btoa( binary );</span>
+  }
+}
+&nbsp;
+CanvasTileCreator.prototype.addTile = function (tileData, gridColumn, gridRow, callback) {
+  var bb = TileBoundingBoxUtils.getTileBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
+&nbsp;
+  var type = fileType(tileData);
+  var binary = '';
+  var bytes = tileData;
+  var len = bytes.byteLength;
+  for (var i = 0; i &lt; len; i++) {
+    binary += String.fromCharCode( bytes[ i ] );
+  }
+  console.log('binary');
+  var base64Data = binaryToAscii( binary );
+  console.log('base64Data');
+  this.image.onload = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >    async.setImmediate(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >      this.tileContext.drawImage(this.image, 0, 0);</span>
+<span class="cstat-no" title="statement not covered" >      this.projectTile(tileData, gridColumn, gridRow, <span class="fstat-no" title="function not covered" >function(err, imageData) {</span></span>
+<span class="cstat-no" title="statement not covered" >        async.eachSeries(this.chunks, <span class="fstat-no" title="function not covered" >function(chunk, chunkDone) {</span></span>
+<span class="cstat-no" title="statement not covered" >          async.setImmediate(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >            var type = fileType(tileData);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            var binary = '';</span>
+<span class="cstat-no" title="statement not covered" >            var bytes = chunk.chunk;</span>
+<span class="cstat-no" title="statement not covered" >            var len = bytes.byteLength;</span>
+<span class="cstat-no" title="statement not covered" >            for (var i = 0; i &lt; len; i++) {</span>
+<span class="cstat-no" title="statement not covered" >              binary += String.fromCharCode( bytes[ i ] );</span>
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            var base64DataChunk = binaryToAscii( binary );</span>
+<span class="cstat-no" title="statement not covered" >            var image = document.createElement('img');</span>
+<span class="cstat-no" title="statement not covered" >            image.onload = <span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >              var p = chunk.position;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >              var xPositionOfImageToDrawFrom = p.tileCropXStart;</span>
+<span class="cstat-no" title="statement not covered" >              var yPositionOfImageToDrawFrom = p.tileCropYStart;</span>
+<span class="cstat-no" title="statement not covered" >              var widthOfImageToDraw = 1 + p.tileCropXEnd - p.tileCropXStart;</span>
+<span class="cstat-no" title="statement not covered" >              var heightOfImageToDraw = 1 + p.tileCropYEnd - p.tileCropYStart;</span>
+<span class="cstat-no" title="statement not covered" >              var xPositionToPlaceImageInCanvas = p.xPositionInFinalTileStart;</span>
+<span class="cstat-no" title="statement not covered" >              var yPositionToPlaceImageInCanvas = p.yPositionInFinalTileStart;</span>
+<span class="cstat-no" title="statement not covered" >              var imageWidth = p.xPositionInFinalTileEnd - p.xPositionInFinalTileStart;</span>
+<span class="cstat-no" title="statement not covered" >              var imageHeight = p.yPositionInFinalTileEnd - p.yPositionInFinalTileStart;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >              this.ctx.drawImage(image,</span>
+                xPositionOfImageToDrawFrom,
+                yPositionOfImageToDrawFrom,
+                widthOfImageToDraw,
+                heightOfImageToDraw,
+                xPositionToPlaceImageInCanvas,
+                yPositionToPlaceImageInCanvas,
+                imageWidth,
+                imageHeight
+              );
+<span class="cstat-no" title="statement not covered" >              chunkDone();</span>
+            }.bind(this);
+<span class="cstat-no" title="statement not covered" >            image.src = 'data:'+type.mime+';base64,' + base64DataChunk;</span>
+          }.bind(this));
+        }.bind(this), callback);
+      }.bind(this));
+    }.bind(this));
+  }.bind(this);
+  this.image.src = 'data:'+type.mime+';base64,' + base64Data;
+};
+&nbsp;
+CanvasTileCreator.prototype.getCompleteTile = <span class="fstat-no" title="function not covered" >function (format, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  callback(null, this.canvas.toDataURL());</span>
+};
+&nbsp;
+CanvasTileCreator.prototype.reproject = <span class="fstat-no" title="function not covered" >function (tileData, tilePieceBoundingBox, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  var ctx = this.ctx;</span>
+<span class="cstat-no" title="statement not covered" >  var width = this.width;</span>
+<span class="cstat-no" title="statement not covered" >  var height = this.height;</span>
+<span class="cstat-no" title="statement not covered" >  var cb = callback;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, this.tileBoundingBox, this.height, this.width, this.projectionTo, this.projectionFrom, this.projectionFromDefinition, this.tileHeightUnitsPerPixel, this.tileWidthUnitsPerPixel, this.tileMatrix.pixel_x_size, this.tileMatrix.pixel_y_size);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var job = {</span>
+    tileBoundingBox: JSON.stringify(this.tileBoundingBox),
+    tileWidthUnitsPerPixel: this.tileWidthUnitsPerPixel,
+    tileHeightUnitsPerPixel: this.tileHeightUnitsPerPixel,
+    projectionTo: this.projectionTo,
+    projectionFrom: this.projectionFrom,
+    projectionFromDefinition: this.projectionFromDefinition,
+    tileWidth: this.tileMatrix.tile_width,
+    tileHeight: this.tileMatrix.tile_height,
+    pixelYSize: this.tileMatrix.pixel_y_size,
+    pixelXSize: this.tileMatrix.pixel_x_size,
+    height: this.height,
+    width: this.width,
+    tilePieceBoundingBox: JSON.stringify(tilePieceBoundingBox),
+    imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer
+  };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    var worker = work(require('./tileWorker.js'));</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    worker.onmessage = <span class="fstat-no" title="function not covered" >function(e) {</span></span>
+<span class="cstat-no" title="statement not covered" >      workerDone(e.data, piecePosition, ctx, cb);</span>
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    worker.postMessage(job, [this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer]);</span>
+&nbsp;
+  } catch (e) {
+<span class="cstat-no" title="statement not covered" >    worker = ProjectTile;</span>
+<span class="cstat-no" title="statement not covered" >    worker(job, <span class="fstat-no" title="function not covered" >function(err, data) {</span></span>
+<span class="cstat-no" title="statement not covered" >      workerDone(data, piecePosition, ctx, cb);</span>
+    });
+  }
+};
+&nbsp;
+<span class="fstat-no" title="function not covered" >function workerDone(data, piecePosition, ctx, cb) {</span>
+<span class="cstat-no" title="statement not covered" >  if (data.message === 'done') {</span>
+<span class="cstat-no" title="statement not covered" >    var imageData = new Uint8ClampedArray(data.imageData);</span>
+<span class="cstat-no" title="statement not covered" >    var offsetX = piecePosition.startX;</span>
+<span class="cstat-no" title="statement not covered" >    var offsetY = piecePosition.startY;</span>
+<span class="cstat-no" title="statement not covered" >    var finalWidth = data.finalWidth;</span>
+<span class="cstat-no" title="statement not covered" >    var finalHeight = data.finalHeight;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    var tmpCanvas = document.createElement('canvas');</span>
+<span class="cstat-no" title="statement not covered" >    tmpCanvas.width = finalWidth;</span>
+<span class="cstat-no" title="statement not covered" >    tmpCanvas.height = finalHeight;</span>
+<span class="cstat-no" title="statement not covered" >    tmpCanvas.getContext('2d').putImageData(new ImageData(imageData, finalWidth, finalHeight), 0, 0);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    ctx.drawImage(tmpCanvas, offsetX, offsetY);</span>
+<span class="cstat-no" title="statement not covered" >    cb();</span>
+  } else <span class="cstat-no" title="statement not covered" >if (data.message === 'donenodata') {</span>
+<span class="cstat-no" title="statement not covered" >    cb();</span>
+  }
+}
+&nbsp;
+&nbsp;
+module.exports = CanvasTileCreator;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 26 2017 14:52:22 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

@@ -37,6 +37,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1, function(err, image) {
+        // fs.writeFile('/tmp/1_1_0.png', image, function() {
+        //   done(err);
+        // });
         testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles','1_1_0.png'), function(err, equal) {
           equal.should.be.equal(true);
           done();
@@ -103,7 +106,8 @@ describe('GeoPackage FeatureTiles tests', function() {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1, function(err, image) {
-        testSetup.diffImages(image, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
+        testSetup.diffImages(image, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
+          console.log('arguments', arguments);
           equal.should.be.equal(true);
           delete image;
           done();
@@ -117,7 +121,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 1, 0, 1, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0.png'), function(err, equal) {
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
           delete data;
           done();
@@ -131,10 +135,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 0, 0, 0, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        // fs.writeFile('/tmp/0_0_0.png', data, function() {
-        //   done();
-        // });
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','0_0_0.png'), function(err, equal) {
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','0_0_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
           delete data;
           done();
@@ -148,7 +149,10 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 8, 12, 5, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','5_8_12.png'), function(err, equal) {
+        // fs.writeFile('/tmp/5_8_12_indexed.png', data, function() {
+        //   done();
+        // });
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','5_8_12_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
           delete data;
           done();

@@ -20,9 +20,9 @@
     </h1>
     <div class='clearfix'>
       <div class='fl pad1y space-right2'>
-        <span class="strong">9.52% </span>
+        <span class="strong">8.89% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>4/42</span>
+        <span class='fraction'>4/45</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
@@ -35,9 +35,9 @@
         <span class='fraction'>0/5</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">9.52% </span>
+        <span class="strong">8.89% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>4/42</span>
+        <span class='fraction'>4/45</span>
       </div>
     </div>
   </div>
@@ -118,7 +118,11 @@
 73
 74
 75
-76</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+76
+77
+78
+79
+80</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -174,7 +178,15 @@
 <span class="cline-any cline-yes">1×</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -184,13 +196,9 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var proj4 = require('proj4');
@@ -247,25 +255,29 @@ module.exports.createPNG = <span class="fstat-no" title="function not covered" >
 }
 &nbsp;
 <span class="fstat-no" title="function not covered" >function createPNGLwip(width, height, redArray, greenArray, blueArray, alphaOrArray, finalWidth, finalHeight, callback) {</span>
-<span class="cstat-no" title="statement not covered" >  var lwip = require('lwip');</span>
-<span class="cstat-no" title="statement not covered" >  var r = [];</span>
-<span class="cstat-no" title="statement not covered" >  var g = [];</span>
-<span class="cstat-no" title="statement not covered" >  var b = [];</span>
-<span class="cstat-no" title="statement not covered" >  var buff = new Buffer(width * height * 3);</span>
+<span class="cstat-no" title="statement not covered" >  var pureimage = require('pureimage');</span>
+<span class="cstat-no" title="statement not covered" >  var bitmap = pureimage.make(width, height);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  var length = redArray.length;</span>
 <span class="cstat-no" title="statement not covered" >  for (var i = 0; i &lt; length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >    r.push(redArray[i]);</span>
-<span class="cstat-no" title="statement not covered" >    g.push(greenArray[i]);</span>
-<span class="cstat-no" title="statement not covered" >    b.push(blueArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    bitmap.data.push(redArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    bitmap.data.push(greenArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    bitmap.data.push(blueArray[i]);</span>
+<span class="cstat-no" title="statement not covered" >    bitmap.data.push(255);</span>
   }
-<span class="cstat-no" title="statement not covered" >  var buff = new Buffer(r.concat(g, b));</span>
-<span class="cstat-no" title="statement not covered" >  lwip.open(buff, {width: width, height: height}, <span class="fstat-no" title="function not covered" >function(err, image) {</span></span>
-<span class="cstat-no" title="statement not covered" >    image.resize(finalWidth, finalHeight, <span class="fstat-no" title="function not covered" >function(err, image) {</span></span>
-<span class="cstat-no" title="statement not covered" >      image.toBuffer('png', {</span>
-        transparency: true
-      }, callback);
-    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var ctx = bitmap.getContext('2d');</span>
+<span class="cstat-no" title="statement not covered" >  ctx.scale(finalWidth/width, finalHeight/height);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var stream = new Writable();</span>
+<span class="cstat-no" title="statement not covered" >  var buffers = [];</span>
+<span class="cstat-no" title="statement not covered" >  stream._write = <span class="fstat-no" title="function not covered" >function(chunk, enc, next) {</span></span>
+<span class="cstat-no" title="statement not covered" >    buffers.push(chunk);</span>
+<span class="cstat-no" title="statement not covered" >    next();</span>
+  };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  this.pureimage.encodePNGToStream(this.canvas, stream).then(<span class="fstat-no" title="function not covered" >function() {</span></span>
+<span class="cstat-no" title="statement not covered" >    callback(null, Buffer.concat(buffers));</span>
   });
 }
 &nbsp;</pre></td></tr>
@@ -274,7 +286,7 @@ module.exports.createPNG = <span class="fstat-no" title="function not covered" >
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jun 02 2017 09:08:07 GMT-0600 (MDT)
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Jul 28 2017 08:00:26 GMT-0600 (MDT)
 </div>
 </div>
 <script src="../../../../prettify.js"></script>

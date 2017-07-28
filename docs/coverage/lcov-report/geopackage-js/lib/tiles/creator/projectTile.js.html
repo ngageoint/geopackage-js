@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for geopackage-js/lib/tiles/creator/projectTile.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">geopackage-js/lib/tiles/creator/</a> projectTile.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">4.62% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>3/65</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">4.62% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>3/65</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">var proj4 = require('proj4')
+  , async = require('async');
+&nbsp;
+var TileUtilities = require('./tileUtilities')
+  , proj4Defs = require('../../proj4Defs');
+&nbsp;
+module.exports = <span class="fstat-no" title="function not covered" >function(job, callback) {</span>
+<span class="cstat-no" title="statement not covered" >  console.log('Tile Worker - working');</span>
+<span class="cstat-no" title="statement not covered" >  console.time('Tile Worker - time');</span>
+<span class="cstat-no" title="statement not covered" >  var self = this;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  if (proj4Defs[job.projectionTo]) {</span>
+<span class="cstat-no" title="statement not covered" >    proj4.defs(job.projectionTo, proj4Defs[job.projectionTo]);</span>
+  }
+<span class="cstat-no" title="statement not covered" >  if (proj4Defs[job.projectionFrom]) {</span>
+<span class="cstat-no" title="statement not covered" >    proj4.defs(job.projectionFrom, proj4Defs[job.projectionFrom]);</span>
+  }
+<span class="cstat-no" title="statement not covered" >  var proj4To = proj4(job.projectionTo);</span>
+<span class="cstat-no" title="statement not covered" >  var proj4From = proj4(job.projectionFrom);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var conversion;</span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    conversion = proj4(job.projectionTo, job.projectionFrom);</span>
+  } catch (e) {}
+<span class="cstat-no" title="statement not covered" >  if (!conversion) {</span>
+<span class="cstat-no" title="statement not covered" >    conversion = proj4(job.projectionTo, job.projectionFromDefinition);</span>
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var tileBoundingBox = JSON.parse(job.tileBoundingBox);</span>
+<span class="cstat-no" title="statement not covered" >  var tilePieceBoundingBox = JSON.parse(job.tilePieceBoundingBox);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, tileBoundingBox, job.height, job.width, job.projectionTo, job.projectionFrom, job.projectionFromDefinition, job.tileHeightUnitsPerPixel, job.tileWidthUnitsPerPixel, job.pixelXSize, job.pixelYSize);</span>
+<span class="cstat-no" title="statement not covered" >  var x = piecePosition.startX;</span>
+<span class="cstat-no" title="statement not covered" >  var y = piecePosition.startY;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var finalWidth = (piecePosition.endX - piecePosition.startX);</span>
+<span class="cstat-no" title="statement not covered" >  var finalHeight = (piecePosition.endY - piecePosition.startY);</span>
+<span class="cstat-no" title="statement not covered" >  if (finalWidth &lt;= 0 || finalHeight &lt;= 0) {</span>
+<span class="cstat-no" title="statement not covered" >    console.timeEnd('Tile Worker - time');</span>
+<span class="cstat-no" title="statement not covered" >    if (callback) {</span>
+<span class="cstat-no" title="statement not covered" >      callback(null, {message:'donenodata'});</span>
+    } else {
+<span class="cstat-no" title="statement not covered" >      postMessage({message:'donenodata'});</span>
+<span class="cstat-no" title="statement not covered" >      return self.close();</span>
+    }
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var imageData = new Uint8ClampedArray(job.imageData);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  var finalImageData = new Uint8ClampedArray(finalWidth * finalHeight * 4);</span>
+<span class="cstat-no" title="statement not covered" >  var latitude;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  async.whilst(</span>
+<span class="fstat-no" title="function not covered" >    function() {</span>
+<span class="cstat-no" title="statement not covered" >      if (y &lt; piecePosition.endY) {</span>
+<span class="cstat-no" title="statement not covered" >        latitude = tileBoundingBox.maxLatitude - (y*job.tileHeightUnitsPerPixel);</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return false;</span>
+    },
+<span class="fstat-no" title="function not covered" >    function(yDone) {</span>
+<span class="cstat-no" title="statement not covered" >      x = piecePosition.startX;</span>
+<span class="cstat-no" title="statement not covered" >      var longitude;</span>
+<span class="cstat-no" title="statement not covered" >      async.setImmediate(<span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >        async.whilst(</span>
+<span class="fstat-no" title="function not covered" >          function() {</span>
+<span class="cstat-no" title="statement not covered" >            if(x &lt; piecePosition.endX) {</span>
+<span class="cstat-no" title="statement not covered" >              longitude = tileBoundingBox.minLongitude + (x*job.tileWidthUnitsPerPixel);</span>
+<span class="cstat-no" title="statement not covered" >              return true;</span>
+            }
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+          },
+<span class="fstat-no" title="function not covered" >          function(xDone) {</span>
+<span class="cstat-no" title="statement not covered" >            async.setImmediate(<span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >              var projected = conversion.forward([longitude, latitude]);</span>
+<span class="cstat-no" title="statement not covered" >              var projectedLongitude = projected[0];</span>
+<span class="cstat-no" title="statement not covered" >              var projectedLatitude = projected[1];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >              var xPixel = job.tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / job.pixelXSize);</span>
+<span class="cstat-no" title="statement not covered" >              var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / job.pixelYSize);</span>
+<span class="cstat-no" title="statement not covered" >              if (xPixel &gt;= 0 &amp;&amp; xPixel &lt; job.tileWidth</span>
+              &amp;&amp; yPixel &gt;= 0 &amp;&amp; yPixel &lt; job.tileHeight) {
+<span class="cstat-no" title="statement not covered" >                var sliceStart = (yPixel * job.tileWidth * 4) + (xPixel * 4);</span>
+<span class="cstat-no" title="statement not covered" >                if (sliceStart &gt;= 0) {</span>
+<span class="cstat-no" title="statement not covered" >                  finalImageData.set(imageData.slice(sliceStart, sliceStart + 4), ((y-piecePosition.startY)*finalWidth*4) + ((x-piecePosition.startX)*4));</span>
+                }
+              }
+<span class="cstat-no" title="statement not covered" >              x++;</span>
+<span class="cstat-no" title="statement not covered" >              xDone();</span>
+            });
+          },
+<span class="fstat-no" title="function not covered" >          function() {</span>
+<span class="cstat-no" title="statement not covered" >            y++;</span>
+<span class="cstat-no" title="statement not covered" >            yDone();</span>
+          }
+        );
+      });
+    },
+<span class="fstat-no" title="function not covered" >    function() {</span>
+<span class="cstat-no" title="statement not covered" >      console.timeEnd('Tile Worker - time');</span>
+<span class="cstat-no" title="statement not covered" >      if (callback) {</span>
+<span class="cstat-no" title="statement not covered" >        callback(null, {message:'done', imageData: finalImageData.buffer, finalWidth: finalWidth, finalHeight: finalHeight}, [finalImageData.buffer]);</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        postMessage({message:'done', imageData: finalImageData.buffer, finalWidth: finalWidth, finalHeight: finalHeight}, [finalImageData.buffer]);</span>
+<span class="cstat-no" title="statement not covered" >        self.close();</span>
+      }
+    }
+  );
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Wed Jul 26 2017 14:52:22 GMT-0600 (MDT)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>
