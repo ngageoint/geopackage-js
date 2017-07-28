@@ -1,5 +1,5 @@
 instrumentation:
-  excludes: ['node_modules/**', 'docs/**', 'test/**', 'mochawesome-reports/**', 'karma.conf.js', 'geopackage.js', './index.js', 'lib/db/sqljsAdapter.js']
+  excludes: ['node_modules/**', 'docs/**', 'test/**', 'mochawesome-reports/**', 'karma.conf.js', 'geopackage.js', './index.js', 'lib/db/sqljsAdapter.js', 'lib/tiles/creator/tileUtilities.js']
   include-all-sources: false
 reporting:
   dir: 'docs/coverage'
