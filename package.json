@@ -44,13 +44,11 @@
     "browserify-shim": "^3.8.12",
     "chai": "^3.5.0",
     "fs-extra": "^2.1.2",
-    "imagediff": "^1.0.8",
     "ink-docstrap": "^1.1.4",
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
     "lcov-badge": "^1.0.4",
     "mocha": "^3.0.2",
-    "uglify-js": "mishoo/UglifyJS2.git#harmony",
     "watchify": "^3.7.0",
     "webworkify": "^1.1.0"
   },
@@ -69,20 +67,19 @@
     "dist"
   ],
   "browser": {
-    "lwip": false,
     "sqlite3": false
   },
   "scripts": {
     "test": "istanbul cover  _mocha",
     "posttest": "lcov-badge -o coverage.svg ./docs/coverage/lcov.info",
-    "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
-    "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude lwip --exclude inquirer -o bundle/test.bundle.js -d",
+    "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
+    "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
     "browser-test": "./test/cli",
     "postbrowser-test": "istanbul report --dir coverage/browser --root coverage/browser lcov",
     "predoc": "rm -rf docs/jsdoc/*",
     "doc": "jsdoc --verbose -c jsdoc.conf",
-    "build": "browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
-    "watch": "watchify -t browserify-css index.js -v --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o static/geopackage.js",
-    "prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js"
+    "build": "browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude inquirer -o static/geopackage.js",
+    "watch": "watchify -t browserify-css index.js -v --standalone geopackage --exclude sqlite3 --exclude inquirer -o static/geopackage.js",
+    "prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude inquirer -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js"
   }
 }
