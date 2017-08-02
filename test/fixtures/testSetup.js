@@ -101,14 +101,21 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
       });
     });
   } else {
+    if (actualTile instanceof Uint8Array) {
+      var binary = '';
+      var bytes = actualTile;
+      var len = bytes.byteLength;
+      for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+      }
+      actualTile = 'data:image/png;base64,' + btoa( binary );
+    }
+
+
     var actual = document.createElement('canvas');
     actual.width = width;
     actual.height = height;
     var ctx = actual.getContext('2d');
-
-
-    // var actual = CanvasImageDiff.createCanvas(width, height);
-    // var ctx = actual.getContext('2d');
 
     var image = new Image();
     image.onload = function() {
@@ -121,8 +128,6 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         expected.height = height;
         var ctx2 = expected.getContext('2d');
 
-        // var expected = CanvasImageDiff.createCanvas(width, height);
-        // var ctx2 = expected.getContext('2d');
         var image2 = new Image();
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
@@ -137,29 +142,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
               equal = false;
             }
           }
-
-
-          // var equal = CanvasImageDiff.equal(actual, expected, 2);
-
-          // if (!equal) {
-            // var diff = CanvasImageDiff.diff(actual, expected);
-            // var diffCanvas = CanvasImageDiff.createCanvas(diff.width, diff.height);
-            // context = diffCanvas.getContext('2d');
-            // context.putImageData(diff, 0, 0);
-            //
-            //
-            // var diffCanvas = document.createElement('canvas');
-            // diffCanvas.width = width;
-            // diffCanvas.height = height;
-            // var diffCtx = diffCanvas.getContext('2d');
-            //
-            // var blendImage = new Image();
-            //
-            //
-            // diffCtx.globalCompositeOperation = 'multiply';
-            // diffCtx.putImageData(actualData, 0, 0);
-            // diffCtx.putImageData(expectedData, 0, 0);
-
+          if (!equal) {
             var h1Tags = document.getElementsByTagName('h1');
             var h2Tags = document.getElementsByTagName('li');
             var currentTag;
@@ -188,8 +171,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(div);
             currentTag.appendChild(actual);
             currentTag.appendChild(expected);
-            // currentTag.appendChild(diffCanvas);
-          // }
+          }
           callback(null, equal);
         }
         image2.src = 'data:image/png;base64,' + expectedBase64;

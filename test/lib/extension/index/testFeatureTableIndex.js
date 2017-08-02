@@ -5,7 +5,7 @@ var GeoPackageManager = require('../../../../lib/geoPackageManager')
   , Verification = require('../../../fixtures/verification')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
-  , fs = require('fs-extra')
+  , fs = require('fs')
   , path = require('path')
   , async = require('async');
 
@@ -18,8 +18,18 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
 
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
     beforeEach('should open the geopackage', function(done) {
-      fs.copy(originalFilename, filename, function(err) {
+      copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageManager.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
@@ -36,7 +46,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       geoPackage.close();
-      fs.remove(filename, done);
+      if (typeof(process) !== 'undefined' && process.version) {
+        fs.unlink(filename, done);
+      } else {
+        done();
+      }
     });
 
     it('should return the index status of false', function(done) {
@@ -78,8 +92,18 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers_indexed.gpkg');
 
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
     beforeEach('should open the geopackage', function(done) {
-      fs.copy(originalFilename, filename, function(err) {
+      copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageManager.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
@@ -96,7 +120,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       geoPackage.close();
-      fs.remove(filename, done);
+      if (typeof(process) !== 'undefined' && process.version) {
+        fs.unlink(filename, done);
+      } else {
+        done();
+      }
     });
 
     it('should query for the index row rivers, 315', function(done) {

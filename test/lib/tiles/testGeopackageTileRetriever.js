@@ -205,7 +205,12 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4, function(err, tile) {
-        var expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png');
+        var expectedPath;
+        if (typeof(process) !== 'undefined' && process.version) {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png');
+        } else {
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTileWeb.png');
+        }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
           imagesAreSame.should.be.equal(true);
           done(err);
