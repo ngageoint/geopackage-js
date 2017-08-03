@@ -49,6 +49,7 @@
     "jsdoc": "^3.4.0",
     "lcov-badge": "^1.0.4",
     "mocha": "^3.0.2",
+    "uglify-es": "^3.0.27",
     "watchify": "^3.7.0",
     "webworkify": "^1.1.0"
   },
