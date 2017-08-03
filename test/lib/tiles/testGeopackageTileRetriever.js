@@ -64,6 +64,30 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
+    it('should get the web mercator x: 2, y: 1, z: 2 tile', function(done) {
+      this.timeout(30000);
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getWebMercatorTile(2,1,2, function(err, tile) {
+        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+          equal.should.be.equal(true);
+          done();
+        });
+      });
+    });
+
+    it('should get the tile with wgs84 bounds', function(done) {
+      this.timeout(30000);
+      var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311185);
+
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      gpr.getTileWithWgs84BoundsInProjection(wgs84BoundingBox, 2, 'EPSG:3857', function(err, tile) {
+        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+          equal.should.be.equal(true);
+          done();
+        });
+      });
+    });
+
     it('should pull all of the tiles and compare them', function(done) {
       this.timeout(30000);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);

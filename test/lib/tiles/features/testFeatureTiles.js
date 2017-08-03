@@ -71,7 +71,6 @@ describe('GeoPackage FeatureTiles tests', function() {
         if (!data) return done(err);
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','5_8_12.png'), function(err, equal) {
           equal.should.be.equal(true);
-          delete data;
           done();
         });
       });
@@ -109,7 +108,6 @@ describe('GeoPackage FeatureTiles tests', function() {
         testSetup.diffImages(image, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
           console.log('arguments', arguments);
           equal.should.be.equal(true);
-          delete image;
           done();
         });
       });
@@ -123,7 +121,6 @@ describe('GeoPackage FeatureTiles tests', function() {
         if (!data) return done(err);
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
-          delete data;
           done();
         });
       });
@@ -137,7 +134,6 @@ describe('GeoPackage FeatureTiles tests', function() {
         if (!data) return done(err);
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','0_0_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
-          delete data;
           done();
         });
       });
@@ -154,7 +150,6 @@ describe('GeoPackage FeatureTiles tests', function() {
         // });
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','5_8_12_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
-          delete data;
           done();
         });
       });

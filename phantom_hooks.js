@@ -13,7 +13,7 @@ module.exports = {
       //   console.log('arguments', arguments);
       //   console.log('made coverage directory');
       //   fs.mkdirSync('./coverage/browser');
-        fs.write('./coverage/browser/coverage.json', JSON.stringify(coverage), 'w', function(err) {
+        fs.write('./docs/coverage/browser/coverage.json', JSON.stringify(coverage), 'w', function(err) {
           console.log('arguments', arguments);
         });
       // });

@@ -24,7 +24,6 @@ describe('Tests for issue 68', function() {
             gpr.getTile(192,401,10,function(err, tile) {
               if (err) return done(err);
               should.exist(tile);
-              delete tile;
               geoPackage.close();
               done();
             });

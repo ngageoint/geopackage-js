@@ -3,6 +3,7 @@ var GeoPackage = require('../index.js')
 
 var path = require('path')
   , fs = require('fs')
+  , PureImage = require('pureimage')
   , should = require('chai').should();
 
 describe('GeoPackageAPI tests', function() {
@@ -35,6 +36,18 @@ describe('GeoPackageAPI tests', function() {
       should.not.exist(err);
       should.exist(gp);
       done();
+    });
+  });
+
+  it('should create a geopackage and export it', function(done) {
+    GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+      should.not.exist(err);
+      should.exist(gp);
+      gp.export(function(err, buffer) {
+        should.not.exist(err);
+        should.exist(buffer);
+        done();
+      });
     });
   });
 
@@ -233,6 +246,43 @@ describe('GeoPackageAPI tests', function() {
             result.should.be.equal(1);
             GeoPackage.getTileFromXYZ(geopackage, 'tiles', 0, 0, 0, 256, 256, function(err, tile) {
               testSetup.diffImages(tile, tilePath, function(err, equal) {
+                equal.should.be.equal(true);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
+      var columns = [];
+
+      var TileColumn = GeoPackage.TileColumn;
+      var DataTypes = GeoPackage.DataTypes;
+      var BoundingBox = GeoPackage.BoundingBox;
+
+      var tableName = 'tiles';
+
+      var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      var contentsSrsId = 3857;
+      var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      var tileMatrixSetSrsId = 3857;
+
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
+        should.not.exist(err);
+        should.exist(tileMatrixSet);
+        fs.readFile(tilePath, function(err, tile) {
+          GeoPackage.addTileToGeoPackage(geopackage, tile, 'tiles', 0, 0, 0, function(err, result) {
+            result.should.be.equal(1);
+            var canvas;
+            if (typeof(process) !== 'undefined' && process.version) {
+              canvas = PureImage.make(256, 256);
+            } else {
+              canvas = document.createElement('canvas');
+            }
+            GeoPackage.drawXYZTileInCanvas(geopackage, 'tiles', 0, 0, 0, 256, 256, canvas, function(err, tile) {
+              testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
                 equal.should.be.equal(true);
                 done();
               });

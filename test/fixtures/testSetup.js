@@ -81,6 +81,51 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
 };
 
+module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
+  if (typeof(process) !== 'undefined' && process.version) {
+    pureimage.decodePNGFromStream(fs.createReadStream(expectedTilePath)).then(function(expectedImage) {
+      var same = true;
+      for (var x = 0; x < actualCanvas.width && same; x++) {
+        for (var y = 0; y < actualCanvas.height && same; y++) {
+          var actualRGBA = actualCanvas.getPixelRGBA(x,y);
+          var expectedRGBA = expectedImage.getPixelRGBA(x,y);
+          same = actualRGBA === expectedRGBA;
+        }
+      }
+      callback(null, same);
+    });
+  } else {
+    module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
+      var expectedBase64 = new Buffer(expectedTile).toString('base64');
+
+      var expected = document.createElement('canvas');
+      expected.width = actualCanvas.width;
+      expected.height = actualCanvas.height;
+      var ctx2 = expected.getContext('2d');
+
+      var image2 = new Image();
+      image2.onload = function() {
+        ctx2.drawImage(image2, 0, 0);
+        return callback(null, module.exports.diffCanvasesContexts(actualCanvas.getContext('2d'), ctx2), actualCanvas.width, actualCanvas.height);
+      }
+      image2.src = 'data:image/png;base64,' + expectedBase64;
+    });
+  }
+}
+
+module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, height) {
+  var actualData = actualCtx.getImageData(0, 0, width, height);
+  var expectedData = expectedCtx.getImageData(0, 0, width, height);
+  if(actualData.data.length != expectedData.data.length)
+    return false;
+  for(var i = 0; i < actualData.data.length; ++i){
+    if(actualData.data[i] != expectedData.data[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
 
@@ -132,16 +177,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
 
-          var actualData = ctx.getImageData(0, 0, width, height);
-          var expectedData = ctx2.getImageData(0, 0, width, height);
-          var equal = true;
-          if(actualData.data.length != expectedData.data.length)
-            equal = false;
-          for(var i = 0; i < actualData.data.length; ++i){
-            if(actualData.data[i] != expectedData.data[i]) {
-              equal = false;
-            }
-          }
+          var equal = module.exports.diffCanvasesContexts(ctx, ctx2, width, height);
           if (!equal) {
             var h1Tags = document.getElementsByTagName('h1');
             var h2Tags = document.getElementsByTagName('li');
