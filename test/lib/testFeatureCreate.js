@@ -1,6 +1,8 @@
 var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../lib/geoPackage')
   , FeatureColumn = require('../../lib/features/user/featureColumn')
+  , DataColumns = require('../../lib/dataColumns').DataColumns
+  , DataColumnsDao = require('../../lib/dataColumns').DataColumnsDao
   , Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable')
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
@@ -83,7 +85,16 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, 5));
 
-    geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+    var dc = new DataColumns();
+    dc.table_name = 'geom.test';
+    dc.column_name = 'test_text_limited.test';
+    dc.name = 'Test Name';
+    dc.title = 'Test';
+    dc.description = 'Test Description';
+    dc.mime_type = 'text/html';
+    dc.constraint_name = 'test constraint';
+
+    geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc], function(err, result) {
       var reader = new UserTableReader(tableName);
       reader.readTable(geopackage.connection, function(err, result) {
         var columns = result.columns;
@@ -138,7 +149,19 @@ describe('GeoPackage Feature table create tests', function() {
            max: 7,
            notNull: false,
            primaryKey: false } ]);
-        done();
+        var dao = new DataColumnsDao(geopackage.getDatabase());
+        dao.getDataColumns('geom.test', 'test_text_limited.test', function(err, dataColumn) {
+          dataColumn.should.be.deep.equal({
+            table_name: 'geom.test',
+            column_name: 'test_text_limited.test',
+            name: 'Test Name',
+            title: 'Test',
+            description: 'Test Description',
+            mime_type: 'text/html',
+            constraint_name: 'test constraint'
+          });
+          done();
+        });
       });
     });
   });

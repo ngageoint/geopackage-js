@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 
 var child = spawn('node_modules/.bin/mocha-phantomjs', [
-  'http://localhost:8080/test/index.html',
+  'http://localhost:3000/test/index.html',
   '-p', path.join('.', 'node_modules', '.bin', 'phantomjs'),
   '--timeout', '25000',
   '--hooks', 'phantom_hooks.js'

@@ -35,6 +35,23 @@ describe('BoundingBox tests', function() {
     bb.equals(bb).should.be.equal(true);
   });
 
+  it('should get BoundingBox GeoJSON', function() {
+    var bb = new BoundingBox(0, 1, 2, 3);
+    var gj = bb.toGeoJSON();
+    gj.type.should.be.equal("Feature");
+    gj.geometry.type.should.be.equal("Polygon");
+    gj.geometry.coordinates[0][0][0].should.be.equal(0);
+    gj.geometry.coordinates[0][0][1].should.be.equal(2);
+    gj.geometry.coordinates[0][1][0].should.be.equal(1);
+    gj.geometry.coordinates[0][1][1].should.be.equal(2);
+    gj.geometry.coordinates[0][2][0].should.be.equal(1);
+    gj.geometry.coordinates[0][2][1].should.be.equal(3);
+    gj.geometry.coordinates[0][3][0].should.be.equal(0);
+    gj.geometry.coordinates[0][3][1].should.be.equal(3);
+    gj.geometry.coordinates[0][4][0].should.be.equal(0);
+    gj.geometry.coordinates[0][4][1].should.be.equal(2);
+  });
+
   it('should project the BoundingBox', function() {
     var bb = new BoundingBox(0, 1, 2, 3);
     var projected = bb.projectBoundingBox('EPSG:4326', 'EPSG:3857');
@@ -56,7 +73,6 @@ describe('BoundingBox tests', function() {
   it('should convert', function() {
    var bb = new BoundingBox(-1252344.2714243277,2504688.5428486555,0,3757032.814272983);
    var projected = bb.projectBoundingBox('EPSG:3857', 'EPSG:4326')
-   console.log('projected', projected);
   });
 
 });
