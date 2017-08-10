@@ -33,6 +33,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 1.0.22
+
+- Fixed bug where querying for indexed features only returned the geometry instead of the entire feature
+
 ##### 1.0.19
 
 - Remove dependency on Lwip
