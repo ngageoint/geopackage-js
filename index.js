@@ -138,21 +138,27 @@ module.exports.createFeatureTableWithDataColumnsAndBoundingBox = function(geopac
  */
 module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tableName, callback) {
   geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
-    var featureRow = featureDao.newRow();
-    var geometryData = new GeometryData();
-    geometryData.setSrsId(4326);
-    var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
-    var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
-    geometryData.setGeometry(geometry);
-    featureRow.setGeometry(geometryData);
-    for (var propertyKey in feature.properties) {
-      if (feature.properties.hasOwnProperty(propertyKey)) {
-        featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+    featureDao.getSrs(function(err, srs) {
+      var featureRow = featureDao.newRow();
+      var geometryData = new GeometryData();
+      geometryData.setSrsId(srs.srs_id);
+      var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
+      var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
+      geometryData.setGeometry(geometry);
+      featureRow.setGeometry(geometryData);
+      for (var propertyKey in feature.properties) {
+        if (feature.properties.hasOwnProperty(propertyKey)) {
+          featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+        }
       }
-    }
 
-    featureDao.create(featureRow, callback);
+      featureDao.create(featureRow, callback);
+    });
   });
+};
+
+module.exports.addGeoJSONFeatureToGeoPackageWithSrs = function(geopackage, feature, tableName, srsNumber, callback) {
+
 };
 
 /**

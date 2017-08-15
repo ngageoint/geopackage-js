@@ -5,12 +5,22 @@ var fs = require('fs')
   , path = require('path')
   , bbox = require('@turf/bbox');
 
-module.exports.addLayer = function(geoJson, geopackage, progressCallback, doneCallback) {
-  setupConversion(geoJson, geopackage, progressCallback, doneCallback, true);
+module.exports.addLayer = function(options, progressCallback, doneCallback) {
+  doneCallback = arguments[arguments.length - 1];
+  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+
+  options.append = true;
+
+  setupConversion(options, progressCallback, doneCallback);
 };
 
-module.exports.convert = function(geoJson, geopackage, progressCallback, doneCallback) {
-  setupConversion(geoJson, geopackage, progressCallback, doneCallback, false);
+module.exports.convert = function(options, progressCallback, doneCallback) {
+  doneCallback = arguments[arguments.length - 1];
+  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+
+  options.append = false;
+
+  setupConversion(options, progressCallback, doneCallback);
 };
 
 module.exports.extract = function(geopackage, tableName, callback) {
@@ -26,12 +36,12 @@ module.exports.extract = function(geopackage, tableName, callback) {
   });
 };
 
-function setupConversion(geoJson, geopackage, progressCallback, doneCallback, append) {
-  if (typeof geopackage === 'function') {
-    doneCallback = progressCallback;
-    progressCallback = geopackage;
-    geopackage = undefined;
-  }
+function setupConversion(options, progressCallback, doneCallback) {
+  var geopackage = options.geopackage;
+  var srsNumber = options.srsNumber || 4326;
+  var append = options.append;
+  var geoJson = options.geojson;
+
   if (!doneCallback) {
     doneCallback = progressCallback;
     progressCallback = function(status, cb) {
@@ -135,6 +145,10 @@ function setupConversion(geoJson, geopackage, progressCallback, doneCallback, ap
 };
 
 function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
+  convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, 4326, progressCallback, callback);
+}
+
+function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNumber, progressCallback, callback) {
   async.waterfall([function(callback) {
     var properties = {};
     var count = 0;
@@ -229,7 +243,7 @@ function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCall
     progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
       var tmp = bbox(geoJson);
       var boundingBox = new GeoPackage.BoundingBox(Math.max(-180, tmp[0]), Math.min(180, tmp[2]), Math.max(-90, tmp[1]), Math.min(90, tmp[3]));
-      GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, 4326, callback);
+      GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, srsNumber, callback);
     });
   }, function(featureDao, callback) {
     var count = 0;
