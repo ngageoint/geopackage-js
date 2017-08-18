@@ -11,6 +11,7 @@ describe('GeoPackageAPI tests', function() {
   var existingPath = path.join(__dirname, 'fixtures', 'rivers.gpkg');
   var geopackageToCreate = path.join(__dirname, 'tmp', 'tmp.gpkg');
   var tilePath = path.join(__dirname, 'fixtures', 'tiles', '0', '0', '0.png');
+  var indexedPath = path.join(__dirname, 'fixtures', 'rivers_indexed.gpkg');
 
 
   it('should open the geopackage', function(done) {
@@ -47,6 +48,67 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(err);
         should.exist(buffer);
         done();
+      });
+    });
+  });
+
+  describe('should operate on an indexed geopackage', function() {
+
+    var indexedGeopackage;
+    var originalFilename = indexedPath;
+    var filename = path.join(__dirname, 'fixtures', 'tmp', 'rivers_indexed.gpkg');
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should open the geopackage', function(done) {
+      copyGeopackage(originalFilename, filename, function(err) {
+        GeoPackage.openGeoPackage(filename, function(err, geopackage) {
+          should.not.exist(err);
+          should.exist(geopackage);
+          indexedGeopackage = geopackage;
+          done();
+        });
+      });
+    });
+
+    afterEach('should close the geopackage', function(done) {
+      indexedGeopackage.close();
+      if (typeof(process) !== 'undefined' && process.version) {
+        fs.unlink(filename, done);
+      } else {
+        done();
+      }
+    });
+
+    it('should add geojson to the geopackage and keep it indexed', function(done) {
+      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers', function(err, id) {
+        // ensure the last indexed changed
+        var db = indexedGeopackage.getDatabase();
+        db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id], function(err, index) {
+          should.not.exist(err);
+          index.geom_id.should.be.equal(id);
+          done();
+        });
       });
     });
   });

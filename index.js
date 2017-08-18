@@ -18,7 +18,8 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , GeometryData = require('./lib/geom/geometryData')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
-  , FeatureTile = require('./lib/tiles/features');
+  , FeatureTile = require('./lib/tiles/features')
+  , FeatureTableIndex = require('./lib/extension/index/featureTableIndex');
 
 var proj4Defs = require('./lib/proj4Defs');
 module.exports.proj4Defs = proj4Defs;
@@ -157,8 +158,42 @@ module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tab
   });
 };
 
-module.exports.addGeoJSONFeatureToGeoPackageWithSrs = function(geopackage, feature, tableName, srsNumber, callback) {
+/**
+ * Adds a GeoJSON feature to the GeoPackage and updates the FeatureTableIndex extension if it exists
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {object}   feature    GeoJSON feature to add
+ * @param  {String}   tableName  Table name to add the tile to
+ * @param  {Function} callback   called with an error if one occurred and the inserted row
+ */
+module.exports.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feature, tableName, callback) {
+  geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
+    featureDao.getSrs(function(err, srs) {
+      var featureRow = featureDao.newRow();
+      var geometryData = new GeometryData();
+      geometryData.setSrsId(srs.srs_id);
+      var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
+      var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
+      geometryData.setGeometry(geometry);
+      featureRow.setGeometry(geometryData);
+      for (var propertyKey in feature.properties) {
+        if (feature.properties.hasOwnProperty(propertyKey)) {
+          featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+        }
+      }
 
+      featureDao.create(featureRow, function(err, id) {
+        var fti = new FeatureTableIndex(geopackage.getDatabase(), featureDao);
+        fti.getTableIndex(function(err, tableIndex) {
+          if (!tableIndex) return callback(null, id);
+          fti.indexRow(tableIndex, id, geometryData, function(err) {
+            fti.updateLastIndexed(tableIndex, function() {
+              return callback(err, id);
+            });
+          });
+        });
+      });
+    });
+  });
 };
 
 /**
