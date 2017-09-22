@@ -1,5 +1,3 @@
-require('@ngageoint/leaflet-geopackage');
-
 var map = L.map('map').setView([45, 15], 3);
 
 var baseLayer = L.tileLayer('https://osm.geointservices.io/tiles/{z}/{x}/{y}.png', {
