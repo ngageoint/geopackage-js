@@ -71,7 +71,7 @@
     "sqlite3": false
   },
   "scripts": {
-    "test": "istanbul cover  _mocha",
+    "test": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha",
     "posttest": "lcov-badge -o coverage.svg ./docs/coverage/lcov.info",
     "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
     "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
