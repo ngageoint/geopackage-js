@@ -10,7 +10,7 @@ Cloning this repository and opening the docs/index.html in your browser will run
 ### Installation ###
 
 [![NPM](https://img.shields.io/npm/v/@ngageoint/geopackage.svg)](https://www.npmjs.com/package/@ngageoint/geopackage)
-[![Coverage Report](https://cdn.rawgit.com/ngageoint/geopackage-js/master/coverage.svg)](http://ngageoint.github.io/geopackage-js/coverage/lcov-report/)
+[![Coverage Status](https://coveralls.io/repos/github/ngageoint/geopackage-js/badge.svg)](https://coveralls.io/github/ngageoint/geopackage-js)
 
 ```sh
 $ npm install @ngageoint/geopackage
