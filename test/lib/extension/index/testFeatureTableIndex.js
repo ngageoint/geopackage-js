@@ -63,6 +63,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     });
 
     it('should index the table', function(done) {
+      this.timeout(5000);
       var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
       fti.getTableIndex(function(err, tableIndex) {
         should.not.exist(tableIndex);
@@ -157,6 +158,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     });
 
     it('should force index the table', function(done) {
+      this.timeout(5000);
       var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
       fti.getTableIndex(function(err, tableIndex) {
         tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
