@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - "6.9.4"
+  - "7.6.0"
+matrix:
+  include:
+    - os: linux
+      dist: trusty
