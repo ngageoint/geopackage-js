@@ -14,17 +14,19 @@ describe('Metadata Reference tests', function() {
   var geopackage;
 
   beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testGeoPackage, function() {
-      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
+    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+      geopackage = gp;
+      done();
     });
   });
 
   afterEach(function(done) {
-    geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    try {
+      geopackage.close();
+      testSetup.deleteGeoPackage(testGeoPackage, done);
+    } catch (e) {
+      done();
+    }
   });
 
   it('should create metadata and reference', function(done) {
