@@ -5,22 +5,26 @@
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
     "geojson-to-geopackage": "../converters/geojson",
-    "jquery": "^2.2.3",
+    "jquery": "3.0.0",
     "leaflet": "^1.0.2",
     "leaflet-mapkey-icon": "github:mapshakers/leaflet-mapkey-icon",
     "mbtiles-to-geopackage": "../converters/mbtiles",
     "mustache": "^2.2.1",
+    "pbf-to-geopackage": "../converters/pbf",
     "proj4": "^2.3.17",
     "promise-polyfill": "^6.0.2",
     "reproject": "^1.1.1",
-    "shapefile-to-geopackage": "../converters/shapefile"
+    "shapefile-to-geopackage": "../converters/shapefile",
+    "webworkify": "^1.5.0"
   },
   "devDependencies": {
     "browserify": "^14.1.0",
     "browserify-css": "^0.9.1"
   },
   "browserify": {
-    "transform": ["browserify-css"]
+    "transform": [
+      "browserify-css"
+    ]
   },
   "scripts": {
     "create": "npm install --no-optional",
