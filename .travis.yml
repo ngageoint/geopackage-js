@@ -1,6 +1,10 @@
 language: node_js
 node_js:
-  - "6"
-  - "7"
+- '6'
+- '7'
 script:
-  - "npm test && npm run coveralls"
+- npm test && npm run coveralls
+notifications:
+  slack:
+    rooms:
+      secure: S5CnVAK+FE1ZXHIzuRlXCSmUlNEtrbnzvAP4W03dCnjHuYKePgvNGn7DXTt900p/5HOXHR6LnZAPOO1DCOpydpBhcCimJM6/jA/x5IUVITOe92SiHlRIRb+Lq5LEHriLmeX1JeOxuS0EjoDBW0gxFBEn9IAXEg6bzhMPOspuWJBWPgZVfcuSb5zwALq1J9SI4gj/0AnjFzNSDlJsJIaisEjZ1N92FNmgdosEz8zAspsj1FvXnZKGknuyCGp/S9hEMvHDtPToNSdpA0fudGO7cvw8ep4F4vsg7Dy6Nis0sddYbMY9m2oWHg8F3az01Nqs0S4vp+agptIcKl8Uc6DfYEOw42lyjDE1SFUFSIIewSq8cjX738J6OIn2OwGUI54wUtvtBe8dkQslPBHLNtNtziSvpMjRBw8zUv64XyuKxVn/IFZKttUnFwFbPCZqFce+U7jI803yNU+E+9lZakN+PX2nYmg/Cj9ftYRs5l1s9/Fmw75WwS0WOwY+I3skpy68i08+WyTK1PTAkqGnoiuekdUXWlnvbGzCSwZazRzcSkap87iZ0u2wPDu7gkc+jKJfOl61OY8bK5lJ/iSCeoy1X0qGJ8+Nybm4lnUZ8lXJRX7+QgG+b0076oMfaaHxQHGaAXst4R7MqNodGT6ULogY/LOmF0mZpbkdnxMWJ5vBu5Y=
