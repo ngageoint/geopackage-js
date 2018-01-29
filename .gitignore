@@ -45,3 +45,5 @@ test/fixtures/private
 **/*/tmp
 
 dist
+
+docs/coverage
