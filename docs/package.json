@@ -11,7 +11,7 @@
     "mbtiles-to-geopackage": "../converters/mbtiles",
     "mustache": "^2.2.1",
     "pbf-to-geopackage": "../converters/pbf",
-    "proj4": "^2.3.17",
+    "proj4": "2.4.3",
     "promise-polyfill": "^6.0.2",
     "reproject": "^1.1.1",
     "shapefile-to-geopackage": "../converters/shapefile",

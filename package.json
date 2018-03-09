@@ -30,7 +30,7 @@
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
-    "proj4": "^2.4.3",
+    "proj4": "2.4.3",
     "pureimage": "https://github.com/danielbarela/node-pureimage.git#upgrade-libraries",
     "reproject": "^1.1.1",
     "sql.js": "https://github.com/kripken/sql.js.git",
