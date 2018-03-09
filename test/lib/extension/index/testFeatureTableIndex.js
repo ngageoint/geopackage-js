@@ -63,7 +63,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     });
 
     it('should index the table', function(done) {
-      this.timeout(5000);
+      this.timeout(10000);
       var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
       fti.getTableIndex(function(err, tableIndex) {
         should.not.exist(tableIndex);
