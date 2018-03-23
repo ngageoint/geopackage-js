@@ -92,6 +92,14 @@ window.loadGeoPackage = function(files) {
 
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'GeoPackage',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'GeoPackage',
@@ -106,6 +114,14 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a GeoJSON file
     else if (f.name.lastIndexOf('json') > f.name.lastIndexOf('.')) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'GeoJSON',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'GeoJSON',
@@ -138,6 +154,14 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile zip
     else if (f.name.lastIndexOf('zip') > f.name.lastIndexOf('.')) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'Shapefile Zip',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'Shapefile Zip',
@@ -166,6 +190,14 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile shp
     else if (f.name.lastIndexOf('shp') > f.name.lastIndexOf('.')) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'Shapefile',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'Shapefile',
@@ -194,6 +226,14 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a MBTiles file
     else if (f.name.lastIndexOf('mbtiles') > f.name.lastIndexOf('.')) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'MBTiles',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'MBTiles',
@@ -222,6 +262,14 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a PBF file
     else if (f.name.lastIndexOf('pbf') > f.name.lastIndexOf('.')) {
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'PBF',
+          'load',
+          'File Size',
+          array.byteLength
+        );
+      }
       ga('send', {
         hitType: 'event',
         eventCategory: 'PBF',
@@ -340,6 +388,13 @@ window.toggleLayer = function(layerType, table) {
   }
 
   if (layerType === 'tile') {
+    if (Piwik) {
+      Piwik.getAsyncTracker().trackEvent(
+        'Layer',
+        'load',
+        'Tile Layer'
+      );
+    }
     ga('send', {
       hitType: 'event',
       eventCategory: 'Layer',
@@ -370,6 +425,13 @@ window.toggleLayer = function(layerType, table) {
       tableLayers[table] = tableLayer;
     });
   } else if (layerType === 'feature') {
+    if (Piwik) {
+      Piwik.getAsyncTracker().trackEvent(
+        'Layer',
+        'load',
+        'Feature Layer'
+      );
+    }
     ga('send', {
       hitType: 'event',
       eventCategory: 'Layer',
@@ -458,6 +520,12 @@ function featureStyle(feature) {
 }
 
 window.loadUrl = function(url, loadingElement, gpName) {
+  if (Piwik) {
+    Piwik.getAsyncTracker().trackEvent(
+      'URL',
+      'load'
+    );
+  }
   ga('send', {
     hitType: 'event',
     eventCategory: 'URL',
