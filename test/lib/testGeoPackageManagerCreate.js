@@ -38,7 +38,7 @@ describe('GeoPackageManager Create tests', function() {
         var buff = new Buffer(4);
         buff.writeUInt32BE(applicationId);
         var idString = buff.toString('ascii', 0, 4);
-        idString.should.be.equal('GP10');
+        idString.should.be.equal('GPKG');
         done();
       });
     });
