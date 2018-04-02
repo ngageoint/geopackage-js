@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -30,7 +30,7 @@
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
     "file-type": "^4.1.0",
-    "proj4": "^2.4.3",
+    "proj4": "2.4.3",
     "pureimage": "https://github.com/danielbarela/node-pureimage.git#upgrade-libraries",
     "reproject": "^1.1.1",
     "sql.js": "https://github.com/kripken/sql.js.git",
@@ -75,7 +75,6 @@
   "scripts": {
     "test": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha",
     "coveralls": "cat ./docs/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "posttest": "lcov-badge -o coverage.svg ./docs/coverage/lcov.info",
     "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
     "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
     "browser-test": "./test/cli",

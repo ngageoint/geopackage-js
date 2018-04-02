@@ -33,6 +33,15 @@ describe('FeatureDao tests', function() {
         });
       });
     });
+
+    it('should query for a row with property_1 equal to Gila', function(done) {
+      geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, featureDao) {
+        featureDao.queryForEqWithFieldAndValue('property_1', 'Gila', function(err, row, rowDone) {
+          row.property_1.should.be.equal('Gila');
+          rowDone();
+        }, done);
+      });
+    });
   });
 
   describe('Indexed test', function() {
