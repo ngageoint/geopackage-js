@@ -232,25 +232,28 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
     }
     featureDao.getSrs(function(err, srs) {
       featureDao.queryForEach(function(err, row, rowDone) {
+
+        var geoJson = {
+          type: 'Feature',
+          properties: {}
+        };
+
         var currentRow = featureDao.getFeatureRow(row);
         var geometry = currentRow.getGeometry();
-        if (geometry) {
+        if (geometry && geometry.geometry) {
           var geom = geometry.geometry;
           var geoJsonGeom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
             geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
+          geoJson.geometry = geoJsonGeom;
         }
-        var geoJson = {
-          geometry: geoJsonGeom,
-          type: 'Feature',
-          properties: {}
-        };
+
         for (var key in currentRow.values) {
           if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
             geoJson.properties[key] = currentRow.values[key];
           } else if (currentRow.getGeometryColumn().name === key) {
-            geoJson.properties[key] = geometry ? 'Valid' : 'No Geometry';
+            geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
           }
         }
         geoJson.id = currentRow.getId();
