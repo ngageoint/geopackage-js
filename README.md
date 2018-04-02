@@ -34,6 +34,11 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 1.1.0
+
+- accept pull request adding support for react
+- fix bug with projected tiles that spanned the date line
+
 ##### 1.0.25
 
 - ensure we use proj4 2.4.3 instead of 2.4.4
