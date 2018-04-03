@@ -242,7 +242,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           var geom = geometry.geometry;
           var geoJsonGeom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
+            geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
           geoJson.geometry = geoJsonGeom;
         }
@@ -278,7 +278,7 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
         if (geometry) {
           var geom = geometry.geometry.toGeoJSON();
           if (srs.definition && srs.definition !== 'undefined') {
-            geom = reproject.reproject(geom, srs.organization + ':' + srs.organization_coordsys_id, 'EPSG:4326');
+            geom = reproject.reproject(geom, srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
           geoJson.geometry = geom;
         }
