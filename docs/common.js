@@ -553,9 +553,28 @@ window.loadUrl = function(url, loadingElement, gpName) {
       $('#download').removeClass('gone');
       $('#choose-label').find('i').toggle();
       loadingElement.toggle();
+      var urlString = window.location.href;
+      var url = new URL(urlString);
+      var layersToLoad = url.searchParams.getAll("layers");
+      if (layersToLoad) {
+        for (var i = 0; i < layersToLoad.length; i++) {
+          $('input[name="onoffswitch-'+layersToLoad[i]+'"]').trigger('click');
+        }
+      }
     });
   };
   xhr.send();
+}
+
+window.onload = function() {
+  var urlString = window.location.href;
+  var url = new URL(urlString);
+  var urlToLoad = url.searchParams.get("gpkg");
+  if (urlToLoad) {
+    $('#loadFromUrl').toggle();
+    $('#loadFromUrl').find('span').html(urlToLoad);
+    window.loadUrl(urlToLoad, $('#loadFromUrl').find('i'), urlToLoad);
+  }
 }
 
 window.loadZooms = function(tableName, tilesElement) {

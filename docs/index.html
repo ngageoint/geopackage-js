@@ -40,6 +40,14 @@
           <a href="./jsdoc/module-geoPackage-GeoPackage.html" target="_blank">API Documentation</a>
         </div>
       </div>
+
+      <div style="font-size: 12px; display: none;" id="loadFromUrl">
+        <div style="padding: 3px;">
+          Loading GeoPackage from: <span id="geoPackageFromUrl"></span>
+          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
+        </div>
+      </div>
+
       <div style="padding: 7px;">
         <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
         <label id="choose-label" for="file"><span>Open a GeoPackage or Convert a Supported File Type </span> <i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
