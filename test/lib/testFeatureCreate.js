@@ -151,6 +151,7 @@ describe('GeoPackage Feature table create tests', function() {
            primaryKey: false } ]);
         var dao = new DataColumnsDao(geopackage.getDatabase());
         dao.getDataColumns('geom.test', 'test_text_limited.test', function(err, dataColumn) {
+          should.not.exist(err);
           dataColumn.should.be.deep.equal({
             table_name: 'geom.test',
             column_name: 'test_text_limited.test',
