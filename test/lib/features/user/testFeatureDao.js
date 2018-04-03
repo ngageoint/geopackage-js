@@ -90,7 +90,6 @@ describe('FeatureDao tests', function() {
       var count = 0;
       var bbox = new BoundingBox(-12863648.645994272, -12865751.85860068, 6655573.571054254, 6651886.678768059);
       featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(bbox, function(err, featureRow, rowCallback) {
-        console.log('featureRow', featureRow);
         should.exist(featureRow.getValueWithColumnName('geom'));
         should.exist(featureRow.getValueWithColumnName('id'));
         should.exist(featureRow.getValueWithColumnName('property_0'));

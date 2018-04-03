@@ -163,12 +163,14 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       fti.getTableIndex(function(err, tableIndex) {
         tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
         fti.indexWithForce(true, function() {
-          console.log('progress', arguments);
+          console.log('Indexing Progress: ', arguments);
         }, function(err) {
+          console.log('Created the index');
           should.not.exist(err);
           // ensure it was created
           var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
           fti2.getTableIndex(function(err, tableIndex) {
+            console.log('Checked the index');
             should.exist(tableIndex);
             should.not.exist(err);
             tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');
