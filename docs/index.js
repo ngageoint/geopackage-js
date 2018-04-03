@@ -21,6 +21,7 @@ window.reproject = reproject;
 window.Mustache = Mustache;
 
 require('leaflet-mapkey-icon');
+require('leaflet-basemaps');
 
 window.GeoPackageAPI = require('@ngageoint/geopackage');
 window.GeoJSONToGeoPackage = require('geojson-to-geopackage');

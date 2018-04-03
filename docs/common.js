@@ -33,10 +33,18 @@ var map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
-var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 });
-baseLayer.addTo(map);
+var arcworldmap = L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png', {
+  attribution: 'Source: Esri, DigitalGlobe, GeoEye, Earthstar Geographics, CNES/Airbus DS, USDA, USGS, AeroGRID, IGN, and the GIS User Community'
+});
+map.addControl(L.control.basemaps({
+  basemaps: [osm, arcworldmap],
+  tileX: 0,
+  tileY: 0,
+  tileZ: 1
+}));
 
 var geoPackage;
 var tableLayers;
