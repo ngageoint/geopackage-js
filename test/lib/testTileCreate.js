@@ -41,6 +41,7 @@ describe('GeoPackage Tile table create tests', function() {
     var tileTable = new TileTable(tableName, requiredColumns);
 
     geopackage.createTileTable(tileTable, function(err, result) {
+      if (err) return done(err);
       Verification.verifyTableExists(geopackage, tableName, function(err) {
         if (err) return done(err);
         done();
