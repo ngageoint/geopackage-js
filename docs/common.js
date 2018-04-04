@@ -88,6 +88,21 @@ window.downloadGeoJSON = function(tableName) {
 }
 
 function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
+  if (Piwik) {
+    Piwik.getAsyncTracker().trackEvent(
+      'GeoJSON',
+      'load',
+      'File Size',
+      array.byteLength
+    );
+  }
+  ga('send', {
+    hitType: 'event',
+    eventCategory: 'GeoJSON',
+    eventAction: 'load',
+    eventLabel: 'File Size',
+    eventValue: array.byteLength
+  });
   var jsonString = '';
   var len = array.byteLength;
   for (var i = 0; i < len; i++) {
@@ -108,6 +123,43 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
     clearInfo();
     readGeoPackage(function() {
       geoJsonDoneCallback ? geoJsonDoneCallback() : null;
+    });
+  });
+}
+
+function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
+  if (Piwik) {
+    Piwik.getAsyncTracker().trackEvent(
+      'Shapefile Zip',
+      'load',
+      'File Size',
+      array.byteLength
+    );
+  }
+  ga('send', {
+    hitType: 'event',
+    eventCategory: 'Shapefile Zip',
+    eventAction: 'load',
+    eventLabel: 'File Size',
+    eventValue: array.byteLength
+  });
+  ShapefileToGeoPackage.convert({
+    shapezipData: array
+  }, function(status, callback) {
+    var text = status.status;
+    if (status.completed) {
+      text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+    }
+    $('#status').text(text);
+    setTimeout(callback, 0);
+  }, function(err, gp) {
+    if (err) {
+      return shapefileZipDoneCallback ? shapefileZipDoneCallback(err) : null;
+    }
+    geoPackage = gp;
+    clearInfo();
+    readGeoPackage(function() {
+      shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
     });
   });
 }
@@ -147,21 +199,6 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a GeoJSON file
     else if (f.name.lastIndexOf('json') > f.name.lastIndexOf('.')) {
-      if (Piwik) {
-        Piwik.getAsyncTracker().trackEvent(
-          'GeoJSON',
-          'load',
-          'File Size',
-          array.byteLength
-        );
-      }
-      ga('send', {
-        hitType: 'event',
-        eventCategory: 'GeoJSON',
-        eventAction: 'load',
-        eventLabel: 'File Size',
-        eventValue: array.byteLength
-      });
       handleGeoJSONByteArray(array, function() {
         $('#choose-label').find('i').toggle();
         $('#download').removeClass('gone');
@@ -170,38 +207,10 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile zip
     else if (f.name.lastIndexOf('zip') > f.name.lastIndexOf('.')) {
-      if (Piwik) {
-        Piwik.getAsyncTracker().trackEvent(
-          'Shapefile Zip',
-          'load',
-          'File Size',
-          array.byteLength
-        );
-      }
-      ga('send', {
-        hitType: 'event',
-        eventCategory: 'Shapefile Zip',
-        eventAction: 'load',
-        eventLabel: 'File Size',
-        eventValue: array.byteLength
-      });
-      ShapefileToGeoPackage.convert({
-        shapezipData: array
-      }, function(status, callback) {
-        var text = status.status;
-        if (status.completed) {
-          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
-        }
-        $('#status').text(text);
-        setTimeout(callback, 0);
-      }, function(err, gp) {
-        geoPackage = gp;
-        clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+      handleShapefileZipByteArray(array, function() {
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a Shapefile shp
@@ -549,6 +558,7 @@ window.loadUrl = function(url, loadingElement, gpName) {
   });
   fileName = url.split('/').pop();
   loadingElement.toggle();
+
   var xhr = new XMLHttpRequest();
   xhr.open('GET', url, true);
   xhr.responseType = 'arraybuffer';
@@ -564,6 +574,22 @@ window.loadUrl = function(url, loadingElement, gpName) {
         $('#choose-label').find('i').toggle();
         loadingElement.toggle();
         loadRequestedLayers();
+      });
+    } else if (e.currentTarget.getResponseHeader('content-type').indexOf('octet-stream') != -1) {
+      handleShapefileZipByteArray(uInt8Array, function(err) {
+        if (err) {
+          loadByteArray(uInt8Array, function() {
+            $('#download').removeClass('gone');
+            $('#choose-label').find('i').toggle();
+            loadingElement.toggle();
+            loadRequestedLayers();
+          });
+        } else {
+          $('#download').removeClass('gone');
+          $('#choose-label').find('i').toggle();
+          loadingElement.toggle();
+          loadRequestedLayers();
+        }
       });
     } else {
       loadByteArray(uInt8Array, function() {
@@ -583,8 +609,16 @@ function loadRequestedLayers() {
   var layersToLoad = url.searchParams.getAll("layers");
   if (layersToLoad) {
     for (var i = 0; i < layersToLoad.length; i++) {
+      Piwik.getAsyncTracker().trackEvent(
+        'Layer Provided In URL',
+        'load'
+      );
       $('input[name="onoffswitch-'+layersToLoad[i]+'"]').trigger('click');
     }
+  }
+  var layerToZoomTo = url.searchParams.get('zoomLayer');
+  if (layerToZoomTo) {
+    $('#zoom-'+layerToZoomTo).trigger('click');
   }
 }
 
@@ -593,6 +627,10 @@ window.onload = function() {
   var url = new URL(urlString);
   var urlToLoad = url.searchParams.get("gpkg");
   if (urlToLoad) {
+    Piwik.getAsyncTracker().trackEvent(
+      'File Provided In URL',
+      'load'
+    );
     $('#loadFromUrl').toggle();
     $('#loadFromUrl').find('span').html(urlToLoad);
     window.loadUrl(urlToLoad, $('#loadFromUrl').find('i'), urlToLoad);

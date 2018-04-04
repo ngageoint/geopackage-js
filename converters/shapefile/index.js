@@ -73,38 +73,42 @@ function setupConversion(options, progressCallback, doneCallback) {
   async.waterfall([
     function(callback) {
       if (options.shapezipData) {
-        var zip = new jszip();
-        zip.load(options.shapezipData);
-        var shpfile = zip.filter(function (relativePath, file){
-          return path.extname(relativePath) === '.shp';
-        });
-        var dbffile = zip.filter(function (relativePath, file){
-          return path.extname(relativePath) === '.dbf';
-        });
-        var prjfile = zip.filter(function (relativePath, file){
-          return path.extname(relativePath) === '.prj';
-        });
-        var shpBuffer = shpfile[0].asNodeBuffer();
-        var shpStream = new stream.PassThrough();
-        shpStream.end(shpBuffer);
+        try {
+          var zip = new jszip();
+          zip.load(options.shapezipData);
+          var shpfile = zip.filter(function (relativePath, file){
+            return path.extname(relativePath) === '.shp';
+          });
+          var dbffile = zip.filter(function (relativePath, file){
+            return path.extname(relativePath) === '.dbf';
+          });
+          var prjfile = zip.filter(function (relativePath, file){
+            return path.extname(relativePath) === '.prj';
+          });
+          var shpBuffer = shpfile[0].asNodeBuffer();
+          var shpStream = new stream.PassThrough();
+          shpStream.end(shpBuffer);
 
-        var dbfStream;
-        if (dbffile.length) {
-          var dbfBuffer = dbffile[0].asNodeBuffer();
-          dbfStream = new stream.PassThrough();
-          dbfStream.end(dbfBuffer);
+          var dbfStream;
+          if (dbffile.length) {
+            var dbfBuffer = dbffile[0].asNodeBuffer();
+            dbfStream = new stream.PassThrough();
+            dbfStream.end(dbfBuffer);
+          }
+
+          if (prjfile.length) {
+            var prjBuffer = prjfile[0].asNodeBuffer();
+            projection = proj4.Proj(prjBuffer.toString());
+          }
+
+          reader = shp.reader({
+            shp: shpStream,
+            dbf: dbfStream,
+            'ignore-properties': !!dbfStream
+          });
+        } catch (e) {
+          return callback(e);
         }
-
-        if (prjfile.length) {
-          var prjBuffer = prjfile[0].asNodeBuffer();
-          projection = proj4.Proj(prjBuffer.toString());
-        }
-
-        reader = shp.reader({
-          shp: shpStream,
-          dbf: dbfStream,
-          'ignore-properties': !!dbfStream
-        });
       } else if (options.shapeData) {
         var shpStream = new stream.PassThrough();
         var shpBuffer = new Buffer(options.shapeData);
@@ -336,8 +340,12 @@ function setupConversion(options, progressCallback, doneCallback) {
       });
     }
   ], function done(err, geopackage) {
-    reader.close(function() {
+    if (!err && reader) {
+      reader.close(function() {
+        doneCallback(err, geopackage);
+      });
+    } else {
       doneCallback(err, geopackage);
-    });
+    }
   });
 };
