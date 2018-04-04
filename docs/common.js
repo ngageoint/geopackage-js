@@ -87,6 +87,31 @@ window.downloadGeoJSON = function(tableName) {
   });
 }
 
+function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
+  var jsonString = '';
+  var len = array.byteLength;
+  for (var i = 0; i < len; i++) {
+    jsonString += String.fromCharCode( array[ i ] );
+  }
+  var json = JSON.parse(jsonString);
+  GeoJSONToGeoPackage.convert({
+    geojson:json
+  }, function(status, callback) {
+    var text = status.status;
+    if (status.completed) {
+      text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
+    }
+    $('#status').text(text);
+    setTimeout(callback, 0);
+  }, function(err, gp) {
+    geoPackage = gp;
+    clearInfo();
+    readGeoPackage(function() {
+      geoJsonDoneCallback ? geoJsonDoneCallback() : null;
+    });
+  });
+}
+
 window.loadGeoPackage = function(files) {
   var f = files[0];
   fileName = f.name;
@@ -137,27 +162,10 @@ window.loadGeoPackage = function(files) {
         eventLabel: 'File Size',
         eventValue: array.byteLength
       });
-      var jsonString = '';
-      var len = array.byteLength;
-      for (var i = 0; i < len; i++) {
-        jsonString += String.fromCharCode( array[ i ] );
-      }
-      var json = JSON.parse(jsonString);
-      GeoJSONToGeoPackage.convert(json, function(status, callback) {
-        var text = status.status;
-        if (status.completed) {
-          text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
-        }
-        $('#status').text(text);
-        setTimeout(callback, 0);
-      }, function(err, gp) {
-        geoPackage = gp;
-        clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+      handleGeoJSONByteArray(array, function() {
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a Shapefile zip
@@ -549,21 +557,35 @@ window.loadUrl = function(url, loadingElement, gpName) {
   $('#choose-label').find('i').toggle();
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
-    loadByteArray(uInt8Array, function() {
-      $('#download').removeClass('gone');
-      $('#choose-label').find('i').toggle();
-      loadingElement.toggle();
-      var urlString = window.location.href;
-      var url = new URL(urlString);
-      var layersToLoad = url.searchParams.getAll("layers");
-      if (layersToLoad) {
-        for (var i = 0; i < layersToLoad.length; i++) {
-          $('input[name="onoffswitch-'+layersToLoad[i]+'"]').trigger('click');
-        }
-      }
-    });
+    if (e.currentTarget.getResponseHeader('content-type').indexOf('json') != -1) {
+      // assume it is geojson
+      handleGeoJSONByteArray(uInt8Array, function() {
+        $('#download').removeClass('gone');
+        $('#choose-label').find('i').toggle();
+        loadingElement.toggle();
+        loadRequestedLayers();
+      });
+    } else {
+      loadByteArray(uInt8Array, function() {
+        $('#download').removeClass('gone');
+        $('#choose-label').find('i').toggle();
+        loadingElement.toggle();
+        loadRequestedLayers();
+      });
+    }
   };
   xhr.send();
+}
+
+function loadRequestedLayers() {
+  var urlString = window.location.href;
+  var url = new URL(urlString);
+  var layersToLoad = url.searchParams.getAll("layers");
+  if (layersToLoad) {
+    for (var i = 0; i < layersToLoad.length; i++) {
+      $('input[name="onoffswitch-'+layersToLoad[i]+'"]').trigger('click');
+    }
+  }
 }
 
 window.onload = function() {
