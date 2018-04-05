@@ -88,7 +88,7 @@ window.downloadGeoJSON = function(tableName) {
 }
 
 function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
-  if (Piwik) {
+  if (window.Piwik) {
     Piwik.getAsyncTracker().trackEvent(
       'GeoJSON',
       'load',
@@ -128,7 +128,7 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
 }
 
 function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
-  if (Piwik) {
+  if (window.Piwik) {
     Piwik.getAsyncTracker().trackEvent(
       'Shapefile Zip',
       'load',
@@ -177,7 +177,7 @@ window.loadGeoPackage = function(files) {
 
     // if it is a GeoPackage file
     if (f.name.lastIndexOf('gpkg') === f.name.lastIndexOf('.')+1) {
-      if (Piwik) {
+      if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent(
           'GeoPackage',
           'load',
@@ -215,7 +215,7 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a Shapefile shp
     else if (f.name.lastIndexOf('shp') > f.name.lastIndexOf('.')) {
-      if (Piwik) {
+      if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent(
           'Shapefile',
           'load',
@@ -251,7 +251,7 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a MBTiles file
     else if (f.name.lastIndexOf('mbtiles') > f.name.lastIndexOf('.')) {
-      if (Piwik) {
+      if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent(
           'MBTiles',
           'load',
@@ -287,7 +287,7 @@ window.loadGeoPackage = function(files) {
     }
     // if it is a PBF file
     else if (f.name.lastIndexOf('pbf') > f.name.lastIndexOf('.')) {
-      if (Piwik) {
+      if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent(
           'PBF',
           'load',
@@ -413,7 +413,7 @@ window.toggleLayer = function(layerType, table) {
   }
 
   if (layerType === 'tile') {
-    if (Piwik) {
+    if (window.Piwik) {
       Piwik.getAsyncTracker().trackEvent(
         'Layer',
         'load',
@@ -450,7 +450,7 @@ window.toggleLayer = function(layerType, table) {
       tableLayers[table] = tableLayer;
     });
   } else if (layerType === 'feature') {
-    if (Piwik) {
+    if (window.Piwik) {
       Piwik.getAsyncTracker().trackEvent(
         'Layer',
         'load',
@@ -545,7 +545,7 @@ function featureStyle(feature) {
 }
 
 window.loadUrl = function(url, loadingElement, gpName, type) {
-  if (Piwik) {
+  if (window.Piwik) {
     Piwik.getAsyncTracker().trackEvent(
       'URL',
       'load'
@@ -614,7 +614,7 @@ function loadRequestedLayers() {
   var layersToLoad = url.searchParams.getAll("layers");
   if (layersToLoad) {
     for (var i = 0; i < layersToLoad.length; i++) {
-      if (Piwik) {
+      if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent(
           'Layer Provided In URL',
           'load'
@@ -636,7 +636,7 @@ window.onload = function() {
   var urlToLoad = determineUrlAndType();
 
   if (urlToLoad) {
-    if (Piwik) {
+    if (window.Piwik) {
       Piwik.getAsyncTracker().trackEvent(
         'File Provided In URL',
         'load'
