@@ -288,7 +288,7 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
           if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
             geoJson.properties[key] = currentRow.values[key];
           } else if (currentRow.getGeometryColumn().name === key) {
-            geoJson.properties[key] = geometry ? 'Valid' : 'No Geometry';
+            // geoJson.properties[key] = geometry ? 'Valid' : 'No Geometry';
           }
         }
         geoJson.id = currentRow.getId();
