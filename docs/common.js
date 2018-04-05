@@ -655,10 +655,10 @@ function determineUrlAndType() {
 
   for (var i = 0; i < types.length; i++) {
     var type = types[i];
-    var url = url.searchParams.get(types[i]);
-    if (url) {
+    var urlToLoad = url.searchParams.get(types[i]);
+    if (urlToLoad) {
       return {
-        url: url,
+        url: urlToLoad,
         type: type
       };
     }
