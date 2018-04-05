@@ -544,7 +544,7 @@ function featureStyle(feature) {
   };
 }
 
-window.loadUrl = function(url, loadingElement, gpName) {
+window.loadUrl = function(url, loadingElement, gpName, type) {
   if (Piwik) {
     Piwik.getAsyncTracker().trackEvent(
       'URL',
@@ -567,37 +567,42 @@ window.loadUrl = function(url, loadingElement, gpName) {
   $('#choose-label').find('i').toggle();
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
-    if (e.currentTarget.getResponseHeader('content-type').indexOf('json') != -1) {
-      // assume it is geojson
-      handleGeoJSONByteArray(uInt8Array, function() {
-        $('#download').removeClass('gone');
-        $('#choose-label').find('i').toggle();
-        loadingElement.toggle();
-        loadRequestedLayers();
-      });
-    } else if (e.currentTarget.getResponseHeader('content-type').indexOf('octet-stream') != -1) {
-      handleShapefileZipByteArray(uInt8Array, function(err) {
-        if (err) {
-          loadByteArray(uInt8Array, function() {
-            $('#download').removeClass('gone');
-            $('#choose-label').find('i').toggle();
-            loadingElement.toggle();
-            loadRequestedLayers();
-          });
-        } else {
+    switch (type) {
+      case 'data':
+        // this case we have to try to determine what kind of thing it is
+      break;
+      case 'geojson':
+        handleGeoJSONByteArray(uInt8Array, function() {
           $('#download').removeClass('gone');
           $('#choose-label').find('i').toggle();
           loadingElement.toggle();
           loadRequestedLayers();
-        }
-      });
-    } else {
-      loadByteArray(uInt8Array, function() {
-        $('#download').removeClass('gone');
-        $('#choose-label').find('i').toggle();
-        loadingElement.toggle();
-        loadRequestedLayers();
-      });
+        });
+        break;
+      case 'mbtiles':
+
+      break;
+      case 'shapefile':
+      case 'shapefilezip':
+        handleShapefileZipByteArray(uInt8Array, function(err) {
+          if (!err) {
+            $('#download').removeClass('gone');
+            $('#choose-label').find('i').toggle();
+            loadingElement.toggle();
+            return loadRequestedLayers();
+          }
+          // could be a regular shapefile
+        });
+        break;
+      case 'gpkg':
+      default:
+        loadByteArray(uInt8Array, function() {
+          $('#download').removeClass('gone');
+          $('#choose-label').find('i').toggle();
+          loadingElement.toggle();
+          loadRequestedLayers();
+        });
+        break;
     }
   };
   xhr.send();
@@ -609,10 +614,12 @@ function loadRequestedLayers() {
   var layersToLoad = url.searchParams.getAll("layers");
   if (layersToLoad) {
     for (var i = 0; i < layersToLoad.length; i++) {
-      Piwik.getAsyncTracker().trackEvent(
-        'Layer Provided In URL',
-        'load'
-      );
+      if (Piwik) {
+        Piwik.getAsyncTracker().trackEvent(
+          'Layer Provided In URL',
+          'load'
+        );
+      }
       $('input[name="onoffswitch-'+layersToLoad[i]+'"]').trigger('click');
     }
   }
@@ -625,15 +632,36 @@ function loadRequestedLayers() {
 window.onload = function() {
   var urlString = window.location.href;
   var url = new URL(urlString);
-  var urlToLoad = url.searchParams.get("gpkg");
+
+  var urlToLoad = determineUrlAndType();
+
   if (urlToLoad) {
-    Piwik.getAsyncTracker().trackEvent(
-      'File Provided In URL',
-      'load'
-    );
+    if (Piwik) {
+      Piwik.getAsyncTracker().trackEvent(
+        'File Provided In URL',
+        'load'
+      );
+    }
     $('#loadFromUrl').toggle();
     $('#loadFromUrl').find('span').html(urlToLoad);
-    window.loadUrl(urlToLoad, $('#loadFromUrl').find('i'), urlToLoad);
+    window.loadUrl(urlToLoad.url, $('#loadFromUrl').find('i'), urlToLoad.url, urlToLoad.type);
+  }
+}
+
+function determineUrlAndType() {
+  var urlString = window.location.href;
+  var url = new URL(urlString);
+  var types = ['data', 'gpkg', 'shapefile', 'shapefilezip', 'mbtiles', 'geojson'];
+
+  for (var i = 0; i < types.length; i++) {
+    var type = types[i];
+    var url = url.searchParams.get(types[i]);
+    if (url) {
+      return {
+        url: url,
+        type: type
+      };
+    }
   }
 }
 
