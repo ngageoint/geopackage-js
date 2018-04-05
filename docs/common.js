@@ -794,7 +794,7 @@ window.loadFeatures = function(tableName, featuresElement) {
     feature.values = [];
     for (var i = 0; i < features.columns.length; i++) {
       var value = feature.properties[features.columns[i].name];
-      if (value === null || value === 'null') {
+      if (value === null || value === 'null' || value == undefined) {
         feature.values.push('');
       } else {
         feature.values.push(value.toString());

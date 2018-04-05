@@ -70,9 +70,12 @@ module.exports.createGeoPackage = function(gppath, callback) {
       }
     }
   ], function() {
+    console.log('creating geopackage file', gppath);
     GeoPackageManager.create(gppath, function(err, geopackage) {
+      console.log('created it with err', err);
       var tc = new TableCreator(geopackage);
-      tc.createRequired(function() {
+      tc.createRequired(function(err) {
+        console.log('created required tables', err);
         callback(null, geopackage);
       });
     });
@@ -251,7 +254,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
           if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
             geoJson.properties[key] = currentRow.values[key];
           } else if (currentRow.getGeometryColumn().name === key) {
-            geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
+            // geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
           }
         }
         geoJson.id = currentRow.getId();
