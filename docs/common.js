@@ -787,6 +787,7 @@ window.loadFeatures = function(tableName, featuresElement) {
   var features = {
     columns: tableInfos[tableName].columns,
     srs: tableInfos[tableName].srs,
+    geometryColumns: tableInfos[tableName].geometryColumns,
     features: []
   };
   GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature, featureDone) {
@@ -794,7 +795,14 @@ window.loadFeatures = function(tableName, featuresElement) {
     feature.values = [];
     for (var i = 0; i < features.columns.length; i++) {
       var value = feature.properties[features.columns[i].name];
-      if (value === null || value === 'null' || value == undefined) {
+
+      if (features.columns[i].name == features.geometryColumns.geometryColumn) {
+        if (feature.geometry) {
+          feature.values.push(feature.geometry.type);
+        } else {
+          feature.values.push('Unknown');
+        }
+      } else if (value === null || value === 'null' || value == undefined) {
         feature.values.push('');
       } else {
         feature.values.push(value.toString());
