@@ -35,7 +35,7 @@
     "reproject": "^1.1.1",
     "sql.js": "https://github.com/kripken/sql.js.git",
     "stream-to-array": "^2.3.0",
-    "wkx": "^0.4.2"
+    "wkx": "https://github.com/danielbarela/wkx.git#geoJsonMValue"
   },
   "devDependencies": {
     "babel-polyfill": "^6.23.0",

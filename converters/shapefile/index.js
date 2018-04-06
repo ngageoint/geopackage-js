@@ -126,9 +126,9 @@ function setupConversion(options, progressCallback, doneCallback) {
           "ignore-properties": !!options.dbfData,
           shp: shpStream
         });
+        callback();
       } else {
         var extension = path.extname(options.shapefile);
-
         if (extension.toLowerCase() === '.zip') {
           fs.readFile(options.shapefile, function(err, data) {
             var zip = new jszip();
@@ -159,6 +159,7 @@ function setupConversion(options, progressCallback, doneCallback) {
               shp: shpStream,
               dbf: dbfStream
             });
+            callback();
           });
         } else {
           dbf = path.basename(options.shapefile, path.extname(options.shapefile)) + '.dbf';
@@ -170,9 +171,9 @@ function setupConversion(options, progressCallback, doneCallback) {
               "ignore-properties": true
             });
           }
+          callback();
         }
       }
-      callback();
     },
     // create or open the geopackage
     function(callback) {

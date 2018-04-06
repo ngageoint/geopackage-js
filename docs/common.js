@@ -793,6 +793,15 @@ window.loadFeatures = function(tableName, featuresElement) {
   GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature, featureDone) {
     feature.tableName = tableName;
     feature.values = [];
+
+    var sanitizedColumns = [];
+    for (var i = 0; i < features.columns.length; i++) {
+      if (features.columns[i].name.toLowerCase() != '_properties_id' && features.columns[i].name.toLowerCase() != '_feature_id') {
+        sanitizedColumns.push(features.columns[i]);
+      }
+    }
+    features.columns = sanitizedColumns;
+
     for (var i = 0; i < features.columns.length; i++) {
       var value = feature.properties[features.columns[i].name];
 

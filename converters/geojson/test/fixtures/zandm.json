@@ -1,0 +1,50 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "asdf#456",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -5.78,
+          4.3,
+          121.0
+        ]
+      },
+      "properties": {
+        "ID": 456
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "gserg#897",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -8.6,
+            2.86,
+            7.7,
+            131
+          ],
+          [
+            -8.6,
+            2.86,
+            109.6648,
+            131
+          ],
+          [
+            -51.8787,
+            4.66,
+            129646.8591,
+            131
+          ]
+        ]
+      },
+      "properties": {
+        "ID": 897
+      }
+    }
+  ]
+}

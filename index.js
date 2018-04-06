@@ -146,7 +146,9 @@ module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tab
       var geometryData = new GeometryData();
       geometryData.setSrsId(srs.srs_id);
       var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
+      console.log('featureGeometry', featureGeometry);
       var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
+      console.log('parsed geometry', geometry);
       geometryData.setGeometry(geometry);
       featureRow.setGeometry(geometryData);
       for (var propertyKey in feature.properties) {
@@ -233,7 +235,6 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
     }
     featureDao.getSrs(function(err, srs) {
       featureDao.queryForEach(function(err, row, rowDone) {
-
         var geoJson = {
           type: 'Feature',
           properties: {}
@@ -244,20 +245,27 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
         if (geometry && geometry.geometry) {
           var geom = geometry.geometry;
           var geoJsonGeom = geometry.geometry.toGeoJSON();
-          if (srs.definition && srs.definition !== 'undefined') {
+          console.log('geoJsonGeom', geoJsonGeom);
+          if (srs.definition && srs.definition !== 'undefined' && (srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id) != 'EPSG:4326') {
             geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id, 'EPSG:4326');
           }
           geoJson.geometry = geoJsonGeom;
         }
 
         for (var key in currentRow.values) {
-          if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name) {
-            geoJson.properties[key] = currentRow.values[key];
+          if(currentRow.values.hasOwnProperty(key) && key != currentRow.getGeometryColumn().name && key != 'id') {
+            if (key.toLowerCase() == '_feature_id') {
+              geoJson.id = currentRow.values[key];
+            } else if (key.toLowerCase() == '_properties_id') {
+              geoJson.properties[key.substring(12)] = currentRow.values[key];
+            } else {
+              geoJson.properties[key] = currentRow.values[key];
+            }
           } else if (currentRow.getGeometryColumn().name === key) {
             // geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
           }
         }
-        geoJson.id = currentRow.getId();
+        geoJson.id = geoJson.id || currentRow.getId();
         featureCallback(err, geoJson, rowDone);
       }, doneCallback);
     });

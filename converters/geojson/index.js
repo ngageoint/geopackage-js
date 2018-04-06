@@ -162,6 +162,15 @@ function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNu
             feature.properties.geometry_property = feature.properties.geometry;
             delete feature.properties.geometry;
           }
+
+          if (feature.id) {
+            if (!properties['_feature_id']) {
+              properties['_feature_id'] = properties['_feature_id'] || {
+                name: '_feature_id'
+              };
+            }
+          }
+
           for (var key in feature.properties) {
             if (!properties[key]) {
               properties[key] = properties[key] || {
@@ -230,13 +239,14 @@ function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNu
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
     var index = 2;
+
     for (var key in properties) {
       var prop = properties[key];
       if (prop.name.toLowerCase() !== 'id') {
         columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
         index++;
       } else if (prop.name.toLowerCase() === 'id') {
-        columns.push(FeatureColumn.createColumnWithIndex(index, '_id', DataTypes.fromName(prop.type), false, null));
+        columns.push(FeatureColumn.createColumnWithIndex(index, '_properties_'+prop.name, DataTypes.fromName(prop.type), false, null));
         index++;
       }
     }
@@ -251,10 +261,19 @@ function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNu
     var fivePercent = Math.floor(featureCount / 20);
     async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
       async.setImmediate(function() {
+        if (feature.id) {
+          feature.properties._feature_id = feature.id;
+        }
+
         if (feature.properties.id) {
-          feature.properties._id = feature.properties.id;
+          feature.properties._properties_id = feature.properties.id;
           delete feature.properties.id;
         }
+        if (feature.properties.ID) {
+          feature.properties._properties_ID = feature.properties.ID;
+          delete feature.properties.ID;
+        }
+
         GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
           if (count++ % fivePercent === 0) {
             progressCallback({
