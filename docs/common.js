@@ -468,8 +468,13 @@ window.toggleLayer = function(layerType, table) {
         pointToLayer: pointToLayer,
         onEachFeature: function (feature, layer) {
           var string = "";
-          for (var key in feature.properties) {
-            string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+          if (feature.properties.name || feature.properties.description) {
+              string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+              string += feature.properties.description ? feature.properties.description : '';
+          } else {
+            for (var key in feature.properties) {
+              string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+            }
           }
           layer.bindPopup(string);
         },

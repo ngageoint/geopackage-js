@@ -219,10 +219,10 @@
         </tr>
       </thead>
       {{#features}}
-      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')" ondblclick="zoomToFeature({{id}}, '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
-      <td><i class="fa fa-circle-o" onclick="toggleFeature({{id}}, '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
+      <tr onmouseover="highlightFeature('{{id}}', '{{tableName}}')" ondblclick="zoomToFeature('{{id}}', '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
+      <td><i class="fa fa-circle-o" onclick="toggleFeature('{{id}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
         {{#values}}
-          <td>{{.}}</td>
+          <td>{{{.}}}</td>
         {{/values}}
       </tr>
       {{/features}}
