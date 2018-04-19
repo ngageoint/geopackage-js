@@ -1,3 +1,20 @@
+var originalInitTile = L.GridLayer.prototype._initTile;
+    if (!originalInitTile.isPatched){
+
+    L.GridLayer.include({
+        _initTile: function (tile) {
+            originalInitTile.call(this, tile);
+
+            var tileSize = this.getTileSize();
+
+            tile.style.width = tileSize.x + 1 + 'px';
+            tile.style.height = tileSize.y + 1 + 'px';
+        }
+    });
+
+    L.GridLayer.prototype._initTile.isPatched = true;
+  }
+
 (function (window, document, undefined) {
 
   L.Control.ZoomIndicator = L.Control.extend({
