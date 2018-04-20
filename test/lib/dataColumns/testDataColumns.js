@@ -159,10 +159,7 @@ describe('Data Columns tests', function() {
       dc.description = 'constraint description';
 
       dao.create(dc, function(err, result) {
-        console.log('err', err);
-        console.log('result', result);
         dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint, rowDone) {
-          console.log('constraint name err', err);
           dataColumnConstraint.should.be.deep.equal({
             constraint_name: 'test constraint',
             constraint_type: 'range',

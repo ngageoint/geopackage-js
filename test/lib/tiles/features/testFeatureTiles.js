@@ -106,7 +106,6 @@ describe('GeoPackage FeatureTiles tests', function() {
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1, function(err, image) {
         testSetup.diffImages(image, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
-          console.log('arguments', arguments);
           equal.should.be.equal(true);
           done();
         });
