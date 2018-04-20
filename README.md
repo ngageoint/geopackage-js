@@ -34,6 +34,11 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 1.1.1
+
+- fix more instances of proj4 bug for react
+- fixed tile generation for images with different x and y pixel densities
+
 ##### 1.1.0
 
 - accept pull request adding support for react
