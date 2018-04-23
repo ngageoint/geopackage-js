@@ -484,13 +484,19 @@ window.toggleLayer = function(layerType, table) {
         style: featureStyle,
         pointToLayer: pointToLayer,
         onEachFeature: function (feature, layer) {
+          var columnMap = tableInfos['rivers'].columnMap;
           var string = "";
           if (feature.properties.name || feature.properties.description) {
               string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
               string += feature.properties.description ? feature.properties.description : '';
           } else {
             for (var key in feature.properties) {
-              string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+              if (columnMap && columnMap[key] && columnMap[key].displayName) {
+                string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+              } else {
+                string += '<div class="item"><span class="label">' + key + ': </span>';
+              }
+              string += '<span class="value">' + feature.properties[key] + '</span></div>';
             }
           }
           layer.bindPopup(string);
@@ -861,7 +867,21 @@ var highlightLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+        var columnMap = tableInfos['rivers'].columnMap;
+        var string = "";
+        if (feature.properties.name || feature.properties.description) {
+            string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+            string += feature.properties.description ? feature.properties.description : '';
+        } else {
+          for (var key in feature.properties) {
+            if (columnMap && columnMap[key] && columnMap[key].displayName) {
+              string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+            } else {
+              string += '<div class="item"><span class="label">' + key + ': </span>';
+            }
+            string += '<span class="value">' + feature.properties[key] + '</span></div>';
+          }
+        }
       }
       layer.bindPopup(string);
     },
@@ -899,7 +919,21 @@ var featureLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
+        var columnMap = tableInfos['rivers'].columnMap;
+        var string = "";
+        if (feature.properties.name || feature.properties.description) {
+            string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+            string += feature.properties.description ? feature.properties.description : '';
+        } else {
+          for (var key in feature.properties) {
+            if (columnMap && columnMap[key] && columnMap[key].displayName) {
+              string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+            } else {
+              string += '<div class="item"><span class="label">' + key + ': </span>';
+            }
+            string += '<span class="value">' + feature.properties[key] + '</span></div>';
+          }
+        }
       }
       layer.bindPopup(string);
     },
