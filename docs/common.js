@@ -484,7 +484,7 @@ window.toggleLayer = function(layerType, table) {
         style: featureStyle,
         pointToLayer: pointToLayer,
         onEachFeature: function (feature, layer) {
-          var columnMap = tableInfos['rivers'].columnMap;
+          var columnMap = tableInfos[table].columnMap;
           var string = "";
           if (feature.properties.name || feature.properties.description) {
               string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
@@ -867,7 +867,7 @@ var highlightLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        var columnMap = tableInfos['rivers'].columnMap;
+        // var columnMap = tableInfos['rivers'].columnMap;
         var string = "";
         if (feature.properties.name || feature.properties.description) {
             string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
@@ -919,7 +919,7 @@ var featureLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        var columnMap = tableInfos['rivers'].columnMap;
+        // var columnMap = tableInfos['rivers'].columnMap;
         var string = "";
         if (feature.properties.name || feature.properties.description) {
             string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
