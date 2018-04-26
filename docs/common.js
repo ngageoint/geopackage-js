@@ -867,7 +867,7 @@ var highlightLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        // var columnMap = tableInfos['rivers'].columnMap;
+        var columnMap = tableInfos[feature.properties.tableName].columnMap;
         var string = "";
         if (feature.properties.name || feature.properties.description) {
             string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
@@ -897,6 +897,7 @@ map.addLayer(highlightLayer);
 window.highlightFeature = function(featureId, tableName) {
 
   GeoPackageAPI.getFeature(geoPackage, tableName, featureId, function(err, geoJson) {
+    geoJson.properties.tableName = tableName;
     highlightLayer.clearLayers();
     highlightLayer.addData(geoJson);
     highlightLayer.bringToFront();
@@ -919,13 +920,14 @@ var featureLayer = L.geoJson([], {
     onEachFeature: function (feature, layer) {
       var string = "";
       for (var key in feature.properties) {
-        // var columnMap = tableInfos['rivers'].columnMap;
+        var columnMap = tableInfos[feature.properties.tableName].columnMap;
         var string = "";
         if (feature.properties.name || feature.properties.description) {
             string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
             string += feature.properties.description ? feature.properties.description : '';
         } else {
           for (var key in feature.properties) {
+            if (key == 'tableName') continue;
             if (columnMap && columnMap[key] && columnMap[key].displayName) {
               string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
             } else {
@@ -957,6 +959,7 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
   currentFeature = featureId;
 
   GeoPackageAPI.getFeature(geoPackage, tableName, featureId, function(err, geoJson) {
+    geoJson.properties.tableName = tableName;
     featureLayer.addData(geoJson);
     featureLayer.bringToFront();
     if (zoom) {
