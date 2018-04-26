@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+var GeoPackageOptimizer = require('./index.js');
+
+var fs = require('fs')
+  , async = require('async')
+  , GeoPackageAPI = require('@ngageoint/geopackage');
+
+console.log('GeoPackage Optimizer For Mobile Clients');
+
+var geoPackageFile = process.argv[2];
+var outputGeoPackageFile = process.argv[3];
+
+if (!geoPackageFile || !outputGeoPackageFile) {
+  console.log('Usage: mobile-optimizer <geoPackageToProcess> <geoPackageToWrite>')
+  process.exit(1);
+}
+
+async.series({
+  fileExists: function(callback) {
+    fs.stat(geoPackageFile, function(err, stats) {
+      if (err || !stats || !stats.isFile()) {
+        return callback('File does not exist.');
+      }
+      return callback(null, true);
+    });
+  },
+  geoPackage: function(callback) {
+    GeoPackageAPI.openGeoPackage(geoPackageFile, function(err, result) {
+      if (err || !result) {
+        return callback('Invalid GeoPackage file.');
+      }
+      console.log('Processing %s', geoPackageFile);
+      callback(null, result);
+    });
+  },
+  outputGeoPackage: function (callback) {
+    GeoPackageAPI.createGeoPackage(outputGeoPackageFile, function(err, result) {
+      if (err || !result) {
+        return callback('Invalid GeoPackage file.');
+      }
+      console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
+      callback(null, result);
+    });
+  }
+},
+function(err, results) {
+  if (err) {
+    console.log('Failed to convert with error', err);
+    process.exit(1);
+  } else {
+    GeoPackageOptimizer(results.geoPackage, results.outputGeoPackage, function(err) {
+      console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
+      process.exit(0);
+    });
+  }
+});
