@@ -19,7 +19,6 @@ $ npm install @ngageoint/geopackage-mobile-optimizer
 ```
 
 ```javascript
-// Load the Rivers GeoPackage and display the tile layer
 var fs = require('fs');
 var GeoPackageAPI = require('@ngageoint/geopackage');
 var GeoPackageOptimizer = require("@ngageoint/geopackage-mobile-optimizer");
