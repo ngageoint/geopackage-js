@@ -34,6 +34,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 1.1.2
+
+- fix case where GeoPackage Zoom does not correspond to the web map zoom
+
 ##### 1.1.1
 
 - fix more instances of proj4 bug for react
