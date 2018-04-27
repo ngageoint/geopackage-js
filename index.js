@@ -430,6 +430,90 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
   });
 };
 
+/**
+ * Gets the tiles in the EPSG:4326 bounding box
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the tile table
+ * @param  {Number}   zoom       Zoom of the tiles to query for
+ * @param  {Number}   west       EPSG:4326 western boundary
+ * @param  {Number}   east       EPSG:4326 eastern boundary
+ * @param  {Number}   south      EPSG:4326 southern boundary
+ * @param  {Number}   north      EPSG:4326 northern boundary
+ * @param  {Function} callback   called with an error if one occurred and a tiles object describing the tiles
+ */
+module.exports.getTilesInBoundingBoxWebZoom = function(geopackage, table, webZoom, west, east, south, north, callback) {
+  var tiles = {};
+
+  geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
+    if (err) {
+      return callback();
+    }
+    if (webZoom < tileDao.minWebZoom || webZoom > tileDao.maxWebZoom) {
+      return callback();
+    }
+    tiles.columns = [];
+    for (var i = 0; i < tileDao.table.columns.length; i++) {
+      var column = tileDao.table.columns[i];
+      tiles.columns.push({
+        index: column.index,
+        name: column.name,
+        max: column.max,
+        min: column.min,
+        notNull: column.notNull,
+        primaryKey: column.primaryKey
+      });
+    }
+    tileDao.getSrs(function(err, srs) {
+      tiles.srs = srs;
+      tiles.tiles = [];
+
+      var zoom = tileDao.webZoomToGeoPackageZoom(webZoom);
+
+      var tms = tileDao.tileMatrixSet;
+      var tm = tileDao.getTileMatrixWithZoomLevel(zoom);
+      var mapBoundingBox = new BoundingBox(Math.max(-180, west), Math.min(east, 180), south, north);
+      tiles.west = Math.max(-180, west).toFixed(2);
+      tiles.east = Math.min(east, 180).toFixed(2);
+      tiles.south = south.toFixed(2);
+      tiles.north = north.toFixed(2);
+      tiles.zoom = zoom;
+      mapBoundingBox = mapBoundingBox.projectBoundingBox('EPSG:4326', tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id);
+
+      var grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(tms.getBoundingBox(), tm.matrix_width, tm.matrix_height, mapBoundingBox);
+
+      tileDao.queryByTileGrid(grid, zoom, function(err, row, rowDone) {
+        var tile = {};
+        tile.tableName = table;
+        tile.id = row.getId();
+
+        var tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
+        tile.minLongitude = tileBB.minLongitude;
+        tile.maxLongitude = tileBB.maxLongitude;
+        tile.minLatitude = tileBB.minLatitude;
+        tile.maxLatitude = tileBB.maxLatitude;
+        tile.projection = tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id;
+        tile.values = [];
+        for (var i = 0; i < tiles.columns.length; i++) {
+          var value = row.values[tiles.columns[i].name];
+          if (tiles.columns[i].name === 'tile_data') {
+            tile.values.push('data');
+          } else
+          if (value === null || value === 'null') {
+            tile.values.push('');
+          } else {
+            tile.values.push(value.toString());
+            tile[tiles.columns[i].name] = value;
+          }
+        }
+        tiles.tiles.push(tile);
+        rowDone();
+      }, function(err) {
+        callback(err, tiles);
+      });
+    });
+  });
+};
+
 module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err || !featureDao) return callback(err);

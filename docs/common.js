@@ -445,8 +445,9 @@ window.toggleLayer = function(layerType, table) {
     });
     geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
-      var maxZoom = tileDao.maxZoom;
-      var minZoom = tileDao.minZoom;
+      // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
+      var maxZoom = tileDao.maxWebMapZoom;
+      var minZoom = tileDao.minWebMapZoom;
       var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
       tableLayer.createTile = function(tilePoint, done) {
         var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
@@ -733,7 +734,6 @@ map.on('moveend', function() {
 });
 
 window.loadTiles = function(tableName, zoom, tilesElement) {
-  //map.setZoom(zoom);
   var mapBounds = map.getBounds();
   if (imageOverlay) map.removeLayer(imageOverlay);
   currentTile = {};
@@ -741,7 +741,7 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   var tilesTableTemplate = $('#all-tiles-template').html();
   Mustache.parse(tilesTableTemplate);
 
-  GeoPackageAPI.getTilesInBoundingBox(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth(), function(err, tiles) {
+  GeoPackageAPI.getTilesInBoundingBoxWebZoom(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth(), function(err, tiles) {
     if (!tiles || !tiles.tiles || !tiles.tiles.length) {
       tilesElement.empty();
       tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
