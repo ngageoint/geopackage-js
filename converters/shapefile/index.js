@@ -57,6 +57,231 @@ function createShapefile(geopackage, tableName, callback) {
   });
 }
 
+function determineTableName(preferredTableName, geopackage, callback) {
+  var name = preferredTableName;
+  geopackage.getFeatureTables(function(err, tables) {
+    var count = 1;
+    while(tables.indexOf(name) !== -1) {
+      name = name + '_' + count;
+      count++;
+    }
+    callback(null, geopackage, name);
+  });
+}
+
+function convertShapefileReaders(readers, geopackage, progressCallback, callback) {
+  async.eachSeries(readers, function(shapefile, shapefileFinished) {
+    var tableName = shapefile.tableName;
+    var reader = shapefile.reader;
+    var projection = shapefile.projection;
+    var features = [];
+
+    async.waterfall([
+      // figure out the table name to put the data into
+      function(callback) {
+        determineTableName(tableName, geopackage, callback);
+      },
+      function(geopackage, tableName, callback) {
+        reader.readHeader(function(err, header) {
+          callback(null, geopackage, tableName, header ? header.bbox : undefined);
+        });
+      },
+      // get the feature properties
+      function(geopackage, tableName, bbox, callback) {
+
+        progressCallback({status: 'Reading Shapefile properties'}, function() {
+
+          var properties = {};
+          var feature;
+
+          async.during(
+            function(cb) {
+              reader.readRecord(function(err, r) {
+                feature = r;
+                cb(null, feature !== shp.end);
+              });
+            }, function(cb) {
+              async.setImmediate(function() {
+                if (!feature) return cb();
+                features.push(feature);
+                for (var key in feature.properties) {
+                  if (!properties[key]) {
+                    properties[key] = properties[key] || {
+                      name: key
+                    };
+
+                    var type = typeof feature.properties[key];
+                    if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
+                      if (type === 'object') {
+                        if (feature.properties[key] instanceof Date) {
+                          type = 'Date';
+                        }
+                      }
+                      switch(type) {
+                        case 'Date':
+                          type = 'DATETIME';
+                          break;
+                        case 'number':
+                          type = 'DOUBLE';
+                          break;
+                        case 'string':
+                          type = 'TEXT';
+                          break;
+                        case 'boolean':
+                          type = 'BOOLEAN';
+                          break;
+                      }
+                      properties[key] = {
+                        name: key,
+                        type: type
+                      };
+                    }
+                  }
+                }
+                cb();
+              });
+            }, function done(err) {
+              callback(err, geopackage, tableName, bbox, properties);
+            }
+          );
+        });
+      },
+      function(geopackage, tableName, bbox, properties, callback) {
+        var FeatureColumn = GeoPackage.FeatureColumn;
+        var GeometryColumns = GeoPackage.GeometryColumns;
+        var DataTypes = GeoPackage.DataTypes;
+        var BoundingBox = GeoPackage.BoundingBox;
+
+        var geometryColumns = new GeometryColumns();
+        geometryColumns.table_name = tableName;
+        geometryColumns.column_name = 'geometry';
+        geometryColumns.geometry_type_name = 'GEOMETRY';
+        geometryColumns.z = 0;
+        geometryColumns.m = 0;
+
+        var columns = [];
+        columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+        columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+        var index = 2;
+        for (var key in properties) {
+          var prop = properties[key];
+          if (prop.name.toLowerCase() !== 'id') {
+            columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
+            index++;
+          }
+        }
+        progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
+          var boundingBox = new BoundingBox(-180, 180, -90, 90);
+          if (projection && bbox) {
+            // bbox is xmin, ymin, xmax, ymax
+            var ll = proj4(projection).inverse([bbox[0], bbox[1]]);
+            var ur = proj4(projection).inverse([bbox[2], bbox[3]]);
+            boundingBox = new BoundingBox(ll[0], ur[0], ll[1], ur[1]);
+          }
+          GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, 4326, function(err, featureDao) {
+            callback(err, geopackage, tableName, featureDao);
+          });
+        });
+      },
+      function(geopackage, tableName, featureDao, callback) {
+        var count = 0;
+        var featureCount = features.length;
+        var fivePercent = Math.floor(featureCount / 20);
+        async.eachSeries(features, function featureIterator(feature, callback) {
+          async.setImmediate(function() {
+            if (projection) {
+              feature = reproject.reproject(feature, projection, 'EPSG:4326');
+            }
+            GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
+              if (count++ % fivePercent === 0) {
+                progressCallback({
+                  status: 'Inserting features into table "' + tableName + '"',
+                  completed: count,
+                  total: featureCount
+                }, callback);
+              } else {
+                callback();
+              }
+            });
+          });
+        }, function done(err) {
+          progressCallback({
+            status: 'Done inserted features into table "' + tableName + '"'
+          }, function() {
+            callback(err, geopackage);
+          });
+        });
+      }
+    ], function(err) {
+      console.log('Completed ' + tableName);
+      if (reader) {
+        reader.close(function() {
+          shapefileFinished(err);
+        });
+      } else {
+        shapefileFinished(err);
+      }
+    });
+  }, function done(err) {
+    callback(err, geopackage);
+  });
+}
+
+function getReadersFromZip(zip) {
+  var readers = [];
+  var shpfileArray = zip.filter(function (relativePath, file){
+    return path.extname(relativePath) === '.shp';
+  });
+  var dbffileArray = zip.filter(function (relativePath, file){
+    return path.extname(relativePath) === '.dbf';
+  });
+  var prjfileArray = zip.filter(function (relativePath, file){
+    return path.extname(relativePath) === '.prj';
+  });
+
+  for (var i = 0; i < shpfileArray.length; i++) {
+    var shapeZipObject = shpfileArray[i];
+    var shpBuffer = shapeZipObject.asNodeBuffer();
+    var shpStream = new stream.PassThrough();
+    shpStream.end(shpBuffer);
+
+    var basename = shapeZipObject.name.substring(0,shapeZipObject.name.length-4);
+
+    var dbfStream;
+
+    for (var d = 0; d < dbffileArray.length; d++) {
+      var dbfZipObject = dbffileArray[d];
+      if (dbfZipObject.name == basename + '.dbf') {
+        var dbfBuffer = dbfZipObject.asNodeBuffer();
+        dbfStream = new stream.PassThrough();
+        dbfStream.end(dbfBuffer);
+        break;
+      }
+    }
+
+    var projection;
+
+    for (var p = 0; p < prjfileArray.length; p++) {
+      var prjZipObject = prjfileArray[p];
+      if (prjZipObject.name == basename + '.prj') {
+        var prjBuffer = prjZipObject.asNodeBuffer();
+        projection = proj4.Proj(prjBuffer.toString());
+        break;
+      }
+    }
+    readers.push({
+      tableName: basename,
+      projection: projection,
+      reader: shp.reader({
+        shp: shpStream,
+        dbf: dbfStream,
+        'ignore-properties': !!dbfStream
+      })
+    });
+  }
+  return readers;
+}
+
 function setupConversion(options, progressCallback, doneCallback) {
   if (!progressCallback) {
     progressCallback = function(status, cb) {
@@ -65,10 +290,8 @@ function setupConversion(options, progressCallback, doneCallback) {
   }
 
   var geopackage = options.geopackage;
-  var projection;
 
-  var reader;
-  var features = [];
+  var readers = [];
 
   async.waterfall([
     function(callback) {
@@ -76,39 +299,11 @@ function setupConversion(options, progressCallback, doneCallback) {
         try {
           var zip = new jszip();
           zip.load(options.shapezipData);
-          var shpfile = zip.filter(function (relativePath, file){
-            return path.extname(relativePath) === '.shp';
-          });
-          var dbffile = zip.filter(function (relativePath, file){
-            return path.extname(relativePath) === '.dbf';
-          });
-          var prjfile = zip.filter(function (relativePath, file){
-            return path.extname(relativePath) === '.prj';
-          });
-          var shpBuffer = shpfile[0].asNodeBuffer();
-          var shpStream = new stream.PassThrough();
-          shpStream.end(shpBuffer);
-
-          var dbfStream;
-          if (dbffile.length) {
-            var dbfBuffer = dbffile[0].asNodeBuffer();
-            dbfStream = new stream.PassThrough();
-            dbfStream.end(dbfBuffer);
-          }
-
-          if (prjfile.length) {
-            var prjBuffer = prjfile[0].asNodeBuffer();
-            projection = proj4.Proj(prjBuffer.toString());
-          }
-
-          reader = shp.reader({
-            shp: shpStream,
-            dbf: dbfStream,
-            'ignore-properties': !!dbfStream
-          });
+          readers = getReadersFromZip(zip);
         } catch (e) {
           return callback(e);
         }
+        callback();
       } else if (options.shapeData) {
         var shpStream = new stream.PassThrough();
         var shpBuffer = new Buffer(options.shapeData);
@@ -121,10 +316,13 @@ function setupConversion(options, progressCallback, doneCallback) {
           dbfStream.end(dbfBuffer);
         }
 
-        reader = shp.reader({
-          dbf: dbfStream,
-          "ignore-properties": !!options.dbfData,
-          shp: shpStream
+        readers.push({
+          tableName: 'features',
+          reader: shp.reader({
+            dbf: dbfStream,
+            "ignore-properties": !!options.dbfData,
+            shp: shpStream
+          })
         });
         callback();
       } else {
@@ -133,42 +331,22 @@ function setupConversion(options, progressCallback, doneCallback) {
           fs.readFile(options.shapefile, function(err, data) {
             var zip = new jszip();
             zip.load(data);
-            var shpfile = zip.filter(function (relativePath, file){
-              return path.extname(relativePath) === '.shp';
-            });
-            var dbffile = zip.filter(function (relativePath, file){
-              return path.extname(relativePath) === '.dbf';
-            });
-            var prjfile = zip.filter(function (relativePath, file){
-              return path.extname(relativePath) === '.prj';
-            });
-
-            var shpBuffer = shpfile[0].asNodeBuffer();
-            var shpStream = new stream.PassThrough();
-            shpStream.end(shpBuffer);
-
-            if (prjfile.length) {
-              var prjBuffer = prjfile[0].asNodeBuffer();
-              projection = proj4.Proj(prjBuffer.toString());
-            }
-
-            var dbfBuffer = dbffile[0].asNodeBuffer();
-            var dbfStream = new stream.PassThrough();
-            dbfStream.end(dbfBuffer);
-            reader = shp.reader({
-              shp: shpStream,
-              dbf: dbfStream
-            });
-            callback();
+            readers = getReadersFromZip(zip);
           });
         } else {
           dbf = path.basename(options.shapefile, path.extname(options.shapefile)) + '.dbf';
           try {
             var stats = fs.statSync(dbf);
-            reader = shp.reader(options.shapefile);
+            readers.push({
+              tableName: path.basename(options.shapefile, path.extname(options.shapefile)),
+              reader: shp.reader(options.shapefile)
+            });
           } catch (e) {
-            reader = shp.reader(options.shapefile, {
-              "ignore-properties": true
+            readers.push({
+              tableName: path.basename(options.shapefile, path.extname(options.shapefile)),
+              reader: shp.reader(options.shapefile, {
+                "ignore-properties": true
+              })
             });
           }
           callback();
@@ -196,157 +374,10 @@ function setupConversion(options, progressCallback, doneCallback) {
         GeoPackage.createGeoPackage(geopackage, callback);
       });
     },
-    // figure out the table name to put the data into
     function(geopackage, callback) {
-      var name = 'features';
-      if (typeof options.shapefile === 'string') {
-        name = path.basename(options.shapefile, path.extname(options.shapefile));
-      }
-      geopackage.getFeatureTables(function(err, tables) {
-        var count = 1;
-        while(tables.indexOf(name) !== -1) {
-          name = name + '_' + count;
-          count++;
-        }
-        callback(null, geopackage, name);
-      });
-    },
-    function(geopackage, tableName, callback) {
-      reader.readHeader(function(err, header) {
-        callback(null, geopackage, tableName, header ? header.bbox : undefined);
-      });
-    },
-    // get the feature properties
-    function(geopackage, tableName, bbox, callback) {
-
-      progressCallback({status: 'Reading Shapefile properties'}, function() {
-
-        var properties = {};
-        var feature;
-
-        async.during(
-          function(cb) {
-            reader.readRecord(function(err, r) {
-              feature = r;
-              cb(null, feature !== shp.end);
-            });
-          }, function(cb) {
-            features.push(feature);
-            async.setImmediate(function() {
-              for (var key in feature.properties) {
-                if (!properties[key]) {
-                  properties[key] = properties[key] || {
-                    name: key
-                  };
-
-                  var type = typeof feature.properties[key];
-                  if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
-                    if (type === 'object') {
-                      if (feature.properties[key] instanceof Date) {
-                        type = 'Date';
-                      }
-                    }
-                    switch(type) {
-                      case 'Date':
-                        type = 'DATETIME';
-                        break;
-                      case 'number':
-                        type = 'DOUBLE';
-                        break;
-                      case 'string':
-                        type = 'TEXT';
-                        break;
-                      case 'boolean':
-                        type = 'BOOLEAN';
-                        break;
-                    }
-                    properties[key] = {
-                      name: key,
-                      type: type
-                    };
-                  }
-                }
-              }
-              cb();
-            });
-          }, function done(err) {
-            callback(err, geopackage, tableName, bbox, properties);
-          }
-        );
-      });
-    }, function(geopackage, tableName, bbox, properties, callback) {
-      var FeatureColumn = GeoPackage.FeatureColumn;
-      var GeometryColumns = GeoPackage.GeometryColumns;
-      var DataTypes = GeoPackage.DataTypes;
-      var BoundingBox = GeoPackage.BoundingBox;
-
-      var geometryColumns = new GeometryColumns();
-      geometryColumns.table_name = tableName;
-      geometryColumns.column_name = 'geometry';
-      geometryColumns.geometry_type_name = 'GEOMETRY';
-      geometryColumns.z = 0;
-      geometryColumns.m = 0;
-
-      var columns = [];
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-      var index = 2;
-      for (var key in properties) {
-        var prop = properties[key];
-        if (prop.name.toLowerCase() !== 'id') {
-          columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
-          index++;
-        }
-      }
-      progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-        var boundingBox = new BoundingBox(-180, 180, -90, 90);
-        if (projection && bbox) {
-          // bbox is xmin, ymin, xmax, ymax
-          var ll = proj4(projection).inverse([bbox[0], bbox[1]]);
-          var ur = proj4(projection).inverse([bbox[2], bbox[3]]);
-          boundingBox = new BoundingBox(ll[0], ur[0], ll[1], ur[1]);
-        }
-        GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, 4326, function(err, featureDao) {
-          callback(err, geopackage, tableName, featureDao);
-        });
-      });
-    }, function(geopackage, tableName, featureDao, callback) {
-
-      var count = 0;
-      var featureCount = features.length;
-      var fivePercent = Math.floor(featureCount / 20);
-      async.eachSeries(features, function featureIterator(feature, callback) {
-        async.setImmediate(function() {
-          if (projection) {
-            feature = reproject.reproject(feature, projection, 'EPSG:4326');
-          }
-          GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
-            if (count++ % fivePercent === 0) {
-              progressCallback({
-                status: 'Inserting features into table "' + tableName + '"',
-                completed: count,
-                total: featureCount
-              }, callback);
-            } else {
-              callback();
-            }
-          });
-        });
-      }, function done(err) {
-        progressCallback({
-          status: 'Done inserted features into table "' + tableName + '"'
-        }, function() {
-          callback(err, geopackage);
-        });
-      });
+      convertShapefileReaders(readers, geopackage, progressCallback, callback);
     }
   ], function done(err, geopackage) {
-    if (!err && reader) {
-      reader.close(function() {
-        doneCallback(err, geopackage);
-      });
-    } else {
-      doneCallback(err, geopackage);
-    }
+    doneCallback(err, geopackage);
   });
 };
