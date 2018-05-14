@@ -8,6 +8,8 @@ Map tiles from [OpenStreetMap](https://www.openstreetmap.org/).
 
 This example page opens a GeoPackage with local landmarks, pizza restaurants, vectors of the parks, and OpenStreetMap tiles from St. Louis and displays them on a Leaflet map.
 
+Want to learn more? See the API [documentation](http://ngageoint.github.io/geopackage-js/jsdoc/module-geoPackage-GeoPackage.html).
+
 ### Run
 
 You can run this example using any web server. For simplicity, I prefer to use the Python module SimpleHTTPServer. If you have python installed, then you already have this module as well.
