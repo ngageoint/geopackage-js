@@ -24,7 +24,7 @@ Open a web browser and point it to http://localhost:8000.
 
 ### Code Walkthrough
 
-We are using Leaflet, but you could use any map you like.
+We are using Leaflet, but you could use any map you like. There is also a [leaflet plugin](https://github.com/ngageoint/geopackage-js/tree/master/leaflet) that has convenience methods for quickly adding data from a GeoPackage to a Leaflet map. 
 
 In your HTML, you can include GeoPackage JS from unpkg.
 
