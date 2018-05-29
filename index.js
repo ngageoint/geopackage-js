@@ -522,7 +522,7 @@ module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, widt
   });
 }
 
-moduel.exports.indexGeoPackage = function(geopackage, callback) {
+module.exports.indexGeoPackage = function(geopackage, callback) {
   geopackage.getFeatureTables(function(err, tables) {
     async.eachSeries(tables, function(table, callback) {
       module.exports.indexFeatureTable(geopackage, table, callback);
@@ -567,7 +567,7 @@ module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east
         rowDoneCallback();
       }, function(err) {
         callback(err, features);
-      }
+      });
     });
   });
 }
