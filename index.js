@@ -561,7 +561,9 @@ module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east
     geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
       if (err || !featureDao) return callback(err);
       var features = [];
-      featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox, function(err, feature, rowDoneCallback) {
+      var bb = new BoundingBox(west, east, south, north);
+      var webMercatorBB = bb.projectBoundingBox('EPSG:4326', 'EPSG:3857');
+      featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(webMercatorBB, function(err, feature, rowDoneCallback) {
         feature.push(feature);
         rowDoneCallback();
       }, function(err) {
