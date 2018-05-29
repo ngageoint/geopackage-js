@@ -522,6 +522,55 @@ module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, widt
   });
 }
 
+moduel.exports.indexGeoPackage = function(geopackage, callback) {
+  geopackage.getFeatureTables(function(err, tables) {
+    async.eachSeries(tables, function(table, callback) {
+      module.exports.indexFeatureTable(geopackage, table, callback);
+    }, callback);
+  });
+}
+
+module.exports.indexFeatureTable = function(geopackage, table, callback) {
+  geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+    var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+    fti.getTableIndex(function(err, tableIndex) {
+      if (tableIndex) {
+        return callback(null, true);
+      }
+      fti.index(function() {
+        console.log('progress', arguments);
+      }, function(err) {
+        return callback(null, !err);
+      });
+    });
+  });
+}
+
+/**
+ * Gets the features in the EPSG:4326 bounding box
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the feature table
+ * @param  {Number}   west       EPSG:4326 western boundary
+ * @param  {Number}   east       EPSG:4326 eastern boundary
+ * @param  {Number}   south      EPSG:4326 southern boundary
+ * @param  {Number}   north      EPSG:4326 northern boundary
+ * @param  {Function} callback   called with an error if one occurred and a features array
+ */
+module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east, south, north, callback) {
+  module.exports.indexFeatureTable(geopackage, table, function() {
+    geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+      if (err || !featureDao) return callback(err);
+      var features = [];
+      featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox, function(err, feature, rowDoneCallback) {
+        feature.push(feature);
+        rowDoneCallback();
+      }, function(err) {
+        callback(err, features);
+      }
+    });
+  });
+}
+
 /**
  * Gets a tile image for an XYZ tile pyramid location
  * @param  {GeoPackage}   geopackage open GeoPackage object
