@@ -10,6 +10,8 @@ var fs = require('fs')
   , reproject = require('reproject')
   , jszip = require('jszip');
 
+proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
   progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
