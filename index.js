@@ -199,6 +199,22 @@ module.exports.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feat
 };
 
 /**
+ * Gets the tables from the GeoPackage
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {Function} callback   called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names
+ */
+module.exports.getTables = function(geopackage, callback) {
+  var tables = {};
+  geopackage.getFeatureTables(function(err, featureTables) {
+    tables.features = featureTables;
+    geopackage.getTileTables(function(err, tileTables) {
+      tables.tiles = tileTables;
+      callback(null, tables);
+    });
+  });
+};
+
+/**
  * Gets the feature tables from the GeoPackage
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and the array of feature table names
