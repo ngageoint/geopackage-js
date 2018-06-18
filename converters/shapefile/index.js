@@ -12,6 +12,19 @@ var fs = require('fs')
 
 proj4 = 'default' in proj4 ? proj4['default'] : proj4;
 
+/**
+ * Add a Shapefile to the GeoPackage
+ * | option       | type    |  |
+ * | ------------ | ------- | -------------- |
+ * | `geopackage`     | varies  | This option can either be a string or a GeoPackage object.  If the option is a string it is interpreted as a path to a GeoPackage file.  If that file exists, it is opened.  If it does not exist, a new file is created and opened. |
+ * | `shapezipData`   | Buffer  | Buffer with the data for a zip file containing a shapefile and it's associated files |
+ * | `shapeData` | Buffer | Buffer with the data for a shapefile (.shp) |
+ * | `shapefile` | String | Interpreted as a path to a .shp or .zip file |
+ * | `dbfData` | String | Only used if the 'shapeData' parameter was provided.  Buffer with the data for a dbf file (.dbf) |
+ * @param  {object} options          object describing the operation, see function description
+ * @param  {Function} progressCallback called with an object describing the progress and a done function to be called when the handling of progress is completed
+ * @param  {function} doneCallback     called with an error if one occurred and the geopackage object
+ */
 module.exports.addLayer = function(options, progressCallback, doneCallback) {
   doneCallback = arguments[arguments.length - 1];
   progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
