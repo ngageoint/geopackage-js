@@ -19,9 +19,9 @@ describe('FeatureDao tests', function() {
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
         var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
+        fsExtra.copy(orignal, copy, callback);
       } else {
-        filename = originalFilename;
+        filename = orignal;
         callback();
       }
     }

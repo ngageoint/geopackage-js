@@ -10,16 +10,29 @@ describe('Contents tests', function() {
   var geoPackage;
   var contentsDao
 
+  function copyGeopackage(orignal, copy, callback) {
+    if (typeof(process) !== 'undefined' && process.version) {
+      var fsExtra = require('fs-extra');
+      fsExtra.copy(orignal, copy, callback);
+    } else {
+      filename = orignal;
+      callback();
+    }
+  }
+
   beforeEach('should open the geopackage', function(done) {
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-    GeoPackageManager.open(filename, function(err, gp) {
-      geoPackage = gp;
-      should.not.exist(err);
-      should.exist(gp);
-      should.exist(gp.getDatabase().getDBConnection());
-      gp.getPath().should.be.equal(filename);
-      contentsDao = new ContentsDao(gp.getDatabase());
-      done();
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
+    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+    copyGeopackage(originalFilename, filename, function() {
+      GeoPackageManager.open(filename, function(err, gp) {
+        geoPackage = gp;
+        should.not.exist(err);
+        should.exist(gp);
+        should.exist(gp.getDatabase().getDBConnection());
+        gp.getPath().should.be.equal(filename);
+        contentsDao = new ContentsDao(gp.getDatabase());
+        done();
+      });
     });
   });
 
