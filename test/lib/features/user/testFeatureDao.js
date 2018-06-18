@@ -1,6 +1,12 @@
 var FeatureDao = require('../../../../lib/features/user/featureDao.js')
+  , FeatureColumn = require('../../../../lib/features/user/featureColumn')
+  , DataTypes = require('../../../../lib/db/dataTypes')
   , GeoPackageManager = require('../../../../lib/geoPackageManager.js')
   , BoundingBox = require('../../../../lib/boundingBox.js')
+  , GeometryData = require('../../../../lib/geom/geometryData')
+  , testSetup = require('../../../fixtures/testSetup')
+  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  , wkx = require('wkx')
   , fs = require('fs')
   , path = require('path')
   , should = require('chai').should();
@@ -9,11 +15,25 @@ describe('FeatureDao tests', function() {
 
   describe('Non indexed test', function() {
     var geoPackage;
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
     beforeEach('create the GeoPackage connection', function(done) {
-      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
-        geoPackage = gp;
-        done();
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
+      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+      copyGeopackage(originalFilename, filename, function() {
+        GeoPackageManager.open(filename, function(err, gp) {
+          geoPackage = gp;
+          done();
+        });
       });
     });
 
@@ -40,6 +60,36 @@ describe('FeatureDao tests', function() {
           row.property_1.should.be.equal('Gila');
           rowDone();
         }, done);
+      });
+    });
+
+
+  });
+
+  describe.skip('Rivers 2 tests', function(){
+    var geoPackage;
+    beforeEach('create the GeoPackage connection', function(done) {
+      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers2.gpkg');
+      GeoPackageManager.open(filename, function(err, gp) {
+        geoPackage = gp;
+        done();
+      });
+    });
+
+    afterEach('close the geopackage connection', function() {
+      geoPackage.close();
+    });
+
+    it('should index the geopackage', function(done) {
+      this.timeout(5000);
+      geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, featureDao) {
+        console.log('featureDao', featureDao);
+        featureDao.featureTableIndex.index(function(progress) {
+          console.log('progress', progress);
+        }, function(err) {
+          console.log('indexed with err', err);
+          done();
+        });
       });
     });
   });
@@ -99,6 +149,162 @@ describe('FeatureDao tests', function() {
         rowCallback();
       }, function(err) {
         console.log('count', count);
+        done();
+      });
+    });
+  });
+
+  describe.skip('Query tests', function() {
+    var geopackage;
+    var queryTestFeatureDao;
+    var testGeoPackage = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'test.gpkg');
+
+    beforeEach('should create the GeoPackage', function(done) {
+      testSetup.deleteGeoPackage(testGeoPackage, function() {
+        testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+          geopackage = gp;
+
+          var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.Point);
+          var boundingBox = new BoundingBox(-180, 180, -80, 80);
+
+          var columns = [];
+
+          columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+          columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
+          columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+
+          var box1 = {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  0
+                ],
+                [
+                  2,
+                  2
+                ],
+                [
+                  0,
+                  2
+                ],
+                [
+                  0,
+                  0
+                ]
+              ]
+            ]
+          };
+
+          var box2 = {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  -1,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ],
+                [
+                  1,
+                  3
+                ],
+                [
+                  -1,
+                  3
+                ],
+                [
+                  -1,
+                  1
+                ]
+              ]
+            ]
+          };
+
+          var line = {
+            "type": "LineString",
+            "coordinates": [
+              [
+                2,
+                3
+              ],
+              [
+                -1,
+                0
+              ]
+            ]
+          };
+
+          var point = {
+            "type": "Point",
+            "coordinates": [
+              0.5,
+              1.5
+            ]
+          };
+
+          var createRow = function(geoJson, name, featureDao, callback) {
+            featureDao.getSrs(function(err, srs) {
+              var featureRow = featureDao.newRow();
+              var geometryData = new GeometryData();
+              geometryData.setSrsId(srs.srs_id);
+              var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+              geometryData.setGeometry(geometry);
+              featureRow.setGeometry(geometryData);
+              featureRow.setValueWithColumnName('name', name);
+
+              featureDao.create(featureRow, callback);
+            });
+          }
+          // create the features
+          // Two intersecting boxes with a line going through the intersection and a point on the line
+          // ---------- / 3
+          // | 1  ____|/_____
+          // |    |  /|  2  |
+          // |____|_/_|     |
+          //      |/        |
+          //      /_________|
+          //     /
+          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+            geopackage.getFeatureDaoWithTableName('QueryTest', function(err, featureDao) {
+              queryTestFeatureDao = featureDao;
+              console.log('featureDao',featureDao);
+              createRow(box1, 'box1', featureDao, function() {
+                createRow(box2, 'box2', featureDao, function() {
+                  createRow(line, 'line', featureDao, function() {
+                    createRow(point, 'point', featureDao, function() {
+                      featureDao.featureTableIndex.index(function() {
+                        console.log('progress', arguments);
+                      }, function(err) {
+                        should.not.exist(err);
+                        done();
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should query for box 1', function(done) {
+      // var bb = new BoundingBox(minLongitudeOrBoundingBox, maxLongitude, minLatitude, maxLatitude)
+      var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        console.log('row', row);
+        rowCallback();
+      }, function(){
+        console.log('done');
         done();
       });
     });
