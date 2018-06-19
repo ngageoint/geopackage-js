@@ -62,36 +62,6 @@ describe('FeatureDao tests', function() {
         }, done);
       });
     });
-
-
-  });
-
-  describe.skip('Rivers 2 tests', function(){
-    var geoPackage;
-    beforeEach('create the GeoPackage connection', function(done) {
-      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers2.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
-        geoPackage = gp;
-        done();
-      });
-    });
-
-    afterEach('close the geopackage connection', function() {
-      geoPackage.close();
-    });
-
-    it('should index the geopackage', function(done) {
-      this.timeout(5000);
-      geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, featureDao) {
-        console.log('featureDao', featureDao);
-        featureDao.featureTableIndex.index(function(progress) {
-          console.log('progress', progress);
-        }, function(err) {
-          console.log('indexed with err', err);
-          done();
-        });
-      });
-    });
   });
 
   describe('Indexed test', function() {
@@ -154,7 +124,7 @@ describe('FeatureDao tests', function() {
     });
   });
 
-  describe.skip('Query tests', function() {
+  describe('Query tests', function() {
     var geopackage;
     var queryTestFeatureDao;
     var testGeoPackage = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'test.gpkg');
@@ -164,7 +134,7 @@ describe('FeatureDao tests', function() {
         testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
           geopackage = gp;
 
-          var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.Point);
+          var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
           var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
           var columns = [];
@@ -178,24 +148,24 @@ describe('FeatureDao tests', function() {
             "coordinates": [
               [
                 [
-                  0,
-                  0
+                  -1,
+                  1
                 ],
                 [
-                  2,
-                  0
+                  1,
+                  1
                 ],
                 [
-                  2,
-                  2
+                  1,
+                  3
                 ],
                 [
-                  0,
-                  2
+                  -1,
+                  3
                 ],
                 [
-                  0,
-                  0
+                  -1,
+                  1
                 ]
               ]
             ]
@@ -206,24 +176,24 @@ describe('FeatureDao tests', function() {
             "coordinates": [
               [
                 [
-                  -1,
-                  1
+                  0,
+                  0
                 ],
                 [
-                  1,
-                  1
+                  2,
+                  0
                 ],
                 [
-                  1,
-                  3
+                  2,
+                  2
                 ],
                 [
-                  -1,
-                  3
+                  0,
+                  2
                 ],
                 [
-                  -1,
-                  1
+                  0,
+                  0
                 ]
               ]
             ]
@@ -276,7 +246,6 @@ describe('FeatureDao tests', function() {
           geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
             geopackage.getFeatureDaoWithTableName('QueryTest', function(err, featureDao) {
               queryTestFeatureDao = featureDao;
-              console.log('featureDao',featureDao);
               createRow(box1, 'box1', featureDao, function() {
                 createRow(box2, 'box2', featureDao, function() {
                   createRow(line, 'line', featureDao, function() {
@@ -299,12 +268,45 @@ describe('FeatureDao tests', function() {
 
     it('should query for box 1', function(done) {
       // var bb = new BoundingBox(minLongitudeOrBoundingBox, maxLongitude, minLatitude, maxLatitude)
-      var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
-        console.log('row', row);
+        row.values.name.should.be.equal('box1');
         rowCallback();
       }, function(){
-        console.log('done');
+        done();
+      });
+    });
+
+    it('should query for box 2', function(done) {
+      var bb = new BoundingBox(1.4, 1.6, .4, .6);
+      queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        row.values.name.should.be.equal('box2');
+        rowCallback();
+      }, function(){
+        done();
+      });
+    });
+
+    it('should query for box1, box 2 and line', function(done) {
+      var bb = new BoundingBox(-.1, .1, .9, 1.1);
+      var foundFeatures = [];
+      queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        foundFeatures.push(row.values.name);
+        rowCallback();
+      }, function(){
+        foundFeatures.should.be.deep.equal(['box1', 'box2', 'line']);
+        done();
+      });
+    });
+
+    it('should query for box1, box 2, line, and point', function(done) {
+      var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      var foundFeatures = [];
+      queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        foundFeatures.push(row.values.name);
+        rowCallback();
+      }, function() {
+        foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
         done();
       });
     });

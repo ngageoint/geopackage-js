@@ -26,6 +26,8 @@
   "dependencies": {
     "@mapbox/tilebelt": "^1.0.1",
     "@turf/bbox": "^3.14.0",
+    "@turf/intersect": "^6.1.2",
+    "@turf/line-intersect": "^6.0.2",
     "async": "^2.1.5",
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.6.3",
@@ -49,7 +51,7 @@
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
     "lcov-badge": "^1.0.4",
-    "mocha": "^3.0.2",
+    "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
     "uglify-es": "^3.0.27",
     "watchify": "^3.7.0",
