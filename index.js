@@ -199,6 +199,33 @@ module.exports.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feat
 };
 
 /**
+ * Queries for GeoJSON features in a feature tables
+ * @param  {String}   geoPackagePath  path to the GeoPackage file
+ * @param  {String}   tableName   Table name to query
+ * @param  {BoundingBox}   boundingBox BoundingBox to query
+ * @param  {Function} callback    Caled with err, featureArray
+ */
+module.exports.queryForGeoJSONFeaturesInTableFromPath = function(geoPackagePath, tableName, boundingBox, callback) {
+  GeoPackageManager.open(geoPackagePath, function(err, geoPackage) {
+    geoPackage.queryForGeoJSONFeaturesInTable(tableName, boundingBox, function(err, features) {
+      geoPackage.close();
+      callback(err, features);
+    });
+  });
+}
+
+/**
+ * Queries for GeoJSON features in a feature tables
+ * @param  {GeoPackage}   geoPackage  open GeoPackage object
+ * @param  {String}   tableName   Table name to query
+ * @param  {BoundingBox}   boundingBox BoundingBox to query
+ * @param  {Function} callback    Caled with err, featureArray
+ */
+module.exports.queryForGeoJSONFeaturesInTable = function(geoPackage, tableName, boundingBox, callback) {
+  geoPackage.queryForGeoJSONFeaturesInTable(tableName, boundingBox, callback);
+}
+
+/**
  * Gets the tables from the GeoPackage
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names
