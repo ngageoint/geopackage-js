@@ -226,6 +226,33 @@ module.exports.queryForGeoJSONFeaturesInTable = function(geoPackage, tableName, 
 }
 
 /**
+ * Iterates GeoJSON features in a feature table that matches the bounding box
+ * @param  {GeoPackage}   geoPackage  open GeoPackage object
+ * @param  {String}   tableName   Table name to query
+ * @param  {BoundingBox}   boundingBox BoundingBox to query
+ * @param  {Function} rowCallback    Caled with err, and GeoJSON feature
+ * @param  {Function} doneCallback    Caled with err if one occurred
+ */
+module.exports.iterateGeoJSONFeaturesInTableWithinBoundingBox = function(geoPackage, tableName, boundingBox, rowCallback, doneCallback) {
+  geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox, rowCallback, doneCallback);
+}
+
+
+/**
+ * Iterates GeoJSON features in a feature table that matches the bounding box
+ * @param  {String}   geoPackagePath  path to the GeoPackage file
+ * @param  {String}   tableName   Table name to query
+ * @param  {BoundingBox}   boundingBox BoundingBox to query
+ * @param  {Function} rowCallback    Caled with err, and GeoJSON feature
+ * @param  {Function} doneCallback    Caled with err if one occurred
+ */
+module.exports.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox = function(geoPackagePath, tableName, boundingBox, rowCallback, doneCallback) {
+  GeoPackageManager.open(geoPackagePath, function(err, geoPackage) {
+    geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox, rowCallback, doneCallback);
+  });
+}
+
+/**
  * Gets the tables from the GeoPackage
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names
