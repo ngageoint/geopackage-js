@@ -124,6 +124,132 @@ describe('FeatureDao tests', function() {
     });
   });
 
+  describe('rivers 2 test', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers2.gpkg');
+    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers2.gpkg');
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should open the geopackage', function(done) {
+      copyGeopackage(originalFilename, filename, function(err) {
+        GeoPackageManager.open(filename, function(err, gp) {
+          geoPackage = gp;
+          should.not.exist(err);
+          should.exist(gp);
+          should.exist(gp.getDatabase().getDBConnection());
+          gp.getPath().should.be.equal(filename);
+          geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, riverFeatureDao) {
+            featureDao = riverFeatureDao;
+            done();
+          });
+        });
+      });
+    });
+
+    afterEach('should close the geopackage', function(done) {
+      geoPackage.close();
+      if (typeof(process) !== 'undefined' && process.version) {
+        fs.unlink(filename, done);
+      } else {
+        done();
+      }
+    });
+
+    it('should query for rivers and calculate distance from a center point', function(done) {
+      var pointToLineDistance = require('@turf/point-to-line-distance').default;
+      var polygonToLine = require('@turf/polygon-to-line').default;
+      var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      var pointDistance = require('@turf/distance').default;
+
+      // var bb = new BoundingBox(-107.44354248046876, -104.69696044921876, 33.098444531367186, 35.36889537510477);
+      // var centerPoint = { type: 'Feature',
+      //  properties: {},
+      //  geometry:
+      //   { type: 'Point',
+      //     coordinates: [ -106.07025146484376, 34.233669953235975 ] } };
+
+      var bb = new BoundingBox(-179, 0, 0, 80);
+      var centerPoint = { type: 'Feature',
+       properties: {},
+       geometry:
+        { type: 'Point',
+          coordinates: [ -105.92193603515625, 34.406906587428736 ] } };
+
+      // var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      // var centerPoint = {
+      //   "type": "Feature",
+      //   "properties": {},
+      //   "geometry": {
+      //     "type": "Point",
+      //     "coordinates": [
+      //       0.5,
+      //       1.5
+      //     ]
+      //   }
+      // };
+      var foundFeatures = [];
+      var closestDistance = 100000000000;
+      var closest;
+
+      featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        console.log('row');
+        foundFeatures.push(row);
+        var geometry = row;
+
+        if (geometry.type == 'Point') {
+          var distance = pointDistance(centerPoint, geometry);
+          if (distance < closestDistance) {
+            closest = geometry;
+            closestDistance = distance;
+          } else if (distance == closestDistance && closest.type != 'Point') {
+            closest = geometry;
+            closestDistance = distance;
+          }
+        } else if (geometry.type == 'LineString') {
+          var distance = pointToLineDistance(centerPoint, geometry);
+          if (distance < closestDistance) {
+            closest = geometry;
+            closestDistance = distance;
+          } else if (distance == closestDistance && closest.type != 'Point') {
+            closest = geometry;
+            closestDistance = distance;
+          }
+        } else if (geometry.type == 'Polygon') {
+          if (booleanPointInPolygon(centerPoint, geometry)) {
+            if (closestDistance != 0) {
+              closest = geometry;
+              closestDistance = 0;
+            }
+          } else {
+            var line = polygonToLine(geometry);
+            var distance = pointToLineDistance(centerPoint, line);
+            if (distance < closestDistance) {
+              closest = geometry;
+              closestDistance = distance;
+            }
+          }
+        }
+        rowCallback();
+      }, function() {
+        console.log('closest', closest.properties);
+        // console.log('foundFeatures', foundFeatures);
+        // foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
+        done();
+      });
+    });
+  });
+
   describe('Query tests', function() {
     var geopackage;
     var queryTestFeatureDao;
@@ -211,6 +337,24 @@ describe('FeatureDao tests', function() {
                 0
               ]
             ]
+          };
+
+          var line2 = {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                [
+                  2.0,
+                  2.5
+                ],
+                [
+                  -0.5,
+                  0
+                ]
+              ]
+            }
           };
 
           var point = {
@@ -307,6 +451,82 @@ describe('FeatureDao tests', function() {
         rowCallback();
       }, function() {
         foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
+        done();
+      });
+    });
+
+    it('should query for box1, box 2, line, and point and calculate distance from a center point', function(done) {
+      var pointToLineDistance = require('@turf/point-to-line-distance').default;
+      var polygonToLine = require('@turf/polygon-to-line').default;
+      var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      var pointDistance = require('@turf/distance').default;
+
+      var bb = new BoundingBox(-107.44354248046876, -104.69696044921876, 33.098444531367186, 35.36889537510477);
+      var centerPoint = { type: 'Feature',
+       properties: {},
+       geometry:
+        { type: 'Point',
+          coordinates: [ -106.07025146484376, 34.233669953235975 ] } };
+
+      // var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      // var centerPoint = {
+      //   "type": "Feature",
+      //   "properties": {},
+      //   "geometry": {
+      //     "type": "Point",
+      //     "coordinates": [
+      //       0.5,
+      //       1.5
+      //     ]
+      //   }
+      // };
+      var foundFeatures = [];
+      var closestDistance = 100000000000;
+      var closest;
+
+      queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        console.log('row', row);
+        foundFeatures.push(row.values);
+        var geometry = row.getGeometry().toGeoJSON();
+
+        if (geometry.type == 'Point') {
+          var distance = pointDistance(centerPoint, geometry);
+          if (distance < closestDistance) {
+            closest = geometry;
+            closestDistance = distance;
+          } else if (distance == closestDistance && closest.type != 'Point') {
+            closest = geometry;
+            closestDistance = distance;
+          }
+        } else if (geometry.type == 'LineString') {
+          var distance = pointToLineDistance(centerPoint, geometry);
+          if (distance < closestDistance) {
+            closest = geometry;
+            closestDistance = distance;
+          } else if (distance == closestDistance && closest.type != 'Point') {
+            closest = geometry;
+            closestDistance = distance;
+          }
+        } else if (geometry.type == 'Polygon') {
+          if (booleanPointInPolygon(centerPoint, geometry)) {
+            if (closestDistance != 0) {
+              closest = geometry;
+              closestDistance = 0;
+            }
+          } else {
+            var line = polygonToLine(geometry);
+            var distance = pointToLineDistance(centerPoint, line);
+            if (distance < closestDistance) {
+              closest = geometry;
+              closestDistance = distance;
+            }
+          }
+        }
+        rowCallback();
+      }, function() {
+        console.log('closest', closest);
+        console.log('foundFeatures', foundFeatures);
+        // foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
         done();
       });
     });
