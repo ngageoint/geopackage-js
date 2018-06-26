@@ -117,9 +117,7 @@ describe('GeoPackageAPI tests', function() {
     var geopackage;
 
     before(function(done) {
-      console.log('delete geopackage');
       fs.unlink(geopackageToCreate, function() {
-        console.log('create geopackage');
         GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
           geopackage = gp;
           done();
@@ -128,7 +126,6 @@ describe('GeoPackageAPI tests', function() {
     });
 
     beforeEach(function(done) {
-      console.log('open geopackage');
       GeoPackage.openGeoPackage(geopackageToCreate, function(err, gp) {
         geopackage = gp;
         done();
