@@ -86,7 +86,7 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, 5));
 
     var dc = new DataColumns();
-    dc.table_name = 'geom.test';
+    dc.table_name = 'test_features.test';
     dc.column_name = 'test_text_limited.test';
     dc.name = 'Test Name';
     dc.title = 'Test';
@@ -150,10 +150,10 @@ describe('GeoPackage Feature table create tests', function() {
            notNull: false,
            primaryKey: false } ]);
         var dao = new DataColumnsDao(geopackage.getDatabase());
-        dao.getDataColumns('geom.test', 'test_text_limited.test', function(err, dataColumn) {
+        dao.getDataColumns('test_features.test', 'test_text_limited.test', function(err, dataColumn) {
           should.not.exist(err);
           dataColumn.should.be.deep.equal({
-            table_name: 'geom.test',
+            table_name: 'test_features.test',
             column_name: 'test_text_limited.test',
             name: 'Test Name',
             title: 'Test',

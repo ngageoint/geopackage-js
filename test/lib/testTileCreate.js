@@ -77,7 +77,9 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.getSpatialReferenceSystemDao().createWebMercator(function(err, result) {
+        should.not.exist(err);
         geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+          should.not.exist(err);
           tileMatrixSet = result;
           Verification.verifyTileMatrixSet(geopackage, function(err) {
             if (err) return done(err);

@@ -203,9 +203,8 @@ describe('FeatureDao tests', function() {
       var closest;
 
       featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
-        console.log('row');
         foundFeatures.push(row);
-        var geometry = row;
+        var geometry = row.geometry;
 
         if (geometry.type == 'Point') {
           var distance = pointDistance(centerPoint, geometry);

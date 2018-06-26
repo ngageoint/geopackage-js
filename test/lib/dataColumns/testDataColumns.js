@@ -192,6 +192,7 @@ describe('Data Columns tests', function() {
 
       dao.create(dc, function(err, result) {
         dao.queryUnique('test constraint', 'range', 'NULL', function(err, dataColumnConstraint) {
+          should.not.exist(err);
           dataColumnConstraint.should.be.deep.equal({
             constraint_name: 'test constraint',
             constraint_type: 'range',
