@@ -585,6 +585,11 @@ module.exports.getTilesInBoundingBoxWebZoom = function(geopackage, table, webZoo
 };
 
 module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
+  x = Number(x);
+  y = Number(y);
+  z = Number(z);
+  width = Number(width);
+  height = Number(height);
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err || !featureDao) return callback(err);
     var ft = new FeatureTile(featureDao, width, height);
@@ -654,6 +659,11 @@ module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east
  * @param  {Function} callback   Called with an error if one occurred and the tile buffer
  */
 module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
+  x = Number(x);
+  y = Number(y);
+  z = Number(z);
+  width = Number(width);
+  height = Number(height);
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     if (err || !tileDao) return callback(err);
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
@@ -674,6 +684,11 @@ module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, heig
  * @param  {Function} callback   Called with an error if one occurred
  */
 module.exports.drawXYZTileInCanvas = function(geopackage, table, x, y, z, width, height, canvas, callback) {
+  x = Number(x);
+  y = Number(y);
+  z = Number(z);
+  width = Number(width);
+  height = Number(height);
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     var retriever = new GeoPackageTileRetriever(tileDao, width, height);
     retriever.drawTileIn(x, y, z, canvas, callback);
