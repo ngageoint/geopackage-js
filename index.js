@@ -70,12 +70,9 @@ module.exports.createGeoPackage = function(gppath, callback) {
       }
     }
   ], function() {
-    console.log('creating geopackage file', gppath);
     GeoPackageManager.create(gppath, function(err, geopackage) {
-      console.log('created it with err', err);
       var tc = new TableCreator(geopackage);
       tc.createRequired(function(err) {
-        console.log('created required tables', err);
         callback(null, geopackage);
       });
     });
