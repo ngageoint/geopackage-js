@@ -574,6 +574,28 @@ describe('FeatureDao tests', function() {
         done();
       });
     });
+
+    it('should get the x: 64, y: 63, z: 7 features as geojson', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7, function(err, geoJSON) {
+        console.timeEnd('generating indexed tile');
+        if (!geoJSON) return done(err);
+        geoJSON.length.should.be.equal(5);
+        done();
+      });
+    });
+
+    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
+        console.timeEnd('generating indexed tile');
+        if (!data) return done(err);
+        fs.writeFileSync('/tmp/64.png', data);
+        done();
+      });
+    });
   });
 
 });

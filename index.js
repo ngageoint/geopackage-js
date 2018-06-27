@@ -607,7 +607,7 @@ module.exports.indexGeoPackage = function(geopackage, callback) {
 
 module.exports.indexFeatureTable = function(geopackage, table, callback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-    var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+    var fti = new FeatureTableIndex(geopackage.getDatabase(), featureDao);
     fti.getTableIndex(function(err, tableIndex) {
       if (tableIndex) {
         return callback(null, true);
@@ -631,6 +631,33 @@ module.exports.indexFeatureTable = function(geopackage, table, callback) {
  * @param  {Number}   north      EPSG:4326 northern boundary
  * @param  {Function} callback   called with an error if one occurred and a features array
  */
+module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, callback) {
+  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+  var bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+  module.exports.indexFeatureTable(geopackage, table, function() {
+    geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+      if (err || !featureDao) return callback(err);
+      var features = [];
+      featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, feature, rowDoneCallback) {
+        features.push(feature);
+        rowDoneCallback();
+      }, function(err) {
+        callback(err, features);
+      });
+    });
+  });
+}
+
+/**
+ * Gets the features in the EPSG:4326 bounding box
+ * @param  {GeoPackage}   geopackage open GeoPackage object
+ * @param  {String}   table      name of the feature table
+ * @param  {Number}   west       EPSG:4326 western boundary
+ * @param  {Number}   east       EPSG:4326 eastern boundary
+ * @param  {Number}   south      EPSG:4326 southern boundary
+ * @param  {Number}   north      EPSG:4326 northern boundary
+ * @param  {Function} callback   called with an error if one occurred and a features array
+ */
 module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east, south, north, callback) {
   module.exports.indexFeatureTable(geopackage, table, function() {
     geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
@@ -638,7 +665,7 @@ module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east
       var features = [];
       var bb = new BoundingBox(west, east, south, north);
       featureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, feature, rowDoneCallback) {
-        feature.push(feature);
+        features.push(feature);
         rowDoneCallback();
       }, function(err) {
         callback(err, features);
