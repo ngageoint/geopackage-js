@@ -28,6 +28,7 @@
     "@turf/bbox": "^3.14.0",
     "@turf/boolean-point-in-polygon": "^6.0.1",
     "@turf/boolean-within": "^6.0.1",
+    "@turf/circle": "^6.0.1",
     "@turf/distance": "^6.0.1",
     "@turf/intersect": "^6.1.2",
     "@turf/line-intersect": "^6.0.2",
