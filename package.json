@@ -35,7 +35,7 @@
     "@turf/polygon-to-line": "^6.0.3",
     "async": "^2.1.5",
     "concat-stream": "^1.6.0",
-    "d3-geo": "^1.6.3",
+    "d3-geo": "^1.10.0",
     "file-type": "7.6.0",
     "proj4": "2.4.3",
     "pureimage": "0.1.6",
