@@ -2,6 +2,7 @@ var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , FeatureColumn = require('../../../../lib/features/user/featureColumn')
   , DataTypes = require('../../../../lib/db/dataTypes')
   , GeoPackageManager = require('../../../../lib/geoPackageManager.js')
+  , GeoPackage = require('../../../../index.js')
   , BoundingBox = require('../../../../lib/boundingBox.js')
   , GeometryData = require('../../../../lib/geom/geometryData')
   , testSetup = require('../../../fixtures/testSetup')
@@ -364,6 +365,14 @@ describe('FeatureDao tests', function() {
             ]
           };
 
+          var point2 = {
+            "type": "Point",
+            "coordinates": [
+              1.5,
+              .5
+            ]
+          };
+
           var createRow = function(geoJson, name, featureDao, callback) {
             featureDao.getSrs(function(err, srs) {
               var featureRow = featureDao.newRow();
@@ -393,11 +402,13 @@ describe('FeatureDao tests', function() {
                 createRow(box2, 'box2', featureDao, function() {
                   createRow(line, 'line', featureDao, function() {
                     createRow(point, 'point', featureDao, function() {
-                      featureDao.featureTableIndex.index(function() {
-                        console.log('progress', arguments);
-                      }, function(err) {
-                        should.not.exist(err);
-                        done();
+                      createRow(point2, 'point2', featureDao, function() {
+                        featureDao.featureTableIndex.index(function() {
+                          console.log('progress', arguments);
+                        }, function(err) {
+                          should.not.exist(err);
+                          done();
+                        });
                       });
                     });
                   });
@@ -406,6 +417,18 @@ describe('FeatureDao tests', function() {
             });
           });
         });
+      });
+    });
+
+    it('should query for the bounding box', function(done) {
+      // "1.3681411743164062,2.3545739912722157,1.4780044555664065,2.4643401260581146"
+      var bb = new BoundingBox(1.3681411743164062, 1.4780044555664065, 2.3545739912722157, 2.4643401260581146);
+      queryTestFeatureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
+        console.log('row', row);
+        // row.values.name.should.be.equal('box1');
+        rowCallback();
+      }, function(){
+        done();
       });
     });
 
@@ -526,6 +549,49 @@ describe('FeatureDao tests', function() {
         console.log('closest', closest);
         console.log('foundFeatures', foundFeatures);
         // foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
+        done();
+      });
+    });
+
+    it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256, function(err, data) {
+        console.timeEnd('generating indexed tile');
+        if (!data) return done(err);
+        done();
+      });
+    });
+
+    it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
+        console.timeEnd('generating indexed tile');
+        if (!data) return done(err);
+        fs.writeFileSync('/tmp/1026.png', data);
+        done();
+      });
+    });
+
+    it('should get the x: 64, y: 63, z: 7 features as geojson', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7, function(err, geoJSON) {
+        console.timeEnd('generating indexed tile');
+        if (!geoJSON) return done(err);
+        geoJSON.length.should.be.equal(5);
+        done();
+      });
+    });
+
+    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
+        console.timeEnd('generating indexed tile');
+        if (!data) return done(err);
+        fs.writeFileSync('/tmp/64.png', data);
         done();
       });
     });
