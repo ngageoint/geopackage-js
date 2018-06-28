@@ -625,10 +625,9 @@ module.exports.indexFeatureTable = function(geopackage, table, callback) {
  * Gets the features in the EPSG:4326 bounding box
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {String}   table      name of the feature table
- * @param  {Number}   west       EPSG:4326 western boundary
- * @param  {Number}   east       EPSG:4326 eastern boundary
- * @param  {Number}   south      EPSG:4326 southern boundary
- * @param  {Number}   north      EPSG:4326 northern boundary
+ * @param  {Number}   x       x tile number
+ * @param  {Number}   y       y tile number
+ * @param  {Number}   z      z tile number
  * @param  {Function} callback   called with an error if one occurred and a features array
  */
 module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, callback) {
