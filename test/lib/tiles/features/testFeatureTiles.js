@@ -125,7 +125,6 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 1, 0, 1, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFileSync('/tmp/1_1_0_indexed.png', data);
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','1_1_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
           done();
@@ -139,7 +138,6 @@ describe('GeoPackage FeatureTiles tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geoPackage, 'rivers', 0, 0, 0, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles','0_0_0_indexed.png'), function(err, equal) {
           equal.should.be.equal(true);
           done();
