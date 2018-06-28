@@ -569,7 +569,7 @@ describe('FeatureDao tests', function() {
       GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFileSync('/tmp/1026.png', data);
+        // fs.writeFileSync('/tmp/1026.png', data);
         done();
       });
     });
@@ -585,13 +585,24 @@ describe('FeatureDao tests', function() {
       });
     });
 
+    it('should get the x: 129, y: 127, z: 8 features as geojson', function(done) {
+      this.timeout(3000);
+      console.time('generating indexed tile');
+      GeoPackage.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 129, 127, 8, function(err, geoJSON) {
+        console.timeEnd('generating indexed tile');
+        if (!geoJSON) return done(err);
+        geoJSON.length.should.be.equal(2);
+        done();
+      });
+    });
+
     it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function(done) {
       this.timeout(3000);
       console.time('generating indexed tile');
       GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFileSync('/tmp/64.png', data);
+        // fs.writeFileSync('/tmp/64.png', data);
         done();
       });
     });
