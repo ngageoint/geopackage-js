@@ -628,10 +628,15 @@ module.exports.indexFeatureTable = function(geopackage, table, callback) {
  * @param  {Number}   x       x tile number
  * @param  {Number}   y       y tile number
  * @param  {Number}   z      z tile number
+ * @param  {Object}   options {tileSize: tile size in pixels, buffer: pixel buffer}
  * @param  {Function} callback   called with an error if one occurred and a features array
  */
-module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, callback) {
-  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, options, callback) {
+  if (!callback) {
+    callback = options;
+    options = null;
+  }
+  var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z, options);
   var bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
   module.exports.indexFeatureTable(geopackage, table, function() {
     geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
