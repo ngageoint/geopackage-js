@@ -444,7 +444,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should query for box 2', function(done) {
-      var bb = new BoundingBox(1.4, 1.6, .4, .6);
+      var bb = new BoundingBox(1.1, 1.3, .4, .6);
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         row.values.name.should.be.equal('box2');
         rowCallback();
