@@ -15,7 +15,7 @@ describe('GeoPackageAPI tests', function() {
 
 
   it('should open the geopackage', function(done) {
-    GeoPackage.openGeoPackage(existingPath, function(err, geopackage) {
+    GeoPackage.open(existingPath, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
       done();
@@ -24,7 +24,7 @@ describe('GeoPackageAPI tests', function() {
 
   it('should open the geopackage byte array', function(done) {
     fs.readFile(existingPath, function(err, data) {
-      GeoPackage.openGeoPackageByteArray(data, function(err, geopackage) {
+      GeoPackage.open(data, function(err, geopackage) {
         should.not.exist(err);
         should.exist(geopackage);
         done();
@@ -33,7 +33,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should create a geopackage', function(done) {
-    GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+    GeoPackage.create(geopackageToCreate, function(err, gp) {
       should.not.exist(err);
       should.exist(gp);
       done();
@@ -41,7 +41,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should create a geopackage and export it', function(done) {
-    GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+    GeoPackage.create(geopackageToCreate, function(err, gp) {
       should.not.exist(err);
       should.exist(gp);
       gp.export(function(err, buffer) {
@@ -70,7 +70,7 @@ describe('GeoPackageAPI tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackage.openGeoPackage(filename, function(err, geopackage) {
+        GeoPackage.open(filename, function(err, geopackage) {
           should.not.exist(err);
           should.exist(geopackage);
           indexedGeopackage = geopackage;
@@ -118,7 +118,7 @@ describe('GeoPackageAPI tests', function() {
 
     before(function(done) {
       fs.unlink(geopackageToCreate, function() {
-        GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+        GeoPackage.create(geopackageToCreate, function(err, gp) {
           geopackage = gp;
           done();
         });
@@ -126,7 +126,7 @@ describe('GeoPackageAPI tests', function() {
     });
 
     beforeEach(function(done) {
-      GeoPackage.openGeoPackage(geopackageToCreate, function(err, gp) {
+      GeoPackage.open(geopackageToCreate, function(err, gp) {
         geopackage = gp;
         done();
       });

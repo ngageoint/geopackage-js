@@ -22,31 +22,35 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , FeatureTableIndex = require('./lib/extension/index/featureTableIndex');
 
 var proj4Defs = require('./lib/proj4Defs');
-module.exports.proj4Defs = proj4Defs;
-module.exports.GeoPackageTileRetriever = GeoPackageTileRetriever;
-module.exports.GeoPackageConnection = GeoPackageConnection;
-module.exports.GeoPackageManager = GeoPackageManager;
+GeoPackageAPI.proj4Defs = proj4Defs;
+
+GeoPackageAPI.GeoPackageTileRetriever = GeoPackageTileRetriever;
+GeoPackageAPI.GeoPackageConnection = GeoPackageConnection;
+GeoPackageAPI.GeoPackageManager = GeoPackageManager;
+
+function GeoPackageAPI() {
+
+}
+
+
+module.exports = GeoPackageAPI;
+
 
 /**
  * Open a GeoPackage at the path specified
- * @param  {String}   gppath   path where the GeoPackage exists
+ * @param  {String}   gppathOrByteArray   path where the GeoPackage exists or Uint8Array of GeoPackage bytes
  * @param  {Function} callback called with an error and the GeoPackage object if opened
  */
-module.exports.openGeoPackage = function(gppath, callback) {
-  GeoPackageManager.open(gppath, callback);
-};
-
-/**
- * Open a GeoPackage from the byte array
- * @param  {Uint8Array}   array    Array of GeoPackage bytes
- * @param  {Function} callback called with an error if it occurred and the open GeoPackage object
- */
-module.exports.openGeoPackageByteArray = function(array, callback) {
-  var db = new SQL.Database(array);
-  GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
-    var geoPackage = new GeoPackage('', '', connection);
-    callback(null, geoPackage);
-  });
+GeoPackageAPI.open = function(gppathOrByteArray, callback) {
+  if (typeof gppathOrByteArray === 'string') {
+    GeoPackageManager.open(gppathOrByteArray, callback);
+  } else {
+    var db = new SQL.Database(gppathOrByteArray);
+    GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      callback(null, geoPackage);
+    });
+  }
 };
 
 /**
@@ -54,7 +58,7 @@ module.exports.openGeoPackageByteArray = function(array, callback) {
  * @param  {String}   gppath   path to GeoPackage fileType
  * @param  {Function} callback called with an error if one occurred and the open GeoPackage object
  */
-module.exports.createGeoPackage = function(gppath, callback) {
+GeoPackageAPI.create = function(gppath, callback) {
   if (!callback) {
     callback = gppath;
     gppath = undefined;
@@ -79,16 +83,16 @@ module.exports.createGeoPackage = function(gppath, callback) {
   });
 };
 
-module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
-module.exports.BoundingBox = require('./lib/boundingBox');
-module.exports.TileUtilities = require('./lib/tiles/creator/tileUtilities');
+GeoPackageAPI.TileColumn = require('./lib/tiles/user/tileColumn');
+GeoPackageAPI.BoundingBox = require('./lib/boundingBox');
+GeoPackageAPI.TileUtilities = require('./lib/tiles/creator/tileUtilities');
 
-module.exports.createTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
+GeoPackageAPI.createTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback) {
   geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback);
 };
 
-module.exports.createStandardWebMercatorTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, minZoom, maxZoom, callback) {
-  module.exports.createTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
+GeoPackageAPI.createStandardWebMercatorTileTable = function(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, minZoom, maxZoom, callback) {
+  GeoPackageAPI.createTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
     geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, function(err, result) {
       callback(err, tileMatrixSet);
     });
@@ -105,25 +109,25 @@ module.exports.createStandardWebMercatorTileTable = function(geopackage, tableNa
  * @param  {Number}   tileColumn column of this tile
  * @param  {Function} callback   called with an eror if one occurred and the inserted row
  */
-module.exports.addTileToGeoPackage = function(geopackage, tile, tableName, zoom, tileRow, tileColumn, callback) {
+GeoPackageAPI.addTileToGeoPackage = function(geopackage, tile, tableName, zoom, tileRow, tileColumn, callback) {
   geopackage.addTile(tile, tableName, zoom, tileRow, tileColumn, callback);
 };
 
-module.exports.FeatureColumn = require('./lib/features/user/featureColumn');
-module.exports.GeometryColumns = require('./lib/features/columns').GeometryColumns;
-module.exports.DataColumns = require('./lib/dataColumns').DataColumns;
-module.exports.DataTypes = require('./lib/db/dataTypes');
+GeoPackageAPI.FeatureColumn = require('./lib/features/user/featureColumn');
+GeoPackageAPI.GeometryColumns = require('./lib/features/columns').GeometryColumns;
+GeoPackageAPI.DataColumns = require('./lib/dataColumns').DataColumns;
+GeoPackageAPI.DataTypes = require('./lib/db/dataTypes');
 
-module.exports.createFeatureTable = function(geopackage, tableName, geometryColumn, featureColumns, callback) {
-  module.exports.createFeatureTableWithDataColumns(geopackage, tableName, geometryColumn, featureColumns, null, callback);
+GeoPackageAPI.createFeatureTable = function(geopackage, tableName, geometryColumn, featureColumns, callback) {
+  GeoPackageAPI.createFeatureTableWithDataColumns(geopackage, tableName, geometryColumn, featureColumns, null, callback);
 };
 
-module.exports.createFeatureTableWithDataColumns = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, callback) {
+GeoPackageAPI.createFeatureTableWithDataColumns = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, callback) {
   var boundingBox = new BoundingBox(-180, 180, -90, 90);
-  module.exports.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, 4326, callback);
+  GeoPackageAPI.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, 4326, callback);
 };
 
-module.exports.createFeatureTableWithDataColumnsAndBoundingBox = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, boundingBoxSrsId, callback) {
+GeoPackageAPI.createFeatureTableWithDataColumnsAndBoundingBox = function(geopackage, tableName, geometryColumn, featureColumns, dataColumns, boundingBox, boundingBoxSrsId, callback) {
   geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumn, boundingBox, boundingBoxSrsId, featureColumns, dataColumns, function(err, result) {
     geopackage.getFeatureDaoWithTableName(tableName, callback);
   });
@@ -136,7 +140,7 @@ module.exports.createFeatureTableWithDataColumnsAndBoundingBox = function(geopac
  * @param  {String}   tableName  Table name to add the tile to
  * @param  {Function} callback   called with an error if one occurred and the inserted row
  */
-module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tableName, callback) {
+GeoPackageAPI.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tableName, callback) {
   geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
     featureDao.getSrs(function(err, srs) {
       var featureRow = featureDao.newRow();
@@ -164,7 +168,7 @@ module.exports.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tab
  * @param  {String}   tableName  Table name to add the tile to
  * @param  {Function} callback   called with an error if one occurred and the inserted row
  */
-module.exports.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feature, tableName, callback) {
+GeoPackageAPI.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feature, tableName, callback) {
   geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
     featureDao.getSrs(function(err, srs) {
       var featureRow = featureDao.newRow();
@@ -202,7 +206,7 @@ module.exports.addGeoJSONFeatureToGeoPackageAndIndex = function(geopackage, feat
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  * @param  {Function} callback    Caled with err, featureArray
  */
-module.exports.queryForGeoJSONFeaturesInTableFromPath = function(geoPackagePath, tableName, boundingBox, callback) {
+GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath = function(geoPackagePath, tableName, boundingBox, callback) {
   GeoPackageManager.open(geoPackagePath, function(err, geoPackage) {
     geoPackage.queryForGeoJSONFeaturesInTable(tableName, boundingBox, function(err, features) {
       geoPackage.close();
@@ -218,7 +222,7 @@ module.exports.queryForGeoJSONFeaturesInTableFromPath = function(geoPackagePath,
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  * @param  {Function} callback    Caled with err, featureArray
  */
-module.exports.queryForGeoJSONFeaturesInTable = function(geoPackage, tableName, boundingBox, callback) {
+GeoPackageAPI.queryForGeoJSONFeaturesInTable = function(geoPackage, tableName, boundingBox, callback) {
   geoPackage.queryForGeoJSONFeaturesInTable(tableName, boundingBox, callback);
 }
 
@@ -230,7 +234,7 @@ module.exports.queryForGeoJSONFeaturesInTable = function(geoPackage, tableName, 
  * @param  {Function} rowCallback    Caled with err, and GeoJSON feature
  * @param  {Function} doneCallback    Caled with err if one occurred
  */
-module.exports.iterateGeoJSONFeaturesInTableWithinBoundingBox = function(geoPackage, tableName, boundingBox, rowCallback, doneCallback) {
+GeoPackageAPI.iterateGeoJSONFeaturesInTableWithinBoundingBox = function(geoPackage, tableName, boundingBox, rowCallback, doneCallback) {
   geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox, rowCallback, doneCallback);
 }
 
@@ -243,7 +247,7 @@ module.exports.iterateGeoJSONFeaturesInTableWithinBoundingBox = function(geoPack
  * @param  {Function} rowCallback    Caled with err, and GeoJSON feature
  * @param  {Function} doneCallback    Caled with err if one occurred
  */
-module.exports.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox = function(geoPackagePath, tableName, boundingBox, rowCallback, doneCallback) {
+GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox = function(geoPackagePath, tableName, boundingBox, rowCallback, doneCallback) {
   GeoPackageManager.open(geoPackagePath, function(err, geoPackage) {
     geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox, rowCallback, doneCallback);
   });
@@ -254,7 +258,7 @@ module.exports.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox = function
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names
  */
-module.exports.getTables = function(geopackage, callback) {
+GeoPackageAPI.getTables = function(geopackage, callback) {
   var tables = {};
   geopackage.getFeatureTables(function(err, featureTables) {
     tables.features = featureTables;
@@ -270,7 +274,7 @@ module.exports.getTables = function(geopackage, callback) {
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and the array of feature table names
  */
-module.exports.getFeatureTables = function(geopackage, callback) {
+GeoPackageAPI.getFeatureTables = function(geopackage, callback) {
   geopackage.getFeatureTables(callback);
 };
 
@@ -280,7 +284,7 @@ module.exports.getFeatureTables = function(geopackage, callback) {
  * @param  {String} featureTableName name of the table to query for
  * @param  {Function} callback   called with an error if one occurred and true or false for the existence of the table
  */
-module.exports.hasFeatureTable = function(geopackage, featureTableName, callback) {
+GeoPackageAPI.hasFeatureTable = function(geopackage, featureTableName, callback) {
   geopackage.getFeatureTables(function(err, tables) {
     return callback(err, tables && tables.indexOf(featureTableName) != -1);
   });
@@ -293,7 +297,7 @@ module.exports.hasFeatureTable = function(geopackage, featureTableName, callback
  * @param  {Function} featureCallback called with an error if one occurred and the next GeoJSON feature in the table
  * @param  {Function} doneCallback    called when all rows are complete
  */
-module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, featureCallback, doneCallback) {
+GeoPackageAPI.iterateGeoJSONFeaturesFromTable = function(geopackage, table, featureCallback, doneCallback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     if (err) {
       return doneCallback(err);
@@ -314,7 +318,7 @@ module.exports.iterateGeoJSONFeaturesFromTable = function(geopackage, table, fea
  * @param  {Number}   featureId  ID of the feature
  * @param  {Function} callback   called with an error if one occurred and the GeoJSON feature
  */
-module.exports.getFeature = function(geopackage, table, featureId, callback) {
+GeoPackageAPI.getFeature = function(geopackage, table, featureId, callback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     featureDao.getSrs(function(err, srs) {
       featureDao.queryForIdObject(featureId, function(err, object, feature) {
@@ -383,7 +387,7 @@ function parseFeatureRowIntoGeoJSON(featureRow, srs) {
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {Function} callback   called with an error if one occurred and the array of tile table names
  */
-module.exports.getTileTables = function(geopackage, callback) {
+GeoPackageAPI.getTileTables = function(geopackage, callback) {
   geopackage.getTileTables(callback);
 };
 
@@ -393,7 +397,7 @@ module.exports.getTileTables = function(geopackage, callback) {
  * @param  {String} tileTableName name of the table to query for
  * @param  {Function} callback   called with an error if one occurred and true or false for the existence of the table
  */
-module.exports.hasTileTable = function(geopackage, tileTableName, callback) {
+GeoPackageAPI.hasTileTable = function(geopackage, tileTableName, callback) {
   geopackage.getTileTables(function(err, tables) {
     return callback(err, tables && tables.indexOf(tileTableName) != -1);
   });
@@ -408,7 +412,7 @@ module.exports.hasTileTable = function(geopackage, tileTableName, callback) {
  * @param  {Number}   tileColumn column of the tile
  * @param  {Function} callback   called with an error if one occurred and the TileRow object
  */
-module.exports.getTileFromTable = function(geopackage, table, zoom, tileRow, tileColumn, callback) {
+GeoPackageAPI.getTileFromTable = function(geopackage, table, zoom, tileRow, tileColumn, callback) {
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
     if (err) return callback();
     tileDao.queryForTile(tileColumn, tileRow, zoom, callback);
@@ -426,7 +430,7 @@ module.exports.getTileFromTable = function(geopackage, table, zoom, tileRow, til
  * @param  {Number}   north      EPSG:4326 northern boundary
  * @param  {Function} callback   called with an error if one occurred and a tiles object describing the tiles
  */
-module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, east, south, north, callback) {
+GeoPackageAPI.getTilesInBoundingBox = function(geopackage, table, zoom, west, east, south, north, callback) {
   var tiles = {};
 
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
@@ -508,7 +512,7 @@ module.exports.getTilesInBoundingBox = function(geopackage, table, zoom, west, e
  * @param  {Number}   north      EPSG:4326 northern boundary
  * @param  {Function} callback   called with an error if one occurred and a tiles object describing the tiles
  */
-module.exports.getTilesInBoundingBoxWebZoom = function(geopackage, table, webZoom, west, east, south, north, callback) {
+GeoPackageAPI.getTilesInBoundingBoxWebZoom = function(geopackage, table, webZoom, west, east, south, north, callback) {
   var tiles = {};
 
   geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
@@ -581,7 +585,7 @@ module.exports.getTilesInBoundingBoxWebZoom = function(geopackage, table, webZoo
   });
 };
 
-module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
+GeoPackageAPI.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   x = Number(x);
   y = Number(y);
   z = Number(z);
@@ -594,15 +598,15 @@ module.exports.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, widt
   });
 }
 
-module.exports.indexGeoPackage = function(geopackage, callback) {
+GeoPackageAPI.indexGeoPackage = function(geopackage, callback) {
   geopackage.getFeatureTables(function(err, tables) {
     async.eachSeries(tables, function(table, callback) {
-      module.exports.indexFeatureTable(geopackage, table, callback);
+      GeoPackageAPI.indexFeatureTable(geopackage, table, callback);
     }, callback);
   });
 }
 
-module.exports.indexFeatureTable = function(geopackage, table, callback) {
+GeoPackageAPI.indexFeatureTable = function(geopackage, table, callback) {
   geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
     var fti = new FeatureTableIndex(geopackage.getDatabase(), featureDao);
     fti.getTableIndex(function(err, tableIndex) {
@@ -628,10 +632,10 @@ module.exports.indexFeatureTable = function(geopackage, table, callback) {
  * @param  {Number}   north      EPSG:4326 northern boundary
  * @param  {Function} callback   called with an error if one occurred and a features array
  */
-module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, callback) {
+GeoPackageAPI.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, callback) {
   var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
   var bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
-  module.exports.indexFeatureTable(geopackage, table, function() {
+  GeoPackageAPI.indexFeatureTable(geopackage, table, function() {
     geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
       if (err || !featureDao) return callback(err);
       var features = [];
@@ -655,8 +659,8 @@ module.exports.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, c
  * @param  {Number}   north      EPSG:4326 northern boundary
  * @param  {Function} callback   called with an error if one occurred and a features array
  */
-module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east, south, north, callback) {
-  module.exports.indexFeatureTable(geopackage, table, function() {
+GeoPackageAPI.getFeaturesInBoundingBox = function(geopackage, table, west, east, south, north, callback) {
+  GeoPackageAPI.indexFeatureTable(geopackage, table, function() {
     geopackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
       if (err || !featureDao) return callback(err);
       var features = [];
@@ -682,7 +686,7 @@ module.exports.getFeaturesInBoundingBox = function(geopackage, table, west, east
  * @param  {Number}   height     height of the resulting tile
  * @param  {Function} callback   Called with an error if one occurred and the tile buffer
  */
-module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
+GeoPackageAPI.getTileFromXYZ = function(geopackage, table, x, y, z, width, height, callback) {
   x = Number(x);
   y = Number(y);
   z = Number(z);
@@ -707,7 +711,7 @@ module.exports.getTileFromXYZ = function(geopackage, table, x, y, z, width, heig
  * @param  {Canvas}   canvas     canvas element to draw the tile into
  * @param  {Function} callback   Called with an error if one occurred
  */
-module.exports.drawXYZTileInCanvas = function(geopackage, table, x, y, z, width, height, canvas, callback) {
+GeoPackageAPI.drawXYZTileInCanvas = function(geopackage, table, x, y, z, width, height, canvas, callback) {
   x = Number(x);
   y = Number(y);
   z = Number(z);

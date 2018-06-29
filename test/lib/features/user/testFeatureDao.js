@@ -564,7 +564,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
-      this.timeout(3000);
+      this.timeout(5000);
       console.time('generating indexed tile');
       GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
