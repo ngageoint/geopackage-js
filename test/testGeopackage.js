@@ -229,7 +229,7 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
       var tileMatrixSetSrsId = 4326;
-      GeoPackage.createTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
+      geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
         should.not.exist(err);
         should.exist(tileMatrixSet);
         GeoPackage.hasTileTable(geopackage, 'tiles', function(err, exists) {
@@ -282,7 +282,7 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(err);
         should.exist(tileMatrixSet);
         testSetup.loadTile(tilePath, function(err, tileData) {
-          GeoPackage.addTileToGeoPackage(geopackage, tileData, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tileData, tableName, 0, 0, 0, function(err, result) {
             result.should.be.equal(1);
             GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0, function(err, tileRow) {
               testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
@@ -313,7 +313,7 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(err);
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          GeoPackage.addTileToGeoPackage(geopackage, tile, tableName, 0, 0, 0, function(err, result) {
+          geopacakage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
             result.should.be.equal(1);
             GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256, function(err, tile) {
               testSetup.diffImages(tile, tilePath, function(err, equal) {

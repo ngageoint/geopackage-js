@@ -2,6 +2,15 @@
 
 This will highlight all API changes that were made between 1.x and 2.x for GeoPackage-JS
 
+### GeoPackageAPI methods changed
+
 GeoPackageAPI.openGeoPackage -> GeoPackageAPI.open
 GeoPackageAPI.openGeoPackageByteArray -> GeoPackageAPI.open
 GeoPackageAPI.createGeoPackage -> GeoPackageAPI.create
+
+### Methods moved from GeoPackageAPI
+
+#### Methods moved to the GeoPackage object
+
+GeoPackageAPI.addTileToGeoPackage -> geopackage.addTile
+GeoPackageAPI.createTileTable -> geopackage.createTileTableWithTableName
