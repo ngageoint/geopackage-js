@@ -27,7 +27,6 @@ require('./lib/wkb/testWkb');
 require('./lib/testFeatureCreate');
 require('./lib/testGeoPackage');
 require('./lib/testGeoPackageCreate');
-require('./lib/testGeoPackageManager');
 require('./lib/testGeoPackageManagerCreate');
 require('./lib/testTileCreate');
 require('./lib/issues/issue68.js');

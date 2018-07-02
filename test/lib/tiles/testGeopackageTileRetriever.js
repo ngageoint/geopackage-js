@@ -1,6 +1,5 @@
-var GeoPackageManager = require('../../../lib/geoPackageManager')
-  , GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
-  , GeoPackage = require('../../..')
+var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
+  , GeoPackageAPI = require('../../..')
   , BoundingBox = require('../../../lib/boundingBox')
   , testSetup = require('../../fixtures/testSetup')
   , proj4 = require('proj4')
@@ -18,7 +17,7 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);
@@ -47,7 +46,7 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should get all the tiles in the bounding box', function(done) {
-      GeoPackage.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85, function(err, tiles) {
+      GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85, function(err, tiles) {
         tiles.tiles.length.should.be.equal(4);
         done(err);
       });
@@ -208,7 +207,7 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', '3857.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);
@@ -267,7 +266,7 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);

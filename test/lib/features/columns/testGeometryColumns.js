@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../../..')
   , GeometryColumnsDao = require('../../../../lib/features/columns').GeometryColumnsDao
   , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
   , TestUtils = require('../../../fixtures/testUtils')

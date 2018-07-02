@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../..')
   , TileDao = require('../../../lib/tiles/user/tileDao')
   , should = require('chai').should()
   , path = require('path')
@@ -13,7 +13,7 @@ describe('TileDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);
@@ -165,7 +165,7 @@ describe('TileDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'private', 'alaska.gpkg');
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);

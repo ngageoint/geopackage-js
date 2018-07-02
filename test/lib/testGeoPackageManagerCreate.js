@@ -1,9 +1,9 @@
-var GeoPackageManager = require('../../lib/geoPackageManager')
+var GeoPackageAPI = require('../..')
   , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 
-describe('GeoPackageManager Create tests', function() {
+describe('GeoPackageAPI Create tests', function() {
 
   var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
   var geopackage;
@@ -23,7 +23,7 @@ describe('GeoPackageManager Create tests', function() {
   });
 
   it('should not allow a file without a gpkg extension', function(done) {
-    GeoPackageManager.create('/tmp/test.g', function(err, geopackage) {
+    GeoPackageAPI.create('/tmp/test.g', function(err, geopackage) {
       should.exist(err);
       should.not.exist(geopackage);
       done();
@@ -31,7 +31,7 @@ describe('GeoPackageManager Create tests', function() {
   });
 
   it('should create the geopackage file', function(done) {
-    GeoPackageManager.create(testGeoPackage, function(err, geopackage) {
+    GeoPackageAPI.create(testGeoPackage, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
       geopackage.getApplicationId(function(err, applicationId) {

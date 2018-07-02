@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../../..')
   , SpatialReferenceSystemDao = require('../../../../lib/core/srs').SpatialReferenceSystemDao
   , should = require('chai').should()
   , path = require('path');
@@ -9,7 +9,7 @@ describe('SpatialReferenceSystem tests', function() {
 
   beforeEach('should open the geopackage', function(done) {
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-    GeoPackageManager.open(filename, function(err, gp) {
+    GeoPackageAPI.open(filename, function(err, gp) {
       geoPackage = gp;
       should.not.exist(err);
       should.exist(gp);

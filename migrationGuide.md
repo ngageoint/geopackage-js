@@ -14,3 +14,7 @@ GeoPackageAPI.createGeoPackage -> GeoPackageAPI.create
 
 GeoPackageAPI.addTileToGeoPackage -> geopackage.addTile
 GeoPackageAPI.createTileTable -> geopackage.createTileTableWithTableName
+
+### GeoPackageManager has been removed
+GeoPackageManager.open -> GeoPackageAPI.open
+GeoPackageManager.create -> GeoPackageAPI.create

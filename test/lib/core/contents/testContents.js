@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../../..')
   , ContentsDao = require('../../../../lib/core/contents').ContentsDao
   , Contents = require('../../../../lib/core/contents').Contents
   , TileMatrix = require('../../../../lib/tiles/matrix').TileMatrix
@@ -24,7 +24,7 @@ describe('Contents tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
     copyGeopackage(originalFilename, filename, function() {
-      GeoPackageManager.open(filename, function(err, gp) {
+      GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
         should.not.exist(err);
         should.exist(gp);

@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../..')
   , TileMatrixDao = require('../../../lib/tiles/matrix').TileMatrixDao
   , TileMatrix = require('../../../lib/tiles/matrix').TileMatrix
   , should = require('chai').should()
@@ -11,7 +11,7 @@ describe('Tile Matrix tests', function() {
 
   beforeEach('should open the geopackage', function(done) {
     var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-    GeoPackageManager.open(filename, function(err, gp) {
+    GeoPackageAPI.open(filename, function(err, gp) {
       geoPackage = gp;
       should.not.exist(err);
       should.exist(gp);

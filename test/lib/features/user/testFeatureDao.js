@@ -1,8 +1,7 @@
 var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , FeatureColumn = require('../../../../lib/features/user/featureColumn')
   , DataTypes = require('../../../../lib/db/dataTypes')
-  , GeoPackageManager = require('../../../../lib/geoPackageManager.js')
-  , GeoPackage = require('../../../../index.js')
+  , GeoPackageAPI = require('../../../../index.js')
   , BoundingBox = require('../../../../lib/boundingBox.js')
   , GeometryData = require('../../../../lib/geom/geometryData')
   , testSetup = require('../../../fixtures/testSetup')
@@ -31,7 +30,7 @@ describe('FeatureDao tests', function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
       copyGeopackage(originalFilename, filename, function() {
-        GeoPackageManager.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           done();
         });
@@ -84,7 +83,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageManager.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
           should.exist(gp);
@@ -144,7 +143,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageManager.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
           should.exist(gp);
@@ -554,9 +553,9 @@ describe('FeatureDao tests', function() {
     });
 
     it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
-      this.timeout(3000);
+      this.timeout(5000);
       console.time('generating indexed tile');
-      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256, function(err, data) {
+      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
         done();
@@ -566,7 +565,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
       this.timeout(5000);
       console.time('generating indexed tile');
-      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
+      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
         fs.writeFileSync('/tmp/1026.png', data);
@@ -577,7 +576,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 features as geojson', function(done) {
       this.timeout(3000);
       console.time('generating indexed tile');
-      GeoPackage.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7, function(err, geoJSON) {
+      GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7, function(err, geoJSON) {
         console.timeEnd('generating indexed tile');
         if (!geoJSON) return done(err);
         geoJSON.length.should.be.equal(5);
@@ -588,7 +587,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function(done) {
       this.timeout(3000);
       console.time('generating indexed tile');
-      GeoPackage.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
+      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
         fs.writeFileSync('/tmp/64.png', data);

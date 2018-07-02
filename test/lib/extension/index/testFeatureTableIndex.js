@@ -1,4 +1,4 @@
-var GeoPackageManager = require('../../../../lib/geoPackageManager')
+var GeoPackageAPI = require('../../../..')
   , GeoPackage = require('../../../../lib/geoPackage')
   , FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
   , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder')
@@ -30,7 +30,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageManager.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
           should.exist(gp);
@@ -105,7 +105,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageManager.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           should.not.exist(err);
           should.exist(gp);

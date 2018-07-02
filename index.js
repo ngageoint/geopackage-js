@@ -6,7 +6,6 @@ module.exports.proj4Defs = proj4Defs;
 
 module.exports.GeoPackageTileRetriever = require('./lib/tiles/retriever');
 module.exports.GeoPackageConnection = require('./lib/db/geoPackageConnection');
-module.exports.GeoPackageManager = require('./lib/geoPackageManager');
 
 module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
 module.exports.BoundingBox = require('./lib/boundingBox');
