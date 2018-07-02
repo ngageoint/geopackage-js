@@ -1,4 +1,5 @@
 var GeoPackage = require('../index.js')
+  , BoundingBox = require('../lib/boundingBox.js')
   , testSetup = require('./fixtures/testSetup');
 
 var path = require('path')
@@ -88,6 +89,20 @@ describe('GeoPackageAPI tests', function() {
       }
     });
 
+    it('should get the tables', function(done) {
+      GeoPackage.getTables(indexedGeopackage, function(err, tables) {
+        tables.should.be.deep.equal({ features: [ 'rivers' ], tiles: [ 'rivers_tiles' ] });
+        done();
+      });
+    });
+
+    it('should query for the tiles in the bounding box', function(done) {
+      GeoPackage.getTilesInBoundingBoxWebZoom(indexedGeopackage, 'rivers_tiles', 0, -180, 180, -80, 80, function(err, tiles) {
+        tiles.tiles.length.should.be.equal(1);
+        done();
+      });
+    });
+
     it('should add geojson to the geopackage and keep it indexed', function(done) {
       GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
         "type": "Feature",
@@ -109,6 +124,48 @@ describe('GeoPackageAPI tests', function() {
           index.geom_id.should.be.equal(id);
           done();
         });
+      });
+    });
+
+    it('should add geojson to the geopackage and keep it indexed and query it', function(done) {
+      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers', function(err, id) {
+        GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, features){
+          features.length.should.be.equal(1);
+          done();
+        });
+      });
+    });
+
+    it('should add geojson to the geopackage and keep it indexed and iterate it', function(done) {
+      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers', function(err, id) {
+        GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, geoJson, rowCallback){
+          geoJson.properties.Scalerank.should.be.equal('test');
+          rowCallback();
+        }, done);
       });
     });
   });
