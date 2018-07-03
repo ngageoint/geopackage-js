@@ -83,6 +83,38 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         });
       });
     });
+
+    it('should index the table from the GeoPackageAPI', function(done) {
+      this.timeout(10000);
+      GeoPackageAPI.indexFeatureTable(geoPackage, 'FEATURESriversds', function(err, status) {
+        should.not.exist(err);
+        status.should.be.equal(true);
+        // ensure it was created
+        var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        fti.getTableIndex(function(err, tableIndex) {
+          should.exist(tableIndex);
+          should.not.exist(err);
+          should.exist(tableIndex.last_indexed);
+          done();
+        });
+      });
+    });
+
+    it('should index the geopackage from the GeoPackageAPI', function(done) {
+      this.timeout(10000);
+      GeoPackageAPI.indexGeoPackage(geoPackage, function(err, status) {
+        should.not.exist(err);
+        status.should.be.equal(true);
+        // ensure it was created
+        var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        fti.getTableIndex(function(err, tableIndex) {
+          should.exist(tableIndex);
+          should.not.exist(err);
+          should.exist(tableIndex.last_indexed);
+          done();
+        });
+      });
+    });
   });
 
   describe('Test existing index', function() {

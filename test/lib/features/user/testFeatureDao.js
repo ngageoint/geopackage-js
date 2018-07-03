@@ -124,6 +124,57 @@ describe('FeatureDao tests', function() {
     });
   });
 
+  describe('Query For Shapes', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'test_shapes_two_points.gpkg');
+    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'test_shapes_two_points.gpkg');
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should copy the geopackage', function(done) {
+      copyGeopackage(originalFilename, filename, done);
+    });
+
+    afterEach('should close the geopackage', function(done) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        fs.unlink(filename, done);
+      } else {
+        done();
+      }
+    });
+
+    it('should query for GeoJSON features', function(done) {
+      var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
+      GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath(filename, 'QueryTest', bb, function(err, features) {
+        features[0].properties.name.should.be.equal('box1');
+        done();
+      });
+    });
+
+    it('should iterate GeoJSON features', function(done) {
+      var count = 0;
+      var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
+      GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb, function(err, feature, rowCallback) {
+        feature.properties.name.should.be.equal('box1');
+        count++;
+        rowCallback();
+      }, function() {
+        count.should.be.equal(1);
+        done();
+      });
+    });
+  });
+
   describe('rivers 2 test', function() {
     var geoPackage;
     var featureDao;
@@ -267,6 +318,8 @@ describe('FeatureDao tests', function() {
           columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
           columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
           columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+          columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+          columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
           var box1 = {
             "type": "Polygon",
@@ -381,7 +434,8 @@ describe('FeatureDao tests', function() {
               geometryData.setGeometry(geometry);
               featureRow.setGeometry(geometryData);
               featureRow.setValueWithColumnName('name', name);
-
+              featureRow.setValueWithColumnName('_feature_id', name);
+              featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
               featureDao.create(featureRow, callback);
             });
           }
@@ -419,14 +473,34 @@ describe('FeatureDao tests', function() {
       });
     });
 
+    it('should query for _feature_id', function(done) {
+      GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line', function(err, row) {
+        row.properties.name.should.be.equal('line');
+        done();
+      });
+    });
+
+    it('should query for _properties_id', function(done) {
+      GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline', function(err, row) {
+        row.properties.name.should.be.equal('line');
+        done();
+      });
+    });
+
     it('should query for the bounding box', function(done) {
-      // "1.3681411743164062,2.3545739912722157,1.4780044555664065,2.4643401260581146"
-      var bb = new BoundingBox(1.3681411743164062, 1.4780044555664065, 2.3545739912722157, 2.4643401260581146);
+      var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       queryTestFeatureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
-        console.log('row', row);
-        // row.values.name.should.be.equal('box1');
+        row.properties.name.should.be.equal('box1');
         rowCallback();
       }, function(){
+        done();
+      });
+    });
+
+    it('should get features in the bounding box', function(done) {
+      var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
+      GeoPackageAPI.getFeaturesInBoundingBox(geopackage, 'QueryTest', -.4, -.6, 2.4, 2.6, function(err, features) {
+        features[0].values.name.should.be.equal('box1');
         done();
       });
     });

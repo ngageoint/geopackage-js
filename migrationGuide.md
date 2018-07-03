@@ -14,6 +14,11 @@ GeoPackageAPI.createGeoPackage -> GeoPackageAPI.create
 
 GeoPackageAPI.addTileToGeoPackage -> geopackage.addTile
 GeoPackageAPI.createTileTable -> geopackage.createTileTableWithTableName
+GeoPackageAPI.getTables -> geopackage.getTables
+GeoPackageAPI.getFeatureTables -> geopackage.getFeatureTables
+GeoPackageAPI.getTileTables -> geopackage.getTileTables
+GeoPackageAPI.hasTileTable -> geopackage.hasTileTable
+GeoPackageAPI.hasFeatureTable -> geopackage.hasFeatureTable
 
 ### GeoPackageManager has been removed
 GeoPackageManager.open -> GeoPackageAPI.open

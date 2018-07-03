@@ -90,8 +90,71 @@ describe('GeoPackageAPI tests', function() {
     });
 
     it('should get the tables', function(done) {
-      GeoPackage.getTables(indexedGeopackage, function(err, tables) {
+      indexedGeopackage.getTables(function(err, tables) {
         tables.should.be.deep.equal({ features: [ 'rivers' ], tiles: [ 'rivers_tiles' ] });
+        done();
+      });
+    });
+
+    it('should get the tile tables', function(done) {
+      indexedGeopackage.getTileTables(function(err, tables) {
+        tables.should.be.deep.equal([ 'rivers_tiles' ]);
+        done();
+      });
+    });
+
+    it('should get the feature tables', function(done) {
+      indexedGeopackage.getFeatureTables(function(err, tables) {
+        tables.should.be.deep.equal([ 'rivers' ]);
+        done();
+      });
+    });
+
+    it('should check if it has feature table', function(done) {
+      indexedGeopackage.hasFeatureTable('rivers', function(err, exists) {
+        exists.should.be.equal(true);
+        done();
+      });
+    });
+
+    it('should check if does not have feature table', function(done) {
+      indexedGeopackage.hasFeatureTable('rivers_no', function(err, exists) {
+        exists.should.be.equal(false);
+        done();
+      });
+    });
+
+    it('should check if it has tile table', function(done) {
+      indexedGeopackage.hasTileTable('rivers_tiles', function(err, exists) {
+        exists.should.be.equal(true);
+        done();
+      });
+    });
+
+    it('should check if does not have tile table', function(done) {
+      indexedGeopackage.hasTileTable('rivers_tiles_no', function(err, exists) {
+        exists.should.be.equal(false);
+        done();
+      });
+    });
+
+    it('should get the 0 0 0 tile', function(done) {
+      GeoPackage.getTileFromXYZ(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, function(err, tile) {
+        should.not.exist(err);
+        should.exist(tile);
+        done();
+      });
+    });
+
+    it('should get the 0 0 0 tile in a canvas', function(done) {
+      var canvas;
+      if (typeof(process) !== 'undefined' && process.version) {
+        canvas = PureImage.make(256, 256);
+      } else {
+        canvas = document.createElement('canvas');
+      }
+      GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas, function(err, tile) {
+        should.not.exist(err);
         done();
       });
     });
@@ -218,10 +281,10 @@ describe('GeoPackageAPI tests', function() {
       GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
         should.not.exist(err);
         should.exist(featureDao);
-        GeoPackage.hasFeatureTable(geopackage, tableName, function(err, exists) {
+        geopackage.hasFeatureTable(tableName, function(err, exists) {
           exists.should.be.equal(true);
           should.not.exist(err);
-          GeoPackage.getFeatureTables(geopackage, function(err, results) {
+          geopackage.getFeatureTables(function(err, results) {
             results.length.should.be.equal(1);
             results[0].should.be.equal(tableName);
             GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
@@ -273,7 +336,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it.skip('should create a tile table', function(done) {
+    it('should create a tile table', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -289,9 +352,9 @@ describe('GeoPackageAPI tests', function() {
       geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
         should.not.exist(err);
         should.exist(tileMatrixSet);
-        GeoPackage.hasTileTable(geopackage, 'tiles', function(err, exists) {
+        geopackage.hasTileTable('tiles', function(err, exists) {
           exists.should.be.equal(true);
-          GeoPackage.getTileTables(geopackage, function(err, tables) {
+          geopackage.getTileTables(function(err, tables) {
             tables.length.should.be.equal(1);
             tables[0].should.be.equal('tiles');
             done();
@@ -300,7 +363,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it.skip('should create a standard web mercator tile table', function(done) {
+    it('should create a standard web mercator tile table', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -352,7 +415,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it.skip('should add a tile to the tile table and get it via xyz', function(done) {
+    it('should add a tile to the tile table and get it via xyz', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -370,7 +433,7 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(err);
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          geopacakage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
             result.should.be.equal(1);
             GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256, function(err, tile) {
               testSetup.diffImages(tile, tilePath, function(err, equal) {
@@ -383,7 +446,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it.skip('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
+    it('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -401,7 +464,7 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(err);
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          GeoPackage.addTileToGeoPackage(geopackage, tile, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
             result.should.be.equal(1);
             var canvas;
             if (typeof(process) !== 'undefined' && process.version) {
