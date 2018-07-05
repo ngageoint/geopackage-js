@@ -28,6 +28,15 @@ describe('GeoPackage create tests', function() {
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
+  it('should get return an empty array if asking for tile tables when they do not exist', function(done) {
+    geopackage.getTileTables(function(err, tables) {
+      should.not.exist(err);
+      should.exist(tables);
+      tables.length.should.be.equal(0);
+      done();
+    });
+  });
+
   it('should create the geometry columns table', function(done) {
     geopackage.createGeometryColumnsTable(function(err, result) {
       should.not.exist(err);
@@ -38,10 +47,12 @@ describe('GeoPackage create tests', function() {
   it('should not fail if the geometry columns table already exists', function(done) {
     geopackage.createGeometryColumnsTable(function(err, result) {
       should.not.exist(err);
+      should.exist(result);
       Verification.verifyGeometryColumns(geopackage, function (err) {
         if (err) return done(err);
         geopackage.createGeometryColumnsTable(function(err, result) {
           should.not.exist(err);
+          should.exist(result);
           Verification.verifyGeometryColumns(geopackage, done);
         });
       });
@@ -58,7 +69,23 @@ describe('GeoPackage create tests', function() {
   it('should create the tile matrix set table', function(done) {
     geopackage.createTileMatrixSetTable(function(err, result) {
       should.not.exist(err);
+      should.exist(result);
       Verification.verifyTileMatrixSet(geopackage, done);
+    });
+  });
+
+  it('should not fail if the tile matrix set table already exists', function(done) {
+    geopackage.createTileMatrixSetTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyTileMatrixSet(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createTileMatrixSetTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          done();
+        });
+      });
     });
   });
 
@@ -66,6 +93,21 @@ describe('GeoPackage create tests', function() {
     geopackage.createTileMatrixTable(function(err, result) {
       should.not.exist(err);
       Verification.verifyTileMatrix(geopackage, done);
+    });
+  });
+
+  it('should not fail if the tile matrix table already exists', function(done) {
+    geopackage.createTileMatrixTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyTileMatrix(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createTileMatrixTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          done();
+        });
+      });
     });
   });
 
@@ -84,10 +126,41 @@ describe('GeoPackage create tests', function() {
     });
   });
 
+  it('should not fail if the data columns table already exists', function(done) {
+    geopackage.createDataColumns(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyDataColumns(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createDataColumns(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyDataColumns(geopackage, done);
+        });
+      });
+    });
+  });
+
   it('should create the data column constraints table', function(done) {
     geopackage.createDataColumnConstraintsTable(function(err, result) {
       should.not.exist(err);
+      should.exist(result);
       Verification.verifyDataColumnConstraints(geopackage, done);
+    });
+  });
+
+  it('should not fail if the data column constraints table already exists', function(done) {
+    geopackage.createDataColumnConstraintsTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyDataColumnConstraints(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createDataColumnConstraintsTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyDataColumnConstraints(geopackage, done);
+        });
+      });
     });
   });
 
@@ -98,10 +171,40 @@ describe('GeoPackage create tests', function() {
     });
   });
 
+  it('should not fail if the metadata reference table already exists', function(done) {
+    geopackage.createMetadataReferenceTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyMetadataReference(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createMetadataReferenceTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyMetadataReference(geopackage, done);
+        });
+      });
+    });
+  });
+
   it('should create the metadata table', function(done) {
     geopackage.createMetadataTable(function(err, result) {
       should.not.exist(err);
       Verification.verifyMetadata(geopackage, done);
+    });
+  });
+
+  it('should not fail if the metadata table already exists', function(done) {
+    geopackage.createMetadataTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyMetadata(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createMetadataTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyMetadata(geopackage, done);
+        });
+      });
     });
   });
 
@@ -112,10 +215,40 @@ describe('GeoPackage create tests', function() {
     });
   });
 
+  it('should not fail if the extensions table already exists', function(done) {
+    geopackage.createExtensionTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyExtensions(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createExtensionTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyExtensions(geopackage, done);
+        });
+      });
+    });
+  });
+
   it('should create the table index table', function(done) {
     geopackage.createTableIndexTable(function(err, result) {
       should.not.exist(err);
       Verification.verifyTableIndex(geopackage, done);
+    });
+  });
+
+  it('should not fail if the table index table already exists', function(done) {
+    geopackage.createTableIndexTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyTableIndex(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createTableIndexTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyTableIndex(geopackage, done);
+        });
+      });
     });
   });
 
@@ -126,33 +259,25 @@ describe('GeoPackage create tests', function() {
     });
   });
 
+  it('should not fail if the geometry index table already exists', function(done) {
+    geopackage.createGeometryIndexTable(function(err, result) {
+      should.not.exist(err);
+      should.exist(result);
+      Verification.verifyGeometryIndex(geopackage, function(err) {
+        if (err) return done(err);
+        geopackage.createGeometryIndexTable(function(err, result) {
+          should.not.exist(err);
+          should.exist(result);
+          Verification.verifyGeometryIndex(geopackage, done);
+        });
+      });
+    });
+  });
+
   it.skip('should create the feature tile link table', function(done) {
     geopackage.createFeatureTileLinkTable(function(err, result) {
       should.not.exist(err);
       Verification.verifyFeatureTileLink(geopackage, done);
     });
   });
-  //
-  // it('should create the required tables', function(done) {
-  //   var tc = new TableCreator(geopackage);
-  //   tc.createRequired(function(err, result) {
-  //     async.series([
-  //       Verification.verifyContents.bind(this, geopackage),
-  //       Verification.verifySRS.bind(this, geopackage),
-  //       function(callback) {
-  //         geopackage.getDatabase().count('gpkg_spatial_ref_sys', function(err, count) {
-  //           count.should.be.equal(3);
-  //           callback();
-  //         });
-  //       }
-  //     ], function() {
-  //       done();
-  //     });
-  //   });
-  // });
-  //
-
-  //
-
-
 });

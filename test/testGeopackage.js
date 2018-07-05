@@ -23,11 +23,29 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
+  it('should not open a file without the correct extension', function(done) {
+    GeoPackage.open(tilePath, function(err, geopackage) {
+      should.exist(err);
+      should.not.exist(geopackage);
+      done();
+    });
+  });
+
   it('should open the geopackage byte array', function(done) {
     fs.readFile(existingPath, function(err, data) {
       GeoPackage.open(data, function(err, geopackage) {
         should.not.exist(err);
         should.exist(geopackage);
+        done();
+      });
+    });
+  });
+
+  it('should not open a byte array that is not a geopackage', function(done) {
+    fs.readFile(tilePath, function(err, data) {
+      GeoPackage.open(data, function(err, geopackage) {
+        should.exist(err);
+        should.not.exist(geopackage);
         done();
       });
     });
@@ -50,6 +68,14 @@ describe('GeoPackageAPI tests', function() {
         should.exist(buffer);
         done();
       });
+    });
+  });
+
+  it('should create a geopackage in memory', function(done) {
+    GeoPackage.create(function(err, gp) {
+      should.not.exist(err);
+      should.exist(gp);
+      done();
     });
   });
 
