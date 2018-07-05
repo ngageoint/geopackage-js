@@ -642,7 +642,6 @@ describe('FeatureDao tests', function() {
       GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFileSync('/tmp/1026.png', data);
         done();
       });
     });
@@ -664,7 +663,6 @@ describe('FeatureDao tests', function() {
       GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
         console.timeEnd('generating indexed tile');
         if (!data) return done(err);
-        fs.writeFileSync('/tmp/64.png', data);
         done();
       });
     });
