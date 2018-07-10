@@ -10,6 +10,7 @@ describe('GeoPackageAPI Create tests', function() {
 
   beforeEach(function(done) {
     testSetup.deleteGeoPackage(testGeoPackage, function() {
+      // done();
       testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
         geopackage = gp;
         done();
@@ -18,7 +19,7 @@ describe('GeoPackageAPI Create tests', function() {
   });
 
   afterEach(function(done) {
-    geopackage.close();
+    // geopackage.close();
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 

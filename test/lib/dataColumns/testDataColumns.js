@@ -27,7 +27,7 @@ describe('Data Columns tests', function() {
 
   beforeEach('create the GeoPackage connection', function(done) {
     copyGeopackage(originalFilename, filename, function(err) {
-      GeoPackageConnection.connect(filename, function(err, geoPackageConnection) {
+      GeoPackageConnection.connect(filename).then(function(geoPackageConnection) {
         connection = geoPackageConnection;
         should.exist(connection);
         done();

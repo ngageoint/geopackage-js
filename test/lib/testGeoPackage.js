@@ -8,9 +8,10 @@ var GeoPackage = require('../../lib/geoPackage')
   , fs = require('fs');
 
 describe('GeoPackage tests', function() {
-
   it('should get the feature table names', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
+      connection = geoPackageConnection;
+      should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
         should.not.exist(err);
@@ -41,7 +42,9 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the features', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
+      connection = geoPackageConnection;
+      should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
         featureDao.queryForEach(function(err, row, rowDone) {
@@ -57,7 +60,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the features from all tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(connection){
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureTables(function(err, tables) {
         async.eachSeries(tables, function(table, callback) {
@@ -89,7 +92,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the tile table names', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
         should.not.exist(err);
@@ -105,7 +109,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the srs 3857', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getSrs(3857, function(err, srs) {
         should.not.exist(err);
@@ -118,7 +123,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the feature dao from the contents', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getContentsDao();
       dao.queryForIdObject('FEATURESriversds', function(err, contents) {
@@ -135,7 +141,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the TILE dao from the contents', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getContentsDao();
       dao.queryForIdObject('TILESosmds', function(err, contents) {
@@ -151,7 +158,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the tiles', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileTables(function(err, tables) {
         async.eachSeries(tables, function(table, callback) {
@@ -176,7 +184,8 @@ describe('GeoPackage tests', function() {
 
   it('should get the info for the table', function(done) {
     this.timeout(30000);
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, dao) {
         geoPackage.getInfoForTable(dao, function(err, info) {
@@ -190,7 +199,8 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the info for the Imagery table', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileDaoWithTableName('imagery', function(err, dao) {
         geoPackage.getInfoForTable(dao, function(err, info) {

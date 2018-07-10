@@ -11,8 +11,9 @@ describe('GeometryColumns tests', function() {
   var connection;
 
   beforeEach('should open the geopackage', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err, gpConnection) {
-      connection = gpConnection;
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
+      connection = geoPackageConnection;
+      should.exist(connection);
       done();
     });
   });

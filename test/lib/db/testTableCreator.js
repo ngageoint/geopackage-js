@@ -106,7 +106,6 @@ describe('TableCreator tests', function() {
     var tc = new TableCreator(geopackage);
     tc.createExtensions(function(err, result) {
       should.not.exist(err);
-      console.log('result', result);
       Verification.verifyExtensions(geopackage, done);
     });
   });
@@ -137,7 +136,8 @@ describe('TableCreator tests', function() {
 
   it('should create the required tables', function(done) {
     var tc = new TableCreator(geopackage);
-    tc.createRequired(function(err, result) {
+    tc.createRequired()
+    .then(function(result) {
       async.series([
         Verification.verifyContents.bind(this, geopackage),
         Verification.verifySRS.bind(this, geopackage),

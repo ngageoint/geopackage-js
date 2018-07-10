@@ -36,7 +36,8 @@ module.exports.createBareGeoPackage = function(gppath, callback) {
       }
     }
   ], function() {
-    GeoPackageConnection.connect(gppath, function(err, connection) {
+    GeoPackageConnection.connect(gppath)
+    .then(function(connection) {
       var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
       callback(null, geopackage);
     });

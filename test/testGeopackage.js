@@ -19,7 +19,16 @@ describe('GeoPackageAPI tests', function() {
     GeoPackage.open(existingPath, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
+      should.exist(geopackage.getTables);
       done();
+    });
+  });
+
+  it('should open the geopackage with a promise', function() {
+    return GeoPackage.open(existingPath)
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      should.exist(geopackage.getTables);
     });
   });
 
@@ -28,6 +37,13 @@ describe('GeoPackageAPI tests', function() {
       should.exist(err);
       should.not.exist(geopackage);
       done();
+    });
+  });
+
+  it('should not open a file without the correct extension via promise', function() {
+    GeoPackage.open(tilePath)
+    .catch(function(error) {
+      should.exist(error);
     });
   });
 
@@ -55,7 +71,16 @@ describe('GeoPackageAPI tests', function() {
     GeoPackage.create(geopackageToCreate, function(err, gp) {
       should.not.exist(err);
       should.exist(gp);
+      should.exist(gp.getTables);
       done();
+    });
+  });
+
+  it('should create a geopackage with a promise', function() {
+    GeoPackage.create(geopackageToCreate)
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      should.exist(geopackage.getTables);
     });
   });
 
@@ -272,7 +297,8 @@ describe('GeoPackageAPI tests', function() {
     });
 
     beforeEach(function(done) {
-      GeoPackage.open(geopackageToCreate, function(err, gp) {
+      GeoPackage.open(geopackageToCreate)
+      .then(function(gp) {
         geopackage = gp;
         done();
       });

@@ -42,7 +42,8 @@ describe('GeoPackage Validate tests', function() {
   // });
 
   it('should not have the required minimum tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
         should.exist(err);
@@ -53,7 +54,8 @@ describe('GeoPackage Validate tests', function() {
   });
 
   it('should have the required minimum tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err, connection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'))
+    .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
         connection.close();

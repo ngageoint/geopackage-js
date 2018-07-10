@@ -23,3 +23,31 @@ GeoPackageAPI.hasFeatureTable -> geopackage.hasFeatureTable
 ### GeoPackageManager has been removed
 GeoPackageManager.open -> GeoPackageAPI.open
 GeoPackageManager.create -> GeoPackageAPI.create
+
+### Methods with callbacks that also now return Promises
+
+All of the following methods take an optional callback but also return a promise which resolves to the same value that the callback is called with.
+
+GeoPackageAPI.open
+GeoPackageAPI.create
+
+### Callbacks that have been moved to Promises
+
+All of the following methods have had their callback parameters removed and they return a promise
+
+GeoPackageConnection constructor
+GeoPackageConnection.connect
+GeoPackageConnection.connectWithDatabase
+GeoPackageConnection.prototype.setApplicationId
+sqliteAdapter.createAdapter
+GeoPackageConnection.prototype.setApplicationId
+TableCreator.prototype.createRequired
+
+### Methods with Callbacks that now return results
+Adapter.prototype.run
+
+### New methods
+GeoPackage.prototype.createRequiredTables
+
+### Other changes
+GeoPackageConnection.prototype.run now explicitly calls out parameters that may be passed

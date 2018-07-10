@@ -7,7 +7,8 @@ var UserTableReader = require('../../../lib/user/userTableReader.js')
 describe('UserTableReader tests', function() {
   var connection;
   beforeEach('create the GeoPackage connection', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'), function(err, geoPackageConnection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'))
+    .then(function(geoPackageConnection) {
       connection = geoPackageConnection;
       should.exist(connection);
       done();
