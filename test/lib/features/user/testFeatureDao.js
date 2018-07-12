@@ -471,6 +471,11 @@ describe('FeatureDao tests', function() {
       });
     });
 
+    it('should count by a field', function(){
+      var count = queryTestFeatureDao.countByEqWithFieldAndValue('name', 'line');
+      count.should.be.equal(1);
+    });
+
     it('should query for _feature_id', function(done) {
       GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line', function(err, row) {
         row.properties.name.should.be.equal('line');

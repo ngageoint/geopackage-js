@@ -38,17 +38,16 @@ describe('TileDao tests', function() {
 
     it('should get the bounding box for each zoom level', function(done) {
       async.eachSeries([0, 1, 2, 3, 4], function(zoom, callback) {
-        tileDao.getBoundingBoxWithZoomLevel(zoom, function(err, bb) {
-          if (zoom === 4) {
-            should.not.exist(bb);
-          } else {
-            bb.minLongitude.should.be.equal(-20037508.342789244);
-            bb.maxLongitude.should.be.equal(20037508.342789244);
-            bb.minLatitude.should.be.equal(-20037508.342789244);
-            bb.maxLatitude.should.be.equal(20037508.342789244);
-          }
-          callback();
-        });
+        var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
+        if (zoom === 4) {
+          should.not.exist(bb);
+        } else {
+          bb.minLongitude.should.be.equal(-20037508.342789244);
+          bb.maxLongitude.should.be.equal(20037508.342789244);
+          bb.minLatitude.should.be.equal(-20037508.342789244);
+          bb.maxLatitude.should.be.equal(20037508.342789244);
+        }
+        callback();
       }, function(err) {
         done();
       });
@@ -186,17 +185,16 @@ describe('TileDao tests', function() {
 
     it('should get the bounding box for each zoom level', function(done) {
       async.eachSeries([4, 5], function(zoom, callback) {
-        tileDao.getBoundingBoxWithZoomLevel(zoom, function(err, bb) {
-          if (zoom === 5) {
-            should.not.exist(bb);
-          } else {
-            bb.minLongitude.should.be.equal(-180);
-            bb.maxLongitude.should.be.equal(-157.5);
-            bb.minLatitude.should.be.equal(45);
-            bb.maxLatitude.should.be.equal(67.5);
-          }
-          callback();
-        });
+        var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
+        if (zoom === 5) {
+          should.not.exist(bb);
+        } else {
+          bb.minLongitude.should.be.equal(-180);
+          bb.maxLongitude.should.be.equal(-157.5);
+          bb.minLatitude.should.be.equal(45);
+          bb.maxLatitude.should.be.equal(67.5);
+        }
+        callback();
       }, function(err) {
         done();
       });

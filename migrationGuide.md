@@ -55,12 +55,17 @@ GeoPackageConnection.prototype.getApplicationId
 GeoPackageConnection.prototype.get
 GeoPackageConnection.prototype.tableExists
 GeoPackageConnection.prototype.setApplicationId
+GeoPackageConnection.prototype.minOfColumn
+GeoPackageConnection.prototype.maxOfColumn
 SqliteAdapter.prototype.get
 ContentsDao.prototype.getSrs
 Dao.prototype.queryForIdObject
 Dao.prototype.queryForSameId
 Dao.prototype.queryForMultiIdObject
 Dao.prototype.isTableExists
+Dao.prototype.countByEqWithFieldAndValue
+Dao.prototype.minOfColumn
+Dao.prototype.maxOfColumn
 SpatialReferenceSystemDao.prototype.getBySrsId
 DataColumnsDao.prototype.getContents
 DataColumnConstraintsDao.prototype.queryUnique
@@ -70,6 +75,8 @@ GeometryColumnsDao.prototype.getProjection
 TileDao constructor
 TileDao.prototype.initialize
 TileDao.prototype.getSrs
+TileDao.prototype.queryForTileGridWithZoomLevel
+TileDao.prototype.getBoundingBoxWithZoomLevel
 TileMatrixSetDao.prototype.getSrs
 TileMatrixSetDao.prototype.getProjection
 TileMatrixSetDao.prototype.getContents
