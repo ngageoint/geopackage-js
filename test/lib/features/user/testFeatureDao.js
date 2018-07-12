@@ -471,6 +471,31 @@ describe('FeatureDao tests', function() {
       });
     });
 
+    it('should update a shape', function(done) {
+      var line;
+      queryTestFeatureDao.queryForEqWithFieldAndValue('_feature_id', 'line', function(err, feature, rowDone) {
+        if (feature) {
+          line = queryTestFeatureDao.getFeatureRow(feature);
+        }
+        rowDone();
+      }, function() {
+        line.setValueWithColumnName('name', 'UpdatedLine');
+        var newLine;
+        queryTestFeatureDao.update(line, function(err) {
+          should.not.exist(err);
+          queryTestFeatureDao.queryForEqWithFieldAndValue('_feature_id', 'line', function(err, feature, rowDone) {
+            if (feature) {
+              newLine = queryTestFeatureDao.getFeatureRow(feature);
+            }
+            rowDone();
+          }, function() {
+            newLine.getValueWithColumnName('name').should.be.equal('UpdatedLine');
+            done();
+          });
+        });
+      });
+    });
+
     it('should count by a field', function(){
       var count = queryTestFeatureDao.countByEqWithFieldAndValue('name', 'line');
       count.should.be.equal(1);
