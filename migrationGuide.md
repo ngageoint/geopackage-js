@@ -19,6 +19,8 @@ GeoPackageAPI.getFeatureTables -> geopackage.getFeatureTables
 GeoPackageAPI.getTileTables -> geopackage.getTileTables
 GeoPackageAPI.hasTileTable -> geopackage.hasTileTable
 GeoPackageAPI.hasFeatureTable -> geopackage.hasFeatureTable
+GeoPackageAPI.indexGeoPackage -> geopackage.index;
+GeoPackageAPI.indexFeatureTable -> geopackage.indexFeatureTable;
 
 ### GeoPackageManager has been removed
 GeoPackageManager.open -> GeoPackageAPI.open

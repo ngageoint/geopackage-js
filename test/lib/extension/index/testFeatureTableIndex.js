@@ -9,7 +9,7 @@ var GeoPackageAPI = require('../../../..')
   , path = require('path')
   , async = require('async');
 
-describe.skip('GeoPackage Feature Table Index Extension tests', function() {
+describe('GeoPackage Feature Table Index Extension tests', function() {
 
   describe('Create new index', function() {
     var geoPackage;
@@ -64,55 +64,47 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
 
     it('should index the table', function(done) {
       this.timeout(10000);
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-      fti.getTableIndex(function(err, tableIndex) {
-        should.not.exist(tableIndex);
+      var fti = featureDao.featureTableIndex;
+      var tableIndex = fti.getTableIndex();
+      should.not.exist(tableIndex);
+      fti.index(function() {
+        console.log('progress', arguments);
+      }, function(err) {
         should.not.exist(err);
-        fti.index(function() {
-          console.log('progress', arguments);
-        }, function(err) {
-          should.not.exist(err);
-          // ensure it was created
-          var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-          fti2.getTableIndex(function(err, tableIndex) {
-            should.exist(tableIndex);
-            should.not.exist(err);
-            should.exist(tableIndex.last_indexed);
-            done();
-          });
-        });
+        // ensure it was created
+        var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        tableIndex = fti2.getTableIndex();
+        should.exist(tableIndex);
+        should.exist(tableIndex.last_indexed);
+        done();
       });
     });
 
-    it('should index the table from the GeoPackageAPI', function(done) {
+    it('should index the table from the geopackage object', function(done) {
       this.timeout(10000);
-      GeoPackageAPI.indexFeatureTable(geoPackage, 'FEATURESriversds', function(err, status) {
+      geoPackage.indexFeatureTable('FEATURESriversds', function(err, status) {
         should.not.exist(err);
         status.should.be.equal(true);
         // ensure it was created
-        var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-        fti.getTableIndex(function(err, tableIndex) {
-          should.exist(tableIndex);
-          should.not.exist(err);
-          should.exist(tableIndex.last_indexed);
-          done();
-        });
+        var fti = featureDao.featureTableIndex;
+        var tableIndex = fti.getTableIndex();
+        should.exist(tableIndex);
+        should.exist(tableIndex.last_indexed);
+        done();
       });
     });
 
-    it('should index the geopackage from the GeoPackageAPI', function(done) {
+    it('should index the geopackage from the geopackage object', function(done) {
       this.timeout(10000);
-      GeoPackageAPI.indexGeoPackage(geoPackage, function(err, status) {
+      geoPackage.index(function(err, status) {
         should.not.exist(err);
         status.should.be.equal(true);
         // ensure it was created
-        var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-        fti.getTableIndex(function(err, tableIndex) {
-          should.exist(tableIndex);
-          should.not.exist(err);
-          should.exist(tableIndex.last_indexed);
-          done();
-        });
+        var fti = featureDao.featureTableIndex;
+        var tableIndex = fti.getTableIndex();
+        should.exist(tableIndex);
+        should.exist(tableIndex.last_indexed);
+        done();
       });
     });
   });
@@ -165,14 +157,13 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
       var whereArgs = [ 'rivers', 315 ];
 
       var query = sqliteQueryBuilder.buildQuery(false, "'nga_geometry_index'", undefined, whereString);
-      geoPackage.getDatabase().get(query, whereArgs, function(err, result) {
-        should.exist(result);
-        done(err);
-      }.bind(this));
+      var result = geoPackage.getDatabase().get(query, whereArgs);
+      should.exist(result);
+      done();
     });
 
     it('should get the extension row', function(done) {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = featureDao.featureTableIndex;
       fti.getFeatureTableIndexExtension(function(err, extension){
         should.not.exist(err);
         should.exist(extension);
@@ -181,7 +172,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
     });
 
     it('should return the index status of true', function(done) {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = featureDao.featureTableIndex;
       fti.isIndexed(function(err, indexed){
         should.not.exist(err);
         indexed.should.be.equal(true);
@@ -191,21 +182,18 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
 
     it('should force index the table', function(done) {
       this.timeout(30000);
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-      fti.getTableIndex(function(err, tableIndex) {
-        tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
-        fti.indexWithForce(true, function() {
-        }, function(err) {
-          should.not.exist(err);
-          // ensure it was created
-          var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-          fti2.getTableIndex(function(err, tableIndex) {
-            should.exist(tableIndex);
-            should.not.exist(err);
-            tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');
-            done();
-          });
-        });
+      var fti = featureDao.featureTableIndex;
+      var tableIndex = fti.getTableIndex();
+      tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
+      fti.indexWithForce(true, function() {
+      }, function(err) {
+        should.not.exist(err);
+        // ensure it was created
+        var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        tableIndex = fti2.getTableIndex();
+        should.exist(tableIndex);
+        tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');
+        done();
       });
     });
   });

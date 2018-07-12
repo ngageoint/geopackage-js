@@ -32,6 +32,16 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
+  it('should not open a file without the minimum tables', function(done) {
+    testSetup.createBareGeoPackage(geopackageToCreate, function(err, gp) {
+      GeoPackage.open(geopackageToCreate, function(err, geopackage) {
+        should.exist(err);
+        should.not.exist(geopackage);
+        testSetup.deleteGeoPackage(geopackageToCreate, done);
+      });
+    });
+  });
+
   it('should not open a file without the correct extension', function(done) {
     GeoPackage.open(tilePath, function(err, geopackage) {
       should.exist(err);
@@ -64,6 +74,26 @@ describe('GeoPackageAPI tests', function() {
         should.not.exist(geopackage);
         done();
       });
+    });
+  });
+
+  it('should not create a geopackage without the correct extension', function(done) {
+    GeoPackage.create(tilePath, function(err, geopackage) {
+      should.exist(err);
+      should.not.exist(geopackage);
+      done();
+    });
+  });
+
+  it('should not create a geopackage without the correct extension return promise', function(done) {
+    GeoPackage.create(tilePath)
+    .then(function(geopackage) {
+      // should not get called
+      false.should.be.equal(true);
+    })
+    .catch(function(error) {
+      should.exist(error);
+      done();
     });
   });
 
