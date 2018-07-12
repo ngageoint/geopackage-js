@@ -41,27 +41,33 @@ describe('GeoPackage Validate tests', function() {
   //   });
   // });
 
-  it('should not have the required minimum tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'))
+  it('should not have the required minimum tables', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'test.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
-        should.exist(err);
-        connection.close();
-        done();
-      });
+      return GeoPackageValidate.hasMinimumTables(geoPackage);
+    })
+    .then(function(hasMinimumTables) {
+      hasMinimumTables.should.be.equal(false);
+    })
+    .catch(function(error) {
+      // this should not get called
+      false.should.be.equal(true);
     });
   });
 
-  it('should have the required minimum tables', function(done) {
+  it('should have the required minimum tables', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      GeoPackageValidate.hasMinimumTables(geoPackage, function(err) {
-        connection.close();
-        should.not.exist(err);
-        done();
-      });
+      return GeoPackageValidate.hasMinimumTables(geoPackage);
+    })
+    .then(function(hasMinimumTables) {
+      hasMinimumTables.should.be.equal(true);
+    })
+    .catch(function(error) {
+      // this should not get called
+      false.should.be.equal(true);
     });
   });
 

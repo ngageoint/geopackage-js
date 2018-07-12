@@ -7,7 +7,7 @@ var testdb = path.join(__dirname, '..', '..', 'tmp', 'test.gpkg');
 
 describe('Database opening tests', function(done) {
 
-  function verifyTableExists(db, done) {
+  function verifyTableExists(db) {
     var statement = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?");
     var results = statement.get(['mytable']);
     if(!results) {
@@ -57,7 +57,7 @@ describe('Database opening tests', function(done) {
     });
   });
 
-  it('should load a file synchronusly then write to the db', function(done) {
+  it('should load a file asynchronusly then write to the db', function(done) {
     createTable(db, function(err, results) {
       var exists = verifyTableExists(db);
       if (!exists) return done(new Error('Table does not exist'));

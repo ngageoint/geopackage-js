@@ -63,21 +63,19 @@ describe('Tile Matrix tests', function() {
     tileMatrixDao.queryForAll(function(err, tileMatrices) {
       var tileMatrix = tileMatrixDao.createObject();
       tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
-      tileMatrixDao.getContents(tileMatrix, function(err, contents) {
-        should.not.exist(err);
-        should.exist(contents);
-        contents.should.have.property('table_name', 'TILESosmds');
-        contents.should.have.property('data_type', 'tiles');
-        contents.should.have.property('identifier', 'TILESosmds');
-        contents.should.have.property('description', null);
-        contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
-        contents.should.have.property('min_x', -180);
-        contents.should.have.property('min_y', -85.0511287798066);
-        contents.should.have.property('max_x', 180);
-        contents.should.have.property('max_y', 85.0511287798066);
-        contents.should.have.property('srs_id', 4326);
-        done();
-      });
+      var contents = tileMatrixDao.getContents(tileMatrix);
+      should.exist(contents);
+      contents.should.have.property('table_name', 'TILESosmds');
+      contents.should.have.property('data_type', 'tiles');
+      contents.should.have.property('identifier', 'TILESosmds');
+      contents.should.have.property('description', null);
+      contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+      contents.should.have.property('min_x', -180);
+      contents.should.have.property('min_y', -85.0511287798066);
+      contents.should.have.property('max_x', 180);
+      contents.should.have.property('max_y', 85.0511287798066);
+      contents.should.have.property('srs_id', 4326);
+      done();
     });
   });
 
@@ -85,17 +83,15 @@ describe('Tile Matrix tests', function() {
     tileMatrixDao.queryForAll(function(err, tileMatrices) {
       var tileMatrix = tileMatrixDao.createObject();
       tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
-      tileMatrixDao.getTileMatrixSet(tileMatrix, function(err, tileMatrixSet) {
-        should.exist(tileMatrixSet);
-        should.not.exist(err);
-        tileMatrixSet.should.have.property('srs_id', 3857);
-        tileMatrixSet.should.have.property('table_name', 'TILESosmds');
-        tileMatrixSet.should.have.property('min_x', -20037508.342789244);
-        tileMatrixSet.should.have.property('min_y', -20037508.342789244);
-        tileMatrixSet.should.have.property('max_x', 20037508.342789244);
-        tileMatrixSet.should.have.property('max_y', 20037508.342789244);
-        done();
-      });
+      var tileMatrixSet = tileMatrixDao.getTileMatrixSet(tileMatrix);
+      should.exist(tileMatrixSet);
+      tileMatrixSet.should.have.property('srs_id', 3857);
+      tileMatrixSet.should.have.property('table_name', 'TILESosmds');
+      tileMatrixSet.should.have.property('min_x', -20037508.342789244);
+      tileMatrixSet.should.have.property('min_y', -20037508.342789244);
+      tileMatrixSet.should.have.property('max_x', 20037508.342789244);
+      tileMatrixSet.should.have.property('max_y', 20037508.342789244);
+      done();
     });
   });
 

@@ -40,7 +40,8 @@ describe('GeoPackage create tests', function() {
   it('should create the geometry columns table', function(done) {
     geopackage.createGeometryColumnsTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyGeometryColumns(geopackage, done);
+      Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -48,29 +49,29 @@ describe('GeoPackage create tests', function() {
     geopackage.createGeometryColumnsTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyGeometryColumns(geopackage, function (err) {
-        if (err) return done(err);
-        geopackage.createGeometryColumnsTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyGeometryColumns(geopackage, done);
-        });
+      Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+      geopackage.createGeometryColumnsTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
 
   it('should create a user feature table', function(done) {
     var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom', wkx.Types.wkt.Point);
-    geopackage.createFeatureTable(featureTable, function(err, result) {
-      Verification.verifyTableExists(geopackage, 'test_features', done);
-    });
+    var result = geopackage.createFeatureTable(featureTable);
+    Verification.verifyTableExists(geopackage, 'test_features').should.be.equal(true);
+    done();
   });
 
   it('should create the tile matrix set table', function(done) {
     geopackage.createTileMatrixSetTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyTileMatrixSet(geopackage, done);
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -78,13 +79,11 @@ describe('GeoPackage create tests', function() {
     geopackage.createTileMatrixSetTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyTileMatrixSet(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createTileMatrixSetTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          done();
-        });
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      geopackage.createTileMatrixSetTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        done();
       });
     });
   });
@@ -92,7 +91,8 @@ describe('GeoPackage create tests', function() {
   it('should create the tile matrix table', function(done) {
     geopackage.createTileMatrixTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyTileMatrix(geopackage, done);
+      Verification.verifyTileMatrix(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -100,13 +100,11 @@ describe('GeoPackage create tests', function() {
     geopackage.createTileMatrixTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyTileMatrix(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createTileMatrixTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          done();
-        });
+      Verification.verifyTileMatrix(geopackage).should.be.equal(true);
+      geopackage.createTileMatrixTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        done();
       });
     });
   });
@@ -114,15 +112,16 @@ describe('GeoPackage create tests', function() {
   it('should create a user tile table', function(done) {
     var columns = TileTable.createRequiredColumns();
     var tileTable = new TileTable('test_tiles', columns);
-    geopackage.createTileTable(tileTable, function(err, result) {
-      Verification.verifyTableExists(geopackage, 'test_tiles', done);
-    });
+    var result = geopackage.createTileTable(tileTable);
+    Verification.verifyTableExists(geopackage, 'test_tiles').should.be.equal(true);
+    done();
   });
 
   it('should create the data columns table', function(done) {
     geopackage.createDataColumns(function(err, result) {
       should.not.exist(err);
-      Verification.verifyDataColumns(geopackage, done);
+      Verification.verifyDataColumns(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -130,13 +129,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createDataColumns(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyDataColumns(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createDataColumns(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyDataColumns(geopackage, done);
-        });
+      Verification.verifyDataColumns(geopackage).should.be.equal(true);
+      geopackage.createDataColumns(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyDataColumns(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -145,7 +143,8 @@ describe('GeoPackage create tests', function() {
     geopackage.createDataColumnConstraintsTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyDataColumnConstraints(geopackage, done);
+      Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -153,13 +152,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createDataColumnConstraintsTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyDataColumnConstraints(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createDataColumnConstraintsTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyDataColumnConstraints(geopackage, done);
-        });
+      Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
+      geopackage.createDataColumnConstraintsTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -167,7 +165,8 @@ describe('GeoPackage create tests', function() {
   it('should create the metadata reference table', function(done) {
     geopackage.createMetadataReferenceTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyMetadataReference(geopackage, done);
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -175,13 +174,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createMetadataReferenceTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyMetadataReference(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createMetadataReferenceTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyMetadataReference(geopackage, done);
-        });
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      geopackage.createMetadataReferenceTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -189,7 +187,8 @@ describe('GeoPackage create tests', function() {
   it('should create the metadata table', function(done) {
     geopackage.createMetadataTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyMetadata(geopackage, done);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -197,13 +196,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createMetadataTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyMetadata(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createMetadataTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyMetadata(geopackage, done);
-        });
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
+      geopackage.createMetadataTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyMetadata(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -211,7 +209,8 @@ describe('GeoPackage create tests', function() {
   it('should create the extensions table', function(done) {
     geopackage.createExtensionTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyExtensions(geopackage, done);
+      Verification.verifyExtensions(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -219,13 +218,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createExtensionTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyExtensions(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createExtensionTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyExtensions(geopackage, done);
-        });
+      Verification.verifyExtensions(geopackage).should.be.equal(true);
+      geopackage.createExtensionTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyExtensions(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -233,7 +231,8 @@ describe('GeoPackage create tests', function() {
   it('should create the table index table', function(done) {
     geopackage.createTableIndexTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyTableIndex(geopackage, done);
+      Verification.verifyTableIndex(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -241,13 +240,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createTableIndexTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyTableIndex(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createTableIndexTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyTableIndex(geopackage, done);
-        });
+      Verification.verifyTableIndex(geopackage).should.be.equal(true);
+      geopackage.createTableIndexTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyTableIndex(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -255,7 +253,8 @@ describe('GeoPackage create tests', function() {
   it('should create the geometry index table', function(done) {
     geopackage.createGeometryIndexTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyGeometryIndex(geopackage, done);
+      Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
+      done();
     });
   });
 
@@ -263,13 +262,12 @@ describe('GeoPackage create tests', function() {
     geopackage.createGeometryIndexTable(function(err, result) {
       should.not.exist(err);
       should.exist(result);
-      Verification.verifyGeometryIndex(geopackage, function(err) {
-        if (err) return done(err);
-        geopackage.createGeometryIndexTable(function(err, result) {
-          should.not.exist(err);
-          should.exist(result);
-          Verification.verifyGeometryIndex(geopackage, done);
-        });
+      Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
+      geopackage.createGeometryIndexTable(function(err, result) {
+        should.not.exist(err);
+        should.exist(result);
+        Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
+        done();
       });
     });
   });
@@ -277,7 +275,8 @@ describe('GeoPackage create tests', function() {
   it.skip('should create the feature tile link table', function(done) {
     geopackage.createFeatureTileLinkTable(function(err, result) {
       should.not.exist(err);
-      Verification.verifyFeatureTileLink(geopackage, done);
+      Verification.verifyFeatureTileLink(geopackage).should.be.equal(true);
+      done();
     });
   });
 });

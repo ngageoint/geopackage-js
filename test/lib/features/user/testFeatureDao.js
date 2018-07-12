@@ -43,14 +43,13 @@ describe('FeatureDao tests', function() {
 
     it('should read the geometry', function(done) {
       geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, featureDao) {
-        featureDao.getSrs(function(err, srs) {
-          featureDao.queryForEach(function(err, row, rowDone) {
-            var currentRow = featureDao.getFeatureRow(row);
-            var geometry = currentRow.getGeometry();
-            should.exist(geometry);
-            rowDone();
-          }, done);
-        });
+        var srs = featureDao.getSrs();
+        featureDao.queryForEach(function(err, row, rowDone) {
+          var currentRow = featureDao.getFeatureRow(row);
+          var geometry = currentRow.getGeometry();
+          should.exist(geometry);
+          rowDone();
+        }, done);
       });
     });
 
@@ -426,18 +425,17 @@ describe('FeatureDao tests', function() {
           };
 
           var createRow = function(geoJson, name, featureDao, callback) {
-            featureDao.getSrs(function(err, srs) {
-              var featureRow = featureDao.newRow();
-              var geometryData = new GeometryData();
-              geometryData.setSrsId(srs.srs_id);
-              var geometry = wkx.Geometry.parseGeoJSON(geoJson);
-              geometryData.setGeometry(geometry);
-              featureRow.setGeometry(geometryData);
-              featureRow.setValueWithColumnName('name', name);
-              featureRow.setValueWithColumnName('_feature_id', name);
-              featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
-              featureDao.create(featureRow, callback);
-            });
+            var srs = featureDao.getSrs();
+            var featureRow = featureDao.newRow();
+            var geometryData = new GeometryData();
+            geometryData.setSrsId(srs.srs_id);
+            var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+            geometryData.setGeometry(geometry);
+            featureRow.setGeometry(geometryData);
+            featureRow.setValueWithColumnName('name', name);
+            featureRow.setValueWithColumnName('_feature_id', name);
+            featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+            featureDao.create(featureRow, callback);
           }
           // create the features
           // Two intersecting boxes with a line going through the intersection and a point on the line

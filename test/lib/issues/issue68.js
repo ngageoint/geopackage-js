@@ -9,11 +9,12 @@ describe('Tests for issue 68', function() {
 
   it('should get a tile', function(done) {
     this.timeout(5000);
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg')).then(function(geoPackageConnection) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
+    .then(function(geoPackageConnection) {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-       geoPackage.getTileTables(function(err, tables) {
+      geoPackage.getTileTables(function(err, tables) {
         tables[0].should.be.equal('package_tiles');
         geoPackage.getTileDaoWithTableName('package_tiles', function(err, tileDao) {
           if (err) return done(err);

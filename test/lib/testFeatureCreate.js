@@ -53,19 +53,12 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
     geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
-      Verification.verifyGeometryColumns(geopackage, function(err) {
-        if (err) return done(err);
-        Verification.verifyTableExists(geopackage, tableName, function(err) {
-          if (err) return done(err);
-          Verification.verifyContentsForTable(geopackage, tableName, function(err) {
-            if (err) return done(err);
-            Verification.verifyGeometryColumnsForTable(geopackage, tableName, function(err) {
-              if (err) return done(err);
-              done();
-            });
-          });
-        });
-      });
+      var verified = Verification.verifyGeometryColumns(geopackage)
+        && Verification.verifyTableExists(geopackage, tableName)
+        && Verification.verifyContentsForTable(geopackage, tableName)
+        && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
+      verified.should.be.equal(true);
+      done();
     });
   });
 
@@ -191,19 +184,12 @@ describe('GeoPackage Feature table create tests', function() {
           columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
           geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
-            Verification.verifyGeometryColumns(geopackage, function(err) {
-              if (err) return done(err);
-              Verification.verifyTableExists(geopackage, tableName, function(err) {
-                if (err) return done(err);
-                Verification.verifyContentsForTable(geopackage, tableName, function(err) {
-                  if (err) return done(err);
-                  Verification.verifyGeometryColumnsForTable(geopackage, tableName, function(err) {
-                    if (err) return done(err);
-                    done();
-                  });
-                });
-              });
-            });
+            var verified = Verification.verifyGeometryColumns(geopackage)
+              && Verification.verifyTableExists(geopackage, tableName)
+              && Verification.verifyContentsForTable(geopackage, tableName)
+              && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
+            verified.should.be.equal(true);
+            done();
           });
         });
       });

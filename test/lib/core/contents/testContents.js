@@ -71,159 +71,139 @@ describe('Contents tests', function() {
   });
 
   it('should get the contents from the ID TILESosmds', function(done) {
-    contentsDao.queryForIdObject('TILESosmds', function(err, contents) {
-      should.exist(contents);
-      should.not.exist(err);
-      contents.should.have.property('table_name', 'TILESosmds');
-      contents.should.have.property('data_type', 'tiles');
-      contents.should.have.property('identifier', 'TILESosmds');
-      contents.should.have.property('description', null);
-      contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
-      contents.should.have.property('min_x', -180);
-      contents.should.have.property('min_y', -85.0511287798066);
-      contents.should.have.property('max_x', 180);
-      contents.should.have.property('max_y', 85.0511287798066);
-      contents.should.have.property('srs_id', 4326);
-      done();
-    });
+    var contents = contentsDao.queryForIdObject('TILESosmds');
+    should.exist(contents);
+    contents.should.have.property('table_name', 'TILESosmds');
+    contents.should.have.property('data_type', 'tiles');
+    contents.should.have.property('identifier', 'TILESosmds');
+    contents.should.have.property('description', null);
+    contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+    contents.should.have.property('min_x', -180);
+    contents.should.have.property('min_y', -85.0511287798066);
+    contents.should.have.property('max_x', 180);
+    contents.should.have.property('max_y', 85.0511287798066);
+    contents.should.have.property('srs_id', 4326);
+    done();
   });
 
   it('should get the contents from the ID FEATURESriversds', function(done) {
-    contentsDao.queryForIdObject('FEATURESriversds', function(err, contents) {
-      should.exist(contents);
-      should.not.exist(err);
-      contents.should.have.property('table_name', 'FEATURESriversds');
-      contents.should.have.property('data_type', 'features');
-      contents.should.have.property('identifier', 'FEATURESriversds');
-      contents.should.have.property('description', null);
-      contents.should.have.property('last_change', '2015-12-04T15:28:59.122Z');
-      contents.should.have.property('min_x', -20037508.342789244);
-      contents.should.have.property('min_y', -19971868.88040857);
-      contents.should.have.property('max_x', 20037508.342789244);
-      contents.should.have.property('max_y', 19971868.880408563);
-      contents.should.have.property('srs_id', 3857);
-      done();
-    });
+    var contents = contentsDao.queryForIdObject('FEATURESriversds');
+    should.exist(contents);
+    contents.should.have.property('table_name', 'FEATURESriversds');
+    contents.should.have.property('data_type', 'features');
+    contents.should.have.property('identifier', 'FEATURESriversds');
+    contents.should.have.property('description', null);
+    contents.should.have.property('last_change', '2015-12-04T15:28:59.122Z');
+    contents.should.have.property('min_x', -20037508.342789244);
+    contents.should.have.property('min_y', -19971868.88040857);
+    contents.should.have.property('max_x', 20037508.342789244);
+    contents.should.have.property('max_y', 19971868.880408563);
+    contents.should.have.property('srs_id', 3857);
+    done();
   });
 
   it('should get the projection from the ID TILESosmds', function(done) {
-    contentsDao.queryForIdObject('TILESosmds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('TILESosmds');
+    should.exist(contents);
+    contentsDao.getProjection(contents, function(err, projection) {
       should.not.exist(err);
-      contentsDao.getProjection(contents, function(err, projection) {
-        should.not.exist(err);
-        should.exist(projection);
-        done();
-      });
+      should.exist(projection);
+      done();
     });
   });
 
   it('should get the projection from the ID FEATURESriversds', function(done) {
-    contentsDao.queryForIdObject('FEATURESriversds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('FEATURESriversds');
+    should.exist(contents);
+    contentsDao.getProjection(contents, function(err, projection) {
       should.not.exist(err);
-      contentsDao.getProjection(contents, function(err, projection) {
-        should.not.exist(err);
-        should.exist(projection);
-        done();
-      });
+      should.exist(projection);
+      done();
     });
   });
 
   it('should get the GeometryColumns from the ID TILESosmds', function(done) {
-    contentsDao.queryForIdObject('TILESosmds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('TILESosmds');
+    should.exist(contents);
+    contentsDao.getGeometryColumns(contents, function(err, columns) {
       should.not.exist(err);
-      contentsDao.getGeometryColumns(contents, function(err, columns) {
-        should.not.exist(err);
-        should.not.exist(columns);
-        done();
-      });
+      should.not.exist(columns);
+      done();
     });
   });
 
   it('should get the GeometryColumns from the ID FEATURESriversds', function(done) {
-    contentsDao.queryForIdObject('FEATURESriversds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('FEATURESriversds');
+    should.exist(contents);
+    contentsDao.getGeometryColumns(contents, function(err, columns) {
       should.not.exist(err);
-      contentsDao.getGeometryColumns(contents, function(err, columns) {
-        should.not.exist(err);
-        should.exist(columns);
-        columns.should.have.property('table_name', 'FEATURESriversds');
-        columns.should.have.property('column_name', 'geom');
-        columns.should.have.property('geometry_type_name', 'GEOMETRY');
-        columns.should.have.property('srs_id', 3857);
-        columns.should.have.property('z', 0);
-        columns.should.have.property('m', 0);
-        done();
-      });
+      should.exist(columns);
+      columns.should.have.property('table_name', 'FEATURESriversds');
+      columns.should.have.property('column_name', 'geom');
+      columns.should.have.property('geometry_type_name', 'GEOMETRY');
+      columns.should.have.property('srs_id', 3857);
+      columns.should.have.property('z', 0);
+      columns.should.have.property('m', 0);
+      done();
     });
   });
 
   it('should get the TileMatrixSet from the ID TILESosmds', function(done) {
-    contentsDao.queryForIdObject('TILESosmds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('TILESosmds');
+    should.exist(contents);
+    contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
       should.not.exist(err);
-      contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
-        should.not.exist(err);
-        should.exist(matrixSet);
-        matrixSet.should.have.property('table_name', 'TILESosmds');
-        matrixSet.should.have.property('srs_id', 3857);
-        matrixSet.should.have.property('min_x', -20037508.342789244);
-        matrixSet.should.have.property('min_y', -20037508.342789244);
-        matrixSet.should.have.property('max_x', 20037508.342789244);
-        matrixSet.should.have.property('max_y', 20037508.342789244);
-        done();
-      });
+      should.exist(matrixSet);
+      matrixSet.should.have.property('table_name', 'TILESosmds');
+      matrixSet.should.have.property('srs_id', 3857);
+      matrixSet.should.have.property('min_x', -20037508.342789244);
+      matrixSet.should.have.property('min_y', -20037508.342789244);
+      matrixSet.should.have.property('max_x', 20037508.342789244);
+      matrixSet.should.have.property('max_y', 20037508.342789244);
+      done();
     });
   });
 
   it('should get the TileMatrixSet from the ID FEATURESriversds', function(done) {
-    contentsDao.queryForIdObject('FEATURESriversds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('FEATURESriversds');
+    should.exist(contents);
+    contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
       should.not.exist(err);
-      contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
-        should.not.exist(err);
-        should.not.exist(matrixSet);
-        done();
-      });
+      should.not.exist(matrixSet);
+      done();
     });
   });
 
   it('should get the TileMatrix from the ID TILESosmds', function(done) {
-    contentsDao.queryForIdObject('TILESosmds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('TILESosmds');
+    should.exist(contents);
+    contentsDao.getTileMatrix(contents, function(err, matrix) {
       should.not.exist(err);
-      contentsDao.getTileMatrix(contents, function(err, matrix) {
-        should.not.exist(err);
-        should.exist(matrix);
-        matrix.should.have.property('length', 4);
+      should.exist(matrix);
+      matrix.should.have.property('length', 4);
 
-        var tm = new TileMatrix();
-        tm.table_name ='TILESosmds';
-        tm.zoom_level = 0;
-        tm.matrix_width = 1;
-        tm.matrix_height = 1;
-        tm.tile_width = 256;
-        tm.tile_height = 256;
-        tm.pixel_x_size = 156543.03392804097;
-        tm.pixel_y_size = 156543.033928041;
+      var tm = new TileMatrix();
+      tm.table_name ='TILESosmds';
+      tm.zoom_level = 0;
+      tm.matrix_width = 1;
+      tm.matrix_height = 1;
+      tm.tile_width = 256;
+      tm.tile_height = 256;
+      tm.pixel_x_size = 156543.03392804097;
+      tm.pixel_y_size = 156543.033928041;
 
-        matrix[0].should.be.deep.equal(tm);
-        done();
-      });
+      matrix[0].should.be.deep.equal(tm);
+      done();
     });
   });
 
   it('should get the TileMatrix from the ID FEATURESriversds', function(done) {
-    contentsDao.queryForIdObject('FEATURESriversds', function(err, contents) {
-      should.exist(contents);
+    var contents = contentsDao.queryForIdObject('FEATURESriversds');
+    should.exist(contents);
+    contentsDao.getTileMatrix(contents, function(err, matrix) {
       should.not.exist(err);
-      contentsDao.getTileMatrix(contents, function(err, matrix) {
-        should.not.exist(err);
-        should.not.exist(matrix);
-        done();
-      });
+      should.not.exist(matrix);
+      done();
     });
   });
 

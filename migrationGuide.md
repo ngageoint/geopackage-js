@@ -38,13 +38,45 @@ All of the following methods have had their callback parameters removed and they
 GeoPackageConnection constructor
 GeoPackageConnection.connect
 GeoPackageConnection.connectWithDatabase
-GeoPackageConnection.prototype.setApplicationId
 sqliteAdapter.createAdapter
 GeoPackageConnection.prototype.setApplicationId
 TableCreator.prototype.createRequired
+GeoPackageValidate.hasMinimumTables
 
 ### Methods with Callbacks that now return results
 Adapter.prototype.run
+GeoPackage.prototype.getApplicationId
+GeoPackage.prototype.createFeatureTable
+GeoPackage.prototype.createTileTable
+GeoPackage.prototype.getSrs
+GeoPackageConnection.prototype.getApplicationId
+GeoPackageConnection.prototype.get
+GeoPackageConnection.prototype.tableExists
+GeoPackageConnection.prototype.setApplicationId
+SqliteAdapter.prototype.get
+ContentsDao.prototype.getSrs
+Dao.prototype.queryForIdObject
+Dao.prototype.queryForSameId
+Dao.prototype.queryForMultiIdObject
+Dao.prototype.isTableExists
+SpatialReferenceSystemDao.prototype.getBySrsId
+DataColumnsDao.prototype.getContents
+DataColumnConstraintsDao.prototype.queryUnique
+GeometryColumnsDao.prototype.getSrs
+GeometryColumnsDao.prototype.getContents
+GeometryColumnsDao.prototype.getProjection
+TileDao constructor
+TileDao.prototype.initialize
+TileDao.prototype.getSrs
+TileMatrixSetDao.prototype.getSrs
+TileMatrixSetDao.prototype.getProjection
+TileMatrixSetDao.prototype.getContents
+TileMatrixDao.prototype.getTileMatrixSet
+FeatureDao.prototype.getSrs
+FeatureTableIndex.prototype.getTableIndex
+GeometryIndexDao.prototype.getTableIndex
+TableCreator.prototype.createUserTable
+GeoPackageValidate.hasMinimumTables
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

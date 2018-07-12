@@ -28,7 +28,9 @@ describe('GeoPackage Extension Dao tests', function() {
   it('should create an extensions table', function(done) {
     var extensionDao = geopackage.getExtensionDao();
     extensionDao.createTable(function(err, table) {
-      Verification.verifyExtensions(geopackage, done);
+      var verified = Verification.verifyExtensions(geopackage);
+      verified.should.be.equal(true);
+      done();
     });
   });
 

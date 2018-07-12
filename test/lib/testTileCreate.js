@@ -40,13 +40,9 @@ describe('GeoPackage Tile table create tests', function() {
     var requiredColumns = TileTable.createRequiredColumns();
     var tileTable = new TileTable(tableName, requiredColumns);
 
-    geopackage.createTileTable(tileTable, function(err, result) {
-      if (err) return done(err);
-      Verification.verifyTableExists(geopackage, tableName, function(err) {
-        if (err) return done(err);
-        done();
-      });
-    });
+    var result = geopackage.createTileTable(tileTable);
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    done();
   });
 
   it('should create a tile table with parameters', function(done) {
@@ -55,15 +51,10 @@ describe('GeoPackage Tile table create tests', function() {
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
     geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
-      Verification.verifyTileMatrixSet(geopackage, function(err) {
-        if (err) return done(err);
-        Verification.verifyContentsForTable(geopackage, tableName, function(err) {
-          if (err) return done(err);
-          Verification.verifyTableExists(geopackage, tableName, function(err) {
-            done(err);
-          });
-        });
-      });
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+      done();
     });
   });
 
@@ -81,15 +72,10 @@ describe('GeoPackage Tile table create tests', function() {
         geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
           should.not.exist(err);
           tileMatrixSet = result;
-          Verification.verifyTileMatrixSet(geopackage, function(err) {
-            if (err) return done(err);
-            Verification.verifyContentsForTable(geopackage, tableName, function(err) {
-              if (err) return done(err);
-              Verification.verifyTableExists(geopackage, tableName, function(err) {
-                done(err);
-              });
-            });
-          });
+          Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+          Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+          Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+          done();
         });
       });
     });
@@ -145,37 +131,32 @@ describe('GeoPackage Tile table create tests', function() {
       geopackage.getSpatialReferenceSystemDao().createWebMercator(function(err, result) {
         geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
           tileMatrixSet = result;
-          Verification.verifyTileMatrixSet(geopackage, function(err) {
-            if (err) return done(err);
-            Verification.verifyContentsForTable(geopackage, tableName, function(err) {
-              if (err) return done(err);
-              Verification.verifyTableExists(geopackage, tableName, function(err) {
-                geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
+          Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+          Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+          Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+          geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
 
-                  async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
-                    var tiles = [];
-                    var tileCount = Math.pow(2,zoom);
-                    for (var i = 0; i < tileCount; i++) {
-                      tiles.push(i);
-                    }
-                    async.eachSeries(tiles, function(xTile, xDone) {
-                      async.eachSeries(tiles, function(yTile, yDone) {
-                        testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
-                          console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
-                          geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
-                            yDone();
-                          });
-                        });
-                      }, xDone);
-                    }, zoomDone);
-                  }, function(err) {
-                    geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-                      tileDao.getCount(function(err, result) {
-                        result.should.be.equal(85);
-                        done(err);
-                      });
+            async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
+              var tiles = [];
+              var tileCount = Math.pow(2,zoom);
+              for (var i = 0; i < tileCount; i++) {
+                tiles.push(i);
+              }
+              async.eachSeries(tiles, function(xTile, xDone) {
+                async.eachSeries(tiles, function(yTile, yDone) {
+                  testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
+                    console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
+                    geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                      yDone();
                     });
                   });
+                }, xDone);
+              }, zoomDone);
+            }, function(err) {
+              geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+                tileDao.getCount(function(err, result) {
+                  result.should.be.equal(85);
+                  done(err);
                 });
               });
             });

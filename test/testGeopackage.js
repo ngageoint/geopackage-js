@@ -233,11 +233,9 @@ describe('GeoPackageAPI tests', function() {
       }, 'rivers', function(err, id) {
         // ensure the last indexed changed
         var db = indexedGeopackage.getDatabase();
-        db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id], function(err, index) {
-          should.not.exist(err);
-          index.geom_id.should.be.equal(id);
-          done();
-        });
+        var index = db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id]);
+        index.geom_id.should.be.equal(id);
+        done();
       });
     });
 

@@ -116,17 +116,16 @@ describe('GeometryColumns tests', function() {
         z: 0,
         m: 0
       });
-      gcd.getSrs(table, function(err, srs) {
-        TestUtils.compareProperties(srs, {
-          srs_name: 'Undefined geographic SRS',
-          srs_id: 0,
-          organization: 'NONE',
-          organization_coordsys_id: 0,
-          definition: 'undefined',
-          description: 'undefined geographic coordinate reference system'
-        });
-        done();
+      var srs = gcd.getSrs(table);
+      TestUtils.compareProperties(srs, {
+        srs_name: 'Undefined geographic SRS',
+        srs_id: 0,
+        organization: 'NONE',
+        organization_coordsys_id: 0,
+        definition: 'undefined',
+        description: 'undefined geographic coordinate reference system'
       });
+      done();
     });
   });
 
@@ -143,21 +142,20 @@ describe('GeometryColumns tests', function() {
         z: 0,
         m: 0
       });
-      gcd.getContents(table, function(err, contents) {
-        contents.should.be.deep.equal({
-          table_name: 'point2d',
-          data_type: 'features',
-          identifier: 'point2d',
-          description: '',
-          last_change: '2014-08-27T15:36:41.000Z',
-          min_x: 1,
-          min_y: 2,
-          max_x: 1,
-          max_y: 2,
-          srs_id: 0
-        });
-        done();
+      var contents = gcd.getContents(table);
+      contents.should.be.deep.equal({
+        table_name: 'point2d',
+        data_type: 'features',
+        identifier: 'point2d',
+        description: '',
+        last_change: '2014-08-27T15:36:41.000Z',
+        min_x: 1,
+        min_y: 2,
+        max_x: 1,
+        max_y: 2,
+        srs_id: 0
       });
+      done();
     });
   });
 
@@ -174,11 +172,9 @@ describe('GeometryColumns tests', function() {
         z: 0,
         m: 0
       });
-      gcd.getProjection(table, function(err, projection) {
-        should.not.exist(err);
-        should.exist(projection);
-        done();
-      });
+      var projection = gcd.getProjection(table);
+      should.exist(projection);
+      done();
     });
   });
 

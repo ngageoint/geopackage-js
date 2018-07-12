@@ -63,21 +63,20 @@ describe('Data Columns tests', function() {
   it('should get the contents for the data column for property_0', function(done) {
     var dc = new DataColumnsDao(connection);
     dc.getDataColumns('FEATURESriversds', 'property_0', function(err, dataColumn) {
-      dc.getContents(dataColumn, function(err, contents) {
-        contents.should.be.deep.equal({
-          table_name: 'FEATURESriversds',
-          data_type: 'features',
-          identifier: 'FEATURESriversds',
-          description: null,
-          last_change: '2015-12-04T15:28:59.122Z',
-          min_x: -20037508.342789244,
-          min_y: -19971868.88040857,
-          max_x: 20037508.342789244,
-          max_y: 19971868.880408563,
-          srs_id: 3857
-        });
-        done();
+      var contents = dc.getContents(dataColumn);
+      contents.should.be.deep.equal({
+        table_name: 'FEATURESriversds',
+        data_type: 'features',
+        identifier: 'FEATURESriversds',
+        description: null,
+        last_change: '2015-12-04T15:28:59.122Z',
+        min_x: -20037508.342789244,
+        min_y: -19971868.88040857,
+        max_x: 20037508.342789244,
+        max_y: 19971868.880408563,
+        srs_id: 3857
       });
+      done();
     });
   });
 
@@ -191,20 +190,18 @@ describe('Data Columns tests', function() {
       dc.description = 'constraint description';
 
       dao.create(dc, function(err, result) {
-        dao.queryUnique('test constraint', 'range', 'NULL', function(err, dataColumnConstraint) {
-          should.not.exist(err);
-          dataColumnConstraint.should.be.deep.equal({
-            constraint_name: 'test constraint',
-            constraint_type: 'range',
-            value: 'NULL',
-            min: 5,
-            min_is_inclusive: 1,
-            max: 6,
-            max_is_inclusive: 1,
-            description: 'constraint description'
-          });
-          done();
+        var dataColumnConstraint = dao.queryUnique('test constraint', 'range', 'NULL');
+        dataColumnConstraint.should.be.deep.equal({
+          constraint_name: 'test constraint',
+          constraint_type: 'range',
+          value: 'NULL',
+          min: 5,
+          min_is_inclusive: 1,
+          max: 6,
+          max_is_inclusive: 1,
+          description: 'constraint description'
         });
+        done();
       });
     });
   });
