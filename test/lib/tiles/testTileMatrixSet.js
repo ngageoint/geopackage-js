@@ -27,11 +27,9 @@ describe('Tile Matrix Set tests', function() {
     geoPackage.close();
   });
 
-  it('should get the tile matrixes', function(done) {
-    tileMatrixSetDao.queryForAll(function(err, tileMatrixSets) {
-      tileMatrixSets.should.have.property('length', 1);
-      done();
-    })
+  it('should get the tile matrixes', function() {
+    var tileMatrixSets = tileMatrixSetDao.queryForAll();
+    tileMatrixSets.should.have.property('length', 1);
   });
 
   it('should get the TileMatrixSet from the ID', function() {

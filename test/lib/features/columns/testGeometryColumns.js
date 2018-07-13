@@ -73,14 +73,11 @@ describe('GeometryColumns tests', function() {
     });
   });
 
-  it('should get all the tables', function(done){
+  it('should get all the tables', function(){
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForAll(function(err, results) {
-      should.not.exist(err);
-      should.exist(results);
-      results.should.have.property('length', 16);
-      done();
-    });
+    var results = gcd.queryForAll();
+    should.exist(results);
+    results.should.have.property('length', 16);
   });
 
   it('should get the table', function(done) {

@@ -51,13 +51,10 @@ describe('SpatialReferenceSystem tests', function() {
     done();
   });
 
-  it('should get all defined SRS', function(done) {
-    geoPackage.getSpatialReferenceSystemDao().queryForAll(function(err, srs) {
-      should.not.exist(err);
-      should.exist(srs);
-      srs.should.have.property('length', 4);
-      done();
-    });
+  it('should get all defined SRS', function() {
+    var srs = geoPackage.getSpatialReferenceSystemDao().queryForAll();
+    should.exist(srs);
+    srs.should.have.property('length', 4);
   });
 
   it('should get the 4326 SRS', function(done) {

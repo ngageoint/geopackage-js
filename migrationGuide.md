@@ -63,12 +63,15 @@ GeoPackageConnection.prototype.setApplicationId
 GeoPackageConnection.prototype.minOfColumn
 GeoPackageConnection.prototype.maxOfColumn
 GeoPackageConnection.prototype.each
+GeoPackageConnection.prototype.all
 SqliteAdapter.prototype.get
+SqliteAdapter.prototype.all
 SqliteAdapter.prototype.each
 ContentsDao.prototype.getSrs
 Dao.prototype.queryForIdObject
 Dao.prototype.queryForSameId
 Dao.prototype.queryForMultiIdObject
+Dao.prototype.queryForAll
 Dao.prototype.isTableExists
 Dao.prototype.countByEqWithFieldAndValue
 Dao.prototype.minOfColumn
@@ -95,6 +98,8 @@ FeatureTableIndex.prototype.getTableIndex
 GeometryIndexDao.prototype.getTableIndex
 TableCreator.prototype.createUserTable
 GeoPackageValidate.hasMinimumTables
+UserTableReader.prototype.readTable
+TileTableReader.prototype.readTileTable
 
 ### New methods
 GeoPackage.prototype.createRequiredTables
