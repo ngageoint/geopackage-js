@@ -10,7 +10,7 @@ var fs = require('fs')
   , testSetup = require('../../../fixtures/testSetup');
 
 describe('Metadata Reference tests', function() {
-  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
+  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'testMetadata.gpkg');
   var geopackage;
 
   beforeEach(function(done) {
