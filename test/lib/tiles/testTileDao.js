@@ -92,7 +92,7 @@ describe('TileDao tests', function() {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        tileDone();
+        // tileDone();
       }, function(err, count) {
         count.should.be.equal(4);
         done();
@@ -104,7 +104,7 @@ describe('TileDao tests', function() {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        tileDone();
+        // tileDone();
       }, function(err, count) {
         count.should.be.equal(4);
         done();
@@ -117,7 +117,7 @@ describe('TileDao tests', function() {
         tileRow.getTileColumn().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        tileDone();
+        // tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();
@@ -130,7 +130,7 @@ describe('TileDao tests', function() {
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        tileDone();
+        // tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();
@@ -149,7 +149,7 @@ describe('TileDao tests', function() {
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-        tileDone();
+        // tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();

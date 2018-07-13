@@ -22,32 +22,29 @@ describe('GeometryColumns tests', function() {
     connection.close();
   });
 
-  it('should get the feature tables', function(done) {
+  it('should get the feature tables', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.getFeatureTables(function(err, tables) {
-      should.not.exist(err);
-      should.exist(tables);
-      tables.length.should.be.equal(16);
-      tables.should.have.members([
-        'point2d',
-         'linestring2d',
-         'polygon2d',
-         'multipoint2d',
-         'multilinestring2d',
-         'multipolygon2d',
-         'geomcollection2d',
-         'geometry2d',
-         'point3d',
-         'linestring3d',
-         'polygon3d',
-         'multipoint3d',
-         'multilinestring3d',
-         'multipolygon3d',
-         'geomcollection3d',
-         'geometry3d'
-      ]);
-      done();
-    });
+    var tables = gcd.getFeatureTables();
+    should.exist(tables);
+    tables.length.should.be.equal(16);
+    tables.should.have.members([
+      'point2d',
+       'linestring2d',
+       'polygon2d',
+       'multipoint2d',
+       'multilinestring2d',
+       'multipolygon2d',
+       'geomcollection2d',
+       'geometry2d',
+       'point3d',
+       'linestring3d',
+       'polygon3d',
+       'multipoint3d',
+       'multilinestring3d',
+       'multipolygon3d',
+       'geomcollection3d',
+       'geometry3d'
+    ]);
   });
 
   it('should get the table', function(done) {

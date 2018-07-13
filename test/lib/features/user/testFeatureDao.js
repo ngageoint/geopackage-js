@@ -48,7 +48,7 @@ describe('FeatureDao tests', function() {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
           should.exist(geometry);
-          rowDone();
+          // rowDone();
         }, done);
       });
     });
@@ -57,7 +57,7 @@ describe('FeatureDao tests', function() {
       geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, featureDao) {
         featureDao.queryForEqWithFieldAndValue('property_1', 'Gila', function(err, row, rowDone) {
           row.property_1.should.be.equal('Gila');
-          rowDone();
+          // rowDone();
         }, done);
       });
     });
@@ -115,7 +115,7 @@ describe('FeatureDao tests', function() {
         should.exist(featureRow.getValueWithColumnName('property_1'));
         should.exist(featureRow.getValueWithColumnName('property_2'));
         count++;
-        rowCallback();
+        // rowCallback();
       }, function(err) {
         console.log('count', count);
         done();
@@ -166,7 +166,7 @@ describe('FeatureDao tests', function() {
       GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb, function(err, feature, rowCallback) {
         feature.properties.name.should.be.equal('box1');
         count++;
-        rowCallback();
+        // rowCallback();
       }, function() {
         count.should.be.equal(1);
         done();
@@ -289,7 +289,7 @@ describe('FeatureDao tests', function() {
             }
           }
         }
-        rowCallback();
+        // rowCallback();
       }, function() {
         console.log('closest', closest.properties);
         // console.log('foundFeatures', foundFeatures);
@@ -477,7 +477,7 @@ describe('FeatureDao tests', function() {
         if (feature) {
           line = queryTestFeatureDao.getFeatureRow(feature);
         }
-        rowDone();
+        // rowDone();
       }, function() {
         line.setValueWithColumnName('name', 'UpdatedLine');
         var newLine;
@@ -487,7 +487,7 @@ describe('FeatureDao tests', function() {
             if (feature) {
               newLine = queryTestFeatureDao.getFeatureRow(feature);
             }
-            rowDone();
+            // rowDone();
           }, function() {
             newLine.getValueWithColumnName('name').should.be.equal('UpdatedLine');
             done();
@@ -519,7 +519,7 @@ describe('FeatureDao tests', function() {
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       queryTestFeatureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         row.properties.name.should.be.equal('box1');
-        rowCallback();
+        // rowCallback();
       }, function(){
         done();
       });
@@ -538,7 +538,7 @@ describe('FeatureDao tests', function() {
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         row.values.name.should.be.equal('box1');
-        rowCallback();
+        // rowCallback();
       }, function(){
         done();
       });
@@ -548,7 +548,7 @@ describe('FeatureDao tests', function() {
       var bb = new BoundingBox(1.1, 1.3, .4, .6);
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         row.values.name.should.be.equal('box2');
-        rowCallback();
+        // rowCallback();
       }, function(){
         done();
       });
@@ -559,7 +559,7 @@ describe('FeatureDao tests', function() {
       var foundFeatures = [];
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         foundFeatures.push(row.values.name);
-        rowCallback();
+        // rowCallback();
       }, function(){
         foundFeatures.should.be.deep.equal(['box1', 'box2', 'line']);
         done();
@@ -571,7 +571,7 @@ describe('FeatureDao tests', function() {
       var foundFeatures = [];
       queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row, rowCallback) {
         foundFeatures.push(row.values.name);
-        rowCallback();
+        // rowCallback();
       }, function() {
         foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
         done();
@@ -645,7 +645,7 @@ describe('FeatureDao tests', function() {
             }
           }
         }
-        rowCallback();
+        // rowCallback();
       }, function() {
         console.log('closest', closest);
         console.log('foundFeatures', foundFeatures);

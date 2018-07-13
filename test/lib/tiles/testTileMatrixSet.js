@@ -34,7 +34,7 @@ describe('Tile Matrix Set tests', function() {
     })
   });
 
-  it('should get the TileMatrixSet from the ID', function(done) {
+  it('should get the TileMatrixSet from the ID', function() {
     var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
     should.exist(tileMatrixSet);
     tileMatrixSet.should.have.property('table_name', 'TILESosmds');
@@ -43,25 +43,20 @@ describe('Tile Matrix Set tests', function() {
     tileMatrixSet.should.have.property('min_y', -20037508.342789244);
     tileMatrixSet.should.have.property('max_x', 20037508.342789244);
     tileMatrixSet.should.have.property('max_y', 20037508.342789244);
-    done();
   });
 
-  it('should get the tile table names from the TileMatrixSet', function(done) {
-    tileMatrixSetDao.getTileTables(function(err, tableNames) {
-      should.not.exist(err);
-      should.exist(tableNames);
-      tableNames.should.have.property('length', 1);
-      tableNames[0].should.be.equal('TILESosmds');
-      done();
-    });
+  it('should get the tile table names from the TileMatrixSet', function() {
+    var tableNames = tileMatrixSetDao.getTileTables();
+    should.exist(tableNames);
+    tableNames.should.have.property('length', 1);
+    tableNames[0].should.be.equal('TILESosmds');
   });
 
-  it('should get the projection from the TileMatrixSet', function(done) {
+  it('should get the projection from the TileMatrixSet', function() {
     var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
     should.exist(tileMatrixSet);
     var projection = tileMatrixSetDao.getProjection(tileMatrixSet);
     should.exist(projection);
-    done();
   });
 
   it('should get the Contents from the TileMatrixSet', function(done) {

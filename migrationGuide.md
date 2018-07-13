@@ -51,13 +51,20 @@ GeoPackage.prototype.getApplicationId
 GeoPackage.prototype.createFeatureTable
 GeoPackage.prototype.createTileTable
 GeoPackage.prototype.getSrs
+GeoPackage.prototype.getFeatureTables
+GeoPackage.prototype.hasFeatureTable
+GeoPackage.prototype.getTileTables
+GeoPackage.prototype.hasTileTable
+GeoPackage.prototype.getTables
 GeoPackageConnection.prototype.getApplicationId
 GeoPackageConnection.prototype.get
 GeoPackageConnection.prototype.tableExists
 GeoPackageConnection.prototype.setApplicationId
 GeoPackageConnection.prototype.minOfColumn
 GeoPackageConnection.prototype.maxOfColumn
+GeoPackageConnection.prototype.each
 SqliteAdapter.prototype.get
+SqliteAdapter.prototype.each
 ContentsDao.prototype.getSrs
 Dao.prototype.queryForIdObject
 Dao.prototype.queryForSameId
@@ -72,6 +79,7 @@ DataColumnConstraintsDao.prototype.queryUnique
 GeometryColumnsDao.prototype.getSrs
 GeometryColumnsDao.prototype.getContents
 GeometryColumnsDao.prototype.getProjection
+GeometryColumnsDao.prototype.getFeatureTables
 TileDao constructor
 TileDao.prototype.initialize
 TileDao.prototype.getSrs
@@ -81,6 +89,7 @@ TileMatrixSetDao.prototype.getSrs
 TileMatrixSetDao.prototype.getProjection
 TileMatrixSetDao.prototype.getContents
 TileMatrixDao.prototype.getTileMatrixSet
+TileMatrixSetDao.prototype.getTileTables
 FeatureDao.prototype.getSrs
 FeatureTableIndex.prototype.getTableIndex
 GeometryIndexDao.prototype.getTableIndex

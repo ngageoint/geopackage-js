@@ -14,21 +14,20 @@ describe('Tests for issue 68', function() {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getTileTables(function(err, tables) {
-        tables[0].should.be.equal('package_tiles');
-        geoPackage.getTileDaoWithTableName('package_tiles', function(err, tileDao) {
+      var tables = geoPackage.getTileTables();
+      tables[0].should.be.equal('package_tiles');
+      geoPackage.getTileDaoWithTableName('package_tiles', function(err, tileDao) {
+        if (err) return done(err);
+        should.exist(tileDao);
+        geoPackage.getInfoForTable(tileDao, function(err, info) {
           if (err) return done(err);
-          should.exist(tileDao);
-          geoPackage.getInfoForTable(tileDao, function(err, info) {
+          should.exist(info);
+          var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+          gpr.getTile(192,401,10,function(err, tile) {
             if (err) return done(err);
-            should.exist(info);
-            var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-            gpr.getTile(192,401,10,function(err, tile) {
-              if (err) return done(err);
-              should.exist(tile);
-              geoPackage.close();
-              done();
-            });
+            should.exist(tile);
+            geoPackage.close();
+            done();
           });
         });
       });

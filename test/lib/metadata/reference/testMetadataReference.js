@@ -133,14 +133,14 @@ describe('Metadata Reference tests', function() {
             var count = 0;
             metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
               count++;
-              rowDone();
+              // rowDone();
             }, function(err) {
               count.should.be.equal(1);
               metadataReferenceDao.removeMetadataParent(metadata1.id, function(err, result) {
                 var count = 0;
                 metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
                   count++;
-                  rowDone();
+                  // rowDone();
                 }, function() {
                   count.should.be.equal(0);
                   done();
@@ -214,7 +214,7 @@ describe('Metadata Reference tests', function() {
               row.table_name.should.be.equal('TEST_TABLE_NAME_2');
               row.md_file_id.should.be.equal(metadata2.id);
               row.md_parent_id.should.be.equal(metadata1.id);
-              rowDone();
+              // rowDone();
             }, function() {
               done();
             });
@@ -285,7 +285,7 @@ describe('Metadata Reference tests', function() {
               count++;
               should.not.exist(err);
               row.md_file_id.should.be.equal(metadata2.id);
-              rowDone();
+              // rowDone();
             }, function() {
               count.should.be.equal(2);
               done();

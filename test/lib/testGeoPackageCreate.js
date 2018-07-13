@@ -28,13 +28,10 @@ describe('GeoPackage create tests', function() {
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
-  it('should get return an empty array if asking for tile tables when they do not exist', function(done) {
-    geopackage.getTileTables(function(err, tables) {
-      should.not.exist(err);
-      should.exist(tables);
-      tables.length.should.be.equal(0);
-      done();
-    });
+  it('should get return an empty array if asking for tile tables when they do not exist', function() {
+    var tables = geopackage.getTileTables();
+    should.exist(tables);
+    tables.length.should.be.equal(0);
   });
 
   it('should create the geometry columns table', function(done) {

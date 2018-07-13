@@ -128,7 +128,7 @@ describe('Data Columns tests', function() {
     dc.constraint_name = 'test constraint';
     dao.create(dc, function(err, result){
       if (err) return done(err);
-      dao.queryByConstraintName('test constraint', function(err, dataColumn, rowDone) {
+      dao.queryByConstraintName('test constraint', function(err, dataColumn) {
         dataColumn.should.be.deep.equal({
           table_name: 'FEATURESriversds',
           column_name: 'test',
@@ -138,7 +138,6 @@ describe('Data Columns tests', function() {
           mime_type: 'text/html',
           constraint_name: 'test constraint'
         });
-        rowDone();
       }, done);
     });
   });
@@ -158,7 +157,7 @@ describe('Data Columns tests', function() {
       dc.description = 'constraint description';
 
       dao.create(dc, function(err, result) {
-        dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint, rowDone) {
+        dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
           dataColumnConstraint.should.be.deep.equal({
             constraint_name: 'test constraint',
             constraint_type: 'range',
@@ -169,7 +168,6 @@ describe('Data Columns tests', function() {
             max_is_inclusive: 1,
             description: 'constraint description'
           });
-          rowDone();
         }, done);
       });
     });

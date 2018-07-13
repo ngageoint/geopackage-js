@@ -13,31 +13,29 @@ describe('GeoPackage tests', function() {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getFeatureTables(function(err, tables) {
-        should.not.exist(err);
-        should.exist(tables);
-        tables.length.should.be.equal(16);
-        tables.should.have.members([
-           'point2d',
-           'linestring2d',
-           'polygon2d',
-           'multipoint2d',
-           'multilinestring2d',
-           'multipolygon2d',
-           'geomcollection2d',
-           'geometry2d',
-           'point3d',
-           'linestring3d',
-           'polygon3d',
-           'multipoint3d',
-           'multilinestring3d',
-           'multipolygon3d',
-           'geomcollection3d',
-           'geometry3d'
-        ]);
-        connection.close();
-        done();
-      });
+      var tables = geoPackage.getFeatureTables();
+      should.exist(tables);
+      tables.length.should.be.equal(16);
+      tables.should.have.members([
+         'point2d',
+         'linestring2d',
+         'polygon2d',
+         'multipoint2d',
+         'multilinestring2d',
+         'multipolygon2d',
+         'geomcollection2d',
+         'geometry2d',
+         'point3d',
+         'linestring3d',
+         'polygon3d',
+         'multipoint3d',
+         'multilinestring3d',
+         'multipolygon3d',
+         'geomcollection3d',
+         'geometry3d'
+      ]);
+      connection.close();
+      done();
     });
   });
 
@@ -50,7 +48,7 @@ describe('GeoPackage tests', function() {
         featureDao.queryForEach(function(err, row, rowDone) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
-          rowDone();
+          // rowDone();
         }, function(err) {
           connection.close();
           done();
@@ -62,30 +60,29 @@ describe('GeoPackage tests', function() {
   it('should get the features from all tables', function(done) {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(connection){
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getFeatureTables(function(err, tables) {
-        async.eachSeries(tables, function(table, callback) {
-          geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-            if (err) {
-              return callback(err);
+      var tables = geoPackage.getFeatureTables();
+      async.eachSeries(tables, function(table, callback) {
+        geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+          if (err) {
+            return callback(err);
+          }
+          var srs = featureDao.getSrs();
+          featureDao.queryForEach(function(err, row, rowDone) {
+            var currentRow = featureDao.getFeatureRow(row);
+            var geometry = currentRow.getGeometry();
+            if (!geometry) {
+              return;
             }
-            var srs = featureDao.getSrs();
-            featureDao.queryForEach(function(err, row, rowDone) {
-              var currentRow = featureDao.getFeatureRow(row);
-              var geometry = currentRow.getGeometry();
-              if (!geometry) {
-                return rowDone();
-              }
-              var geom = geometry.geometry;
-              var geoJson = projectedJson = geom.toGeoJSON();
-              rowDone();
-            }, function(err) {
-              callback();
-            });
+            var geom = geometry.geometry;
+            var geoJson = projectedJson = geom.toGeoJSON();
+            // rowDone();
+          }, function(err) {
+            callback();
           });
-        }, function(err) {
-          connection.close();
-          done(err);
         });
+      }, function(err) {
+        connection.close();
+        done(err);
       });
     });
   });
@@ -94,16 +91,14 @@ describe('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getTileTables(function(err, tables) {
-        should.not.exist(err);
-        should.exist(tables);
-        tables.length.should.be.equal(1);
-        tables.should.have.members([
-           'TILESosmds'
-        ]);
-        connection.close();
-        done();
-      });
+      var tables = geoPackage.getTileTables();
+      should.exist(tables);
+      tables.length.should.be.equal(1);
+      tables.should.have.members([
+         'TILESosmds'
+      ]);
+      connection.close();
+      done();
     });
   });
 
@@ -156,23 +151,22 @@ describe('GeoPackage tests', function() {
     GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getTileTables(function(err, tables) {
-        async.eachSeries(tables, function(table, callback) {
-          geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+      var tables = geoPackage.getTileTables();
+      async.eachSeries(tables, function(table, callback) {
+        geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
 
-            var maxZoom = tileDao.maxZoom;
-            var minZoom = tileDao.minZoom;
+          var maxZoom = tileDao.maxZoom;
+          var minZoom = tileDao.minZoom;
 
-            var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-            gpr.getTile(0, 0, 1, function(err, tileData) {
-              should.exist(tileData);
-              callback();
-            });
+          var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+          gpr.getTile(0, 0, 1, function(err, tileData) {
+            should.exist(tileData);
+            callback();
           });
-        }, function(err) {
-          connection.close();
-          done(err);
         });
+      }, function(err) {
+        connection.close();
+        done(err);
       });
     });
   });
