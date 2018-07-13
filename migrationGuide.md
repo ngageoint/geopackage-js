@@ -64,6 +64,7 @@ GeoPackageConnection.prototype.minOfColumn
 GeoPackageConnection.prototype.maxOfColumn
 GeoPackageConnection.prototype.each
 GeoPackageConnection.prototype.all
+GeoPackageConnection.prototype.count
 SqliteAdapter.prototype.get
 SqliteAdapter.prototype.all
 SqliteAdapter.prototype.each
@@ -100,6 +101,7 @@ TableCreator.prototype.createUserTable
 GeoPackageValidate.hasMinimumTables
 UserTableReader.prototype.readTable
 TileTableReader.prototype.readTileTable
+UserDao.prototype.getCount
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

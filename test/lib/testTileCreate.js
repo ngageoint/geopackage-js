@@ -108,10 +108,9 @@ describe('GeoPackage Tile table create tests', function() {
           }, zoomDone);
         }, function(err) {
           geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-            tileDao.getCount(function(err, result) {
-              result.should.be.equal(85);
-              done(err);
-            });
+            var count = tileDao.getCount();
+            count.should.be.equal(85);
+            done();
           });
         });
       });
@@ -154,10 +153,9 @@ describe('GeoPackage Tile table create tests', function() {
               }, zoomDone);
             }, function(err) {
               geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-                tileDao.getCount(function(err, result) {
-                  result.should.be.equal(85);
-                  done(err);
-                });
+                var count = tileDao.getCount();
+                count.should.be.equal(85);
+                done();
               });
             });
           });
@@ -167,20 +165,18 @@ describe('GeoPackage Tile table create tests', function() {
 
     it('should delete the tiles', function(done) {
       geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-        tileDao.getCount(function(err, result) {
-          result.should.be.equal(85);
-          tileDao.deleteTile(0, 0, 0, function(err, result) {
-            result.should.be.equal(1);
-            tileDao.getCount(function(err, result) {
-              result.should.be.equal(84);
-              tileDao.dropTable(function(err, result) {
-                result.should.be.equal(true);
-                var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
-                tileMatrixSetDao.delete(tileMatrixSet, function(err, results) {
-                  results.should.be.equal(1);
-                  done(err);
-                });
-              });
+        var count = tileDao.getCount();
+        count.should.be.equal(85);
+        tileDao.deleteTile(0, 0, 0, function(err, result) {
+          result.should.be.equal(1);
+          count = tileDao.getCount();
+          count.should.be.equal(84);
+          tileDao.dropTable(function(err, result) {
+            result.should.be.equal(true);
+            var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
+            tileMatrixSetDao.delete(tileMatrixSet, function(err, results) {
+              results.should.be.equal(1);
+              done(err);
             });
           });
         });
