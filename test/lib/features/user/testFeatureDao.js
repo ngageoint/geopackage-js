@@ -424,7 +424,7 @@ describe('FeatureDao tests', function() {
             ]
           };
 
-          var createRow = function(geoJson, name, featureDao, callback) {
+          var createRow = function(geoJson, name, featureDao) {
             var srs = featureDao.getSrs();
             var featureRow = featureDao.newRow();
             var geometryData = new GeometryData();
@@ -435,7 +435,7 @@ describe('FeatureDao tests', function() {
             featureRow.setValueWithColumnName('name', name);
             featureRow.setValueWithColumnName('_feature_id', name);
             featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
-            featureDao.create(featureRow, callback);
+            return featureDao.create(featureRow);
           }
           // create the features
           // Two intersecting boxes with a line going through the intersection and a point on the line
@@ -449,21 +449,17 @@ describe('FeatureDao tests', function() {
           geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
             geopackage.getFeatureDaoWithTableName('QueryTest', function(err, featureDao) {
               queryTestFeatureDao = featureDao;
-              createRow(box1, 'box1', featureDao, function() {
-                createRow(box2, 'box2', featureDao, function() {
-                  createRow(line, 'line', featureDao, function() {
-                    createRow(point, 'point', featureDao, function() {
-                      createRow(point2, 'point2', featureDao, function() {
-                        featureDao.featureTableIndex.index(function() {
-                          console.log('progress', arguments);
-                        }, function(err) {
-                          should.not.exist(err);
-                          done();
-                        });
-                      });
-                    });
-                  });
-                });
+              createRow(box1, 'box1', featureDao);
+              createRow(box2, 'box2', featureDao);
+              createRow(line, 'line', featureDao);
+              createRow(point, 'point', featureDao);
+              createRow(point2, 'point2', featureDao);
+              featureDao.featureTableIndex.index(function() {
+                console.log('progress', arguments);
+              }, function(err) {
+                console.log('indexed');
+                should.not.exist(err);
+                done();
               });
             });
           });

@@ -88,6 +88,7 @@ describe('GeoPackage Feature table create tests', function() {
     dc.constraint_name = 'test constraint';
 
     geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc], function(err, result) {
+      console.log('feature table created');
       var reader = new UserTableReader(tableName);
       var result = reader.readTable(geopackage.connection);
       var columns = result.columns;
@@ -212,25 +213,24 @@ describe('GeoPackage Feature table create tests', function() {
         featureRow.setValueWithColumnName('test space', 'space space');
         featureRow.setValueWithColumnName('test-dash', 'dash-dash');
 
-        featureDao.create(featureRow, function(err, result) {
-          var count = featureDao.getCount();
-          count.should.be.equal(1);
-          var rows = featureDao.queryForAll();
-          var fr = featureDao.getFeatureRow(rows[0]);
-          var geom = fr.getGeometry();
-          geom.geometry.x.should.be.equal(1);
-          geom.geometry.y.should.be.equal(2);
-          fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
-          fr.getValueWithColumnName('test_real').should.be.equal(3.0);
-          fr.getValueWithColumnName('test_boolean').should.be.equal(true);
-          fr.getValueWithColumnName('test_integer').should.be.equal(5);
-          fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-          fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-          fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-          fr.getValueWithColumnName('test space').toString().should.be.equal('space space');
-          fr.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
-          done();
-        });
+        var result = featureDao.create(featureRow);
+        var count = featureDao.getCount();
+        count.should.be.equal(1);
+        var rows = featureDao.queryForAll();
+        var fr = featureDao.getFeatureRow(rows[0]);
+        var geom = fr.getGeometry();
+        geom.geometry.x.should.be.equal(1);
+        geom.geometry.y.should.be.equal(2);
+        fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
+        fr.getValueWithColumnName('test_real').should.be.equal(3.0);
+        fr.getValueWithColumnName('test_boolean').should.be.equal(true);
+        fr.getValueWithColumnName('test_integer').should.be.equal(5);
+        fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
+        fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
+        fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+        fr.getValueWithColumnName('test space').toString().should.be.equal('space space');
+        fr.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+        done();
       });
     });
 
@@ -254,23 +254,22 @@ describe('GeoPackage Feature table create tests', function() {
           featureRow.setValueWithColumnName('test_text_limited', 'testt');
           featureRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
 
-          featureDao.create(featureRow, function(err, result) {
-            var count = featureDao.getCount();
-            count.should.be.equal(1);
-            var rows = featureDao.queryForAll();
-            var fr = featureDao.getFeatureRow(rows[0]);
-            var geom = fr.getGeometry();
-            geom.geometry.x.should.be.equal(1);
-            geom.geometry.y.should.be.equal(2);
-            fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
-            fr.getValueWithColumnName('test_real').should.be.equal(3.0);
-            fr.getValueWithColumnName('test_boolean').should.be.equal(true);
-            fr.getValueWithColumnName('test_integer').should.be.equal(5);
-            fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-            fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-            fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-            done();
-          });
+          var result = featureDao.create(featureRow);
+          var count = featureDao.getCount();
+          count.should.be.equal(1);
+          var rows = featureDao.queryForAll();
+          var fr = featureDao.getFeatureRow(rows[0]);
+          var geom = fr.getGeometry();
+          geom.geometry.x.should.be.equal(1);
+          geom.geometry.y.should.be.equal(2);
+          fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
+          fr.getValueWithColumnName('test_real').should.be.equal(3.0);
+          fr.getValueWithColumnName('test_boolean').should.be.equal(true);
+          fr.getValueWithColumnName('test_integer').should.be.equal(5);
+          fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
+          fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
+          fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+          done();
         });
       });
 

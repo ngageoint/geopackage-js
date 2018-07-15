@@ -437,7 +437,6 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 3857;
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
-
       GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3, function(err, tileMatrixSet) {
         should.not.exist(err);
         should.exist(tileMatrixSet);

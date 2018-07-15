@@ -61,11 +61,9 @@ describe('Metadata Reference tests', function() {
         metadata3.metadata = 'TEST METDATA 3';
 
         async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          metadataDao.create(metadata, function(err, result) {
-            should.not.exist(err);
-            result.should.be.equal(metadata.id);
-            done();
-          });
+          var result = metadataDao.create(metadata);
+          result.should.be.equal(metadata.id);
+          done();
         }, function(err) {
           var ref1 = new MetadataReference();
           ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
@@ -80,10 +78,8 @@ describe('Metadata Reference tests', function() {
           ref2.setParentMetadata(metadata1);
 
           async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref, function(err, result) {
-              should.not.exist(err);
-              done();
-            });
+            metadataReferenceDao.create(ref);
+            done();
           }, done);
         });
       });
@@ -115,11 +111,9 @@ describe('Metadata Reference tests', function() {
         metadata2.metadata = 'TEST METDATA 2';
 
         async.eachSeries([metadata1, metadata2], function(metadata, done) {
-          metadataDao.create(metadata, function(err, result) {
-            should.not.exist(err);
-            result.should.be.equal(metadata.id);
-            done();
-          });
+          var result = metadataDao.create(metadata);
+          result.should.be.equal(metadata.id);
+          done();
         }, function(err) {
           var ref = new MetadataReference();
           ref.setReferenceScopeType(MetadataReference.TABLE);
@@ -128,23 +122,21 @@ describe('Metadata Reference tests', function() {
           ref.setMetadata(metadata2);
           ref.setParentMetadata(metadata1);
 
-          metadataReferenceDao.create(ref, function(err, result) {
-            should.not.exist(err);
-            var count = 0;
-            metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
-              count++;
-              // rowDone();
-            }, function(err) {
-              count.should.be.equal(1);
-              metadataReferenceDao.removeMetadataParent(metadata1.id, function(err, result) {
-                var count = 0;
-                metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
-                  count++;
-                  // rowDone();
-                }, function() {
-                  count.should.be.equal(0);
-                  done();
-                });
+          metadataReferenceDao.create(ref);
+          var count = 0;
+          metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
+            count++;
+            // rowDone();
+          }, function(err) {
+            count.should.be.equal(1);
+            metadataReferenceDao.removeMetadataParent(metadata1.id, function(err, result) {
+              var count = 0;
+              metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
+                count++;
+                // rowDone();
+              }, function() {
+                count.should.be.equal(0);
+                done();
               });
             });
           });
@@ -185,11 +177,9 @@ describe('Metadata Reference tests', function() {
         metadata3.metadata = 'TEST METDATA 3';
 
         async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          metadataDao.create(metadata, function(err, result) {
-            should.not.exist(err);
-            result.should.be.equal(metadata.id);
-            done();
-          });
+          var result = metadataDao.create(metadata);
+          result.should.be.equal(metadata.id);
+          done();
         }, function(err) {
           var ref1 = new MetadataReference();
           ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
@@ -204,17 +194,14 @@ describe('Metadata Reference tests', function() {
           ref2.setParentMetadata(metadata1);
 
           async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref, function(err, result) {
-              should.not.exist(err);
-              done();
-            });
+            metadataReferenceDao.create(ref);
+            done();
           }, function() {
-            metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row, rowDone) {
+            metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
               should.not.exist(err);
               row.table_name.should.be.equal('TEST_TABLE_NAME_2');
               row.md_file_id.should.be.equal(metadata2.id);
               row.md_parent_id.should.be.equal(metadata1.id);
-              // rowDone();
             }, function() {
               done();
             });
@@ -256,11 +243,9 @@ describe('Metadata Reference tests', function() {
         metadata3.metadata = 'TEST METDATA 3';
 
         async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          metadataDao.create(metadata, function(err, result) {
-            should.not.exist(err);
-            result.should.be.equal(metadata.id);
-            done();
-          });
+          var result = metadataDao.create(metadata);
+          result.should.be.equal(metadata.id);
+          done();
         }, function(err) {
           var ref1 = new MetadataReference();
           ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
@@ -275,17 +260,14 @@ describe('Metadata Reference tests', function() {
           ref2.setParentMetadata(metadata1);
 
           async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref, function(err, result) {
-              should.not.exist(err);
-              done();
-            });
+            metadataReferenceDao.create(ref);
+            done();
           }, function() {
             var count = 0;
-            metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row, rowDone) {
+            metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
               count++;
               should.not.exist(err);
               row.md_file_id.should.be.equal(metadata2.id);
-              // rowDone();
             }, function() {
               count.should.be.equal(2);
               done();

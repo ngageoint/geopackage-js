@@ -99,20 +99,19 @@ describe('Data Columns tests', function() {
     dc.description = 'Test Description';
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
-    dao.create(dc, function(err, result){
-      if (err) return done(err);
-      dao.getDataColumns('FEATURESriversds', 'test', function(err, dataColumn) {
-        dataColumn.should.be.deep.equal({
-          table_name: 'FEATURESriversds',
-          column_name: 'test',
-          name: 'Test Name',
-          title: 'Test',
-          description: 'Test Description',
-          mime_type: 'text/html',
-          constraint_name: 'test constraint'
-        });
-        done();
+    var result = dao.create(dc);
+    should.exist(result);
+    dao.getDataColumns('FEATURESriversds', 'test', function(err, dataColumn) {
+      dataColumn.should.be.deep.equal({
+        table_name: 'FEATURESriversds',
+        column_name: 'test',
+        name: 'Test Name',
+        title: 'Test',
+        description: 'Test Description',
+        mime_type: 'text/html',
+        constraint_name: 'test constraint'
       });
+      done();
     });
   });
 
@@ -126,20 +125,19 @@ describe('Data Columns tests', function() {
     dc.description = 'Test Description';
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
-    dao.create(dc, function(err, result){
-      if (err) return done(err);
-      dao.queryByConstraintName('test constraint', function(err, dataColumn) {
-        dataColumn.should.be.deep.equal({
-          table_name: 'FEATURESriversds',
-          column_name: 'test',
-          name: 'Test Name',
-          title: 'Test',
-          description: 'Test Description',
-          mime_type: 'text/html',
-          constraint_name: 'test constraint'
-        });
-      }, done);
-    });
+    var result = dao.create(dc);
+    should.exist(result);
+    dao.queryByConstraintName('test constraint', function(err, dataColumn) {
+      dataColumn.should.be.deep.equal({
+        table_name: 'FEATURESriversds',
+        column_name: 'test',
+        name: 'Test Name',
+        title: 'Test',
+        description: 'Test Description',
+        mime_type: 'text/html',
+        constraint_name: 'test constraint'
+      });
+    }, done);
   });
 
   it('should create a data column constraint', function(done) {
@@ -156,20 +154,19 @@ describe('Data Columns tests', function() {
       dc.max_is_inclusive = true;
       dc.description = 'constraint description';
 
-      dao.create(dc, function(err, result) {
-        dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
-          dataColumnConstraint.should.be.deep.equal({
-            constraint_name: 'test constraint',
-            constraint_type: 'range',
-            value: 'NULL',
-            min: 5,
-            min_is_inclusive: 1,
-            max: 6,
-            max_is_inclusive: 1,
-            description: 'constraint description'
-          });
-        }, done);
-      });
+      var resutl = dao.create(dc);
+      dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
+        dataColumnConstraint.should.be.deep.equal({
+          constraint_name: 'test constraint',
+          constraint_type: 'range',
+          value: 'NULL',
+          min: 5,
+          min_is_inclusive: 1,
+          max: 6,
+          max_is_inclusive: 1,
+          description: 'constraint description'
+        });
+      }, done);
     });
   });
 
@@ -187,20 +184,19 @@ describe('Data Columns tests', function() {
       dc.max_is_inclusive = true;
       dc.description = 'constraint description';
 
-      dao.create(dc, function(err, result) {
-        var dataColumnConstraint = dao.queryUnique('test constraint', 'range', 'NULL');
-        dataColumnConstraint.should.be.deep.equal({
-          constraint_name: 'test constraint',
-          constraint_type: 'range',
-          value: 'NULL',
-          min: 5,
-          min_is_inclusive: 1,
-          max: 6,
-          max_is_inclusive: 1,
-          description: 'constraint description'
-        });
-        done();
+      var result = dao.create(dc);
+      var dataColumnConstraint = dao.queryUnique('test constraint', 'range', 'NULL');
+      dataColumnConstraint.should.be.deep.equal({
+        constraint_name: 'test constraint',
+        constraint_type: 'range',
+        value: 'NULL',
+        min: 5,
+        min_is_inclusive: 1,
+        max: 6,
+        max_is_inclusive: 1,
+        description: 'constraint description'
       });
+      done();
     });
   });
 
