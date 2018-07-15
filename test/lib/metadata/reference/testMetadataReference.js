@@ -121,23 +121,19 @@ describe('Metadata Reference tests', function() {
           ref.timestamp = new Date();
           ref.setMetadata(metadata2);
           ref.setParentMetadata(metadata1);
-
           metadataReferenceDao.create(ref);
           var count = 0;
-          metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
+          metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
             count++;
-            // rowDone();
           }, function(err) {
             count.should.be.equal(1);
-            metadataReferenceDao.removeMetadataParent(metadata1.id, function(err, result) {
-              var count = 0;
-              metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row, rowDone) {
-                count++;
-                // rowDone();
-              }, function() {
-                count.should.be.equal(0);
-                done();
-              });
+            var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
+            var countAfter = 0;
+            metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
+              countAfter++;
+            }, function() {
+              countAfter.should.be.equal(0);
+              done();
             });
           });
         });

@@ -88,6 +88,9 @@ Dao.prototype.deleteById
 Dao.prototype.deleteByMultiId
 Dao.prototype.deleteWhere
 Dao.prototype.deleteAll
+Dao.prototype.updateWithValues
+Dao.prototype.update
+Dao.prototype.createOrUpdate
 SpatialReferenceSystemDao.prototype.getBySrsId
 SpatialReferenceSystemDao.prototype.createWgs84
 SpatialReferenceSystemDao.prototype.createUndefinedCartesian
@@ -114,6 +117,9 @@ FeatureDao.prototype.getSrs
 FeatureTableIndex.prototype.getTableIndex
 FeatureTableIndex.prototype.createTableIndex
 FeatureTableIndex.prototype.clearGeometryIndicies
+FeatureTableIndex.prototype.indexRow
+FeatureTableIndex.prototype.updateLastIndexed
+FeatureTableIndex.prototype.indexTable
 GeometryIndexDao.prototype.getTableIndex
 TableCreator.prototype.createUserTable
 GeoPackageValidate.hasMinimumTables
@@ -121,6 +127,7 @@ UserTableReader.prototype.readTable
 TileTableReader.prototype.readTileTable
 UserDao.prototype.getCount
 BaseExtension.prototype.createExtension
+MetadataReferenceDao.prototype.removeMetadataParent
 
 ### New methods
 GeoPackage.prototype.createRequiredTables
