@@ -273,17 +273,15 @@ describe('GeoPackage Feature table create tests', function() {
         });
       });
 
-      it('should delete the feature', function(done) {
+      it('should delete the feature', function() {
         var count = featureDao.getCount();
         count.should.be.equal(1);
 
         var rows = featureDao.queryForAll();
         var fr = featureDao.getFeatureRow(rows[0]);
-        featureDao.delete(fr, function(err, result) {
-          var count = featureDao.getCount();
-          count.should.be.equal(0);
-          done();
-        });
+        var result = featureDao.delete(fr);
+        var count = featureDao.getCount();
+        count.should.be.equal(0);
       });
     });
   });

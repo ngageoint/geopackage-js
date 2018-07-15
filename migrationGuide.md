@@ -66,11 +66,13 @@ GeoPackageConnection.prototype.each
 GeoPackageConnection.prototype.all
 GeoPackageConnection.prototype.count
 GeoPackageConnection.prototype.insert
+GeoPackageConnection.prototype.delete
 SqliteAdapter.prototype.get
 SqliteAdapter.prototype.all
 SqliteAdapter.prototype.each
 SqliteAdapter.prototype.insert
 SqliteAdapter.prototype.count
+SqliteAdapter.prototype.delete
 ContentsDao.prototype.getSrs
 Dao.prototype.queryForIdObject
 Dao.prototype.queryForSameId
@@ -81,6 +83,11 @@ Dao.prototype.countByEqWithFieldAndValue
 Dao.prototype.minOfColumn
 Dao.prototype.maxOfColumn
 Dao.prototype.create
+Dao.prototype.delete
+Dao.prototype.deleteById
+Dao.prototype.deleteByMultiId
+Dao.prototype.deleteWhere
+Dao.prototype.deleteAll
 SpatialReferenceSystemDao.prototype.getBySrsId
 SpatialReferenceSystemDao.prototype.createWgs84
 SpatialReferenceSystemDao.prototype.createUndefinedCartesian
@@ -97,6 +104,7 @@ TileDao.prototype.initialize
 TileDao.prototype.getSrs
 TileDao.prototype.queryForTileGridWithZoomLevel
 TileDao.prototype.getBoundingBoxWithZoomLevel
+TileDao.prototype.deleteTile
 TileMatrixSetDao.prototype.getSrs
 TileMatrixSetDao.prototype.getProjection
 TileMatrixSetDao.prototype.getContents
@@ -105,6 +113,7 @@ TileMatrixSetDao.prototype.getTileTables
 FeatureDao.prototype.getSrs
 FeatureTableIndex.prototype.getTableIndex
 FeatureTableIndex.prototype.createTableIndex
+FeatureTableIndex.prototype.clearGeometryIndicies
 GeometryIndexDao.prototype.getTableIndex
 TableCreator.prototype.createUserTable
 GeoPackageValidate.hasMinimumTables
