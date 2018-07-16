@@ -443,7 +443,8 @@ describe('FeatureDao tests', function() {
           //      |/        |
           //      /_________|
           //     /
-          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+          .then(function(result) {
             geopackage.getFeatureDaoWithTableName('QueryTest', function(err, featureDao) {
               queryTestFeatureDao = featureDao;
               createRow(box1, 'box1', featureDao);

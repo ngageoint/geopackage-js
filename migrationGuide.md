@@ -56,6 +56,10 @@ GeoPackage.prototype.hasFeatureTable
 GeoPackage.prototype.getTileTables
 GeoPackage.prototype.hasTileTable
 GeoPackage.prototype.getTables
+GeoPackage.prototype.createTableIndexTable
+GeoPackage.prototype.createFeatureTableWithGeometryColumns
+GeoPackage.prototype.createFeatureTableWithGeometryColumnsAndDataColumns
+GeoPackage.prototype.createTileTableWithTableName
 GeoPackageConnection.prototype.getApplicationId
 GeoPackageConnection.prototype.get
 GeoPackageConnection.prototype.tableExists
@@ -128,6 +132,9 @@ TileTableReader.prototype.readTileTable
 UserDao.prototype.getCount
 BaseExtension.prototype.createExtension
 MetadataReferenceDao.prototype.removeMetadataParent
+ExtensionDao.prototype.createTable
+GeometryIndexDao.prototype.createTable
+TableIndexDao.prototype.createTable
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

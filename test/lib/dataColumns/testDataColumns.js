@@ -142,7 +142,8 @@ describe('Data Columns tests', function() {
 
   it('should create a data column constraint', function(done) {
     var tc = new TableCreator(connection);
-    tc.createDataColumnConstraints(function() {
+    tc.createDataColumnConstraints()
+    .then(function() {
       var dao = new DataColumnConstraintsDao(connection);
       var dc = new DataColumnConstraints();
       dc.constraint_name = 'test constraint';
@@ -172,7 +173,8 @@ describe('Data Columns tests', function() {
 
   it('should create a data column constraint and query unique', function(done) {
     var tc = new TableCreator(connection);
-    tc.createDataColumnConstraints(function() {
+    tc.createDataColumnConstraints()
+    .then(function() {
       var dao = new DataColumnConstraintsDao(connection);
       var dc = new DataColumnConstraints();
       dc.constraint_name = 'test constraint';

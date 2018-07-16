@@ -36,7 +36,7 @@ describe('GeoPackage Feature table create tests', function() {
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
-  it('should create a feature table', function(done) {
+  it('should create a feature table', function() {
     var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
@@ -52,13 +52,13 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
-    geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+    return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+    .then(function(result) {
       var verified = Verification.verifyGeometryColumns(geopackage)
         && Verification.verifyTableExists(geopackage, tableName)
         && Verification.verifyContentsForTable(geopackage, tableName)
         && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
       verified.should.be.equal(true);
-      done();
     });
   });
 
@@ -87,7 +87,8 @@ describe('GeoPackage Feature table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc], function(err, result) {
+    geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
+    .then(function() {
       console.log('feature table created');
       var reader = new UserTableReader(tableName);
       var result = reader.readTable(geopackage.connection);
@@ -183,7 +184,8 @@ describe('GeoPackage Feature table create tests', function() {
           columns.push(FeatureColumn.createColumnWithIndex(9, 'test space', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
           columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
-          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns, function(err, result) {
+          geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+          .then(function(result) {
             var verified = Verification.verifyGeometryColumns(geopackage)
               && Verification.verifyTableExists(geopackage, tableName)
               && Verification.verifyContentsForTable(geopackage, tableName)

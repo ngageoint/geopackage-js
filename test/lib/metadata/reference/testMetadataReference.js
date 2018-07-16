@@ -29,113 +29,112 @@ describe('Metadata Reference tests', function() {
     }
   });
 
-  it('should create metadata and reference', function(done) {
+  it('should create metadata and reference', function() {
+    return geopackage.createMetadataTable()
+    .then(function() {
+      return geopackage.createMetadataReferenceTable();
+    })
+    .then(function() {
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-    geopackage.createMetadataTable(function(err, result) {
-      geopackage.createMetadataReferenceTable(function(err, result) {
-        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-        Verification.verifyMetadata(geopackage).should.be.equal(true);
+      var metadataDao = geopackage.getMetadataDao();
+      var metadataReferenceDao = geopackage.getMetadataReferenceDao();
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+      var metadata1 = new Metadata();
+      metadata1.id = 1;
+      metadata1.md_scope = Metadata.DATASET;
+      metadata1.md_standard_uri = "TEST_URI_1";
+      metadata1.mime_type = 'text/xml';
+      metadata1.metadata = 'TEST METDATA 1';
 
-        var metadata1 = new Metadata();
-        metadata1.id = 1;
-        metadata1.md_scope = Metadata.DATASET;
-        metadata1.md_standard_uri = "TEST_URI_1";
-        metadata1.mime_type = 'text/xml';
-        metadata1.metadata = 'TEST METDATA 1';
+      var metadata2 = new Metadata();
+      metadata2.id = 2;
+      metadata2.md_scope = Metadata.FEATURE_TYPE;
+      metadata2.md_standard_uri = "TEST_URI_2";
+      metadata2.mime_type = 'text/xml';
+      metadata2.metadata = 'TEST METDATA 2';
 
-        var metadata2 = new Metadata();
-        metadata2.id = 2;
-        metadata2.md_scope = Metadata.FEATURE_TYPE;
-        metadata2.md_standard_uri = "TEST_URI_2";
-        metadata2.mime_type = 'text/xml';
-        metadata2.metadata = 'TEST METDATA 2';
+      var metadata3 = new Metadata();
+      metadata3.id = 3;
+      metadata3.md_scope = Metadata.TILE;
+      metadata3.md_standard_uri = "TEST_URI_3";
+      metadata3.mime_type = 'text/xml';
+      metadata3.metadata = 'TEST METDATA 3';
 
-        var metadata3 = new Metadata();
-        metadata3.id = 3;
-        metadata3.md_scope = Metadata.TILE;
-        metadata3.md_standard_uri = "TEST_URI_3";
-        metadata3.mime_type = 'text/xml';
-        metadata3.metadata = 'TEST METDATA 3';
+      [metadata1, metadata2, metadata3].forEach(function(metadata) {
+        var result = metadataDao.create(metadata);
+        result.should.be.equal(metadata.id);
+      });
 
-        async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          var result = metadataDao.create(metadata);
-          result.should.be.equal(metadata.id);
-          done();
-        }, function(err) {
-          var ref1 = new MetadataReference();
-          ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-          ref1.timestamp = new Date();
-          ref1.setMetadata(metadata1);
+      var ref1 = new MetadataReference();
+      ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
+      ref1.timestamp = new Date();
+      ref1.setMetadata(metadata1);
 
-          var ref2 = new MetadataReference();
-          ref2.setReferenceScopeType(MetadataReference.TABLE);
-          ref2.table_name = 'TEST_TABLE_NAME_2';
-          ref2.timestamp = new Date();
-          ref2.setMetadata(metadata2);
-          ref2.setParentMetadata(metadata1);
+      var ref2 = new MetadataReference();
+      ref2.setReferenceScopeType(MetadataReference.TABLE);
+      ref2.table_name = 'TEST_TABLE_NAME_2';
+      ref2.timestamp = new Date();
+      ref2.setMetadata(metadata2);
+      ref2.setParentMetadata(metadata1);
 
-          async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref);
-            done();
-          }, done);
-        });
+      [ref1, ref2].forEach(function(ref) {
+        metadataReferenceDao.create(ref);
       });
     });
   });
 
   it('should create metadata and reference with a parent and then remove it', function(done) {
+    geopackage.createMetadataTable()
+    .then(function() {
+      return geopackage.createMetadataReferenceTable();
+    })
+    .then(function() {
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-    geopackage.createMetadataTable(function(err, result) {
-      geopackage.createMetadataReferenceTable(function(err, result) {
-        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-        Verification.verifyMetadata(geopackage).should.be.equal(true);
+      var metadataDao = geopackage.getMetadataDao();
+      var metadataReferenceDao = geopackage.getMetadataReferenceDao();
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+      var metadata1 = new Metadata();
+      metadata1.id = 1;
+      metadata1.md_scope = Metadata.DATASET;
+      metadata1.md_standard_uri = "TEST_URI_1";
+      metadata1.mime_type = 'text/xml';
+      metadata1.metadata = 'TEST METDATA 1';
 
-        var metadata1 = new Metadata();
-        metadata1.id = 1;
-        metadata1.md_scope = Metadata.DATASET;
-        metadata1.md_standard_uri = "TEST_URI_1";
-        metadata1.mime_type = 'text/xml';
-        metadata1.metadata = 'TEST METDATA 1';
+      var metadata2 = new Metadata();
+      metadata2.id = 2;
+      metadata2.md_scope = Metadata.FEATURE_TYPE;
+      metadata2.md_standard_uri = "TEST_URI_2";
+      metadata2.mime_type = 'text/xml';
+      metadata2.metadata = 'TEST METDATA 2';
 
-        var metadata2 = new Metadata();
-        metadata2.id = 2;
-        metadata2.md_scope = Metadata.FEATURE_TYPE;
-        metadata2.md_standard_uri = "TEST_URI_2";
-        metadata2.mime_type = 'text/xml';
-        metadata2.metadata = 'TEST METDATA 2';
+      [metadata1, metadata2].forEach(function(metadata) {
+        var result = metadataDao.create(metadata);
+        result.should.be.equal(metadata.id);
+      });
 
-        async.eachSeries([metadata1, metadata2], function(metadata, done) {
-          var result = metadataDao.create(metadata);
-          result.should.be.equal(metadata.id);
+      var ref = new MetadataReference();
+      ref.setReferenceScopeType(MetadataReference.TABLE);
+      ref.table_name = 'TEST_TABLE_NAME_2';
+      ref.timestamp = new Date();
+      ref.setMetadata(metadata2);
+      ref.setParentMetadata(metadata1);
+      metadataReferenceDao.create(ref);
+      var count = 0;
+      metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
+        count++;
+      }, function(err) {
+        count.should.be.equal(1);
+        var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
+        var countAfter = 0;
+        metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
+          countAfter++;
+        }, function() {
+          countAfter.should.be.equal(0);
           done();
-        }, function(err) {
-          var ref = new MetadataReference();
-          ref.setReferenceScopeType(MetadataReference.TABLE);
-          ref.table_name = 'TEST_TABLE_NAME_2';
-          ref.timestamp = new Date();
-          ref.setMetadata(metadata2);
-          ref.setParentMetadata(metadata1);
-          metadataReferenceDao.create(ref);
-          var count = 0;
-          metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-            count++;
-          }, function(err) {
-            count.should.be.equal(1);
-            var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
-            var countAfter = 0;
-            metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-              countAfter++;
-            }, function() {
-              countAfter.should.be.equal(0);
-              done();
-            });
-          });
         });
       });
     });
@@ -143,133 +142,131 @@ describe('Metadata Reference tests', function() {
 
   it('should query for metadatareference by metadata and parent', function(done) {
 
-    geopackage.createMetadataTable(function(err, result) {
-      geopackage.createMetadataReferenceTable(function(err, result) {
-        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-        Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geopackage.createMetadataTable()
+    .then(function() {
+      return geopackage.createMetadataReferenceTable();
+    })
+    .then(function() {
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+      var metadataDao = geopackage.getMetadataDao();
+      var metadataReferenceDao = geopackage.getMetadataReferenceDao();
 
-        var metadata1 = new Metadata();
-        metadata1.id = 1;
-        metadata1.md_scope = Metadata.DATASET;
-        metadata1.md_standard_uri = "TEST_URI_1";
-        metadata1.mime_type = 'text/xml';
-        metadata1.metadata = 'TEST METDATA 1';
+      var metadata1 = new Metadata();
+      metadata1.id = 1;
+      metadata1.md_scope = Metadata.DATASET;
+      metadata1.md_standard_uri = "TEST_URI_1";
+      metadata1.mime_type = 'text/xml';
+      metadata1.metadata = 'TEST METDATA 1';
 
-        var metadata2 = new Metadata();
-        metadata2.id = 2;
-        metadata2.md_scope = Metadata.FEATURE_TYPE;
-        metadata2.md_standard_uri = "TEST_URI_2";
-        metadata2.mime_type = 'text/xml';
-        metadata2.metadata = 'TEST METDATA 2';
+      var metadata2 = new Metadata();
+      metadata2.id = 2;
+      metadata2.md_scope = Metadata.FEATURE_TYPE;
+      metadata2.md_standard_uri = "TEST_URI_2";
+      metadata2.mime_type = 'text/xml';
+      metadata2.metadata = 'TEST METDATA 2';
 
-        var metadata3 = new Metadata();
-        metadata3.id = 3;
-        metadata3.md_scope = Metadata.TILE;
-        metadata3.md_standard_uri = "TEST_URI_3";
-        metadata3.mime_type = 'text/xml';
-        metadata3.metadata = 'TEST METDATA 3';
+      var metadata3 = new Metadata();
+      metadata3.id = 3;
+      metadata3.md_scope = Metadata.TILE;
+      metadata3.md_standard_uri = "TEST_URI_3";
+      metadata3.mime_type = 'text/xml';
+      metadata3.metadata = 'TEST METDATA 3';
 
-        async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          var result = metadataDao.create(metadata);
-          result.should.be.equal(metadata.id);
-          done();
-        }, function(err) {
-          var ref1 = new MetadataReference();
-          ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-          ref1.timestamp = new Date();
-          ref1.setMetadata(metadata1);
+      [metadata1, metadata2, metadata3].forEach(function(metadata) {
+        var result = metadataDao.create(metadata);
+        result.should.be.equal(metadata.id);
+      });
 
-          var ref2 = new MetadataReference();
-          ref2.setReferenceScopeType(MetadataReference.TABLE);
-          ref2.table_name = 'TEST_TABLE_NAME_2';
-          ref2.timestamp = new Date();
-          ref2.setMetadata(metadata2);
-          ref2.setParentMetadata(metadata1);
+      var ref1 = new MetadataReference();
+      ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
+      ref1.timestamp = new Date();
+      ref1.setMetadata(metadata1);
 
-          async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref);
-            done();
-          }, function() {
-            metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
-              should.not.exist(err);
-              row.table_name.should.be.equal('TEST_TABLE_NAME_2');
-              row.md_file_id.should.be.equal(metadata2.id);
-              row.md_parent_id.should.be.equal(metadata1.id);
-            }, function() {
-              done();
-            });
-          });
-        });
+      var ref2 = new MetadataReference();
+      ref2.setReferenceScopeType(MetadataReference.TABLE);
+      ref2.table_name = 'TEST_TABLE_NAME_2';
+      ref2.timestamp = new Date();
+      ref2.setMetadata(metadata2);
+      ref2.setParentMetadata(metadata1);
+
+      [ref1, ref2].forEach(function(ref) {
+        metadataReferenceDao.create(ref);
+      });
+      metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
+        should.not.exist(err);
+        row.table_name.should.be.equal('TEST_TABLE_NAME_2');
+        row.md_file_id.should.be.equal(metadata2.id);
+        row.md_parent_id.should.be.equal(metadata1.id);
+      }, function() {
+        done();
       });
     });
   });
 
   it('should query for metadatareference by metadata', function(done) {
 
-    geopackage.createMetadataTable(function(err, result) {
-      geopackage.createMetadataReferenceTable(function(err, result) {
-        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-        Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geopackage.createMetadataTable()
+    .then(function() {
+      return geopackage.createMetadataReferenceTable();
+    })
+    .then(function() {
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+      var metadataDao = geopackage.getMetadataDao();
+      var metadataReferenceDao = geopackage.getMetadataReferenceDao();
 
-        var metadata1 = new Metadata();
-        metadata1.id = 1;
-        metadata1.md_scope = Metadata.DATASET;
-        metadata1.md_standard_uri = "TEST_URI_1";
-        metadata1.mime_type = 'text/xml';
-        metadata1.metadata = 'TEST METDATA 1';
+      var metadata1 = new Metadata();
+      metadata1.id = 1;
+      metadata1.md_scope = Metadata.DATASET;
+      metadata1.md_standard_uri = "TEST_URI_1";
+      metadata1.mime_type = 'text/xml';
+      metadata1.metadata = 'TEST METDATA 1';
 
-        var metadata2 = new Metadata();
-        metadata2.id = 2;
-        metadata2.md_scope = Metadata.FEATURE_TYPE;
-        metadata2.md_standard_uri = "TEST_URI_2";
-        metadata2.mime_type = 'text/xml';
-        metadata2.metadata = 'TEST METDATA 2';
+      var metadata2 = new Metadata();
+      metadata2.id = 2;
+      metadata2.md_scope = Metadata.FEATURE_TYPE;
+      metadata2.md_standard_uri = "TEST_URI_2";
+      metadata2.mime_type = 'text/xml';
+      metadata2.metadata = 'TEST METDATA 2';
 
-        var metadata3 = new Metadata();
-        metadata3.id = 3;
-        metadata3.md_scope = Metadata.TILE;
-        metadata3.md_standard_uri = "TEST_URI_3";
-        metadata3.mime_type = 'text/xml';
-        metadata3.metadata = 'TEST METDATA 3';
+      var metadata3 = new Metadata();
+      metadata3.id = 3;
+      metadata3.md_scope = Metadata.TILE;
+      metadata3.md_standard_uri = "TEST_URI_3";
+      metadata3.mime_type = 'text/xml';
+      metadata3.metadata = 'TEST METDATA 3';
 
-        async.eachSeries([metadata1, metadata2, metadata3], function(metadata, done) {
-          var result = metadataDao.create(metadata);
-          result.should.be.equal(metadata.id);
-          done();
-        }, function(err) {
-          var ref1 = new MetadataReference();
-          ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-          ref1.timestamp = new Date();
-          ref1.setMetadata(metadata2);
+      [metadata1, metadata2, metadata3].forEach(function(metadata) {
+        var result = metadataDao.create(metadata);
+        result.should.be.equal(metadata.id);
+      });
 
-          var ref2 = new MetadataReference();
-          ref2.setReferenceScopeType(MetadataReference.TABLE);
-          ref2.table_name = 'TEST_TABLE_NAME_2';
-          ref2.timestamp = new Date();
-          ref2.setMetadata(metadata2);
-          ref2.setParentMetadata(metadata1);
+      var ref1 = new MetadataReference();
+      ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
+      ref1.timestamp = new Date();
+      ref1.setMetadata(metadata2);
 
-          async.eachSeries([ref1, ref2], function(ref, done) {
-            metadataReferenceDao.create(ref);
-            done();
-          }, function() {
-            var count = 0;
-            metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
-              count++;
-              should.not.exist(err);
-              row.md_file_id.should.be.equal(metadata2.id);
-            }, function() {
-              count.should.be.equal(2);
-              done();
-            });
-          });
-        });
+      var ref2 = new MetadataReference();
+      ref2.setReferenceScopeType(MetadataReference.TABLE);
+      ref2.table_name = 'TEST_TABLE_NAME_2';
+      ref2.timestamp = new Date();
+      ref2.setMetadata(metadata2);
+      ref2.setParentMetadata(metadata1);
+
+      [ref1, ref2].forEach(function(ref) {
+        metadataReferenceDao.create(ref);
+      });
+      var count = 0;
+      metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
+        count++;
+        should.not.exist(err);
+        row.md_file_id.should.be.equal(metadata2.id);
+      }, function() {
+        count.should.be.equal(2);
+        done();
       });
     });
   });

@@ -34,25 +34,26 @@ describe('GeoPackage create tests', function() {
     tables.length.should.be.equal(0);
   });
 
-  it('should create the geometry columns table', function(done) {
-    geopackage.createGeometryColumnsTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the geometry columns table', function() {
+    return geopackage.createGeometryColumnsTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the geometry columns table already exists', function(done) {
-    geopackage.createGeometryColumnsTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the geometry columns table already exists', function() {
+    return geopackage.createGeometryColumnsTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-      geopackage.createGeometryColumnsTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createGeometryColumnsTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
     });
   });
 
@@ -63,46 +64,47 @@ describe('GeoPackage create tests', function() {
     done();
   });
 
-  it('should create the tile matrix set table', function(done) {
-    geopackage.createTileMatrixSetTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should create the tile matrix set table', function() {
+    return geopackage.createTileMatrixSetTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the tile matrix set table already exists', function(done) {
-    geopackage.createTileMatrixSetTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the tile matrix set table already exists', function() {
+    return geopackage.createTileMatrixSetTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-      geopackage.createTileMatrixSetTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createTileMatrixSetTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
     });
   });
 
-  it('should create the tile matrix table', function(done) {
-    geopackage.createTileMatrixTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the tile matrix table', function() {
+    return geopackage.createTileMatrixTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTileMatrix(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the tile matrix table already exists', function(done) {
-    geopackage.createTileMatrixTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the tile matrix table already exists', function() {
+    return geopackage.createTileMatrixTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTileMatrix(geopackage).should.be.equal(true);
-      geopackage.createTileMatrixTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createTileMatrixTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
     });
   });
 
@@ -114,158 +116,164 @@ describe('GeoPackage create tests', function() {
     done();
   });
 
-  it('should create the data columns table', function(done) {
-    geopackage.createDataColumns(function(err, result) {
-      should.not.exist(err);
+  it('should create the data columns table', function() {
+    return geopackage.createDataColumns()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyDataColumns(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the data columns table already exists', function(done) {
-    geopackage.createDataColumns(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the data columns table already exists', function() {
+    return geopackage.createDataColumns()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyDataColumns(geopackage).should.be.equal(true);
-      geopackage.createDataColumns(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyDataColumns(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createDataColumns()
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyDataColumns(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the data column constraints table', function(done) {
-    geopackage.createDataColumnConstraintsTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should create the data column constraints table', function() {
+    return geopackage.createDataColumnConstraintsTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the data column constraints table already exists', function(done) {
-    geopackage.createDataColumnConstraintsTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the data column constraints table already exists', function() {
+    return geopackage.createDataColumnConstraintsTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
-      geopackage.createDataColumnConstraintsTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createDataColumnConstraintsTable()
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the metadata reference table', function(done) {
-    geopackage.createMetadataReferenceTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the metadata reference table', function() {
+    return geopackage.createMetadataReferenceTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the metadata reference table already exists', function(done) {
-    geopackage.createMetadataReferenceTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the metadata reference table already exists', function() {
+    geopackage.createMetadataReferenceTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-      geopackage.createMetadataReferenceTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createMetadataReferenceTable()
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the metadata table', function(done) {
-    geopackage.createMetadataTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the metadata table', function() {
+    return geopackage.createMetadataTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyMetadata(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the metadata table already exists', function(done) {
-    geopackage.createMetadataTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the metadata table already exists', function() {
+    geopackage.createMetadataTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyMetadata(geopackage).should.be.equal(true);
-      geopackage.createMetadataTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyMetadata(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createMetadataTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the extensions table', function(done) {
-    geopackage.createExtensionTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the extensions table', function() {
+    return geopackage.createExtensionTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyExtensions(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the extensions table already exists', function(done) {
-    geopackage.createExtensionTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the extensions table already exists', function() {
+    return geopackage.createExtensionTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyExtensions(geopackage).should.be.equal(true);
-      geopackage.createExtensionTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyExtensions(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createExtensionTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyExtensions(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the table index table', function(done) {
-    geopackage.createTableIndexTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the table index table', function() {
+    return geopackage.createTableIndexTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTableIndex(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the table index table already exists', function(done) {
-    geopackage.createTableIndexTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the table index table already exists', function() {
+    return geopackage.createTableIndexTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyTableIndex(geopackage).should.be.equal(true);
-      geopackage.createTableIndexTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyTableIndex(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createTableIndexTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyTableIndex(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the geometry index table', function(done) {
-    geopackage.createGeometryIndexTable(function(err, result) {
-      should.not.exist(err);
+  it('should create the geometry index table', function() {
+    return geopackage.createGeometryIndexTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
-      done();
     });
   });
 
-  it('should not fail if the geometry index table already exists', function(done) {
-    geopackage.createGeometryIndexTable(function(err, result) {
-      should.not.exist(err);
-      should.exist(result);
+  it('should not fail if the geometry index table already exists', function() {
+    return geopackage.createGeometryIndexTable()
+    .then(function(created) {
+      created.should.be.equal(true);
       Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
-      geopackage.createGeometryIndexTable(function(err, result) {
-        should.not.exist(err);
-        should.exist(result);
-        Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
-        done();
-      });
+    })
+    .then(function() {
+      return geopackage.createGeometryIndexTable();
+    })
+    .then(function(created) {
+      created.should.be.equal(true);
+      Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
     });
   });
 

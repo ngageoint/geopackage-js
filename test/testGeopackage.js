@@ -399,7 +399,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should create a tile table', function(done) {
+    it('should create a tile table', function() {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -412,15 +412,14 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
       var tileMatrixSetSrsId = 4326;
-      geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         var exists = geopackage.hasTileTable('tiles');
         exists.should.be.equal(true);
         var tables = geopackage.getTileTables();
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('tiles');
-        done();
       });
     });
 

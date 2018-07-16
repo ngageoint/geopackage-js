@@ -35,26 +35,25 @@ describe('GeoPackage Tile table create tests', function() {
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
-  it('should create a tile table', function(done) {
+  it('should create a tile table', function() {
 
     var requiredColumns = TileTable.createRequiredColumns();
     var tileTable = new TileTable(tableName, requiredColumns);
 
     var result = geopackage.createTileTable(tileTable);
     Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-    done();
   });
 
-  it('should create a tile table with parameters', function(done) {
+  it('should create a tile table with parameters', function() {
     var contentsBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var contentsSrsId = 4326;
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
-    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+    return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+    .then(function(result) {
       Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
       Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
       Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-      done();
     });
   });
 
@@ -63,18 +62,17 @@ describe('GeoPackage Tile table create tests', function() {
     var tileMatrixSet;
     var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
 
-    beforeEach(function(done) {
+    beforeEach(function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.getSpatialReferenceSystemDao().createWebMercator();
-      geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
-        should.not.exist(err);
+      return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+      .then(function(result) {
         tileMatrixSet = result;
         Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
         Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
         Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-        done();
       });
     });
 
@@ -126,7 +124,8 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.getSpatialReferenceSystemDao().createWebMercator();
-      geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, result) {
+      geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+      .then(function(result) {
         tileMatrixSet = result;
         Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
         Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
