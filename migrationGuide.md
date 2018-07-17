@@ -60,6 +60,7 @@ GeoPackage.prototype.createTableIndexTable
 GeoPackage.prototype.createFeatureTableWithGeometryColumns
 GeoPackage.prototype.createFeatureTableWithGeometryColumnsAndDataColumns
 GeoPackage.prototype.createTileTableWithTableName
+GeoPackage.prototype.getInfoForTable
 GeoPackageConnection.prototype.getApplicationId
 GeoPackageConnection.prototype.get
 GeoPackageConnection.prototype.tableExists

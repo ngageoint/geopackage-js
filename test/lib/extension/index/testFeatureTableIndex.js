@@ -16,7 +16,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
     var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+    var filename;
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
@@ -29,6 +29,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
     }
 
     beforeEach('should open the geopackage', function(done) {
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -46,11 +47,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       geoPackage.close();
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.unlink(filename, done);
-      } else {
-        done();
-      }
+      testSetup.deleteGeoPackage(filename, done);
     });
 
     it('should return the index status of false', function(done) {
@@ -115,7 +112,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
     var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers_indexed.gpkg');
+    var filename;
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
@@ -128,6 +125,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
     }
 
     beforeEach('should open the geopackage', function(done) {
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -145,11 +143,7 @@ describe.skip('GeoPackage Feature Table Index Extension tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       geoPackage.close();
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.unlink(filename, done);
-      } else {
-        done();
-      }
+      testSetup.deleteGeoPackage(filename, done);
     });
 
     it('should query for the index row rivers, 315', function(done) {

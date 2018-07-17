@@ -4,6 +4,7 @@ var DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints').DataColumnConstraints
   , GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , TableCreator = require('../../../lib/db/tableCreator')
+  , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
   , fs = require('fs')
   , should = require('chai').should();
@@ -13,7 +14,7 @@ describe('Data Columns tests', function() {
   var connection;
 
   var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-  var filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+  var filename;
 
   function copyGeopackage(orignal, copy, callback) {
     if (typeof(process) !== 'undefined' && process.version) {
@@ -26,6 +27,7 @@ describe('Data Columns tests', function() {
   }
 
   beforeEach('create the GeoPackage connection', function(done) {
+    filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
     copyGeopackage(originalFilename, filename, function(err) {
       GeoPackageConnection.connect(filename).then(function(geoPackageConnection) {
         connection = geoPackageConnection;
@@ -37,11 +39,7 @@ describe('Data Columns tests', function() {
 
   afterEach('should close the geopackage', function(done) {
     connection.close();
-    if (typeof(process) !== 'undefined' && process.version) {
-      fs.unlink(filename, done);
-    } else {
-      done();
-    }
+    testSetup.deleteGeoPackage(filename, done);
   });
 
   it('should get the data column for property_0', function() {

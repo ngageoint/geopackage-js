@@ -1,12 +1,17 @@
 var fs = require('fs')
   , async = require('async')
   , path = require('path')
+  , crypto = require('crypto')
   , pureimage = require('pureimage')
   , Duplex = require('stream').Duplex
   , TableCreator = require('../../lib/db/tableCreator')
   , GeoPackage = require('../../lib/geoPackage')
   , GeoPackageAPI = require('../..')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
+
+module.exports.createTempName = function() {
+  return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
+}
 
 module.exports.createGeoPackage = function(gppath, callback) {
   async.series([

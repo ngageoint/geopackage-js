@@ -3,7 +3,8 @@ var path = require('path');
 var Database = require('better-sqlite3');
 var sqliteAdapter = require('../../../lib/db/sqliteAdapter')
 var testSetup = require('../../fixtures/testSetup');
-var testdb = path.join(__dirname, '..', '..', 'tmp', 'test.gpkg');
+var testPath = path.join(__dirname, '..', '..', 'tmp');
+var testDb;
 
 describe('Database opening tests', function(done) {
 
@@ -34,16 +35,15 @@ describe('Database opening tests', function(done) {
   var db;
 
   beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testdb, function() {
-      testSetup.createGeoPackage(testdb, function(err, gp) {
-        db = gp.getDatabase().getDBConnection();
-        done();
-      });
+    testDb = path.join(testPath, testSetup.createTempName());
+    testSetup.createGeoPackage(testDb, function(err, gp) {
+      db = gp.getDatabase().getDBConnection();
+      done();
     });
   });
 
   afterEach(function(done) {
-    testSetup.deleteGeoPackage(testdb, done);
+    testSetup.deleteGeoPackage(testDb, done);
   });
 
   it('should load a file synchronusly then write to the db', function(done) {

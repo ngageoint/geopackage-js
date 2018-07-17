@@ -138,7 +138,7 @@ describe('GeoPackageAPI tests', function() {
 
     var indexedGeopackage;
     var originalFilename = indexedPath;
-    var filename = path.join(__dirname, 'fixtures', 'tmp', 'rivers_indexed.gpkg');
+    var filename;
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
@@ -151,6 +151,7 @@ describe('GeoPackageAPI tests', function() {
     }
 
     beforeEach('should open the geopackage', function(done) {
+      filename = path.join(__dirname, 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackage.open(filename, function(err, geopackage) {
           should.not.exist(err);
@@ -163,11 +164,7 @@ describe('GeoPackageAPI tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       indexedGeopackage.close();
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.unlink(filename, done);
-      } else {
-        done();
-      }
+      testSetup.deleteGeoPackage(filename, done);
     });
 
     it('should get the tables', function() {

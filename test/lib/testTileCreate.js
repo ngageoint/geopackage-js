@@ -17,16 +17,16 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
 
 describe('GeoPackage Tile table create tests', function() {
 
-  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
+  var testGeoPackage;
+  var testPath = path.join(__dirname, '..', 'tmp');
   var tableName = 'test_tiles.test';
   var geopackage;
 
   beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testGeoPackage, function() {
-      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
+    testGeoPackage = path.join(testPath, testSetup.createTempName());
+    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+      geopackage = gp;
+      done();
     });
   });
 

@@ -19,16 +19,14 @@ describe('Tests for issue 68', function() {
       geoPackage.getTileDaoWithTableName('package_tiles', function(err, tileDao) {
         if (err) return done(err);
         should.exist(tileDao);
-        geoPackage.getInfoForTable(tileDao, function(err, info) {
+        var info = geoPackage.getInfoForTable(tileDao);
+        should.exist(info);
+        var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+        gpr.getTile(192,401,10,function(err, tile) {
           if (err) return done(err);
-          should.exist(info);
-          var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-          gpr.getTile(192,401,10,function(err, tile) {
-            if (err) return done(err);
-            should.exist(tile);
-            geoPackage.close();
-            done();
-          });
+          should.exist(tile);
+          geoPackage.close();
+          done();
         });
       });
     });

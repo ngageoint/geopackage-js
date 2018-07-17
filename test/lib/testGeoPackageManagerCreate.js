@@ -5,21 +5,20 @@ var GeoPackageAPI = require('../..')
 
 describe('GeoPackageAPI Create tests', function() {
 
-  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
+  var testGeoPackage;
+  var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
   beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testGeoPackage, function() {
-      // done();
-      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
+    testGeoPackage = path.join(testPath, testSetup.createTempName());
+    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+      geopackage = gp;
+      done();
     });
   });
 
   afterEach(function(done) {
-    // geopackage.close();
+    geopackage.close();
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 

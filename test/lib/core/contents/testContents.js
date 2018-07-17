@@ -2,13 +2,15 @@ var GeoPackageAPI = require('../../../..')
   , ContentsDao = require('../../../../lib/core/contents').ContentsDao
   , Contents = require('../../../../lib/core/contents').Contents
   , TileMatrix = require('../../../../lib/tiles/matrix').TileMatrix
+  , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 
 describe('Contents tests', function() {
 
   var geoPackage;
-  var contentsDao
+  var contentsDao;
+  var filename;
 
   function copyGeopackage(orignal, copy, callback) {
     if (typeof(process) !== 'undefined' && process.version) {
@@ -22,7 +24,7 @@ describe('Contents tests', function() {
 
   beforeEach('should open the geopackage', function(done) {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+    filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
     copyGeopackage(originalFilename, filename, function() {
       GeoPackageAPI.open(filename, function(err, gp) {
         geoPackage = gp;
@@ -36,8 +38,9 @@ describe('Contents tests', function() {
     });
   });
 
-  afterEach('should close the geopackage', function(){
+  afterEach('should close the geopackage', function(done) {
     geoPackage.close();
+    testSetup.deleteGeoPackage(filename, done);
   });
 
   it('should get the contents', function() {

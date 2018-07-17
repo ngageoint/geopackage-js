@@ -177,12 +177,11 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, dao) {
-        geoPackage.getInfoForTable(dao, function(err, info) {
-          should.not.exist(err);
-          should.exist(info);
-          connection.close();
-          done(err);
-        });
+        var info = geoPackage.getInfoForTable(dao);
+        should.exist(info);
+        info.tableName.should.be.equal('FEATURESriversds');
+        connection.close();
+        done(err);
       });
     });
   });
@@ -192,13 +191,12 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getTileDaoWithTableName('imagery', function(err, dao) {
-        geoPackage.getInfoForTable(dao, function(err, info) {
-          should.not.exist(err);
-          should.exist(info);
-          info.srs.id.should.be.equal(3857);
-          connection.close();
-          done(err);
-        });
+        var info = geoPackage.getInfoForTable(dao);
+        should.exist(info);
+        info.tableName.should.be.equal('imagery');
+        info.srs.id.should.be.equal(3857);
+        connection.close();
+        done(err);
       });
     });
   });

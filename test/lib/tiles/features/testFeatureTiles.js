@@ -12,6 +12,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     var geoPackage;
     var featureDao;
+    var filename;
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
@@ -25,7 +26,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rivers.gpkg');
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function() {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -41,8 +42,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       });
     });
 
-    afterEach('should close the geopackage', function() {
+    afterEach('should close the geopackage', function(done) {
       geoPackage.close();
+      testSetup.deleteGeoPackage(filename, done);
     });
 
     it('should get the x: 1, y: 0, z: 1 tile', function(done) {
