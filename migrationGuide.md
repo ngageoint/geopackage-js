@@ -95,6 +95,9 @@ Dao.prototype.deleteAll
 Dao.prototype.updateWithValues
 Dao.prototype.update
 Dao.prototype.createOrUpdate
+Dao.prototype.queryWhere
+Dao.prototype.queryWhereWithArgs
+DataColumnsDao.prototype.getDataColumns
 SpatialReferenceSystemDao.prototype.getBySrsId
 SpatialReferenceSystemDao.prototype.createWgs84
 SpatialReferenceSystemDao.prototype.createUndefinedCartesian

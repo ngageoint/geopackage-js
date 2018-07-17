@@ -44,9 +44,10 @@ describe('Data Columns tests', function() {
     }
   });
 
-  it('should get the data column for property_0', function(done) {
+  it('should get the data column for property_0', function() {
     var dc = new DataColumnsDao(connection);
-    dc.getDataColumns('FEATURESriversds', 'property_0', function(err, dataColumn) {
+    return dc.getDataColumns('FEATURESriversds', 'property_0')
+    .then(function(dataColumn) {
       dataColumn.should.be.deep.equal({
         table_name: 'FEATURESriversds',
         column_name: 'property_0',
@@ -56,13 +57,13 @@ describe('Data Columns tests', function() {
         mime_type: null,
         constraint_name: null
       });
-      done();
     });
   });
 
-  it('should get the contents for the data column for property_0', function(done) {
+  it('should get the contents for the data column for property_0', function() {
     var dc = new DataColumnsDao(connection);
-    dc.getDataColumns('FEATURESriversds', 'property_0', function(err, dataColumn) {
+    return dc.getDataColumns('FEATURESriversds', 'property_0')
+    .then(function(dataColumn) {
       var contents = dc.getContents(dataColumn);
       contents.should.be.deep.equal({
         table_name: 'FEATURESriversds',
@@ -76,20 +77,18 @@ describe('Data Columns tests', function() {
         max_y: 19971868.880408563,
         srs_id: 3857
       });
-      done();
     });
   });
 
-  it('should get the data column for geom', function(done) {
+  it('should get the data column for geom', function() {
     var dc = new DataColumnsDao(connection);
-    dc.getDataColumns('FEATURESriversds', 'geom', function(err, dataColumn) {
-      should.not.exist(err);
+    return dc.getDataColumns('FEATURESriversds', 'geom')
+    .then(function(dataColumn) {
       should.not.exist(dataColumn);
-      done();
     });
   });
 
-  it('should create a data column', function(done) {
+  it('should create a data column', function() {
     var dao = new DataColumnsDao(connection);
     var dc = new DataColumns();
     dc.table_name = 'FEATURESriversds';
@@ -101,7 +100,8 @@ describe('Data Columns tests', function() {
     dc.constraint_name = 'test constraint';
     var result = dao.create(dc);
     should.exist(result);
-    dao.getDataColumns('FEATURESriversds', 'test', function(err, dataColumn) {
+    dao.getDataColumns('FEATURESriversds', 'test')
+    .then(function(dataColumn) {
       dataColumn.should.be.deep.equal({
         table_name: 'FEATURESriversds',
         column_name: 'test',
@@ -111,7 +111,6 @@ describe('Data Columns tests', function() {
         mime_type: 'text/html',
         constraint_name: 'test constraint'
       });
-      done();
     });
   });
 
