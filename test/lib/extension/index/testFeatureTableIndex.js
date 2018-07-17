@@ -9,7 +9,7 @@ var GeoPackageAPI = require('../../../..')
   , path = require('path')
   , async = require('async');
 
-describe.skip('GeoPackage Feature Table Index Extension tests', function() {
+describe('GeoPackage Feature Table Index Extension tests', function() {
 
   describe('Create new index', function() {
     var geoPackage;
