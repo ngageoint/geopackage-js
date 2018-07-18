@@ -44,7 +44,8 @@ describe('GeoPackage tests', function() {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getFeatureDaoWithTableName('point2d', function(err, featureDao) {
+      geoPackage.getFeatureDaoWithTableName('point2d')
+      .then(function(featureDao) {
         featureDao.queryForEach(function(err, row, rowDone) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
@@ -62,8 +63,9 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getFeatureTables();
       async.eachSeries(tables, function(table, callback) {
-        geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-          if (err) {
+        geoPackage.getFeatureDaoWithTableName(table)
+        .then(function(featureDao) {
+          if (!featureDao) {
             return callback(err);
           }
           var srs = featureDao.getSrs();
@@ -114,19 +116,18 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the feature dao from the contents', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+  it('should get the feature dao from the contents', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getContentsDao();
       var contents = dao.queryForIdObject('FEATURESriversds');
-      geoPackage.getFeatureDaoWithContents(contents, function(err, featureDao) {
-        should.not.exist(err);
+      return geoPackage.getFeatureDaoWithContents(contents)
+      .then(function(featureDao) {
         should.exist(featureDao);
         featureDao.getGeometryType().should.be.equal('GEOMETRY');
         featureDao.table_name.should.be.equal('FEATURESriversds');
         connection.close();
-        done();
       });
     });
   });
@@ -171,17 +172,17 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the info for the table', function(done) {
+  it('should get the info for the table', function() {
     this.timeout(30000);
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, dao) {
+      return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
+      .then(function(dao) {
         var info = geoPackage.getInfoForTable(dao);
         should.exist(info);
         info.tableName.should.be.equal('FEATURESriversds');
         connection.close();
-        done(err);
       });
     });
   });

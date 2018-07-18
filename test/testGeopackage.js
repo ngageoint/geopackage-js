@@ -230,8 +230,8 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should add geojson to the geopackage and keep it indexed', function(done) {
-      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+    it('should add geojson to the geopackage and keep it indexed', function() {
+      return GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
         "type": "Feature",
         "properties": {
           'property_0': 'test'
@@ -243,12 +243,12 @@ describe('GeoPackageAPI tests', function() {
             40.17887331434696
           ]
         }
-      }, 'rivers', function(err, id) {
+      }, 'rivers')
+      .then(function(id) {
         // ensure the last indexed changed
         var db = indexedGeopackage.getDatabase();
         var index = db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id]);
         index.geom_id.should.be.equal(id);
-        done();
       });
     });
 
@@ -265,7 +265,8 @@ describe('GeoPackageAPI tests', function() {
             40.17887331434696
           ]
         }
-      }, 'rivers', function(err, id) {
+      }, 'rivers')
+      .then(function(id) {
         GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, features){
           features.length.should.be.equal(1);
           done();
@@ -286,10 +287,10 @@ describe('GeoPackageAPI tests', function() {
             40.17887331434696
           ]
         }
-      }, 'rivers', function(err, id) {
-        GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, geoJson, rowCallback){
+      }, 'rivers')
+      .then(function(id) {
+        GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, geoJson){
           geoJson.properties.Scalerank.should.be.equal('test');
-          // rowCallback();
         }, done);
       });
     });
@@ -341,8 +342,8 @@ describe('GeoPackageAPI tests', function() {
       columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
       columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
-        should.not.exist(err);
+      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
+      .then(function(featureDao) {
         should.exist(featureDao);
         var exists = geopackage.hasFeatureTable(tableName);
         exists.should.be.equal(true);
@@ -361,7 +362,8 @@ describe('GeoPackageAPI tests', function() {
               40.17887331434696
             ]
           }
-        }, tableName, function(err, id) {
+        }, tableName)
+        .then(function(id) {
           id.should.be.equal(1);
           GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
             "type": "Feature",
@@ -375,17 +377,17 @@ describe('GeoPackageAPI tests', function() {
                 40.17887331434696
               ]
             }
-          }, tableName, function(err, id) {
+          }, tableName)
+          .then(function(id) {
             id.should.be.equal(2);
-            GeoPackage.getFeature(geopackage, tableName, 2, function(err, feature) {
-              should.not.exist(err);
+            GeoPackage.getFeature(geopackage, tableName, 2)
+            .then(function(feature) {
               should.exist(feature);
               feature.id.should.be.equal(2);
               should.exist(feature.geometry);
               var count = 0;
-              GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, rowCallback) {
+              GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature) {
                 count++;
-                // rowCallback();
               }, function(err) {
                 count.should.be.equal(2);
                 done();

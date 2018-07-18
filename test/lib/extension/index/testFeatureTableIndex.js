@@ -37,7 +37,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, riverFeatureDao) {
+          geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
+          .then(function(riverFeatureDao) {
             featureDao = riverFeatureDao;
             done();
           });
@@ -50,12 +51,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       testSetup.deleteGeoPackage(filename, done);
     });
 
-    it('should return the index status of false', function(done) {
+    it('should return the index status of false', function() {
       var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-      fti.isIndexed(function(err, indexed){
-        should.not.exist(err);
+      return fti.isIndexed()
+      .then(function(indexed){
         indexed.should.be.equal(false);
-        done();
       });
     });
 
@@ -64,10 +64,9 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       should.not.exist(tableIndex);
-      fti.index(function() {
-        console.log('progress', arguments);
-      }, function(err) {
-        should.not.exist(err);
+      fti.index()
+      .then(function(indexed) {
+        indexed.should.be.equal(true);
         // ensure it was created
         var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
         tableIndex = fti2.getTableIndex();
@@ -77,17 +76,16 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       });
     });
 
-    it('should index the table from the geopackage object', function(done) {
+    it('should index the table from the geopackage object', function() {
       this.timeout(10000);
-      geoPackage.indexFeatureTable('FEATURESriversds', function(err, status) {
-        should.not.exist(err);
-        status.should.be.equal(true);
+      return geoPackage.indexFeatureTable('FEATURESriversds')
+      .then(function(indexed) {
+        indexed.should.be.equal(true);
         // ensure it was created
         var fti = featureDao.featureTableIndex;
         var tableIndex = fti.getTableIndex();
         should.exist(tableIndex);
         should.exist(tableIndex.last_indexed);
-        done();
       });
     });
 
@@ -133,7 +131,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('rivers', function(err, riverFeatureDao) {
+          geoPackage.getFeatureDaoWithTableName('rivers')
+          .then(function(riverFeatureDao) {
             featureDao = riverFeatureDao;
             done();
           });
@@ -156,38 +155,35 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       done();
     });
 
-    it('should get the extension row', function(done) {
+    it('should get the extension row', function() {
       var fti = featureDao.featureTableIndex;
-      fti.getFeatureTableIndexExtension(function(err, extension){
-        should.not.exist(err);
+      return fti.getFeatureTableIndexExtension()
+      .then(function(extension){
         should.exist(extension);
-        done();
       });
     });
 
-    it('should return the index status of true', function(done) {
+    it('should return the index status of true', function() {
       var fti = featureDao.featureTableIndex;
-      fti.isIndexed(function(err, indexed){
-        should.not.exist(err);
+      return fti.isIndexed()
+      .then(function(indexed){
         indexed.should.be.equal(true);
-        done();
       });
     });
 
-    it('should force index the table', function(done) {
+    it('should force index the table', function() {
       this.timeout(30000);
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
-      fti.indexWithForce(true, function() {
-      }, function(err) {
-        should.not.exist(err);
+      return fti.indexWithForce(true)
+      .then(function(indexed) {
+        indexed.should.be.equal(true);
         // ensure it was created
         var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
         tableIndex = fti2.getTableIndex();
         should.exist(tableIndex);
         tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');
-        done();
       });
     });
   });

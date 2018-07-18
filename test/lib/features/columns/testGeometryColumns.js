@@ -47,10 +47,10 @@ describe('GeometryColumns tests', function() {
     ]);
   });
 
-  it('should get the table', function(done) {
+  it('should get the table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('point2d', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('point2d')
+    .then(function(table) {
       should.exist(table);
       TestUtils.compareProperties(table, {
         column_name: 'geom',
@@ -60,16 +60,14 @@ describe('GeometryColumns tests', function() {
         z: 0,
         m: 0
       });
-      done();
     });
   });
 
-  it('should get no table', function(done) {
+  it('should get no table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('doesnotexist', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('doesnotexist')
+    .then(function(table) {
       should.not.exist(table);
-      done();
     });
   });
 
@@ -80,10 +78,10 @@ describe('GeometryColumns tests', function() {
     results.should.have.property('length', 16);
   });
 
-  it('should get the table', function(done) {
+  it('should get the table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('point2d', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('point2d')
+    .then(function(table) {
       should.exist(table);
       TestUtils.compareProperties(table, {
         table_name: 'point2d',
@@ -93,14 +91,13 @@ describe('GeometryColumns tests', function() {
         z: 0,
         m: 0
       });
-      done();
     });
   });
 
-  it('should get the srs from the table', function(done) {
+  it('should get the srs from the table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('point2d', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('point2d')
+    .then(function(table) {
       should.exist(table);
       TestUtils.compareProperties(table, {
         table_name: 'point2d',
@@ -119,14 +116,13 @@ describe('GeometryColumns tests', function() {
         definition: 'undefined',
         description: 'undefined geographic coordinate reference system'
       });
-      done();
     });
   });
 
-  it('should get the contents from the table', function(done) {
+  it('should get the contents from the table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('point2d', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('point2d')
+    .then(function(table) {
       should.exist(table);
       TestUtils.compareProperties(table, {
         table_name: 'point2d',
@@ -149,14 +145,13 @@ describe('GeometryColumns tests', function() {
         max_y: 2,
         srs_id: 0
       });
-      done();
     });
   });
 
-  it('should get the projection from the table', function(done) {
+  it('should get the projection from the table', function() {
     var gcd = new GeometryColumnsDao(connection);
-    gcd.queryForTableName('point2d', function(err, table) {
-      should.not.exist(err);
+    return gcd.queryForTableName('point2d')
+    .then(function(table) {
       should.exist(table);
       TestUtils.compareProperties(table, {
         table_name: 'point2d',
@@ -168,7 +163,6 @@ describe('GeometryColumns tests', function() {
       });
       var projection = gcd.getProjection(table);
       should.exist(projection);
-      done();
     });
   });
 

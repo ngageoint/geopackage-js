@@ -158,7 +158,6 @@ describe('TableCreator tests', function() {
       Verification.verifySRS(geopackage).should.be.equal(true);
       var count = geopackage.getDatabase().count('gpkg_spatial_ref_sys');
       count.should.be.equal(4);
-      done();
     });
   });
 

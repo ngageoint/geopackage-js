@@ -125,26 +125,26 @@ describe('Metadata Reference tests', function() {
       ref.setMetadata(metadata2);
       ref.setParentMetadata(metadata1);
       metadataReferenceDao.create(ref);
-      var count = 0;
+      // var count = 0;
       metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-        count++;
-      }, function(err) {
+        // count++;
+      }).then(function(count) {
         count.should.be.equal(1);
         var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
-        var countAfter = 0;
+        // var countAfter = 0;
         metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-          countAfter++;
-        }, function() {
-          countAfter.should.be.equal(0);
+          // countAfter++;
+        }).then(function(count) {
+          count.should.be.equal(0);
           done();
         });
       });
     });
   });
 
-  it('should query for metadatareference by metadata and parent', function(done) {
+  it('should query for metadatareference by metadata and parent', function() {
 
-    geopackage.createMetadataTable()
+    return geopackage.createMetadataTable()
     .then(function() {
       return geopackage.createMetadataReferenceTable();
     })
@@ -196,20 +196,18 @@ describe('Metadata Reference tests', function() {
       [ref1, ref2].forEach(function(ref) {
         metadataReferenceDao.create(ref);
       });
-      metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
+      return metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
         should.not.exist(err);
         row.table_name.should.be.equal('TEST_TABLE_NAME_2');
         row.md_file_id.should.be.equal(metadata2.id);
         row.md_parent_id.should.be.equal(metadata1.id);
-      }, function() {
-        done();
       });
     });
   });
 
-  it('should query for metadatareference by metadata', function(done) {
+  it('should query for metadatareference by metadata', function() {
 
-    geopackage.createMetadataTable()
+    return geopackage.createMetadataTable()
     .then(function() {
       return geopackage.createMetadataReferenceTable();
     })
@@ -261,14 +259,11 @@ describe('Metadata Reference tests', function() {
       [ref1, ref2].forEach(function(ref) {
         metadataReferenceDao.create(ref);
       });
-      var count = 0;
-      metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
-        count++;
+      return metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
         should.not.exist(err);
         row.md_file_id.should.be.equal(metadata2.id);
-      }, function() {
+      }).then(function(count){
         count.should.be.equal(2);
-        done();
       });
     });
   });

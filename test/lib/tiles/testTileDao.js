@@ -76,64 +76,57 @@ describe('TileDao tests', function() {
       should.exist(tileTable.getTileDataColumn);
     });
 
-    it('should query for a tile', function(done) {
-      tileDao.queryForTile(0, 0, 0, function(err, tileRow) {
+    it('should query for a tile', function() {
+      return tileDao.queryForTile(0, 0, 0)
+      .then(function(tileRow) {
         tileRow.getZoomLevel().should.be.equal(0);
         tileRow.getTileColumn().should.be.equal(0);
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level', function(done) {
-      tileDao.queryForTilesWithZoomLevel(1, function(err, tileRow, tileDone) {
+    it('should query for tiles in the zoom level', function() {
+      return tileDao.queryForTilesWithZoomLevel(1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        // tileDone();
-      }, function(err, count) {
+      })
+      .then(function(count) {
         count.should.be.equal(4);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level descending order', function(done) {
-      tileDao.queryForTilesDescending(1, function(err, tileRow, tileDone) {
+    it('should query for tiles in the zoom level descending order', function() {
+      return tileDao.queryForTilesDescending(1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        // tileDone();
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(4);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level and column', function(done) {
-      tileDao.queryForTilesInColumn(1, 1, function(err, tileRow, tileDone) {
+    it('should query for tiles in the zoom level and column', function() {
+      return tileDao.queryForTilesInColumn(1, 1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileColumn().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        // tileDone();
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(2);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level and row', function(done) {
-      tileDao.queryForTilesInRow(1, 1, function(err, tileRow, tileDone) {
+    it('should query for tiles in the zoom level and row', function() {
+      return tileDao.queryForTilesInRow(1, 1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        // tileDone();
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(2);
-        done();
       });
     });
 
@@ -144,12 +137,11 @@ describe('TileDao tests', function() {
         min_y: 0,
         max_y: 0
       };
-      tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow, tileDone) {
+      tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-        // tileDone();
       }, function(err, count) {
         count.should.be.equal(2);
         done();
@@ -223,60 +215,56 @@ describe('TileDao tests', function() {
       should.exist(tileTable.getTileDataColumn);
     });
 
-    it('should query for a tile', function(done) {
-      tileDao.queryForTile(1, 1, 4, function(err, tileRow) {
+    it('should query for a tile', function() {
+      return tileDao.queryForTile(1, 1, 4)
+      .then(function(tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         tileRow.getTileColumn().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level', function(done) {
-      tileDao.queryForTilesWithZoomLevel(4, function(err, tileRow) {
+    it('should query for tiles in the zoom level', function() {
+      return tileDao.queryForTilesWithZoomLevel(4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(16);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level descending order', function(done) {
+    it('should query for tiles in the zoom level descending order', function() {
       tileDao.queryForTilesDescending(4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(16);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level and column', function(done) {
-      tileDao.queryForTilesInColumn(1, 4, function(err, tileRow) {
+    it('should query for tiles in the zoom level and column', function() {
+      return tileDao.queryForTilesInColumn(1, 4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         tileRow.getTileColumn().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(4);
-        done();
       });
     });
 
-    it('should query for tiles in the zoom level and row', function(done) {
-      tileDao.queryForTilesInRow(1, 4, function(err, tileRow) {
+    it('should query for tiles in the zoom level and row', function() {
+      return tileDao.queryForTilesInRow(1, 4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      }).then(function(count) {
         count.should.be.equal(4);
-        done();
       });
     });
 

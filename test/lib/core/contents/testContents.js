@@ -102,41 +102,34 @@ describe('Contents tests', function() {
     done();
   });
 
-  it('should get the projection from the ID TILESosmds', function(done) {
+  it('should get the projection from the ID TILESosmds', function() {
     var contents = contentsDao.queryForIdObject('TILESosmds');
     should.exist(contents);
-    contentsDao.getProjection(contents, function(err, projection) {
-      should.not.exist(err);
-      should.exist(projection);
-      done();
-    });
+    var projection = contentsDao.getProjection(contents);
+    should.exist(projection);
   });
 
-  it('should get the projection from the ID FEATURESriversds', function(done) {
+  it('should get the projection from the ID FEATURESriversds', function() {
     var contents = contentsDao.queryForIdObject('FEATURESriversds');
     should.exist(contents);
-    contentsDao.getProjection(contents, function(err, projection) {
-      should.not.exist(err);
-      should.exist(projection);
-      done();
-    });
+    var projection = contentsDao.getProjection(contents);
+    should.exist(projection);
   });
 
-  it('should get the GeometryColumns from the ID TILESosmds', function(done) {
+  it('should get the GeometryColumns from the ID TILESosmds', function() {
     var contents = contentsDao.queryForIdObject('TILESosmds');
     should.exist(contents);
-    contentsDao.getGeometryColumns(contents, function(err, columns) {
-      should.not.exist(err);
+    return contentsDao.getGeometryColumns(contents)
+    .then(function(columns) {
       should.not.exist(columns);
-      done();
     });
   });
 
-  it('should get the GeometryColumns from the ID FEATURESriversds', function(done) {
+  it('should get the GeometryColumns from the ID FEATURESriversds', function() {
     var contents = contentsDao.queryForIdObject('FEATURESriversds');
     should.exist(contents);
-    contentsDao.getGeometryColumns(contents, function(err, columns) {
-      should.not.exist(err);
+    return contentsDao.getGeometryColumns(contents)
+    .then(function(columns) {
       should.exist(columns);
       columns.should.have.property('table_name', 'FEATURESriversds');
       columns.should.have.property('column_name', 'geom');
@@ -144,15 +137,14 @@ describe('Contents tests', function() {
       columns.should.have.property('srs_id', 3857);
       columns.should.have.property('z', 0);
       columns.should.have.property('m', 0);
-      done();
     });
   });
 
-  it('should get the TileMatrixSet from the ID TILESosmds', function(done) {
+  it('should get the TileMatrixSet from the ID TILESosmds', function() {
     var contents = contentsDao.queryForIdObject('TILESosmds');
     should.exist(contents);
-    contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
-      should.not.exist(err);
+    return contentsDao.getTileMatrixSet(contents)
+    .then(function(matrixSet) {
       should.exist(matrixSet);
       matrixSet.should.have.property('table_name', 'TILESosmds');
       matrixSet.should.have.property('srs_id', 3857);
@@ -160,25 +152,23 @@ describe('Contents tests', function() {
       matrixSet.should.have.property('min_y', -20037508.342789244);
       matrixSet.should.have.property('max_x', 20037508.342789244);
       matrixSet.should.have.property('max_y', 20037508.342789244);
-      done();
     });
   });
 
-  it('should get the TileMatrixSet from the ID FEATURESriversds', function(done) {
+  it('should get the TileMatrixSet from the ID FEATURESriversds', function() {
     var contents = contentsDao.queryForIdObject('FEATURESriversds');
     should.exist(contents);
-    contentsDao.getTileMatrixSet(contents, function(err, matrixSet) {
-      should.not.exist(err);
+    return contentsDao.getTileMatrixSet(contents)
+    .then(function(matrixSet) {
       should.not.exist(matrixSet);
-      done();
     });
   });
 
-  it('should get the TileMatrix from the ID TILESosmds', function(done) {
+  it('should get the TileMatrix from the ID TILESosmds', function() {
     var contents = contentsDao.queryForIdObject('TILESosmds');
     should.exist(contents);
-    contentsDao.getTileMatrix(contents, function(err, matrix) {
-      should.not.exist(err);
+    return contentsDao.getTileMatrix(contents)
+    .then(function(matrix) {
       should.exist(matrix);
       matrix.should.have.property('length', 4);
 
@@ -193,17 +183,15 @@ describe('Contents tests', function() {
       tm.pixel_y_size = 156543.033928041;
 
       matrix[0].should.be.deep.equal(tm);
-      done();
     });
   });
 
-  it('should get the TileMatrix from the ID FEATURESriversds', function(done) {
+  it('should get the TileMatrix from the ID FEATURESriversds', function() {
     var contents = contentsDao.queryForIdObject('FEATURESriversds');
     should.exist(contents);
-    contentsDao.getTileMatrix(contents, function(err, matrix) {
-      should.not.exist(err);
+    return contentsDao.getTileMatrix(contents)
+    .then(function(matrix) {
       should.not.exist(matrix);
-      done();
     });
   });
 

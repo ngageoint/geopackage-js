@@ -112,7 +112,7 @@ describe('Data Columns tests', function() {
     });
   });
 
-  it('should query by the constraint name to retrieve a data column', function(done) {
+  it('should query by the constraint name to retrieve a data column', function() {
     var dao = new DataColumnsDao(connection);
     var dc = new DataColumns();
     dc.table_name = 'FEATURESriversds';
@@ -124,7 +124,7 @@ describe('Data Columns tests', function() {
     dc.constraint_name = 'test constraint';
     var result = dao.create(dc);
     should.exist(result);
-    dao.queryByConstraintName('test constraint', function(err, dataColumn) {
+    return dao.queryByConstraintName('test constraint', function(err, dataColumn) {
       dataColumn.should.be.deep.equal({
         table_name: 'FEATURESriversds',
         column_name: 'test',
@@ -134,12 +134,12 @@ describe('Data Columns tests', function() {
         mime_type: 'text/html',
         constraint_name: 'test constraint'
       });
-    }, done);
+    });
   });
 
-  it('should create a data column constraint', function(done) {
+  it('should create a data column constraint', function() {
     var tc = new TableCreator(connection);
-    tc.createDataColumnConstraints()
+    return tc.createDataColumnConstraints()
     .then(function() {
       var dao = new DataColumnConstraintsDao(connection);
       var dc = new DataColumnConstraints();
@@ -153,7 +153,7 @@ describe('Data Columns tests', function() {
       dc.description = 'constraint description';
 
       var resutl = dao.create(dc);
-      dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
+      return dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
         dataColumnConstraint.should.be.deep.equal({
           constraint_name: 'test constraint',
           constraint_type: 'range',
@@ -164,13 +164,13 @@ describe('Data Columns tests', function() {
           max_is_inclusive: 1,
           description: 'constraint description'
         });
-      }, done);
+      });
     });
   });
 
-  it('should create a data column constraint and query unique', function(done) {
+  it('should create a data column constraint and query unique', function() {
     var tc = new TableCreator(connection);
-    tc.createDataColumnConstraints()
+    return tc.createDataColumnConstraints()
     .then(function() {
       var dao = new DataColumnConstraintsDao(connection);
       var dc = new DataColumnConstraints();
@@ -195,7 +195,6 @@ describe('Data Columns tests', function() {
         max_is_inclusive: 1,
         description: 'constraint description'
       });
-      done();
     });
   });
 

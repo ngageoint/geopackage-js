@@ -18,9 +18,10 @@ describe('FeatureTableReader tests', function() {
     connection.close();
   });
 
-  it('should read the table', function(done) {
+  it('should read the table', function() {
     var reader = new FeatureTableReader('point2d');
-    reader.readFeatureTable(connection, function(err, table) {
+    return reader.readFeatureTable(connection)
+    .then(function(table) {
       table.table_name.should.be.equal('point2d');
       table.columns.length.should.be.equal(8);
       table.columns[0].name.should.be.equal('fid');
@@ -33,16 +34,17 @@ describe('FeatureTableReader tests', function() {
       table.columns[7].name.should.be.equal('binaryfield');
 
       table.getGeometryColumn().name.should.be.equal('geom');
-
-      done();
     });
   });
 
-  it('should read the table with geometry columns', function(done) {
-    new GeometryColumnsDao(connection).queryForTableName('point2d', function(err, geometryColumns) {
+  it('should read the table with geometry columns', function() {
+    var gcd = new GeometryColumnsDao(connection);
+    return gcd.queryForTableName('point2d')
+    .then(function(geometryColumns) {
       var reader = new FeatureTableReader(geometryColumns);
 
-      reader.readFeatureTable(connection, function(err, table) {
+      return reader.readFeatureTable(connection)
+      .then(function(table) {
         table.table_name.should.be.equal('point2d');
         table.columns.length.should.be.equal(8);
         table.columns[0].name.should.be.equal('fid');
@@ -55,8 +57,6 @@ describe('FeatureTableReader tests', function() {
         table.columns[7].name.should.be.equal('binaryfield');
 
         table.getGeometryColumn().name.should.be.equal('geom');
-
-        done();
       });
     });
   });

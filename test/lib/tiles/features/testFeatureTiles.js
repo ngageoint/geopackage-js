@@ -34,7 +34,8 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, riverFeatureDao) {
+          geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
+          .then(function(riverFeatureDao) {
             featureDao = riverFeatureDao;
             done();
           });
@@ -98,7 +99,8 @@ describe('GeoPackage FeatureTiles tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getFeatureDaoWithTableName('rivers', function(err, riverFeatureDao) {
+        geoPackage.getFeatureDaoWithTableName('rivers')
+        .then(function(riverFeatureDao) {
           featureDao = riverFeatureDao;
           done();
         });

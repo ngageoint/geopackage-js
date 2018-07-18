@@ -163,7 +163,7 @@ describe('GeoPackage Feature table create tests', function() {
 
   describe('GeoPackage feature CRUD tests', function(done) {
 
-    beforeEach(function(done) {
+    beforeEach(function() {
       var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', wkx.Types.wkt.Point);
       var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
@@ -181,19 +181,19 @@ describe('GeoPackage Feature table create tests', function() {
       columns.push(FeatureColumn.createColumnWithIndex(9, 'test space', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
       columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
-      geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+      return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
       .then(function(result) {
         var verified = Verification.verifyGeometryColumns(geopackage)
           && Verification.verifyTableExists(geopackage, tableName)
           && Verification.verifyContentsForTable(geopackage, tableName)
           && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
         verified.should.be.equal(true);
-        done();
       });
     });
 
-    it('should create a feature', function(done) {
-      geopackage.getFeatureDaoWithTableName(tableName, function(err, featureDao) {
+    it('should create a feature', function() {
+      return geopackage.getFeatureDaoWithTableName(tableName)
+      .then(function(featureDao) {
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(4326);
@@ -227,15 +227,15 @@ describe('GeoPackage Feature table create tests', function() {
         fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
         fr.getValueWithColumnName('test space').toString().should.be.equal('space space');
         fr.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
-        done();
       });
     });
 
     describe('delete feature tests', function(done) {
       var featureDao;
 
-      beforeEach(function(done) {
-        geopackage.getFeatureDaoWithTableName(tableName, function(err, fd) {
+      beforeEach(function() {
+        return geopackage.getFeatureDaoWithTableName(tableName)
+        .then(function(fd) {
           featureDao = fd;
           var featureRow = featureDao.newRow();
           var geometryData = new GeometryData();
@@ -266,7 +266,6 @@ describe('GeoPackage Feature table create tests', function() {
           fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
           fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
           fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-          done();
         });
       });
 
