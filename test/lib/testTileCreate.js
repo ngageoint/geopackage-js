@@ -76,38 +76,33 @@ describe('GeoPackage Tile table create tests', function() {
       });
     });
 
-    it('should create the tile matrix for the zoom levels', function(done){
-
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
-        done();
-      });
+    it('should create the tile matrix for the zoom levels', function(){
+      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
     });
 
     it('should add all of the tiles to the tile matrix', function(done){
 
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
-
-        async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
-          var tiles = [];
-          var tileCount = Math.pow(2,zoom);
-          for (var i = 0; i < tileCount; i++) {
-            tiles.push(i);
-          }
-          async.eachSeries(tiles, function(xTile, xDone) {
-            async.eachSeries(tiles, function(yTile, yDone) {
-              testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
-                geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
-                  yDone();
-                });
+      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
+        var tiles = [];
+        var tileCount = Math.pow(2,zoom);
+        for (var i = 0; i < tileCount; i++) {
+          tiles.push(i);
+        }
+        async.eachSeries(tiles, function(xTile, xDone) {
+          async.eachSeries(tiles, function(yTile, yDone) {
+            testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
+              geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                yDone();
               });
-            }, xDone);
-          }, zoomDone);
-        }, function(err) {
-          geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-            var count = tileDao.getCount();
-            count.should.be.equal(85);
-            done();
-          });
+            });
+          }, xDone);
+        }, zoomDone);
+      }, function(err) {
+        geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+          var count = tileDao.getCount();
+          count.should.be.equal(85);
+          done();
         });
       });
     });
@@ -130,30 +125,29 @@ describe('GeoPackage Tile table create tests', function() {
         Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
         Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
         Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-        geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, function(err, result) {
+        geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
 
-          async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
-            var tiles = [];
-            var tileCount = Math.pow(2,zoom);
-            for (var i = 0; i < tileCount; i++) {
-              tiles.push(i);
-            }
-            async.eachSeries(tiles, function(xTile, xDone) {
-              async.eachSeries(tiles, function(yTile, yDone) {
-                testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
-                  console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
-                  geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
-                    yDone();
-                  });
+        async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
+          var tiles = [];
+          var tileCount = Math.pow(2,zoom);
+          for (var i = 0; i < tileCount; i++) {
+            tiles.push(i);
+          }
+          async.eachSeries(tiles, function(xTile, xDone) {
+            async.eachSeries(tiles, function(yTile, yDone) {
+              testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
+                console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
+                geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                  yDone();
                 });
-              }, xDone);
-            }, zoomDone);
-          }, function(err) {
-            geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-              var count = tileDao.getCount();
-              count.should.be.equal(85);
-              done();
-            });
+              });
+            }, xDone);
+          }, zoomDone);
+        }, function(err) {
+          geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+            var count = tileDao.getCount();
+            count.should.be.equal(85);
+            done();
           });
         });
       });

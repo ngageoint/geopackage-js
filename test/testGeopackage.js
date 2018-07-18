@@ -418,7 +418,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should create a standard web mercator tile table', function(done) {
+    it('should create a standard web mercator tile table', function() {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -431,10 +431,9 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 3857;
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      return GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
-        done();
       });
     });
 
@@ -452,8 +451,8 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         testSetup.loadTile(tilePath, function(err, tileData) {
           geopackage.addTile(tileData, tableName, 0, 0, 0, function(err, result) {
@@ -483,8 +482,8 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
           geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
@@ -514,8 +513,8 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
           geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {

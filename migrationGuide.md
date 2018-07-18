@@ -202,6 +202,9 @@ FeatureTiles.prototype.drawTileQueryIndex
 FeatureTiles.prototype.drawTile
 GeoPackageAPI.getFeatureTileFromXYZ
 
+GeoPackage.prototype.createStandardWebMercatorTileMatrix
+GeoPackageAPI.createStandardWebMercatorTileTable
+
 ### New methods
 GeoPackage.prototype.createRequiredTables
 
