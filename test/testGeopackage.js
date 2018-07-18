@@ -252,8 +252,8 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should add geojson to the geopackage and keep it indexed and query it', function(done) {
-      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+    it('should add geojson to the geopackage and keep it indexed and query it', function() {
+      return GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
         "type": "Feature",
         "properties": {
           'property_0': 'test'
@@ -267,15 +267,14 @@ describe('GeoPackageAPI tests', function() {
         }
       }, 'rivers')
       .then(function(id) {
-        GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, features){
+        return GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, features){
           features.length.should.be.equal(1);
-          done();
         });
       });
     });
 
-    it('should add geojson to the geopackage and keep it indexed and iterate it', function(done) {
-      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+    it('should add geojson to the geopackage and keep it indexed and iterate it', function() {
+      return GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
         "type": "Feature",
         "properties": {
           'property_0': 'test'
@@ -289,9 +288,9 @@ describe('GeoPackageAPI tests', function() {
         }
       }, 'rivers')
       .then(function(id) {
-        GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, geoJson){
+        return GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, geoJson){
           geoJson.properties.Scalerank.should.be.equal('test');
-        }, done);
+        });
       });
     });
   });

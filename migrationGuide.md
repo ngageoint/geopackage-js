@@ -191,6 +191,12 @@ GeoPackageAPI.createFeatureTableWithDataColumns
 GeoPackageAPI.createFeatureTable
 GeoPackageAPI.getFeaturesInBoundingBox
 
+FeatureDao.prototype.queryForGeoJSONIndexedFeaturesWithBoundingBox
+GeoPackageAPI.getGeoJSONFeaturesInTile
+GeoPackageAPI.queryForGeoJSONFeaturesInTable
+GeoPackage.prototype.queryForGeoJSONFeaturesInTable
+GeoPackage.prototype.iterateGeoJSONFeaturesInTableWithinBoundingBox
+
 ### New methods
 GeoPackage.prototype.createRequiredTables
 
