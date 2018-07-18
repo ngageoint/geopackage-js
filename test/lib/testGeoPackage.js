@@ -39,20 +39,20 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the features', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
+  it('should get the features', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
+    .then(function(geoPackageConnection) {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d')
       .then(function(featureDao) {
-        featureDao.queryForEach(function(err, row, rowDone) {
+        featureDao.queryForEach(function(err, row) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
-          // rowDone();
-        }, function(err) {
+        })
+        .then(function() {
           connection.close();
-          done();
         });
       });
     });
@@ -69,7 +69,7 @@ describe('GeoPackage tests', function() {
             return callback(err);
           }
           var srs = featureDao.getSrs();
-          featureDao.queryForEach(function(err, row, rowDone) {
+          featureDao.queryForEach(function(err, row) {
             var currentRow = featureDao.getFeatureRow(row);
             var geometry = currentRow.getGeometry();
             if (!geometry) {
@@ -77,8 +77,8 @@ describe('GeoPackage tests', function() {
             }
             var geom = geometry.geometry;
             var geoJson = projectedJson = geom.toGeoJSON();
-            // rowDone();
-          }, function(err) {
+          })
+          .then(function() {
             callback();
           });
         });

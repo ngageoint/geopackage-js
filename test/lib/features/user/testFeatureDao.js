@@ -42,15 +42,15 @@ describe('FeatureDao tests', function() {
       testSetup.deleteGeoPackage(filename, done);
     });
 
-    it('should read the geometry', function(done) {
-      geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
+    it('should read the geometry', function() {
+      return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
       .then(function(featureDao) {
         var srs = featureDao.getSrs();
         featureDao.queryForEach(function(err, row) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
           should.exist(geometry);
-        }, done);
+        });
       });
     });
 
@@ -603,23 +603,23 @@ describe('FeatureDao tests', function() {
       });
     });
 
-    it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+    it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256, function(err, data) {
+      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256)
+      .then(function(data) {
         console.timeEnd('generating indexed tile');
-        if (!data) return done(err);
-        done();
+        should.exist(data);
       });
     });
 
-    it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+    it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256, function(err, data) {
+      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256)
+      .then(function(data) {
         console.timeEnd('generating indexed tile');
-        if (!data) return done(err);
-        done();
+        should.exist(data);
       });
     });
 
@@ -633,13 +633,13 @@ describe('FeatureDao tests', function() {
       });
     });
 
-    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function(done) {
+    it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(3000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256, function(err, data) {
+      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256)
+      .then(function(data) {
         console.timeEnd('generating indexed tile');
-        if (!data) return done(err);
-        done();
+        should.exist(data);
       });
     });
   });

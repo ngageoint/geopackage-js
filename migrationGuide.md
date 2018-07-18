@@ -190,12 +190,17 @@ GeoPackage.prototype.indexFeatureTable
 GeoPackageAPI.createFeatureTableWithDataColumns
 GeoPackageAPI.createFeatureTable
 GeoPackageAPI.getFeaturesInBoundingBox
-
 FeatureDao.prototype.queryForGeoJSONIndexedFeaturesWithBoundingBox
 GeoPackageAPI.getGeoJSONFeaturesInTile
 GeoPackageAPI.queryForGeoJSONFeaturesInTable
 GeoPackage.prototype.queryForGeoJSONFeaturesInTable
 GeoPackage.prototype.iterateGeoJSONFeaturesInTableWithinBoundingBox
+Dao.prototype.queryForEach
+GeoPackageAPI.iterateGeoJSONFeaturesFromTable
+FeatureTiles.prototype.drawTileWithBoundingBox
+FeatureTiles.prototype.drawTileQueryIndex
+FeatureTiles.prototype.drawTile
+GeoPackageAPI.getFeatureTileFromXYZ
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

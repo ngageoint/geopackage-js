@@ -315,7 +315,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should create a feature table', function(done) {
+    it('should create a feature table', function() {
       var columns = [];
 
       var FeatureColumn = GeoPackage.FeatureColumn;
@@ -341,7 +341,7 @@ describe('GeoPackageAPI tests', function() {
       columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
       columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
+      return GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
       .then(function(featureDao) {
         should.exist(featureDao);
         var exists = geopackage.hasFeatureTable(tableName);
@@ -349,7 +349,7 @@ describe('GeoPackageAPI tests', function() {
         var results = geopackage.getFeatureTables();
         results.length.should.be.equal(1);
         results[0].should.be.equal(tableName);
-        GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
+        return GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
           "type": "Feature",
           "properties": {
             'test_text_limited.test': 'test'
@@ -362,38 +362,35 @@ describe('GeoPackageAPI tests', function() {
             ]
           }
         }, tableName)
-        .then(function(id) {
-          id.should.be.equal(1);
-          GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
-            "type": "Feature",
-            "properties": {
-              'test_text_limited.test': 'test'
-            },
-            "geometry": {
-              "type": "Point",
-              "coordinates": [
-                -99.84374999999999,
-                40.17887331434696
-              ]
-            }
-          }, tableName)
-          .then(function(id) {
-            id.should.be.equal(2);
-            GeoPackage.getFeature(geopackage, tableName, 2)
-            .then(function(feature) {
-              should.exist(feature);
-              feature.id.should.be.equal(2);
-              should.exist(feature.geometry);
-              var count = 0;
-              GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature) {
-                count++;
-              }, function(err) {
-                count.should.be.equal(2);
-                done();
-              });
-            });
-          });
+      })
+      .then(function(id) {
+        id.should.be.equal(1);
+        return GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
+          "type": "Feature",
+          "properties": {
+            'test_text_limited.test': 'test'
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -99.84374999999999,
+              40.17887331434696
+            ]
+          }
+        }, tableName);
+      })
+      .then(function(id) {
+        id.should.be.equal(2);
+        return GeoPackage.getFeature(geopackage, tableName, 2);
+      })
+      .then(function(feature) {
+        should.exist(feature);
+        feature.id.should.be.equal(2);
+        should.exist(feature.geometry);
+        return GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature) {
         });
+      }).then(function(count) {
+        count.should.be.equal(2);
       });
     });
 
