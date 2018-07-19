@@ -59,12 +59,12 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       });
     });
 
-    it('should index the table', function(done) {
+    it('should index the table', function() {
       this.timeout(10000);
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       should.not.exist(tableIndex);
-      fti.index()
+      return fti.index()
       .then(function(indexed) {
         indexed.should.be.equal(true);
         // ensure it was created
@@ -72,7 +72,53 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         tableIndex = fti2.getTableIndex();
         should.exist(tableIndex);
         should.exist(tableIndex.last_indexed);
-        done();
+      })
+      .then(function() {
+        fti.hasExtension(fti.extensionName, fti.tableName, fti.columnName)
+        .then(function(exists) {
+          exists.should.be.equal(true);
+        });
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        return extensionDao.queryByExtension(fti.extensionName)
+        .then(function(extension) {
+          extension.getAuthor().should.be.equal('nga');
+          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+          extension.column_name.should.be.equal('geom');
+          extension.table_name.should.be.equal('FEATURESriversds');
+          extension.scope.should.be.equal('read-write');
+          extension.extension_name.should.be.equal('nga_geometry_index');
+        });
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        return extensionDao.queryByExtensionAndTableName(fti.extensionName, fti.tableName)
+        .then(function(extensions) {
+          var extension = extensions[0];
+          extension.getAuthor().should.be.equal('nga');
+          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+          extension.column_name.should.be.equal('geom');
+          extension.table_name.should.be.equal('FEATURESriversds');
+          extension.scope.should.be.equal('read-write');
+          extension.extension_name.should.be.equal('nga_geometry_index');
+        });
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        return extensionDao.queryByExtensionAndTableNameAndColumnName(fti.extensionName, fti.tableName, fti.columnName)
+        .then(function(extensions) {
+          var extension = extensions[0];
+          extension.getAuthor().should.be.equal('nga');
+          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+          extension.column_name.should.be.equal('geom');
+          extension.table_name.should.be.equal('FEATURESriversds');
+          extension.scope.should.be.equal('read-write');
+          extension.extension_name.should.be.equal('nga_geometry_index');
+        });
       });
     });
 

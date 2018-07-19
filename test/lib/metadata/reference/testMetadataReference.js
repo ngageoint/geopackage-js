@@ -185,6 +185,10 @@ describe('Metadata Reference tests', function() {
       ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
       ref1.timestamp = new Date();
       ref1.setMetadata(metadata1);
+      ref1.md_file_id.should.be.equal(metadata1.id);
+      should.not.exist(ref1.table_name);
+      should.not.exist(ref1.column_name);
+      should.not.exist(ref1.row_id_value);
 
       var ref2 = new MetadataReference();
       ref2.setReferenceScopeType(MetadataReference.TABLE);
@@ -192,6 +196,26 @@ describe('Metadata Reference tests', function() {
       ref2.timestamp = new Date();
       ref2.setMetadata(metadata2);
       ref2.setParentMetadata(metadata1);
+
+      should.not.exist(ref2.column_name);
+      should.not.exist(ref2.row_id_value);
+      ref2.md_parent_id.should.be.equal(metadata1.id);
+
+      var ref3 = new MetadataReference();
+      ref3.setReferenceScopeType(MetadataReference.ROW);
+      ref3.timestamp = new Date();
+      ref3.setMetadata();
+      ref3.setParentMetadata();
+      ref3.md_file_id.should.be.equal(-1);
+      ref3.md_parent_id.should.be.equal(-1);
+      should.not.exist(ref3.column_name);
+
+      var ref4 = new MetadataReference();
+      ref4.setReferenceScopeType(MetadataReference.ROW);
+      ref4.timestamp = new Date();
+      ref4.setMetadata(metadata1);
+
+      should.not.exist(ref4.row_id_value);
 
       [ref1, ref2].forEach(function(ref) {
         metadataReferenceDao.create(ref);
