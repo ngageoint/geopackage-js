@@ -44,6 +44,12 @@ sqliteAdapter.createAdapter
 GeoPackageConnection.prototype.setApplicationId
 TableCreator.prototype.createRequired
 GeoPackageValidate.hasMinimumTables
+GeoPackage.prototype.index
+TileDao.prototype.queryByTileGrid
+GeoPackageAPI.getTilesInBoundingBox
+GeoPackageAPI.getTilesInBoundingBoxWebZoom
+GeoPackageTileRetriever.prototype.retrieveTileResults
+GeoPackageTileRetriever.prototype.hasTile
 
 ### Methods with Callbacks that now return results
 Adapter.prototype.run

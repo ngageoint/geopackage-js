@@ -46,10 +46,10 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it('should get all the tiles in the bounding box', function(done) {
-      GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85, function(err, tiles) {
+    it('should get all the tiles in the bounding box', function() {
+      return GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85)
+      .then(function(tiles) {
         tiles.tiles.length.should.be.equal(4);
-        done(err);
       });
     });
 
@@ -135,27 +135,25 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it('should have a tile at XYZ 0, 0, 1', function(done) {
+    it('should have a tile at XYZ 0, 0, 1', function() {
       var maxZoom = tileDao.maxZoom;
       var minZoom = tileDao.minZoom;
 
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.hasTile(0, 0, 1, function(err, hasTile) {
+      return gpr.hasTile(0, 0, 1)
+      .then(function(hasTile) {
         hasTile.should.be.equal(true);
-        should.not.exist(err);
-        done();
       });
     });
 
-    it('should not have a tile at -1, 0, 0', function(done) {
+    it('should not have a tile at -1, 0, 0', function() {
       var maxZoom = tileDao.maxZoom;
       var minZoom = tileDao.minZoom;
 
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.hasTile(-1, 0, 0, function(err, hasTile) {
+      return gpr.hasTile(-1, 0, 0)
+      .then(function(hasTile) {
         hasTile.should.be.equal(false);
-        should.not.exist(err);
-        done();
       });
     });
 

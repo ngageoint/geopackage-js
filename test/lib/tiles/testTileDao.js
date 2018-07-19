@@ -143,7 +143,8 @@ describe('TileDao tests', function() {
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      })
+      .then(function(count) {
         count.should.be.equal(2);
         done();
       });
@@ -282,7 +283,8 @@ describe('TileDao tests', function() {
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-      }, function(err, count) {
+      })
+      .then(function(count) {
         count.should.be.equal(2);
         done();
       });

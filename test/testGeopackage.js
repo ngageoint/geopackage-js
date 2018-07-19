@@ -223,10 +223,10 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should query for the tiles in the bounding box', function(done) {
-      GeoPackage.getTilesInBoundingBoxWebZoom(indexedGeopackage, 'rivers_tiles', 0, -180, 180, -80, 80, function(err, tiles) {
+    it('should query for the tiles in the bounding box', function() {
+      return GeoPackage.getTilesInBoundingBoxWebZoom(indexedGeopackage, 'rivers_tiles', 0, -180, 180, -80, 80)
+      .then(function(tiles) {
         tiles.tiles.length.should.be.equal(1);
-        done();
       });
     });
 

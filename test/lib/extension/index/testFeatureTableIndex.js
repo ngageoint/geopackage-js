@@ -89,17 +89,16 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       });
     });
 
-    it('should index the geopackage from the geopackage object', function(done) {
+    it('should index the geopackage from the geopackage object', function() {
       this.timeout(10000);
-      geoPackage.index(function(err, status) {
-        should.not.exist(err);
+      return geoPackage.index()
+      .then(function(status) {
         status.should.be.equal(true);
         // ensure it was created
         var fti = featureDao.featureTableIndex;
         var tableIndex = fti.getTableIndex();
         should.exist(tableIndex);
         should.exist(tableIndex.last_indexed);
-        done();
       });
     });
   });
