@@ -132,19 +132,17 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the TILE dao from the contents', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+  it('should get the TILE dao from the contents', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getContentsDao();
       var contents = dao.queryForIdObject('TILESosmds');
-      geoPackage.getTileDaoWithContents(contents, function(err, tileDao) {
-        should.not.exist(err);
-        should.exist(tileDao);
-        tileDao.table_name.should.be.equal('TILESosmds');
-        connection.close();
-        done();
-      });
+      return geoPackage.getTileDaoWithContents(contents);
+    })
+    .then(function(tileDao) {
+      should.exist(tileDao);
+      tileDao.table_name.should.be.equal('TILESosmds');
     });
   });
 
@@ -154,7 +152,8 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
       async.eachSeries(tables, function(table, callback) {
-        geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+        geoPackage.getTileDaoWithTableName(table)
+        .then(function(tileDao) {
 
           var maxZoom = tileDao.maxZoom;
           var minZoom = tileDao.minZoom;
@@ -187,17 +186,17 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the info for the Imagery table', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
+  it('should get the info for the Imagery table', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getTileDaoWithTableName('imagery', function(err, dao) {
-        var info = geoPackage.getInfoForTable(dao);
+      geoPackage.getTileDaoWithTableName('imagery')
+      .then(function(tileDao) {
+        var info = geoPackage.getInfoForTable(tileDao);
         should.exist(info);
         info.tableName.should.be.equal('imagery');
         info.srs.id.should.be.equal(3857);
         connection.close();
-        done(err);
       });
     });
   });

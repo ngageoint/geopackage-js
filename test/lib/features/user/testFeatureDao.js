@@ -146,20 +146,22 @@ describe('FeatureDao tests', function() {
 
     it('should query for GeoJSON features', function() {
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      return GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath(filename, 'QueryTest', bb, function(err, features) {
+      return GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath(filename, 'QueryTest', bb)
+      .then(function(features) {
         features[0].properties.name.should.be.equal('box1');
       });
     });
 
-    it('should iterate GeoJSON features', function(done) {
+    it('should iterate GeoJSON features', function() {
       var count = 0;
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb, function(err, feature) {
+      return GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb, function(err, feature) {
+        console.log('feature', feature);
         feature.properties.name.should.be.equal('box1');
         count++;
-      }, function() {
+      })
+      .then(function(count) {
         count.should.be.equal(1);
-        done();
       });
     });
   });

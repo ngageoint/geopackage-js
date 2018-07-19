@@ -201,9 +201,15 @@ FeatureTiles.prototype.drawTileWithBoundingBox
 FeatureTiles.prototype.drawTileQueryIndex
 FeatureTiles.prototype.drawTile
 GeoPackageAPI.getFeatureTileFromXYZ
-
 GeoPackage.prototype.createStandardWebMercatorTileMatrix
 GeoPackageAPI.createStandardWebMercatorTileTable
+GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox
+GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath
+GeoPackage.prototype.getTileDaoWithTileMatrixSet
+GeoPackage.prototype.getTileDaoWithContents
+GeoPackage.prototype.getTileDaoWithTableName
+GeoPackage.prototype.addTile
+GeoPackageAPI.getTileFromTable
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

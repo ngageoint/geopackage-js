@@ -19,7 +19,8 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('TILESosmds', function(err, retrievedTileDao) {
+        geoPackage.getTileDaoWithTableName('TILESosmds')
+        .then(function(retrievedTileDao) {
           tileDao = retrievedTileDao;
           done();
         });
@@ -162,7 +163,8 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('alaska', function(err, retrievedTileDao) {
+        geoPackage.getTileDaoWithTableName('alaska')
+        .then(function(retrievedTileDao) {
           tileDao = retrievedTileDao;
           done();
         });

@@ -455,9 +455,11 @@ describe('GeoPackageAPI tests', function() {
       .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         testSetup.loadTile(tilePath, function(err, tileData) {
-          geopackage.addTile(tileData, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tileData, tableName, 0, 0, 0)
+          .then(function(result) {
             result.should.be.equal(1);
-            GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0, function(err, tileRow) {
+            GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0)
+            .then(function(tileRow) {
               testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
                 equal.should.be.equal(true);
                 done();
@@ -486,7 +488,8 @@ describe('GeoPackageAPI tests', function() {
       .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tile, tableName, 0, 0, 0)
+          .then(function(result) {
             result.should.be.equal(1);
             GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256, function(err, tile) {
               testSetup.diffImages(tile, tilePath, function(err, equal) {
@@ -517,7 +520,8 @@ describe('GeoPackageAPI tests', function() {
       .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          geopackage.addTile(tile, tableName, 0, 0, 0, function(err, result) {
+          geopackage.addTile(tile, tableName, 0, 0, 0)
+          .then(function(result) {
             result.should.be.equal(1);
             var canvas;
             if (typeof(process) !== 'undefined' && process.version) {

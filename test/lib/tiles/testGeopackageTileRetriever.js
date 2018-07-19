@@ -23,7 +23,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('TILESosmds', function(err, osmTileDao) {
+        geoPackage.getTileDaoWithTableName('TILESosmds')
+        .then(function(osmTileDao) {
           tileDao = osmTileDao;
           done();
         });
@@ -213,7 +214,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('imagery', function(err, imagery) {
+        geoPackage.getTileDaoWithTableName('imagery')
+        .then(function(imagery) {
           tileDao = imagery;
           done();
         });
@@ -272,7 +274,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('imagery', function(err, osmTileDao) {
+        geoPackage.getTileDaoWithTableName('imagery')
+        .then(function(osmTileDao) {
           tileDao = osmTileDao;
           done();
         });

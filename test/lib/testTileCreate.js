@@ -92,14 +92,16 @@ describe('GeoPackage Tile table create tests', function() {
         async.eachSeries(tiles, function(xTile, xDone) {
           async.eachSeries(tiles, function(yTile, yDone) {
             testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
-              geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+              geopackage.addTile(image, tableName, zoom, yTile, xTile)
+              .then(function(){
                 yDone();
               });
             });
           }, xDone);
         }, zoomDone);
       }, function(err) {
-        geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+        geopackage.getTileDaoWithTableName(tableName)
+        .then(function(tileDao) {
           var count = tileDao.getCount();
           count.should.be.equal(85);
           done();
@@ -137,14 +139,16 @@ describe('GeoPackage Tile table create tests', function() {
             async.eachSeries(tiles, function(yTile, yDone) {
               testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, image) {
                 console.log('Adding tile %d, %d, %d', zoom, xTile, yTile);
-                geopackage.addTile(image, tableName, zoom, yTile, xTile, function(err, result) {
+                geopackage.addTile(image, tableName, zoom, yTile, xTile)
+                .then(function() {
                   yDone();
                 });
               });
             }, xDone);
           }, zoomDone);
         }, function(err) {
-          geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+          geopackage.getTileDaoWithTableName(tableName)
+          .then(function(tileDao) {
             var count = tileDao.getCount();
             count.should.be.equal(85);
             done();
@@ -154,7 +158,8 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should delete the tiles', function(done) {
-      geopackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
+      geopackage.getTileDaoWithTableName(tableName)
+      .then(function(tileDao) {
         var count = tileDao.getCount();
         count.should.be.equal(85);
         var result = tileDao.deleteTile(0, 0, 0);
