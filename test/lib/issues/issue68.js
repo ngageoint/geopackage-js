@@ -19,9 +19,14 @@ describe('Tests for issue 68', function() {
       geoPackage.getTileDaoWithTableName('package_tiles')
       .then(function(tileDao) {
         should.exist(tileDao);
-        var info = geoPackage.getInfoForTable(tileDao);
-        should.exist(info);
-        var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+        return geoPackage.getInfoForTable(tileDao)
+        .then(function(info) {
+          return {info: info, tileDao: tileDao};
+        });
+      })
+      .then(function(previousResults){
+        should.exist(previousResults.info);
+        var gpr = new GeoPackageTileRetriever(previousResults.tileDao, 256, 256);
         gpr.getTile(192,401,10,function(err, tile) {
           if (err) return done(err);
           should.exist(tile);
