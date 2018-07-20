@@ -38,7 +38,7 @@
     "better-sqlite3": "^4.1.4",
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.10.0",
-    "file-type": "7.6.0",
+    "file-type": "8.1.0",
     "proj4": "2.4.3",
     "pureimage": "0.1.6",
     "reproject": "^1.1.1",
