@@ -4,6 +4,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , DataColumns = require('../../lib/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/dataColumns').DataColumnsDao
   , Verification = require('../fixtures/verification')
+  , FeatureTable = require('../../lib/features/user/featureTable')
   , TileTable = require('../../lib/tiles/user/tileTable')
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , TableCreator = require('../../lib/db/tableCreator')
@@ -60,6 +61,21 @@ describe('GeoPackage Feature table create tests', function() {
         && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
       verified.should.be.equal(true);
     });
+  });
+
+  it('should not create a feature table with two geometry columns', function() {
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
+    var boundingBox = new BoundingBox(-180, 180, -80, 80);
+
+    var columns = [];
+
+    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkx.Types.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', wkx.Types.wkt.Point, false, null));
+    (function() {
+      new FeatureTable(tableName, columns);
+    }).should.throw();
+
   });
 
   it('should create a feature table and read the information about it', function(done) {
