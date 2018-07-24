@@ -7,9 +7,9 @@ var path = require('path')
 
 describe('Tests for issue 68', function() {
 
-  it('should get a tile', function(done) {
+  it('should get a tile', function() {
     this.timeout(5000);
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
+    return GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
     .then(function(geoPackageConnection) {
       connection = geoPackageConnection;
       should.exist(connection);
@@ -27,11 +27,10 @@ describe('Tests for issue 68', function() {
       .then(function(previousResults){
         should.exist(previousResults.info);
         var gpr = new GeoPackageTileRetriever(previousResults.tileDao, 256, 256);
-        gpr.getTile(192,401,10,function(err, tile) {
-          if (err) return done(err);
+        return gpr.getTile(192,401,10)
+        .then(function(tile) {
           should.exist(tile);
           geoPackage.close();
-          done();
         });
       });
     });

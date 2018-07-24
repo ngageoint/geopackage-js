@@ -51,6 +51,14 @@ GeoPackageAPI.getTilesInBoundingBoxWebZoom
 GeoPackageTileRetriever.prototype.retrieveTileResults
 GeoPackageTileRetriever.prototype.hasTile
 TileCreator.prototype.projectTile
+GeoPackageTileRetriever.prototype.getTileWithBounds
+GeoPackageTileRetriever.prototype.getWebMercatorTile
+GeoPackageTileRetriever.prototype.getTileWithWgs84BoundsInProjection
+GeoPackageTileRetriever.prototype.getTileWithWgs84Bounds
+GeoPackageTileRetriever.prototype.drawTileIn
+GeoPackageTileRetriever.prototype.getTile
+GeoPackageAPI.getTileFromXYZ
+GeoPackageAPI.drawXYZTileInCanvas
 
 ### Methods with Callbacks that now return results
 Adapter.prototype.run

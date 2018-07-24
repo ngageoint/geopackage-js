@@ -202,25 +202,21 @@ describe('GeoPackageAPI tests', function() {
       exists.should.be.equal(false);
     });
 
-    it('should get the 0 0 0 tile', function(done) {
-      GeoPackage.getTileFromXYZ(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, function(err, tile) {
-        should.not.exist(err);
+    it('should get the 0 0 0 tile', function() {
+      return GeoPackage.getTileFromXYZ(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256)
+      .then(function(tile) {
         should.exist(tile);
-        done();
       });
     });
 
-    it('should get the 0 0 0 tile in a canvas', function(done) {
+    it('should get the 0 0 0 tile in a canvas', function() {
       var canvas;
       if (typeof(process) !== 'undefined' && process.version) {
         canvas = PureImage.make(256, 256);
       } else {
         canvas = document.createElement('canvas');
       }
-      GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas, function(err, tile) {
-        should.not.exist(err);
-        done();
-      });
+      return GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
     });
 
     it('should query for the tiles in the bounding box', function() {
@@ -491,7 +487,8 @@ describe('GeoPackageAPI tests', function() {
           geopackage.addTile(tile, tableName, 0, 0, 0)
           .then(function(result) {
             result.should.be.equal(1);
-            GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256, function(err, tile) {
+            GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256)
+            .then(function(tile) {
               testSetup.diffImages(tile, tilePath, function(err, equal) {
                 equal.should.be.equal(true);
                 done();
@@ -529,7 +526,8 @@ describe('GeoPackageAPI tests', function() {
             } else {
               canvas = document.createElement('canvas');
             }
-            GeoPackage.drawXYZTileInCanvas(geopackage, tableName, 0, 0, 0, 256, 256, canvas, function(err, tile) {
+            GeoPackage.drawXYZTileInCanvas(geopackage, tableName, 0, 0, 0, 256, 256, canvas)
+            .then(function(tile) {
               testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
                 equal.should.be.equal(true);
                 done();

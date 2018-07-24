@@ -159,7 +159,8 @@ describe('GeoPackage tests', function() {
           var minZoom = tileDao.minZoom;
 
           var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-          gpr.getTile(0, 0, 1, function(err, tileData) {
+          gpr.getTile(0, 0, 1)
+          .then(function(tileData) {
             should.exist(tileData);
             callback();
           });
