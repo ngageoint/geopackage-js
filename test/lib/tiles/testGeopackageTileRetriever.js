@@ -35,15 +35,13 @@ describe('GeoPackage Tile Retriever tests', function() {
       geoPackage.close();
     });
 
-    it('should get the web mercator bounding box', function(done) {
+    it('should get the web mercator bounding box', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.getWebMercatorBoundingBox(function(err, result) {
-        result.minLongitude.should.be.equal(-20037508.342789244);
-        result.maxLongitude.should.be.equal(20037508.342789244);
-        result.minLatitude.should.be.equal(-20037508.342789255);
-        result.maxLatitude.should.be.equal(20037508.342789244);
-        done();
-      });
+      var result = gpr.getWebMercatorBoundingBox();
+      result.minLongitude.should.be.equal(-20037508.342789244);
+      result.maxLongitude.should.be.equal(20037508.342789244);
+      result.minLatitude.should.be.equal(-20037508.342789255);
+      result.maxLatitude.should.be.equal(20037508.342789244);
     });
 
     it('should get all the tiles in the bounding box', function() {
@@ -280,15 +278,28 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it('should get the web mercator bounding box', function(done) {
+    it('should get the web mercator bounding box', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.getWebMercatorBoundingBox(function(err, result) {
-        result.minLongitude.should.be.equal(-20037508.342789244);
-        result.maxLongitude.should.be.equal(-15028131.257091932);
-        result.minLatitude.should.be.equal(5621521.486192066);
-        result.maxLatitude.should.be.equal(20036051.91933679);
-        done();
-      });
+      var result = gpr.getWebMercatorBoundingBox();
+      result.minLongitude.should.be.equal(-20037508.342789244);
+      result.maxLongitude.should.be.equal(-15028131.257091932);
+      result.minLatitude.should.be.equal(5621521.486192066);
+      result.maxLatitude.should.be.equal(20036051.91933679);
+    });
+
+    it('should get the web mercator bounding box twice', function() {
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      var result = gpr.getWebMercatorBoundingBox();
+      result.minLongitude.should.be.equal(-20037508.342789244);
+      result.maxLongitude.should.be.equal(-15028131.257091932);
+      result.minLatitude.should.be.equal(5621521.486192066);
+      result.maxLatitude.should.be.equal(20036051.91933679);
+
+      var result2 = gpr.getWebMercatorBoundingBox();
+      result2.minLongitude.should.be.equal(-20037508.342789244);
+      result2.maxLongitude.should.be.equal(-15028131.257091932);
+      result2.minLatitude.should.be.equal(5621521.486192066);
+      result2.maxLatitude.should.be.equal(20036051.91933679);
     });
 
     it('should get the x: 0, y: 4, z: 4 tile', function(done) {

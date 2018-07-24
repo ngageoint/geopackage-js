@@ -50,6 +50,7 @@ GeoPackageAPI.getTilesInBoundingBox
 GeoPackageAPI.getTilesInBoundingBoxWebZoom
 GeoPackageTileRetriever.prototype.retrieveTileResults
 GeoPackageTileRetriever.prototype.hasTile
+TileCreator.prototype.projectTile
 
 ### Methods with Callbacks that now return results
 Adapter.prototype.run
@@ -216,6 +217,8 @@ GeoPackage.prototype.getTileDaoWithContents
 GeoPackage.prototype.getTileDaoWithTableName
 GeoPackage.prototype.addTile
 GeoPackageAPI.getTileFromTable
+GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox
+TileCreator.initialize
 
 ### New methods
 GeoPackage.prototype.createRequiredTables
