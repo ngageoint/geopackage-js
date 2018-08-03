@@ -323,4 +323,5 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
   });
+
 });

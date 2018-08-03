@@ -3,6 +3,7 @@ var fs = require('fs')
   , path = require('path')
   , crypto = require('crypto')
   , pureimage = require('pureimage')
+  , CanvasCompare = require('canvas-compare')
   , Duplex = require('stream').Duplex
   , TableCreator = require('../../lib/db/tableCreator')
   , GeoPackage = require('../../lib/geoPackage')
@@ -99,20 +100,37 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
       callback(null, same);
     });
   } else {
+
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
       var expectedBase64 = new Buffer(expectedTile).toString('base64');
+console.log('canvas compare', CanvasCompare);
+      CanvasCompare({
+        baseImageUrl: actualCanvas.toDataURL(),
+        targetImageUrl: 'data:image/png;base64,' + expectedBase64
+      })
+      .then(function(result) {
+        console.log('result', result);
+        callback(null, true);
+      })
+      .catch(function(reason) {
+        console.log('reason', reason);
+        callback(null, false);
+      });
 
-      var expected = document.createElement('canvas');
-      expected.width = actualCanvas.width;
-      expected.height = actualCanvas.height;
-      var ctx2 = expected.getContext('2d');
-
-      var image2 = new Image();
-      image2.onload = function() {
-        ctx2.drawImage(image2, 0, 0);
-        return callback(null, module.exports.diffCanvasesContexts(actualCanvas.getContext('2d'), ctx2), actualCanvas.width, actualCanvas.height);
-      }
-      image2.src = 'data:image/png;base64,' + expectedBase64;
+      // var expected = document.createElement('canvas');
+      // expected.width = actualCanvas.width;
+      // expected.height = actualCanvas.height;
+      // var ctx2 = expected.getContext('2d');
+      //
+      // var image2 = new Image();
+      // image2.onload = function() {
+      //   ctx2.drawImage(image2, 0, 0);
+      //   CanvasCompare({
+      //
+      //   })
+      //   return callback(null, module.exports.diffCanvasesContexts(actualCanvas.getContext('2d'), ctx2), actualCanvas.width, actualCanvas.height);
+      // }
+      // image2.src = 'data:image/png;base64,' + expectedBase64;
     });
   }
 }
@@ -211,8 +229,25 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(div);
             currentTag.appendChild(actual);
             currentTag.appendChild(expected);
+
+            console.log('canvas compare', CanvasCompare);
+
+            CanvasCompare.canvasCompare({
+              baseImageUrl: actualTile,
+              targetImageUrl: 'data:image/png;base64,' + expectedBase64
+            })
+            .then(function(result) {
+              console.log('result', result);
+              currentTag.appendChild(result.producePreview());
+              callback(null, false);
+            })
+            .catch(function(reason) {
+              console.log('reason', reason);
+              callback(null, false);
+            });
+          } else {
+            callback(null, equal);
           }
-          callback(null, equal);
         }
         image2.src = 'data:image/png;base64,' + expectedBase64;
       });

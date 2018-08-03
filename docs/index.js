@@ -24,7 +24,7 @@ require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
 
 window.GeoPackageAPI = require('@ngageoint/geopackage');
-window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
-window.ShapefileToGeoPackage = require('shapefile-to-geopackage');
-window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
-window.PBFToGeoPackage = require('pbf-to-geopackage');
+// window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+// window.ShapefileToGeoPackage = require('shapefile-to-geopackage');
+// window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
+// window.PBFToGeoPackage = require('pbf-to-geopackage');

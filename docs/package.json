@@ -4,19 +4,21 @@
     "@ngageoint/geopackage": "../",
     "async": "^2.0.0-rc.5",
     "file-type": "^3.8.0",
-    "geojson-to-geopackage": "../converters/geojson",
     "jquery": "3.0.0",
     "leaflet": "^1.0.2",
     "leaflet-basemaps": "^0.3.1",
     "leaflet-mapkey-icon": "github:mapshakers/leaflet-mapkey-icon",
-    "mbtiles-to-geopackage": "../converters/mbtiles",
     "mustache": "^2.2.1",
-    "pbf-to-geopackage": "../converters/pbf",
     "proj4": "2.4.3",
     "promise-polyfill": "^6.0.2",
     "reproject": "^1.1.1",
-    "shapefile-to-geopackage": "../converters/shapefile",
     "webworkify": "^1.5.0"
+  },
+  "no": {
+    "mbtiles-to-geopackage": "../converters/mbtiles",
+    "geojson-to-geopackage": "../converters/geojson",
+    "shapefile-to-geopackage": "../converters/shapefile",
+    "pbf-to-geopackage": "../converters/pbf"
   },
   "devDependencies": {
     "browserify": "^14.1.0",
