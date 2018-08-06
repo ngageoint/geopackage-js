@@ -383,9 +383,13 @@ describe('GeoPackageAPI tests', function() {
         should.exist(feature);
         feature.id.should.be.equal(2);
         should.exist(feature.geometry);
-        return GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature) {
-        });
-      }).then(function(count) {
+        return GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName);
+      })
+      .then(function(each) {
+        var count = 0;
+        for (var row of each.results) {
+          count++;
+        }
         count.should.be.equal(2);
       });
     });

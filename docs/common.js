@@ -485,44 +485,63 @@ window.toggleLayer = function(layerType, table) {
       eventLabel: 'Feature Layer'
     });
     var geojsonLayer = L.geoJson([], {
-        style: featureStyle,
-        pointToLayer: pointToLayer,
-        onEachFeature: function (feature, layer) {
-          var columnMap = tableInfos[table].columnMap;
-          var string = "";
-          if (feature.properties.name || feature.properties.description) {
-              string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
-              string += feature.properties.description ? feature.properties.description : '';
+      style: featureStyle,
+      pointToLayer: pointToLayer,
+      coordsToLatLng: function(coords) {
+        return L.GeoJSON.coordsToLatLng(coords);
+      }
+    }).bindPopup(function(layer) {
+      var feature = layer.feature;
+      var columnMap = tableInfos[table].columnMap;
+      var string = "";
+      if (feature.properties.name || feature.properties.description) {
+          string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+          string += feature.properties.description ? feature.properties.description : '';
+      } else {
+        for (var key in feature.properties) {
+          if (columnMap && columnMap[key] && columnMap[key].displayName) {
+            string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
           } else {
-            for (var key in feature.properties) {
-              if (columnMap && columnMap[key] && columnMap[key].displayName) {
-                string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
-              } else {
-                string += '<div class="item"><span class="label">' + key + ': </span>';
-              }
-              string += '<span class="value">' + feature.properties[key] + '</span></div>';
-            }
+            string += '<div class="item"><span class="label">' + key + ': </span>';
           }
-          layer.bindPopup(string);
-        },
-        coordsToLatLng: function(coords) {
-          // if (coords[0] < 0) {
-          //   coords[0] = coords[0] + 360;
-          // }
-          return L.GeoJSON.coordsToLatLng(coords);
+          string += '<span class="value">' + feature.properties[key] + '</span></div>';
         }
+      }
+      return string;
     });
     var tableInfo = tableInfos[table];
 
-    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson) {
-      geojsonLayer.addData(geoJson);
-    })
-    .then(function() {
-      geojsonLayer.addTo(map);
-      geojsonLayer.bringToFront();
-      tableLayers[table] = geojsonLayer;
+    geojsonLayer.addTo(map);
+    geojsonLayer.bringToFront();
+    tableLayers[table] = geojsonLayer;
+
+    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table)
+    .then(function(each) {
+      var promise = Promise.resolve();
+      var iterator = each.results[Symbol.iterator]();
+      var nextRow = iterator.next();
+      if (!nextRow.done) {
+        promise = addRowToLayer(iterator, nextRow.value, each.featureDao, each.srs, geojsonLayer);
+      }
+      return promise;
     });
   }
+}
+
+function addRowToLayer(iterator, row, featureDao, srs, layer) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      var currentRow = featureDao.getFeatureRow(row);
+      var json = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, srs);
+      layer.addData(json);
+      resolve(json);
+    });
+  }).then(function() {
+    var nextRow = iterator.next();
+    if (!nextRow.done) {
+      return addRowToLayer(iterator, nextRow.value, featureDao, srs, layer);
+    }
+  });
 }
 
 function pointToLayer(feature, latlng) {
@@ -816,45 +835,72 @@ window.loadFeatures = function(tableName, featuresElement) {
   var featuresTableTemplate = $('#all-features-template').html();
   Mustache.parse(featuresTableTemplate);
 
+  var featureTemplate = $('#feature-template').html();
+  Mustache.parse(featureTemplate);
+
+  featuresElement.empty();
+
   var features = {
     columns: tableInfos[tableName].columns,
     srs: tableInfos[tableName].srs,
     geometryColumns: tableInfos[tableName].geometryColumns,
+    tableName: tableName,
     features: []
   };
-  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature) {
-    feature.tableName = tableName;
-    feature.values = [];
-
-    var sanitizedColumns = [];
-    for (var i = 0; i < features.columns.length; i++) {
-      if (features.columns[i].name.toLowerCase() != '_properties_id' && features.columns[i].name.toLowerCase() != '_feature_id') {
-        sanitizedColumns.push(features.columns[i]);
-      }
+  var sanitizedColumns = [];
+  for (var i = 0; i < features.columns.length; i++) {
+    if (features.columns[i].name.toLowerCase() != '_properties_id' && features.columns[i].name.toLowerCase() != '_feature_id') {
+      sanitizedColumns.push(features.columns[i]);
     }
-    features.columns = sanitizedColumns;
+  }
+  features.columns = sanitizedColumns;
+  featuresElement.append(Mustache.render(featuresTableTemplate, features));
 
-    for (var i = 0; i < features.columns.length; i++) {
-      var value = feature.properties[features.columns[i].name];
+  var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
 
-      if (features.columns[i].name == features.geometryColumns.geometryColumn) {
-        if (feature.geometry) {
-          feature.values.push(feature.geometry.type);
-        } else {
-          feature.values.push('Unknown');
+  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName)
+  .then(function(each) {
+    var promise = Promise.resolve();
+
+    for (var row of each.results) {
+      promise = featureParsePromise(promise, row, each, features, tableName)
+      .then(function(feature) {
+        featuresTable.append(Mustache.render(featureTemplate, feature));
+      });
+    }
+    return promise.then(function() {
+      return features;
+    });
+  });
+}
+
+function featureParsePromise(promise, row, each, features, tableName) {
+  return promise.then(function() {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        var currentRow = each.featureDao.getFeatureRow(row);
+        var feature = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, each.srs);
+        feature.tableName = tableName;
+        feature.values = [];
+
+        for (var i = 0; i < features.columns.length; i++) {
+          var value = feature.properties[features.columns[i].name];
+
+          if (features.columns[i].name == features.geometryColumns.geometryColumn) {
+            if (feature.geometry) {
+              feature.values.push(feature.geometry.type);
+            } else {
+              feature.values.push('Unknown');
+            }
+          } else if (value === null || value === 'null' || value == undefined) {
+            feature.values.push('');
+          } else {
+            feature.values.push(value.toString());
+          }
         }
-      } else if (value === null || value === 'null' || value == undefined) {
-        feature.values.push('');
-      } else {
-        feature.values.push(value.toString());
-      }
-    }
-    features.features.push(feature);
-  })
-  .then(function() {
-    var rendered = Mustache.render(featuresTableTemplate, features);
-    featuresElement.empty();
-    featuresElement.append(rendered);
+        resolve(feature);
+      });
+    });
   });
 }
 

@@ -45,12 +45,13 @@ describe('FeatureDao tests', function() {
     it('should read the geometry', function() {
       return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
       .then(function(featureDao) {
-        var srs = featureDao.getSrs();
-        featureDao.queryForEach(function(err, row) {
+        var each = featureDao.queryForEach();
+        var srs = featureDao.srs;
+        for (var row of each) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
           should.exist(geometry);
-        });
+        }
       });
     });
 

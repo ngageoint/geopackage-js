@@ -47,13 +47,14 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       geoPackage.getFeatureDaoWithTableName('point2d')
       .then(function(featureDao) {
-        featureDao.queryForEach(function(err, row) {
+        var each = featureDao.queryForEach();
+        for (var row of each) {
           var currentRow = featureDao.getFeatureRow(row);
           var geometry = currentRow.getGeometry();
-        })
-        .then(function() {
-          connection.close();
-        });
+        }
+      })
+      .then(function() {
+        connection.close();
       });
     });
   });
@@ -69,18 +70,17 @@ describe('GeoPackage tests', function() {
             return callback(err);
           }
           var srs = featureDao.getSrs();
-          featureDao.queryForEach(function(err, row) {
+          var each = featureDao.queryForEach();
+          for (var row of each) {
             var currentRow = featureDao.getFeatureRow(row);
             var geometry = currentRow.getGeometry();
             if (!geometry) {
-              return;
+              continue;
             }
             var geom = geometry.geometry;
             var geoJson = projectedJson = geom.toGeoJSON();
-          })
-          .then(function() {
-            callback();
-          });
+          }
+          callback();
         });
       }, function(err) {
         connection.close();
