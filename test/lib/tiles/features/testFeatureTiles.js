@@ -28,17 +28,14 @@ describe('GeoPackage FeatureTiles tests', function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename)
+        .then(function(gp) {
           geoPackage = gp;
-          should.not.exist(err);
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-          .then(function(riverFeatureDao) {
-            featureDao = riverFeatureDao;
-            done();
-          });
+          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          done();
         });
       });
     });
@@ -102,11 +99,8 @@ describe('GeoPackage FeatureTiles tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getFeatureDaoWithTableName('rivers')
-        .then(function(riverFeatureDao) {
-          featureDao = riverFeatureDao;
-          done();
-        });
+        featureDao = geoPackage.getFeatureDaoWithTableName('rivers');
+        done();
       });
     });
 

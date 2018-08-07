@@ -45,17 +45,13 @@ describe('GeoPackage tests', function() {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getFeatureDaoWithTableName('point2d')
-      .then(function(featureDao) {
-        var each = featureDao.queryForEach();
-        for (var row of each) {
-          var currentRow = featureDao.getFeatureRow(row);
-          var geometry = currentRow.getGeometry();
-        }
-      })
-      .then(function() {
-        connection.close();
-      });
+      var featureDao = geoPackage.getFeatureDaoWithTableName('point2d');
+      var each = featureDao.queryForEach();
+      for (var row of each) {
+        var currentRow = featureDao.getFeatureRow(row);
+        var geometry = currentRow.getGeometry();
+      }
+      connection.close();
     });
   });
 
@@ -64,24 +60,22 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getFeatureTables();
       async.eachSeries(tables, function(table, callback) {
-        geoPackage.getFeatureDaoWithTableName(table)
-        .then(function(featureDao) {
-          if (!featureDao) {
-            return callback(err);
+        var featureDao = geoPackage.getFeatureDaoWithTableName(table);
+        if (!featureDao) {
+          return callback(new Error('No feature table exists'));
+        }
+        var srs = featureDao.getSrs();
+        var each = featureDao.queryForEach();
+        for (var row of each) {
+          var currentRow = featureDao.getFeatureRow(row);
+          var geometry = currentRow.getGeometry();
+          if (!geometry) {
+            continue;
           }
-          var srs = featureDao.getSrs();
-          var each = featureDao.queryForEach();
-          for (var row of each) {
-            var currentRow = featureDao.getFeatureRow(row);
-            var geometry = currentRow.getGeometry();
-            if (!geometry) {
-              continue;
-            }
-            var geom = geometry.geometry;
-            var geoJson = projectedJson = geom.toGeoJSON();
-          }
-          callback();
-        });
+          var geom = geometry.geometry;
+          var geoJson = projectedJson = geom.toGeoJSON();
+        }
+        callback();
       }, function(err) {
         connection.close();
         done(err);
@@ -122,13 +116,11 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getContentsDao();
       var contents = dao.queryForIdObject('FEATURESriversds');
-      return geoPackage.getFeatureDaoWithContents(contents)
-      .then(function(featureDao) {
-        should.exist(featureDao);
-        featureDao.getGeometryType().should.be.equal('GEOMETRY');
-        featureDao.table_name.should.be.equal('FEATURESriversds');
-        connection.close();
-      });
+      var featureDao = geoPackage.getFeatureDaoWithContents(contents);
+      should.exist(featureDao);
+      featureDao.getGeometryType().should.be.equal('GEOMETRY');
+      featureDao.table_name.should.be.equal('FEATURESriversds');
+      connection.close();
     });
   });
 
@@ -139,8 +131,6 @@ describe('GeoPackage tests', function() {
       var dao = geoPackage.getContentsDao();
       var contents = dao.queryForIdObject('TILESosmds');
       return geoPackage.getTileDaoWithContents(contents);
-    })
-    .then(function(tileDao) {
       should.exist(tileDao);
       tileDao.table_name.should.be.equal('TILESosmds');
     });
@@ -152,18 +142,15 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
       async.eachSeries(tables, function(table, callback) {
-        geoPackage.getTileDaoWithTableName(table)
-        .then(function(tileDao) {
+        var tileDao = geoPackage.getTileDaoWithTableName(table);
+        var maxZoom = tileDao.maxZoom;
+        var minZoom = tileDao.minZoom;
 
-          var maxZoom = tileDao.maxZoom;
-          var minZoom = tileDao.minZoom;
-
-          var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-          gpr.getTile(0, 0, 1)
-          .then(function(tileData) {
-            should.exist(tileData);
-            callback();
-          });
+        var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+        gpr.getTile(0, 0, 1)
+        .then(function(tileData) {
+          should.exist(tileData);
+          callback();
         });
       }, function(err) {
         connection.close();
@@ -177,16 +164,14 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-      .then(function(dao) {
-        return geoPackage.getInfoForTable(dao);
-      })
-      .then(function(info) {
-        should.exist(info);
-        info.tableName.should.be.equal('FEATURESriversds');
-        info.columnMap.property_0.displayName.should.be.equal('Scalerank');
-        connection.close();
-      });
+      var dao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      return geoPackage.getInfoForTable(dao);
+    })
+    .then(function(info) {
+      should.exist(info);
+      info.tableName.should.be.equal('FEATURESriversds');
+      info.columnMap.property_0.displayName.should.be.equal('Scalerank');
+      connection.close();
     });
   });
 
@@ -194,16 +179,14 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      geoPackage.getTileDaoWithTableName('imagery')
-      .then(function(tileDao) {
-        return geoPackage.getInfoForTable(tileDao);
-      })
-      .then(function(info) {
-        should.exist(info);
-        info.tableName.should.be.equal('imagery');
-        info.srs.id.should.be.equal(3857);
-        connection.close();
-      });
+      var tileDao = geoPackage.getTileDaoWithTableName('imagery');
+      return geoPackage.getInfoForTable(tileDao);
+    })
+    .then(function(info) {
+      should.exist(info);
+      info.tableName.should.be.equal('imagery');
+      info.srs.id.should.be.equal(3857);
+      connection.close();
     });
   });
 

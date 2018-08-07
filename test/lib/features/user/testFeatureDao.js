@@ -43,24 +43,20 @@ describe('FeatureDao tests', function() {
     });
 
     it('should read the geometry', function() {
-      return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-      .then(function(featureDao) {
-        var each = featureDao.queryForEach();
-        var srs = featureDao.srs;
-        for (var row of each) {
-          var currentRow = featureDao.getFeatureRow(row);
-          var geometry = currentRow.getGeometry();
-          should.exist(geometry);
-        }
-      });
+      var featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      var each = featureDao.queryForEach();
+      var srs = featureDao.srs;
+      for (var row of each) {
+        var currentRow = featureDao.getFeatureRow(row);
+        var geometry = currentRow.getGeometry();
+        should.exist(geometry);
+      }
     });
 
     it('should query for a row with property_1 equal to Gila', function() {
-      return geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-      .then(function(featureDao) {
-        return featureDao.queryForEachEqWithFieldAndValue('property_1', 'Gila', function(err, row) {
-          row.property_1.should.be.equal('Gila');
-        });
+      var featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      return featureDao.queryForEachEqWithFieldAndValue('property_1', 'Gila', function(err, row) {
+        row.property_1.should.be.equal('Gila');
       });
     });
   });
@@ -91,11 +87,8 @@ describe('FeatureDao tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('rivers')
-          .then(function(riverFeatureDao) {
-            featureDao = riverFeatureDao;
-            done();
-          });
+          featureDao = geoPackage.getFeatureDaoWithTableName('rivers');
+          done();
         });
       });
     });
@@ -107,15 +100,19 @@ describe('FeatureDao tests', function() {
 
     it('should query for indexed geometries', function() {
       var count = 0;
-      var bbox = new BoundingBox(-12863648.645994272, -12865751.85860068, 6655573.571054254, 6651886.678768059);
-      return featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(bbox, function(err, featureRow) {
-        should.exist(featureRow.getValueWithColumnName('geom'));
-        should.exist(featureRow.getValueWithColumnName('id'));
-        should.exist(featureRow.getValueWithColumnName('property_0'));
-        should.exist(featureRow.getValueWithColumnName('property_1'));
-        should.exist(featureRow.getValueWithColumnName('property_2'));
+      var bbox = new BoundingBox(-13189576.119, -13126488.564, 6637372.21, 6607360.178);
+      var iterator = featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(bbox);
+
+      for (var row of iterator) {
         count++;
-      });
+        row.values.property_1.should.be.equal('Columbia');
+        should.exist(row.getValueWithColumnName('geom'));
+        should.exist(row.getValueWithColumnName('id'));
+        should.exist(row.getValueWithColumnName('property_0'));
+        should.exist(row.getValueWithColumnName('property_1'));
+        should.exist(row.getValueWithColumnName('property_2'));
+      }
+      count.should.be.equal(1);
     });
   });
 
@@ -156,12 +153,12 @@ describe('FeatureDao tests', function() {
     it('should iterate GeoJSON features', function() {
       var count = 0;
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      return GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb, function(err, feature) {
-        console.log('feature', feature);
-        feature.properties.name.should.be.equal('box1');
-        count++;
-      })
-      .then(function(count) {
+      return GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb)
+      .then(function(iterator) {
+        for (var feature of iterator) {
+          feature.properties.name.should.be.equal('box1');
+          count++;
+        }
         count.should.be.equal(1);
       });
     });
@@ -193,11 +190,8 @@ describe('FeatureDao tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-          .then(function(riverFeatureDao) {
-            featureDao = riverFeatureDao;
-            done();
-          });
+          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          done();
         });
       });
     });
@@ -219,49 +213,55 @@ describe('FeatureDao tests', function() {
        geometry:
         { type: 'Point',
           coordinates: [ -105.92193603515625, 34.406906587428736 ] } };
-      var foundFeatures = [];
-      var closestDistance = 100000000000;
-      var closest;
 
-      return featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, function(err, row) {
-        foundFeatures.push(row);
-        var geometry = row.geometry;
 
-        if (geometry.type == 'Point') {
-          var distance = pointDistance(centerPoint, geometry);
-          if (distance < closestDistance) {
-            closest = row;
-            closestDistance = distance;
-          } else if (distance == closestDistance && closest.type != 'Point') {
-            closest = row;
-            closestDistance = distance;
-          }
-        } else if (geometry.type == 'LineString') {
-          var distance = pointToLineDistance(centerPoint, geometry);
-          if (distance < closestDistance) {
-            closest = row;
-            closestDistance = distance;
-          } else if (distance == closestDistance && closest.type != 'Point') {
-            closest = row;
-            closestDistance = distance;
-          }
-        } else if (geometry.type == 'Polygon') {
-          if (booleanPointInPolygon(centerPoint, geometry)) {
-            if (closestDistance != 0) {
-              closest = row;
-              closestDistance = 0;
-            }
-          } else {
-            var line = polygonToLine(geometry);
-            var distance = pointToLineDistance(centerPoint, line);
+      return featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb)
+      .then(function(iterator) {
+        var foundFeatures = [];
+        var closestDistance = 100000000000;
+        var closest;
+
+        for (var row of iterator) {
+          foundFeatures.push(row);
+          var geometry = row.geometry;
+
+          if (geometry.type == 'Point') {
+            var distance = pointDistance(centerPoint, geometry);
             if (distance < closestDistance) {
               closest = row;
               closestDistance = distance;
+            } else if (distance == closestDistance && closest.type != 'Point') {
+              closest = row;
+              closestDistance = distance;
+            }
+          } else if (geometry.type == 'LineString') {
+            var distance = pointToLineDistance(centerPoint, geometry);
+            if (distance < closestDistance) {
+              closest = row;
+              closestDistance = distance;
+            } else if (distance == closestDistance && closest.type != 'Point') {
+              closest = row;
+              closestDistance = distance;
+            }
+          } else if (geometry.type == 'Polygon') {
+            if (booleanPointInPolygon(centerPoint, geometry)) {
+              if (closestDistance != 0) {
+                closest = row;
+                closestDistance = 0;
+              }
+            } else {
+              var line = polygonToLine(geometry);
+              var distance = pointToLineDistance(centerPoint, line);
+              if (distance < closestDistance) {
+                closest = row;
+                closestDistance = distance;
+              }
             }
           }
         }
+        return closest;
       })
-      .then(function() {
+      .then(function(closest) {
         closest.properties.Name.should.be.equal('Rio Grande');
       });
     });
@@ -421,18 +421,16 @@ describe('FeatureDao tests', function() {
         //     /
         geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
         .then(function(result) {
-          geopackage.getFeatureDaoWithTableName('QueryTest')
-          .then(function(featureDao) {
-            queryTestFeatureDao = featureDao;
-            createRow(box1, 'box1', featureDao);
-            createRow(box2, 'box2', featureDao);
-            createRow(line, 'line', featureDao);
-            createRow(point, 'point', featureDao);
-            createRow(point2, 'point2', featureDao);
-            featureDao.featureTableIndex.index()
-            .then(function() {
-              done();
-            });
+          var featureDao = geopackage.getFeatureDaoWithTableName('QueryTest');
+          queryTestFeatureDao = featureDao;
+          createRow(box1, 'box1', featureDao);
+          createRow(box2, 'box2', featureDao);
+          createRow(line, 'line', featureDao);
+          createRow(point, 'point', featureDao);
+          createRow(point2, 'point2', featureDao);
+          featureDao.featureTableIndex.index()
+          .then(function() {
+            done();
           });
         });
       });
@@ -466,17 +464,13 @@ describe('FeatureDao tests', function() {
     });
 
     it('should query for _feature_id', function() {
-      return GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line')
-      .then(function(row) {
-        row.properties.name.should.be.equal('line');
-      });
+      var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line');
+      row.properties.name.should.be.equal('line');
     });
 
     it('should query for _properties_id', function() {
-      return GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline')
-      .then(function(row) {
-        row.properties.name.should.be.equal('line');
-      });
+      var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline');
+      row.properties.name.should.be.equal('line');
     });
 
     it('should query for the bounding box', function() {
@@ -489,46 +483,48 @@ describe('FeatureDao tests', function() {
     it('should get features in the bounding box', function() {
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       return GeoPackageAPI.getFeaturesInBoundingBox(geopackage, 'QueryTest', -.4, -.6, 2.4, 2.6)
-      .then(function(features) {
-        features[0].values.name.should.be.equal('box1');
+      .then(function(iterator) {
+        for (var feature of iterator) {
+          feature.values.name.should.be.equal('box1');
+        }
       });
     });
 
     it('should query for box 1', function() {
       // var bb = new BoundingBox(minLongitudeOrBoundingBox, maxLongitude, minLatitude, maxLatitude)
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      return queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row) {
+      var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb)
+      for (var row of iterator) {
         row.values.name.should.be.equal('box1');
-      });
+      }
     });
 
     it('should query for box 2', function() {
       var bb = new BoundingBox(1.1, 1.3, .4, .6);
-      return queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row) {
+      var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb);
+      for (var row of iterator) {
         row.values.name.should.be.equal('box2');
-      });
+      };
     });
 
     it('should query for box1, box 2 and line', function() {
       var bb = new BoundingBox(-.1, .1, .9, 1.1);
       var foundFeatures = [];
-      return queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row) {
+      var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb);
+      for (var row of iterator) {
         foundFeatures.push(row.values.name);
-      })
-      .then(function(count) {
-        foundFeatures.should.be.deep.equal(['box1', 'box2', 'line']);
-      });
+      }
+      foundFeatures.should.be.deep.equal(['box1', 'box2', 'line']);
     });
 
     it('should query for box1, box 2, line, and point', function() {
       var bb = new BoundingBox(.4, .6, 1.4, 1.6);
       var foundFeatures = [];
-      return queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row) {
+      var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb);
+      for (var row of iterator) {
         foundFeatures.push(row.values.name);
-      })
-      .then(function() {
-        foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
-      });
+      }
+      foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
     });
 
     it('should query for box1, box 2, line, and point and calculate distance from a center point', function() {
@@ -537,73 +533,71 @@ describe('FeatureDao tests', function() {
       var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
       var pointDistance = require('@turf/distance').default;
 
-      var bb = new BoundingBox(-107.44354248046876, -104.69696044921876, 33.098444531367186, 35.36889537510477);
+      // var bb = new BoundingBox(-107.44354248046876, -104.69696044921876, 33.098444531367186, 35.36889537510477);
       var centerPoint = { type: 'Feature',
        properties: {},
        geometry:
         { type: 'Point',
           coordinates: [ -106.07025146484376, 34.233669953235975 ] } };
 
-      // var bb = new BoundingBox(.4, .6, 1.4, 1.6);
-      // var centerPoint = {
-      //   "type": "Feature",
-      //   "properties": {},
-      //   "geometry": {
-      //     "type": "Point",
-      //     "coordinates": [
-      //       0.5,
-      //       1.5
-      //     ]
-      //   }
-      // };
+      var bb = new BoundingBox(.4, .6, 1.4, 1.6);
+      var centerPoint = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            0.5,
+            1.5
+          ]
+        }
+      };
       var foundFeatures = [];
       var closestDistance = 100000000000;
       var closest;
 
-      return queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb, function(err, row) {
-        console.log('row', row);
-        foundFeatures.push(row.values);
+      var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb);
+
+      for (var row of iterator) {
+        foundFeatures.push(row.values.name);
         var geometry = row.getGeometry().toGeoJSON();
 
         if (geometry.type == 'Point') {
           var distance = pointDistance(centerPoint, geometry);
           if (distance < closestDistance) {
-            closest = geometry;
+            closest = row;
             closestDistance = distance;
           } else if (distance == closestDistance && closest.type != 'Point') {
-            closest = geometry;
+            closest = row;
             closestDistance = distance;
           }
         } else if (geometry.type == 'LineString') {
           var distance = pointToLineDistance(centerPoint, geometry);
           if (distance < closestDistance) {
-            closest = geometry;
+            closest = row;
             closestDistance = distance;
           } else if (distance == closestDistance && closest.type != 'Point') {
-            closest = geometry;
+            closest = row;
             closestDistance = distance;
           }
         } else if (geometry.type == 'Polygon') {
           if (booleanPointInPolygon(centerPoint, geometry)) {
             if (closestDistance != 0) {
-              closest = geometry;
+              closest = row;
               closestDistance = 0;
             }
           } else {
             var line = polygonToLine(geometry);
             var distance = pointToLineDistance(centerPoint, line);
             if (distance < closestDistance) {
-              closest = geometry;
+              closest = row;
               closestDistance = distance;
             }
           }
         }
-      })
-      .then(function() {
-        console.log('closest', closest);
-        console.log('foundFeatures', foundFeatures);
-        // foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
-      });
+      }
+      closest.values.name.should.be.equal('point');
+      foundFeatures.should.be.deep.equal(['box1', 'box2', 'line', 'point']);
     });
 
     it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {

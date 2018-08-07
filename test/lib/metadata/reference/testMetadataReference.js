@@ -125,20 +125,17 @@ describe('Metadata Reference tests', function() {
       ref.setMetadata(metadata2);
       ref.setParentMetadata(metadata1);
       metadataReferenceDao.create(ref);
-      // var count = 0;
-      metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-        // count++;
-      }).then(function(count) {
-        count.should.be.equal(1);
-        var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
-        // var countAfter = 0;
-        metadataReferenceDao.queryByMetadataParent(metadata1.id, function(err, row) {
-          // countAfter++;
-        }).then(function(count) {
-          count.should.be.equal(0);
-          done();
-        });
-      });
+      var count = 0;
+      for (var row of metadataReferenceDao.queryByMetadataParent(metadata1.id)) {
+        count++;
+      }
+      count.should.be.equal(1);
+      var result = metadataReferenceDao.removeMetadataParent(metadata1.id);
+      var countAfter = 0;
+      for (var row of metadataReferenceDao.queryByMetadataParent(metadata1.id)) {
+        countAfter++;
+      }
+      done();
     });
   });
 
@@ -220,12 +217,12 @@ describe('Metadata Reference tests', function() {
       [ref1, ref2].forEach(function(ref) {
         metadataReferenceDao.create(ref);
       });
-      return metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id, function(err, row) {
-        should.not.exist(err);
+
+      for (var row of metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id)) {
         row.table_name.should.be.equal('TEST_TABLE_NAME_2');
         row.md_file_id.should.be.equal(metadata2.id);
         row.md_parent_id.should.be.equal(metadata1.id);
-      });
+      }
     });
   });
 
@@ -283,12 +280,13 @@ describe('Metadata Reference tests', function() {
       [ref1, ref2].forEach(function(ref) {
         metadataReferenceDao.create(ref);
       });
-      return metadataReferenceDao.queryByMetadata(metadata2.id, function(err, row) {
-        should.not.exist(err);
+      var count = 0;
+      for (var row of metadataReferenceDao.queryByMetadata(metadata2.id)) {
         row.md_file_id.should.be.equal(metadata2.id);
-      }).then(function(count){
-        count.should.be.equal(2);
-      });
+        count++;
+      }
+
+      count.should.be.equal(2);
     });
   });
 });

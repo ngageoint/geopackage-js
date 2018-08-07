@@ -37,11 +37,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('FEATURESriversds')
-          .then(function(riverFeatureDao) {
-            featureDao = riverFeatureDao;
-            done();
-          });
+          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          done();
         });
       });
     });
@@ -53,10 +50,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     it('should return the index status of false', function() {
       var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-      return fti.isIndexed()
-      .then(function(indexed){
-        indexed.should.be.equal(false);
-      });
+      var indexed = fti.isIndexed();
+      indexed.should.be.equal(false);
     });
 
     it('should index the table', function() {
@@ -74,51 +69,43 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         should.exist(tableIndex.last_indexed);
       })
       .then(function() {
-        fti.hasExtension(fti.extensionName, fti.tableName, fti.columnName)
-        .then(function(exists) {
-          exists.should.be.equal(true);
-        });
+        var exists = fti.hasExtension(fti.extensionName, fti.tableName, fti.columnName)
+        exists.should.be.equal(true);
       })
       .then(function() {
         var extensionDao = fti.extensionsDao;
-        return extensionDao.queryByExtension(fti.extensionName)
-        .then(function(extension) {
-          extension.getAuthor().should.be.equal('nga');
-          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
-          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
-          extension.column_name.should.be.equal('geom');
-          extension.table_name.should.be.equal('FEATURESriversds');
-          extension.scope.should.be.equal('read-write');
-          extension.extension_name.should.be.equal('nga_geometry_index');
-        });
+        var extension = extensionDao.queryByExtension(fti.extensionName);
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('FEATURESriversds');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
       })
       .then(function() {
         var extensionDao = fti.extensionsDao;
-        return extensionDao.queryByExtensionAndTableName(fti.extensionName, fti.tableName)
-        .then(function(extensions) {
-          var extension = extensions[0];
-          extension.getAuthor().should.be.equal('nga');
-          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
-          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
-          extension.column_name.should.be.equal('geom');
-          extension.table_name.should.be.equal('FEATURESriversds');
-          extension.scope.should.be.equal('read-write');
-          extension.extension_name.should.be.equal('nga_geometry_index');
-        });
+        var extensions = extensionDao.queryByExtensionAndTableName(fti.extensionName, fti.tableName);
+        var extension = extensions[0];
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('FEATURESriversds');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
       })
       .then(function() {
         var extensionDao = fti.extensionsDao;
-        return extensionDao.queryByExtensionAndTableNameAndColumnName(fti.extensionName, fti.tableName, fti.columnName)
-        .then(function(extensions) {
-          var extension = extensions[0];
-          extension.getAuthor().should.be.equal('nga');
-          extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
-          extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
-          extension.column_name.should.be.equal('geom');
-          extension.table_name.should.be.equal('FEATURESriversds');
-          extension.scope.should.be.equal('read-write');
-          extension.extension_name.should.be.equal('nga_geometry_index');
-        });
+        var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(fti.extensionName, fti.tableName, fti.columnName);
+        var extension = extensions[0];
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('FEATURESriversds');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
       });
     });
 
@@ -176,11 +163,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          geoPackage.getFeatureDaoWithTableName('rivers')
-          .then(function(riverFeatureDao) {
-            featureDao = riverFeatureDao;
-            done();
-          });
+          featureDao = geoPackage.getFeatureDaoWithTableName('rivers');
+          done();
         });
       });
     });
@@ -202,18 +186,14 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
 
     it('should get the extension row', function() {
       var fti = featureDao.featureTableIndex;
-      return fti.getFeatureTableIndexExtension()
-      .then(function(extension){
-        should.exist(extension);
-      });
+      var extension = fti.getFeatureTableIndexExtension();
+      should.exist(extension);
     });
 
     it('should return the index status of true', function() {
       var fti = featureDao.featureTableIndex;
-      return fti.isIndexed()
-      .then(function(indexed){
-        indexed.should.be.equal(true);
-      });
+      var indexed = fti.isIndexed();
+      indexed.should.be.equal(true);
     });
 
     it('should force index the table', function() {

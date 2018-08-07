@@ -23,11 +23,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('TILESosmds')
-        .then(function(osmTileDao) {
-          tileDao = osmTileDao;
-          done();
-        });
+        tileDao = geoPackage.getTileDaoWithTableName('TILESosmds');
+        done();
       });
     });
 
@@ -45,10 +42,8 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should get all the tiles in the bounding box', function() {
-      return GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85)
-      .then(function(tiles) {
-        tiles.tiles.length.should.be.equal(4);
-      });
+      var tiles = GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85);
+      tiles.tiles.length.should.be.equal(4);
     });
 
     it('should get the x: 2, y: 1, z: 2 tile', function(done) {
@@ -140,10 +135,8 @@ describe('GeoPackage Tile Retriever tests', function() {
       var minZoom = tileDao.minZoom;
 
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      return gpr.hasTile(0, 0, 1)
-      .then(function(hasTile) {
-        hasTile.should.be.equal(true);
-      });
+      var hasTile = gpr.hasTile(0, 0, 1);
+      hasTile.should.be.equal(true);
     });
 
     it('should not have a tile at -1, 0, 0', function() {
@@ -151,10 +144,8 @@ describe('GeoPackage Tile Retriever tests', function() {
       var minZoom = tileDao.minZoom;
 
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      return gpr.hasTile(-1, 0, 0)
-      .then(function(hasTile) {
-        hasTile.should.be.equal(false);
-      });
+      var hasTile = gpr.hasTile(-1, 0, 0);
+      hasTile.should.be.equal(false);
     });
 
     it('should get a tile specified with wgs84 coordinates', function() {
@@ -211,11 +202,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('imagery')
-        .then(function(imagery) {
-          tileDao = imagery;
-          done();
-        });
+        tileDao = geoPackage.getTileDaoWithTableName('imagery');
+        done();
       });
     });
 
@@ -273,11 +261,8 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('imagery')
-        .then(function(osmTileDao) {
-          tileDao = osmTileDao;
-          done();
-        });
+        tileDao = geoPackage.getTileDaoWithTableName('imagery');
+        done();
       });
     });
 

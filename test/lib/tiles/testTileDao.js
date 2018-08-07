@@ -19,11 +19,8 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('TILESosmds')
-        .then(function(retrievedTileDao) {
-          tileDao = retrievedTileDao;
-          done();
-        });
+        tileDao = geoPackage.getTileDaoWithTableName('TILESosmds');
+        done();
       });
     });
 
@@ -78,14 +75,12 @@ describe('TileDao tests', function() {
     });
 
     it('should query for a tile', function() {
-      return tileDao.queryForTile(0, 0, 0)
-      .then(function(tileRow) {
-        tileRow.getZoomLevel().should.be.equal(0);
-        tileRow.getTileColumn().should.be.equal(0);
-        tileRow.getTileRow().should.be.equal(0);
-        var data = tileRow.getTileData();
-        should.exist(data);
-      });
+      var tileRow = tileDao.queryForTile(0, 0, 0);
+      tileRow.getZoomLevel().should.be.equal(0);
+      tileRow.getTileColumn().should.be.equal(0);
+      tileRow.getTileRow().should.be.equal(0);
+      var data = tileRow.getTileData();
+      should.exist(data);
     });
 
     it('should query for tiles in the zoom level', function() {
@@ -110,44 +105,46 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level and column', function() {
-      return tileDao.queryForTilesInColumn(1, 1, function(err, tileRow) {
+      var count = 0;
+      for (var tileRow of tileDao.queryForTilesInColumn(1, 1)) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileColumn().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(2);
-      });
+        count++;
+      }
+      count.should.be.equal(2);
     });
 
     it('should query for tiles in the zoom level and row', function() {
-      return tileDao.queryForTilesInRow(1, 1, function(err, tileRow) {
+      var count = 0;
+      for (var tileRow of tileDao.queryForTilesInRow(1, 1)) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(2);
-      });
+        count++;
+      }
+      count.should.be.equal(2);
     });
 
-    it('should query for tiles in the tile grid', function(done) {
+    it('should query for tiles in the tile grid', function() {
       var tileGrid = {
         min_x: 0,
         max_x: 1,
         min_y: 0,
         max_y: 0
       };
-      tileDao.queryByTileGrid(tileGrid, 1, function(err, tileRow) {
+      var iterator = tileDao.queryByTileGrid(tileGrid, 1);
+      var count = 0;
+      for (var tileRow of iterator) {
         tileRow.getZoomLevel().should.be.equal(1);
         tileRow.getTileRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
-      })
-      .then(function(count) {
-        count.should.be.equal(2);
-        done();
-      });
+        count++;
+      }
+      count.should.be.equal(2);
     });
   });
 
@@ -164,11 +161,8 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        geoPackage.getTileDaoWithTableName('alaska')
-        .then(function(retrievedTileDao) {
-          tileDao = retrievedTileDao;
-          done();
-        });
+        tileDao = geoPackage.getTileDaoWithTableName('alaska');
+        done();
       });
     });
 

@@ -16,22 +16,14 @@ describe('Tests for issue 68', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
       tables[0].should.be.equal('package_tiles');
-      geoPackage.getTileDaoWithTableName('package_tiles')
-      .then(function(tileDao) {
-        should.exist(tileDao);
-        return geoPackage.getInfoForTable(tileDao)
-        .then(function(info) {
-          return {info: info, tileDao: tileDao};
-        });
-      })
-      .then(function(previousResults){
-        should.exist(previousResults.info);
-        var gpr = new GeoPackageTileRetriever(previousResults.tileDao, 256, 256);
-        return gpr.getTile(192,401,10)
-        .then(function(tile) {
-          should.exist(tile);
-          geoPackage.close();
-        });
+      var tileDao = geoPackage.getTileDaoWithTableName('package_tiles');
+      should.exist(tileDao);
+      var info = geoPackage.getInfoForTable(tileDao);
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      return gpr.getTile(192,401,10)
+      .then(function(tile) {
+        should.exist(tile);
+        geoPackage.close();
       });
     });
   });
