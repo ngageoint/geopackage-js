@@ -165,9 +165,7 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
-      return geoPackage.getInfoForTable(dao);
-    })
-    .then(function(info) {
+      var info = geoPackage.getInfoForTable(dao);
       should.exist(info);
       info.tableName.should.be.equal('FEATURESriversds');
       info.columnMap.property_0.displayName.should.be.equal('Scalerank');
@@ -180,9 +178,7 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var tileDao = geoPackage.getTileDaoWithTableName('imagery');
-      return geoPackage.getInfoForTable(tileDao);
-    })
-    .then(function(info) {
+      var info = geoPackage.getInfoForTable(tileDao);
       should.exist(info);
       info.tableName.should.be.equal('imagery');
       info.srs.id.should.be.equal(3857);

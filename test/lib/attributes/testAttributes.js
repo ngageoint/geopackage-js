@@ -185,17 +185,15 @@ describe('GeoPackage Attribute table create tests', function() {
          notNull: false,
          primaryKey: false } ]);
       var dao = new DataColumnsDao(geopackage.getDatabase());
-      return dao.getDataColumns('test_attributes.test', 'test_text_limited.test')
-      .then(function(dataColumn) {
-        dataColumn.should.be.deep.equal({
-          table_name: 'test_attributes.test',
-          column_name: 'test_text_limited.test',
-          name: 'Test Name',
-          title: 'Test',
-          description: 'Test Description',
-          mime_type: 'text/html',
-          constraint_name: 'test constraint'
-        });
+      var dataColumn = dao.getDataColumns('test_attributes.test', 'test_text_limited.test');
+      dataColumn.should.be.deep.equal({
+        table_name: 'test_attributes.test',
+        column_name: 'test_text_limited.test',
+        name: 'Test Name',
+        title: 'Test',
+        description: 'Test Description',
+        mime_type: 'text/html',
+        constraint_name: 'test constraint'
       });
     });
   });

@@ -60,6 +60,8 @@ describe('SpatialReferenceSystem tests', function() {
   it('should get the 4326 SRS', function(done) {
     var srs = geoPackage.getSpatialReferenceSystemDao().getBySrsId(4326);
     should.exist(srs);
+    var srsProjection = srs.getProjection();
+    should.exist(srsProjection);
     var projection = geoPackage.getSpatialReferenceSystemDao().getProjection(srs);
     should.exist(projection);
     done();

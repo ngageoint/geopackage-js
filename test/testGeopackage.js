@@ -258,9 +258,8 @@ describe('GeoPackageAPI tests', function() {
           ]
         }
       }, 'rivers');
-      return GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18), function(err, features){
-        features.length.should.be.equal(1);
-      });
+      var features = GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18));
+      features.length.should.be.equal(1);
     });
 
     it('should add geojson to the geopackage and keep it indexed and iterate it', function() {
@@ -277,12 +276,10 @@ describe('GeoPackageAPI tests', function() {
           ]
         }
       }, 'rivers')
-      GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18))
-      .then(function(iterator) {
-        for (var geoJson of iterator) {
-          geoJson.properties.Scalerank.should.be.equal('test');
-        }
-      });
+      var iterator = GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18))
+      for (var geoJson of iterator) {
+        geoJson.properties.Scalerank.should.be.equal('test');
+      }
     });
   });
 

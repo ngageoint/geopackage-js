@@ -227,6 +227,16 @@ GeoPackage.prototype.addTile
 GeoPackageAPI.getTileFromTable
 GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox
 TileCreator.initialize
+FeatureDao.prototype.queryIndexedFeaturesWithWebMercatorBoundingBox returns an iterable
+FeatureDao.prototype.fastQueryWebMercatorBoundingBox returns an iterable
+FeatureTableIndex.prototype.queryWithGeometryEnvelope returns an iterable
+FeatureTableIndex.prototype.queryWithBoundingBox returns an iterable
+FeatureDao.prototype.queryForGeoJSONIndexedFeaturesWithBoundingBox returns an iterable
+DataColumnConstraintsDao.prototype.queryByConstraintName
+DataColumnsDao.prototype.queryByConstraintName
+GeometryIndexDao.prototype.queryForTableName
+TileDao.prototype.queryForTilesWithZoomLevel
+TileDao.prototype.queryForTilesDescending
 
 ### New methods
 GeoPackage.prototype.createRequiredTables

@@ -208,7 +208,7 @@ describe('Metadata Reference tests', function() {
       should.not.exist(ref3.column_name);
 
       var ref4 = new MetadataReference();
-      ref4.setReferenceScopeType(MetadataReference.ROW);
+      ref4.setReferenceScopeType(MetadataReference.COLUMN);
       ref4.timestamp = new Date();
       ref4.setMetadata(metadata1);
 

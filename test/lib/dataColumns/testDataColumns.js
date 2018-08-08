@@ -44,46 +44,40 @@ describe('Data Columns tests', function() {
 
   it('should get the data column for property_0', function() {
     var dc = new DataColumnsDao(connection);
-    return dc.getDataColumns('FEATURESriversds', 'property_0')
-    .then(function(dataColumn) {
-      dataColumn.should.be.deep.equal({
-        table_name: 'FEATURESriversds',
-        column_name: 'property_0',
-        name: 'Scalerank',
-        title: 'Scalerank',
-        description: 'Scalerank',
-        mime_type: null,
-        constraint_name: null
-      });
+    var dataColumn = dc.getDataColumns('FEATURESriversds', 'property_0');
+    dataColumn.should.be.deep.equal({
+      table_name: 'FEATURESriversds',
+      column_name: 'property_0',
+      name: 'Scalerank',
+      title: 'Scalerank',
+      description: 'Scalerank',
+      mime_type: null,
+      constraint_name: null
     });
   });
 
   it('should get the contents for the data column for property_0', function() {
     var dc = new DataColumnsDao(connection);
-    return dc.getDataColumns('FEATURESriversds', 'property_0')
-    .then(function(dataColumn) {
-      var contents = dc.getContents(dataColumn);
-      contents.should.be.deep.equal({
-        table_name: 'FEATURESriversds',
-        data_type: 'features',
-        identifier: 'FEATURESriversds',
-        description: null,
-        last_change: '2015-12-04T15:28:59.122Z',
-        min_x: -20037508.342789244,
-        min_y: -19971868.88040857,
-        max_x: 20037508.342789244,
-        max_y: 19971868.880408563,
-        srs_id: 3857
-      });
+    var dataColumn = dc.getDataColumns('FEATURESriversds', 'property_0');
+    var contents = dc.getContents(dataColumn);
+    contents.should.be.deep.equal({
+      table_name: 'FEATURESriversds',
+      data_type: 'features',
+      identifier: 'FEATURESriversds',
+      description: null,
+      last_change: '2015-12-04T15:28:59.122Z',
+      min_x: -20037508.342789244,
+      min_y: -19971868.88040857,
+      max_x: 20037508.342789244,
+      max_y: 19971868.880408563,
+      srs_id: 3857
     });
   });
 
   it('should get the data column for geom', function() {
     var dc = new DataColumnsDao(connection);
-    return dc.getDataColumns('FEATURESriversds', 'geom')
-    .then(function(dataColumn) {
-      should.not.exist(dataColumn);
-    });
+    var dataColumn = dc.getDataColumns('FEATURESriversds', 'geom');
+    should.not.exist(dataColumn);
   });
 
   it('should create a data column', function() {
@@ -98,17 +92,15 @@ describe('Data Columns tests', function() {
     dc.constraint_name = 'test constraint';
     var result = dao.create(dc);
     should.exist(result);
-    dao.getDataColumns('FEATURESriversds', 'test')
-    .then(function(dataColumn) {
-      dataColumn.should.be.deep.equal({
-        table_name: 'FEATURESriversds',
-        column_name: 'test',
-        name: 'Test Name',
-        title: 'Test',
-        description: 'Test Description',
-        mime_type: 'text/html',
-        constraint_name: 'test constraint'
-      });
+    var dataColumn = dao.getDataColumns('FEATURESriversds', 'test');
+    dataColumn.should.be.deep.equal({
+      table_name: 'FEATURESriversds',
+      column_name: 'test',
+      name: 'Test Name',
+      title: 'Test',
+      description: 'Test Description',
+      mime_type: 'text/html',
+      constraint_name: 'test constraint'
     });
   });
 
@@ -124,7 +116,7 @@ describe('Data Columns tests', function() {
     dc.constraint_name = 'test constraint';
     var result = dao.create(dc);
     should.exist(result);
-    return dao.queryByConstraintName('test constraint', function(err, dataColumn) {
+    for (var dataColumn of dao.queryByConstraintName('test constraint')) {
       dataColumn.should.be.deep.equal({
         table_name: 'FEATURESriversds',
         column_name: 'test',
@@ -134,7 +126,7 @@ describe('Data Columns tests', function() {
         mime_type: 'text/html',
         constraint_name: 'test constraint'
       });
-    });
+    }
   });
 
   it('should create a data column constraint', function() {
@@ -153,7 +145,7 @@ describe('Data Columns tests', function() {
       dc.description = 'constraint description';
 
       var resutl = dao.create(dc);
-      return dao.queryByConstraintName('test constraint', function(err, dataColumnConstraint) {
+      for (var dataColumnConstraint of dao.queryByConstraintName('test constraint')) {
         dataColumnConstraint.should.be.deep.equal({
           constraint_name: 'test constraint',
           constraint_type: 'range',
@@ -164,7 +156,7 @@ describe('Data Columns tests', function() {
           max_is_inclusive: 1,
           description: 'constraint description'
         });
-      });
+      }
     });
   });
 

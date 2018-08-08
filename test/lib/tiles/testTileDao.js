@@ -84,24 +84,25 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the zoom level', function() {
-      return tileDao.queryForTilesWithZoomLevel(1, function(err, tileRow) {
+      var count = 0;
+      for (var tileRow of tileDao.queryForTilesWithZoomLevel(1)) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      })
-      .then(function(count) {
-        count.should.be.equal(4);
-      });
+        count++;
+      }
+      count.should.be.equal(4);
     });
 
     it('should query for tiles in the zoom level descending order', function() {
-      return tileDao.queryForTilesDescending(1, function(err, tileRow) {
+      var count = 0;
+      for (var tileRow of tileDao.queryForTilesDescending(1)) {
         tileRow.getZoomLevel().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(4);
-      });
+        count++;
+      }
+      count.should.be.equal(4);
     });
 
     it('should query for tiles in the zoom level and column', function() {
