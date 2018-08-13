@@ -138,9 +138,8 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
   }, function(err, gp) {
     geoPackage = gp;
     clearInfo();
-    readGeoPackage(function() {
-      geoJsonDoneCallback ? geoJsonDoneCallback() : null;
-    });
+    readGeoPackage();
+    geoJsonDoneCallback ? geoJsonDoneCallback() : null;
   });
 }
 
@@ -175,9 +174,8 @@ function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
     }
     geoPackage = gp;
     clearInfo();
-    readGeoPackage(function() {
-      shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
-    });
+    readGeoPackage();
+    shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
   });
 }
 
@@ -259,11 +257,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a MBTiles file
@@ -295,11 +292,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a PBF file
@@ -331,11 +327,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
   }
@@ -363,7 +358,8 @@ function loadByteArray(array, callback) {
 
   GeoPackageAPI.open(array, function(err, gp) {
     geoPackage = gp;
-    readGeoPackage(callback);
+    readGeoPackage();
+    callback();
   });
 }
 
@@ -379,38 +375,21 @@ function readGeoPackage() {
   var featureTableNode = $('#feature-tables');
 
   var tileTables = geoPackage.getTileTables();
-  var promise = tileTables.reduce(function(sequence, table) {
-    return sequence.then(function(){
-      return geoPackage.getTileDaoWithTableName(table)
-      .then(function(tileDao) {
-        return geoPackage.getInfoForTable(tileDao);
-      })
-      .then(function(info) {
-        tableInfos[table] = info;
-        var rendered = Mustache.render(tileTableTemplate, info);
-        tileTableNode.append(rendered);
-      });
-    });
-  }, Promise.resolve());
-
-  var featureTables = geoPackage.getFeatureTables();
-  promise.then(function() {
-    featureTables.reduce(function(sequence, table) {
-      return sequence.then(function() {
-        return geoPackage.getFeatureDaoWithTableName(table)
-        .then(function(featureDao) {
-          return geoPackage.getInfoForTable(featureDao);
-        })
-        .then(function(info) {
-          tableInfos[table] = info;
-          var rendered = Mustache.render(featureTableTemplate, info);
-          featureTableNode.append(rendered);
-        });
-      });
-    }, Promise.resolve());
+  tileTables.forEach(function(table) {
+    var tileDao = geoPackage.getTileDaoWithTableName(table);
+    var info = geoPackage.getInfoForTable(tileDao);
+    tableInfos[table] = info;
+    var rendered = Mustache.render(tileTableTemplate, info);
+    tileTableNode.append(rendered);
   });
-
-  return promise;
+  var featureTables = geoPackage.getFeatureTables();
+  featureTables.forEach(function(table) {
+    var featureDao = geoPackage.getFeatureDaoWithTableName(table);
+    var info = geoPackage.getInfoForTable(featureDao);
+    tableInfos[table] = info;
+    var rendered = Mustache.render(featureTableTemplate, info);
+    featureTableNode.append(rendered);
+  });
 }
 
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
@@ -484,47 +463,114 @@ window.toggleLayer = function(layerType, table) {
       eventAction: 'load',
       eventLabel: 'Feature Layer'
     });
-    var geojsonLayer = L.geoJson([], {
-      style: featureStyle,
-      pointToLayer: pointToLayer,
-      coordsToLatLng: function(coords) {
-        return L.GeoJSON.coordsToLatLng(coords);
-      }
-    }).bindPopup(function(layer) {
-      var feature = layer.feature;
-      var columnMap = tableInfos[table].columnMap;
-      var string = "";
-      if (feature.properties.name || feature.properties.description) {
-          string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
-          string += feature.properties.description ? feature.properties.description : '';
-      } else {
-        for (var key in feature.properties) {
-          if (columnMap && columnMap[key] && columnMap[key].displayName) {
-            string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
-          } else {
-            string += '<div class="item"><span class="label">' + key + ': </span>';
-          }
-          string += '<span class="value">' + feature.properties[key] + '</span></div>';
-        }
-      }
-      return string;
-    });
+
     var tableInfo = tableInfos[table];
 
-    geojsonLayer.addTo(map);
-    geojsonLayer.bringToFront();
-    tableLayers[table] = geojsonLayer;
+    geoPackage.indexFeatureTable(table, function(message) {
+      $('#status-'+table).find('span').html(message);
+    })
+    .then(function(indexed) {
+      var styles = {};
+      styles[table.name] = {
+        weight: 2,
+        radius: 3
+      };
 
-    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table)
-    .then(function(each) {
-      var promise = Promise.resolve();
-      var iterator = each.results[Symbol.iterator]();
-      var nextRow = iterator.next();
-      if (!nextRow.done) {
-        promise = addRowToLayer(iterator, nextRow.value, each.featureDao, each.srs, geojsonLayer);
+      var featureLayer = L.vectorGrid.protobuf('',{
+        maxNativeZoom: 18,
+        vectorTileLayerStyles: styles,
+        interactive: true,
+        rendererFactory: L.canvas.tile,
+        getFeatureId: function(feature) {
+          feature.properties.id = table + feature.id;
+          return feature.properties.id;
+        }
+      })
+      .bindPopup(function(feature) {
+        var columnMap = tableInfos[table].columnMap;
+        var string = "";
+        if (feature.properties.name || feature.properties.description) {
+            string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+            string += feature.properties.description ? feature.properties.description : '';
+        } else {
+          for (var key in feature.properties) {
+            if (columnMap && columnMap[key] && columnMap[key].displayName) {
+              string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+            } else {
+              string += '<div class="item"><span class="label">' + key + ': </span>';
+            }
+            string += '<span class="value">' + feature.properties[key] + '</span></div>';
+          }
+        }
+        return string;
+      });
+
+      featureLayer._getVectorTilePromise = function(coords, tileBounds) {
+        var x = coords.x;
+  			var y = coords.y;
+  		  var z = coords.z;
+        return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
+        .then(function(json) {
+    			// Normalize feature getters into actual instanced features
+    			for (var layerName in json.layers) {
+    				var feats = [];
+
+    				for (var i=0; i<json.layers[layerName].length; i++) {
+    					var feat = json.layers[layerName].feature(i);
+    					feat.geometry = feat.loadGeometry();
+    					feats.push(feat);
+    				}
+
+    				json.layers[layerName].features = feats;
+    			}
+
+    			return json;
+    		});
       }
-      return promise;
+      featureLayer.addTo(map);
+      featureLayer.bringToFront();
+      tableLayers[table] = featureLayer;
     });
+
+    // var geojsonLayer = L.geoJson([], {
+    //   style: featureStyle,
+    //   pointToLayer: pointToLayer,
+    //   coordsToLatLng: function(coords) {
+    //     return L.GeoJSON.coordsToLatLng(coords);
+    //   }
+    // }).bindPopup(function(layer) {
+    //   var feature = layer.feature;
+    //   var columnMap = tableInfos[table].columnMap;
+    //   var string = "";
+    //   if (feature.properties.name || feature.properties.description) {
+    //       string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+    //       string += feature.properties.description ? feature.properties.description : '';
+    //   } else {
+    //     for (var key in feature.properties) {
+    //       if (columnMap && columnMap[key] && columnMap[key].displayName) {
+    //         string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+    //       } else {
+    //         string += '<div class="item"><span class="label">' + key + ': </span>';
+    //       }
+    //       string += '<span class="value">' + feature.properties[key] + '</span></div>';
+    //     }
+    //   }
+    //   return string;
+    // });
+    // geojsonLayer.addTo(map);
+    // geojsonLayer.bringToFront();
+    // tableLayers[table] = geojsonLayer;
+
+    // GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table)
+    // .then(function(each) {
+    //   var promise = Promise.resolve();
+    //   var iterator = each.results[Symbol.iterator]();
+    //   var nextRow = iterator.next();
+    //   if (!nextRow.done) {
+    //     promise = addRowToLayer(iterator, nextRow.value, each.featureDao, each.srs, geojsonLayer);
+    //   }
+    //   return promise;
+    // });
   }
 }
 
@@ -719,18 +765,17 @@ window.loadZooms = function(tableName, tilesElement) {
   var zoomsTemplate = $('#tile-zoom-levels-template').html();
   Mustache.parse(zoomsTemplate);
 
-  geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-    var zooms = [];
-    for (var i = tileDao.minZoom; i <= tileDao.maxZoom; i++) {
-      zooms.push({zoom: i, tableName: tableName});
-    }
-    var zoomLevels = {
-      zooms: zooms
-    };
-    var rendered = Mustache.render(zoomsTemplate, zoomLevels);
-    tilesElement.empty();
-    tilesElement.append(rendered);
-  });
+  var tileDao = geoPackage.getTileDaoWithTableName(tableName);
+  var zooms = [];
+  for (var i = tileDao.minZoom; i <= tileDao.maxZoom; i++) {
+    zooms.push({zoom: i, tableName: tableName});
+  }
+  var zoomLevels = {
+    zooms: zooms
+  };
+  var rendered = Mustache.render(zoomsTemplate, zoomLevels);
+  tilesElement.empty();
+  tilesElement.append(rendered);
 }
 
 var visibleTileTables = {};

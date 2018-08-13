@@ -22,6 +22,7 @@ window.Mustache = Mustache;
 
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
+require('leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js');
 
 window.GeoPackageAPI = require('@ngageoint/geopackage');
 // window.GeoJSONToGeoPackage = require('geojson-to-geopackage');

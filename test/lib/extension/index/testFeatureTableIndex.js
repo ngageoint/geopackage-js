@@ -9,7 +9,118 @@ var GeoPackageAPI = require('../../../..')
   , path = require('path')
   , async = require('async');
 
+  var memwatch = require('memwatch-next');
+
 describe('GeoPackage Feature Table Index Extension tests', function() {
+
+  describe.skip('Create new index', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'pol.gpkg');
+    var filename;
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should open the geopackage', function(done) {
+      this.timeout(0);
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      copyGeopackage(originalFilename, filename, function(err) {
+        GeoPackageAPI.open(filename, function(err, gp) {
+          geoPackage = gp;
+          should.not.exist(err);
+          should.exist(gp);
+          should.exist(gp.getDatabase().getDBConnection());
+          gp.getPath().should.be.equal(filename);
+          featureDao = geoPackage.getFeatureDaoWithTableName('Pollution_Removal_UK_Grid');
+          done();
+        });
+      });
+    });
+
+    afterEach('should close the geopackage', function(done) {
+      geoPackage.close();
+      testSetup.deleteGeoPackage(filename, done);
+    });
+
+    it('should return the index status of false', function() {
+      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var indexed = fti.isIndexed();
+      indexed.should.be.equal(false);
+    });
+
+    it('should index the table', function() {
+      this.timeout(0);
+      memwatch.on('leak', function(info) {
+        console.log('leak info', info);
+      });
+      memwatch.on('stats', function(stats) {
+        console.log('stats', stats);
+      });
+      var fti = featureDao.featureTableIndex;
+      var tableIndex = fti.getTableIndex();
+      should.not.exist(tableIndex);
+      return fti.index(function(message) {
+        console.log('message', message);
+      })
+      .then(function(indexed) {
+        console.log('indexed', indexed);
+        indexed.should.be.equal(true);
+        // ensure it was created
+        var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        tableIndex = fti2.getTableIndex();
+        should.exist(tableIndex);
+        should.exist(tableIndex.last_indexed);
+      })
+      .then(function() {
+        var exists = fti.hasExtension(fti.extensionName, fti.tableName, fti.columnName)
+        exists.should.be.equal(true);
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        var extension = extensionDao.queryByExtension(fti.extensionName);
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('Pollution_Removal_UK_Grid');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        var extensions = extensionDao.queryByExtensionAndTableName(fti.extensionName, fti.tableName);
+        var extension = extensions[0];
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('Pollution_Removal_UK_Grid');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
+      })
+      .then(function() {
+        var extensionDao = fti.extensionsDao;
+        var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(fti.extensionName, fti.tableName, fti.columnName);
+        var extension = extensions[0];
+        extension.getAuthor().should.be.equal('nga');
+        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
+        extension.column_name.should.be.equal('geom');
+        extension.table_name.should.be.equal('Pollution_Removal_UK_Grid');
+        extension.scope.should.be.equal('read-write');
+        extension.extension_name.should.be.equal('nga_geometry_index');
+      });
+    });
+});
 
   describe('Create new index', function() {
     var geoPackage;
@@ -59,8 +170,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       should.not.exist(tableIndex);
-      return fti.index()
+      return fti.index(function(message) {
+        console.log('message', message);
+      })
       .then(function(indexed) {
+        console.log('indexed', indexed);
         indexed.should.be.equal(true);
         // ensure it was created
         var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);

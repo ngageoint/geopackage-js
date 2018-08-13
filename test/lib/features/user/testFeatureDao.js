@@ -500,6 +500,7 @@ describe('FeatureDao tests', function() {
       var bb = new BoundingBox(-.1, .1, .9, 1.1);
       var foundFeatures = [];
       var iterator = queryTestFeatureDao.queryIndexedFeaturesWithBoundingBox(bb);
+
       for (var row of iterator) {
         foundFeatures.push(row.values.name);
       }

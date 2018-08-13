@@ -219,6 +219,11 @@ describe('GeoPackageAPI tests', function() {
       return GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
     });
 
+    it('should get the 0 0 0 vector tile', function() {
+      var vectorTile = GeoPackage.getVectorTile(indexedGeopackage, 'rivers', 0, 0, 0);
+      should.exist(vectorTile);
+    });
+
     it('should query for the tiles in the bounding box', function() {
       var tiles = GeoPackage.getTilesInBoundingBoxWebZoom(indexedGeopackage, 'rivers_tiles', 0, -180, 180, -80, 80);
       tiles.tiles.length.should.be.equal(1);
@@ -286,20 +291,12 @@ describe('GeoPackageAPI tests', function() {
   describe('should operate on a new geopackage', function() {
     var geopackage;
 
-    before(function(done) {
+    beforeEach(function(done) {
       fs.unlink(geopackageToCreate, function() {
         GeoPackage.create(geopackageToCreate, function(err, gp) {
           geopackage = gp;
           done();
         });
-      });
-    });
-
-    beforeEach(function(done) {
-      GeoPackage.open(geopackageToCreate)
-      .then(function(gp) {
-        geopackage = gp;
-        done();
       });
     });
 

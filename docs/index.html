@@ -116,6 +116,7 @@
 
   <script id="feature-table-template" type="x-tmpl-mustache">
   <div>
+    <div class="status" id="status-{{tableName}}"><span></span></div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
       <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
