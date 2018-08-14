@@ -50,6 +50,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1)
       .then(function(image) {
+        fs.writeFileSync('/tmp/file.png', image);
         testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles','1_1_0.png'), function(err, equal) {
           equal.should.be.equal(true);
           done();

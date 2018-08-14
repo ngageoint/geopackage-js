@@ -46,7 +46,7 @@
     "proj4": "2.4.3",
     "pureimage": "0.1.6",
     "reproject": "^1.1.1",
-    "sql.js": "https://github.com/kripken/sql.js.git",
+    "sql.js": "https://github.com/danielbarela/sql.js.git",
     "stream-to-array": "^2.3.0",
     "vt-pbf": "^3.1.1",
     "wkx": "0.4.4"
