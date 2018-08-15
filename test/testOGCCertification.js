@@ -31,6 +31,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
   });
 
   it('output a 1.2 compliant GeoPackage', function() {
+    this.timeout(60000);
     console.log('Create GeoPackage');
 
     return GeoPackageAPI.create(testGeoPackage)
