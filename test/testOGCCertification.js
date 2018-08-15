@@ -194,10 +194,10 @@ describe('Create a GeoPackage for OGC Certification', function() {
       return createFeatureTableAndAddFeatures('polygon2', [poly2], wkx.Types.wkt.Polygon);
     })
     .then(function() {
-      return createFeatureTableAndAddFeatures('geometry1', [point1, line1, poly1], wkx.Types.wkt.GeometryCollection);
+      return createFeatureTableAndAddFeatures('geometry1', [point1, line1, poly1], 'GEOMETRY');
     })
     .then(function() {
-      return createFeatureTableAndAddFeatures('geometry2', [point2, line2, poly2], wkx.Types.wkt.GeometryCollection);
+      return createFeatureTableAndAddFeatures('geometry2', [point2, line2, poly2], 'GEOMETRY');
     });
   }
 
@@ -205,7 +205,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     console.log('Creating Feature Table ' + tableName);
     var geometryColumns = new GeometryColumns();
     geometryColumns.table_name = tableName;
-    geometryColumns.column_name = 'geom';
+    geometryColumns.column_name = 'geometry';
     geometryColumns.geometry_type_name = type;
     geometryColumns.z = 0;
     geometryColumns.m = 0;
@@ -215,7 +215,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     var columns = [];
     var columnNumber = 0;
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geom', type, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geometry', type, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(columnNumber++, 'text', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
     columns.push(FeatureColumn.createColumnWithIndex(columnNumber++, 'real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(columnNumber++, 'boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
@@ -319,8 +319,8 @@ describe('Create a GeoPackage for OGC Certification', function() {
   function createTiles() {
     var tableName = 'OSM';
     var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
-    var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
-    var contentsSrsId = 4326;
+    var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+    var contentsSrsId = 3857;
     var tileMatrixSetSrsId = 3857;
     geopackage.getSpatialReferenceSystemDao().createWebMercator();
     return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)

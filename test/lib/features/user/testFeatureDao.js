@@ -616,7 +616,6 @@ describe('FeatureDao tests', function() {
       return GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7)
       .then(function(geoJSON) {
         console.timeEnd('generating indexed tile');
-        console.log('geoJSON', geoJSON);
         should.exist(geoJSON);
         geoJSON.length.should.be.equal(5);
       });

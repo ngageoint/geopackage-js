@@ -11,7 +11,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , BoundingBox = require('../../lib/boundingBox')
   , DataTypes = require('../../lib/db/dataTypes')
   , GeometryData = require('../../lib/geom/geometryData')
-  , UserTableReader = require('../../lib/user/userTableReader')
+  , FeatureTableReader = require('../../lib/features/user/FeatureTableReader')
   , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkx = require('wkx')
@@ -78,7 +78,7 @@ describe('GeoPackage Feature table create tests', function() {
 
   });
 
-  it('should create a feature table and read the information about it', function(done) {
+  it('should create a feature table and read the information about it', function() {
     var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
@@ -103,14 +103,14 @@ describe('GeoPackage Feature table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
+    return geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
     .then(function() {
-      console.log('feature table created');
-      var reader = new UserTableReader(tableName);
-      var result = reader.readTable(geopackage.connection);
+      var reader = new FeatureTableReader(tableName);
+      var result = reader.readFeatureTable(geopackage.connection);
       var columns = result.columns;
 
       var plainObject = JSON.parse(JSON.stringify(columns));
+
       plainObject.should.deep.include.members([{ index: 0,
          name: 'id',
          dataType: 5,
@@ -118,9 +118,9 @@ describe('GeoPackage Feature table create tests', function() {
          primaryKey: true },
        { index: 1,
          name: 'geom.test',
-         dataType: 13,
          notNull: false,
-         primaryKey: false },
+         primaryKey: false,
+         geometryType: 1 },
        { index: 2,
          name: 'test_text.test',
          dataType: 9,
@@ -171,7 +171,6 @@ describe('GeoPackage Feature table create tests', function() {
         mime_type: 'text/html',
         constraint_name: 'test constraint'
       });
-      done();
     });
   });
 
