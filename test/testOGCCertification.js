@@ -7,7 +7,8 @@ var GeoPackageAPI = require('../index')
   , DataColumns = GeoPackageAPI.DataColumns
   , UserColumn = GeoPackageAPI.UserColumn
   , Metadata = GeoPackageAPI.Metadata
-  , MetadataReference = GeoPackageAPI.MetadataReference;
+  , MetadataReference = GeoPackageAPI.MetadataReference
+  , RTreeIndex = GeoPackageAPI.RTreeIndex;
 
 var path = require('path')
   , fs = require('fs')
@@ -285,7 +286,15 @@ describe('Create a GeoPackage for OGC Certification', function() {
   }
 
   function createRTreeSpatialIndexExtension() {
+    var tables = geopackage.getFeatureTables();
 
+    return tables.reduce(function(sequence, table) {
+      return sequence.then(function() {
+        var featureDao = geopackage.getFeatureDaoWithTableName(table);
+        var rtreeIndex = new RTreeIndex(featureDao.connection, featureDao);
+        return rtreeIndex.create();
+      });
+    }, Promise.resolve());
   }
 
   function createRelatedTablesMediaExtension() {

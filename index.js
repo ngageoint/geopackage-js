@@ -18,3 +18,4 @@ module.exports.DataColumns = require('./lib/dataColumns').DataColumns;
 module.exports.DataTypes = require('./lib/db/dataTypes');
 module.exports.Metadata = require('./lib/metadata').Metadata;
 module.exports.MetadataReference = require('./lib/metadata/reference').MetadataReference;
+module.exports.RTreeIndex = require('./lib/extension/rtree').RTreeIndex;
