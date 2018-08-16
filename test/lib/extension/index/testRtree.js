@@ -136,7 +136,7 @@ describe('RTree tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       this.timeout(0);
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'rtree.gpkg');//testSetup.createTempName());
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;

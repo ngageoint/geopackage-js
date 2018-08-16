@@ -8,7 +8,8 @@ var GeoPackageAPI = require('../index')
   , UserColumn = GeoPackageAPI.UserColumn
   , Metadata = GeoPackageAPI.Metadata
   , MetadataReference = GeoPackageAPI.MetadataReference
-  , RTreeIndex = GeoPackageAPI.RTreeIndex;
+  , RTreeIndex = GeoPackageAPI.RTreeIndex
+  , CrsWktExtension = GeoPackageAPI.CrsWktExtension;
 
 var path = require('path')
   , fs = require('fs')
@@ -61,7 +62,9 @@ describe('Create a GeoPackage for OGC Certification', function() {
   });
 
   function createCRSWKTExtension() {
-
+    console.log('Creating CRS WKT Extension');
+    var crs = new CrsWktExtension(geopackage.getDatabase());
+    crs.getOrCreateExtension();
   }
 
   function createFeatures() {
