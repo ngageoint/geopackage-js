@@ -11,6 +11,7 @@ var GeoPackageAPI = require('../index')
   , RTreeIndex = GeoPackageAPI.RTreeIndex
   , CrsWktExtension = GeoPackageAPI.CrsWktExtension
   , SchemaExtension = GeoPackageAPI.SchemaExtension
+  , MetadataExtension = GeoPackageAPI.MetadataExtension
   , DataColumnsDao = GeoPackageAPI.DataColumnsDao
   , DataColumnConstraintsDao = GeoPackageAPI.DataColumnConstraintsDao
   , TableCreator = GeoPackageAPI.TableCreator;
@@ -36,7 +37,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     }
   });
 
-  it('output a 1.2 compliant GeoPackage', function() {
+  it.only('output a 1.2 compliant GeoPackage', function() {
     this.timeout(60000);
     console.log('Create GeoPackage');
 
@@ -540,6 +541,9 @@ describe('Create a GeoPackage for OGC Certification', function() {
   }
 
   function createMetadataExtension() {
+    var metadataExtension = new MetadataExtension(geopackage.getDatabase());
+    metadataExtension.getOrCreateExtension();
+
     return geopackage.createMetadataTable()
     .then(function() {
       return geopackage.createMetadataReferenceTable();

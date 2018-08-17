@@ -22,5 +22,6 @@ module.exports.MetadataReference = require('./lib/metadata/reference').MetadataR
 module.exports.RTreeIndex = require('./lib/extension/rtree').RTreeIndex;
 module.exports.CrsWktExtension = require('./lib/extension/crsWkt').CrsWktExtension;
 module.exports.SchemaExtension = require('./lib/extension/schema').SchemaExtension;
+module.exports.MetadataExtension = require('./lib/extension/metadata').MetadataExtension;
 module.exports.DataColumnsDao = require('./lib/dataColumns').DataColumnsDao;
 module.exports.DataColumnConstraintsDao = require('./lib/dataColumnConstraints').DataColumnConstraintsDao;
