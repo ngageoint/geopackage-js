@@ -9,7 +9,11 @@ var GeoPackageAPI = require('../index')
   , Metadata = GeoPackageAPI.Metadata
   , MetadataReference = GeoPackageAPI.MetadataReference
   , RTreeIndex = GeoPackageAPI.RTreeIndex
-  , CrsWktExtension = GeoPackageAPI.CrsWktExtension;
+  , CrsWktExtension = GeoPackageAPI.CrsWktExtension
+  , SchemaExtension = GeoPackageAPI.SchemaExtension
+  , DataColumnsDao = GeoPackageAPI.DataColumnsDao
+  , DataColumnConstraintsDao = GeoPackageAPI.DataColumnConstraintsDao
+  , TableCreator = GeoPackageAPI.TableCreator;
 
 var path = require('path')
   , fs = require('fs')
@@ -38,6 +42,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
 
     return GeoPackageAPI.create(testGeoPackage)
     .then(function(gp) {
+      console.log('Created GeoPackage');
       geopackage = gp;
     })
     .then(createCRSWKTExtension)
@@ -58,6 +63,9 @@ describe('Create a GeoPackage for OGC Certification', function() {
     .then(createPropertiesExtension)
     .then(function() {
       geopackage.close();
+    })
+    .catch(function(error) {
+      console.log('error', error);
     });
   });
 
@@ -262,7 +270,111 @@ describe('Create a GeoPackage for OGC Certification', function() {
   }
 
   function createSchemaExtension() {
+    console.log('Create Schema Extension');
+    var schema = new SchemaExtension(geopackage.getDatabase());
+    schema.getOrCreateExtension();
 
+    var tc = new TableCreator(geopackage.getDatabase());
+    return tc.createDataColumnConstraints()
+    .then(function() {
+      return tc.createDataColumns();
+    })
+    .then(function() {
+      var dcd = geopackage.getDataColumnConstraintsDao();
+      var sampleRange = dcd.createObject();
+      sampleRange.constraint_name = 'sampleRange';
+      sampleRange.constraint_type = DataColumnConstraintsDao.RANGE_TYPE;
+      sampleRange.min = 1;
+      sampleRange.min_is_inclusive = true;
+      sampleRange.max = 10;
+      sampleRange.max_is_inclusive = true;
+      sampleRange.description = 'sampleRange description';
+      dcd.create(sampleRange);
+
+      var sampleEnum1 = dcd.createObject();
+      sampleEnum1.constraint_name = 'sampleEnum';
+      sampleEnum1.constraint_type = DataColumnConstraintsDao.ENUM_TYPE;
+      sampleEnum1.value = '1';
+      sampleEnum1.description = 'sampleEnum description';
+      dcd.create(sampleEnum1);
+
+      var sampleEnum3 = dcd.createObject();
+      sampleEnum3.constraint_name = sampleEnum1.constraint_name;
+      sampleEnum3.constraint_type = DataColumnConstraintsDao.ENUM_TYPE;
+      sampleEnum3.value = '3';
+      sampleEnum3.description = 'sampleEnum description';
+      dcd.create(sampleEnum3);
+
+      var sampleEnum5 = dcd.createObject();
+      sampleEnum5.constraint_name = sampleEnum1.constraint_name;
+      sampleEnum5.constraint_type = DataColumnConstraintsDao.ENUM_TYPE;
+      sampleEnum5.value = '5';
+      sampleEnum5.description = 'sampleEnum description';
+      dcd.create(sampleEnum5);
+
+      var sampleEnum7 = dcd.createObject();
+      sampleEnum7.constraint_name = sampleEnum1.constraint_name;
+      sampleEnum7.constraint_type = DataColumnConstraintsDao.ENUM_TYPE;
+      sampleEnum7.value = '7';
+      sampleEnum7.description = 'sampleEnum description';
+      dcd.create(sampleEnum7);
+
+      var sampleEnum9 = dcd.createObject();
+      sampleEnum9.constraint_name = sampleEnum1.constraint_name;
+      sampleEnum9.constraint_type = DataColumnConstraintsDao.ENUM_TYPE;
+      sampleEnum9.value = '9';
+      sampleEnum9.description = 'sampleEnum description';
+      dcd.create(sampleEnum9);
+
+      var sampleGlob = dcd.createObject();
+      sampleGlob.constraint_name = 'sampleGlob';
+      sampleGlob.constraint_type = DataColumnConstraintsDao.GLOB_TYPE;
+      sampleGlob.value = '[1-2][0-9][0-9][0-9]';
+      sampleGlob.description = 'sampleGlob description';
+      dcd.create(sampleGlob);
+
+      var dc = geopackage.getDataColumnsDao();
+      var featureTables = geopackage.getFeatureTables();
+      for (var i = 0; i < featureTables.length; i++) {
+        var tableName = featureTables[i];
+        var featureDao = geopackage.getFeatureDaoWithTableName(tableName);
+        var table = featureDao.getFeatureTable();
+
+        for (var c = 0; c < table.columns.length; c++) {
+          var column = table.columns[c];
+          if (column.primaryKey || column.getTypeName() !== 'INTEGER') continue;
+          var dataColumns = dc.createObject();
+          dataColumns.table_name = tableName;
+          dataColumns.column_name = column.name;
+          dataColumns.name = tableName+'_'+column.name;
+          dataColumns.title = 'Test Title';
+          dataColumns.description = 'Test Description';
+          dataColumns.mime_type = 'test mime type';
+          dataColumns.constraint_name = 'test constraint';
+
+          var constraintType = c % 3;
+          var constraintName;
+          var value = 0;
+          if (constraintType === 0) {
+            constraintName = sampleRange.constraint_name;
+            value = 1 + Math.round(Math.random() * 10);
+          } else if (constraintType === 1) {
+            constraintName = sampleEnum1.constraint_name;
+            value = 1 + (Math.round(Math.random() * 5) * 2);
+          } else if (constraintType === 2) {
+            constraintName = sampleGlob.constraint_name;
+            value = 1000 + Math.round(Math.random() * 2000);
+          }
+          dataColumns.constraint_name = constraintName;
+          var update = {};
+          update[column.name] = value;
+          featureDao.update(update);
+
+          dc.create(dataColumns);
+          break;
+        }
+      }
+    });
   }
 
   function createGeometryIndexExtension() {

@@ -6,6 +6,7 @@ module.exports.proj4Defs = proj4Defs;
 
 module.exports.GeoPackageTileRetriever = require('./lib/tiles/retriever');
 module.exports.GeoPackageConnection = require('./lib/db/geoPackageConnection');
+module.exports.TableCreator = require('./lib/db/tableCreator');
 
 module.exports.TileColumn = require('./lib/tiles/user/tileColumn');
 module.exports.BoundingBox = require('./lib/boundingBox');
@@ -20,3 +21,6 @@ module.exports.Metadata = require('./lib/metadata').Metadata;
 module.exports.MetadataReference = require('./lib/metadata/reference').MetadataReference;
 module.exports.RTreeIndex = require('./lib/extension/rtree').RTreeIndex;
 module.exports.CrsWktExtension = require('./lib/extension/crsWkt').CrsWktExtension;
+module.exports.SchemaExtension = require('./lib/extension/schema').SchemaExtension;
+module.exports.DataColumnsDao = require('./lib/dataColumns').DataColumnsDao;
+module.exports.DataColumnConstraintsDao = require('./lib/dataColumnConstraints').DataColumnConstraintsDao;
