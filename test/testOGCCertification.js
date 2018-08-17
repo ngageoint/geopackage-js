@@ -12,6 +12,7 @@ var GeoPackageAPI = require('../index')
   , CrsWktExtension = GeoPackageAPI.CrsWktExtension
   , SchemaExtension = GeoPackageAPI.SchemaExtension
   , MetadataExtension = GeoPackageAPI.MetadataExtension
+  , WebPExtension = GeoPackageAPI.WebPExtension
   , DataColumnsDao = GeoPackageAPI.DataColumnsDao
   , DataColumnConstraintsDao = GeoPackageAPI.DataColumnConstraintsDao
   , TableCreator = GeoPackageAPI.TableCreator;
@@ -37,7 +38,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     }
   });
 
-  it('output a 1.2 compliant GeoPackage', function() {
+  it.only('output a 1.2 compliant GeoPackage', function() {
     this.timeout(60000);
     console.log('Create GeoPackage');
 
@@ -487,7 +488,30 @@ describe('Create a GeoPackage for OGC Certification', function() {
   }
 
   function createWebPExtension() {
+    console.log('Creating WebP Extension');
+    var tableName = 'webp_tiles';
 
+    var webpExtension = new WebPExtension(geopackage.getDatabase(), tableName);
+		webpExtension.getOrCreateExtension();
+
+		var tileMatrixSetBoundingBox = new BoundingBox(-11667347.997449303,
+				4824705.2253603265, -11666125.00499674, 4825928.217812888);
+    var contentsBoundingBox = new BoundingBox(-11667347.997449303,
+				4824705.2253603265, -11666125.00499674, 4825928.217812888);
+
+    var contentsSrsId = 3857;
+    var tileMatrixSetSrsId = 3857;
+    geopackage.getSpatialReferenceSystemDao().createWebMercator();
+    return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+    .then(function(tileMatrixSet) {
+      return new Promise(function(resolve, reject) {
+        geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 15, 15);
+
+        loadTile(path.join(__dirname, 'fixtures', 'tiles', '15', '6844', '12438.webp'), function(err, image) {
+          resolve(geopackage.addTile(image, tableName, 15, 12438, 6844));
+        });
+      });
+    });
   }
 
   function createAttributes() {
