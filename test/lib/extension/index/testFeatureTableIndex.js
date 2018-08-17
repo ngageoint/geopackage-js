@@ -6,8 +6,7 @@ var GeoPackageAPI = require('../../../..')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , fs = require('fs')
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('GeoPackage Feature Table Index Extension tests', function() {
 

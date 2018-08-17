@@ -1,7 +1,6 @@
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async')
   , Metadata = require('../../../lib/metadata').Metadata
   , MetadataDao = require('../../../lib/metadata').MetadataDao;
 

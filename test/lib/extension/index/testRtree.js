@@ -9,8 +9,7 @@ var GeoPackageAPI = require('../../../..')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , fs = require('fs')
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('RTree tests', function() {
 
@@ -157,7 +156,7 @@ describe('RTree tests', function() {
 
     it('should add the RTree extension to the GeoPackage', function() {
       var rtreeIndex = new RTreeIndex(featureDao.connection, featureDao);
-      return rtreeIndex.create()
+      return rtreeIndex.getOrCreateExtension()
       .then(function(extension) {
         var fti = new FeatureTableIndex(featureDao.connection, featureDao);
         var indexed = fti.isIndexed();

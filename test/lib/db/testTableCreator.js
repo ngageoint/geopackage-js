@@ -8,8 +8,7 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , testSetup = require('../../fixtures/testSetup')
   , wkx = require('wkx')
   , should = require('chai').should()
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('TableCreator tests', function() {
 

@@ -1,8 +1,7 @@
 var GeoPackageAPI = require('../../..')
   , TileDao = require('../../../lib/tiles/user/tileDao')
   , should = require('chai').should()
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('TileDao tests', function() {
 
@@ -34,8 +33,8 @@ describe('TileDao tests', function() {
       done();
     });
 
-    it('should get the bounding box for each zoom level', function(done) {
-      async.eachSeries([0, 1, 2, 3, 4], function(zoom, callback) {
+    it('should get the bounding box for each zoom level', function() {
+      [0, 1, 2, 3, 4].forEach(function(zoom) {
         var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
         if (zoom === 4) {
           should.not.exist(bb);
@@ -45,14 +44,11 @@ describe('TileDao tests', function() {
           bb.minLatitude.should.be.equal(-20037508.342789244);
           bb.maxLatitude.should.be.equal(20037508.342789244);
         }
-        callback();
-      }, function(err) {
-        done();
-      });
+      })
     });
 
-    it('should get the tile grid for each zoom level', function(done) {
-      async.eachSeries([0, 1, 2, 3, 4], function(zoom, callback) {
+    it('should get the tile grid for each zoom level', function() {
+      [0, 1, 2, 3, 4].forEach(function(zoom) {
         var grid = tileDao.getTileGridWithZoomLevel(zoom);
         if (zoom === 4) {
           should.not.exist(grid);
@@ -62,9 +58,6 @@ describe('TileDao tests', function() {
           grid.max_x.should.be.equal(Math.pow(2, zoom)-1);
           grid.max_x.should.be.equal(Math.pow(2, zoom)-1);
         }
-        callback();
-      }, function(err) {
-        done();
       });
     });
 
@@ -167,14 +160,13 @@ describe('TileDao tests', function() {
       });
     });
 
-    it('should get the zoom levels', function(done) {
+    it('should get the zoom levels', function() {
       tileDao.minZoom.should.be.equal(4);
       tileDao.maxZoom.should.be.equal(4);
-      done();
     });
 
-    it('should get the bounding box for each zoom level', function(done) {
-      async.eachSeries([4, 5], function(zoom, callback) {
+    it('should get the bounding box for each zoom level', function() {
+      [4, 5].forEach(function(zoom) {
         var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
         if (zoom === 5) {
           should.not.exist(bb);
@@ -184,14 +176,11 @@ describe('TileDao tests', function() {
           bb.minLatitude.should.be.equal(45);
           bb.maxLatitude.should.be.equal(67.5);
         }
-        callback();
-      }, function(err) {
-        done();
       });
     });
 
-    it('should get the tile grid for each zoom level', function(done) {
-      async.eachSeries([4, 5], function(zoom, callback) {
+    it('should get the tile grid for each zoom level', function() {
+      [4, 5].forEach(function(zoom) {
         var grid = tileDao.getTileGridWithZoomLevel(zoom);
         if (zoom === 5) {
           should.not.exist(grid);
@@ -201,9 +190,6 @@ describe('TileDao tests', function() {
           grid.maxX.should.be.equal(3);
           grid.maxX.should.be.equal(3);
         }
-        callback();
-      }, function(err) {
-        done();
       });
     });
 

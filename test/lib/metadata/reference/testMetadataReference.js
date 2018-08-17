@@ -1,7 +1,6 @@
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async')
   , MetadataReference = require('../../../../lib/metadata/reference').MetadataReference
   , Metadata = require('../../../../lib/metadata').Metadata
   , GeoPackage = require('../../../../lib/geoPackage')

@@ -1,4 +1,3 @@
-var async = require('async');
 
 module.exports.verifySRS = function(geopackage) {
   var db = geopackage.getDatabase();

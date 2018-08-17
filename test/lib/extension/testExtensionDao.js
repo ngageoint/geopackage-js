@@ -3,8 +3,7 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , Verification = require('../../fixtures/verification')
   , testSetup = require('../../fixtures/testSetup')
   , should = require('chai').should()
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('GeoPackage Extension Dao tests', function() {
   var testGeoPackage;

@@ -1,5 +1,4 @@
 var fs = require('fs')
-  , async = require('async')
   , path = require('path')
   , crypto = require('crypto')
   , pureimage = require('pureimage')
@@ -15,42 +14,34 @@ module.exports.createTempName = function() {
 }
 
 module.exports.createGeoPackage = function(gppath, callback) {
-  async.series([
-    function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.mkdir(path.dirname(gppath), function() {
-          fs.open(gppath, 'w', callback);
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.mkdir(path.dirname(gppath), function() {
+      fs.open(gppath, 'w', function() {
+        GeoPackageAPI.create(gppath)
+        .then(function(geopackage) {
+          callback(null, geopackage);
         });
-      } else {
-        callback();
-      }
-    }
-  ], function() {
-    GeoPackageAPI.create(gppath)
-    .then(function(geopackage) {
-      callback(null, geopackage);
+      });
     });
-  });
+  } else {
+    callback();
+  }
 }
 
 module.exports.createBareGeoPackage = function(gppath, callback) {
-  async.series([
-    function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.mkdir(path.dirname(gppath), function() {
-          fs.open(gppath, 'w', callback);
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.mkdir(path.dirname(gppath), function() {
+      fs.open(gppath, 'w', function() {
+        GeoPackageConnection.connect(gppath)
+        .then(function(connection) {
+          var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
+          callback(null, geopackage);
         });
-      } else {
-        callback();
-      }
-    }
-  ], function() {
-    GeoPackageConnection.connect(gppath)
-    .then(function(connection) {
-      var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-      callback(null, geopackage);
+      });
     });
-  });
+  } else {
+    callback();
+  }
 }
 
 module.exports.deleteGeoPackage = function(gppath, callback) {
@@ -103,34 +94,16 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
 
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
       var expectedBase64 = new Buffer(expectedTile).toString('base64');
-console.log('canvas compare', CanvasCompare);
       CanvasCompare({
         baseImageUrl: actualCanvas.toDataURL(),
         targetImageUrl: 'data:image/png;base64,' + expectedBase64
       })
       .then(function(result) {
-        console.log('result', result);
         callback(null, true);
       })
       .catch(function(reason) {
-        console.log('reason', reason);
         callback(null, false);
       });
-
-      // var expected = document.createElement('canvas');
-      // expected.width = actualCanvas.width;
-      // expected.height = actualCanvas.height;
-      // var ctx2 = expected.getContext('2d');
-      //
-      // var image2 = new Image();
-      // image2.onload = function() {
-      //   ctx2.drawImage(image2, 0, 0);
-      //   CanvasCompare({
-      //
-      //   })
-      //   return callback(null, module.exports.diffCanvasesContexts(actualCanvas.getContext('2d'), ctx2), actualCanvas.width, actualCanvas.height);
-      // }
-      // image2.src = 'data:image/png;base64,' + expectedBase64;
     });
   }
 }

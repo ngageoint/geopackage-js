@@ -4,7 +4,6 @@ var GeoPackage = require('../../lib/geoPackage')
   , proj4 = require('proj4')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async')
   , fs = require('fs');
 
 describe('GeoPackage tests', function() {
@@ -55,11 +54,12 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the features from all tables', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(connection){
+  it('should get the features from all tables', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
+    .then(function(connection){
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getFeatureTables();
-      async.eachSeries(tables, function(table, callback) {
+      tables.forEach(function(table) {
         var featureDao = geoPackage.getFeatureDaoWithTableName(table);
         if (!featureDao) {
           return callback(new Error('No feature table exists'));
@@ -75,11 +75,8 @@ describe('GeoPackage tests', function() {
           var geom = geometry.geometry;
           var geoJson = projectedJson = geom.toGeoJSON();
         }
-        callback();
-      }, function(err) {
-        connection.close();
-        done(err);
       });
+      connection.close();
     });
   });
 
@@ -136,25 +133,26 @@ describe('GeoPackage tests', function() {
     });
   });
 
-  it('should get the tiles', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+  it('should get the tiles', function() {
+    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
-      async.eachSeries(tables, function(table, callback) {
-        var tileDao = geoPackage.getTileDaoWithTableName(table);
-        var maxZoom = tileDao.maxZoom;
-        var minZoom = tileDao.minZoom;
 
-        var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-        gpr.getTile(0, 0, 1)
-        .then(function(tileData) {
-          should.exist(tileData);
-          callback();
+      return tables.reduce(function(sequence, table) {
+        return sequence.then(function() {
+          var tileDao = geoPackage.getTileDaoWithTableName(table);
+          var maxZoom = tileDao.maxZoom;
+          var minZoom = tileDao.minZoom;
+
+          var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+          return gpr.getTile(0, 0, 1)
+          .then(function(tileData) {
+            should.exist(tileData);
+          });
         });
-      }, function(err) {
+      }, Promise.resolve()).then(function() {
         connection.close();
-        done(err);
       });
     });
   });

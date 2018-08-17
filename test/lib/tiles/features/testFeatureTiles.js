@@ -2,7 +2,6 @@ var FeatureTiles = require('../../../../lib/tiles/features')
   , GeoPackageAPI = require('../../../..')
   , testSetup = require('../../../fixtures/testSetup')
   , fs = require('fs')
-  , async = require('async')
   , should = require('chai').should()
   , path = require('path');
 

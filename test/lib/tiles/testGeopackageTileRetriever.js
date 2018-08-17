@@ -4,7 +4,6 @@ var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
   , testSetup = require('../../fixtures/testSetup')
   , proj4 = require('proj4')
   , fs = require('fs')
-  , async = require('async')
   , should = require('chai').should()
   , path = require('path');
 
@@ -84,31 +83,43 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it('should pull all of the tiles and compare them', function(done) {
+    it('should pull all of the tiles and compare them', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      var zooms = [0, 1, 2, 3];
 
-      async.eachSeries([0, 1, 2, 3], function(zoom, zoomDone) {
-        var tiles = [];
-        var tileCount = Math.pow(2,zoom);
-        for (var i = 0; i < tileCount; i++) {
-          tiles.push(i);
-        }
-        async.eachSeries(tiles, function(xTile, xDone) {
-          async.eachSeries(tiles, function(yTile, yDone) {
-            gpr.getTile(xTile,yTile,zoom)
-            .then(function(tile) {
-              testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png'), function(err, equal) {
-                console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), xTile.toString(), yTile.toString()+'.png') + ' passes?', equal);
-                equal.should.be.equal(true);
-                yDone();
-              });
+      return zooms.reduce(function(zoomSequence, zoom) {
+        return zoomSequence.then(function() {
+          var xtiles = [];
+          var tileCount = Math.pow(2,zoom);
+          for (var i = 0; i < tileCount; i++) {
+            xtiles.push(i);
+          }
+          return xtiles.reduce(function(xSequence, x) {
+            return xSequence.then(function() {
+              var ytiles = [];
+              var tileCount = Math.pow(2,zoom);
+              for (var i = 0; i < tileCount; i++) {
+                ytiles.push(i);
+              }
+              return ytiles.reduce(function(ySequence, y) {
+                return ySequence.then(function() {
+                  return new Promise(function(resolve, reject) {
+                    gpr.getTile(x,y,zoom)
+                    .then(function(tile) {
+                      testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, equal) {
+                        console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png') + ' passes?', equal);
+                        equal.should.be.equal(true);
+                        resolve();
+                      });
+                    });
+                  });
+                });
+              }, Promise.resolve());
             });
-          }, xDone);
-        }, zoomDone);
-      }, function(err) {
-        done(err);
-      });
+          }, Promise.resolve());
+        });
+      }, Promise.resolve());
     });
 
     it('should get the x: 0, y: 0, z: 3 tile', function() {
