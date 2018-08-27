@@ -52,7 +52,7 @@ describe('RTree tests', function() {
     });
 
     it('should return the index status of true', function() {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
       var indexed = fti.isIndexed();
       fti.rtreeIndexed.should.be.equal(true);
       indexed.should.be.equal(true);
@@ -80,7 +80,7 @@ describe('RTree tests', function() {
     });
 
     it('should query the index with a geometry envelope', function() {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
       var bb = new BoundingBox(-105, -103, 39, 40);
       var envelope = bb.buildEnvelope();
       var iterator = fti.queryWithGeometryEnvelope(envelope);
@@ -92,7 +92,7 @@ describe('RTree tests', function() {
     });
 
     it('should query the index with a geometry envelope around the 180 line', function() {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
       var bb = new BoundingBox(-103, -105, 39, 40);
       var envelope = bb.buildEnvelope();
       var iterator = fti.queryWithGeometryEnvelope(envelope);
@@ -104,7 +104,7 @@ describe('RTree tests', function() {
     });
 
     it('should query the index with a geometry envelope around the 180 line and find something', function() {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
       var bb = new BoundingBox(-178, -179, 39, 40);
       var envelope = bb.buildEnvelope();
       var iterator = fti.queryWithGeometryEnvelope(envelope);
@@ -155,10 +155,10 @@ describe('RTree tests', function() {
     });
 
     it('should add the RTree extension to the GeoPackage', function() {
-      var rtreeIndex = new RTreeIndex(featureDao.connection, featureDao);
+      var rtreeIndex = new RTreeIndex(geoPackage, featureDao);
       return rtreeIndex.getOrCreateExtension()
       .then(function(extension) {
-        var fti = new FeatureTableIndex(featureDao.connection, featureDao);
+        var fti = new FeatureTableIndex(geoPackage, featureDao);
         var indexed = fti.isIndexed();
         indexed.should.be.equal(true);
       })

@@ -17,7 +17,7 @@ describe('Tile Matrix tests', function() {
       should.exist(gp);
       should.exist(gp.getDatabase().getDBConnection());
       gp.getPath().should.be.equal(filename);
-      tileMatrixDao = new TileMatrixDao(gp.getDatabase());
+      tileMatrixDao = new TileMatrixDao(gp);
       done();
     });
   });

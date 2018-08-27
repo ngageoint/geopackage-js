@@ -68,12 +68,13 @@ describe('Create a GeoPackage for OGC Certification', function() {
     })
     .catch(function(error) {
       console.log('error', error);
+      false.should.be.equal(true);
     });
   });
 
   function createCRSWKTExtension() {
     console.log('Creating CRS WKT Extension');
-    var crs = new CrsWktExtension(geopackage.getDatabase());
+    var crs = new CrsWktExtension(geopackage);
     crs.getOrCreateExtension();
   }
 
@@ -273,10 +274,10 @@ describe('Create a GeoPackage for OGC Certification', function() {
 
   function createSchemaExtension() {
     console.log('Create Schema Extension');
-    var schema = new SchemaExtension(geopackage.getDatabase());
+    var schema = new SchemaExtension(geopackage);
     schema.getOrCreateExtension();
 
-    var tc = new TableCreator(geopackage.getDatabase());
+    var tc = new TableCreator(geopackage);
     return tc.createDataColumnConstraints()
     .then(function() {
       return tc.createDataColumns();
@@ -408,7 +409,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     return tables.reduce(function(sequence, table) {
       return sequence.then(function() {
         var featureDao = geopackage.getFeatureDaoWithTableName(table);
-        var rtreeIndex = new RTreeIndex(featureDao.connection, featureDao);
+        var rtreeIndex = new RTreeIndex(geopackage, featureDao);
         return rtreeIndex.create();
       });
     }, Promise.resolve());
@@ -491,7 +492,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
     console.log('Creating WebP Extension');
     var tableName = 'webp_tiles';
 
-    var webpExtension = new WebPExtension(geopackage.getDatabase(), tableName);
+    var webpExtension = new WebPExtension(geopackage, tableName);
 		webpExtension.getOrCreateExtension();
 
 		var tileMatrixSetBoundingBox = new BoundingBox(-11667347.997449303,
@@ -565,7 +566,7 @@ describe('Create a GeoPackage for OGC Certification', function() {
   }
 
   function createMetadataExtension() {
-    var metadataExtension = new MetadataExtension(geopackage.getDatabase());
+    var metadataExtension = new MetadataExtension(geopackage);
     metadataExtension.getOrCreateExtension();
 
     return geopackage.createMetadataTable()

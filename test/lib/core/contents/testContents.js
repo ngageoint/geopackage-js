@@ -32,7 +32,7 @@ describe('Contents tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        contentsDao = new ContentsDao(gp.getDatabase());
+        contentsDao = new ContentsDao(gp);
         done();
       });
     });

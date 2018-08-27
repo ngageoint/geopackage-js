@@ -42,7 +42,6 @@ describe('GeoPackage Attribute table create tests', function() {
     columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
     columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
     columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
-
     return geopackage.createAttributeTable(tableName, columns)
     .then(function(result) {
       var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
@@ -107,7 +106,7 @@ describe('GeoPackage Attribute table create tests', function() {
     var table = new AttributeTable(geopackage.connection, columns);
 
     (function() {
-      new AttributeDao(geopackage.connection, table);
+      new AttributeDao(geopackage, table);
     }).should.throw();
   });
 
@@ -184,7 +183,7 @@ describe('GeoPackage Attribute table create tests', function() {
          max: 7,
          notNull: false,
          primaryKey: false } ]);
-      var dao = new DataColumnsDao(geopackage.getDatabase());
+      var dao = new DataColumnsDao(geopackage);
       var dataColumn = dao.getDataColumns('test_attributes.test', 'test_text_limited.test');
       dataColumn.should.be.deep.equal({
         table_name: 'test_attributes.test',

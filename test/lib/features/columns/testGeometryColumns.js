@@ -7,23 +7,26 @@ var GeoPackageAPI = require('../../../..')
 
 describe('GeometryColumns tests', function() {
 
-  var db;
-  var connection;
+  var geoPackage;
 
   beforeEach('should open the geopackage', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
-      connection = geoPackageConnection;
-      should.exist(connection);
+    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
+    GeoPackageAPI.open(filename, function(err, gp) {
+      geoPackage = gp;
+      should.not.exist(err);
+      should.exist(gp);
+      should.exist(gp.getDatabase().getDBConnection());
+      gp.getPath().should.be.equal(filename);
       done();
     });
   });
 
   afterEach('should close the geopackage', function() {
-    connection.close();
+    geoPackage.close();
   });
 
   it('should get the feature tables', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var tables = gcd.getFeatureTables();
     should.exist(tables);
     tables.length.should.be.equal(16);
@@ -48,7 +51,7 @@ describe('GeometryColumns tests', function() {
   });
 
   it('should get the table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
     TestUtils.compareProperties(table, {
@@ -62,20 +65,20 @@ describe('GeometryColumns tests', function() {
   });
 
   it('should get no table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('doesnotexist');
     should.not.exist(table);
   });
 
   it('should get all the tables', function(){
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var results = gcd.queryForAll();
     should.exist(results);
     results.should.have.property('length', 16);
   });
 
   it('should get the table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
     TestUtils.compareProperties(table, {
@@ -89,7 +92,7 @@ describe('GeometryColumns tests', function() {
   });
 
   it('should get the srs from the table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
     TestUtils.compareProperties(table, {
@@ -112,7 +115,7 @@ describe('GeometryColumns tests', function() {
   });
 
   it('should get the contents from the table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
     TestUtils.compareProperties(table, {
@@ -139,7 +142,7 @@ describe('GeometryColumns tests', function() {
   });
 
   it('should get the projection from the table', function() {
-    var gcd = new GeometryColumnsDao(connection);
+    var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
     TestUtils.compareProperties(table, {

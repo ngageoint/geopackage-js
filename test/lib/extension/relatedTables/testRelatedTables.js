@@ -1,0 +1,228 @@
+var GeoPackageAPI = require('../../../../.')
+  , Verification = require('../../../fixtures/verification')
+  , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
+  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  , testSetup = require('../../../fixtures/testSetup')
+  , RelatedTablesUtils = require('./relatedTablesUtils')
+  , should = require('chai').should()
+  , wkx = require('wkx')
+  , path = require('path');
+
+describe('Related Tables tests', function() {
+
+  describe('Related Tables Read Tests', function() {
+    var testGeoPackage;
+    var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
+    var geopackage;
+
+    var geoPackage;
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(orignal, copy, callback);
+      } else {
+        filename = orignal;
+        callback();
+      }
+    }
+    var filename;
+    beforeEach('create the GeoPackage connection', function(done) {
+
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rte.gpkg');
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      copyGeopackage(originalFilename, filename, function() {
+        GeoPackageAPI.open(filename, function(err, gp) {
+          geoPackage = gp;
+          done();
+        });
+      });
+    });
+
+    afterEach('close the geopackage connection', function(done) {
+      geoPackage.close();
+      testSetup.deleteGeoPackage(filename, done);
+    });
+
+    it('should read a relationship', function() {
+      var rte = new RelatedTablesExtension(geoPackage);
+      rte.has().should.be.equal(true);
+      var relationships = rte.getRelationships();
+      relationships.length.should.be.equal(1);
+
+      for (var i = 0; i < relationships.length; i++) {
+        var relationship = relationships[i];
+        var baseDao = geoPackage.getFeatureDaoWithTableName(relationship.base_table_name);
+        var features = baseDao.queryForAll();
+        var baseIdMappings = {};
+        for (var f = 0; f < features.length; f++) {
+          var feature = features[f];
+          var row = baseDao.getFeatureRow(feature);
+          var relatedIds = rte.getMappingsForBase(relationship.mapping_table_name, row.getId());
+          if (row.getId() === 1) {
+            relatedIds.length.should.be.equal(2);
+          } else if (row.getId() === 2) {
+            relatedIds.length.should.be.equal(1);
+          }
+          baseIdMappings[row.getId()] = relatedIds;
+        }
+
+        var relatedIdMappings = {};
+        var relatedDao = geoPackage.getAttributeDaoWithTableName(relationship.related_table_name);
+        var attributes = relatedDao.queryForAll();
+        for (var a = 0; a < attributes.length; a++) {
+          var attribute = attributes[a];
+          var row = relatedDao.getAttributeRow(attribute);
+          var baseIds = rte.getMappingsForRelated(relationship.mapping_table_name, row.getId());
+          if (row.getId() === 17) {
+            baseIds.length.should.be.equal(2);
+          } else if (row.getId() === 18) {
+            baseIds.length.should.be.equal(3);
+          } else if (row.getId() === 19) {
+            baseIds.length.should.be.equal(1);
+          }
+          relatedIdMappings[row.getId()] = baseIds;
+        }
+
+        for (var baseId in baseIdMappings) {
+          var relatedIds = baseIdMappings[baseId.toString()];
+          for (var r = 0; r < relatedIds.length; r++) {
+            var relatedId = relatedIds[r];
+            relatedIdMappings[relatedId.toString()].indexOf(Number(baseId)).should.not.equal(-1);
+          }
+        }
+
+        for (var relatedId in relatedIdMappings) {
+          var baseIds = relatedIdMappings[relatedId.toString()];
+          for (var b = 0; b < baseIds.length; b++) {
+            var baseId = baseIds[b];
+            baseIdMappings[baseId.toString()].indexOf(Number(relatedId)).should.not.equal(-1);
+          }
+        }
+      }
+    });
+  });
+
+  describe('Related Tables Write Tests', function() {
+
+    var testGeoPackage;
+    var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
+    var geopackage;
+
+    var geoPackage;
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(orignal, copy, callback);
+      } else {
+        filename = orignal;
+        callback();
+      }
+    }
+    var filename;
+    beforeEach('create the GeoPackage connection', function(done) {
+
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      copyGeopackage(originalFilename, filename, function() {
+        GeoPackageAPI.open(filename, function(err, gp) {
+          geoPackage = gp;
+          done();
+        });
+      });
+    });
+
+    afterEach('close the geopackage connection', function(done) {
+      geoPackage.close();
+      testSetup.deleteGeoPackage(filename, done);
+    });
+
+    it('should write a relationship', function() {
+
+      var rte = new RelatedTablesExtension(geoPackage);
+      rte.has().should.be.equal(false);
+
+      var extendedRelationships = rte.getRelationships();
+      extendedRelationships.length.should.be.equal(0);
+
+      var baseTableName = 'geometry2d';
+      var relatedTableName = 'geometry3d';
+      var mappingTableName = 'g2d_3d';
+
+      var additionalColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
+      var userMappingTable = UserMappingTable.create(mappingTableName, additionalColumns);
+      rte.has(userMappingTable.table_name).should.be.equal(false);
+
+      var numColumns = UserMappingTable.numRequiredColumns() + additionalColumns.length;
+      numColumns.should.be.equal(userMappingTable.columns.length);
+
+      var baseIdColumn = userMappingTable.getBaseIdColumn();
+      should.exist(baseIdColumn);
+      baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
+      baseIdColumn.notNull.should.be.equal(true);
+      baseIdColumn.primaryKey.should.be.equal(false);
+
+      var featureRelationship = RelatedTablesExtension.RelationshipBuilder
+      .setBaseTableName(baseTableName)
+      .setRelatedTableName(relatedTableName)
+      .setUserMappingTable(userMappingTable);
+
+      return rte.addFeaturesRelationship(featureRelationship)
+      .then(function(extendedRelation){
+        rte.has().should.be.equal(true);
+        rte.has(userMappingTable.table_name).should.be.equal(true);
+        should.exist(extendedRelation);
+        var relationships = rte.getRelationships();
+        relationships.length.should.be.equal(1);
+        geoPackage.isTable(mappingTableName).should.be.equal(true);
+
+        var baseDao = geoPackage.getFeatureDaoWithTableName(baseTableName);
+        var relatedDao = geoPackage.getFeatureDaoWithTableName(relatedTableName);
+        var baseResults = baseDao.queryForAll();
+        var relatedResults = relatedDao.queryForAll();
+
+        var userMappingDao = rte.getMappingDao(mappingTableName);
+        var userMappingRow;
+        for (var i = 0; i < 10; i++) {
+          userMappingRow = userMappingDao.newRow();
+          userMappingRow.setBaseId(Math.floor(Math.random() * baseResults.length));
+          userMappingRow.setRelatedId(Math.floor(Math.random() * relatedResults.length));
+          RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+          var result = userMappingDao.create(userMappingRow);
+        }
+
+        var count = userMappingDao.getCount();
+        count.should.be.equal(10);
+
+        userMappingTable = userMappingDao.table;
+        var columns = userMappingTable.columnNames;
+        var userMappingRows = userMappingDao.queryForAll();
+        userMappingRows.length.should.be.equal(10);
+
+        var rowsDeleted = 0;
+        for (var i = 0; i < userMappingRows.length; i++) {
+          var resultRow = userMappingDao.getUserMappingRow(userMappingRows[i]);
+          should.not.exist(resultRow.getId());
+          RelatedTablesUtils.validateUserRow(columns, resultRow);
+          RelatedTablesUtils.validateDublinCoreColumns(resultRow);
+          var deleteResult = userMappingDao.deleteByIds(resultRow.getBaseId(), resultRow.getRelatedId());
+          rowsDeleted += deleteResult;
+        }
+        rowsDeleted.should.be.equal(10);
+        rte.removeRelationship(extendedRelation);
+        rte.has(userMappingTable.table_name).should.be.equal(false);
+        relationships = rte.getRelationships();
+        relationships.length.should.be.equal(0);
+        geoPackage.isTable(mappingTableName).should.be.equal(false);
+        rte.removeExtension();
+        rte.has().should.be.equal(false);
+      })
+      .catch(function(error) {
+        console.log('error', error);
+        false.should.be.equal(true);
+      });
+    });
+  });
+});

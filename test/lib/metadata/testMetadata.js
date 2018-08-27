@@ -1,13 +1,14 @@
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
+  , GeoPackage = require('../../../lib/geoPackage')
   , Metadata = require('../../../lib/metadata').Metadata
   , MetadataDao = require('../../../lib/metadata').MetadataDao;
 
 describe('Metadata tests', function() {
 
   it('should create a Metadata object', function() {
-    var md = new MetadataDao();
+    var md = new MetadataDao(new GeoPackage());
     var metadata = md.createObject();
     should.exist(metadata.getScopeInformation);
   });

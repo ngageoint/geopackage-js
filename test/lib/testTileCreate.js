@@ -168,7 +168,7 @@ describe('GeoPackage Tile table create tests', function() {
       });
     });
 
-    it('should delete the tiles', function(done) {
+    it('should delete the tiles', function() {
       var tileDao = geopackage.getTileDaoWithTableName(tableName);
       var count = tileDao.getCount();
       count.should.be.equal(85);
@@ -176,13 +176,11 @@ describe('GeoPackage Tile table create tests', function() {
       result.should.be.equal(1);
       count = tileDao.getCount();
       count.should.be.equal(84);
-      tileDao.dropTable(function(err, result) {
-        result.should.be.equal(true);
-        var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
-        var results = tileMatrixSetDao.delete(tileMatrixSet);
-        results.should.be.equal(1);
-        done();
-      });
+      var result = tileDao.dropTable();
+      result.should.be.equal(true);
+      var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
+      var results = tileMatrixSetDao.delete(tileMatrixSet);
+      results.should.be.equal(1);
     });
   });
 });

@@ -105,7 +105,7 @@ describe('GeoPackage Feature table create tests', function() {
     return geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
     .then(function() {
       var reader = new FeatureTableReader(tableName);
-      var result = reader.readFeatureTable(geopackage.connection);
+      var result = reader.readFeatureTable(geopackage);
       var columns = result.columns;
 
       var plainObject = JSON.parse(JSON.stringify(columns));
@@ -159,7 +159,7 @@ describe('GeoPackage Feature table create tests', function() {
          max: 7,
          notNull: false,
          primaryKey: false } ]);
-      var dao = new DataColumnsDao(geopackage.getDatabase());
+      var dao = new DataColumnsDao(geopackage);
       var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
       dataColumn.should.be.deep.equal({
         table_name: 'test_features.test',

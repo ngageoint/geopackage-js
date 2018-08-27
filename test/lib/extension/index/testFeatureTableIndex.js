@@ -48,7 +48,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     });
 
     it('should return the index status of false', function() {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
       var indexed = fti.isIndexed();
       indexed.should.be.equal(false);
     });
@@ -65,7 +65,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         console.log('indexed', indexed);
         indexed.should.be.equal(true);
         // ensure it was created
-        var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        var fti2 = new FeatureTableIndex(geoPackage, featureDao);
         tableIndex = fti2.getTableIndex();
         should.exist(tableIndex);
         should.exist(tableIndex.last_indexed);
@@ -207,7 +207,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       .then(function(indexed) {
         indexed.should.be.equal(true);
         // ensure it was created
-        var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
+        var fti2 = new FeatureTableIndex(geoPackage, featureDao);
         tableIndex = fti2.getTableIndex();
         should.exist(tableIndex);
         tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');

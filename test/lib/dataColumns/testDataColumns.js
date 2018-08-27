@@ -2,7 +2,7 @@ var DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
   , DataColumns = require('../../../lib/dataColumns').DataColumns
   , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints').DataColumnConstraintsDao
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints').DataColumnConstraints
-  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
+  , GeoPackageAPI = require('../../../.')
   , TableCreator = require('../../../lib/db/tableCreator')
   , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
@@ -11,7 +11,7 @@ var DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
 
 describe('Data Columns tests', function() {
 
-  var connection;
+  var geoPackage;
 
   var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
   var filename;
@@ -29,21 +29,24 @@ describe('Data Columns tests', function() {
   beforeEach('create the GeoPackage connection', function(done) {
     filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
     copyGeopackage(originalFilename, filename, function(err) {
-      GeoPackageConnection.connect(filename).then(function(geoPackageConnection) {
-        connection = geoPackageConnection;
-        should.exist(connection);
+      GeoPackageAPI.open(filename, function(err, gp) {
+        geoPackage = gp;
+        should.not.exist(err);
+        should.exist(gp);
+        should.exist(gp.getDatabase().getDBConnection());
+        gp.getPath().should.be.equal(filename);
         done();
       });
     });
   });
 
   afterEach('should close the geopackage', function(done) {
-    connection.close();
+    geoPackage.close();
     testSetup.deleteGeoPackage(filename, done);
   });
 
   it('should get the data column for property_0', function() {
-    var dc = new DataColumnsDao(connection);
+    var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumns('FEATURESriversds', 'property_0');
     dataColumn.should.be.deep.equal({
       table_name: 'FEATURESriversds',
@@ -57,7 +60,7 @@ describe('Data Columns tests', function() {
   });
 
   it('should get the contents for the data column for property_0', function() {
-    var dc = new DataColumnsDao(connection);
+    var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumns('FEATURESriversds', 'property_0');
     var contents = dc.getContents(dataColumn);
     contents.should.be.deep.equal({
@@ -75,13 +78,13 @@ describe('Data Columns tests', function() {
   });
 
   it('should get the data column for geom', function() {
-    var dc = new DataColumnsDao(connection);
+    var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumns('FEATURESriversds', 'geom');
     should.not.exist(dataColumn);
   });
 
   it('should create a data column', function() {
-    var dao = new DataColumnsDao(connection);
+    var dao = new DataColumnsDao(geoPackage);
     var dc = new DataColumns();
     dc.table_name = 'FEATURESriversds';
     dc.column_name = 'test';
@@ -105,7 +108,7 @@ describe('Data Columns tests', function() {
   });
 
   it('should query by the constraint name to retrieve a data column', function() {
-    var dao = new DataColumnsDao(connection);
+    var dao = new DataColumnsDao(geoPackage);
     var dc = new DataColumns();
     dc.table_name = 'FEATURESriversds';
     dc.column_name = 'test';
@@ -130,10 +133,10 @@ describe('Data Columns tests', function() {
   });
 
   it('should create a data column constraint', function() {
-    var tc = new TableCreator(connection);
+    var tc = new TableCreator(geoPackage);
     return tc.createDataColumnConstraints()
     .then(function() {
-      var dao = new DataColumnConstraintsDao(connection);
+      var dao = new DataColumnConstraintsDao(geoPackage);
       var dc = new DataColumnConstraints();
       dc.constraint_name = 'test constraint';
       dc.constraint_type = 'range';
@@ -161,10 +164,10 @@ describe('Data Columns tests', function() {
   });
 
   it('should create a data column constraint and query unique', function() {
-    var tc = new TableCreator(connection);
+    var tc = new TableCreator(geoPackage);
     return tc.createDataColumnConstraints()
     .then(function() {
-      var dao = new DataColumnConstraintsDao(connection);
+      var dao = new DataColumnConstraintsDao(geoPackage);
       var dc = new DataColumnConstraints();
       dc.constraint_name = 'test constraint';
       dc.constraint_type = 'range';

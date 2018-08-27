@@ -1,16 +1,19 @@
 var UserTableReader = require('../../../lib/user/userTableReader.js')
   , UserDao = require('../../../lib/user/userDao')
-  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection.js')
+  , GeoPackageAPI = require('../../../.')
   , path = require('path')
   , should = require('chai').should();
 
 describe('UserTableReader tests', function() {
-  var connection;
+  var geoPackage;
   beforeEach('create the GeoPackage connection', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg'))
-    .then(function(geoPackageConnection) {
-      connection = geoPackageConnection;
-      should.exist(connection);
+    var filename = path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg');
+    GeoPackageAPI.open(filename, function(err, gp) {
+      geoPackage = gp;
+      should.not.exist(err);
+      should.exist(gp);
+      should.exist(gp.getDatabase().getDBConnection());
+      gp.getPath().should.be.equal(filename);
       done();
     });
   });
@@ -21,7 +24,7 @@ describe('UserTableReader tests', function() {
 
   it('should read the table', function() {
     var reader = new UserTableReader('point2d');
-    var table = reader.readTable(connection);
+    var table = reader.readTable(geoPackage.getDatabase());
     table.table_name.should.be.equal('point2d');
     table.columns.length.should.be.equal(8);
     table.columns[0].name.should.be.equal('fid');
@@ -36,8 +39,8 @@ describe('UserTableReader tests', function() {
 
   it('should query the table', function() {
     var reader = new UserTableReader('point2d');
-    var table = reader.readTable(connection);//, function(err, table) {
-    var ud = new UserDao(connection, table);
+    var table = reader.readTable(geoPackage.getDatabase());
+    var ud = new UserDao(geoPackage, table);
     var results = ud.queryForAll();
     should.exist(results);
     results.length.should.be.equal(2);
