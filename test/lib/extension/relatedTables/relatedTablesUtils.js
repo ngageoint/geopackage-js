@@ -16,7 +16,7 @@ module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
   columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
 
-  // Add test columsn for common data types, some with limits
+  // Add test columns for common data types, some with limits
   columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text", DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull, ''));
   columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_real", DataTypes.GPKGDataType.GPKG_DT_REAL, notNull));
   columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_boolean", DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, notNull));
@@ -39,7 +39,7 @@ module.exports.createSimpleUserColumns = function(startingIndex, notNull) {
   for (var i = 0; i < allAdditionalColumns.length; i++) {
     var column = allAdditionalColumns[i];
     if (SimpleAttributesTable.isSimple(column)) {
-      columns.add(UserColumn.createColumnWithIndex(columnIndex++, column.name, column.dataType, column.notNull, column.defaultValue));
+      columns.push(UserColumn.createColumnWithIndex(columnIndex++, column.name, column.dataType, column.notNull, column.defaultValue));
     }
   }
 

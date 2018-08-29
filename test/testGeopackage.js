@@ -169,7 +169,7 @@ describe('GeoPackageAPI tests', function() {
 
     it('should get the tables', function() {
       var tables = indexedGeopackage.getTables();
-      tables.should.be.deep.equal({ features: [ 'rivers' ], tiles: [ 'rivers_tiles' ] });
+      tables.should.be.deep.equal({ attributes: [], features: [ 'rivers' ], tiles: [ 'rivers_tiles' ] });
     });
 
     it('should get the tile tables', function() {
