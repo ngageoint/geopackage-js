@@ -129,7 +129,7 @@ describe('Related Simple Attributes tests', function() {
     var contentsDao = geoPackage.getContentsDao();
     var contentsTables = contentsDao.getTables();
     contentsTables.indexOf(simpleTable.table_name).should.be.equal(-1);
-    var relationship = RelatedTablesExtension.RelationshipBuilder
+    var relationship = RelatedTablesExtension.RelationshipBuilder()
     .setBaseTableName(baseTableName)
     .setRelatedTable(simpleTable)
     .setUserMappingTable(userMappingTable);

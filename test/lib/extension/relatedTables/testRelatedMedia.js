@@ -54,7 +54,7 @@ describe('Related Media tests', function() {
   }
 
   it('should create a media relationship', function() {
-    var rte = new RelatedTablesExtension(geoPackage);
+    var rte = geoPackage.getRelatedTablesExtension();
     rte.has().should.be.equal(false);
 
     var extendedRelationships = rte.getRelationships();
@@ -115,7 +115,7 @@ describe('Related Media tests', function() {
     var contentsDao = geoPackage.getContentsDao();
     var contentsTables = contentsDao.getTables();
     contentsTables.indexOf(mediaTable.table_name).should.be.equal(-1);
-    var relationship = RelatedTablesExtension.RelationshipBuilder
+    var relationship = RelatedTablesExtension.RelationshipBuilder()
     .setBaseTableName(baseTableName)
     .setRelatedTable(mediaTable)
     .setUserMappingTable(userMappingTable);

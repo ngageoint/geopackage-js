@@ -6,6 +6,9 @@ var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , GeometryData = require('../../../../lib/geom/geometryData')
   , testSetup = require('../../../fixtures/testSetup')
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
+  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
   , wkx = require('wkx')
   , fs = require('fs')
   , path = require('path')
@@ -268,9 +271,17 @@ describe('FeatureDao tests', function() {
     var queryTestFeatureDao;
     var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
     var testGeoPackage;
+    var tileBuffer;
 
     afterEach('should delete the geopackage', function(done) {
       testSetup.deleteGeoPackage(testGeoPackage, done);
+    });
+
+    beforeEach('get the tile buffer', function(done) {
+      testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'), function(err, buffer) {
+        tileBuffer = buffer;
+        done();
+      });
     });
 
     beforeEach('should create the GeoPackage', function(done) {
@@ -628,6 +639,76 @@ describe('FeatureDao tests', function() {
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
+      });
+    });
+
+    it('should create a media relationship between a feature and a media row', function() {
+      var rte = geopackage.getRelatedTablesExtension();
+      var additionalMediaColumns = RelatedTablesUtils.createAdditionalUserColumns(MediaTable.numRequiredColumns());
+      var mediaTable = MediaTable.create('media_table', additionalMediaColumns);
+      rte.createRelatedTable(mediaTable);
+
+      var mediaDao = rte.getMediaDao(mediaTable);
+      should.exist(mediaDao);
+      mediaTable = mediaDao.mediaTable;
+      should.exist(mediaTable);
+
+      // Create media row
+      var contentType = 'image/png';
+      var mediaRow = mediaDao.newRow();
+      mediaRow.setData(tileBuffer);
+      mediaRow.setContentType(contentType);
+      RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
+      mediaRowId = mediaDao.create(mediaRow);
+      mediaRowId.should.be.greaterThan(0);
+      mediaRow = mediaDao.queryForIdObject(mediaRowId);
+
+      var featureRow = queryTestFeatureDao.getFeatureRow(queryTestFeatureDao.queryForAll()[0]);
+      return queryTestFeatureDao.linkMediaRow(featureRow, mediaRow)
+      .then(function() {
+        var linkedMedia = queryTestFeatureDao.getLinkedMedia(featureRow);
+        linkedMedia.length.should.be.equal(1);
+        linkedMedia[0].id.should.be.equal(mediaRowId);
+      });
+    });
+
+    it('should create a simple attributes relationship between a feature and a simple attributes row', function() {
+      var rte = geopackage.getRelatedTablesExtension();
+      var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(SimpleAttributesTable.numRequiredColumns(), true);
+      var simpleTable = SimpleAttributesTable.create('simple_table', simpleUserColumns);
+      rte.createRelatedTable(simpleTable);
+
+      var simpleDao = rte.getSimpleAttributesDao(simpleTable);
+      should.exist(simpleDao);
+      simpleTable = simpleDao.simpleAttributesTable;
+      should.exist(simpleTable);
+
+      // Create simple attributes row
+      var simpleRow = simpleDao.newRow();
+      RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
+      simpleRowId = simpleDao.create(simpleRow);
+      simpleRowId.should.be.greaterThan(0);
+      simpleRow = simpleDao.queryForIdObject(simpleRowId);
+
+      var featureRow = queryTestFeatureDao.getFeatureRow(queryTestFeatureDao.queryForAll()[0]);
+      return queryTestFeatureDao.linkSimpleAttributesRow(featureRow, simpleRow)
+      .then(function() {
+        var linkedAttributes = queryTestFeatureDao.getLinkedSimpleAttributes(featureRow);
+        linkedAttributes.length.should.be.equal(1);
+        linkedAttributes[0].id.should.be.equal(simpleRowId);
+      });
+    });
+
+    it('should create a feature relationship between a feature and another feature row', function() {
+      var all = queryTestFeatureDao.queryForAll();
+      var featureRow = queryTestFeatureDao.getFeatureRow(all[0]);
+      var relatedFeatureRow = queryTestFeatureDao.getFeatureRow(all[1]);
+
+      return queryTestFeatureDao.linkFeatureRow(featureRow, relatedFeatureRow)
+      .then(function() {
+        var linkedFeatures = queryTestFeatureDao.getLinkedFeatures(featureRow);
+        linkedFeatures.length.should.be.equal(1);
+        linkedFeatures[0].id.should.be.equal(relatedFeatureRow.getId());
       });
     });
   });

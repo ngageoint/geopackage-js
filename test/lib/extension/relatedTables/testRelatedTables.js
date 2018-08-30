@@ -164,7 +164,7 @@ describe('Related Tables tests', function() {
       baseIdColumn.notNull.should.be.equal(true);
       baseIdColumn.primaryKey.should.be.equal(false);
 
-      var featureRelationship = RelatedTablesExtension.RelationshipBuilder
+      var featureRelationship = RelatedTablesExtension.RelationshipBuilder()
       .setBaseTableName(baseTableName)
       .setRelatedTableName(relatedTableName)
       .setUserMappingTable(userMappingTable);
