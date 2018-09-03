@@ -15,7 +15,10 @@ var GeoPackageAPI = require('../index')
   , WebPExtension = GeoPackageAPI.WebPExtension
   , DataColumnsDao = GeoPackageAPI.DataColumnsDao
   , DataColumnConstraintsDao = GeoPackageAPI.DataColumnConstraintsDao
-  , TableCreator = GeoPackageAPI.TableCreator;
+  , TableCreator = GeoPackageAPI.TableCreator
+  , MediaTable = GeoPackageAPI.MediaTable
+  , UserMappingTable = GeoPackageAPI.UserMappingTable
+  , DublinCoreType = GeoPackageAPI.DublinCoreType;
 
 var wkx = require('wkx')
   , path = require('path')
@@ -140,7 +143,7 @@ GeoPackageUtils.createFeatures = function(geopackage) {
   };
   var poly1 = {
     geoJson: bitsPolygon,
-    name: 'BITSystems'
+    name: 'BIT Systems'
   };
   var poly2 = {
     geoJson: ngaVisitorCenterPolygon,
@@ -385,32 +388,121 @@ GeoPackageUtils.createRTreeSpatialIndexExtension = function(geopackage) {
 }
 
 GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
-  return geopackage;
+  var relatedTables = geopackage.getRelatedTablesExtension();
+  var mediaTable = MediaTable.create('media');
+  relatedTables.createRelatedTable(mediaTable);
+
+  var mediaDao = relatedTables.getMediaDao(mediaTable);
+  mediaTable = mediaDao.mediaTable;
+
+
+  return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'BITSystems_Logo.png'))
+  .then(function(bitsLogoBuffer) {
+    var bitsLogo = mediaDao.newRow();
+    bitsLogo.setContentType('image/png');
+    bitsLogo.setData(bitsLogoBuffer);
+    var bitsRowId = mediaDao.create(bitsLogo);
+    bitsLogo = mediaDao.queryForIdObject(bitsRowId);
+
+    var featureDao = geopackage.getFeatureDaoWithTableName('geometry1');
+    var rows = featureDao.queryForLike('text', 'BIT Systems%');
+
+    return rows.reduce(function(sequence, row) {
+      return sequence.then(function() {
+        var featureRow = featureDao.getFeatureRow(row);
+        return featureDao.linkMediaRow(featureRow, bitsLogo);
+      });
+    }, Promise.resolve())
+  })
+  .then(function() {
+    return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'NGA_Logo.png'));
+  })
+  .then(function(ngaLogoBuffer) {
+    var ngaLogo = mediaDao.newRow();
+    ngaLogo.setContentType('image/png');
+    ngaLogo.setData(ngaLogoBuffer);
+    var ngaRowId = mediaDao.create(ngaLogo);
+    ngaLogo = mediaDao.queryForIdObject(ngaRowId);
+
+    var featureDao = geopackage.getFeatureDaoWithTableName('geometry2');
+    var rows = featureDao.queryForLike('text', 'NGA%');
+
+    return rows.reduce(function(sequence, row) {
+      return sequence.then(function() {
+        var featureRow = featureDao.getFeatureRow(row);
+        return featureDao.linkMediaRow(featureRow, ngaLogo);
+      });
+    }, Promise.resolve())
+  })
+  .then(function() {
+    return geopackage;
+  });
 }
 
 GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
+  var point1FeatureDao = geopackage.getFeatureDaoWithTableName('point1');
+  var polygon1FeatureDao = geopackage.getFeatureDaoWithTableName('polygon1');
+  var point2FeatureDao = geopackage.getFeatureDaoWithTableName('point2');
+  var polygon2FeatureDao = geopackage.getFeatureDaoWithTableName('polygon2');
+
+  // relate the point1 feature to the polygon1 feature
+  var point1Row = point1FeatureDao.getFeatureRow(point1FeatureDao.queryForAll()[0]);
+  var polygon1Row = polygon1FeatureDao.getFeatureRow(polygon1FeatureDao.queryForAll()[0]);
+
+  var columns = [];
+  var columnIndex = UserMappingTable.numRequiredColumns();
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DATE.name, DataTypes.GPKGDataType.GPKG_DT_DATETIME));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.GPKGDataType.GPKG_DT_TEXT));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT));
+
+  var userMappingTable = UserMappingTable.create('point1_to_polygon1', columns);
+  var mappingColumnValues = {};
+  mappingColumnValues[DublinCoreType.DATE.name] = new Date();
+  mappingColumnValues[DublinCoreType.DESCRIPTION.name] = 'Description';
+  mappingColumnValues[DublinCoreType.SOURCE.name] = 'Source';
+  mappingColumnValues[DublinCoreType.TITLE.name] = 'Title';
+
+  return point1FeatureDao.linkFeatureRow(point1Row, polygon1Row, userMappingTable, mappingColumnValues)
+  .then(function() {
+    // relate the point2 feature to the polygon2 feature
+    var point2Row = point2FeatureDao.getFeatureRow(point2FeatureDao.queryForAll()[0]);
+    var polygon2Row = polygon2FeatureDao.getFeatureRow(polygon2FeatureDao.queryForAll()[0]);
+    return point2FeatureDao.linkFeatureRow(point2Row, polygon2Row);
+  })
+  .then(function() {
+    return geopackage;
+  });
+}
+
+GeoPackageUtils.createRelatedTablesSimpleAttributesExtension = function(geopackage) {
   return geopackage;
 }
 
-GeoPackageUtils.loadTile = function(tilePath, callback) {
-  if (typeof(process) !== 'undefined' && process.version) {
-    fs.readFile(tilePath, callback);
-  } else {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', tilePath, true);
-    xhr.responseType = 'arraybuffer';
+GeoPackageUtils.loadFile = function(filePath) {
+  return new Promise(function(resolve, reject) {
+    if (typeof(process) !== 'undefined' && process.version) {
+      fs.readFile(filePath, function(err, data) {
+        if (err) {
+          return reject(err);
+        }
+        resolve(data);
+      });
+    } else {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', filePath, true);
+      xhr.responseType = 'arraybuffer';
 
-    xhr.onload = function(e) {
-      if (xhr.status !== 200) {
-        return callback();
-      }
-      return callback(null, new Buffer(this.response));
-    };
-    xhr.onerror = function(e) {
-      return callback();
-    };
-    xhr.send();
-  }
+      xhr.onload = function(e) {
+        if (xhr.status !== 200) {
+          reject();
+        }
+        resolve(new Buffer(this.response));
+      };
+      xhr.onerror = reject;
+      xhr.send();
+    }
+  });
 }
 
 GeoPackageUtils.createTiles = function(geopackage) {
@@ -442,11 +534,10 @@ GeoPackageUtils.createTiles = function(geopackage) {
             }
             return ytiles.reduce(function(ySequence, y) {
               return ySequence.then(function() {
-                return new Promise(function(resolve, reject) {
-                  GeoPackageUtils.loadTile(path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, image) {
-                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
-                  });
+                return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'))
+                .then(function(image) {
+                  console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
+                  return geopackage.addTile(image, tableName, zoom, y, x);
                 });
               });
             }, Promise.resolve());
@@ -477,13 +568,11 @@ GeoPackageUtils.createWebPExtension = function(geopackage) {
   geopackage.getSpatialReferenceSystemDao().createWebMercator();
   return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
   .then(function(tileMatrixSet) {
-    return new Promise(function(resolve, reject) {
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 15, 15);
-
-      GeoPackageUtils.loadTile(path.join(__dirname, 'fixtures', 'tiles', '15', '6844', '12438.webp'), function(err, image) {
-        resolve(geopackage.addTile(image, tableName, 15, 12438, 6844));
-      });
-    });
+    geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 15, 15);
+    return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', '15', '6844', '12438.webp'));
+  })
+  .then(function(image) {
+    return geopackage.addTile(image, tableName, 15, 12438, 6844);
   })
   .then(function() {
     return geopackage;
@@ -535,10 +624,6 @@ GeoPackageUtils.createAttributes = function(geopackage) {
     }
     return geopackage;
   });
-}
-
-GeoPackageUtils.createRelatedTablesSimpleAttributesExtension = function(geopackage) {
-  return geopackage;
 }
 
 GeoPackageUtils.createMetadataExtension = function(geopackage) {
