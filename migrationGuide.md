@@ -1,6 +1,7 @@
 ## 1.x to 2.x Migration Guide
 
-This will highlight all API changes that were made between 1.x and 2.x for GeoPackage-JS
+This will highlight all API changes that were made between 1.x and 2.x for GeoPackage-JS  
+This guide is not complete yet.
 
 ### GeoPackageAPI methods changed
 

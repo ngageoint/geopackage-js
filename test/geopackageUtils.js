@@ -506,7 +506,14 @@ GeoPackageUtils.loadFile = function(filePath) {
 }
 
 GeoPackageUtils.createTiles = function(geopackage) {
-  var tableName = 'OSM';
+  return GeoPackageUtils.addWebMercatorTilesFromPath(geopackage, 'OSM', path.join(__dirname, 'fixtures', 'tiles'), 0, 3)
+  .then(function() {
+    return geopackage;
+  });
+}
+
+GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, tileBaseDir, minZoom, maxZoom) {
+  var tableName = tableName || 'OSM';
   var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
   var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
   var contentsSrsId = 3857;
@@ -514,26 +521,24 @@ GeoPackageUtils.createTiles = function(geopackage) {
   geopackage.getSpatialReferenceSystemDao().createWebMercator();
   return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
   .then(function(tileMatrixSet) {
-    geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
-
-    var zooms = [0, 1, 2, 3];
+    geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom);
+    var zooms = [];
+    for (var i = minZoom; i <= maxZoom; i++) {
+      zooms.push(i);
+    }
 
     return zooms.reduce(function(zoomSequence, zoom) {
       return zoomSequence.then(function() {
-        var xtiles = [];
-        var tileCount = Math.pow(2,zoom);
-        for (var i = 0; i < tileCount; i++) {
-          xtiles.push(i);
-        }
-        return xtiles.reduce(function(xSequence, x) {
+        var xfilenames = fs.readdirSync(path.join(tileBaseDir, zoom.toString()));
+        return xfilenames.reduce(function(xSequence, xFilename) {
           return xSequence.then(function() {
-            var ytiles = [];
-            var tileCount = Math.pow(2,zoom);
-            for (var i = 0; i < tileCount; i++) {
-              ytiles.push(i);
-            }
-            return ytiles.reduce(function(ySequence, y) {
+            var x = Number(xFilename);
+            if (Number.isNaN(x)) return;
+            var yfilenames = fs.readdirSync(path.join(tileBaseDir, zoom.toString(), x.toString()));
+            return yfilenames.reduce(function(ySequence, yFilename) {
               return ySequence.then(function() {
+                var y = Number(yFilename.slice(0, yFilename.lastIndexOf('.')));
+                if (Number.isNaN(y)) return;
                 return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'))
                 .then(function(image) {
                   console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
