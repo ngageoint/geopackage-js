@@ -6,7 +6,7 @@ var path = require('path')
 
 describe('Create GeoPackage samples', function() {
 
-  describe.only('Create a GeoPackage for OGC Certification', function() {
+  describe('Create a GeoPackage for OGC Certification', function() {
     var testGeoPackage = path.join(__dirname, 'fixtures', 'tmp', 'js-example.gpkg');
     var geopackage;
 
