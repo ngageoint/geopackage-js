@@ -41,6 +41,7 @@ var map = L.map('map', {
   center: [45,0],
   zoom: 3,
   worldCopyJump: true,
+  crs: L.CRS.EPSG4326,
   // maxBounds: [
   //   [-85, -180],
   //   [85, 180]
@@ -50,7 +51,7 @@ var map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
-var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+var osm = L.tileLayer('https://osm.geointservices.io/tiles/default_pc/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 });
 var arcworldmap = L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png', {
@@ -454,12 +455,25 @@ window.toggleLayer = function(layerType, table) {
         var size = this.getTileSize();
         canvas.width = size.x;
         canvas.height = size.y;
+        var tableLayer = this;
         setTimeout(function() {
           console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
-            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-            done(err, canvas);
-          });
+          if (map.options.crs === L.CRS.EPSG4326) {
+            var tileSize = tableLayer.getTileSize(),
+    		    nwPoint = tilePoint.scaleBy(tileSize),
+    		    sePoint = nwPoint.add(tileSize),
+    		    nw = map.unproject(nwPoint, tilePoint.z),
+    		    se = map.unproject(sePoint, tilePoint.z);
+            GeoPackageAPI.draw4326TileInCanvas(geoPackage, table, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, size.x, size.y, canvas, function(err) {
+              console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+              done(err, canvas);
+            });
+          } else {
+            GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
+              console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+              done(err, canvas);
+            });
+          }
         }, 0);
         return canvas;
       }

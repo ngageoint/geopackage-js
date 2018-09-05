@@ -725,3 +725,14 @@ module.exports.drawXYZTileInCanvas = function(geopackage, table, x, y, z, width,
     retriever.drawTileIn(x, y, z, canvas, callback);
   });
 };
+
+module.exports.draw4326TileInCanvas = function(geopackage, table, minLat, minLon, maxLat, maxLon, z, width, height, canvas, callback) {
+  z = Number(z);
+  width = Number(width);
+  height = Number(height);
+  geopackage.getTileDaoWithTableName(table, function(err, tileDao) {
+    var retriever = new GeoPackageTileRetriever(tileDao, width, height);
+    var bounds = new BoundingBox(minLon, maxLon, minLat, maxLat);
+    retriever.drawTileWithWgs84BoundsInProjection(bounds, z, 'EPSG:4326', canvas, callback);
+  });
+}
