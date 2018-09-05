@@ -286,6 +286,26 @@ describe('GeoPackageAPI tests', function() {
         geoJson.properties.Scalerank.should.be.equal('test');
       }
     });
+
+    it('should add geojson to the geopackage and keep it indexed and iterate it and pull the features', function() {
+      var id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers')
+      var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(indexedGeopackage, 'rivers');
+      for (var geoJson of iterator.results) {
+        should.exist(geoJson.properties);
+      }
+    });
   });
 
   describe('should operate on a new geopackage', function() {
