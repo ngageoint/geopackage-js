@@ -6,7 +6,7 @@ L.tileLayer('http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery
 
 
 window.onload = function () {
-  window.loadUrl("http://localhost:8000/StLouis.gpkg");
+  window.loadUrl("./StLouis.gpkg");
 }
 
 
