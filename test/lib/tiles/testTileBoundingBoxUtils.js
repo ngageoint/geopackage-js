@@ -32,7 +32,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018754.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getTileRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
     minRow.should.be.equal(1);
     done();
   });
@@ -43,7 +43,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018755.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getTileRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
     minRow.should.be.equal(0);
     done();
   });

@@ -1,0 +1,391 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>extension/rtree/index.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">extension/rtree/index.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * RTreeIndexDao module.
+ * @module RTreeIndexDao
+ * @see module:dao/dao
+ */
+
+var Dao = require('../../dao/dao')
+  , BaseExtension = require('../baseExtension')
+  , Extension = require('../.').Extension
+  , EnvelopeBuilder = require('../../geom/envelopeBuilder')
+  , GeometryData = require('../../geom/geometryData');
+
+var util = require('util');
+
+var RTreeIndex = function(geoPackage, featureDao) {
+  BaseExtension.call(this, geoPackage);
+
+  this.extensionName = Extension.buildExtensionName(RTreeIndexDao.EXTENSION_RTREE_INDEX_AUTHOR, RTreeIndexDao.EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR);
+
+  this.extensionDefinition = RTreeIndexDao.EXTENSION_RTREE_INDEX_DEFINITION;
+
+  this.tableName = featureDao.table_name;
+  this.primaryKeyColumn = featureDao.idColumns[0];
+  this.columnName = featureDao.getGeometryColumnName();
+
+  this.rtreeIndexDao = new RTreeIndexDao(geoPackage, featureDao);
+  this.extensionExists = this.hasExtension(this.extensionName, this.tableName, this.columnName);
+}
+
+util.inherits(RTreeIndex, BaseExtension);
+
+RTreeIndex.prototype.getRTreeIndexExtension = function () {
+  return this.getExtension(this.extensionName, this.tableName, this.columnName);
+};
+
+RTreeIndex.prototype.getOrCreateExtension = function() {
+  return this.getOrCreate(this.extensionName, this.tableName, this.columnName, this.extensionDefinition, Extension.WRITE_ONLY);
+};
+
+RTreeIndex.prototype.create = function() {
+  if (this.extensionExists) {
+    return Promise.resolve(this.getRTreeIndexExtension());
+  }
+
+  return this.getOrCreate(this.extensionName, this.tableName, this.columnName, RTreeIndexDao.EXTENSION_RTREE_INDEX_DEFINITION, Extension.WRITE_ONLY)
+  .then(function() {
+    this.createAllFunctions();
+    this.createRTreeIndex();
+    this.loadRTreeIndex();
+    this.createAllTriggers();
+    return this.getRTreeIndexExtension();
+  }.bind(this));
+}
+
+RTreeIndex.prototype.createAllTriggers = function() {
+  var insertTrigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_insert AFTER INSERT ON '+this.tableName+
+  '  WHEN (new.'+this.columnName+' NOT NULL AND NOT ST_IsEmpty(NEW.'+this.columnName+')) '+
+  'BEGIN '+
+  '  INSERT OR REPLACE INTO rtree_'+this.tableName+'_'+this.columnName+' VALUES ('+
+  '    NEW.'+this.primaryKeyColumn+','+
+  '    ST_MinX(NEW.'+this.columnName+'), ST_MaxX(NEW.'+this.columnName+'), '+
+  '    ST_MinY(NEW.'+this.columnName+'), ST_MaxY(NEW.'+this.columnName+') '+
+  '  ); '+
+  'END;';
+
+  var update1Trigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_update1 AFTER UPDATE OF '+this.columnName+' ON '+this.tableName+
+  '  WHEN OLD.'+this.primaryKeyColumn+' = NEW.'+this.primaryKeyColumn+' AND '+
+  '     (NEW.'+this.columnName+' NOTNULL AND NOT ST_IsEmpty(NEW.'+this.columnName+')) '+
+  'BEGIN '+
+  '  INSERT OR REPLACE INTO rtree_'+this.tableName+'_'+this.columnName+' VALUES ('+
+  '    NEW.'+this.primaryKeyColumn+','+
+  '    ST_MinX(NEW.'+this.columnName+'), ST_MaxX(NEW.'+this.columnName+'), '+
+  '    ST_MinY(NEW.'+this.columnName+'), ST_MaxY(NEW.'+this.columnName+') '+
+  '  ); '+
+  'END;';
+
+  var update2Trigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_update2 AFTER UPDATE OF '+this.columnName+' ON '+this.tableName+
+  '  WHEN OLD.'+this.primaryKeyColumn+' = NEW.'+this.primaryKeyColumn+' AND '+
+  '       (NEW.'+this.columnName+' ISNULL OR ST_IsEmpty(NEW.'+this.columnName+')) '+
+  'BEGIN '+
+  '  DELETE FROM rtree_'+this.tableName+'_'+this.columnName+' WHERE id = OLD.'+this.primaryKeyColumn+'; '+
+  'END;';
+
+  var update3Trigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_update3 AFTER UPDATE OF '+this.columnName+' ON '+this.tableName+
+  '  WHEN OLD.'+this.primaryKeyColumn+' != NEW.'+this.primaryKeyColumn+' AND '+
+  '       (NEW.'+this.columnName+' NOTNULL AND NOT ST_IsEmpty(NEW.'+this.columnName+')) '+
+  'BEGIN '+
+  '  DELETE FROM rtree_'+this.tableName+'_'+this.columnName+' WHERE id = OLD.'+this.primaryKeyColumn+'; '+
+  '  INSERT OR REPLACE INTO rtree_'+this.tableName+'_'+this.columnName+' VALUES ('+
+  '    NEW.'+this.primaryKeyColumn+', '+
+  '    ST_MinX(NEW.'+this.columnName+'), ST_MaxX(NEW.'+this.columnName+'), '+
+  '    ST_MinY(NEW.'+this.columnName+'), ST_MaxY(NEW.'+this.columnName+')'+
+  '  ); '+
+  'END;';
+
+  var update4Trigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_update4 AFTER UPDATE ON '+this.tableName+
+  '  WHEN OLD.'+this.primaryKeyColumn+' != NEW.'+this.primaryKeyColumn+' AND '+
+  '       (NEW.'+this.columnName+' ISNULL OR ST_IsEmpty(NEW.'+this.columnName+')) '+
+  'BEGIN '+
+  '  DELETE FROM rtree_'+this.tableName+'_'+this.columnName+' WHERE id IN (OLD.'+this.primaryKeyColumn+', NEW.'+this.primaryKeyColumn+'); '+
+  'END;';
+
+  var deleteTrigger =
+  'CREATE TRIGGER rtree_'+this.tableName+'_'+this.columnName+'_delete AFTER DELETE ON '+this.tableName+
+  '  WHEN old.'+this.columnName+' NOT NULL '+
+  'BEGIN'+
+  '  DELETE FROM rtree_'+this.tableName+'_'+this.columnName+' WHERE id = OLD.'+this.primaryKeyColumn+'; '+
+  'END;';
+
+  this.connection.run(insertTrigger);
+  this.connection.run(update1Trigger);
+  this.connection.run(update2Trigger);
+  this.connection.run(update3Trigger);
+  this.connection.run(update4Trigger);
+  this.connection.run(deleteTrigger);
+}
+
+RTreeIndex.prototype.loadRTreeIndex = function() {
+  this.connection.run('INSERT OR REPLACE INTO rtree_'+this.tableName+'_'+this.columnName+' SELECT '+this.primaryKeyColumn+', st_minx('+this.columnName+'), st_maxx('+this.columnName+'), st_miny('+this.columnName+'), st_maxy('+this.columnName+') FROM '+this.tableName);
+}
+
+RTreeIndex.prototype.createRTreeIndex = function() {
+  this.connection.run('CREATE VIRTUAL TABLE rtree_'+this.tableName+'_'+this.columnName+' USING rtree(id, minx, maxx, miny, maxy)');
+}
+
+RTreeIndex.prototype.createAllFunctions = function() {
+  this.createMinXFunction();
+	this.createMaxXFunction();
+	this.createMinYFunction();
+	this.createMaxYFunction();
+	this.createIsEmptyFunction();
+}
+
+RTreeIndex.prototype.createMinXFunction = function() {
+  this.connection.registerFunction('ST_MinX', function(buffer) {
+    var geom = new GeometryData(buffer);
+    var envelope = geom.envelope;
+    if (!envelope) {
+      envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+    }
+    return envelope.minX;
+  });
+}
+
+RTreeIndex.prototype.createMinYFunction = function() {
+  this.connection.registerFunction('ST_MinY', function(buffer) {
+    var geom = new GeometryData(buffer);
+    var envelope = geom.envelope;
+    if (!envelope) {
+      envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+    }
+    return envelope.minY;
+  });
+}
+
+RTreeIndex.prototype.createMaxXFunction = function() {
+  this.connection.registerFunction('ST_MaxX', function(buffer) {
+    var geom = new GeometryData(buffer);
+    var envelope = geom.envelope;
+    if (!envelope) {
+      envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+    }
+    return envelope.maxX;
+  });
+}
+
+RTreeIndex.prototype.createMaxYFunction = function() {
+  this.connection.registerFunction('ST_MaxY', function(buffer) {
+    var geom = new GeometryData(buffer);
+    var envelope = geom.envelope;
+    if (!envelope) {
+      envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+    }
+    return envelope.maxY;
+  });
+}
+
+RTreeIndex.prototype.createIsEmptyFunction = function() {
+  this.connection.registerFunction('ST_IsEmpty', function(buffer) {
+    var geom = new GeometryData(buffer);
+    return !geom || geom.empty || !geom.geometry;
+  });
+}
+
+/**
+ * RTree Index Data Access Object
+ * @class
+ * @extends {module:dao/dao~Dao}
+ */
+var RTreeIndexDao = function(geoPackage, featureDao) {
+  Dao.call(this, geoPackage);
+  this.featureDao = featureDao;
+
+};
+
+util.inherits(RTreeIndexDao, Dao);
+
+RTreeIndexDao.prototype.queryWithGeometryEnvelope = function(envelope) {
+  var tableName = this.featureDao.gpkgTableName;
+
+  var where = '';
+  var minXLessThanMaxX = envelope.minX &lt; envelope.maxX;
+  if (minXLessThanMaxX) {
+    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.maxX, '&lt;=');
+    where += ' and ';
+    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.minX, '>=');
+  } else {
+    where += '(';
+    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.maxX, '&lt;=');
+    where += ' or ';
+    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.minX, '>=');
+    where += ' or ';
+    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.minX, '>=');
+    where += ' or ';
+    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.maxX, '&lt;=');
+    where += ')';
+  }
+
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValueAndOperation('miny', envelope.maxY, '&lt;=');
+  where += ' and ';
+  where += this.buildWhereWithFieldAndValueAndOperation('maxy', envelope.minY, '>=');
+
+  var whereArgs = []
+  whereArgs.push(envelope.maxX, envelope.minX);
+  if (!minXLessThanMaxX) {
+    whereArgs.push(envelope.minX, envelope.maxX);
+  }
+  whereArgs.push(envelope.maxY, envelope.minY);
+
+  var join = 'inner join ' + tableName + ' on ' + tableName + '.' + this.featureDao.idColumns[0] + ' = ' + this.gpkgTableName+'.id';
+  return this.queryJoinWhereWithArgs(join, where, whereArgs, [tableName + '.*']);
+}
+
+RTreeIndexDao.TABLE_NAME = "rtree";
+RTreeIndexDao.COLUMN_TABLE_NAME = RTreeIndexDao.TABLE_NAME + ".table_name";
+RTreeIndexDao.COLUMN_GEOM_ID = RTreeIndexDao.TABLE_NAME + ".geom_id";
+RTreeIndexDao.COLUMN_MIN_X = RTreeIndexDao.TABLE_NAME + ".minx";
+RTreeIndexDao.COLUMN_MAX_X = RTreeIndexDao.TABLE_NAME + ".maxx";
+RTreeIndexDao.COLUMN_MIN_Y = RTreeIndexDao.TABLE_NAME + ".miny";
+RTreeIndexDao.COLUMN_MAX_Y = RTreeIndexDao.TABLE_NAME + ".maxy";
+RTreeIndexDao.COLUMN_MIN_Z = RTreeIndexDao.TABLE_NAME + ".minz";
+RTreeIndexDao.COLUMN_MAX_Z = RTreeIndexDao.TABLE_NAME + ".maxz";
+RTreeIndexDao.COLUMN_MIN_M = RTreeIndexDao.TABLE_NAME + ".minm";
+RTreeIndexDao.COLUMN_MAX_M = RTreeIndexDao.TABLE_NAME + ".maxm";
+
+RTreeIndexDao.EXTENSION_NAME = 'gpkg_rtree_index';
+RTreeIndexDao.EXTENSION_RTREE_INDEX_AUTHOR = 'gpkg';
+RTreeIndexDao.EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR = 'rtree_index';
+RTreeIndexDao.EXTENSION_RTREE_INDEX_DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
+
+RTreeIndexDao.prototype.gpkgTableName = RTreeIndexDao.TABLE_NAME;
+
+module.exports.RTreeIndexDao = RTreeIndexDao;
+module.exports.RTreeIndex = RTreeIndex;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

@@ -46,18 +46,18 @@ describe('FeatureDao tests', function() {
     });
 
     it('should read the geometry', function() {
-      var featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
       var each = featureDao.queryForEach();
       var srs = featureDao.srs;
       for (var row of each) {
-        var currentRow = featureDao.getFeatureRow(row);
+        var currentRow = featureDao.getRow(row);
         var geometry = currentRow.getGeometry();
         should.exist(geometry);
       }
     });
 
     it('should query for a row with property_1 equal to Gila', function() {
-      var featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
 
       for (var row of featureDao.queryForEachEqWithFieldAndValue('property_1', 'Gila')) {
         row.property_1.should.be.equal('Gila');
@@ -91,7 +91,7 @@ describe('FeatureDao tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('rivers');
+          featureDao = geoPackage.getFeatureDao('rivers');
           done();
         });
       });
@@ -194,7 +194,7 @@ describe('FeatureDao tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
           done();
         });
       });
@@ -428,7 +428,7 @@ describe('FeatureDao tests', function() {
         //     /
         geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
         .then(function(result) {
-          var featureDao = geopackage.getFeatureDaoWithTableName('QueryTest');
+          var featureDao = geopackage.getFeatureDao('QueryTest');
           queryTestFeatureDao = featureDao;
           createRow(box1, 'box1', featureDao);
           createRow(box2, 'box2', featureDao);
@@ -446,13 +446,13 @@ describe('FeatureDao tests', function() {
     it('should update a shape', function() {
       var line;
       for (var feature of queryTestFeatureDao.queryForEachEqWithFieldAndValue('_feature_id', 'line')) {
-        line = queryTestFeatureDao.getFeatureRow(feature);
+        line = queryTestFeatureDao.getRow(feature);
       }
       line.setValueWithColumnName('name', 'UpdatedLine');
       var newLine;
       queryTestFeatureDao.update(line);
       for (var feature of queryTestFeatureDao.queryForEachEqWithFieldAndValue('_feature_id', 'line')) {
-        newLine = queryTestFeatureDao.getFeatureRow(feature);
+        newLine = queryTestFeatureDao.getRow(feature);
       }
       newLine.getValueWithColumnName('name').should.be.equal('UpdatedLine');
     });
@@ -663,7 +663,7 @@ describe('FeatureDao tests', function() {
       mediaRowId.should.be.greaterThan(0);
       mediaRow = mediaDao.queryForIdObject(mediaRowId);
 
-      var featureRow = queryTestFeatureDao.getFeatureRow(queryTestFeatureDao.queryForAll()[0]);
+      var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
       return queryTestFeatureDao.linkMediaRow(featureRow, mediaRow)
       .then(function() {
         var linkedMedia = queryTestFeatureDao.getLinkedMedia(featureRow);
@@ -690,7 +690,7 @@ describe('FeatureDao tests', function() {
       simpleRowId.should.be.greaterThan(0);
       simpleRow = simpleDao.queryForIdObject(simpleRowId);
 
-      var featureRow = queryTestFeatureDao.getFeatureRow(queryTestFeatureDao.queryForAll()[0]);
+      var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
       return queryTestFeatureDao.linkSimpleAttributesRow(featureRow, simpleRow)
       .then(function() {
         var linkedAttributes = queryTestFeatureDao.getLinkedSimpleAttributes(featureRow);
@@ -701,8 +701,8 @@ describe('FeatureDao tests', function() {
 
     it('should create a feature relationship between a feature and another feature row', function() {
       var all = queryTestFeatureDao.queryForAll();
-      var featureRow = queryTestFeatureDao.getFeatureRow(all[0]);
-      var relatedFeatureRow = queryTestFeatureDao.getFeatureRow(all[1]);
+      var featureRow = queryTestFeatureDao.getRow(all[0]);
+      var relatedFeatureRow = queryTestFeatureDao.getRow(all[1]);
 
       return queryTestFeatureDao.linkFeatureRow(featureRow, relatedFeatureRow)
       .then(function() {

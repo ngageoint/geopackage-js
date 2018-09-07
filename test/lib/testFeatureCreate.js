@@ -204,7 +204,7 @@ describe('GeoPackage Feature table create tests', function() {
     });
 
     it('should create a feature', function() {
-      var featureDao = geopackage.getFeatureDaoWithTableName(tableName);
+      var featureDao = geopackage.getFeatureDao(tableName);
       var featureRow = featureDao.newRow();
       var geometryData = new GeometryData();
       geometryData.setSrsId(4326);
@@ -225,7 +225,7 @@ describe('GeoPackage Feature table create tests', function() {
       var count = featureDao.getCount();
       count.should.be.equal(1);
       var rows = featureDao.queryForAll();
-      var fr = featureDao.getFeatureRow(rows[0]);
+      var fr = featureDao.getRow(rows[0]);
       var geom = fr.getGeometry();
       geom.geometry.x.should.be.equal(1);
       geom.geometry.y.should.be.equal(2);
@@ -244,7 +244,7 @@ describe('GeoPackage Feature table create tests', function() {
       var featureDao;
 
       beforeEach(function() {
-        featureDao = geopackage.getFeatureDaoWithTableName(tableName);
+        featureDao = geopackage.getFeatureDao(tableName);
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(4326);
@@ -263,7 +263,7 @@ describe('GeoPackage Feature table create tests', function() {
         var count = featureDao.getCount();
         count.should.be.equal(1);
         var rows = featureDao.queryForAll();
-        var fr = featureDao.getFeatureRow(rows[0]);
+        var fr = featureDao.getRow(rows[0]);
         var geom = fr.getGeometry();
         geom.geometry.x.should.be.equal(1);
         geom.geometry.y.should.be.equal(2);
@@ -281,7 +281,7 @@ describe('GeoPackage Feature table create tests', function() {
         count.should.be.equal(1);
 
         var rows = featureDao.queryForAll();
-        var fr = featureDao.getFeatureRow(rows[0]);
+        var fr = featureDao.getRow(rows[0]);
         var result = featureDao.delete(fr);
         var count = featureDao.getCount();
         count.should.be.equal(0);

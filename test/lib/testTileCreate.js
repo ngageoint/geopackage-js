@@ -169,7 +169,7 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should delete the tiles', function() {
-      var tileDao = geopackage.getTileDaoWithTableName(tableName);
+      var tileDao = geopackage.getTileDao(tableName);
       var count = tileDao.getCount();
       count.should.be.equal(85);
       var result = tileDao.deleteTile(0, 0, 0);

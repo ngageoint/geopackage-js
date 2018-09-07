@@ -1,0 +1,336 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>tiles/features/index.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">tiles/features/index.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">var TileBoundingBoxUtils = require('../tileBoundingBoxUtils')
+  , BoundingBox = require('../../boundingBox');
+
+var d3geo = require('d3-geo')
+  , PureImage = require('pureimage')
+  , fs = require('fs')
+  , concat = require('concat-stream')
+  , reproject = require('reproject')
+  , bbox = require('@turf/bbox')
+  , TurfCircle = require('@turf/circle').default
+  , PolyToLine = require('@turf/polygon-to-line').default
+  , tilebelt = require('@mapbox/tilebelt');
+
+/**
+ *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
+ *  from those features.
+ */
+var FeatureTiles = function(featureDao, tileWidth, tileHeight) {
+  this.featureDao = featureDao;
+
+  this.tileWidth = tileWidth || 256;
+  this.tileHeight = tileHeight || 256;
+
+  this.compressFormat = 'png';
+  this.pointRadius = 4.0;
+  this.lineStrokeWidth = 2;
+  this.polygonStrokeWidth = 2.0;
+  this.fillPolygon = false;
+
+  this.calculateDrawOverlap();
+}
+
+module.exports = FeatureTiles;
+
+FeatureTiles.prototype.getFeatureDao = function () {
+  return this.featureDao;
+}
+
+FeatureTiles.prototype.calculateDrawOverlap = function() {
+  if (this.pointIcon) {
+    this.heightOverlap = this.pointIcon.getHeight();
+    this.widthOverlap = this.pointIcon.getWidth();
+  } else {
+    this.heightOverlap = this.pointRadius;
+    this.widthOverlap = this.pointRadius;
+  }
+
+  var lineHalfStroke = this.lineStrokeWidth / 2.0;
+  this.heightOverlap = Math.max(this.heightOverlap, lineHalfStroke);
+  this.widthOverlap = Math.max(this.widthOverlap, lineHalfStroke);
+
+  var polygonHalfStroke = this.polygonStrokeWidth / 2.0;
+  this.heightOverlap = Math.max(this.heightOverlap, polygonHalfStroke);
+  this.widthOverlap = Math.max(this.widthOverlap, polygonHalfStroke);
+}
+
+FeatureTiles.prototype.setDrawOverlapsWithPixels = function(pixels) {
+  this.widthOverlap = pixels;
+  this.heightOverlap = pixels;
+}
+
+FeatureTiles.prototype.drawTile = function (x, y, z) {
+  var indexed = this.featureDao.isIndexed();
+  if (indexed) {
+    return this.drawTileQueryIndex(x, y, z);
+  } else {
+    return this.drawTileQueryAll(x, y, z);
+  }
+}
+
+FeatureTiles.prototype.drawTileQueryIndex = function(x, y, z) {
+  console.log('Draw tile query index');
+  var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+  var width = 256;
+  var height = 256;
+
+  var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 &lt;&lt; z), width * (1 &lt;&lt; z));
+  var xTranslate = -positionAndScale.xPositionInFinalTileStart;
+  var yTranslate = -positionAndScale.yPositionInFinalTileStart;
+
+  var pointPixelRadius = 5;
+  var pointKilometers = (((boundingBox.maxLatitude - boundingBox.minLatitude) / height) * pointPixelRadius) / 1000;
+
+  var image = PureImage.make(width, height);
+  var context = image.getContext('2d');
+  context.imageSmoothingEnabled = true;
+  context.clearRect(0, 0, width, height);
+  context.strokeStyle = 'blue';
+  context.fillStyle = 'rgba(0, 0, 255, .3)';
+  context.lineWidth = this.lineStrokeWidth;
+  // context.beginPath();
+  var count = 0;
+  console.time('Creating image');
+  var srs = this.featureDao.getSrs();
+  var iterator = this.featureDao.fastQueryWebMercatorBoundingBox(boundingBox);
+
+  for (var featureRow of iterator) {
+    var gj = featureRow.getGeometry().geometry.toGeoJSON();
+    if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
+      gj = reproject.toWgs84(gj, this.featureDao.projection);
+    }
+    if (gj.type === 'Polygon') {
+      gj = PolyToLine(gj);
+    }
+    this.addFeatureToBatch(gj, context, xTranslate, yTranslate, z, pointKilometers);
+  }
+
+  console.timeEnd('Creating image');
+  return new Promise(function(resolve, reject) {
+    var writeStream = concat(function(buffer) {
+      resolve(buffer);
+    });
+    PureImage.encodePNGToStream(image, writeStream);
+  });
+}
+
+FeatureTiles.prototype.drawTileQueryAll = function(x, y, zoom) {
+  var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+
+  var count = this.featureDao.getCount();
+  var totalCount;
+  if (this.maxFeaturesPerTile) {
+    totalCount = count;
+  }
+  if (!this.maxFeaturesPerTile || totalCount &lt;= this.maxFeaturesPerTile) {
+    return this.drawTileWithBoundingBox(boundingBox, zoom);
+  } else {
+    // draw the unindexed max features tile
+    return;
+  }
+}
+
+FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom) {
+  var width = 256;
+  var height = 256;
+  var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 &lt;&lt; zoom), width * (1 &lt;&lt; zoom));
+  var xTranslate = -positionAndScale.xPositionInFinalTileStart;
+  var yTranslate = -positionAndScale.yPositionInFinalTileStart;
+
+  var pointPixelRadius = 5;
+  var pointKilometers = (((boundingBox.maxLatitude - boundingBox.minLatitude) / height) * pointPixelRadius) / 1000;
+
+  var image = PureImage.make(width, height);
+  var context = image.getContext('2d');
+  context.clearRect(0, 0, width, height);
+  context.strokeStyle = 'blue';
+  context.fillStyle = 'rgba(0, 0, 255, .3)';
+  context.lineWidth = this.lineStrokeWidth;
+  var featureDao = this.featureDao;
+  var srs = featureDao.getSrs();
+  var each = featureDao.queryForEach();
+  for (var row of each) {
+    var fr = featureDao.getRow(row);
+    var gj = fr.getGeometry().geometry.toGeoJSON();
+    if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
+      gj = reproject.toWgs84(gj, featureDao.projection);
+    }
+    if (gj.type === 'Polygon') {
+      gj = PolyToLine(gj);
+    }
+    this.addFeatureToBatch(gj, context, xTranslate, yTranslate, zoom, pointKilometers);
+  }
+  return new Promise(function(resolve, reject) {
+    var writeStream = concat(function(buffer) {
+      resolve(buffer);
+    });
+    PureImage.encodePNGToStream(image, writeStream);
+  });
+}
+
+FeatureTiles.prototype.addFeatureToBatch = function(geoJson, context, xTranslate, yTranslate, zoom, pointKilometers) {
+  var width = 256;
+  var height = 256;
+  var pi = Math.PI,
+    tau = 2 * pi;
+  var drawProjection = d3geo.geoMercator()
+    .scale((1 &lt;&lt; zoom) * 256 / tau)
+    .center([-180, 85.0511287798066])
+    .translate([xTranslate, yTranslate]);
+  var path = new d3geo.geoPath()
+    .context(context)
+    .projection(drawProjection);
+
+    context.beginPath();
+
+    if (geoJson.type === 'Point') {
+      console.log('pointKilometers', pointKilometers);
+      if (pointKilometers > 1) {
+        path(geoJson);
+      } else {
+        console.time('turf circle');
+        var circle = TurfCircle(geoJson, pointKilometers, {units:'kilometers'});
+        console.timeEnd('turf circle');
+        path(circle);
+        // context.closePath();
+      }
+      context.stroke();
+      // context.fill();
+    } else {
+      path(geoJson);
+      context.stroke();
+    }
+
+
+}
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

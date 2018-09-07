@@ -18,7 +18,7 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDaoWithTableName('TILESosmds');
+        tileDao = geoPackage.getTileDao('TILESosmds');
         done();
       });
     });
@@ -71,7 +71,7 @@ describe('TileDao tests', function() {
       var tileRow = tileDao.queryForTile(0, 0, 0);
       tileRow.getZoomLevel().should.be.equal(0);
       tileRow.getTileColumn().should.be.equal(0);
-      tileRow.getTileRow().should.be.equal(0);
+      tileRow.getRow().should.be.equal(0);
       var data = tileRow.getTileData();
       should.exist(data);
     });
@@ -114,7 +114,7 @@ describe('TileDao tests', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesInRow(1, 1)) {
         tileRow.getZoomLevel().should.be.equal(1);
-        tileRow.getTileRow().should.be.equal(1);
+        tileRow.getRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
         count++;
@@ -133,7 +133,7 @@ describe('TileDao tests', function() {
       var count = 0;
       for (var tileRow of iterator) {
         tileRow.getZoomLevel().should.be.equal(1);
-        tileRow.getTileRow().should.be.equal(0);
+        tileRow.getRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
         count++;
@@ -155,7 +155,7 @@ describe('TileDao tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDaoWithTableName('alaska');
+        tileDao = geoPackage.getTileDao('alaska');
         done();
       });
     });
@@ -204,7 +204,7 @@ describe('TileDao tests', function() {
       .then(function(tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
         tileRow.getTileColumn().should.be.equal(1);
-        tileRow.getTileRow().should.be.equal(1);
+        tileRow.getRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
       });
@@ -244,7 +244,7 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level and row', function() {
       return tileDao.queryForTilesInRow(1, 4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getTileRow().should.be.equal(1);
+        tileRow.getRow().should.be.equal(1);
         var data = tileRow.getTileData();
         should.exist(data);
       }).then(function(count) {
@@ -261,7 +261,7 @@ describe('TileDao tests', function() {
       };
       tileDao.queryByTileGrid(tileGrid, 4, function(err, tileRow) {
         tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getTileRow().should.be.equal(0);
+        tileRow.getRow().should.be.equal(0);
         var data = tileRow.getTileData();
         should.exist(data);
       })

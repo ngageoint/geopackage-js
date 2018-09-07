@@ -16,7 +16,7 @@ describe('Tests for issue 68', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
       tables[0].should.be.equal('package_tiles');
-      var tileDao = geoPackage.getTileDaoWithTableName('package_tiles');
+      var tileDao = geoPackage.getTileDao('package_tiles');
       should.exist(tileDao);
       var info = geoPackage.getInfoForTable(tileDao);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);

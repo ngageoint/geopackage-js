@@ -40,7 +40,7 @@ describe('RTree tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('line1');
+          featureDao = geoPackage.getFeatureDao('line1');
           done();
         });
       });
@@ -143,7 +143,7 @@ describe('RTree tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
           done();
         });
       });

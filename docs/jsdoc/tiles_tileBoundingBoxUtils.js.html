@@ -1,0 +1,416 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>tiles/tileBoundingBoxUtils.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">tiles/tileBoundingBoxUtils.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">
+var BoundingBox = require('../boundingBox')
+  , TileGrid = require('./tileGrid');
+
+var proj4 = require('proj4');
+proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+
+var WEB_MERCATOR_HALF_WORLD_WIDTH = proj4('EPSG:4326', 'EPSG:3857').forward([180, 0])[0];
+
+module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
+  var totalBox = new BoundingBox(-WEB_MERCATOR_HALF_WORLD_WIDTH, WEB_MERCATOR_HALF_WORLD_WIDTH, -WEB_MERCATOR_HALF_WORLD_WIDTH, WEB_MERCATOR_HALF_WORLD_WIDTH);
+
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+  var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+
+  var minX = Math.floor((webMercatorBoundingBox.minLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+  var maxX = Math.max(0,Math.floor(((webMercatorBoundingBox.maxLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var maxY = Math.max(0,Math.ceil(((-1 * (webMercatorBoundingBox.minLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
+  var minY = Math.floor((-1 * (webMercatorBoundingBox.maxLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+
+  return {
+    minX: minX,
+    maxX: maxX,
+    minY: minY,
+    maxY: maxY
+  };
+}
+
+module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth) {
+  var p = {};
+
+  var finalTileWidth = totalBoundingBox.maxLongitude - totalBoundingBox.minLongitude;
+  var xoffsetMin = geoPackageTileBoundingBox.minLongitude - totalBoundingBox.minLongitude;
+  var xpercentageMin = xoffsetMin / finalTileWidth;
+
+  var finalTileHeight = totalBoundingBox.maxLatitude - totalBoundingBox.minLatitude;
+  var yoffsetMax = totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude;
+  var ypercentageMax = yoffsetMax / finalTileHeight;
+
+  var gpTileWidth = geoPackageTileBoundingBox.maxLongitude - geoPackageTileBoundingBox.minLongitude;
+  var gpPixelsPerUnitWidth = tileWidth / gpTileWidth;
+
+  var finalTilePixelsPerUnitWidth = totalWidth / finalTileWidth;
+
+  var xPositionInFinalTileUnits = ((geoPackageTileBoundingBox.minLongitude - totalBoundingBox.minLongitude) * finalTilePixelsPerUnitWidth);
+  var widthInFinalTileUnits = ((geoPackageTileBoundingBox.maxLongitude - geoPackageTileBoundingBox.minLongitude) * finalTilePixelsPerUnitWidth);
+
+  var gpTileHeight = geoPackageTileBoundingBox.maxLatitude - geoPackageTileBoundingBox.minLatitude;
+  var gpPixelsPerUnitHeight = tileHeight / gpTileHeight;
+
+  var finalTilePixelsPerUnitHeight = totalHeight / finalTileHeight;
+
+  var yPositionInFinalTileUnits = ((totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude) * finalTilePixelsPerUnitHeight);
+  var heightInFinalTileUnits = (geoPackageTileBoundingBox.maxLatitude - geoPackageTileBoundingBox.minLatitude) * finalTilePixelsPerUnitHeight;
+
+  p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
+  p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
+  p.dx = xPositionInFinalTileUnits;
+  p.dy = yPositionInFinalTileUnits;
+  p.sx = 0;
+  p.sy = 0;
+  p.dWidth = widthInFinalTileUnits;
+  p.dHeight = heightInFinalTileUnits;
+  p.sWidth = tileWidth;
+  p.sHeight = tileHeight;
+
+  return p;
+}
+
+/**
+ * Get the Web Mercator tile bounding box from the Standard Maps API tile
+ * coordinates and zoom level
+ *
+ *  @param x    x
+ *  @param y    y
+ *  @param zoom zoom level
+ *
+ *  @return web mercator bounding box
+ */
+module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom) {
+  var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
+	var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
+
+	var minLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ (x * tileSize);
+	var maxLon = (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)
+			+ ((x + 1) * tileSize);
+	var minLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- ((y + 1) * tileSize);
+	var maxLat = WEB_MERCATOR_HALF_WORLD_WIDTH
+			- (y * tileSize);
+
+	var box = new BoundingBox(minLon, maxLon, minLat, maxLat);
+
+	return box;
+}
+
+/**
+ *  Get the tile size in meters
+ *
+ *  @param tilesPerSide tiles per side
+ *
+ *  @return meters
+ */
+module.exports.tileSizeWithTilesPerSide = function(tilesPerSide) {
+  return (2*WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+}
+
+/**
+ *  Get the tiles per side, width and height, at the zoom level
+ *
+ *  @param zoom zoom level
+ *
+ *  @return tiles per side
+ */
+module.exports.tilesPerSideWithZoom = function(zoom) {
+  return Math.pow(2,zoom);
+}
+
+/**
+ *  Get the tile grid
+ *
+ *  @param webMercatorTotalBox    web mercator total bounding box
+ *  @param matrixWidth            matrix width
+ *  @param matrixHeight           matrix height
+ *  @param boundingBox            bounding box
+ *
+ *  @return tile grid
+ */
+module.exports.getTileGridWithTotalBoundingBox = function(totalBoundingBox, matrixWidth, matrixHeight, boundingBox) {
+  var minColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.minLongitude);
+  var maxColumn = module.exports.getTileColumnWithTotalBoundingBox(totalBoundingBox, matrixWidth, boundingBox.maxLongitude, true);
+  if (minColumn &lt; matrixWidth &amp;&amp; maxColumn >= 0) {
+    if (minColumn &lt; 0) {
+      minColumn = 0;
+    }
+    if (maxColumn >= matrixWidth) {
+      maxColumn = matrixWidth - 1;
+    }
+  }
+
+  var maxRow = module.exports.getRowWithTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.minLatitude, true);
+  var minRow = module.exports.getRowWithTotalBoundingBox(totalBoundingBox, matrixHeight, boundingBox.maxLatitude);
+
+
+  if(minRow &lt; matrixHeight &amp;&amp; maxRow >= 0){
+    if(minRow &lt; 0){
+      minRow = 0;
+    }
+    if(maxRow >= matrixHeight){
+      maxRow = matrixHeight - 1;
+    }
+  }
+
+  var tileGrid = new TileGrid(minColumn, maxColumn, minRow, maxRow);
+  return tileGrid;
+}
+
+/**
+ *  Get the tile column of the longitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixWidth         matrix width
+ *  @param longitude           longitude
+ *
+ *  @return tile column
+ */
+module.exports.getTileColumnWithTotalBoundingBox = function(webMercatorTotalBox, matrixWidth, longitude, max) {
+  var minX = webMercatorTotalBox.minLongitude;
+  var maxX = webMercatorTotalBox.maxLongitude;
+  var tileId;
+  if (longitude &lt; minX) {
+    tileId = -1;
+  } else if (longitude >= maxX) {
+    tileId = matrixWidth;
+  } else {
+    var matrixWidthMeters = maxX - minX;
+    var tileWidth = matrixWidthMeters / matrixWidth;
+    var tileIdDouble = ((longitude - minX) / tileWidth);
+    tileId = ~~tileIdDouble;
+    if (max) {
+      // if the edge lands right on the calculated edge, subtract one
+      if (tileIdDouble === tileId) {
+        tileId--;
+      }
+    }
+  }
+  return tileId;
+}
+
+/**
+ *  Get the tile row of the latitude in degrees
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param matrixHeight        matrix height
+ *  @param latitude            latitude
+ *
+ *  @return tile row
+ */
+module.exports.getRowWithTotalBoundingBox = function(webMercatorTotalBox, matrixHeight, latitude, max) {
+  var minY = webMercatorTotalBox.minLatitude;
+  var maxY = webMercatorTotalBox.maxLatitude;
+
+  var tileId;
+  if (latitude &lt; minY) {
+    tileId = matrixHeight;
+  } else if (latitude >= maxY) {
+    tileId = -1;
+  } else {
+    var matrixHeightMeters = maxY - minY;
+    var tileHeight = matrixHeightMeters / matrixHeight;
+    var tileIdDouble = ((maxY - latitude) / tileHeight);
+    tileId = ~~tileIdDouble;
+    if (max) {
+      // if the edge lands right on the calculated edge, add one
+      if (tileIdDouble === tileId) {
+        tileId--;
+      }
+    }
+  }
+  return tileId;
+}
+
+/**
+ *  Get the web mercator bounding box of the tile column and row in the tile
+ *  matrix using the total bounding box
+ *
+ *  @param webMercatorTotalBox web mercator total bounding box
+ *  @param tileMatrix          tile matrix
+ *  @param tileColumn          tile column
+ *  @param tileRow             tile row
+ *
+ *  @return web mercator bounding box
+ */
+module.exports.getTileBoundingBox = function(box, tileMatrix, tileColumn, tileRow) {
+  var tileMatrixWidth = tileMatrix.matrix_width;
+  var tileMatrixHeight = tileMatrix.matrix_height;
+  var tileGrid = new TileGrid(tileColumn, tileColumn, tileRow, tileRow);
+  var matrixMinX = box.minLongitude;
+  var matrixMaxX = box.maxLongitude;
+  var matrixWidth = matrixMaxX - matrixMinX;
+  var tileWidth = matrixWidth / tileMatrixWidth;
+
+  // Find the longitude range
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
+
+  // Get the tile height
+  var matrixMinY = box.minLatitude;
+  var matrixMaxY = box.maxLatitude;
+  var matrixHeight = matrixMaxY - matrixMinY;
+  var tileHeight = matrixHeight / tileMatrixHeight;
+
+  // Find the latitude range
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
+
+  var boundingBox = new BoundingBox(minLon, maxLon, minLat, maxLat);
+
+  return boundingBox;
+}
+
+module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatrixWidth, tileMatrixHeight, tileGrid) {
+  // Get the tile width
+  var matrixMinX = matrixSetBoundingBox.minLongitude;
+  var matrixMaxX = matrixSetBoundingBox.maxLongitude;
+  var matrixWidth = matrixMaxX - matrixMinX;
+  var tileWidth = matrixWidth / tileMatrixWidth;
+
+  // Find the longitude range
+  var minLon = matrixMinX + (tileWidth * tileGrid.min_x);
+  var maxLon = minLon + (tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x));
+
+  // Get the tile height
+  var matrixMinY = matrixSetBoundingBox.minLatitude;
+  var matrixMaxY = matrixSetBoundingBox.maxLatitude;
+  var matrixHeight = matrixMaxY - matrixMinY;
+  var tileHeight = matrixHeight / tileMatrixHeight;
+
+  // Find the latitude range
+  var maxLat = matrixMaxY - (tileHeight * tileGrid.min_y);
+  var minLat = maxLat - (tileHeight * (tileGrid.max_y + 1 - tileGrid.min_y));
+
+  return new BoundingBox(minLon, maxLon, minLat, maxLat);
+}
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

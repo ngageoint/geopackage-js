@@ -53,12 +53,12 @@ describe('Related Tables tests', function() {
 
       for (var i = 0; i < relationships.length; i++) {
         var relationship = relationships[i];
-        var baseDao = geoPackage.getFeatureDaoWithTableName(relationship.base_table_name);
+        var baseDao = geoPackage.getFeatureDao(relationship.base_table_name);
         var features = baseDao.queryForAll();
         var baseIdMappings = {};
         for (var f = 0; f < features.length; f++) {
           var feature = features[f];
-          var row = baseDao.getFeatureRow(feature);
+          var row = baseDao.getRow(feature);
           var relatedIds = rte.getMappingsForBase(relationship.mapping_table_name, row.getId());
           if (row.getId() === 1) {
             relatedIds.length.should.be.equal(2);
@@ -73,7 +73,7 @@ describe('Related Tables tests', function() {
         var attributes = relatedDao.queryForAll();
         for (var a = 0; a < attributes.length; a++) {
           var attribute = attributes[a];
-          var row = relatedDao.getAttributeRow(attribute);
+          var row = relatedDao.getRow(attribute);
           var baseIds = rte.getMappingsForRelated(relationship.mapping_table_name, row.getId());
           if (row.getId() === 17) {
             baseIds.length.should.be.equal(2);
@@ -178,8 +178,8 @@ describe('Related Tables tests', function() {
         relationships.length.should.be.equal(1);
         geoPackage.isTable(mappingTableName).should.be.equal(true);
 
-        var baseDao = geoPackage.getFeatureDaoWithTableName(baseTableName);
-        var relatedDao = geoPackage.getFeatureDaoWithTableName(relatedTableName);
+        var baseDao = geoPackage.getFeatureDao(baseTableName);
+        var relatedDao = geoPackage.getFeatureDao(relatedTableName);
         var baseResults = baseDao.queryForAll();
         var relatedResults = relatedDao.queryForAll();
 

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>Classes</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">list</span>
+				<h1><span class="name">Classes</span></h1>
+				<div class="summary"><p>All documented classes.</p></div>			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li class="active">Classes</li>
+						</ol>
+					<section>
+		<h2><span class="name">Classes</span></h2>
+		<article class="secondary">
+				<dl class="symbol">
+						
+						<dt class="symbol-title class public">
+			<h4 id="BoundingBox" class="class public"><a href="BoundingBox.html"><span class="signature-new">new&nbsp;</span><span class="name">BoundingBox</span><span class="signature-params">( <span class="signature-param">minLongitudeOrBoundingBox</span>, <span class="signature-param">maxLongitude</span>, <span class="signature-param">minLatitude</span>, <span class="signature-param">maxLatitude</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{<a href="BoundingBox.html">BoundingBox</a>}</span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="AttributeDao" class="class public"><a href="module-attributes_attributeDao-AttributeDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">attributes/attributeDao~</span><span class="name">AttributeDao</span><span class="signature-params">( <span class="signature-param">geopackage</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="AttributeRow" class="class public"><a href="module-attributes_attributeRow-AttributeRow.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">attributes/attributeRow~</span><span class="name">AttributeRow</span><span class="signature-params">( <span class="signature-param">attributeTable</span>, <span class="signature-param">columnTypes</span>, <span class="signature-param">values</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="AttributeTableReader" class="class public"><a href="module-attributes_attributeTableReader-AttributeTableReader.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">attributes/attributeTableReader~</span><span class="name">AttributeTableReader</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="AttributeTable" class="class public"><a href="module-attributes_attributeTable-AttributeTable.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">attributes/attributeTable~</span><span class="name">AttributeTable</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">columns</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="Contents" class="class public"><a href="module-core_contents-Contents.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">core/contents~</span><span class="name">Contents</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="ContentsDao" class="class public"><a href="module-core_contents-ContentsDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">core/contents~</span><span class="name">ContentsDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="SpatialReferenceSystem" class="class public"><a href="module-core_srs-SpatialReferenceSystem.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">core/srs~</span><span class="name">SpatialReferenceSystem</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="SpatialReferenceSystemDao" class="class public"><a href="module-core_srs-SpatialReferenceSystemDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">core/srs~</span><span class="name">SpatialReferenceSystemDao</span><span class="signature-params">( <span class="signature-param">geoPackage</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="ColumnValues" class="class public"><a href="module-dao_columnValues-ColumnValues.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dao/columnValues~</span><span class="name">ColumnValues</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="Dao" class="class public"><a href="module-dao_dao-Dao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dao/dao~</span><span class="name">Dao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="DataColumnConstraints" class="class public"><a href="module-dataColumnConstraints-DataColumnConstraints.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dataColumnConstraints~</span><span class="name">DataColumnConstraints</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="DataColumnConstraintsDao" class="class public"><a href="module-dataColumnConstraints-DataColumnConstraintsDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dataColumnConstraints~</span><span class="name">DataColumnConstraintsDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="DataColumns" class="class public"><a href="module-dataColumns-DataColumns.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dataColumns~</span><span class="name">DataColumns</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="DataColumnsDao" class="class public"><a href="module-dataColumns-DataColumnsDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">dataColumns~</span><span class="name">DataColumnsDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserDao" class="class public"><a href="module-extensions_relatedTables_MediaDao-UserDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">extensions/relatedTables/MediaDao~</span><span class="name">UserDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserDao" class="class public"><a href="module-extensions_relatedTables_SimpleAttributesDao-UserDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">extensions/relatedTables/SimpleAttributesDao~</span><span class="name">UserDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="GeometryColumns" class="class public"><a href="module-features_columns-GeometryColumns.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">features/columns~</span><span class="name">GeometryColumns</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="GeometryColumnsDao" class="class public"><a href="module-features_columns-GeometryColumnsDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">features/columns~</span><span class="name">GeometryColumnsDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="FeatureDao" class="class public"><a href="module-features_user_featureDao-FeatureDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">features/user/featureDao~</span><span class="name">FeatureDao</span><span class="signature-params">( <span class="signature-param">db</span>, <span class="signature-param">table</span>, <span class="signature-param">geometryColumns</span>, <span class="signature-param">metadataDb</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="FeatureTableReader" class="class public"><a href="module-features_user_featureTableReader-FeatureTableReader.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">features/user/featureTableReader~</span><span class="name">FeatureTableReader</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="ExtendedRelation" class="class public"><a href="module-geometryIndexDao-ExtendedRelation.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">geometryIndexDao~</span><span class="name">ExtendedRelation</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="ExtendedRelationDao" class="class public"><a href="module-geometryIndexDao-ExtendedRelationDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">geometryIndexDao~</span><span class="name">ExtendedRelationDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="GeometryIndexDao" class="class public"><a href="module-geometryIndexDao-GeometryIndexDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">geometryIndexDao~</span><span class="name">GeometryIndexDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TableIndex" class="class public"><a href="module-geometryIndexDao-TableIndex.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">geometryIndexDao~</span><span class="name">TableIndex</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="GeoPackage" class="class public"><a href="module-geoPackage-GeoPackage.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">geoPackage~</span><span class="name">GeoPackage</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="MetadataReference" class="class public"><a href="module-metadata_reference-MetadataReference.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata/reference~</span><span class="name">MetadataReference</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="MetadataReferenceDao" class="class public"><a href="module-metadata_reference-MetadataReferenceDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata/reference~</span><span class="name">MetadataReferenceDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="Extension" class="class public"><a href="module-metadata-Extension.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata~</span><span class="name">Extension</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="ExtensionDao" class="class public"><a href="module-metadata-ExtensionDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata~</span><span class="name">ExtensionDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="Metadata" class="class public"><a href="module-metadata-Metadata.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata~</span><span class="name">Metadata</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="MetadataDao" class="class public"><a href="module-metadata-MetadataDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">metadata~</span><span class="name">MetadataDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="RTreeIndexDao" class="class public"><a href="module-RTreeIndexDao-RTreeIndexDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">RTreeIndexDao~</span><span class="name">RTreeIndexDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TableIndex" class="class public"><a href="module-tableIndexDao-TableIndex.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tableIndexDao~</span><span class="name">TableIndex</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TableIndexDao" class="class public"><a href="module-tableIndexDao-TableIndexDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tableIndexDao~</span><span class="name">TableIndexDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileMatrixSet" class="class public"><a href="module-tiles_matrixset-TileMatrixSet.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/matrixset~</span><span class="name">TileMatrixSet</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileMatrixSetDao" class="class public"><a href="module-tiles_matrixset-TileMatrixSetDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/matrixset~</span><span class="name">TileMatrixSetDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileMatrix" class="class public"><a href="module-tiles_matrix-TileMatrix.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/matrix~</span><span class="name">TileMatrix</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileMatrixSetDao" class="class public"><a href="module-tiles_matrix-TileMatrixSetDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/matrix~</span><span class="name">TileMatrixSetDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileDao" class="class public"><a href="module-tiles_user_tileDao-TileDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/user/tileDao~</span><span class="name">TileDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>, <span class="signature-param">tileMatrixSet</span>, <span class="signature-param">tileMatrices</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="TileTableReader" class="class public"><a href="module-tiles_user_tileTableReader-TileTableReader.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">tiles/user/tileTableReader~</span><span class="name">TileTableReader</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserColumn" class="class public"><a href="module-user_userColumn-UserColumn.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userColumn~</span><span class="name">UserColumn</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserDao" class="class public"><a href="module-user_userDao-UserDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userDao~</span><span class="name">UserDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserDao" class="class public"><a href="module-user_userDao-UserDao.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userDao~</span><span class="name">UserDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserRow" class="class public"><a href="module-user_userRow-UserRow.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userRow~</span><span class="name">UserRow</span><span class="signature-params">( <span class="signature-param">table</span>, <span class="signature-param">columnTypes</span>, <span class="signature-param">values</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserTableReader" class="class public"><a href="module-user_userTableReader-UserTableReader.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userTableReader~</span><span class="name">UserTableReader</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">requiredColumns</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+						<hr/>
+						<dt class="symbol-title class public">
+			<h4 id="UserTable" class="class public"><a href="module-user_userTable-UserTable.html"><span class="signature-new">new&nbsp;</span><span class="ancestors">user/userTable~</span><span class="name">UserTable</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">columns</span>&nbsp;)</span><span class="signature-type"></span></a></h4>
+</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+				</dl>
+		</article>
+					</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>

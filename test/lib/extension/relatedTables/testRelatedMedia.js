@@ -165,18 +165,18 @@ describe('Related Media tests', function() {
       copiedMediaId.should.be.equal(mediaRowId + 1);
       mediaCount.should.be.equal(mediaDao.count());
 
-      var featureDao = geoPackage.getFeatureDaoWithTableName(baseTableName);
+      var featureDao = geoPackage.getFeatureDao(baseTableName);
       var allFeatures = featureDao.queryForAll();
       var featureIds = [];
       for (var i = 0; i < allFeatures.length; i++) {
-        var row = featureDao.getFeatureRow(allFeatures[i]);
+        var row = featureDao.getRow(allFeatures[i]);
         featureIds.push(row.getId());
       }
 
       var allMedia = mediaDao.queryForAll();
       var mediaIds = [];
       for (var i = 0; i < allMedia.length; i++) {
-        var row = mediaDao.getMediaRow(allMedia[i]);
+        var row = mediaDao.getRow(allMedia[i]);
         mediaIds.push(row.getId());
       }
 
@@ -258,13 +258,13 @@ describe('Related Media tests', function() {
         // get and test the Media Rows mapped to each Feature Row
         var features = featureDao.queryForAll();
         for (var f = 0; f < features.length; f++) {
-          var featureRow = featureDao.getFeatureRow(features[f]);
+          var featureRow = featureDao.getRow(features[f]);
           var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.getId());
           var mediaRows = mediaDao.getRows(mappedIds);
           mediaRows.length.should.be.equal(mappedIds.length);
 
           mediaRows.forEach(function(row) {
-            var mediaRow = mediaDao.getMediaRow(row);
+            var mediaRow = mediaDao.getRow(row);
             mediaRow.hasId().should.be.equal(true);
             mediaRow.getId().should.be.greaterThan(0);
             mediaIds.indexOf(mediaRow.getId()).should.not.be.equal(-1);
@@ -314,7 +314,7 @@ describe('Related Media tests', function() {
         });
 
         // Get and test the feature DAO
-        featureDao = geoPackage.getFeatureDaoWithTableName(featureDao.table_name);
+        featureDao = geoPackage.getFeatureDao(featureDao.table_name);
         should.exist(featureDao);
         var featureTable = featureDao.getFeatureTable();
         should.exist(featureTable);
@@ -327,7 +327,7 @@ describe('Related Media tests', function() {
         var medias = mediaDao.queryForAll();
         var totalMapped = 0;
         medias.forEach(function(row) {
-          var mediaRow = mediaDao.getMediaRow(row);
+          var mediaRow = mediaDao.getRow(row);
           var mappedIds = rte.getMappingsForRelated(mediaRelation.mapping_table_name, mediaRow.getId());
           mappedIds.forEach(function(mappedId){
             var featureRow = featureDao.queryForIdObject(mappedId);

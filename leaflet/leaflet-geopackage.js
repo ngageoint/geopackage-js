@@ -58,6 +58,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
 function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
   var geoPackage = gridLayer.geoPackage;
   var layerName = gridLayer.options.layerName;
+  var map = gridLayer._map;
   if (!geoPackage) {
     // not loaded yet, just wait
     setTimeout(maybeDrawTile, 250, gridLayer, tilePoint, canvas, callback);
@@ -65,10 +66,22 @@ function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
   }
   setTimeout(function() {
     console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-    GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas, function(err) {
+
+    if (map.options.crs === L.CRS.EPSG4326) {
+      var tileSize = gridLayer.getTileSize(),
+      nwPoint = tilePoint.scaleBy(tileSize),
+      sePoint = nwPoint.add(tileSize),
+      nw = map.unproject(nwPoint, tilePoint.z),
+      se = map.unproject(sePoint, tilePoint.z);
+      console.log('Draw 4326 tile');
+      GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas);
       console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
       callback(err, canvas);
-    });
+    } else {
+      GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas);
+      console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+      callback(err, canvas);
+    }
   }, 0);
 }
 

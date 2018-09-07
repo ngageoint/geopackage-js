@@ -204,7 +204,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
 
   return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
   .then(function(result) {
-    var featureDao = geopackage.getFeatureDaoWithTableName(tableName);
+    var featureDao = geopackage.getFeatureDao(tableName);
     for (var i = 0; i < features.length; i++) {
       var feature = features[i];
       GeoPackageUtils.createFeature(geopackage, feature.geoJson, feature.name, featureDao);
@@ -303,7 +303,7 @@ GeoPackageUtils.createSchemaExtension = function(geopackage) {
     var featureTables = geopackage.getFeatureTables();
     for (var i = 0; i < featureTables.length; i++) {
       var tableName = featureTables[i];
-      var featureDao = geopackage.getFeatureDaoWithTableName(tableName);
+      var featureDao = geopackage.getFeatureDao(tableName);
       var table = featureDao.getFeatureTable();
 
       for (var c = 0; c < table.columns.length; c++) {
@@ -353,7 +353,7 @@ GeoPackageUtils.createGeometryIndexExtension = function(geopackage) {
   return tables.reduce(function(sequence, table) {
     return sequence.then(function() {
       console.log('Index table ' + table);
-      var featureDao = geopackage.getFeatureDaoWithTableName(table);
+      var featureDao = geopackage.getFeatureDao(table);
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       return fti.index();
@@ -377,7 +377,7 @@ GeoPackageUtils.createRTreeSpatialIndexExtension = function(geopackage) {
 
   return tables.reduce(function(sequence, table) {
     return sequence.then(function() {
-      var featureDao = geopackage.getFeatureDaoWithTableName(table);
+      var featureDao = geopackage.getFeatureDao(table);
       var rtreeIndex = new RTreeIndex(geopackage, featureDao);
       return rtreeIndex.create();
     });
@@ -404,12 +404,12 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     var bitsRowId = mediaDao.create(bitsLogo);
     bitsLogo = mediaDao.queryForIdObject(bitsRowId);
 
-    var featureDao = geopackage.getFeatureDaoWithTableName('geometry1');
+    var featureDao = geopackage.getFeatureDao('geometry1');
     var rows = featureDao.queryForLike('text', 'BIT Systems%');
 
     return rows.reduce(function(sequence, row) {
       return sequence.then(function() {
-        var featureRow = featureDao.getFeatureRow(row);
+        var featureRow = featureDao.getRow(row);
         return featureDao.linkMediaRow(featureRow, bitsLogo);
       });
     }, Promise.resolve())
@@ -424,12 +424,12 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     var ngaRowId = mediaDao.create(ngaLogo);
     ngaLogo = mediaDao.queryForIdObject(ngaRowId);
 
-    var featureDao = geopackage.getFeatureDaoWithTableName('geometry2');
+    var featureDao = geopackage.getFeatureDao('geometry2');
     var rows = featureDao.queryForLike('text', 'NGA%');
 
     return rows.reduce(function(sequence, row) {
       return sequence.then(function() {
-        var featureRow = featureDao.getFeatureRow(row);
+        var featureRow = featureDao.getRow(row);
         return featureDao.linkMediaRow(featureRow, ngaLogo);
       });
     }, Promise.resolve())
@@ -440,14 +440,14 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
 }
 
 GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
-  var point1FeatureDao = geopackage.getFeatureDaoWithTableName('point1');
-  var polygon1FeatureDao = geopackage.getFeatureDaoWithTableName('polygon1');
-  var point2FeatureDao = geopackage.getFeatureDaoWithTableName('point2');
-  var polygon2FeatureDao = geopackage.getFeatureDaoWithTableName('polygon2');
+  var point1FeatureDao = geopackage.getFeatureDao('point1');
+  var polygon1FeatureDao = geopackage.getFeatureDao('polygon1');
+  var point2FeatureDao = geopackage.getFeatureDao('point2');
+  var polygon2FeatureDao = geopackage.getFeatureDao('polygon2');
 
   // relate the point1 feature to the polygon1 feature
-  var point1Row = point1FeatureDao.getFeatureRow(point1FeatureDao.queryForAll()[0]);
-  var polygon1Row = polygon1FeatureDao.getFeatureRow(polygon1FeatureDao.queryForAll()[0]);
+  var point1Row = point1FeatureDao.getRow(point1FeatureDao.queryForAll()[0]);
+  var polygon1Row = polygon1FeatureDao.getRow(polygon1FeatureDao.queryForAll()[0]);
 
   var columns = [];
   var columnIndex = UserMappingTable.numRequiredColumns();
@@ -466,8 +466,8 @@ GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
   return point1FeatureDao.linkFeatureRow(point1Row, polygon1Row, userMappingTable, mappingColumnValues)
   .then(function() {
     // relate the point2 feature to the polygon2 feature
-    var point2Row = point2FeatureDao.getFeatureRow(point2FeatureDao.queryForAll()[0]);
-    var polygon2Row = polygon2FeatureDao.getFeatureRow(polygon2FeatureDao.queryForAll()[0]);
+    var point2Row = point2FeatureDao.getRow(point2FeatureDao.queryForAll()[0]);
+    var polygon2Row = polygon2FeatureDao.getRow(polygon2FeatureDao.queryForAll()[0]);
     return point2FeatureDao.linkFeatureRow(point2Row, polygon2Row);
   })
   .then(function() {

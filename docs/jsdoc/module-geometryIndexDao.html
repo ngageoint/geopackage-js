@@ -1,310 +1,215 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>GeoPackage JS Module: geometryIndexDao</title>
-
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-
+		<title>geometryIndexDao</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
 </head>
-
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">GeoPackage JS</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">module</span>
+				<h1><span class="name">geometryIndexDao</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li class="active">geometryIndexDao</li>
+						</ol>
+					<section>
+		<dl class="symbol">
+			<dt class="symbol-title "></dt>
+			<dd class="symbol-details ">
+				<div class="symbol-details-inner">
+					<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>GeometryIndexDao module.</p></div>
+					</div>					<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+									<!-- source -->
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Source</label>
+										<div class="col-sm-9">
+											<p class="form-control-static"><a href="extension_relatedTables_extendedRelation.js.html">extension/relatedTables/extendedRelation.js</a>, <a href="extension_relatedTables_extendedRelation.js.html#line-1">line 1</a></p>
+										</div>
+									</div>
+					
+					
+									<!-- see -->
+									<div class="form-group">
+										<label class="col-sm-3 control-label">See</label>
+										<div class="col-sm-9">
+												<p class="form-control-static"><a href="module-dao_dao.html">dao/dao</a></p>
+										</div>
+									</div>
+					
+					
+							</form>
+					</div>				</div>
+			</dd>
+		</dl>
+							<article class="secondary">
+									<h3>Classes</h3>
+									<dl class="symbol">
+											<hr/>
+											<dt class="symbol-title class public">
+			<h4 id="TableIndex" class="class public"><a href="module-geometryIndexDao-TableIndex.html"><span class="signature-new">new&nbsp;</span><span class="name">TableIndex</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+		</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
 	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-core_contents.html">core/contents</a></li><li><a href="module-dao_dao.html">dao/dao</a></li><li><a href="module-dao_geometryColumns.html">dao/geometryColumns</a></li><li><a href="module-dao_geoPackageConstants.html">dao/geoPackageConstants</a></li><li><a href="module-dao_spatialReferenceSystem.html">dao/spatialReferenceSystem</a></li><li><a href="module-dataColumnConstraints.html">dataColumnConstraints</a></li><li><a href="module-dataColumns.html">dataColumns</a></li><li><a href="module-db_dataTypes.html">db/dataTypes</a></li><li><a href="module-db_sqliteQueryBuilder.html">db/sqliteQueryBuilder</a></li><li><a href="module-features_user_featureColumn.html">features/user/featureColumn</a></li><li><a href="module-features_user_featureDao.html">features/user/featureDao</a></li><li><a href="module-features_user_featureRow.html">features/user/featureRow</a></li><li><a href="module-features_user_featureTable.html">features/user/featureTable</a></li><li><a href="module-features_user_featureTableReader.html">features/user/featureTableReader</a></li><li><a href="module-geom_geometryData.html">geom/geometryData</a></li><li><a href="module-geometryIndexDao.html">geometryIndexDao</a></li><li><a href="module-geoPackage.html">geoPackage</a></li><li><a href="module-GeoPackage_.html">GeoPackage</a></li><li><a href="module-geoPackageManager.html">geoPackageManager</a></li><li><a href="module-metadata.html">metadata</a></li><li><a href="module-metadata_reference.html">metadata/reference</a></li><li><a href="module-tableIndexDao.html">tableIndexDao</a></li><li><a href="module-tiles_matrix.html">tiles/matrix</a></li><li><a href="module-tiles_matrixset.html">tiles/matrixset</a></li><li><a href="module-tiles_user_tileColumn.html">tiles/user/tileColumn</a></li><li><a href="module-tiles_user_tileDao.html">tiles/user/tileDao</a></li><li><a href="module-tiles_user_tileRow.html">tiles/user/tileRow</a></li><li><a href="module-tiles_user_tileTable.html">tiles/user/tileTable</a></li><li><a href="module-tiles_user_tileTableReader.html">tiles/user/tileTableReader</a></li><li><a href="module-user_userColumn.html">user/userColumn</a></li><li><a href="module-user_userDao.html">user/userDao</a></li><li><a href="module-user_userRow.html">user/userRow</a></li><li><a href="module-user_userTable.html">user/userTable</a></li><li><a href="module-user_userTableReader.html">user/userTableReader</a></li><li><a href="module-validate_geoPackageValidate.html">validate/geoPackageValidate</a></li><li><a href="module-wkb.html">wkb</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="module-core_contents-Contents.html">core/contents~Contents</a></li><li><a href="module-core_contents-ContentsDao.html">core/contents~ContentsDao</a></li><li><a href="module-dao_dao-Dao.html">dao/dao~Dao</a></li><li><a href="module-dao_geometryColumns-GeometryColumnsDao.html">dao/geometryColumns~GeometryColumnsDao</a></li><li><a href="module-dao_geometryColumns-SpatialReferenceSystem.html">dao/geometryColumns~SpatialReferenceSystem</a></li><li><a href="module-dao_spatialReferenceSystem-SpatialReferenceSystem.html">dao/spatialReferenceSystem~SpatialReferenceSystem</a></li><li><a href="module-dao_spatialReferenceSystem-SpatialReferenceSystemDao.html">dao/spatialReferenceSystem~SpatialReferenceSystemDao</a></li><li><a href="module-dataColumnConstraints-DataColumnConstraints.html">dataColumnConstraints~DataColumnConstraints</a></li><li><a href="module-dataColumnConstraints-DataColumnConstraintsDao.html">dataColumnConstraints~DataColumnConstraintsDao</a></li><li><a href="module-dataColumns-DataColumns.html">dataColumns~DataColumns</a></li><li><a href="module-dataColumns-DataColumnsDao.html">dataColumns~DataColumnsDao</a></li><li><a href="module-features_user_featureDao-FeatureDao.html">features/user/featureDao~FeatureDao</a></li><li><a href="module-features_user_featureTableReader-FeatureTableReader.html">features/user/featureTableReader~FeatureTableReader</a></li><li><a href="module-geometryIndexDao-GeometryIndexDao.html">geometryIndexDao~GeometryIndexDao</a></li><li><a href="module-geometryIndexDao-TableIndex.html">geometryIndexDao~TableIndex</a></li><li><a href="module-geoPackage-GeoPackage.html">geoPackage~GeoPackage</a></li><li><a href="module-metadata_reference-MetadataReference.html">metadata/reference~MetadataReference</a></li><li><a href="module-metadata_reference-MetadataReferenceDao.html">metadata/reference~MetadataReferenceDao</a></li><li><a href="module-metadata-Extension.html">metadata~Extension</a></li><li><a href="module-metadata-ExtensionDao.html">metadata~ExtensionDao</a></li><li><a href="module-metadata-Metadata.html">metadata~Metadata</a></li><li><a href="module-metadata-MetadataDao.html">metadata~MetadataDao</a></li><li><a href="module-tableIndexDao-TableIndex.html">tableIndexDao~TableIndex</a></li><li><a href="module-tableIndexDao-TableIndexDao.html">tableIndexDao~TableIndexDao</a></li><li><a href="module-tiles_matrixset-TileMatrixSet.html">tiles/matrixset~TileMatrixSet</a></li><li><a href="module-tiles_matrixset-TileMatrixSetDao.html">tiles/matrixset~TileMatrixSetDao</a></li><li><a href="module-tiles_matrix-TileMatrix.html">tiles/matrix~TileMatrix</a></li><li><a href="module-tiles_matrix-TileMatrixSetDao.html">tiles/matrix~TileMatrixSetDao</a></li><li><a href="module-tiles_user_tileDao-TileDao.html">tiles/user/tileDao~TileDao</a></li><li><a href="module-tiles_user_tileTableReader-TileTableReader.html">tiles/user/tileTableReader~TileTableReader</a></li><li><a href="module-user_userColumn-UserColumn.html">user/userColumn~UserColumn</a></li><li><a href="module-user_userDao-UserDao.html">user/userDao~UserDao</a></li><li><a href="module-user_userRow-UserRow.html">user/userRow~UserRow</a></li><li><a href="module-user_userTableReader-UserTableReader.html">user/userTableReader~UserTableReader</a></li>
-				</ul>
-			</li>
-			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#BaseExtension">BaseExtension</a></li><li><a href="global.html#FeatureTableIndex">FeatureTableIndex</a></li><li><a href="global.html#FeatureTiles">FeatureTiles</a></li><li><a href="global.html#getLongitudeFromPixelWithWidth">getLongitudeFromPixelWithWidth</a></li><li><a href="global.html#getTileBoundingBox">getTileBoundingBox</a></li><li><a href="global.html#getTileColumnWithTotalBoundingBox">getTileColumnWithTotalBoundingBox</a></li><li><a href="global.html#getTileGridWithTotalBoundingBox">getTileGridWithTotalBoundingBox</a></li><li><a href="global.html#getTileRowWithTotalBoundingBox">getTileRowWithTotalBoundingBox</a></li><li><a href="global.html#getWebMercatorBoundingBoxFromXYZ">getWebMercatorBoundingBoxFromXYZ</a></li><li><a href="global.html#progress">progress</a></li><li><a href="global.html#TileGrid">TileGrid</a></li><li><a href="global.html#tileSizeWithTilesPerSide">tileSizeWithTilesPerSide</a></li><li><a href="global.html#tilesPerSideWithZoom">tilesPerSideWithZoom</a></li>
-				</ul>
-			</li>
-			
-		</ul>
-        
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        
+</dd>
+											<hr/>
+											<dt class="symbol-title class public">
+			<h4 id="GeometryIndexDao" class="class public"><a href="module-geometryIndexDao-GeometryIndexDao.html"><span class="signature-new">new&nbsp;</span><span class="name">GeometryIndexDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+		</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
 	</div>
-
-</div>
-</div>
-
-
-<div class="container" id="toc-content">
-<div class="row">
-
-	
-	<div class="col-md-8">
-	
-		<div id="main">
-			
-
-	<h1 class="page-title">Module: geometryIndexDao</h1>
-<section>
-
-<header>
-    
-</header>
-
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">GeometryIndexDao module.</div>
-        
-
-        
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
-	<dd class="tag-see">
-		<ul>
-			<li><a href="module-dao_dao.html">module:dao/dao</a></li>
-			</ul>
-	</dd>
-	
-
-	
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-geometryIndexDao-GeometryIndexDao.html">GeometryIndexDao</a></dt>
-            <dd></dd>
-        
-            <dt><a href="module-geometryIndexDao-TableIndex.html">TableIndex</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
+</dd>
+											<hr/>
+											<dt class="symbol-title class public">
+			<h4 id="ExtendedRelation" class="class public"><a href="module-geometryIndexDao-ExtendedRelation.html"><span class="signature-new">new&nbsp;</span><span class="name">ExtendedRelation</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+		</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title class public">
+			<h4 id="ExtendedRelationDao" class="class public"><a href="module-geometryIndexDao-ExtendedRelationDao.html"><span class="signature-new">new&nbsp;</span><span class="name">ExtendedRelationDao</span><span class="signature-params">()</span><span class="signature-type"></span></a></h4>
+		</dt>
+<dd class="symbol-details class public">
+	<div class="symbol-details-inner">
+	</div>
+</dd>
+									</dl>
+							</article>
+					</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
 		</div>
 	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
 		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
 	
-
-</div>
-</div>
-
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
-
-<footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
-	
-		on 2018-06-20T07:42:45-06:00
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
-</footer>
-
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
-
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : false,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
-    </script>
-
-
 </body>
 </html>

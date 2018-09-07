@@ -22,7 +22,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDaoWithTableName('TILESosmds');
+        tileDao = geoPackage.getTileDao('TILESosmds');
         done();
       });
     });
@@ -213,7 +213,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDaoWithTableName('imagery');
+        tileDao = geoPackage.getTileDao('imagery');
         done();
       });
     });
@@ -272,7 +272,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(gp);
         should.exist(gp.getDatabase().getDBConnection());
         gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDaoWithTableName('imagery');
+        tileDao = geoPackage.getTileDao('imagery');
         done();
       });
     });

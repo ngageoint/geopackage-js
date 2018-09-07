@@ -1,0 +1,326 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>tiles/user/tileRow.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">tiles/user/tileRow.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * tileRow module.
+ * @module tiles/user/tileRow
+ */
+
+var UserRow = require('../../user/userRow');
+
+var util = require('util');
+
+/**
+ * Tile Row containing the values from a single result set row
+ * @param  {TileTable} tileTable tile table
+ * @param  {Array} columnTypes  column types
+ * @param  {Array} values       values
+ */
+var TileRow = function(tileTable, columnTypes, values) {
+  UserRow.call(this, tileTable, columnTypes, values);
+  this.tileTable = tileTable;
+}
+
+util.inherits(TileRow, UserRow);
+
+TileRow.prototype.toObjectValue = function (value) {
+  return value;
+};
+
+TileRow.prototype.toDatabaseValue = function (columnName) {
+  return this.getValueWithColumnName(columnName);
+};
+
+/**
+ * Get the zoom level column index
+ * @return {Number} zoom level column index
+ */
+TileRow.prototype.getZoomLevelColumnIndex = function () {
+  return this.tileTable.zoomLevelIndex;
+};
+
+/**
+ * Get the zoom level column
+ * @return {TileColumn} zoom level column
+ */
+TileRow.prototype.getZoomLevelColumn = function() {
+  return this.tileTable.getZoomLevelColumn();
+}
+
+/**
+ * Get the zoom level
+ * @return {Number} zoom level
+ */
+TileRow.prototype.getZoomLevel = function () {
+  return this.getValueWithColumnName(this.getZoomLevelColumn().name);
+};
+
+/**
+ * Set the zoom level
+ * @param {Number} zoomLevel zoom level
+ */
+TileRow.prototype.setZoomLevel = function (zoomLevel) {
+  this.setValueWithIndex(this.getZoomLevelColumnIndex(), zoomLevel);
+};
+
+/**
+ * Get the tile column column Index
+ * @return {number} tile column column index
+ */
+TileRow.prototype.getTileColumnColumnIndex = function () {
+  return this.tileTable.tileColumnIndex;
+};
+
+/**
+ * Get the tile column column
+ * @return {TileColumn} tile column column
+ */
+TileRow.prototype.getTileColumnColumn = function () {
+  return this.tileTable.getTileColumnColumn();
+};
+
+/**
+ * Get the tile column
+ * @return {Number} tile column
+ */
+TileRow.prototype.getTileColumn = function () {
+  return this.getValueWithColumnName(this.getTileColumnColumn().name);
+};
+
+/**
+ * Set the tile column
+ * @param {number} tileColumn tile column
+ */
+TileRow.prototype.setTileColumn = function (tileColumn) {
+  this.setValueWithColumnName(this.getTileColumnColumn().name, tileColumn);
+};
+
+/**
+ * Get the tile row column index
+ * @return {Number} tile row column index
+ */
+TileRow.prototype.getRowColumnIndex = function () {
+  return this.tileTable.tileRowIndex;
+};
+
+/**
+ * Get the tile row column
+ * @return {TileColumn} tile row column
+ */
+TileRow.prototype.getRowColumn = function () {
+  return this.tileTable.getRowColumn();
+};
+
+/**
+ * Get the tile row
+ * @return {Number} tile row
+ */
+TileRow.prototype.getRow = function () {
+  return this.getValueWithColumnName(this.getRowColumn().name);
+};
+
+/**
+ * Set the tile row
+ * @param {Number} tileRow tile row
+ */
+TileRow.prototype.setTileRow = function (tileRow) {
+  this.setValueWithColumnName(this.getRowColumn().name, tileRow);
+};
+
+/**
+ * Get the tile data column index
+ * @return {Number} tile data column index
+ */
+TileRow.prototype.getTileDataColumnIndex = function () {
+  return this.tileTable.tileDataIndex;
+};
+
+/**
+ * Get the tile data column
+ * @return {TileColumn} tile data column
+ */
+TileRow.prototype.getTileDataColumn = function () {
+  return this.tileTable.getTileDataColumn();
+};
+
+/**
+ * Get the tile data
+ * @return {Buffer} tile data
+ */
+TileRow.prototype.getTileData = function () {
+  return this.getValueWithColumnName(this.getTileDataColumn().name);
+};
+
+/**
+ * Set the tile data
+ * @param {Buffer} tileData tile data
+ */
+TileRow.prototype.setTileData = function (tileData) {
+  this.setValueWithColumnName(this.getTileDataColumn().name, tileData);
+};
+
+/**
+ * Get the tile data as an image
+ * @return {image} tile image
+ */
+TileRow.prototype.getTileDataImage = function () {
+  // TODO
+};
+
+
+// /**
+//  *  Get the tile data as a scaled image
+//  *
+//  *  @param scale scale, 0.0 to 1.0
+//  *
+//  *  @return tile image
+//  */
+// -(UIImage *) getTileDataImageWithScale: (CGFloat) scale;
+//
+// /**
+//  *  Set the tile data with an image
+//  *
+//  *  @param image  image
+//  *  @param format image format
+//  */
+// -(void) setTileDataWithImage: (UIImage *) image andFormat: (enum GPKGCompressFormat) format;
+//
+// /**
+//  *  Set the tile data with an image
+//  *
+//  *  @param image  image
+//  *  @param format image format
+//  *  @param quality compression quality, 0.0 to 1.0, used only for GPKG_CF_JPEG
+//  */
+// -(void) setTileDataWithImage: (UIImage *) image andFormat: (enum GPKGCompressFormat) format andQuality: (CGFloat) quality;
+
+
+module.exports = TileRow;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

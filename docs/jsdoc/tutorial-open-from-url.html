@@ -1,0 +1,461 @@
+<!-- start:readme.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>Open from URL</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">tutorial</span>
+				<h1><span class="title">Open from URL</span></h1>
+				<div class="summary"><p>Loads a GeoPackage from a URL</p></div>			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+							<li class="active">Open from URL</li>
+						</ol>
+		<section class="tutorial-section">
+			<article><!DOCTYPE html>
+<html>
+<head>
+  <title>Open A GeoPackage From A URL</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
+  <style type="text/css">
+    body {
+      background-color: light-gray;
+      font-family: Helvetica;
+      overflow-y: auto;
+    }
+
+    .information {
+      padding: 7px;
+    }
+
+    .table-group {
+      font-size: 12px;
+    }
+
+    .table-info {
+      padding-bottom: 7px;
+    }
+
+    .table-name {
+      font-weight: bold;
+      font-size: 14px;
+      vertical-align: top;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    .table-name a {
+      font-size: 11px;
+    }
+
+    .title {
+      font-size: 15px;
+      font-weight: bold;
+      color: #222;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: bold;
+      padding-top: 7px;
+    }
+
+    .section {
+      font-size: 12px;
+      padding-left: 7px;
+    }
+
+    .column {
+      padding: 4px;
+    }
+
+    .label {
+      color: #777;
+    }
+
+    .value {
+      color: #222;
+    }
+  </style>
+
+  <script type="text/javascript" src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/mustache"></script>
+  <script type="text/javascript" src="https://unpkg.com/@ngageoint/geopackage/dist/geopackage.min.js"></script>
+  <script type="text/javascript">
+
+  var GeoPackageAPI = window.geopackage;
+
+  window.onload = function() {
+    loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg');
+  }
+
+  function loadUrl(url, gpName) {
+    $('.urlToLoad').each(function() {
+      $(this).html(url);
+    });
+    fileName = url.split('/').pop();
+    urlToUint8Array(url, function(err, uInt8Array) {
+      GeoPackageAPI.openGeoPackageByteArray(uInt8Array, function(err, geoPackage) {
+        displayGeoPackageInfo(geoPackage, function() {
+          console.log('done');
+          $('#loaded').toggle();
+          $('#loadFromUrl').toggle();
+        });
+      });
+    });
+  }
+
+  function urlToUint8Array(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(e) {
+      var uInt8Array = new Uint8Array(this.response);
+      callback(null, uInt8Array);
+    }
+    xhr.send();
+  }
+
+  function displayGeoPackageInfo(geoPackage, callback) {
+    tableInfos = {};
+    var featureTableTemplate = $('#feature-table-template').html();
+    Mustache.parse(featureTableTemplate);
+
+    var tileTableTemplate = $('#tile-table-template').html();
+    Mustache.parse(tileTableTemplate);
+
+    var tileTableNode = $('#tile-tables');
+    var featureTableNode = $('#feature-tables');
+
+    geoPackage.getTileTables(function(err, tables) {
+      console.log('There are %s tile tables', tables.length);
+      tables.forEach(function(table) {
+        geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
+          geoPackage.getInfoForTable(tileDao, function(err, info) {
+            tableInfos[table] = info;
+            console.log('Table Info for %s', table, info);
+            var rendered = Mustache.render(tileTableTemplate, info);
+            tileTableNode.append(rendered);
+          });
+        });
+      });
+    });
+    geoPackage.getFeatureTables(function(err, tables) {
+      console.log('There are %s feature tables', tables.length);
+      tables.forEach(function(table) {
+        geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
+          geoPackage.getInfoForTable(featureDao, function(err, info) {
+            tableInfos[table] = info;
+            console.log('Table Info for %s', table, info);
+            var rendered = Mustache.render(featureTableTemplate, info);
+            featureTableNode.append(rendered);
+          });
+        });
+      });
+    });
+    callback();
+  }
+  </script>
+</head>
+
+<body>
+  <div id="information" class="information">
+    <h2 id="loadFromUrl">Loading URL: <span class="urlToLoad"></span></h2>
+    <h2 style="display:none" id="loaded">Information about GeoPackage at URL: <span class="urlToLoad"></span><h2>
+    <hr>
+    <div class="tableGroup">
+      <div id="tile-tables"></div>
+    </div>
+    <div class="tableGroup">
+      <div id="feature-tables"></div>
+    </div>
+  </div>
+
+  <script id="feature-table-template" type="x-tmpl-mustache">
+  <div>
+    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>)</div>
+    <div class="table-info">
+      <div class="metadata">
+        <div class="srs">
+          <div class="section-title">Features Spatial Reference System</div>
+          <div class="section">
+            <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+            <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+            <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+            <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organization_coordsys_id}}</span></div>
+            <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
+          </div>
+        </div>
+        <div class="contents">
+          <div class="section-title">Contents</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+            <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+            <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+            <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+            <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+            <div class="item"><span class="label">MinY: </span><span class="value">{{contents.minY}}</span></div>
+            <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+            <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+            <div class="srs">
+              <div class="section-title">Contents Spatial Reference System</div>
+              <div class="section">
+                <div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
+                <div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
+                <div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
+                <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
+                <div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
+                <div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="geometryColumns">
+          <div class="section-title">Geometry Columns</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{geometryColumns.tableName}}</span></div>
+            <div class="item"><span class="label">Column Name: </span><span class="value">{{geometryColumns.columnName}}</span></div>
+            <div class="item"><span class="label">Geometry Type Name: </span><span class="value">{{geometryColumns.geometryTypeName}}</span></div>
+            <div class="item"><span class="label">Z: </span><span class="value">{{geometryColumns.z}}</span></div>
+            <div class="item"><span class="label">M: </span><span class="value">{{geometryColumns.m}}</span></div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="section-title">{{tableName}} columns:</div>
+          <div class="section">
+            {{#columns}}
+            <div class="column">
+              <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+              <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+              <div class="item"><span class="label">Data Type: </span><span class="value">{{dataType}}</span></div>
+              <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+              <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+              <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+              <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+              {{#dataColumn}}
+              <div class="section-title">Data Column:</div>
+              <div class="section">
+                <div class="dataColumn">
+                  <div class="item"><span class="label">Name: </span><span class="value">{{dataColumn.name}}</span></div>
+                  <div class="item"><span class="label">Title: </span><span class="value">{{dataColumn.title}}</span></div>
+                  <div class="item"><span class="label">Description: </span><span class="value">{{dataColumn.description}}</span></div>
+                  <div class="item"><span class="label">Mime Type: </span><span class="value">{{dataColumn.mime_type}}</span></div>
+                </div>
+              </div>
+              {{/dataColumn}}
+            </div>
+            {{/columns}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+  </script>
+  <script id="tile-table-template" type="x-tmpl-mustache">
+  <div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minWebMapZoom}} - {{maxWebMapZoom}}</span>)</div>
+    <div class="table-info">
+      <div class="metadata">
+        <div class="tiles">
+          <div class="section-title">Tile Information</div>
+          <div class="section">
+            <div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
+            <div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
+            <div class="item"><span class="label">Min GeoPackage File Zoom: </span><span class="value">{{minZoom}}</span></div>
+            <div class="item"><span class="label">Max GeoPackage File Zoom: </span><span class="value">{{maxZoom}}</span></div>
+            <div class="item"><span class="label">Min Web Map Zoom: </span><span class="value">{{minWebMapZoom}}</span></div>
+            <div class="item"><span class="label">Max Web Map Zoom: </span><span class="value">{{maxWebMapZoom}}</span></div>
+          </div>
+        </div>
+        <div class="srs">
+          <div class="section-title">Tile Matrix Spatial Reference System</div>
+          <div class="section">
+            <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+            <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+            <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+            <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organization_coordsys_id}}</span></div>
+            <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
+          </div>
+        </div>
+        <div class="contents">
+          <div class="section-title">Contents</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+            <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+            <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+            <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+            <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+            <div class="item"><span class="label">Min Y: </span><span class="value">{{contents.minY}}</span></div>
+            <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+            <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+            <div class="srs">
+              <div class="section-title">Contents Spatial Reference System</div>
+              <div class="section">
+                <div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
+                <div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
+                <div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
+                <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
+                <div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
+                <div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="section-title">{{tableName}} columns:</div>
+          <div class="section">
+            {{#columns}}
+            <div class="column">
+              <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+              <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+              <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+              <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+              <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+              <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+            </div>
+            {{/columns}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+  </div>
+  </script>
+  <script id="tile-zoom-levels-template" type="x-tmpl-mustache">
+  <span style="font-size: 12px;" class="label">Zoom:</span>
+  {{#zooms}}
+  <input type="radio" name="zoomLevel" value="{{zoom}}" onchange="loadTiles('{{tableName}}', {{zoom}}, $(this).parent().find('.tiles'))"><span class="value" style="font-size: 12px;">{{zoom}}</span>
+  {{/zooms}}
+  <div class="tiles">
+  </div>
+  </script>
+</body>
+</html>
+</article>
+		</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:readme.hbs -->

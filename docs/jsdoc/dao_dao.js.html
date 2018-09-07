@@ -1,0 +1,523 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>dao/dao.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">dao/dao.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * Dao module.
+ * @module dao/dao
+ */
+
+var sqliteQueryBuilder = require('../db/sqliteQueryBuilder')
+  , ColumnValues = require('./columnValues');
+
+/** @class Dao */
+var Dao = function(geoPackage) {
+  this.geoPackage = geoPackage;
+  this.connection = geoPackage.getDatabase();
+}
+
+Dao.prototype.populateObjectFromResult = function (object, result) {
+  if (!result) return;
+  for (var key in result) {
+    object[key] = result[key];
+  }
+};
+
+/**
+ * Checks if the table exists
+ * @param  {validationCallback} callback - Callback to call with the results of if the table exists or not
+ */
+Dao.prototype.isTableExists = function () {
+  var results = this.connection.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [this.gpkgTableName]);
+  return !!results;
+};
+
+Dao.prototype.refresh = function(object) {
+  return this.queryForSameId(object);
+}
+
+Dao.prototype.queryForIdObject = function(id) {
+  var whereString = this.buildPkWhereWithValue(id);
+  var whereArgs = this.buildPkWhereArgsWithValue(id);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, whereString);
+  var result = this.connection.get(query, whereArgs);
+  if (!result) return;
+  var object = this.createObject(result);
+  // TOOD something is wrong here
+  this.populateObjectFromResult(object, result);
+  return object;
+};
+
+Dao.prototype.queryForSameId = function (object) {
+  var idArray = this.getMultiId(object);
+  return this.queryForMultiIdObject(idArray);
+};
+
+Dao.prototype.getMultiId = function (object) {
+  var idValues = [];
+  for (var i = 0; i &lt; this.idColumns.length; i++) {
+    idValues.push(object.values ? object.values[this.idColumns[i]] : object[this.idColumns[i]]);
+  }
+  return idValues;
+};
+
+Dao.prototype.queryForMultiIdObject = function (idValues) {
+  var whereString = this.buildPkWhereWithValues(idValues);
+  var whereArgs = this.buildPkWhereArgsWithValues(idValues);
+
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, whereString);
+
+  var result = this.connection.get(query, whereArgs);
+  if (!result) return;
+  var object = this.createObject(result);
+  this.populateObjectFromResult(object, result);
+  return object;
+};
+
+/**
+ * Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory
+ * @param  {Function} callback called with an error if one occurred and the array of results
+ */
+Dao.prototype.queryForAll = function () {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'");
+  return this.connection.all(query);
+};
+
+Dao.prototype.queryForAllWhere = function(where, whereArgs) {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, where);
+  return this.connection.all(query, whereArgs);
+}
+
+Dao.prototype.queryForLike = function(fieldName, value) {
+  var values = new ColumnValues();
+  values.addColumn(fieldName, value);
+  var where = this.buildWhereLike(values);
+  var whereArgs = this.buildWhereArgsWithValue(value);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, where);
+  return this.connection.all(query, whereArgs);
+}
+
+/**
+ * Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory
+ */
+Dao.prototype.queryForColumnsInAll = function (columnName) {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", [columnName]);
+  return this.connection.all(query);
+};
+
+Dao.prototype.queryForColumnsWhere = function (columnName, fieldValues) {
+  var where = this.buildWhereWithFields(fieldValues);
+  var whereArgs = this.buildWhereArgsWithValues(fieldValues);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", [columnName], where);
+  return this.connection.all(query, whereArgs);
+};
+
+Dao.prototype.queryForChunk = function(pageSize, page) {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, undefined, undefined, undefined, undefined, this.idColumns[0], pageSize, page * pageSize);
+  return this.connection.all(query);
+};
+
+Dao.prototype.queryForEach = function () {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'");
+  var count = 0;
+  return this.connection.each(query);
+};
+
+Dao.prototype.queryForFieldValues = function (fieldValues) {
+  var whereString = this.buildWhereWithFields(fieldValues);
+  var whereArgs = this.buildWhereArgsWithValues(fieldValues);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, whereString);
+  var count = 0;
+  return this.connection.each(query, whereArgs);
+};
+
+Dao.prototype.queryJoinWhereWithArgs = function(join, where, whereArgs, columns) {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", columns, where, join);
+  var count = 0;
+  return this.connection.each(query, whereArgs);
+}
+
+Dao.prototype.queryWhereWithArgsDistinct = function(where, whereArgs) {
+  var query = sqliteQueryBuilder.buildQuery(true, "'"+this.gpkgTableName+"'", undefined, where);
+  var count = 0;
+  return this.connection.each(query, whereArgs);
+}
+
+Dao.prototype.queryWhereWithArgs = function(where, whereArgs) {
+  return this.queryWhere(where, whereArgs, undefined, undefined, undefined, undefined);
+}
+
+Dao.prototype.queryWhere = function (where, whereArgs, groupBy, having, orderBy, limit) {
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, where, undefined, groupBy, having, orderBy, limit);
+  return this.connection.each(query, whereArgs);
+};
+
+Dao.prototype.buildPkWhereWithValue = function(idValue) {
+  return this.buildWhereWithFieldAndValue(this.idColumns, idValue);
+};
+
+Dao.prototype.buildPkWhereArgsWithValue = function (idValue) {
+  return this.buildWhereArgsWithValue(idValue);
+};
+
+Dao.prototype.buildPkWhereWithValues = function (idValuesArray) {
+  var idColumnValues = new ColumnValues();
+  for (var i = 0; i &lt; idValuesArray.length; i++) {
+    idColumnValues.addColumn(this.idColumns[i], idValuesArray[i]);
+  }
+  return this.buildWhereWithFields(idColumnValues);
+};
+
+Dao.prototype.buildPkWhereArgsWithValues = function (idValuesArray) {
+  var values = [];
+  for (var i = 0; i &lt; idValuesArray.length; i++) {
+    values = values.concat(this.buildWhereArgsWithValue(idValuesArray[i]));
+  }
+  return values;
+};
+
+Dao.prototype.buildWhereLike = function(fields, operation) {
+  var whereString = '';
+  for (var i = 0; i &lt; fields.columns.length; i++) {
+    var column = fields.columns[i];
+    if (i) {
+      whereString += ' ' + operation + ' ';
+    }
+    whereString += this.buildWhereWithFieldAndValueAndOperation(column, fields.getValue(column), 'like');
+  }
+  return whereString;
+}
+
+Dao.prototype.buildWhereWithFields = function (fields) {
+  return this.buildWhereWithFieldsAndOperation(fields, 'and');
+};
+
+Dao.prototype.buildWhereWithFieldsAndOperation = function (fields, operation) {
+  var whereString = '';
+
+  for (var i = 0; i &lt; fields.columns.length; i++) {
+    var column = fields.columns[i];
+    if (i) {
+      whereString += ' ' + operation + ' ';
+    }
+    whereString += this.buildWhereWithFieldAndValue(column, fields.getValue(column));
+  }
+  return whereString;
+};
+
+Dao.prototype.buildWhereArgsWithValue = function (value) {
+  var args = [];
+  if(value !== undefined || value !== null) {
+    args.push(value);
+  }
+  return args;
+};
+
+Dao.prototype.buildWhereArgsWithValueArray = function (values) {
+  var args = [];
+  for (var i = 0; i &lt; values.length; i++) {
+    var value = values[i];
+    if (value !== undefined &amp;&amp; value !== null) {
+      args.push(value);
+    }
+  }
+  return args.count ? null : args;
+};
+
+Dao.prototype.buildWhereArgsWithValues = function (values) {
+  var args = [];
+  for (var i = 0; i &lt; values.columns.length; i++) {
+    var column = values.columns[i];
+    var value = values.getValue(column);
+    if (value !== undefined &amp;&amp; value !== null) {
+      args.push(value);
+    }
+  }
+  return args.count ? null : args;
+};
+
+Dao.prototype.buildWhereWithFieldAndValue = function (field, value) {
+  return this.buildWhereWithFieldAndValueAndOperation(field, value, '=');
+};
+
+Dao.prototype.buildWhereWithFieldAndValueAndOperation = function (field, value, operation) {
+  var whereString = '' + field + ' ';
+  if(value === undefined || value === null){
+    whereString += "is null";
+  } else {
+    whereString += operation + ' ?';
+  }
+  return whereString;
+};
+
+Dao.prototype.queryForEachEqWithFieldAndValue = function (field, value, rowCallback) {
+  return this.queryForEachEqWithField(field, value, undefined, undefined, undefined);
+};
+
+Dao.prototype.queryForAllEqWithFieldAndValue = function (field, value) {
+  return this.queryForAllEqWithField(field, value, undefined, undefined, undefined);
+};
+
+Dao.prototype.queryForEachEqWithField = function(field, value, groupBy, having, orderBy) {
+  var whereString = this.buildWhereWithFieldAndValue(field, value);
+  var whereArgs = this.buildWhereArgsWithValue(value);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, whereString);
+  return this.connection.each(query, whereArgs);
+};
+
+Dao.prototype.queryForAllEqWithField = function(field, value, groupBy, having, orderBy) {
+  var whereString = this.buildWhereWithFieldAndValue(field, value);
+  var whereArgs = this.buildWhereArgsWithValue(value);
+  var query = sqliteQueryBuilder.buildQuery(false, "'"+this.gpkgTableName+"'", undefined, whereString);
+  return this.connection.all(query, whereArgs);
+};
+
+Dao.prototype.countByEqWithFieldAndValue = function(field, value) {
+  var whereString = this.buildWhereWithFieldAndValue(field, value);
+  var whereArgs = this.buildWhereArgsWithValue(value);
+  var query = sqliteQueryBuilder.buildCount("'"+this.gpkgTableName+"'", whereString);
+
+  result = this.connection.get(query, whereArgs);
+  if (!result) return 0;
+  return result.count;
+};
+
+Dao.prototype.countWhere = function(fields) {
+  var where = this.buildWhereWithFieldsAndOperation(fields, 'and');
+  var whereArgs = this.buildWhereArgsWithValues(fields);
+  var query = sqliteQueryBuilder.buildCount("'"+this.gpkgTableName+"'", where);
+
+  result = this.connection.get(query, whereArgs);
+  if (!result) return 0;
+  return result.count;
+}
+
+Dao.prototype.count = function() {
+  return this.connection.count(this.gpkgTableName);
+}
+
+Dao.prototype.getId = function (object) {
+  return this.getValueFromObjectWithColumnName(object, this.idColumns[0]);
+};
+
+Dao.prototype.getValueFromObjectWithColumnName = function (object, column) {
+  return object[column];
+};
+
+Dao.prototype.getValue = function(column) {
+  return this[column];
+}
+
+Dao.prototype.minOfColumn = function (column, where, whereArgs) {
+  return this.connection.minOfColumn("'"+this.gpkgTableName+"'", column, where, whereArgs);
+};
+
+Dao.prototype.maxOfColumn = function (column, where, whereArgs) {
+  return this.connection.maxOfColumn("'"+this.gpkgTableName+"'", column, where, whereArgs);
+};
+
+Dao.prototype.delete = function(object) {
+  if (object.getId) {
+    return this.deleteById(object.getId());
+  }
+  return this.deleteByMultiId(this.getMultiId(object));
+};
+
+Dao.prototype.deleteById = function(idValue) {
+  var where = this.buildPkWhereWithValue(idValue);
+  var whereArgs = this.buildPkWhereArgsWithValue(idValue);
+
+  return this.connection.delete("'"+this.gpkgTableName+"'", where, whereArgs);
+};
+
+Dao.prototype.deleteByMultiId = function(idValues) {
+  var where = this.buildPkWhereWithValues(idValues);
+  var whereArgs = this.buildPkWhereArgsWithValues(idValues);
+
+  return this.connection.delete("'"+this.gpkgTableName+"'", where, whereArgs);
+};
+
+Dao.prototype.deleteWhere = function(where, whereArgs) {
+  return this.connection.delete("'"+this.gpkgTableName+"'", where, whereArgs);
+};
+
+Dao.prototype.deleteAll = function() {
+  return this.connection.delete("'"+this.gpkgTableName+"'", null, null);
+};
+
+Dao.prototype.create = function(object) {
+  var sql = sqliteQueryBuilder.buildInsert("'"+this.gpkgTableName+"'", object);
+  var insertObject = sqliteQueryBuilder.buildUpdateOrInsertObject(object);
+  return this.connection.insert(sql, insertObject);
+};
+
+Dao.prototype.updateWithValues = function (values, where, whereArgs) {
+  var update = sqliteQueryBuilder.buildUpdate("'"+this.gpkgTableName+"'", values, where, whereArgs);
+  return this.connection.run(update.sql, update.args);
+};
+
+Dao.prototype.update = function(object) {
+  var updateValues = sqliteQueryBuilder.buildUpdateOrInsertObject(object);
+  var multiId = this.getMultiId(object);
+  var where = ' where ';
+  for (var i = 0; i &lt; multiId.length; i++) {
+    where += '"' + this.idColumns[i] + '" = $' + sqliteQueryBuilder.fixColumnName(this.idColumns[i]);
+    updateValues[sqliteQueryBuilder.fixColumnName(this.idColumns[i])] = multiId[i];
+  }
+  var whereArgs = this.buildPkWhereArgsWithValues(multiId);
+  var update = sqliteQueryBuilder.buildObjectUpdate("'"+this.gpkgTableName+"'", object);
+  update += where;
+  return this.connection.run(update, updateValues);
+};
+
+Dao.prototype.createOrUpdate = function(object) {
+  var existing = this.queryForSameId(object);
+  if (!existing) {
+    return this.create(object);
+  } else {
+    return this.update(object);
+  }
+};
+
+Dao.prototype.dropTable = function() {
+  return this.connection.dropTable("'"+this.gpkgTableName+"'");
+};
+
+/**
+ * The Dao
+ * @type {Dao}
+ */
+module.exports = Dao;
+
+/**
+ * Validation callback is passed an error if the validation failed.
+ * @callback validationCallback
+ * @param {Error} null if no error, otherwise describes the error
+ */
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 7th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

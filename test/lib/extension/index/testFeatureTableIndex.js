@@ -36,7 +36,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
           done();
         });
       });
@@ -165,7 +165,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDaoWithTableName('rivers');
+          featureDao = geoPackage.getFeatureDao('rivers');
           done();
         });
       });

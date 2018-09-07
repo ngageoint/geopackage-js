@@ -44,10 +44,10 @@ describe('GeoPackage tests', function() {
       connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
-      var featureDao = geoPackage.getFeatureDaoWithTableName('point2d');
+      var featureDao = geoPackage.getFeatureDao('point2d');
       var each = featureDao.queryForEach();
       for (var row of each) {
-        var currentRow = featureDao.getFeatureRow(row);
+        var currentRow = featureDao.getRow(row);
         var geometry = currentRow.getGeometry();
       }
       connection.close();
@@ -60,14 +60,14 @@ describe('GeoPackage tests', function() {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getFeatureTables();
       tables.forEach(function(table) {
-        var featureDao = geoPackage.getFeatureDaoWithTableName(table);
+        var featureDao = geoPackage.getFeatureDao(table);
         if (!featureDao) {
           return callback(new Error('No feature table exists'));
         }
         var srs = featureDao.getSrs();
         var each = featureDao.queryForEach();
         for (var row of each) {
-          var currentRow = featureDao.getFeatureRow(row);
+          var currentRow = featureDao.getRow(row);
           var geometry = currentRow.getGeometry();
           if (!geometry) {
             continue;
@@ -141,7 +141,7 @@ describe('GeoPackage tests', function() {
 
       return tables.reduce(function(sequence, table) {
         return sequence.then(function() {
-          var tileDao = geoPackage.getTileDaoWithTableName(table);
+          var tileDao = geoPackage.getTileDao(table);
           var maxZoom = tileDao.maxZoom;
           var minZoom = tileDao.minZoom;
 
@@ -162,7 +162,7 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var dao = geoPackage.getFeatureDaoWithTableName('FEATURESriversds');
+      var dao = geoPackage.getFeatureDao('FEATURESriversds');
       var info = geoPackage.getInfoForTable(dao);
       should.exist(info);
       info.tableName.should.be.equal('FEATURESriversds');
@@ -175,7 +175,7 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var tileDao = geoPackage.getTileDaoWithTableName('imagery');
+      var tileDao = geoPackage.getTileDao('imagery');
       var info = geoPackage.getInfoForTable(tileDao);
       should.exist(info);
       info.tableName.should.be.equal('imagery');

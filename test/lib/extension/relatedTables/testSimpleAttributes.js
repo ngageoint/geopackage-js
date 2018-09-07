@@ -180,14 +180,14 @@ describe('Related Simple Attributes tests', function() {
       var allAttributes = attributesDao.queryForAll();
       var attributeIds = [];
       for (var i = 0; i < allAttributes.length; i++) {
-        var row = attributesDao.getAttributeRow(allAttributes[i]);
+        var row = attributesDao.getRow(allAttributes[i]);
         attributeIds.push(row.getId());
       }
 
       var allSimpleAttributes = simpleDao.queryForAll();
       var simpleIds = [];
       for (var i = 0; i < allSimpleAttributes.length; i++) {
-        var row = simpleDao.getSimpleAttributesRow(allSimpleAttributes[i]);
+        var row = simpleDao.getRow(allSimpleAttributes[i]);
         simpleIds.push(row.getId());
       }
 
@@ -269,13 +269,13 @@ describe('Related Simple Attributes tests', function() {
         // get and test the Attributes Rows mapped to each Simple Attributes Row
         var attributes = attributesDao.queryForAll();
         for (var f = 0; f < attributes.length; f++) {
-          var attributeRow = attributesDao.getAttributeRow(attributes[f]);
+          var attributeRow = attributesDao.getRow(attributes[f]);
           var mappedIds = rte.getMappingsForBase(attributeRelation, attributeRow.getId());
           var simpleRows = simpleDao.getRows(mappedIds);
           simpleRows.length.should.be.equal(mappedIds.length);
 
           simpleRows.forEach(function(row) {
-            var simpleRow = simpleDao.getSimpleAttributesRow(row);
+            var simpleRow = simpleDao.getRow(row);
             simpleRow.hasId().should.be.equal(true);
             simpleRow.getId().should.be.greaterThan(0);
             simpleIds.indexOf(simpleRow.getId()).should.not.be.equal(-1);
@@ -336,7 +336,7 @@ describe('Related Simple Attributes tests', function() {
         var simples = simpleDao.queryForAll();
         var totalMapped = 0;
         simples.forEach(function(row) {
-          var simpleRow = simpleDao.getSimpleAttributesRow(row);
+          var simpleRow = simpleDao.getRow(row);
           var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.getId());
           mappedIds.forEach(function(mappedId){
             var attributeRow = attributesDao.queryForIdObject(mappedId);

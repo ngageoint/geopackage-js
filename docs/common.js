@@ -423,32 +423,29 @@ window.toggleLayer = function(layerType, table) {
       eventAction: 'load',
       eventLabel: 'Tile Layer'
     });
-    geoPackage.getTileDaoWithTableName(table)
-    .then(function(tileDao) {
-
-      // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
-      var maxZoom = tileDao.maxWebMapZoom;
-      var minZoom = tileDao.minWebMapZoom;
-      var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
-      tableLayer.createTile = function(tilePoint, done) {
-        var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
-        var size = this.getTileSize();
-        canvas.width = size.x;
-        canvas.height = size.y;
-        setTimeout(function() {
-          console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas)
-          .then(function() {
-            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-            done(null, canvas);
-          });
-        }, 0);
-        return canvas;
-      }
-      map.addLayer(tableLayer);
-      tableLayer.bringToFront();
-      tableLayers[table] = tableLayer;
-    });
+    var tileDao = geoPackage.getTileDaoWithTableName(table);
+    // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
+    var maxZoom = tileDao.maxWebMapZoom;
+    var minZoom = tileDao.minWebMapZoom;
+    var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
+    tableLayer.createTile = function(tilePoint, done) {
+      var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+      var size = this.getTileSize();
+      canvas.width = size.x;
+      canvas.height = size.y;
+      setTimeout(function() {
+        console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+        GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas)
+        .then(function() {
+          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+          done(null, canvas);
+        });
+      }, 0);
+      return canvas;
+    }
+    map.addLayer(tableLayer);
+    tableLayer.bringToFront();
+    tableLayers[table] = tableLayer;
   } else if (layerType === 'feature') {
     if (window.Piwik) {
       Piwik.getAsyncTracker().trackEvent(
@@ -807,17 +804,15 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   var tilesTableTemplate = $('#all-tiles-template').html();
   Mustache.parse(tilesTableTemplate);
 
-  GeoPackageAPI.getTilesInBoundingBoxWebZoom(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth())
-  .then(function(tiles) {
-    if (!tiles || !tiles.tiles || !tiles.tiles.length) {
-      tilesElement.empty();
-      tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
-      return;
-    }
-    var rendered = Mustache.render(tilesTableTemplate, tiles);
+  var tiles = GeoPackageAPI.getTilesInBoundingBoxWebZoom(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
+  if (!tiles || !tiles.tiles || !tiles.tiles.length) {
     tilesElement.empty();
-    tilesElement.append(rendered);
-  });
+    tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
+    return;
+  }
+  var rendered = Mustache.render(tilesTableTemplate, tiles);
+  tilesElement.empty();
+  tilesElement.append(rendered);
 }
 
 window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
