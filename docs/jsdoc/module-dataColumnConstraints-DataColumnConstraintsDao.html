@@ -109,12 +109,33 @@
 					<section>
 							<dl class="symbol primary">
 								<dt class="symbol-title class">
-			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">DataColumnConstraintsDao</span><span class="signature-params">()</span><span class="signature-type"></span></h2>
+			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">DataColumnConstraintsDao</span><span class="signature-params">( <span class="signature-param">geoPackage</span>&nbsp;)</span><span class="signature-type"></span></h2>
 </dt>
 <dd class="symbol-details class" style="max-height: 9999px;">
 	<div class="symbol-details-inner">
 			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Data Column Constraints Data Access Object</p></div>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>geoPackage</code></td>
+							<td><span class="param-type"><a href="module-geoPackage-GeoPackage.html">module:geoPackage~GeoPackage</a></span></td>
+							<td class="last">
+									<p>GeoPackage object</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
 			
@@ -157,7 +178,52 @@
 									<dl class="symbol">
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="queryByConstraintName" class="function public"><span class="name">queryByConstraintName</span><span class="signature-params">( <span class="signature-param">constraintName</span>, <span class="signature-param">dataColumnConstraintCallback</span>, <span class="signature-param">doneCallback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+			<h4 id="createObject" class="function public"><span class="name">createObject</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{<a href="module-dataColumnConstraints-DataColumnConstraints.html">module:dataColumnConstraints~DataColumnConstraints</a>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Creates a new DataColumnConstraints object</p></div>
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type"><a href="module-dataColumnConstraints-DataColumnConstraints.html">module:dataColumnConstraints~DataColumnConstraints</a></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dataColumnConstraints_index.js.html">dataColumnConstraints/index.js</a>, <a href="dataColumnConstraints_index.js.html#line-81">line 81</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryByConstraintName" class="function public"><span class="name">queryByConstraintName</span><span class="signature-params">( <span class="signature-param">constraintName</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
@@ -180,24 +246,18 @@
 									<p>constraint name</p>
 							</td>
 						</tr>
-						<tr>
-								<td><code>dataColumnConstraintCallback</code></td>
-							<td><span class="param-type">function</span></td>
-							<td class="last">
-									<p>callback for each result</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>doneCallback</code></td>
-							<td><span class="param-type">function</span></td>
-							<td class="last">
-									<p>callback for done</p>
-							</td>
-						</tr>
 					</tbody>
 				</table>
 			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
 			
@@ -217,7 +277,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="dataColumnConstraints_index.js.html">dataColumnConstraints/index.js</a>, <a href="dataColumnConstraints_index.js.html#line-87">line 87</a></p>
+									<p class="form-control-static"><a href="dataColumnConstraints_index.js.html">dataColumnConstraints/index.js</a>, <a href="dataColumnConstraints_index.js.html#line-90">line 90</a></p>
 								</div>
 							</div>
 			
@@ -229,7 +289,7 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="queryUnique" class="function public"><span class="name">queryUnique</span><span class="signature-params">( <span class="signature-param">constraintName</span>, <span class="signature-param">constraintType</span>, <span class="signature-param">value</span>&nbsp;)</span><span class="signature-type"></span></h4>
+			<h4 id="queryUnique" class="function public"><span class="name">queryUnique</span><span class="signature-params">( <span class="signature-param">constraintName</span>, <span class="signature-param">constraintType</span>, <span class="signature-param">value</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{<a href="module-dataColumnConstraints-DataColumnConstraints.html">module:dataColumnConstraints~DataColumnConstraints</a>}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
@@ -269,7 +329,15 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type"><a href="module-dataColumnConstraints-DataColumnConstraints.html">module:dataColumnConstraints~DataColumnConstraints</a></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
 			
@@ -289,7 +357,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="dataColumnConstraints_index.js.html">dataColumnConstraints/index.js</a>, <a href="dataColumnConstraints_index.js.html#line-97">line 97</a></p>
+									<p class="form-control-static"><a href="dataColumnConstraints_index.js.html">dataColumnConstraints/index.js</a>, <a href="dataColumnConstraints_index.js.html#line-101">line 101</a></p>
 								</div>
 							</div>
 			
@@ -1034,7 +1102,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable</span></label>
 								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
+									<div class="form-control-static returns-description"><p>iterable of database objects</p></div>
 								</div>
 							</div>
 					</form>

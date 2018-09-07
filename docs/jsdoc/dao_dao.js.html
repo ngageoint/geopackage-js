@@ -254,7 +254,7 @@ Dao.prototype.queryForChunk = function(pageSize, page) {
  * @param  {string} [groupBy] group by clause
  * @param  {string} [having]  having clause
  * @param  {string} [orderBy] order by clause
- * @return {Iterable}
+ * @return {Iterable} iterable of database objects
  */
 Dao.prototype.queryForEach = function (field, value, groupBy, having, orderBy) {
   if (!field) {
