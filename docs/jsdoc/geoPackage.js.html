@@ -253,7 +253,7 @@ GeoPackage.prototype.getRelatedTablesExtension = function() {
 
 GeoPackage.prototype.getSrs = function(srsId) {
   var dao = this.getSpatialReferenceSystemDao();
-  return dao.queryForIdObject(srsId);
+  return dao.queryForId(srsId);
 }
 
 GeoPackage.prototype.createRequiredTables = function() {
@@ -275,7 +275,7 @@ GeoPackage.prototype.createSupportedExtensions = function() {
 GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet) {
   var tileMatrices = [];
   var tileMatrixDao = this.getTileMatrixDao();
-  var results = tileMatrixDao.queryForAllEqWithField(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC');
+  var results = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC');
   results.forEach(function(result) {
     var tm = new TileMatrix();
     tileMatrixDao.populateObjectFromResult(tm, result);
@@ -294,7 +294,7 @@ GeoPackage.prototype.getTileDaoWithContents = function (contents) {
 
 GeoPackage.prototype.getTileDao = function (tableName) {
   var tms = this.getTileMatrixSetDao();
-  var results = tms.queryForAllEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName);
+  var results = tms.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName);
   if (results.length > 1) {
     throw new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length);
   } else if (results.length === 0) {
@@ -386,7 +386,7 @@ GeoPackage.prototype.getTableType = function(tableName) {
 }
 
 GeoPackage.prototype.getTableContents = function(tableName) {
-  return this.getContentsDao().queryForIdObject(tableName);
+  return this.getContentsDao().queryForId(tableName);
 }
 
 GeoPackage.prototype.deleteTable = function(tableName) {
@@ -515,7 +515,7 @@ GeoPackage.prototype.createGeometryColumnsTable = function () {
  */
 GeoPackage.prototype.getAttributeDaoWithTableName = function (tableName) {
   var dao = this.getContentsDao();
-  var contents = dao.queryForIdObject(tableName);
+  var contents = dao.queryForId(tableName);
   return this.getAttributeDaoWithContents(contents);
 };
 

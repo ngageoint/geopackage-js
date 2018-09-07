@@ -453,13 +453,13 @@ GeoPackageAPI.getFeature = function(geopackage, table, featureId) {
   var srs;
   var featureDao = geopackage.getFeatureDao(table)
   srs = featureDao.getSrs();
-  var feature = featureDao.queryForIdObject(featureId);
+  var feature = featureDao.queryForId(featureId);
   if (!feature) {
-    var features = featureDao.queryForAllEqWithFieldAndValue('_feature_id', featureId)
+    var features = featureDao.queryForAllEq('_feature_id', featureId)
     if (features.length) {
       feature = featureDao.getRow(features[0]);
     } else {
-      var features = featureDao.queryForAllEqWithFieldAndValue('_properties_id', featureId)
+      var features = featureDao.queryForAllEq('_properties_id', featureId)
       if (features.length) {
         feature = featureDao.getRow(features[0]);
       }

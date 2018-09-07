@@ -203,7 +203,7 @@ ExtensionDao.prototype.createObject = function(row) {
 };
 
 ExtensionDao.prototype.queryByExtension = function(extensionName) {
-  var results = this.queryForAllEqWithFieldAndValue(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
+  var results = this.queryForAllEq(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
   var e = this.createObject(results[0]);
   return e;
 }
@@ -249,14 +249,14 @@ ExtensionDao.prototype.createTable = function() {
 ExtensionDao.prototype.deleteByExtension = function(extensionName) {
   var values = new ColumnValues();
   values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
-  this.deleteWhere(this.buildWhereWithFieldsAndOperation(values, '='), this.buildWhereArgsWithValues(values));
+  this.deleteWhere(this.buildWhere(values, '='), this.buildWhereArgs(values));
 }
 
 ExtensionDao.prototype.deleteByExtensionAndTableName = function(extensionName, tableName) {
   var values = new ColumnValues();
   values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
   values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
-  this.deleteWhere(this.buildWhereWithFieldsAndOperation(values, 'and'), this.buildWhereArgsWithValues(values));
+  this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
 }
 
 ExtensionDao.TABLE_NAME = "gpkg_extensions";

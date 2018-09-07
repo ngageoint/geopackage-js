@@ -145,7 +145,7 @@ describe('Related Simple Attributes tests', function() {
       geoPackage.isTable(mappingTableName).should.be.equal(true);
       geoPackage.isTable(simpleTable.table_name).should.be.equal(true);
       contentsDao.getTables().indexOf(simpleTable.table_name).should.not.be.equal(-1);
-      validateContents(simpleTable, contentsDao.queryForIdObject(simpleTable.table_name));
+      validateContents(simpleTable, contentsDao.queryForId(simpleTable.table_name));
       SimpleAttributesTable.RELATION_TYPE.dataType.should.be.equal(geoPackage.getTableType(simpleTable.table_name));
       geoPackage.isTableType(SimpleAttributesTable.RELATION_TYPE.dataType, simpleTable.table_name);
 
@@ -168,7 +168,7 @@ describe('Related Simple Attributes tests', function() {
       }
 
       // copy the last row insert and insert the final simple row
-      var simpleRowToCopy = simpleDao.queryForIdObject(simpleRowId);
+      var simpleRowToCopy = simpleDao.queryForId(simpleRowId);
       simpleRowToCopy.resetId();
       var copiedSimpleId = simpleDao.create(simpleRowToCopy);
       copiedSimpleId.should.be.greaterThan(0);
@@ -339,7 +339,7 @@ describe('Related Simple Attributes tests', function() {
           var simpleRow = simpleDao.getRow(row);
           var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.getId());
           mappedIds.forEach(function(mappedId){
-            var attributeRow = attributesDao.queryForIdObject(mappedId);
+            var attributeRow = attributesDao.queryForId(mappedId);
             should.exist(attributeRow);
             attributeRow.hasId().should.be.equal(true);
             attributeRow.getId().should.be.greaterThan(0);
@@ -393,10 +393,10 @@ describe('Related Simple Attributes tests', function() {
 
       // Delete the media table and contents row
       geoPackage.isTable(simpleTable.table_name);
-      should.exist(contentsDao.queryForIdObject(simpleTable.table_name));
+      should.exist(contentsDao.queryForId(simpleTable.table_name));
       geoPackage.deleteTable(simpleTable.table_name);
       geoPackage.isTable(simpleTable.table_name).should.be.equal(false);
-      should.exist(contentsDao.queryForIdObject(simpleTable.table_name));
+      should.exist(contentsDao.queryForId(simpleTable.table_name));
 
       // Delete the related tables extension
       rte.removeExtension();

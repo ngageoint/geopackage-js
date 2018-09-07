@@ -210,9 +210,9 @@ ContentsDao.prototype.getTables = function(tableType) {
   if (tableType) {
     var fieldValues = new ColumnValues();
     fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);
-    results = this.queryForColumnsWhere('table_name', fieldValues);
+    results = this.queryForColumns('table_name', fieldValues);
   } else {
-    results = this.queryForColumnsInAll('table_name');
+    results = this.queryForColumns('table_name');
   }
   var tableNames = [];
   for (var i = 0; i &lt; results.length; i++) {
@@ -239,7 +239,7 @@ ContentsDao.prototype.getProjection = function (contents) {
  */
 ContentsDao.prototype.getSrs = function (contents) {
   var dao = this.geoPackage.getSpatialReferenceSystemDao();
-  return dao.queryForIdObject(contents.srs_id);
+  return dao.queryForId(contents.srs_id);
 };
 
 /**
@@ -251,7 +251,7 @@ ContentsDao.prototype.getGeometryColumns = function (contents) {
   var dao = this.geoPackage.getGeometryColumnsDao();
   // TODO what is causing this to need to be here and not up in the require section
   var GeometryColumnsDao = require('../../features/columns').GeometryColumnsDao;
-  var results = dao.queryForAllEqWithFieldAndValue(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
+  var results = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
   if (!results || !results.length) return;
   var gc = dao.createObject();
   dao.populateObjectFromResult(gc, results[0]);
@@ -265,7 +265,7 @@ ContentsDao.prototype.getGeometryColumns = function (contents) {
  */
 ContentsDao.prototype.getTileMatrixSet = function (contents) {
   var dao = this.geoPackage.getTileMatrixSetDao();
-  var results = dao.queryForAllEqWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name);
+  var results = dao.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name);
   if (!results || !results.length) return;
   var gc = dao.createObject();
   dao.populateObjectFromResult(gc, results[0]);
@@ -279,7 +279,7 @@ ContentsDao.prototype.getTileMatrixSet = function (contents) {
  */
 ContentsDao.prototype.getTileMatrix = function (contents) {
   var dao = this.geoPackage.getTileMatrixDao();
-  var results = dao.queryForAllEqWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, contents.table_name);
+  var results = dao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, contents.table_name);
   if (!results || !results.length) return;
   var tileMatricies = [];
   for (var i = 0; i &lt; results.length; i++) {

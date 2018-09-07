@@ -210,12 +210,12 @@ TileMatrixSetDao.prototype.getProjection = function (tileMatrixSet) {
  */
 TileMatrixSetDao.prototype.getSrs = function (tileMatrixSet, callback) {
   var dao = this.geoPackage.getSpatialReferenceSystemDao();
-  return dao.queryForIdObject(tileMatrixSet.srs_id);
+  return dao.queryForId(tileMatrixSet.srs_id);
 };
 
 TileMatrixSetDao.prototype.getContents = function (tileMatrixSet, callback) {
   var dao = this.geoPackage.getContentsDao();
-  return dao.queryForIdObject(tileMatrixSet.table_name);
+  return dao.queryForId(tileMatrixSet.table_name);
 };
 
 TileMatrixSet.TABLE_NAME = "tableName";

@@ -143,7 +143,7 @@ RelatedTablesExtension.prototype.getOrCreateMappingTable = function(mappingTable
 }
 
 RelatedTablesExtension.prototype.setContents = function(userRelatedTable) {
-  var contents = this.geoPackage.getContentsDao().queryForIdObject(userRelatedTable.table_name);
+  var contents = this.geoPackage.getContentsDao().queryForId(userRelatedTable.table_name);
   userRelatedTable.setContents(contents);
 }
 
@@ -375,7 +375,7 @@ RelatedTablesExtension.prototype.getMediaDao = function(tableName) {
     var reader = new UserTableReader(tableName, MediaTable.requiredColumns());
     var userTable = reader.readTable(this.geoPackage.getDatabase());
     table = new MediaTable(userTable.table_name, userTable.columns, MediaTable.requiredColumns());
-    table.setContents(this.geoPackage.getContentsDao().queryForIdObject(table.table_name));
+    table.setContents(this.geoPackage.getContentsDao().queryForId(table.table_name));
   }
 
   return new MediaDao(this.geoPackage, table);
@@ -392,7 +392,7 @@ RelatedTablesExtension.prototype.getSimpleAttributesDao = function(tableName) {
     var reader = new UserTableReader(tableName, SimpleAttributesTable.requiredColumns());
     var userTable = reader.readTable(this.geoPackage.getDatabase());
     table = new SimpleAttributesTable(userTable.table_name, userTable.columns, SimpleAttributesTable.requiredColumns());
-    table.setContents(this.geoPackage.getContentsDao().queryForIdObject(table.table_name));
+    table.setContents(this.geoPackage.getContentsDao().queryForId(table.table_name));
   }
 
   return new SimpleAttributesDao(this.geoPackage, table);

@@ -402,7 +402,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     bitsLogo.setContentType('image/png');
     bitsLogo.setData(bitsLogoBuffer);
     var bitsRowId = mediaDao.create(bitsLogo);
-    bitsLogo = mediaDao.queryForIdObject(bitsRowId);
+    bitsLogo = mediaDao.queryForId(bitsRowId);
 
     var featureDao = geopackage.getFeatureDao('geometry1');
     var rows = featureDao.queryForLike('text', 'BIT Systems%');
@@ -422,7 +422,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     ngaLogo.setContentType('image/png');
     ngaLogo.setData(ngaLogoBuffer);
     var ngaRowId = mediaDao.create(ngaLogo);
-    ngaLogo = mediaDao.queryForIdObject(ngaRowId);
+    ngaLogo = mediaDao.queryForId(ngaRowId);
 
     var featureDao = geopackage.getFeatureDao('geometry2');
     var rows = featureDao.queryForLike('text', 'NGA%');

@@ -99,10 +99,32 @@
 					<section>
 							<dl class="symbol primary">
 								<dt class="symbol-title class">
-			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">Dao</span><span class="signature-params">()</span><span class="signature-type"></span></h2>
+			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">Dao</span><span class="signature-params">( <span class="signature-param">geoPackage</span>&nbsp;)</span><span class="signature-type"></span></h2>
 </dt>
 <dd class="symbol-details class" style="max-height: 9999px;">
 	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Base DAO</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>geoPackage</code></td>
+							<td><span class="param-type"><a href="module-geoPackage-GeoPackage.html">module:geoPackage~GeoPackage</a></span></td>
+							<td class="last">
+									<p>GeoPackage object</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
@@ -139,127 +161,84 @@
 									<dl class="symbol">
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="isTableExists" class="function public"><span class="name">isTableExists</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+			<h4 id="populateObjectFromResult" class="function public"><span class="name">populateObjectFromResult</span><span class="signature-params">( <span class="signature-param">object</span>, <span class="signature-param">result</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Copies object properties from result object to the object</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to copy properties to</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>result</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to copy properties from</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-24">line 24</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="isTableExists" class="function public"><span class="name">isTableExists</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{Boolean}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
 			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Checks if the table exists</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>callback</code></td>
-							<td><span class="param-type"><a href="global.html#validationCallback">validationCallback</a></span></td>
-							<td class="last">
-									<p>Callback to call with the results of if the table exists or not</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Boolean</span></label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-26">line 26</a></p>
+									<div class="form-control-static returns-description"></div>
 								</div>
 							</div>
-			
-			
-			
-			
 					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="queryForAll" class="function public"><span class="name">queryForAll</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>callback</code></td>
-							<td><span class="param-type">function</span></td>
-							<td class="last">
-									<p>called with an error if one occurred and the array of results</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-77">line 77</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="queryForColumnsInAll" class="function public"><span class="name">queryForColumnsInAll</span><span class="signature-params">()</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p></div>
 			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
@@ -280,7 +259,2292 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-99">line 99</a></p>
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-35">line 35</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="refresh" class="function public"><span class="name">refresh</span><span class="signature-params">( <span class="signature-param">object</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Object}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Refreshes the object by id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to refresh</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Object</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-45">line 45</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForId" class="function public"><span class="name">queryForId</span><span class="signature-params">( <span class="signature-param">id</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Object}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Query for object by id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>id</code></td>
+							<td><span class="param-type">object</span></td>
+							<td class="last">
+									<p>ID of the object to query for</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Object</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>object created from the raw database object</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-54">line 54</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForMultiId" class="function public"><span class="name">queryForMultiId</span><span class="signature-params">( <span class="signature-param">idValues</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Object}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Query for object by multi id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>idValues</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+							<td class="last">
+									<p>ColumnValues with the multi id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Object</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>object created from the raw database object</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-87">line 87</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForAll" class="function public"><span class="name">queryForAll</span><span class="signature-params">( [&nbsp;<span class="signature-param">where</span> [,&nbsp;<span class="signature-param">whereArgs</span>&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>Optional where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;object></span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>Optional where args array</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>raw object array from the database</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-106">line 106</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForLike" class="function public"><span class="name">queryForLike</span><span class="signature-params">( <span class="signature-param">fieldName</span>, <span class="signature-param">value</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>fieldName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>name of the field to query for</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>value</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>value of the like clause</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>raw object array from the database</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-117">line 117</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForColumns" class="function public"><span class="name">queryForColumns</span><span class="signature-params">( <span class="signature-param">columnName</span> [,&nbsp;<span class="signature-param">fieldValues</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all matches and returns them.  Only queries for the specified column name  Be aware this pulls all results into memory</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>columnName</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+							<td class="last">
+									<p>name of the column to query for</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>fieldValues</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>optional values to filter on</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>raw object array from the database</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-132">line 132</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForChunk" class="function public"><span class="name">queryForChunk</span><span class="signature-params">( <span class="signature-param">pageSize</span>, <span class="signature-param">page</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for all items in the table with a page size and page number</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>pageSize</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>size of the chunk to query for</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>page</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>chunk number to query for</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>raw object array from the database</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-149">line 149</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForEach" class="function public"><span class="name">queryForEach</span><span class="signature-params">( [&nbsp;<span class="signature-param">field</span> [,&nbsp;<span class="signature-param">value</span> [,&nbsp;<span class="signature-param">groupBy</span> [,&nbsp;<span class="signature-param">having</span> [,&nbsp;<span class="signature-param">orderBy</span>&nbsp;]&nbsp;]&nbsp;]&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Iterate all items in the table one at a time.  If no parameters are passed, iterates the entire table.  Returns an Iterable object</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>field</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>field to filter on</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>value</code></td>
+							<td><span class="param-type">Object</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>value to filter on</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>groupBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>group by clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>having</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>having clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>orderBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>order by clause</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-163">line 163</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForFieldValues" class="function public"><span class="name">queryForFieldValues</span><span class="signature-params">( <span class="signature-param">fieldValues</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable.Object}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Iterate all objects in thet able that match the ColumnValues passed in</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>fieldValues</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+							<td class="last">
+									<p>ColumnValues to query for</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable.Object</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-181">line 181</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryJoinWhereWithArgs" class="function public"><span class="name">queryJoinWhereWithArgs</span><span class="signature-params">( <span class="signature-param">join</span>, <span class="signature-param">where</span>, <span class="signature-param">whereArgs</span>, <span class="signature-param">columns</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Iterate all matching objects</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>join</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>join clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+							<td class="last">
+									<p>array of where query values</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>columns</code></td>
+							<td><span class="param-type">Array.&lt;string></span></td>
+							<td class="last">
+									<p>columns to query for</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-197">line 197</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryWhereWithArgsDistinct" class="function public"><span class="name">queryWhereWithArgsDistinct</span><span class="signature-params">( <span class="signature-param">where</span>, <span class="signature-param">whereArgs</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Iterate all distinct matching rows in the table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+							<td class="last">
+									<p>array of where query values</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-209">line 209</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryWhere" class="function public"><span class="name">queryWhere</span><span class="signature-params">( [&nbsp;<span class="signature-param">where</span> [,&nbsp;<span class="signature-param">whereArgs</span> [,&nbsp;<span class="signature-param">groupBy</span> [,&nbsp;<span class="signature-param">having</span> [,&nbsp;<span class="signature-param">orderBy</span> [,&nbsp;<span class="signature-param">limit</span>&nbsp;]&nbsp;]&nbsp;]&nbsp;]&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Iterable.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Iterate all matching rows</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>array of where query values</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>groupBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>group by clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>having</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>having clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>orderBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>order by clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>limit</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>limit clause</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Iterable.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-225">line 225</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="buildPkWhere" class="function public"><span class="name">buildPkWhere</span><span class="signature-params">( <span class="signature-param">idValue</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{string}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the primary key where clause</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>idValue</code></td>
+							<td><span class="param-type">Object</span> | <span class="param-type">Array.&lt;Object></span></td>
+							<td class="last">
+									<p>id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">string</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>primary key where clause</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-235">line 235</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="buildPkWhereArgs" class="function public"><span class="name">buildPkWhereArgs</span><span class="signature-params">( <span class="signature-param">idValue</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the primary key where args</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>idValue</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>where args</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-252">line 252</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="buildWhereLike" class="function public"><span class="name">buildWhereLike</span><span class="signature-params">( <span class="signature-param">fields</span>, <span class="signature-param">operation</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{string}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Build where (or selection) LIKE statement for fields</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>fields</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+							<td class="last">
+									<p>columns and values</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>operation</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>AND or OR</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">string</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>where clause</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-270">line 270</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="buildWhere" class="function public"><span class="name">buildWhere</span><span class="signature-params">( <span class="signature-param">fields</span> [,&nbsp;<span class="signature-param">operation</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{string}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Build where or selection statement for fields</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+							<th>Default</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>fields</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>columns and values</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>operation</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+								<td>AND</td>
+							<td class="last">
+									<p>AND or OR</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">string</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>where clause</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-288">line 288</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="buildWhereWithFieldAndValue" class="function public"><span class="name">buildWhereWithFieldAndValue</span><span class="signature-params">( <span class="signature-param">field</span> [,&nbsp;<span class="signature-param">value</span> [,&nbsp;<span class="signature-param">operation</span>&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{string}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Builds a where clause from the field and value with an optional operation.  If the value is empty, 'is null' is added to the query for the field</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+							<th>Default</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>field</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+								<td></td>
+							<td class="last">
+									<p>field name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>value</code></td>
+							<td><span class="param-type">Object</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+								<td></td>
+							<td class="last">
+									<p>optional value to filter on</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>operation</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+								<td>&#x27;&#x3D;&#x27;</td>
+							<td class="last">
+									<p>optional operation</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">string</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>where clause</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-334">line 334</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForAllEq" class="function public"><span class="name">queryForAllEq</span><span class="signature-params">( <span class="signature-param">field</span>, <span class="signature-param">value</span> [,&nbsp;<span class="signature-param">groupBy</span> [,&nbsp;<span class="signature-param">having</span> [,&nbsp;<span class="signature-param">orderBy</span>&nbsp;]&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Object>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Query for all rows in the table that match</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>field</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+							<td class="last">
+									<p>field to match</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>value</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+							<td class="last">
+									<p>value to match</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>groupBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>group by clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>having</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>having clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>orderBy</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>order by clause</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Object></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>array of raw database objects</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-354">line 354</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="count" class="function public"><span class="name">count</span><span class="signature-params">( [&nbsp;<span class="signature-param">fields</span> [,&nbsp;<span class="signature-param">value</span>&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Count rows in the table optionally filtered by the parameters specified</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>fields</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span> | <span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>Either a ColumnValues object or a string specifying a field name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>value</code></td>
+							<td><span class="param-type">Object</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>value to filter on if fields is a string</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>count of objects</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-367">line 367</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="minOfColumn" class="function public"><span class="name">minOfColumn</span><span class="signature-params">( <span class="signature-param">column</span> [,&nbsp;<span class="signature-param">where</span> [,&nbsp;<span class="signature-param">whereArgs</span>&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the min of the column</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>column</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+							<td class="last">
+									<p>column name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>where args</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-395">line 395</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="maxOfColumn" class="function public"><span class="name">maxOfColumn</span><span class="signature-params">( <span class="signature-param">column</span> [,&nbsp;<span class="signature-param">where</span> [,&nbsp;<span class="signature-param">whereArgs</span>&nbsp;]&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the max of the column</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>column</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes"></td>
+							<td class="last">
+									<p>column name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>where args</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-406">line 406</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="delete" class="function public"><span class="name">delete</span><span class="signature-params">( <span class="signature-param">object</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the object passed in.  Object is deleted by id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to delete</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects deleted</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-415">line 415</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteById" class="function public"><span class="name">deleteById</span><span class="signature-params">( <span class="signature-param">idValue</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the object specified by the id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>idValue</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>id value</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects deleted</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-427">line 427</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteByMultiId" class="function public"><span class="name">deleteByMultiId</span><span class="signature-params">( <span class="signature-param">idValue</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the object specified by the ids</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>idValue</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+							<td class="last">
+									<p>id values</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects deleted</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-439">line 439</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteWhere" class="function public"><span class="name">deleteWhere</span><span class="signature-params">( <span class="signature-param">where</span>, <span class="signature-param">whereArgs</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete objects that match the query</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+							<td class="last">
+									<p>where arguments</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects deleted</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-452">line 452</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteAll" class="function public"><span class="name">deleteAll</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all objects in the table</p></div>
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects deleted</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-460">line 460</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="create" class="function public"><span class="name">create</span><span class="signature-params">( <span class="signature-param">object</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Insert the object into the table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to be inserted</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>id of the inserted object</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-469">line 469</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="updateWithValues" class="function public"><span class="name">updateWithValues</span><span class="signature-params">( <span class="signature-param">values</span>, <span class="signature-param">where</span>, <span class="signature-param">whereArgs</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Update all rows that match the query</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>values</code></td>
+							<td><span class="param-type"><a href="module-dao_columnValues-ColumnValues.html">module:dao/columnValues~ColumnValues</a></span></td>
+							<td class="last">
+									<p>values to insert</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>where</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>where clause</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>whereArgs</code></td>
+							<td><span class="param-type">Array.&lt;Object></span></td>
+							<td class="last">
+									<p>where arguments</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects updated</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-482">line 482</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="update" class="function public"><span class="name">update</span><span class="signature-params">( <span class="signature-param">object</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Update the object specified</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object with updated values</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects updated</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-492">line 492</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createOrUpdate" class="function public"><span class="name">createOrUpdate</span><span class="signature-params">( <span class="signature-param">object</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for the object by id, and if it exists, updates it, otherwise creates a new object</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>object</code></td>
+							<td><span class="param-type">Object</span></td>
+							<td class="last">
+									<p>object to update or create</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>number of objects modified</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-512">line 512</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="dropTable" class="function public"><span class="name">dropTable</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Drops this table</p></div>
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>results of the drop</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="dao_dao.js.html">dao/dao.js</a>, <a href="dao_dao.js.html#line-525">line 525</a></p>
 								</div>
 							</div>
 			

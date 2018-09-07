@@ -302,25 +302,25 @@ RTreeIndexDao.prototype.queryWithGeometryEnvelope = function(envelope) {
   var where = '';
   var minXLessThanMaxX = envelope.minX &lt; envelope.maxX;
   if (minXLessThanMaxX) {
-    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.maxX, '&lt;=');
+    where += this.buildWhereWithFieldAndValue('minx', envelope.maxX, '&lt;=');
     where += ' and ';
-    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.minX, '>=');
+    where += this.buildWhereWithFieldAndValue('maxx', envelope.minX, '>=');
   } else {
     where += '(';
-    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.maxX, '&lt;=');
+    where += this.buildWhereWithFieldAndValue('minx', envelope.maxX, '&lt;=');
     where += ' or ';
-    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.minX, '>=');
+    where += this.buildWhereWithFieldAndValue('maxx', envelope.minX, '>=');
     where += ' or ';
-    where += this.buildWhereWithFieldAndValueAndOperation('minx', envelope.minX, '>=');
+    where += this.buildWhereWithFieldAndValue('minx', envelope.minX, '>=');
     where += ' or ';
-    where += this.buildWhereWithFieldAndValueAndOperation('maxx', envelope.maxX, '&lt;=');
+    where += this.buildWhereWithFieldAndValue('maxx', envelope.maxX, '&lt;=');
     where += ')';
   }
 
   where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation('miny', envelope.maxY, '&lt;=');
+  where += this.buildWhereWithFieldAndValue('miny', envelope.maxY, '&lt;=');
   where += ' and ';
-  where += this.buildWhereWithFieldAndValueAndOperation('maxy', envelope.minY, '>=');
+  where += this.buildWhereWithFieldAndValue('maxy', envelope.minY, '>=');
 
   var whereArgs = []
   whereArgs.push(envelope.maxX, envelope.minX);

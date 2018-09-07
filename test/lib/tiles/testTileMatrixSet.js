@@ -33,7 +33,7 @@ describe('Tile Matrix Set tests', function() {
   });
 
   it('should get the TileMatrixSet from the ID', function() {
-    var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
+    var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     tileMatrixSet.should.have.property('table_name', 'TILESosmds');
     tileMatrixSet.should.have.property('srs_id', 3857);
@@ -51,14 +51,14 @@ describe('Tile Matrix Set tests', function() {
   });
 
   it('should get the projection from the TileMatrixSet', function() {
-    var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
+    var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var projection = tileMatrixSetDao.getProjection(tileMatrixSet);
     should.exist(projection);
   });
 
   it('should get the Contents from the TileMatrixSet', function(done) {
-    var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
+    var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var contents = tileMatrixSetDao.getContents(tileMatrixSet);
     should.exist(contents);
@@ -76,7 +76,7 @@ describe('Tile Matrix Set tests', function() {
   });
 
   it('should get the BoundingBox from the TileMatrixSet', function(done) {
-    var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
+    var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var bb = tileMatrixSet.getBoundingBox();
     bb.minLongitude.should.be.equal(-20037508.342789244);
@@ -87,7 +87,7 @@ describe('Tile Matrix Set tests', function() {
   });
 
   it('should set the BoundingBox from the TileMatrixSet', function(done) {
-    var tileMatrixSet = tileMatrixSetDao.queryForIdObject('TILESosmds');
+    var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var bb = new BoundingBox(-1, 1, -1, 1);
     tileMatrixSet.setBoundingBox(bb);

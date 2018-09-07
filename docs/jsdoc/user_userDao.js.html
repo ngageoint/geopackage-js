@@ -231,7 +231,7 @@ UserDao.prototype.getLinkedMedia = function(userRow) {
     var mappings = userMappingDao.queryByBaseId(userRow.getId());
     for (var m = 0; m &lt; mappings.length; m++) {
       var relatedId = mappings[m].related_id;
-      linkedMedia.push(mediaDao.queryForIdObject(relatedId));
+      linkedMedia.push(mediaDao.queryForId(relatedId));
     }
   }
   return linkedMedia;
@@ -248,7 +248,7 @@ UserDao.prototype.getLinkedSimpleAttributes = function(userRow) {
     var mappings = userMappingDao.queryByBaseId(userRow.getId());
     for (var m = 0; m &lt; mappings.length; m++) {
       var relatedId = mappings[m].related_id;
-      linkedSimpleAttributes.push(simpleDao.queryForIdObject(relatedId));
+      linkedSimpleAttributes.push(simpleDao.queryForId(relatedId));
     }
   }
   return linkedSimpleAttributes;
@@ -265,7 +265,7 @@ UserDao.prototype.getLinkedFeatures = function(userRow) {
     var mappings = userMappingDao.queryByBaseId(userRow.getId());
     for (var m = 0; m &lt; mappings.length; m++) {
       var relatedId = mappings[m].related_id;
-      linkedFeatures.push(featureDao.queryForIdObject(relatedId));
+      linkedFeatures.push(featureDao.queryForId(relatedId));
     }
   }
   return linkedFeatures;

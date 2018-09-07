@@ -59,7 +59,7 @@ describe('FeatureDao tests', function() {
     it('should query for a row with property_1 equal to Gila', function() {
       var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
 
-      for (var row of featureDao.queryForEachEqWithFieldAndValue('property_1', 'Gila')) {
+      for (var row of featureDao.queryForEach('property_1', 'Gila')) {
         row.property_1.should.be.equal('Gila');
       }
     });
@@ -445,20 +445,20 @@ describe('FeatureDao tests', function() {
 
     it('should update a shape', function() {
       var line;
-      for (var feature of queryTestFeatureDao.queryForEachEqWithFieldAndValue('_feature_id', 'line')) {
+      for (var feature of queryTestFeatureDao.queryForEach('_feature_id', 'line')) {
         line = queryTestFeatureDao.getRow(feature);
       }
       line.setValueWithColumnName('name', 'UpdatedLine');
       var newLine;
       queryTestFeatureDao.update(line);
-      for (var feature of queryTestFeatureDao.queryForEachEqWithFieldAndValue('_feature_id', 'line')) {
+      for (var feature of queryTestFeatureDao.queryForEach('_feature_id', 'line')) {
         newLine = queryTestFeatureDao.getRow(feature);
       }
       newLine.getValueWithColumnName('name').should.be.equal('UpdatedLine');
     });
 
     it('should count by a field', function(){
-      var count = queryTestFeatureDao.countByEqWithFieldAndValue('name', 'line');
+      var count = queryTestFeatureDao.count('name', 'line');
       count.should.be.equal(1);
     });
 
@@ -661,7 +661,7 @@ describe('FeatureDao tests', function() {
       RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
       mediaRowId = mediaDao.create(mediaRow);
       mediaRowId.should.be.greaterThan(0);
-      mediaRow = mediaDao.queryForIdObject(mediaRowId);
+      mediaRow = mediaDao.queryForId(mediaRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
       return queryTestFeatureDao.linkMediaRow(featureRow, mediaRow)
@@ -688,7 +688,7 @@ describe('FeatureDao tests', function() {
       RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
       simpleRowId = simpleDao.create(simpleRow);
       simpleRowId.should.be.greaterThan(0);
-      simpleRow = simpleDao.queryForIdObject(simpleRowId);
+      simpleRow = simpleDao.queryForId(simpleRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
       return queryTestFeatureDao.linkSimpleAttributesRow(featureRow, simpleRow)

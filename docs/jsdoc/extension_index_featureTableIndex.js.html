@@ -185,10 +185,10 @@ FeatureTableIndex.prototype.isIndexed = function () {
     var result = this.getFeatureTableIndexExtension();
     if (result) {
       var contentsDao = this.geoPackage.getContentsDao();
-      var contents = contentsDao.queryForIdObject(this.tableName);
+      var contents = contentsDao.queryForId(this.tableName);
       if (!contents) return false;
       var lastChange = new Date(contents.last_change);
-      var tableIndex = this.tableIndexDao.queryForIdObject(this.tableName);
+      var tableIndex = this.tableIndexDao.queryForId(this.tableName);
       if (!tableIndex || !tableIndex.last_indexed) {
         return false;
       }
@@ -229,7 +229,7 @@ FeatureTableIndex.prototype.createTableIndex = function() {
 
 FeatureTableIndex.prototype.getTableIndex = function() {
   if (this.tableIndexDao.isTableExists()) {
-    return this.tableIndexDao.queryForIdObject(this.tableName);
+    return this.tableIndexDao.queryForId(this.tableName);
   } else {
     return;
   }
@@ -244,7 +244,7 @@ FeatureTableIndex.prototype.createOrClearGeometryIndicies = function() {
 
 FeatureTableIndex.prototype.clearGeometryIndicies = function() {
   var where = this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
-  var whereArgs = this.geometryIndexDao.buildWhereArgsWithValue(this.tableName);
+  var whereArgs = this.geometryIndexDao.buildWhereArgs(this.tableName);
   return this.geometryIndexDao.deleteWhere(where, whereArgs);
 };
 

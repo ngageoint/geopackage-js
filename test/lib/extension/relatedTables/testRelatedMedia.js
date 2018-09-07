@@ -131,7 +131,7 @@ describe('Related Media tests', function() {
       geoPackage.isTable(mappingTableName).should.be.equal(true);
       geoPackage.isTable(mediaTable.table_name).should.be.equal(true);
       contentsDao.getTables().indexOf(mediaTable.table_name).should.not.be.equal(-1);
-      validateContents(mediaTable, contentsDao.queryForIdObject(mediaTable.table_name));
+      validateContents(mediaTable, contentsDao.queryForId(mediaTable.table_name));
       MediaTable.RELATION_TYPE.dataType.should.be.equal(geoPackage.getTableType(mediaTable.table_name));
       geoPackage.isTableType(MediaTable.RELATION_TYPE.dataType, mediaTable.table_name);
 
@@ -158,7 +158,7 @@ describe('Related Media tests', function() {
       }
 
       // copy the last row insert and insert the final media row
-      var mediaRowToCopy = mediaDao.queryForIdObject(mediaRowId);
+      var mediaRowToCopy = mediaDao.queryForId(mediaRowId);
       mediaRowToCopy.resetId();
       var copiedMediaId = mediaDao.create(mediaRowToCopy);
       copiedMediaId.should.be.greaterThan(0);
@@ -330,7 +330,7 @@ describe('Related Media tests', function() {
           var mediaRow = mediaDao.getRow(row);
           var mappedIds = rte.getMappingsForRelated(mediaRelation.mapping_table_name, mediaRow.getId());
           mappedIds.forEach(function(mappedId){
-            var featureRow = featureDao.queryForIdObject(mappedId);
+            var featureRow = featureDao.queryForId(mappedId);
             should.exist(featureRow);
             featureRow.hasId().should.be.equal(true);
             featureRow.getId().should.be.greaterThan(0);
@@ -364,10 +364,10 @@ describe('Related Media tests', function() {
 
       // Delete the media table and contents row
       geoPackage.isTable(mediaTable.table_name);
-      should.exist(contentsDao.queryForIdObject(mediaTable.table_name));
+      should.exist(contentsDao.queryForId(mediaTable.table_name));
       geoPackage.deleteTable(mediaTable.table_name);
       geoPackage.isTable(mediaTable.table_name).should.be.equal(false);
-      should.exist(contentsDao.queryForIdObject(mediaTable.table_name));
+      should.exist(contentsDao.queryForId(mediaTable.table_name));
 
       // Delete the related tables extension
       rte.removeExtension();
