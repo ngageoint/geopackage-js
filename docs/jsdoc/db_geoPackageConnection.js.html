@@ -1,9 +1,10 @@
+<!-- start:source.tmpl.hbs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-		<title>db/sqliteQueryBuilder</title>
+		<title>db/geoPackageConnection.js</title>
 		<link rel="icon" type="image/png" href="favicon.png"/>
 		<!--[if lt IE 9]>
 		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -42,7 +43,7 @@
 			</style>
 		<script type="text/javascript">
 			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
-			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_TOC_ENABLED = false;
 			window.DOCLET_AFILTER_ENABLED = false;
 		</script>
 </head>
@@ -84,62 +85,182 @@
 	</header>
 	<!-- end:navbar.hbs -->		<div class="page-header">
 			<div class="container">
-				<span class="kind">module</span>
-				<h1><span class="name">db/sqliteQueryBuilder</span></h1>
+				<span class="kind">source</span>
+				<h1><span class="name">db/geoPackageConnection.js</span></h1>
 			</div>
 		</div>
 	<div class="container content">
 		<div class="row">
-			<div class="col-md-9 main-content">
-						<ol class="breadcrumb">
-							<li><a href="index.html">Home</a></li>
-							<li><a href="list_module.html">Modules</a></li>
-							<li class="active">db/sqliteQueryBuilder</li>
-						</ol>
-					<section>
-		<dl class="symbol">
-			<dt class="symbol-title "></dt>
-			<dd class="symbol-details ">
-				<div class="symbol-details-inner">
-					<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>SQLite query builder module.</p></div>
-					</div>					<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-									<!-- source -->
-									<div class="form-group">
-										<label class="col-sm-3 control-label">Source</label>
-										<div class="col-sm-9">
-											<p class="form-control-static"><a href="db_sqliteQueryBuilder.js.html">db/sqliteQueryBuilder.js</a>, <a href="db_sqliteQueryBuilder.js.html#line-1">line 1</a></p>
-										</div>
-									</div>
-					
-					
-					
-					
-							</form>
-					</div>				</div>
-			</dd>
-		</dl>
-							<article class="secondary">
-							</article>
-					</section>
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * Connection to the SQLite file
+ * @module db/geoPackageConnection
+ */
+
+var GeoPackageConstants = require('../geoPackageConstants');
+
+if (typeof(process) !== 'undefined' &amp;&amp; process.version &amp;&amp; !process.env.FORCE_SQLJS) {
+  console.log('Better SQLite');
+} else {
+  console.log('SQL.js');
+}
+
+/**
+ * Creates a connection to the SQLite file and when connected, returns a promise that resolves the connection
+ * @see {module:db/sqliteAdapter~SqliteAdapter}
+ * @class
+ * @param  {string} filePath path to the sqlite file
+ * @return {Promise&lt;module:db/geoPackageConnection~GeoPackageConnection>}
+ */
+var GeoPackageConnection = function(filePath) {
+  if (typeof(process) !== 'undefined' &amp;&amp; process.version &amp;&amp; !process.env.FORCE_SQLJS) {
+    this.adapterCreator = require('./sqliteAdapter');
+  } else {
+    this.adapterCreator = require('./sqljsAdapter');
+  }
+
+  var promise = new Promise(function(resolve, reject) {
+    this.adapterCreator.createAdapter(filePath)
+    .then(function(adapter) {
+      this.adapter = adapter;
+      resolve(this);
+    }.bind(this))
+    .catch(function(error) {
+      reject(error);
+    });
+  }.bind(this));
+
+  return promise;
+}
+
+GeoPackageConnection.prototype.close = function() {
+  this.adapter.close();
+}
+
+GeoPackageConnection.prototype.export = function(callback) {
+  this.adapter.export(callback);
+}
+
+GeoPackageConnection.prototype.getDBConnection = function () {
+  return this.adapter.db;
+};
+
+GeoPackageConnection.prototype.setDBConnection = function (db) {
+  this.adapter = this.adapterCreator.createAdapterFromDb(db);
+};
+
+GeoPackageConnection.prototype.registerFunction = function(name, functionDefinition) {
+  return this.adapter.registerFunction(name, functionDefinition);
+}
+
+GeoPackageConnection.prototype.get = function (sql, params) {
+  return this.adapter.get(sql, params);
+};
+
+GeoPackageConnection.prototype.run = function (sql, params) {
+  return this.adapter.run(sql, params)
+};
+
+GeoPackageConnection.prototype.all = function (sql, params) {
+  return this.adapter.all(sql, params);
+};
+
+GeoPackageConnection.prototype.each = function (sql, params) {
+  return this.adapter.each(sql, params);
+};
+
+GeoPackageConnection.prototype.minOfColumn = function(table, column, where, whereArgs) {
+  var minStatement = 'select min('+column+') as min from ' + table;
+  if(where) {
+    minStatement += ' ';
+    if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    minStatement += where;
+  }
+  return this.adapter.get(minStatement, whereArgs).min;
+};
+
+GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, whereArgs, callback) {
+  var maxStatement = 'select max('+column+') as max from ' + table;
+  if(where) {
+    maxStatement += ' ';
+    if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    maxStatement += where;
+  }
+  return this.adapter.get(maxStatement, whereArgs).max;
+};
+
+GeoPackageConnection.prototype.count = function(table) {
+  return this.adapter.count(table);
+};
+
+GeoPackageConnection.prototype.countWhere = function(tableName, where, whereArgs) {
+  return this.adapter.countWhere(tableName, where, whereArgs);
+}
+
+GeoPackageConnection.prototype.insert = function (sql, params) {
+  return this.adapter.insert(sql, params);
+};
+
+GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs) {
+  var deleteStatement = 'DELETE FROM ' + tableName + '';
+
+  if (where) {
+    deleteStatement += ' WHERE ' + where;
+  }
+
+  return this.adapter.delete(deleteStatement, whereArgs);
+};
+
+GeoPackageConnection.prototype.dropTable = function(tableName) {
+  return this.adapter.dropTable(tableName);
+};
+
+GeoPackageConnection.prototype.tableExists = function(tableName) {
+  return this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName]);
+};
+
+GeoPackageConnection.prototype.columnAndTableExists = function(tableName, columnName) {
+  var columns = this.adapter.all('PRAGMA table_info(\''+tableName+'\')');
+  for (var i = 0; i &lt; columns.length; i++) {
+    if (columns[i].name === columnName) {
+      return true;
+    }
+  }
+  return false;
+}
+
+GeoPackageConnection.prototype.setApplicationId = function() {
+  var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
+  var applicationId = buff.readUInt32BE(0);
+  this.adapter.run('PRAGMA application_id = ' + applicationId);
+  this.adapter.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
+}
+
+GeoPackageConnection.prototype.getApplicationId = function(callback) {
+  return this.adapter.get('PRAGMA application_id').application_id;
+}
+
+module.exports = GeoPackageConnection;
+
+GeoPackageConnection.connect = function(filePath) {
+  return new GeoPackageConnection(filePath);
+}
+
+GeoPackageConnection.connectWithDatabase = function(db, callback) {
+  return new GeoPackageConnection(undefined)
+  .then(function(connection) {
+    connection.setDBConnection(db);
+  });
+}
+</code></pre>
+		</section>
 			</div>
-				<div class="col-md-3 side-content">
-					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
-				</div>
 		</div>
 	</div>
 	<footer>
@@ -171,3 +292,4 @@
 	
 </body>
 </html>
+<!-- end:source.tmpl.hbs -->
