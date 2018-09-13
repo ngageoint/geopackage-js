@@ -99,11 +99,38 @@
  * @module db/sqliteQueryBuilder
  */
 
-module.exports.fixColumnName = function(columnName) {
+/**
+ * Utility class to build sql queries
+ * @class
+ */
+function SqliteQueryBuilder() {}
+
+module.exports = SqliteQueryBuilder;
+
+/**
+ * Replaces all whitespace in a column name with underscores
+ * @param  {string} columnName column name to fix
+ * @return {string}
+ */
+SqliteQueryBuilder.fixColumnName = function(columnName) {
   return columnName.replace(/\W+/g, '_');
 }
 
-module.exports.buildQuery = function(distinct, tables, columns, where, join, groupBy, having, orderBy, limit, offset) {
+/**
+ * Builds a query
+ * @param  {Boolean} distinct whether query should be distinct or not
+ * @param  {string} tables   table names to query, added to the query from clause
+ * @param  {string[]} [columns=*]  columns to query for
+ * @param  {string} [where]    where clause
+ * @param  {string} [join]     join clause
+ * @param  {string} [groupBy]  group by clause
+ * @param  {string} [having]   having clause
+ * @param  {string} [orderBy]  order by clause
+ * @param  {Number} [limit]    limit
+ * @param  {Number} [offset]   offset
+ * @return {string}
+ */
+SqliteQueryBuilder.buildQuery = function(distinct, tables, columns, where, join, groupBy, having, orderBy, limit, offset) {
 
   var query = '';
   if (isEmpty(groupBy) &amp;&amp; !isEmpty(having)) {
@@ -134,15 +161,27 @@ module.exports.buildQuery = function(distinct, tables, columns, where, join, gro
   return query;
 }
 
-module.exports.buildCount = function(tables, where) {
+/**
+ * Builds a count statement
+ * @param  {string} tables table names to query for
+ * @param  {string} [where]  where clause
+ * @return {string} count statement
+ */
+SqliteQueryBuilder.buildCount = function(tables, where) {
   var query = 'select count(*) as count from ' + tables;
   query = appendClauseToString(query, ' where ', where);
   return query;
 }
 
-module.exports.buildInsert = function(table, object) {
+/**
+ * Builds an insert statement using the properties of the object
+ * @param  {string} table  table to insert into
+ * @param  {Object} object object to insert
+ * @return {string} insert statement
+ */
+SqliteQueryBuilder.buildInsert = function(table, object) {
   if (object.getColumnNames) {
-    return module.exports.buildInsertFromColumnNames(table, object);
+    return SqliteQueryBuilder.buildInsertFromColumnNames(table, object);
   }
   var insert = 'insert into ' + table + ' (';
   var keys = '';
@@ -156,7 +195,7 @@ module.exports.buildInsert = function(table, object) {
       }
       first = false;
       keys += key;
-      values += '$' + module.exports.fixColumnName(key);
+      values += '$' + SqliteQueryBuilder.fixColumnName(key);
     }
   }
 
@@ -164,7 +203,13 @@ module.exports.buildInsert = function(table, object) {
   return insert;
 }
 
-module.exports.buildInsertFromColumnNames = function(table, object) {
+/**
+ * Builds an insert statement from the object.getColumnNames method
+ * @param  {string} table  table to insert into
+ * @param  {Object} object object with a getColumnNames method
+ * @return {string} insert statement
+ */
+SqliteQueryBuilder.buildInsertFromColumnNames = function(table, object) {
   var insert = 'insert into ' + table + ' (';
   var keys = '';
   var values = '';
@@ -178,30 +223,35 @@ module.exports.buildInsertFromColumnNames = function(table, object) {
     }
     first = false;
     keys += '"' + key + '"';
-    values += '$' + module.exports.fixColumnName(key);
+    values += '$' + SqliteQueryBuilder.fixColumnName(key);
   }
 
   insert += keys + ') values (' + values + ')';
   return insert;
 }
 
-module.exports.buildUpdateOrInsertObject = function(object) {
+/**
+ * Builds an update or insert object to bind to a statement
+ * @param  {Object} object object to create bind parameters from
+ * @return {Object} bind parameters
+ */
+SqliteQueryBuilder.buildUpdateOrInsertObject = function(object) {
   var insertOrUpdate = {};
   if (object.getColumnNames) {
     var columnNames = object.getColumnNames();
     for (var i = 0; i &lt; columnNames.length; i++) {
-      insertOrUpdate[module.exports.fixColumnName(columnNames[i])] = object.toDatabaseValue(columnNames[i]);
+      insertOrUpdate[SqliteQueryBuilder.fixColumnName(columnNames[i])] = object.toDatabaseValue(columnNames[i]);
     }
   } else {
     for (var key in object) {
       if (object.hasOwnProperty(key)) {
         if (object.toDatabaseValue) {
-          insertOrUpdate[module.exports.fixColumnName(key)] = object.toDatabaseValue(key);
+          insertOrUpdate[SqliteQueryBuilder.fixColumnName(key)] = object.toDatabaseValue(key);
         } else {
           if (typeof object[key] == 'boolean') {
-            insertOrUpdate[module.exports.fixColumnName(key)] = object[key] ? 1 : 0;
+            insertOrUpdate[SqliteQueryBuilder.fixColumnName(key)] = object[key] ? 1 : 0;
           } else {
-            insertOrUpdate[module.exports.fixColumnName(key)] = object[key];
+            insertOrUpdate[SqliteQueryBuilder.fixColumnName(key)] = object[key];
           }
         }
       }
@@ -210,7 +260,15 @@ module.exports.buildUpdateOrInsertObject = function(object) {
   return insertOrUpdate;
 }
 
-module.exports.buildUpdate = function(table, values, where, whereArgs) {
+/**
+ * Builds an update statement
+ * @param  {string} table     table to update
+ * @param  {Object} values    object with values to update
+ * @param  {string} [where]     where clause
+ * @param  {Array|Ojbect} [whereArgs] where bind parameters
+ * @return {Object} object with a sql property containing the update statement and an args property with bind arguments
+ */
+SqliteQueryBuilder.buildUpdate = function(table, values, where, whereArgs) {
   var args = [];
   var update = 'update ' + table + ' set ';
   var first = true;
@@ -238,7 +296,13 @@ module.exports.buildUpdate = function(table, values, where, whereArgs) {
   };
 }
 
-module.exports.buildObjectUpdate = function(table, object) {
+/**
+ * Builds an update from an object
+ * @param  {string} table  table name to update
+ * @param  {Object} object object with values to update
+ * @return {string} update statement
+ */
+SqliteQueryBuilder.buildObjectUpdate = function(table, object) {
   var update = 'update ' + table + ' set ';
   var first = true;
   if (object.getColumnNames) {
@@ -251,7 +315,7 @@ module.exports.buildObjectUpdate = function(table, object) {
       }
       first = false;
       update += '"' + key + '"=';
-      update += '$' + module.exports.fixColumnName(key);
+      update += '$' + SqliteQueryBuilder.fixColumnName(key);
     }
   } else {
     for (var key in object) {
@@ -262,7 +326,7 @@ module.exports.buildObjectUpdate = function(table, object) {
 
       if (object.hasOwnProperty(key)) {
         update += '"' + key + '"=';
-        update += '$' + module.exports.fixColumnName(key);
+        update += '$' + SqliteQueryBuilder.fixColumnName(key);
       }
     }
   }
@@ -301,7 +365,7 @@ function isEmpty(string) {
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 11th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

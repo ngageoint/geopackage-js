@@ -176,14 +176,6 @@ Adapter.prototype.close = function() {
 }
 
 /**
- * Returns a Buffer containing the contents of the database as a file
- * @param  {Function} callback called when export is complete
- */
-Adapter.prototype.export = function(callback) {
-  fs.readFile(this.filePath, callback);
-}
-
-/**
  * Get the connection to the database file
  * @return {better-sqlite3.Database}
  */
@@ -192,16 +184,32 @@ Adapter.prototype.getDBConnection = function () {
 };
 
 /**
+ * Returns a Buffer containing the contents of the database as a file
+ * @param  {Function} callback called when export is complete
+ */
+Adapter.prototype.export = function(callback) {
+  fs.readFile(this.filePath, callback);
+}
+
+/**
  * Registers the given function so that it can be used by SQL statements
  * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#registeroptions-function---this|better-sqlite3 register}
  * @param  {string} name               name of function to register
  * @param  {Function} functionDefinition function to register
- * @return {better-sqlite3.Database}
+ * @return {module:db/sqliteAdapter~Adapter} this
  */
 Adapter.prototype.registerFunction = function(name, functionDefinition) {
-  return this.db.register({name: name}, functionDefinition);
+  this.db.register({name: name}, functionDefinition);
+  return this;
 }
 
+/**
+ * Gets one row of results from the statement
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#getbindparameters---row|better-sqlite3 get}
+ * @param  {string} sql    statement to run
+ * @param  {Array|Object} [params] bind parameters
+ * @return {Object}
+ */
 Adapter.prototype.get = function (sql, params) {
   var statement = this.db.prepare(sql);
   if (params) {
@@ -211,6 +219,13 @@ Adapter.prototype.get = function (sql, params) {
   }
 };
 
+/**
+ * Gets all results from the statement in an array
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#allbindparameters---array-of-rows|better-sqlite3 all}
+ * @param  {string} sql    statement to run
+ * @param  {Array|Object} [params] bind parameters
+ * @return {Object[]}
+ */
 Adapter.prototype.all = function (sql, params) {
   var statement = this.db.prepare(sql);
   if (params) {
@@ -220,25 +235,13 @@ Adapter.prototype.all = function (sql, params) {
   }
 };
 
-Adapter.prototype.run = function(sql, params) {
-  var statement = this.db.prepare(sql);
-  if (params) {
-    return statement.run(params);
-  } else {
-    return statement.run();
-  }
-}
-
-Adapter.prototype.insert = function(sql, params) {
-  var statement = this.db.prepare(sql);
-  return statement.run(params).lastInsertROWID;
-};
-
-Adapter.prototype.delete = function(sql, params) {
-  var statement = this.db.prepare(sql);
-  return statement.run(params).changes;
-};
-
+/**
+ * Returns an Iterable with results from the query
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#iteratebindparameters---iterator|better-sqlite3 iterate}
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Iterable&lt;Object>}
+ */
 Adapter.prototype.each = function (sql, params) {
   var statement = this.db.prepare(sql);
   if (params) {
@@ -248,6 +251,49 @@ Adapter.prototype.each = function (sql, params) {
   }
 };
 
+/**
+ * Runs the statement specified, returning information about what changed
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#runbindparameters---object|better-sqlite3}
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Object} object containing a changes property indicating the number of rows changed and a lastInsertROWID indicating the last inserted row
+ */
+Adapter.prototype.run = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  if (params) {
+    return statement.run(params);
+  } else {
+    return statement.run();
+  }
+}
+
+/**
+ * Runs the specified insert statement and returns the last inserted id or undefined if no insert happened
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Number} last inserted row id
+ */
+Adapter.prototype.insert = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  return statement.run(params).lastInsertROWID;
+};
+
+/**
+ * Runs the specified delete statement and returns the number of deleted rows
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} params bind parameters
+ * @return {number} deleted rows
+ */
+Adapter.prototype.delete = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  return statement.run(params).changes;
+};
+
+/**
+ * Drops the table
+ * @param  {string} table table name
+ * @return {Boolean} indicates if the table was dropped
+ */
 Adapter.prototype.dropTable = function(table) {
   try {
     var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
@@ -259,6 +305,13 @@ Adapter.prototype.dropTable = function(table) {
   }
 };
 
+/**
+ * Counts rows that match the query
+ * @param  {string} tableName table name from which to count
+ * @param  {string} [where]     where clause
+ * @param  {Object|Array} [whereArgs] where args
+ * @return {Number} count
+ */
 Adapter.prototype.count = function (tableName, where, whereArgs) {
   var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
   if (where) {
@@ -278,7 +331,7 @@ Adapter.prototype.count = function (tableName, where, whereArgs) {
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 11th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

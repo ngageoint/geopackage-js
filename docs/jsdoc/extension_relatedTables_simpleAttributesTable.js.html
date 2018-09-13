@@ -96,7 +96,7 @@
 			<article></article>
 			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
  * simpleAttributesTable module.
- * @module extension/relatedTables/simpleAttributesTable
+ * @module extension/relatedTables
  */
 
 var UserTable = require('../../user/userTable')
@@ -108,9 +108,12 @@ var UserTable = require('../../user/userTable')
 var util = require('util');
 
 /**
- * Represents a user attribute table
+ * Simple Attributes Requirements Class User-Defined Related Data Table
+ * @class
+ * @extends {module:extension/relatedTables~UserRelatedTable}
  * @param  {string} tableName table name
- * @param  {array} columns   attribute columns
+ * @param  {module:user/userColumn~UserColumn[]} columns   attribute columns
+ * @param {string[]} requiredColumns required column names
  */
 var SimpleAttributesTable = function(tableName, columns, requiredColumns) {
   UserRelatedTable.call(this, tableName, SimpleAttributesTable.RELATION_TYPE.name, SimpleAttributesTable.RELATION_TYPE.dataType, columns, requiredColumns);
@@ -119,35 +122,66 @@ var SimpleAttributesTable = function(tableName, columns, requiredColumns) {
 
 util.inherits(SimpleAttributesTable, UserRelatedTable);
 
-SimpleAttributesTable.create = function(tableName, columns) {
+/**
+ * Create a simple attributes table with the columns
+ * @param  {string} tableName name of the table
+ * @param  {module:user/userColumn~UserColumn[]} additionalColumns additional columns
+ * @return {module:extension/relatedTables~SimpleAttributesTable}
+ */
+SimpleAttributesTable.create = function(tableName, additionalColumns) {
   var tableColumns = SimpleAttributesTable.createRequiredColumns(0);
 
-  if (columns) {
-    tableColumns = tableColumns.concat(columns);
+  if (additionalColumns) {
+    tableColumns = tableColumns.concat(additionalColumns);
   }
 
   return new SimpleAttributesTable(tableName, tableColumns, SimpleAttributesTable.requiredColumns());
 }
 
+/**
+ * Get the required columns
+ * @param  {string} [idColumnName=id] id column name
+ * @return {string[]}
+ */
 SimpleAttributesTable.requiredColumns = function(idColumnName) {
   var requiredColumns = [];
   requiredColumns.push(idColumnName || SimpleAttributesTable.COLUMN_ID);
   return requiredColumns;
 }
 
+/**
+ * Get the number of required columns
+ * @return {Number}
+ */
 SimpleAttributesTable.numRequiredColumns = function(){
   return SimpleAttributesTable.requiredColumns().length;
 }
 
+/**
+ * Create the required columns
+ * @param  {Number} [startingIndex=0] starting index of the required columns
+ * @param  {string} [idColumnName=id]  id column name
+ * @return {module:user/userColumn~UserColumn[]}
+ */
 SimpleAttributesTable.createRequiredColumns = function(startingIndex, idColumnName) {
   startingIndex = startingIndex || 0;
   return [SimpleAttributesTable.createIdColumn(startingIndex++, idColumnName || SimpleAttributesTable.COLUMN_ID)];
 }
 
+/**
+ * Create the primary key id column
+ * @param  {Number} index        index of the column
+ * @param  {string} idColumnName name of the id column
+ * @return {module:user/userColumn~UserColumn}
+ */
 SimpleAttributesTable.createIdColumn = function(index, idColumnName) {
   return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
 }
 
+/**
+ * Validate that Simple Attributes columns to verify at least one non id
+ * column exists and that all columns are simple data types
+ */
 SimpleAttributesTable.prototype.validateColumns = function() {
   var columns = this.columns;
   if (columns.length &lt; 2) {
@@ -162,18 +196,36 @@ SimpleAttributesTable.prototype.validateColumns = function() {
   }
 }
 
+/**
+ * Get the column index of the id column
+ * @return {Number}
+ */
 SimpleAttributesTable.prototype.getIdColumnIndex = function() {
   return this.pkIndex;
 }
 
+/**
+ * Get the primary key id column
+ * @return {module:user/userColumn~UserColumn}
+ */
 SimpleAttributesTable.prototype.getIdColumn = function() {
   return this.getPkColumn();
 }
 
+/**
+ * Determine if the column is a simple column
+ * @param  {module:user/userColumn~UserColumn} column column to check
+ * @return {Boolean}
+ */
 SimpleAttributesTable.isSimple = function(column) {
   return column.notNull &amp;&amp; SimpleAttributesTable.isSimpleDataType(column.dataType);
 }
 
+/**
+ * Determine if the data type is a simple type: TEXT, INTEGER, or REAL
+ * @param {module:db/dataTypes~GPKGDataType}
+ * @return {Boolean}
+ */
 SimpleAttributesTable.isSimpleDataType = function(dataType) {
   return dataType === DataTypes.GPKGDataType.GPKG_DT_TEXT || dataType === DataTypes.GPKGDataType.GPKG_DT_INTEGER || dataType === DataTypes.GPKGDataType.GPKG_DT_REAL;
 }
@@ -183,10 +235,6 @@ SimpleAttributesTable.COLUMN_ID = 'id';
 
 SimpleAttributesTable.prototype.TABLE_TYPE = 'simple_attributes';
 
-/**
- * The SimpleAttributesTable
- * @type {SimpleAttributesTable}
- */
 module.exports = SimpleAttributesTable;
 </code></pre>
 		</section>
@@ -195,7 +243,7 @@ module.exports = SimpleAttributesTable;
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 11th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
