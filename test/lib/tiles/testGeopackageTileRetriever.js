@@ -308,4 +308,85 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
   });
+
+  describe.skip('whitehorse tests', function() {
+    var tileDao;
+
+    beforeEach('should open the geopackage', function(done) {
+      var filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', 'whitehorse.gpkg');
+      GeoPackageManager.open(filename, function(err, gp) {
+        geoPackage = gp;
+        should.not.exist(err);
+        should.exist(gp);
+        should.exist(gp.getDatabase().getDBConnection());
+        gp.getPath().should.be.equal(filename);
+        geoPackage.getTileDaoWithTableName('WhiteHorse', function(err, whitehorseTileDao) {
+          tileDao = whitehorseTileDao;
+          done();
+        });
+      });
+    });
+
+    it('should get a tile by combining more zoomed in tiles', function(done) {
+      // WhiteHorse data exists between 11 and 18, so we will get a zoom level 9 tile
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      console.log('get tile');
+      gpr.getTile(63, 146, 9, function(err, tile) {
+        fs.writeFileSync('/tmp/whGetTile.png', tile);
+        console.log('getTileWithWgs84BoundsInProjection');
+        var west = -135.703125;
+        var east = -135;
+        var south = 60.586967342258696;
+        var north = 60.930432202923335;
+
+        gpr.getTileWithWgs84BoundsInProjection(new BoundingBox(west, east, south, north), 11, 'EPSG:4326', function(err, tile) {
+          console.log('err', err);
+          console.log('tile', tile);
+          fs.writeFileSync('/tmp/whGetTileWithWgs84BoundsInProjection.png', tile);
+          done();
+        });
+      });
+    });
+  });
+
+  describe.only('rio tests', function() {
+    var tileDao;
+
+    beforeEach('should open the geopackage', function(done) {
+      var filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', 'allRio16.gpkg');
+      GeoPackageManager.open(filename, function(err, gp) {
+        geoPackage = gp;
+        should.not.exist(err);
+        should.exist(gp);
+        should.exist(gp.getDatabase().getDBConnection());
+        gp.getPath().should.be.equal(filename);
+        geoPackage.getTileDaoWithTableName('Commerical_Imagery', function(err, whitehorseTileDao) {
+          tileDao = whitehorseTileDao;
+          done();
+        });
+      });
+    });
+
+    it('should get a tile by combining more zoomed in tiles', function(done) {
+      this.timeout(30000);
+      // WhiteHorse data exists between 11 and 18, so we will get a zoom level 9 tile
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
+      console.log('get tile');
+      gpr.getTile(48, 72, 7, function(err, tile) {
+        fs.writeFileSync('/tmp/rioGetTile.png', tile);
+        console.log('getTileWithWgs84BoundsInProjection');
+        var west = -45;
+        var east = -42.1875;
+        var south = -24.5271348225978;
+        var north = -21.94304553343817;
+
+        gpr.getTileWithWgs84BoundsInProjection(new BoundingBox(west, east, south, north), 8, 'EPSG:4326', function(err, tile) {
+          console.log('err', err);
+          console.log('tile', tile);
+          fs.writeFileSync('/tmp/rioGetTileWithWgs84BoundsInProjection.png', tile);
+          done();
+        });
+      });
+    });
+  });
 });

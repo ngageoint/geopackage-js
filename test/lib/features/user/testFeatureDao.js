@@ -125,6 +125,63 @@ describe('FeatureDao tests', function() {
     });
   });
 
+  describe.skip('tmp test', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures','tmp', '20180710112528-06190-map.gpkg');
+    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', '20180710112528-06190-map.gpkg');
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should open the geopackage', function(done) {
+      copyGeopackage(originalFilename, filename, function(err) {
+        GeoPackageManager.open(filename, function(err, gp) {
+          geoPackage = gp;
+          should.not.exist(err);
+          should.exist(gp);
+          should.exist(gp.getDatabase().getDBConnection());
+          gp.getPath().should.be.equal(filename);
+            geoPackage.getFeatureDaoWithTableName('Waypoints', function(err, waypoints) {
+              waypoints.featureTableIndex.indexWithForce(true, function() {}, function() {
+                geoPackage.getFeatureDaoWithTableName('Tracks', function(err, riverFeatureDao) {
+                  featureDao = riverFeatureDao;
+                  featureDao.featureTableIndex.indexWithForce(true, function() {}, done);
+                });
+              });
+            });
+          // });
+        });
+      });
+    });
+
+    // afterEach('should close the geopackage', function(done) {
+    //   geoPackage.close();
+    //   if (typeof(process) !== 'undefined' && process.version) {
+    //     fs.unlink(filename, done);
+    //   } else {
+    //     done();
+    //   }
+    // });
+
+    it('should query and work', function(done) {
+      GeoPackage.getGeoJSONFeaturesInTile(geoPackage, 'Tracks', 251, 1799, 12, function(err, geoJSON) {
+        console.log('geoJson', geoJSON);
+        console.log('err', err);
+        if (!geoJSON) return done(err);
+        done();
+      });
+    });
+  });
+
   describe('rivers 2 test', function() {
     var geoPackage;
     var featureDao;

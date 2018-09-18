@@ -50,6 +50,15 @@ var map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
+var defs = window.GeoPackageAPI.proj4Defs;
+for (var name in defs) {
+  if (defs[name]) {
+    console.log('name', name);
+    console.log('defs[name]', defs[name]);
+    window.proj4.defs(name, defs[name]);
+  }
+}
+
 var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong>'
 });

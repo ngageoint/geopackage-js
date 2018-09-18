@@ -243,8 +243,10 @@ function convertShapefileReaders(readers, geopackage, progressCallback, callback
 }
 
 function getReadersFromZip(zip) {
+  console.log('get readers from zip');
   var readers = [];
   var shpfileArray = zip.filter(function (relativePath, file){
+    console.log('relativePath', relativePath);
     return path.extname(relativePath) === '.shp';
   });
   var dbffileArray = zip.filter(function (relativePath, file){
@@ -256,6 +258,7 @@ function getReadersFromZip(zip) {
 
   for (var i = 0; i < shpfileArray.length; i++) {
     var shapeZipObject = shpfileArray[i];
+    console.log('shapeZipObject', shapeZipObject);
     var shpBuffer = shapeZipObject.asNodeBuffer();
     var shpStream = new stream.PassThrough();
     shpStream.end(shpBuffer);
@@ -347,6 +350,7 @@ function setupConversion(options, progressCallback, doneCallback) {
             var zip = new jszip();
             zip.load(data);
             readers = getReadersFromZip(zip);
+            callback();
           });
         } else {
           dbf = path.basename(options.shapefile, path.extname(options.shapefile)) + '.dbf';
@@ -370,6 +374,7 @@ function setupConversion(options, progressCallback, doneCallback) {
     },
     // create or open the geopackage
     function(callback) {
+      console.log('create or open geopackage');
       if (typeof geopackage === 'object') {
         return progressCallback({status: 'Opening GeoPackage'}, function() {
           callback(null, geopackage);
@@ -378,6 +383,7 @@ function setupConversion(options, progressCallback, doneCallback) {
 
       try {
         var stats = fs.statSync(geopackage);
+        console.log('stats', stats);
         if (!options.append) {
           console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
           return callback(new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage));
