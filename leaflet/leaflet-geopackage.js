@@ -10,6 +10,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
 	options: {
 		layerName: '',
     geoPackageUrl: '',
+    geoPackage: undefined,
     noCache: false
 	},
 	initialize: function initialize(options) {
@@ -19,6 +20,13 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
 	onAdd: function onAdd(map) {
 		L.GridLayer.prototype.onAdd.call(this, map);
     var layer = this;
+
+    if (layer.options.geoPackage) {
+      layer.geoPackage = layer.options.geoPackage;
+      layer.geoPackageLoaded = true;
+      return;
+    }
+
     if (!layer.options.noCache && geoPackageCache[layer.options.geoPackageUrl]) {
       console.log('GeoPackage was %s loaded, pulling from cache', layer.options.geoPackageUrl);
       layer.geoPackageLoaded = true;
@@ -114,14 +122,25 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
 	onAdd: function onAdd(map) {
 		L.GeoJSON.prototype.onAdd.call(this, map);
     var layer = this;
+
+    if (layer.options.geoPackage) {
+      layer.geoPackage = layer.options.geoPackage;
+      layer.geoPackageLoaded = true;
+      var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+      for (var geoJson of results.results) {
+        layer.addData(geoJson);
+      }
+      return;
+    }
+
     if (!layer.options.noCache && geoPackageCache[layer.options.geoPackageUrl]) {
       console.log('GeoPackage was %s loaded, pulling from cache', layer.options.geoPackageUrl);
       layer.geoPackageLoaded = true;
       layer.geoPackage = geoPackageCache[layer.options.geoPackageUrl];
-      GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName, function(err, geoJson, done) {
+      var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+      for (var geoJson of results.results) {
         layer.addData(geoJson);
-        setTimeout(done, 0);
-      });
+      }
       return;
     }
     layer.geoPackageLoaded = false;
@@ -135,10 +154,10 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
         layer.geoPackageLoaded = true;
         layer.geoPackage = gp;
         geoPackageCache[layer.options.geoPackageUrl] = layer.options.noCache || gp;
-        GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName, function(err, geoJson, done) {
+        var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+        for (var geoJson of results.results) {
           layer.addData(geoJson);
-          setTimeout(done, 0);
-        });
+        }
       });
     };
     console.time('Loading GeoPackage ' + layer.options.geoPackageUrl);

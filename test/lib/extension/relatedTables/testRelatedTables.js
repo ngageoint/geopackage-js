@@ -102,6 +102,25 @@ describe('Related Tables tests', function() {
         }
       }
     });
+
+    it('should get relationships for the base table name', function() {
+      var rte = new RelatedTablesExtension(geoPackage);
+      var relationships = rte.getRelationships('cats_feature');
+      relationships.length.should.be.equal(1);
+      relationships[0].base_table_name.should.be.equal('cats_feature');
+      relationships[0].base_primary_column.should.be.equal('id');
+      relationships[0].related_table_name.should.be.equal('cats_media');
+      relationships[0].related_primary_column.should.be.equal('id');
+    });
+
+    it('should get relationships for the base table name and baseId', function() {
+      var rte = new RelatedTablesExtension(geoPackage);
+      var relationships = rte.getRelatedRows('cats_feature', 1);
+      relationships.length.should.be.equal(1);
+      relationships[0].related_table_name.should.be.equal('cats_media');
+      relationships[0].mappingRows.length.should.be.equal(2);
+      relationships[0].mappingRows[0].row.id.should.be.equal(relationships[0].mappingRows[0].related_id);
+    });
   });
 
   describe('Related Tables Write Tests', function() {
