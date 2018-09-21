@@ -11,7 +11,11 @@ describe('CSV to GeoPackage tests', function() {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'));
     } catch (e) {}
 
-    return CSVToGeoPackage.convert({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg')}, function(status) {
+    return CSVToGeoPackage.convert({
+      csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+      geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'),
+      delimiter: ';'
+    }, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -27,7 +31,10 @@ describe('CSV to GeoPackage tests', function() {
 
   it('should convert the geojson', function(done) {
     fs.readFile(path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), 'utf8', function(err, data) {
-      CSVToGeoPackage.convert({csvData:data})
+      CSVToGeoPackage.convert({
+        csvData:data,
+        delimiter: ';'
+      })
       .then(function(geopackage) {
         var tables = geopackage.getFeatureTables();
         tables.length.should.be.equal(1);
@@ -44,7 +51,11 @@ describe('CSV to GeoPackage tests', function() {
 
   it('should convert the natural earth 110m file and add the layer twice', function() {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'));
-    return CSVToGeoPackage.convert({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg')}, function(status) {
+    return CSVToGeoPackage.convert({
+      csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+      geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'),
+      delimiter: ';'
+    }, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -58,7 +69,11 @@ describe('CSV to GeoPackage tests', function() {
       return geopackage;
     })
     .then(function(geopackage) {
-      return CSVToGeoPackage.addLayer({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg')}, function(status) {
+      return CSVToGeoPackage.addLayer({
+        csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+        geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'),
+        delimiter: ';'
+      }, function(status) {
         return Promise.resolve();
       })
       .then(function() {
@@ -79,7 +94,11 @@ describe('CSV to GeoPackage tests', function() {
 
   it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function() {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'));
-    return CSVToGeoPackage.convert({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg')}, function(status) {
+    return CSVToGeoPackage.convert({
+      csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+      geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'),
+      delimiter: ';'
+    }, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -93,7 +112,11 @@ describe('CSV to GeoPackage tests', function() {
       return geopackage;
     })
     .then(function(geopackage) {
-      return CSVToGeoPackage.addLayer({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:geopackage}, function(status) {
+      return CSVToGeoPackage.addLayer({
+        csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+        geopackage:geopackage,
+        delimiter: ';'
+      }, function(status) {
         return Promise.resolve();
       });
     })
@@ -111,7 +134,11 @@ describe('CSV to GeoPackage tests', function() {
 
   it('should convert the natural earth 110m file and add read it out as geojson', function() {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'));
-    return CSVToGeoPackage.convert({csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'), geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg')}, function(status) {
+    return CSVToGeoPackage.convert({
+      csv:path.join(__dirname, 'fixtures', '110m-admin-0-countries.csv'),
+      geopackage:path.join(__dirname, 'fixtures', 'tmp', '110m-admin-0-countries.gpkg'),
+      delimiter: ';'
+    }, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {

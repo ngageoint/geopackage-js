@@ -94,8 +94,8 @@ function setupConversion(options, progressCallback) {
     .then(function() {
       return new Promise(function(resolve, reject) {
         var parser = CSVStream({
-          delimiter: ';',
-          newline: '\r\n',
+          delimiter: options.delimiter || ',',
+          newline: options.newline || '\r\n',
           objectMode: true,
           columns: true
         });
@@ -110,11 +110,8 @@ function setupConversion(options, progressCallback) {
             type: 'Feature',
             properties: line
           };
-          if (line.WKT) {
-            var geom = wkx.Geometry.parse(line.WKT).toGeoJSON();
-            gj.geometry = geom;
-          } else if (line.wkt) {
-            var geom = wkx.Geometry.parse(line.wkt).toGeoJSON();
+          if (line.WKT || line.wkt) {
+            var geom = wkx.Geometry.parse(line.WKT || line.wkt).toGeoJSON();
             gj.geometry = geom;
           } else if (line.latitude && line.longitude) {
             gj.geometry = {
@@ -125,11 +122,19 @@ function setupConversion(options, progressCallback) {
               ]
             }
           } else if (line.lat && line.lng) {
+            gj.geometry = {
+              type: 'Point',
+              coordinates: [
+                line.lng,
+                line.lat
+              ]
+            }
+          } else if (line.lat && line.lon) {
            gj.geometry = {
              type: 'Point',
              coordinates: [
-               line.longitude,
-               line.latitude
+               line.lon,
+               line.lat
              ]
            }
           } else if (line.CoordY && line.CoordX) {
