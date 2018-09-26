@@ -1,19 +1,19 @@
-var GeoPackageManager = require('../../lib/geoPackageManager')
+var GeoPackageAPI = require('../..')
   , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 
-describe('GeoPackageManager Create tests', function() {
+describe('GeoPackageAPI Create tests', function() {
 
-  var testGeoPackage = path.join(__dirname, '..', 'tmp', 'test.gpkg');
+  var testGeoPackage;
+  var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
   beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testGeoPackage, function() {
-      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
+    testGeoPackage = path.join(testPath, testSetup.createTempName());
+    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
+      geopackage = gp;
+      done();
     });
   });
 
@@ -23,7 +23,7 @@ describe('GeoPackageManager Create tests', function() {
   });
 
   it('should not allow a file without a gpkg extension', function(done) {
-    GeoPackageManager.create('/tmp/test.g', function(err, geopackage) {
+    GeoPackageAPI.create('/tmp/test.g', function(err, geopackage) {
       should.exist(err);
       should.not.exist(geopackage);
       done();
@@ -31,16 +31,15 @@ describe('GeoPackageManager Create tests', function() {
   });
 
   it('should create the geopackage file', function(done) {
-    GeoPackageManager.create(testGeoPackage, function(err, geopackage) {
+    GeoPackageAPI.create(testGeoPackage, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
-      geopackage.getApplicationId(function(err, applicationId) {
-        var buff = new Buffer(4);
-        buff.writeUInt32BE(applicationId);
-        var idString = buff.toString('ascii', 0, 4);
-        idString.should.be.equal('GPKG');
-        done();
-      });
+      var applicationId = geopackage.getApplicationId();
+      var buff = new Buffer(4);
+      buff.writeUInt32BE(applicationId);
+      var idString = buff.toString('ascii', 0, 4);
+      idString.should.be.equal('GPKG');
+      done();
     });
   });
 

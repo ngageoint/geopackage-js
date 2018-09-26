@@ -1,0 +1,413 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>db/geoPackageConnection.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">db/geoPackageConnection.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * Connection to the SQLite file
+ * @module db/geoPackageConnection
+ */
+
+var GeoPackageConstants = require('../geoPackageConstants');
+
+if (typeof(process) !== 'undefined' &amp;&amp; process.version &amp;&amp; !process.env.FORCE_SQLJS) {
+  console.log('Better SQLite');
+} else {
+  console.log('SQL.js');
+}
+
+/**
+ * Creates a connection to the SQLite file and when connected, returns a promise that resolves the connection.
+ * This will create a {module:db/sqliteAdapter~Adapter} if running in node and the FORCE_SQLJS environment variable is not set.
+ * This will create a {module:db/sqljsAdapter~Adapter} if running in the browser or the FORCE_SQLJS environment variable is set
+ * @see {module:db/sqliteAdapter~Adapter}
+ * @see {module:db/sqljsAdapter~Adapter}
+ * @class
+ * @param  {string} filePath path to the sqlite file
+ * @return {Promise&lt;module:db/geoPackageConnection~GeoPackageConnection>}
+ */
+var GeoPackageConnection = function(filePath) {
+  if (typeof(process) !== 'undefined' &amp;&amp; process.version &amp;&amp; !process.env.FORCE_SQLJS) {
+    this.adapterCreator = require('./sqliteAdapter');
+  } else {
+    this.adapterCreator = require('./sqljsAdapter');
+  }
+
+  var promise = new Promise(function(resolve, reject) {
+    this.adapterCreator.createAdapter(filePath)
+    .then(function(adapter) {
+      this.adapter = adapter;
+      resolve(this);
+    }.bind(this))
+    .catch(function(error) {
+      reject(error);
+    });
+  }.bind(this));
+
+  return promise;
+}
+
+/**
+ * Close the database.
+ */
+GeoPackageConnection.prototype.close = function() {
+  this.adapter.close();
+}
+
+/**
+ * exports the GeoPackage as a file
+ * @param  {Function} callback called with an err and the buffer containing the contents of the file
+ */
+GeoPackageConnection.prototype.export = function(callback) {
+  this.adapter.export(callback);
+}
+
+/**
+ * Gets the raw connection to the database
+ * @return {Object}
+ */
+GeoPackageConnection.prototype.getDBConnection = function () {
+  return this.adapter.db;
+};
+
+/**
+ * Connects to a GeoPackage database
+ * @param  {Object} db database to connect to
+ * @return {(module:db/sqliteAdapter~Adapter|module:db/sqljsAdapter~Adapter)}
+ */
+GeoPackageConnection.prototype.setDBConnection = function (db) {
+  return this.adapter = this.adapterCreator.createAdapterFromDb(db);
+};
+
+/**
+* Registers the given function so that it can be used by SQL statements
+* @param  {string} name               name of function to register
+* @param  {Function} functionDefinition function to register
+* @return {(module:db/sqliteAdapter~Adapter|module:db/sqljsAdapter~Adapter)} the adapter in use
+*/
+GeoPackageConnection.prototype.registerFunction = function(name, functionDefinition) {
+  this.adapter.registerFunction(name, functionDefinition);
+  return this.adapter;
+}
+
+/**
+ * Gets the first result from the query
+ * @param  {string} sql    sql query to run
+ * @param  {Array|Object} [params] array of substitution parameters
+ * @return {object}
+ */
+GeoPackageConnection.prototype.get = function (sql, params) {
+  return this.adapter.get(sql, params);
+};
+
+/**
+ * Runs the sql provided and returns the results
+ * @param  {string} sql    sql to run
+ * @param  {Array|Object} [params] array of substitution parameters
+ * @return {object}
+ */
+GeoPackageConnection.prototype.run = function (sql, params) {
+  return this.adapter.run(sql, params)
+};
+
+/**
+ * Executes the query and returns all results in an array
+ * @param  {string} sql    sql to run
+ * @param  {Array|Object} [params] Array of substitution parameters
+ * @return {Object[]}
+ */
+GeoPackageConnection.prototype.all = function (sql, params) {
+  return this.adapter.all(sql, params);
+};
+
+/**
+ * Executes the query and returns an Iterable object of results
+ * @param  {string} sql    sql to run
+ * @param  {Array|Object} [params] substitution parameters
+ * @return {Iterable&lt;Object>}
+ */
+GeoPackageConnection.prototype.each = function (sql, params) {
+  return this.adapter.each(sql, params);
+};
+
+/**
+ * Gets the minimum value from the column
+ * @param  {string} table     table to query
+ * @param  {string} column    column to get the min value from
+ * @param  {string} [where]     where clause
+ * @param  {Array|Object} [whereArgs] substitution parameters
+ * @return {Object}
+ */
+GeoPackageConnection.prototype.minOfColumn = function(table, column, where, whereArgs) {
+  var minStatement = 'select min('+column+') as min from ' + table;
+  if(where) {
+    minStatement += ' ';
+    if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    minStatement += where;
+  }
+  return this.adapter.get(minStatement, whereArgs).min;
+};
+
+/**
+ * Gets the maximum value from the column
+ * @param  {string} table     table to query
+ * @param  {string} column    column to get the max value from
+ * @param  {string} [where]     where clause
+ * @param  {Array|Object} [whereArgs] substitution parameters
+ * @return {Object}
+ */
+GeoPackageConnection.prototype.maxOfColumn = function(table, column, where, whereArgs, callback) {
+  var maxStatement = 'select max('+column+') as max from ' + table;
+  if(where) {
+    maxStatement += ' ';
+    if (where.indexOf('where')) {
+      where = 'where ' + where;
+    }
+    maxStatement += where;
+  }
+  return this.adapter.get(maxStatement, whereArgs).max;
+};
+
+/**
+ * Return the count of objects in the table
+ * @param  {string} table table name
+ * @param  {string} [where] where clause
+ * @param  {Array|Object} [whereArgs] substitution parameters
+ * @return {Number}
+ */
+GeoPackageConnection.prototype.count = function(table, where, whereArgs) {
+  return this.adapter.count(table, where, whereArgs);
+};
+
+/**
+ * Executes an insert statement and returns the last id inserted
+ * @param  {string} sql    sql to insert
+ * @param  {Array|Object} params substitution parameters
+ * @return {Object} last row id inserted
+ */
+GeoPackageConnection.prototype.insert = function (sql, params) {
+  return this.adapter.insert(sql, params);
+};
+
+/**
+ * Delete from the table
+ * @param  {string} tableName table name to delete from
+ * @param  {string} [where]     where clause
+ * @param  {Array|Object} [whereArgs] substitution parameters
+ * @return {Number} number of rows deleted
+ */
+GeoPackageConnection.prototype.delete = function(tableName, where, whereArgs) {
+  var deleteStatement = 'DELETE FROM ' + tableName + '';
+
+  if (where) {
+    deleteStatement += ' WHERE ' + where;
+  }
+
+  return this.adapter.delete(deleteStatement, whereArgs);
+};
+
+/**
+ * Drops the table specified
+ * @param  {string} tableName table to drop
+ * @return {Boolean} results of table drop
+ */
+GeoPackageConnection.prototype.dropTable = function(tableName) {
+  return this.adapter.dropTable(tableName);
+};
+
+/**
+ * Gets information about the table specified.  If data is returned, the table exists
+ * @param  {string} tableName table to check
+ * @return {Object}
+ */
+GeoPackageConnection.prototype.tableExists = function(tableName) {
+  return this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName]);
+};
+
+/**
+ * Checks if a table and column exist
+ * @param  {string} tableName  table to check
+ * @param  {string} columnName column to check
+ * @return {Boolean}
+ */
+GeoPackageConnection.prototype.columnAndTableExists = function(tableName, columnName) {
+  var columns = this.adapter.all('PRAGMA table_info(\''+tableName+'\')');
+  for (var i = 0; i &lt; columns.length; i++) {
+    if (columns[i].name === columnName) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Sets the APPLICATION_ID and user_version for GeoPackage
+ */
+GeoPackageConnection.prototype.setApplicationId = function() {
+  var buff = new Buffer(GeoPackageConstants.APPLICATION_ID);
+  var applicationId = buff.readUInt32BE(0);
+  this.adapter.run('PRAGMA application_id = ' + applicationId);
+  this.adapter.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
+}
+
+/**
+ * gets the application_id from the sqlite file
+ * @return {Object}
+ */
+GeoPackageConnection.prototype.getApplicationId = function() {
+  return this.adapter.get('PRAGMA application_id').application_id;
+}
+
+module.exports = GeoPackageConnection;
+
+/**
+ * Convenience method
+ * @see {module:db/geoPackageConnection~GeoPackageConnection}
+ * @see {module:db/sqliteAdapter~Adapter}
+ * @see {module:db/sqljsAdapter~Adapter}
+ * @param  {string|Buffer} filePath string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
+ * @return {Promise}
+ */
+GeoPackageConnection.connect = function(filePath) {
+  return new GeoPackageConnection(filePath);
+}
+
+/**
+ * Convenience method
+ * @param  {Object}   db       open database to connect to
+ * @return {Promise}
+ */
+GeoPackageConnection.connectWithDatabase = function(db) {
+  return new GeoPackageConnection(undefined)
+  .then(function(connection) {
+    connection.setDBConnection(db);
+  });
+}
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

@@ -1,10 +1,17 @@
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
-  , async = require('async')
-  , Metadata = require('../../../lib/metadata').Metadata;
+  , GeoPackage = require('../../../lib/geoPackage')
+  , Metadata = require('../../../lib/metadata').Metadata
+  , MetadataDao = require('../../../lib/metadata').MetadataDao;
 
 describe('Metadata tests', function() {
+
+  it('should create a Metadata object', function() {
+    var md = new MetadataDao(new GeoPackage());
+    var metadata = md.createObject();
+    should.exist(metadata.getScopeInformation);
+  });
 
   it('should test getting scope information', function() {
     var m1 = new Metadata();

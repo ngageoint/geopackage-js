@@ -1,6 +1,7 @@
 var GeometryData = require('../../../lib/geom/geometryData.js');
 
-var wkx = require('wkx');
+var wkx = require('wkx')
+  , should = require('chai').should();
 
 describe('Geometry Data tests', function() {
 
@@ -16,83 +17,117 @@ describe('Geometry Data tests', function() {
   var rawPoint = new wkx.Point(1, 2);
   var point = rawPoint.toWkb();
 
-  it('should fail the magic number check', function(done) {
+  it('should fail the magic number check', function() {
     var buffer = new Buffer('HI');
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry magic number: HI, Expected: GP');
-    done();
   });
 
-  it('should fail the version check', function(done) {
+  it('should fail the version check', function() {
     var version = new Buffer(1);
     version.writeUInt8(1);
     var buffer = Buffer.concat([magic, version]);
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry version 1, Expected: 0');
-    done();
   });
 
-  it('should throw unexpected geometry flags where 7 is 1 and 6 is 1', function(done) {
+  it('should throw unexpected geometry flags where 7 is 1 and 6 is 1', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(255);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7=1, 6=1');
-    done();
   });
 
-  it('should throw unexpected geometry flags where 7 is 0 and 6 is 1', function(done) {
+  it('should throw unexpected geometry flags where 7 is 0 and 6 is 1', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(127);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7=0, 6=1');
-    done();
   });
 
-  it('should throw unexpected geometry flags where 7 is 1 and 6 is 0', function(done) {
+  it('should throw unexpected geometry flags where 7 is 1 and 6 is 0', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(128);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry flags. Flag bit 7 and 6 should both be 0, 7=1, 6=0');
-    done();
   });
 
-  it('should set extended to true', function(done) {
+  it('should set extended to true', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(32);
 
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
     geometryData.extended.should.be.equal(true);
-    done();
+
+    var buffer = geometryData.toData();
+    var geometryData2 = new GeometryData(buffer);
+    geometryData2.extended.should.be.equal(true);
   });
 
-  it('should set byte order to little endian', function(done) {
+  it('should set empty to true', function() {
+    var flags = new Buffer(1);
+    flags.writeUInt8(32);
+
+    var buffer = Buffer.concat([magic, version, flags, srs]);
+    var geometryData = new GeometryData(buffer);
+    geometryData.extended.should.be.equal(true);
+    geometryData.empty = true;
+
+    var buffer = geometryData.toData();
+    var geometryData2 = new GeometryData(buffer);
+    geometryData2.empty.should.be.equal(true);
+  });
+
+  it('should fail to parse the geometry but not throw an error', function() {
+    var flags = new Buffer(1);
+    flags.writeUInt8(32);
+
+    var badGeom = new Buffer(1);
+    badGeom.writeUInt8(0);
+
+    var buffer = Buffer.concat([magic, version, flags, srs, badGeom]);
+    var geometryData = new GeometryData(buffer);
+    should.exist(geometryData.geometryError);
+  });
+
+  it('should set byte order to little endian', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(1);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
     geometryData.byteOrder.should.be.equal(1);
-    done();
   });
 
-  it('should set byte order to big endian', function(done) {
+  it('should export byte order as little endian', function() {
+    var flags = new Buffer(1);
+    flags.writeUInt8(1);
+    var buffer = Buffer.concat([magic, version, flags, srs, point]);
+    var geometryData = new GeometryData(buffer);
+    geometryData.byteOrder.should.be.equal(1);
+
+    var buffer = geometryData.toData();
+    var geometryData2 = new GeometryData(buffer);
+    geometryData2.byteOrder.should.be.equal(1);
+  });
+
+  it('should set byte order to big endian', function() {
     var flags = new Buffer(1);
     flags.writeUInt8(0);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    done();
   });
 
-  it('should parse the big endian envelope', function(done) {
+  it('should parse the big endian envelope', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(2);
     var envelope = new Buffer(32);
@@ -111,10 +146,9 @@ describe('Geometry Data tests', function() {
     geometryData.envelope.hasM.should.be.equal(false);
     geometryData.geometry.x.should.be.equal(1);
     geometryData.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should parse the big endian envelope with z', function(done) {
+  it('should parse the big endian envelope with z', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(4);
     var envelope = new Buffer(48);
@@ -137,10 +171,9 @@ describe('Geometry Data tests', function() {
     geometryData.envelope.hasM.should.be.equal(false);
     geometryData.geometry.x.should.be.equal(1);
     geometryData.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should parse the big endian envelope with m', function(done) {
+  it('should parse the big endian envelope with m', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(6);
     var envelope = new Buffer(48);
@@ -163,10 +196,9 @@ describe('Geometry Data tests', function() {
     geometryData.envelope.maxM.should.be.equal(99.0);
     geometryData.geometry.x.should.be.equal(1);
     geometryData.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should parse the big endian envelope with m and z', function(done) {
+  it('should parse the big endian envelope with m and z', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
@@ -193,10 +225,9 @@ describe('Geometry Data tests', function() {
     geometryData.envelope.maxM.should.be.equal(55.0);
     geometryData.geometry.x.should.be.equal(1);
     geometryData.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should parse the Uint8Array', function(done) {
+  it('should parse the Uint8Array', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(8);
     var envelope = new Buffer(64);
@@ -224,27 +255,24 @@ describe('Geometry Data tests', function() {
     geometryData.envelope.maxM.should.be.equal(55.0);
     geometryData.geometry.x.should.be.equal(1);
     geometryData.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should throw unexpected geometry flags error', function(done) {
+  it('should throw unexpected geometry flags error', function() {
     var tflags = new Buffer(1);
     tflags.writeUInt8(12);
     var buffer = Buffer.concat([magic, version, tflags, srs]);
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry flags. Envelope contents indicator must be between 0 and 4. Actual: 6');
-    done();
   });
 
-  it('should get the point out', function(done) {
+  it('should get the point out', function() {
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    done();
   });
 
-  it('should create a point geometry data with an envelope', function(done) {
+  it('should create a point geometry data with an envelope', function() {
     var geometryData = new GeometryData();
     geometryData.empty.should.be.equal(true);
     geometryData.setSrsId(4326);
@@ -277,10 +305,9 @@ describe('Geometry Data tests', function() {
     geometryData2.envelope.maxM.should.be.equal(55.0);
     geometryData2.geometry.x.should.be.equal(1);
     geometryData2.geometry.y.should.be.equal(2);
-    done();
   });
 
-  it('should create a point geometry data without an envelope', function(done) {
+  it('should create a point geometry data without an envelope', function() {
     var geometryData = new GeometryData();
     geometryData.setSrsId(4326);
     geometryData.setGeometry(rawPoint);
@@ -289,7 +316,6 @@ describe('Geometry Data tests', function() {
     geometryData2.byteOrder.should.be.equal(0);
     geometryData2.geometry.x.should.be.equal(1);
     geometryData2.geometry.y.should.be.equal(2);
-    done();
   });
 
 });

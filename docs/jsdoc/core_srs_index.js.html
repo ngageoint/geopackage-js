@@ -1,0 +1,396 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>core/srs/index.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">core/srs/index.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * SpatialReferenceSystem module.
+ * @module core/srs
+ */
+
+var Dao = require('../../dao/dao');
+
+var util = require('util')
+  , proj4 = require('proj4');
+proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+
+/**
+ * Spatial Reference System object. The coordinate reference system definitions it contains are referenced by the GeoPackage Contents and GeometryColumns objects to relate the vector and tile data in user tables to locations on the earth.
+ * @class SpatialReferenceSystem
+ */
+var SpatialReferenceSystem = function() {
+  /**
+   * Human readable name of this SRS
+   * @member {string}
+   */
+  this.srs_name;
+  /**
+   * Unique identifier for each Spatial Reference System within a GeoPackage
+   * @member {Number}
+   */
+  this.srs_id;
+
+  /**
+   * Case-insensitive name of the defining organization e.g. EPSG or epsg
+   * @member {string}
+   */
+  this.organization;
+
+  /**
+   * Numeric ID of the Spatial Reference System assigned by the organization
+   * @member {Number}
+   */
+  this.organization_coordsys_id;
+
+  /**
+   * Well-known Text [32] Representation of the Spatial Reference System
+   * @member {string}
+   */
+  this.definition;
+
+  /**
+   * Human readable description of this SRS
+   * @member {string}
+   */
+  this.description;
+
+  /**
+   * Well-known Text Representation of the Spatial Reference System
+   * @member {string}
+   */
+  this.definition_12_063;
+};
+
+/**
+ * Return the proj4 projection specified by this SpatialReferenceSystem
+ * @return {proj4}
+ */
+SpatialReferenceSystem.prototype.getProjection = function() {
+  if(this.organization_coordsys_id === 4326 &amp;&amp; (this.organization === 'EPSG' || this.organization === 'epsg')) {
+    return proj4('EPSG:4326');
+  } else if (this.definition_12_063 &amp;&amp; this.definition_12_063 !== '' &amp;&amp; this.definition_12_063 !== 'undefined') {
+      return proj4(this.definition_12_063);
+  } else if (this.definition &amp;&amp; this.definition !== '' &amp;&amp; this.definition !== 'undefined') {
+      return proj4(this.definition);
+  } else if (this.organization &amp;&amp; this.organization_coordsys_id) {
+    return proj4(this.organization.toUpperCase() + ':' + this.organization_coordsys_id);
+  } else {
+    return {};
+  }
+}
+
+/**
+ * Spatial Reference System Data Access Object
+ * @class SpatialReferenceSystemDao
+ * @extends {module:dao/dao~Dao}
+ * @param {module:geoPackage~GeoPackage} geoPackage The GeoPackage object
+ */
+var SpatialReferenceSystemDao = function(geoPackage) {
+  Dao.call(this, geoPackage);
+}
+
+util.inherits(SpatialReferenceSystemDao, Dao);
+
+/**
+ * Create a new SpatialReferenceSystem object
+ * @return {module:core/srs~SpatialReferenceSystem}
+ */
+SpatialReferenceSystemDao.prototype.createObject = function () {
+  return new SpatialReferenceSystem();
+};
+
+/**
+ * Get the Spatial Reference System for the provided id
+ * @param  {Number}   srsId srs id
+ * @return {module:core/srs~SpatialReferenceSystem}
+ */
+SpatialReferenceSystemDao.prototype.getBySrsId = function(srsId) {
+  return this.queryForId(srsId);
+};
+
+/**
+ * Return the proj4 projection specified by this SpatialReferenceSystem
+ * @return {proj4}
+ */
+SpatialReferenceSystemDao.prototype.getProjection = function (srs) {
+  return srs.getProjection();
+};
+
+/**
+ * Creates the required EPSG WGS84 Spatial Reference System (spec
+ * Requirement 11)
+ * @return {Number} id of the created row
+ */
+SpatialReferenceSystemDao.prototype.createWgs84 = function() {
+  var srs = this.getBySrsId(4326);
+  if (srs) {
+    return srs;
+  }
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'WGS 84 geodetic';
+  srs.srs_id = 4326;
+  srs.organization = 'EPSG';
+  srs.organization_coordsys_id = 4326;
+  srs.definition = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+  srs.description = 'longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid';
+  if (this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
+    srs.definition_12_063 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+  }
+  return this.create(srs);
+}
+
+/**
+ * Creates the required Undefined Cartesian Spatial Reference System (spec
+ * Requirement 11)
+ * @return {Number} id of the created row
+ */
+SpatialReferenceSystemDao.prototype.createUndefinedCartesian = function() {
+  var srs = this.getBySrsId(-1);
+  if (srs) {
+    return srs;
+  }
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'Undefined cartesian SRS';
+  srs.srs_id = -1;
+  srs.organization = 'NONE';
+  srs.organization_coordsys_id = -1;
+  srs.definition = 'undefined';
+  srs.description = 'undefined cartesian coordinate reference system';
+  if (this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
+    srs.definition_12_063 = 'undefined';
+  }
+  return this.create(srs);
+}
+
+/**
+ * Creates the required Undefined Geographic Spatial Reference System (spec
+ * Requirement 11)
+ * @return {Number} id of the created row
+ */
+SpatialReferenceSystemDao.prototype.createUndefinedGeographic = function() {
+  var srs = this.getBySrsId(0);
+  if (srs) {
+    return srs;
+  }
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'Undefined geographic SRS';
+  srs.srs_id = 0;
+  srs.organization = 'NONE';
+  srs.organization_coordsys_id = 0;
+  srs.definition = 'undefined';
+  srs.description = 'undefined geographic coordinate reference system';
+  if (this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
+    srs.definition_12_063 = 'undefined';
+  }
+  return this.create(srs);
+}
+
+/**
+ * Creates the Web Mercator Spatial Reference System if it does not already
+ * exist
+ * @return {Number} id of the created row
+ */
+SpatialReferenceSystemDao.prototype.createWebMercator = function() {
+  var srs = this.getBySrsId(3857);
+  if (srs) {
+    return srs;
+  }
+  var srs = new SpatialReferenceSystem();
+  srs.srs_name = 'WGS 84 / Pseudo-Mercator';
+  srs.srs_id = 3857;
+  srs.organization = 'EPSG';
+  srs.organization_coordsys_id = 3857;
+  srs.definition = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+  srs.description = 'Spherical Mercator projection coordinate system';
+  if(this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
+    srs.definition_12_063 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+  }
+  return this.create(srs);
+}
+
+/**
+ * Spatial Reference System Table Name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.TABLE_NAME = 'gpkg_spatial_ref_sys';
+
+/**
+ * Table Name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.prototype.gpkgTableName = SpatialReferenceSystemDao.TABLE_NAME;
+
+/**
+ * srsName field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_SRS_NAME = "srs_name";
+
+/**
+ * srsId field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_SRS_ID = "srs_id";
+
+/**
+ * id field name, srsId
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_ID = SpatialReferenceSystemDao.COLUMN_SRS_ID;
+
+/**
+ * organization field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_ORGANIZATION = "organization";
+
+/**
+ * organizationCoordsysId field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_ORGANIZATION_COORDSYS_ID = "organization_coordsys_id";
+
+/**
+ * definition field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_DEFINITION = "definition";
+
+/**
+ * description field name
+ * @type {String}
+ */
+SpatialReferenceSystemDao.COLUMN_DESCRIPTION = "description";
+
+
+SpatialReferenceSystemDao.prototype.idColumns = [SpatialReferenceSystemDao.COLUMN_SRS_ID];
+
+module.exports.SpatialReferenceSystemDao = SpatialReferenceSystemDao;
+SpatialReferenceSystem.TABLE_NAME = SpatialReferenceSystemDao.TABLE_NAME;
+module.exports.SpatialReferenceSystem = SpatialReferenceSystem;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

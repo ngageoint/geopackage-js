@@ -1,0 +1,246 @@
+## 1.x to 2.x Migration Guide
+
+This will highlight all API changes that were made between 1.x and 2.x for GeoPackage-JS  
+This guide is not complete yet.
+
+### GeoPackageAPI methods changed
+
+GeoPackageAPI.openGeoPackage -> GeoPackageAPI.open
+GeoPackageAPI.openGeoPackageByteArray -> GeoPackageAPI.open
+GeoPackageAPI.createGeoPackage -> GeoPackageAPI.create
+
+### Methods moved from GeoPackageAPI
+
+#### Methods moved to the GeoPackage object
+
+GeoPackageAPI.addTileToGeoPackage -> geopackage.addTile
+GeoPackageAPI.createTileTable -> geopackage.createTileTableWithTableName
+GeoPackageAPI.getTables -> geopackage.getTables
+GeoPackageAPI.getFeatureTables -> geopackage.getFeatureTables
+GeoPackageAPI.getTileTables -> geopackage.getTileTables
+GeoPackageAPI.hasTileTable -> geopackage.hasTileTable
+GeoPackageAPI.hasFeatureTable -> geopackage.hasFeatureTable
+GeoPackageAPI.indexGeoPackage -> geopackage.index;
+GeoPackageAPI.indexFeatureTable -> geopackage.indexFeatureTable;
+
+### GeoPackageManager has been removed
+GeoPackageManager.open -> GeoPackageAPI.open
+GeoPackageManager.create -> GeoPackageAPI.create
+
+### Methods with callbacks that also now return Promises
+
+All of the following methods take an optional callback but also return a promise which resolves to the same value that the callback is called with.
+
+GeoPackageAPI.open
+GeoPackageAPI.create
+
+### Callbacks that have been moved to Promises
+
+All of the following methods have had their callback parameters removed and they return a promise
+
+GeoPackageConnection constructor
+GeoPackageConnection.connect
+GeoPackageConnection.connectWithDatabase
+sqliteAdapter.createAdapter
+GeoPackageConnection.prototype.setApplicationId
+TableCreator.prototype.createRequired
+GeoPackageValidate.hasMinimumTables
+GeoPackage.prototype.index
+TileDao.prototype.queryByTileGrid
+GeoPackageAPI.getTilesInBoundingBox
+GeoPackageAPI.getTilesInBoundingBoxWebZoom
+GeoPackageTileRetriever.prototype.retrieveTileResults
+GeoPackageTileRetriever.prototype.hasTile
+TileCreator.prototype.projectTile
+GeoPackageTileRetriever.prototype.getTileWithBounds
+GeoPackageTileRetriever.prototype.getWebMercatorTile
+GeoPackageTileRetriever.prototype.getTileWithWgs84BoundsInProjection
+GeoPackageTileRetriever.prototype.getTileWithWgs84Bounds
+GeoPackageTileRetriever.prototype.drawTileIn
+GeoPackageTileRetriever.prototype.getTile
+GeoPackageAPI.getTileFromXYZ
+GeoPackageAPI.drawXYZTileInCanvas
+
+### Methods with Callbacks that now return results
+Adapter.prototype.run
+GeoPackage.prototype.getApplicationId
+GeoPackage.prototype.createFeatureTable
+GeoPackage.prototype.createTileTable
+GeoPackage.prototype.getSrs
+GeoPackage.prototype.getFeatureTables
+GeoPackage.prototype.hasFeatureTable
+GeoPackage.prototype.getTileTables
+GeoPackage.prototype.hasTileTable
+GeoPackage.prototype.getTables
+GeoPackage.prototype.createTableIndexTable
+GeoPackage.prototype.createFeatureTableWithGeometryColumns
+GeoPackage.prototype.createFeatureTableWithGeometryColumnsAndDataColumns
+GeoPackage.prototype.createTileTableWithTableName
+GeoPackage.prototype.getInfoForTable
+GeoPackageConnection.prototype.getApplicationId
+GeoPackageConnection.prototype.get
+GeoPackageConnection.prototype.tableExists
+GeoPackageConnection.prototype.setApplicationId
+GeoPackageConnection.prototype.minOfColumn
+GeoPackageConnection.prototype.maxOfColumn
+GeoPackageConnection.prototype.each
+GeoPackageConnection.prototype.all
+GeoPackageConnection.prototype.count
+GeoPackageConnection.prototype.insert
+GeoPackageConnection.prototype.delete
+SqliteAdapter.prototype.get
+SqliteAdapter.prototype.all
+SqliteAdapter.prototype.each
+SqliteAdapter.prototype.insert
+SqliteAdapter.prototype.count
+SqliteAdapter.prototype.delete
+ContentsDao.prototype.getSrs
+Dao.prototype.queryForIdObject
+Dao.prototype.queryForSameId
+Dao.prototype.queryForMultiIdObject
+Dao.prototype.queryForAll
+Dao.prototype.isTableExists
+Dao.prototype.countByEqWithFieldAndValue
+Dao.prototype.minOfColumn
+Dao.prototype.maxOfColumn
+Dao.prototype.create
+Dao.prototype.delete
+Dao.prototype.deleteById
+Dao.prototype.deleteByMultiId
+Dao.prototype.deleteWhere
+Dao.prototype.deleteAll
+Dao.prototype.updateWithValues
+Dao.prototype.update
+Dao.prototype.createOrUpdate
+Dao.prototype.queryWhere
+Dao.prototype.queryWhereWithArgs
+Dao.prototype.queryWhereWithArgsDistinct
+Dao.prototype.queryJoinWhereWithArgs
+Dao.prototype.queryForFieldValues
+DataColumnsDao.prototype.getDataColumns
+SpatialReferenceSystemDao.prototype.getBySrsId
+SpatialReferenceSystemDao.prototype.createWgs84
+SpatialReferenceSystemDao.prototype.createUndefinedCartesian
+SpatialReferenceSystemDao.prototype.createUndefinedGeographic
+SpatialReferenceSystemDao.prototype.createWebMercator
+DataColumnsDao.prototype.getContents
+DataColumnConstraintsDao.prototype.queryUnique
+GeometryColumnsDao.prototype.getSrs
+GeometryColumnsDao.prototype.getContents
+GeometryColumnsDao.prototype.getProjection
+GeometryColumnsDao.prototype.getFeatureTables
+TileDao constructor
+TileDao.prototype.initialize
+TileDao.prototype.getSrs
+TileDao.prototype.queryForTileGridWithZoomLevel
+TileDao.prototype.getBoundingBoxWithZoomLevel
+TileDao.prototype.deleteTile
+TileMatrixSetDao.prototype.getSrs
+TileMatrixSetDao.prototype.getProjection
+TileMatrixSetDao.prototype.getContents
+TileMatrixDao.prototype.getTileMatrixSet
+TileMatrixSetDao.prototype.getTileTables
+FeatureDao.prototype.getSrs
+FeatureDao.prototype.fastQueryWebMercatorBoundingBox
+FeatureDao.prototype.queryIndexedFeaturesWithWebMercatorBoundingBox
+FeatureDao.prototype.queryIndexedFeaturesWithBoundingBox
+FeatureTableIndex.prototype.getTableIndex
+FeatureTableIndex.prototype.createTableIndex
+FeatureTableIndex.prototype.clearGeometryIndicies
+FeatureTableIndex.prototype.indexRow
+FeatureTableIndex.prototype.updateLastIndexed
+FeatureTableIndex.prototype.indexTable
+FeatureTableIndex.prototype.queryWithGeometryEnvelope
+FeatureTableIndex.prototype.queryWithBoundingBox
+GeometryIndexDao.prototype.getTableIndex
+TableCreator.prototype.createUserTable
+GeoPackageValidate.hasMinimumTables
+UserTableReader.prototype.readTable
+TileTableReader.prototype.readTileTable
+UserDao.prototype.getCount
+BaseExtension.prototype.createExtension
+MetadataReferenceDao.prototype.removeMetadataParent
+ExtensionDao.prototype.createTable
+GeometryIndexDao.prototype.createTable
+TableIndexDao.prototype.createTable
+ExtensionDao.prototype.queryByExtensionAndTableName
+ExtensionDao.prototype.queryByExtensionAndTableNameAndColumnName
+MetadataReferenceDao.prototype.queryByMetadataAndParent
+MetadataReferenceDao.prototype.queryByMetadata
+MetadataReferenceDao.prototype.queryByMetadataParent
+TileDao.prototype.queryForTile
+TileDao.prototype.queryForTilesInColumn
+TileDao.prototype.queryForTilesInRow
+BaseExtension.prototype.getExtension
+BaseExtension.prototype.getOrCreate
+FeatureTableIndex.prototype.getOrCreateExtension
+FeatureTableIndex.prototype.getFeatureTableIndexExtension
+FeatureTableIndex.prototype.isIndexed
+FeatureDao.prototype.isIndexed
+FeatureTableIndex.prototype.getOrCreateTableIndex
+FeatureTableIndex.prototype.createOrClearGeometryIndicies
+FeatureTableIndex.prototype.index
+FeatureTableIndex.prototype.indexWithForce
+Dao.prototype.queryForEqWithField -> Dao.prototype.queryForEachEqWithField and Dao.prototype.queryForAllEqWithField
+Dao.prototype.queryForEqWithFieldAndValue -> Dao.prototype.queryForEachEqWithFieldAndValue and Dao.prototype.queryForAllEqWithFieldAndValue
+ContentsDao.prototype.getGeometryColumns
+ContentsDao.prototype.getTileMatrixSet
+ContentsDao.prototype.getTileMatrix
+ContentsDao.prototype.getProjection
+DataColumnConstraintsDao.prototype.queryByConstraintName
+DataColumnsDao.prototype.queryByConstraintName
+ExtensionDao.prototype.queryByExtension
+GeometryIndexDao.prototype.queryForTableName
+GeometryColumnsDao.prototype.queryForTableName
+TileDao.prototype.queryForTilesWithZoomLevel
+TileDao.prototype.queryForTilesDescending
+FeatureTableReader.prototype.readFeatureTable
+GeoPackage.prototype.getFeatureDaoWithGeometryColumns
+GeoPackage.prototype.getFeatureDaoWithContents
+GeoPackage.prototype.getFeatureDaoWithTableName
+GeoPackageAPI.createFeatureTableWithDataColumnsAndBoundingBox
+GeoPackageAPI.addGeoJSONFeatureToGeoPackage
+GeoPackageAPI.addGeoJSONFeatureToGeoPackageAndIndex
+GeoPackageAPI.getFeature
+GeoPackage.prototype.indexFeatureTable
+GeoPackageAPI.createFeatureTableWithDataColumns
+GeoPackageAPI.createFeatureTable
+GeoPackageAPI.getFeaturesInBoundingBox
+FeatureDao.prototype.queryForGeoJSONIndexedFeaturesWithBoundingBox
+GeoPackageAPI.getGeoJSONFeaturesInTile
+GeoPackageAPI.queryForGeoJSONFeaturesInTable
+GeoPackage.prototype.queryForGeoJSONFeaturesInTable
+GeoPackage.prototype.iterateGeoJSONFeaturesInTableWithinBoundingBox
+Dao.prototype.queryForEach
+GeoPackageAPI.iterateGeoJSONFeaturesFromTable
+FeatureTiles.prototype.drawTileWithBoundingBox
+FeatureTiles.prototype.drawTileQueryIndex
+FeatureTiles.prototype.drawTile
+GeoPackageAPI.getFeatureTileFromXYZ
+GeoPackage.prototype.createStandardWebMercatorTileMatrix
+GeoPackageAPI.createStandardWebMercatorTileTable
+GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox
+GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath
+GeoPackage.prototype.getTileDaoWithTileMatrixSet
+GeoPackage.prototype.getTileDaoWithContents
+GeoPackage.prototype.getTileDaoWithTableName
+GeoPackage.prototype.addTile
+GeoPackageAPI.getTileFromTable
+GeoPackageTileRetriever.prototype.getWebMercatorBoundingBox
+TileCreator.initialize
+FeatureDao.prototype.queryIndexedFeaturesWithWebMercatorBoundingBox returns an iterable
+FeatureDao.prototype.fastQueryWebMercatorBoundingBox returns an iterable
+FeatureTableIndex.prototype.queryWithGeometryEnvelope returns an iterable
+FeatureTableIndex.prototype.queryWithBoundingBox returns an iterable
+FeatureDao.prototype.queryForGeoJSONIndexedFeaturesWithBoundingBox returns an iterable
+DataColumnConstraintsDao.prototype.queryByConstraintName
+DataColumnsDao.prototype.queryByConstraintName
+GeometryIndexDao.prototype.queryForTableName
+TileDao.prototype.queryForTilesWithZoomLevel
+TileDao.prototype.queryForTilesDescending
+
+### New methods
+GeoPackage.prototype.createRequiredTables
+
+### Other changes
+GeoPackageConnection.prototype.run now explicitly calls out parameters that may be passed

@@ -168,12 +168,12 @@ function loadByteArray(array, callback) {
 #### NodeJS Usage ####
 
 ```javascript
-var geopackage = require('geopackage')
+var GeoPackageAPI = require('@ngageoint/geopackage')
   , GeoPackageManager = geopackage.GeoPackageManager
   , GeoPackageConnection = geopackage.GeoPackageConnection
   , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
 
-GeoPackageManager.open(filename, function(err, geoPackage) {
+GeoPackageAPI.open(filename, function(err, geoPackage) {
 
   // Now you can operate on the GeoPackage
 

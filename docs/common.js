@@ -145,9 +145,8 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
   }, function(err, gp) {
     geoPackage = gp;
     clearInfo();
-    readGeoPackage(function() {
-      geoJsonDoneCallback ? geoJsonDoneCallback() : null;
-    });
+    readGeoPackage();
+    geoJsonDoneCallback ? geoJsonDoneCallback() : null;
   });
 }
 
@@ -182,9 +181,8 @@ function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
     }
     geoPackage = gp;
     clearInfo();
-    readGeoPackage(function() {
-      shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
-    });
+    readGeoPackage();
+    shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
   });
 }
 
@@ -266,11 +264,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a MBTiles file
@@ -302,11 +299,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
     // if it is a PBF file
@@ -338,11 +334,10 @@ window.loadGeoPackage = function(files) {
       }, function(err, gp) {
         geoPackage = gp;
         clearInfo();
-        readGeoPackage(function() {
-          $('#choose-label').find('i').toggle();
-          $('#download').removeClass('gone');
-          $('#status').addClass('gone');
-        });
+        readGeoPackage();
+        $('#choose-label').find('i').toggle();
+        $('#download').removeClass('gone');
+        $('#status').addClass('gone');
       });
     }
   }
@@ -368,13 +363,14 @@ function clearInfo() {
 function loadByteArray(array, callback) {
   clearInfo();
 
-  GeoPackageAPI.openGeoPackageByteArray(array, function(err, gp) {
+  GeoPackageAPI.open(array, function(err, gp) {
     geoPackage = gp;
-    readGeoPackage(callback);
+    readGeoPackage();
+    callback();
   });
 }
 
-function readGeoPackage(callback) {
+function readGeoPackage() {
   tableInfos = {};
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
@@ -385,38 +381,22 @@ function readGeoPackage(callback) {
   var tileTableNode = $('#tile-tables');
   var featureTableNode = $('#feature-tables');
 
-  async.parallel([
-    function(callback) {
-      geoPackage.getTileTables(function(err, tables) {
-        async.eachSeries(tables, function(table, callback) {
-          geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
-            geoPackage.getInfoForTable(tileDao, function(err, info) {
-              tableInfos[table] = info;
-              var rendered = Mustache.render(tileTableTemplate, info);
-              tileTableNode.append(rendered);
-              callback();
-            });
-          });
-        }, callback);
-      });
-    }, function(callback) {
-      geoPackage.getFeatureTables(function(err, tables) {
-        async.eachSeries(tables, function(table, callback) {
-          geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao) {
-            if (err) {
-              return callback();
-            }
-            geoPackage.getInfoForTable(featureDao, function(err, info) {
-              tableInfos[table] = info;
-              var rendered = Mustache.render(featureTableTemplate, info);
-              featureTableNode.append(rendered);
-              callback();
-            });
-          });
-        }, callback);
-      });
-    }
-  ], callback);
+  var tileTables = geoPackage.getTileTables();
+  tileTables.forEach(function(table) {
+    var tileDao = geoPackage.getTileDaoWithTableName(table);
+    var info = geoPackage.getInfoForTable(tileDao);
+    tableInfos[table] = info;
+    var rendered = Mustache.render(tileTableTemplate, info);
+    tileTableNode.append(rendered);
+  });
+  var featureTables = geoPackage.getFeatureTables();
+  featureTables.forEach(function(table) {
+    var featureDao = geoPackage.getFeatureDaoWithTableName(table);
+    var info = geoPackage.getInfoForTable(featureDao);
+    tableInfos[table] = info;
+    var rendered = Mustache.render(featureTableTemplate, info);
+    featureTableNode.append(rendered);
+  });
 }
 
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
@@ -450,43 +430,29 @@ window.toggleLayer = function(layerType, table) {
       eventAction: 'load',
       eventLabel: 'Tile Layer'
     });
-    geoPackage.getTileDaoWithTableName(table, function(err, tileDao) {
-
-      // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
-      var maxZoom = tileDao.maxWebMapZoom;
-      var minZoom = tileDao.minWebMapZoom;
-      var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
-      tableLayer.createTile = function(tilePoint, done) {
-        var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
-        var size = this.getTileSize();
-        canvas.width = size.x;
-        canvas.height = size.y;
-        var tableLayer = this;
-        setTimeout(function() {
-          console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          if (map.options.crs === L.CRS.EPSG4326) {
-            var tileSize = tableLayer.getTileSize(),
-    		    nwPoint = tilePoint.scaleBy(tileSize),
-    		    sePoint = nwPoint.add(tileSize),
-    		    nw = map.unproject(nwPoint, tilePoint.z),
-    		    se = map.unproject(sePoint, tilePoint.z);
-            GeoPackageAPI.draw4326TileInCanvas(geoPackage, table, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, size.x, size.y, canvas, function(err) {
-              console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-              done(err, canvas);
-            });
-          } else {
-            GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
-              console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-              done(err, canvas);
-            });
-          }
-        }, 0);
-        return canvas;
-      }
-      map.addLayer(tableLayer);
-      tableLayer.bringToFront();
-      tableLayers[table] = tableLayer;
-    });
+    var tileDao = geoPackage.getTileDaoWithTableName(table);
+    // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
+    var maxZoom = tileDao.maxWebMapZoom;
+    var minZoom = tileDao.minWebMapZoom;
+    var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
+    tableLayer.createTile = function(tilePoint, done) {
+      var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+      var size = this.getTileSize();
+      canvas.width = size.x;
+      canvas.height = size.y;
+      setTimeout(function() {
+        console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+        GeoPackageAPI.drawXYZTileInCanvas(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas)
+        .then(function() {
+          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+          done(null, canvas);
+        });
+      }, 0);
+      return canvas;
+    }
+    map.addLayer(tableLayer);
+    tableLayer.bringToFront();
+    tableLayers[table] = tableLayer;
   } else if (layerType === 'feature') {
     if (window.Piwik) {
       Piwik.getAsyncTracker().trackEvent(
@@ -501,47 +467,131 @@ window.toggleLayer = function(layerType, table) {
       eventAction: 'load',
       eventLabel: 'Feature Layer'
     });
-    var geojsonLayer = L.geoJson([], {
-        style: featureStyle,
-        pointToLayer: pointToLayer,
-        onEachFeature: function (feature, layer) {
-          var columnMap = tableInfos[table].columnMap;
-          var string = "";
-          if (feature.properties.name || feature.properties.description) {
-              string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
-              string += feature.properties.description ? feature.properties.description : '';
-          } else {
-            for (var key in feature.properties) {
-              if (columnMap && columnMap[key] && columnMap[key].displayName) {
-                string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
-              } else {
-                string += '<div class="item"><span class="label">' + key + ': </span>';
-              }
-              string += '<span class="value">' + feature.properties[key] + '</span></div>';
-            }
-          }
-          layer.bindPopup(string);
-        },
-        coordsToLatLng: function(coords) {
-          // if (coords[0] < 0) {
-          //   coords[0] = coords[0] + 360;
-          // }
-          return L.GeoJSON.coordsToLatLng(coords);
-        }
-    });
+
     var tableInfo = tableInfos[table];
 
-    GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table, function(err, geoJson, done) {
-      geojsonLayer.addData(geoJson);
-      async.setImmediate(function(){
-        done();
+    geoPackage.indexFeatureTable(table, function(message) {
+      $('#status-'+table).find('span').html(message);
+    })
+    .then(function(indexed) {
+      var styles = {};
+      styles[table.name] = {
+        weight: 2,
+        radius: 3
+      };
+
+      var featureLayer = L.vectorGrid.protobuf('',{
+        maxNativeZoom: 18,
+        vectorTileLayerStyles: styles,
+        interactive: true,
+        rendererFactory: L.canvas.tile,
+        getFeatureId: function(feature) {
+          feature.properties.id = table + feature.id;
+          return feature.properties.id;
+        }
+      })
+      .bindPopup(function(feature) {
+        var columnMap = tableInfos[table].columnMap;
+        var string = "";
+        if (feature.properties.name || feature.properties.description) {
+            string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+            string += feature.properties.description ? feature.properties.description : '';
+        } else {
+          for (var key in feature.properties) {
+            if (columnMap && columnMap[key] && columnMap[key].displayName) {
+              string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+            } else {
+              string += '<div class="item"><span class="label">' + key + ': </span>';
+            }
+            string += '<span class="value">' + feature.properties[key] + '</span></div>';
+          }
+        }
+        return string;
       });
-    }, function(err) {
-      geojsonLayer.addTo(map);
-      geojsonLayer.bringToFront();
-      tableLayers[table] = geojsonLayer;
+
+      featureLayer._getVectorTilePromise = function(coords, tileBounds) {
+        var x = coords.x;
+  			var y = coords.y;
+  		  var z = coords.z;
+        return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
+        .then(function(json) {
+    			// Normalize feature getters into actual instanced features
+    			for (var layerName in json.layers) {
+    				var feats = [];
+
+    				for (var i=0; i<json.layers[layerName].length; i++) {
+    					var feat = json.layers[layerName].feature(i);
+    					feat.geometry = feat.loadGeometry();
+    					feats.push(feat);
+    				}
+
+    				json.layers[layerName].features = feats;
+    			}
+
+    			return json;
+    		});
+      }
+      featureLayer.addTo(map);
+      featureLayer.bringToFront();
+      tableLayers[table] = featureLayer;
     });
+
+    // var geojsonLayer = L.geoJson([], {
+    //   style: featureStyle,
+    //   pointToLayer: pointToLayer,
+    //   coordsToLatLng: function(coords) {
+    //     return L.GeoJSON.coordsToLatLng(coords);
+    //   }
+    // }).bindPopup(function(layer) {
+    //   var feature = layer.feature;
+    //   var columnMap = tableInfos[table].columnMap;
+    //   var string = "";
+    //   if (feature.properties.name || feature.properties.description) {
+    //       string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
+    //       string += feature.properties.description ? feature.properties.description : '';
+    //   } else {
+    //     for (var key in feature.properties) {
+    //       if (columnMap && columnMap[key] && columnMap[key].displayName) {
+    //         string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
+    //       } else {
+    //         string += '<div class="item"><span class="label">' + key + ': </span>';
+    //       }
+    //       string += '<span class="value">' + feature.properties[key] + '</span></div>';
+    //     }
+    //   }
+    //   return string;
+    // });
+    // geojsonLayer.addTo(map);
+    // geojsonLayer.bringToFront();
+    // tableLayers[table] = geojsonLayer;
+
+    // GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, table)
+    // .then(function(each) {
+    //   var promise = Promise.resolve();
+    //   var iterator = each.results[Symbol.iterator]();
+    //   var nextRow = iterator.next();
+    //   if (!nextRow.done) {
+    //     promise = addRowToLayer(iterator, nextRow.value, each.featureDao, each.srs, geojsonLayer);
+    //   }
+    //   return promise;
+    // });
   }
+}
+
+function addRowToLayer(iterator, row, featureDao, srs, layer) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      var currentRow = featureDao.getFeatureRow(row);
+      var json = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, srs);
+      layer.addData(json);
+      resolve(json);
+    });
+  }).then(function() {
+    var nextRow = iterator.next();
+    if (!nextRow.done) {
+      return addRowToLayer(iterator, nextRow.value, featureDao, srs, layer);
+    }
+  });
 }
 
 function pointToLayer(feature, latlng) {
@@ -645,7 +695,8 @@ window.loadUrl = function(url, loadingElement, gpName, type) {
         break;
       case 'gpkg':
       default:
-        loadByteArray(uInt8Array, function() {
+        loadByteArray(uInt8Array)
+        .then(function() {
           $('#download').removeClass('gone');
           $('#choose-label').find('i').toggle();
           loadingElement.toggle();
@@ -718,18 +769,17 @@ window.loadZooms = function(tableName, tilesElement) {
   var zoomsTemplate = $('#tile-zoom-levels-template').html();
   Mustache.parse(zoomsTemplate);
 
-  geoPackage.getTileDaoWithTableName(tableName, function(err, tileDao) {
-    var zooms = [];
-    for (var i = tileDao.minZoom; i <= tileDao.maxZoom; i++) {
-      zooms.push({zoom: i, tableName: tableName});
-    }
-    var zoomLevels = {
-      zooms: zooms
-    };
-    var rendered = Mustache.render(zoomsTemplate, zoomLevels);
-    tilesElement.empty();
-    tilesElement.append(rendered);
-  });
+  var tileDao = geoPackage.getTileDaoWithTableName(tableName);
+  var zooms = [];
+  for (var i = tileDao.minZoom; i <= tileDao.maxZoom; i++) {
+    zooms.push({zoom: i, tableName: tableName});
+  }
+  var zoomLevels = {
+    zooms: zooms
+  };
+  var rendered = Mustache.render(zoomsTemplate, zoomLevels);
+  tilesElement.empty();
+  tilesElement.append(rendered);
 }
 
 var visibleTileTables = {};
@@ -761,16 +811,15 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   var tilesTableTemplate = $('#all-tiles-template').html();
   Mustache.parse(tilesTableTemplate);
 
-  GeoPackageAPI.getTilesInBoundingBoxWebZoom(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth(), function(err, tiles) {
-    if (!tiles || !tiles.tiles || !tiles.tiles.length) {
-      tilesElement.empty();
-      tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
-      return;
-    }
-    var rendered = Mustache.render(tilesTableTemplate, tiles);
+  var tiles = GeoPackageAPI.getTilesInBoundingBoxWebZoom(geoPackage, tableName, zoom, Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
+  if (!tiles || !tiles.tiles || !tiles.tiles.length) {
     tilesElement.empty();
-    tilesElement.append(rendered);
-  });
+    tilesElement.html('<div class="section-title">No tiles exist in the GeoPackage for the current bounds and zoom level</div>')
+    return;
+  }
+  var rendered = Mustache.render(tilesTableTemplate, tiles);
+  tilesElement.empty();
+  tilesElement.append(rendered);
 }
 
 window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitude, maxLongitude, maxLatitude, projection, tableName) {
@@ -785,7 +834,8 @@ window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitud
   var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
   var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
 
-  GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn, function(err, tile) {
+  GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn)
+  .then(function(tile) {
     var tileData = tile.getTileData();
     var type = fileType(tileData);
     var binary = '';
@@ -832,47 +882,72 @@ window.loadFeatures = function(tableName, featuresElement) {
   var featuresTableTemplate = $('#all-features-template').html();
   Mustache.parse(featuresTableTemplate);
 
+  var featureTemplate = $('#feature-template').html();
+  Mustache.parse(featureTemplate);
+
+  featuresElement.empty();
+
   var features = {
     columns: tableInfos[tableName].columns,
     srs: tableInfos[tableName].srs,
     geometryColumns: tableInfos[tableName].geometryColumns,
+    tableName: tableName,
     features: []
   };
-  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName, function(err, feature, featureDone) {
-    feature.tableName = tableName;
-    feature.values = [];
-
-    var sanitizedColumns = [];
-    for (var i = 0; i < features.columns.length; i++) {
-      if (features.columns[i].name.toLowerCase() != '_properties_id' && features.columns[i].name.toLowerCase() != '_feature_id') {
-        sanitizedColumns.push(features.columns[i]);
-      }
+  var sanitizedColumns = [];
+  for (var i = 0; i < features.columns.length; i++) {
+    if (features.columns[i].name.toLowerCase() != '_properties_id' && features.columns[i].name.toLowerCase() != '_feature_id') {
+      sanitizedColumns.push(features.columns[i]);
     }
-    features.columns = sanitizedColumns;
+  }
+  features.columns = sanitizedColumns;
+  featuresElement.append(Mustache.render(featuresTableTemplate, features));
 
-    for (var i = 0; i < features.columns.length; i++) {
-      var value = feature.properties[features.columns[i].name];
+  var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
 
-      if (features.columns[i].name == features.geometryColumns.geometryColumn) {
-        if (feature.geometry) {
-          feature.values.push(feature.geometry.type);
-        } else {
-          feature.values.push('Unknown');
-        }
-      } else if (value === null || value === 'null' || value == undefined) {
-        feature.values.push('');
-      } else {
-        feature.values.push(value.toString());
-      }
+  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName)
+  .then(function(each) {
+    var promise = Promise.resolve();
+
+    for (var row of each.results) {
+      promise = featureParsePromise(promise, row, each, features, tableName)
+      .then(function(feature) {
+        featuresTable.append(Mustache.render(featureTemplate, feature));
+      });
     }
-    features.features.push(feature);
-    async.setImmediate(function(){
-      featureDone();
+    return promise.then(function() {
+      return features;
     });
-  }, function() {
-    var rendered = Mustache.render(featuresTableTemplate, features);
-    featuresElement.empty();
-    featuresElement.append(rendered);
+  });
+}
+
+function featureParsePromise(promise, row, each, features, tableName) {
+  return promise.then(function() {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        var currentRow = each.featureDao.getFeatureRow(row);
+        var feature = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, each.srs);
+        feature.tableName = tableName;
+        feature.values = [];
+
+        for (var i = 0; i < features.columns.length; i++) {
+          var value = feature.properties[features.columns[i].name];
+
+          if (features.columns[i].name == features.geometryColumns.geometryColumn) {
+            if (feature.geometry) {
+              feature.values.push(feature.geometry.type);
+            } else {
+              feature.values.push('Unknown');
+            }
+          } else if (value === null || value === 'null' || value == undefined) {
+            feature.values.push('');
+          } else {
+            feature.values.push(value.toString());
+          }
+        }
+        resolve(feature);
+      });
+    });
   });
 }
 
@@ -916,7 +991,8 @@ map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId, function(err, geoJson) {
+  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
+  .then(function(geoJson) {
     geoJson.properties.tableName = tableName;
     highlightLayer.clearLayers();
     highlightLayer.addData(geoJson);
@@ -978,7 +1054,8 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
 
   currentFeature = featureId;
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId, function(err, geoJson) {
+  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
+  .then(function(geoJson) {
     geoJson.properties.tableName = tableName;
     featureLayer.addData(geoJson);
     featureLayer.bringToFront();

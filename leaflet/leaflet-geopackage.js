@@ -10,6 +10,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
 	options: {
 		layerName: '',
     geoPackageUrl: '',
+    geoPackage: undefined,
     noCache: false
 	},
 	initialize: function initialize(options) {
@@ -19,6 +20,13 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
 	onAdd: function onAdd(map) {
 		L.GridLayer.prototype.onAdd.call(this, map);
     var layer = this;
+
+    if (layer.options.geoPackage) {
+      layer.geoPackage = layer.options.geoPackage;
+      layer.geoPackageLoaded = true;
+      return;
+    }
+
     if (!layer.options.noCache && geoPackageCache[layer.options.geoPackageUrl]) {
       console.log('GeoPackage was %s loaded, pulling from cache', layer.options.geoPackageUrl);
       layer.geoPackageLoaded = true;
@@ -74,15 +82,13 @@ function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
       nw = map.unproject(nwPoint, tilePoint.z),
       se = map.unproject(sePoint, tilePoint.z);
       console.log('Draw 4326 tile');
-      GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas, function(err) {
-        console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        callback(err, canvas);
-      });
+      GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas);
+      console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+      callback(err, canvas);
     } else {
-      GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas, function(err) {
-        console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        callback(err, canvas);
-      });
+      GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas);
+      console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+      callback(err, canvas);
     }
   }, 0);
 }
@@ -116,14 +122,25 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
 	onAdd: function onAdd(map) {
 		L.GeoJSON.prototype.onAdd.call(this, map);
     var layer = this;
+
+    if (layer.options.geoPackage) {
+      layer.geoPackage = layer.options.geoPackage;
+      layer.geoPackageLoaded = true;
+      var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+      for (var geoJson of results.results) {
+        layer.addData(geoJson);
+      }
+      return;
+    }
+
     if (!layer.options.noCache && geoPackageCache[layer.options.geoPackageUrl]) {
       console.log('GeoPackage was %s loaded, pulling from cache', layer.options.geoPackageUrl);
       layer.geoPackageLoaded = true;
       layer.geoPackage = geoPackageCache[layer.options.geoPackageUrl];
-      GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName, function(err, geoJson, done) {
+      var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+      for (var geoJson of results.results) {
         layer.addData(geoJson);
-        setTimeout(done, 0);
-      });
+      }
       return;
     }
     layer.geoPackageLoaded = false;
@@ -137,10 +154,10 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
         layer.geoPackageLoaded = true;
         layer.geoPackage = gp;
         geoPackageCache[layer.options.geoPackageUrl] = layer.options.noCache || gp;
-        GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName, function(err, geoJson, done) {
+        var results = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(layer.geoPackage, layer.options.layerName);
+        for (var geoJson of results.results) {
           layer.addData(geoJson);
-          setTimeout(done, 0);
-        });
+        }
       });
     };
     console.time('Loading GeoPackage ' + layer.options.geoPackageUrl);
