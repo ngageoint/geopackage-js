@@ -1,0 +1,270 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>extension/relatedTables/mediaTable.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">extension/relatedTables/mediaTable.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * mediaTable module.
+ * @module extension/relatedTables
+ */
+
+var UserTable = require('../../user/userTable')
+  , UserRelatedTable = require('./userRelatedTable')
+  , UserColumn = require('../../user/userColumn')
+  , DataType = require('../../db/dataTypes')
+  , RelationType = require('./relationType');
+
+var util = require('util');
+
+/**
+ * Media Requirements Class User-Defined Related Data Table
+ * @class
+ * @extends {module:extension/relatedTables~UserRelatedTable}
+ * @param  {string} tableName table name
+ * @param  {module:user/userColumn~UserColumn[]} columns   media columns
+ * @param {string[]} requiredColumns required column names
+ */
+var MediaTable = function(tableName, columns, requiredColumns) {
+  UserRelatedTable.call(this, tableName, MediaTable.RELATION_TYPE.name, MediaTable.RELATION_TYPE.dataType, columns, requiredColumns);
+}
+
+util.inherits(MediaTable, UserRelatedTable);
+
+/**
+ * Create a media table with a minimum required columns followed by the additional columns
+ * @param  {string} tableName         name of the table
+ * @param  {module:user/userColumn~UserColumn[]} additionalColumns additional columns
+ * @return {module:extension/relatedTables~MediaTable}
+ */
+MediaTable.create = function(tableName, additionalColumns) {
+  var columns = MediaTable.createRequiredColumns();
+  if (additionalColumns) {
+    columns = columns.concat(additionalColumns);
+  }
+  return new MediaTable(tableName, columns, MediaTable.requiredColumns());
+}
+
+/**
+ * Get the required columns
+ * @param  {string} [idColumnName=id] id column name
+ * @return {string[]}
+ */
+MediaTable.requiredColumns = function(idColumnName) {
+  var requiredColumns = [];
+  requiredColumns.push(idColumnName || MediaTable.COLUMN_ID);
+  requiredColumns.push(MediaTable.COLUMN_DATA);
+  requiredColumns.push(MediaTable.COLUMN_CONTENT_TYPE);
+  return requiredColumns;
+}
+
+/**
+ * Get the number of required columns
+ * @return {Number}
+ */
+MediaTable.numRequiredColumns = function(){
+  return MediaTable.requiredColumns().length;
+}
+
+/**
+ * Create the required columns
+ * @param  {Number} [startingIndex=0] starting index of the required columns
+ * @param  {string} [idColumnName=id]  id column name
+ * @return {module:user/userColumn~UserColumn[]}
+ */
+MediaTable.createRequiredColumns = function(startingIndex, idColumnName) {
+  startingIndex = startingIndex || 0;
+  return [
+    MediaTable.createIdColumn(startingIndex++, idColumnName || MediaTable.COLUMN_ID),
+    MediaTable.createDataColumn(startingIndex++),
+    MediaTable.createContentTypeColumn(startingIndex++)
+  ];
+}
+
+/**
+ * Create the primary key id column
+ * @param  {Number} index        index of the column
+ * @param  {string} idColumnName name of the id column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.createIdColumn = function(index, idColumnName) {
+  return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
+}
+
+/**
+ * Create the data column
+ * @param  {Number} index        index of the column
+ * @param  {string} idColumnName name of the id column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.createDataColumn = function(index) {
+  return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, DataType.GPKGDataType.GPKG_DT_BLOB, true);
+}
+
+/**
+ * Create the content type column
+ * @param  {Number} index        index of the column
+ * @param  {string} idColumnName name of the id column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.createContentTypeColumn = function(index) {
+  return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, DataType.GPKGDataType.GPKG_DT_TEXT, true);
+}
+
+/**
+ * Get the primary key id column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.prototype.getIdColumn = function() {
+  return this.getPkColumn();
+}
+
+/**
+ * Get the data column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.prototype.getDataColumn = function() {
+  return this.getColumnWithColumnName(MediaTable.COLUMN_DATA);
+}
+
+/**
+ * Get the content type column
+ * @return {module:user/userColumn~UserColumn}
+ */
+MediaTable.prototype.getContentTypeColumn = function() {
+  return this.getColumnWithColumnName(MediaTable.COLUMN_CONTENT_TYPE);
+}
+
+MediaTable.RELATION_TYPE = RelationType.MEDIA;
+MediaTable.COLUMN_ID = 'id';
+MediaTable.COLUMN_DATA = 'data';
+MediaTable.COLUMN_CONTENT_TYPE = 'content_type';
+
+MediaTable.prototype.TABLE_TYPE = 'media';
+
+module.exports = MediaTable;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

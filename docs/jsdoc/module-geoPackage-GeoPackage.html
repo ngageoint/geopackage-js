@@ -1,2622 +1,1681 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>GeoPackage JS Class: GeoPackage</title>
-
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
-
+		<title>geoPackage~GeoPackage</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = true;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
 </head>
-
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top ">
-<div class="container">
-	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">GeoPackage JS</a>
-		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-			<span class="icon-bar"></span>
-        </button>
-	</div>
-	<div class="navbar-collapse collapse" id="topNavigation">
-		<ul class="nav navbar-nav">
-			
-			<li class="dropdown">
-				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="module-core_contents.html">core/contents</a></li><li><a href="module-dao_dao.html">dao/dao</a></li><li><a href="module-dao_geometryColumns.html">dao/geometryColumns</a></li><li><a href="module-dao_geoPackageConstants.html">dao/geoPackageConstants</a></li><li><a href="module-dao_spatialReferenceSystem.html">dao/spatialReferenceSystem</a></li><li><a href="module-dataColumnConstraints.html">dataColumnConstraints</a></li><li><a href="module-dataColumns.html">dataColumns</a></li><li><a href="module-db_dataTypes.html">db/dataTypes</a></li><li><a href="module-db_sqliteQueryBuilder.html">db/sqliteQueryBuilder</a></li><li><a href="module-features_user_featureColumn.html">features/user/featureColumn</a></li><li><a href="module-features_user_featureDao.html">features/user/featureDao</a></li><li><a href="module-features_user_featureRow.html">features/user/featureRow</a></li><li><a href="module-features_user_featureTable.html">features/user/featureTable</a></li><li><a href="module-features_user_featureTableReader.html">features/user/featureTableReader</a></li><li><a href="module-geom_geometryData.html">geom/geometryData</a></li><li><a href="module-geometryIndexDao.html">geometryIndexDao</a></li><li><a href="module-geoPackage.html">geoPackage</a></li><li><a href="module-GeoPackage_.html">GeoPackage</a></li><li><a href="module-geoPackageManager.html">geoPackageManager</a></li><li><a href="module-metadata.html">metadata</a></li><li><a href="module-metadata_reference.html">metadata/reference</a></li><li><a href="module-tableIndexDao.html">tableIndexDao</a></li><li><a href="module-tiles_matrix.html">tiles/matrix</a></li><li><a href="module-tiles_matrixset.html">tiles/matrixset</a></li><li><a href="module-tiles_user_tileColumn.html">tiles/user/tileColumn</a></li><li><a href="module-tiles_user_tileDao.html">tiles/user/tileDao</a></li><li><a href="module-tiles_user_tileRow.html">tiles/user/tileRow</a></li><li><a href="module-tiles_user_tileTable.html">tiles/user/tileTable</a></li><li><a href="module-tiles_user_tileTableReader.html">tiles/user/tileTableReader</a></li><li><a href="module-user_userColumn.html">user/userColumn</a></li><li><a href="module-user_userDao.html">user/userDao</a></li><li><a href="module-user_userRow.html">user/userRow</a></li><li><a href="module-user_userTable.html">user/userTable</a></li><li><a href="module-user_userTableReader.html">user/userTableReader</a></li><li><a href="module-validate_geoPackageValidate.html">validate/geoPackageValidate</a></li><li><a href="module-wkb.html">wkb</a></li>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
 				</ul>
-			</li>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">class</span>
+				<h1><span class="ancestors"><a href="module-geoPackage_.html">geoPackage</a>~</span><span class="name">GeoPackage</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-9 main-content">
+						<ol class="breadcrumb">
+							<li><a href="index.html">Home</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li class="active"><a href="module-geoPackage_.html">geoPackage</a>~GeoPackage</li>
+						</ol>
+					<section>
+							<dl class="symbol primary">
+								<dt class="symbol-title class">
+			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">GeoPackage</span><span class="signature-params">()</span><span class="signature-type"></span></h2>
+</dt>
+<dd class="symbol-details class" style="max-height: 9999px;">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>GeoPackage database</p></div>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
-			<li class="dropdown">
-				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="module-core_contents-Contents.html">core/contents~Contents</a></li><li><a href="module-core_contents-ContentsDao.html">core/contents~ContentsDao</a></li><li><a href="module-dao_dao-Dao.html">dao/dao~Dao</a></li><li><a href="module-dao_geometryColumns-GeometryColumnsDao.html">dao/geometryColumns~GeometryColumnsDao</a></li><li><a href="module-dao_geometryColumns-SpatialReferenceSystem.html">dao/geometryColumns~SpatialReferenceSystem</a></li><li><a href="module-dao_spatialReferenceSystem-SpatialReferenceSystem.html">dao/spatialReferenceSystem~SpatialReferenceSystem</a></li><li><a href="module-dao_spatialReferenceSystem-SpatialReferenceSystemDao.html">dao/spatialReferenceSystem~SpatialReferenceSystemDao</a></li><li><a href="module-dataColumnConstraints-DataColumnConstraints.html">dataColumnConstraints~DataColumnConstraints</a></li><li><a href="module-dataColumnConstraints-DataColumnConstraintsDao.html">dataColumnConstraints~DataColumnConstraintsDao</a></li><li><a href="module-dataColumns-DataColumns.html">dataColumns~DataColumns</a></li><li><a href="module-dataColumns-DataColumnsDao.html">dataColumns~DataColumnsDao</a></li><li><a href="module-features_user_featureDao-FeatureDao.html">features/user/featureDao~FeatureDao</a></li><li><a href="module-features_user_featureTableReader-FeatureTableReader.html">features/user/featureTableReader~FeatureTableReader</a></li><li><a href="module-geometryIndexDao-GeometryIndexDao.html">geometryIndexDao~GeometryIndexDao</a></li><li><a href="module-geometryIndexDao-TableIndex.html">geometryIndexDao~TableIndex</a></li><li><a href="module-geoPackage-GeoPackage.html">geoPackage~GeoPackage</a></li><li><a href="module-metadata_reference-MetadataReference.html">metadata/reference~MetadataReference</a></li><li><a href="module-metadata_reference-MetadataReferenceDao.html">metadata/reference~MetadataReferenceDao</a></li><li><a href="module-metadata-Extension.html">metadata~Extension</a></li><li><a href="module-metadata-ExtensionDao.html">metadata~ExtensionDao</a></li><li><a href="module-metadata-Metadata.html">metadata~Metadata</a></li><li><a href="module-metadata-MetadataDao.html">metadata~MetadataDao</a></li><li><a href="module-tableIndexDao-TableIndex.html">tableIndexDao~TableIndex</a></li><li><a href="module-tableIndexDao-TableIndexDao.html">tableIndexDao~TableIndexDao</a></li><li><a href="module-tiles_matrixset-TileMatrixSet.html">tiles/matrixset~TileMatrixSet</a></li><li><a href="module-tiles_matrixset-TileMatrixSetDao.html">tiles/matrixset~TileMatrixSetDao</a></li><li><a href="module-tiles_matrix-TileMatrix.html">tiles/matrix~TileMatrix</a></li><li><a href="module-tiles_matrix-TileMatrixSetDao.html">tiles/matrix~TileMatrixSetDao</a></li><li><a href="module-tiles_user_tileDao-TileDao.html">tiles/user/tileDao~TileDao</a></li><li><a href="module-tiles_user_tileTableReader-TileTableReader.html">tiles/user/tileTableReader~TileTableReader</a></li><li><a href="module-user_userColumn-UserColumn.html">user/userColumn~UserColumn</a></li><li><a href="module-user_userDao-UserDao.html">user/userDao~UserDao</a></li><li><a href="module-user_userRow-UserRow.html">user/userRow~UserRow</a></li><li><a href="module-user_userTableReader-UserTableReader.html">user/userTableReader~UserTableReader</a></li>
-				</ul>
-			</li>
 			
-			<li class="dropdown">
-				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
-				<ul class="dropdown-menu ">
-					<li><a href="global.html#BaseExtension">BaseExtension</a></li><li><a href="global.html#FeatureTableIndex">FeatureTableIndex</a></li><li><a href="global.html#FeatureTiles">FeatureTiles</a></li><li><a href="global.html#getLongitudeFromPixelWithWidth">getLongitudeFromPixelWithWidth</a></li><li><a href="global.html#getTileBoundingBox">getTileBoundingBox</a></li><li><a href="global.html#getTileColumnWithTotalBoundingBox">getTileColumnWithTotalBoundingBox</a></li><li><a href="global.html#getTileGridWithTotalBoundingBox">getTileGridWithTotalBoundingBox</a></li><li><a href="global.html#getTileRowWithTotalBoundingBox">getTileRowWithTotalBoundingBox</a></li><li><a href="global.html#getWebMercatorBoundingBoxFromXYZ">getWebMercatorBoundingBoxFromXYZ</a></li><li><a href="global.html#progress">progress</a></li><li><a href="global.html#TileGrid">TileGrid</a></li><li><a href="global.html#tileSizeWithTilesPerSide">tileSizeWithTilesPerSide</a></li><li><a href="global.html#tilesPerSideWithZoom">tilesPerSideWithZoom</a></li>
-				</ul>
-			</li>
 			
-		</ul>
-        
-            <div class="col-sm-3 col-md-3">
-                <form class="navbar-form" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        
-	</div>
-
-</div>
-</div>
-
-
-<div class="container" id="toc-content">
-<div class="row">
-
-	
-	<div class="col-md-8">
-	
-		<div id="main">
 			
-
-	<h1 class="page-title">Class: GeoPackage</h1>
-<section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="module-geoPackage.html">geoPackage</a>~</span>
-        
-        GeoPackage
-        </h2>
-        
-    
-</header>
-
-
-<article>
-    <div class="container-overview">
-    
-        
-<hr>
-<dt>
-    <h4 class="name" id="GeoPackage"><span class="type-signature"></span>new GeoPackage()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        GeoPackage database
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-50">line 50</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="createDataColumnConstraintsTable"><span class="type-signature"></span>createDataColumnConstraintsTable(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create the Data Column Constraints table if it does not already exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+							</dl>
+							<article class="secondary">
+									<h3>Methods</h3>
+									<dl class="symbol">
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getName" class="function public"><span class="name">getName</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{String}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the GeoPackage name</p></div>
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">String</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>the GeoPackage name</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-98">line 98</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createDataColumns"><span class="type-signature"></span>createDataColumns(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create the Data Columns table if it does not already exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getTables" class="function public"><span class="name">getTables</span><span class="signature-params">( <span class="signature-param">geopackage</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Gets the tables from the GeoPackage</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>geopackage</code></td>
+							<td><span class="param-type">GeoPackage</span></td>
+							<td class="last">
+									<p>open GeoPackage object</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names and a 'attributes' property which is an array of attribute table names</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-217">line 217</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createFeatureTable"><span class="type-signature"></span>createFeatureTable(featureTable, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create a new feature table
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>featureTable</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">FeatureTable</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">feature table</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getTileTables" class="function public"><span class="name">getTileTables</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the tile tables</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">callback</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and the array of {TileTable} names</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-236">line 236</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createGeometryColumnsTable"><span class="type-signature"></span>createGeometryColumnsTable(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create the Geometry Columns table if it does not already exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="hasTileTable" class="function public"><span class="name">hasTileTable</span><span class="signature-params">( <span class="signature-param">tileTableName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Checks if the tile table exists in the GeoPackage</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tileTableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>name of the table to query for</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and true or false for the existence of the table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-249">line 249</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createTileMatrixSetTable"><span class="type-signature"></span>createTileMatrixSetTable(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create the Tile Matrix Set table if it does not already exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="hasFeatureTable" class="function public"><span class="name">hasFeatureTable</span><span class="signature-params">( <span class="signature-param">geopackage</span>, <span class="signature-param">featureTableName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Checks if the feature table exists in the GeoPackage</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>geopackage</code></td>
+							<td><span class="param-type">GeoPackage</span></td>
+							<td class="last">
+									<p>open GeoPackage object</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureTableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>name of the table to query for</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and true or false for the existence of the table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-260">line 260</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createTileMatrixTable"><span class="type-signature"></span>createTileMatrixTable(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create the Tile Matrix table if it does not already exist
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getFeatureTables" class="function public"><span class="name">getFeatureTables</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the feature tables</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">callback</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and the array of {FeatureTable} names</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-269">line 269</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createTileTable"><span class="type-signature"></span>createTileTable(tileTable, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create a new tile table
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tileTable</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">TileTable</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">tile table</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getFeatureDaoWithGeometryColumns" class="function public"><span class="name">getFeatureDaoWithGeometryColumns</span><span class="signature-params">( <span class="signature-param">geometryColumns</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get a Feature DAO from Geometry Columns</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>geometryColumns</code></td>
+							<td><span class="param-type">GeometryColumns</span></td>
+							<td class="last">
+									<p>Geometry Columns</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">callback</span></td>
+							<td class="last">
+									<p>called with an error if one occurred and the {FeatureDao}</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-339">line 339</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createTileTableWithTableName"><span class="type-signature"></span>createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Create a new tile table
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tableName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">tile table name</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>contentsBoundingBox</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">bounding box of the contents table</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>contentsSrsId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">srs id of the contents table</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tileMatrixSetBoundingBox</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">bounding box of the matrix set</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tileMatrixSetSrsId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">srs id of the matrix set</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred otherwise the table now exists</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getFeatureDaoWithContents" class="function public"><span class="name">getFeatureDaoWithContents</span><span class="signature-params">( <span class="signature-param">contents</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get a Feature DAO from Contents</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>contents</code></td>
+							<td><span class="param-type">Contents</span></td>
+							<td class="last">
+									<p>Contents</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>callback called with an error if one occurred and the {FeatureDao}</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-355">line 355</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getApplicationId"><span class="type-signature"></span>getApplicationId(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the application id of the GeoPackage
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">callback called with the application id</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getFeatureDao" class="function public"><span class="name">getFeatureDao</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get a Feature DAO from Contents</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>callback called with an error if one occurred and the {FeatureDao}</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-366">line 366</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getFeatureDaoWithContents"><span class="type-signature"></span>getFeatureDaoWithContents(contents, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a Feature DAO from Contents
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>contents</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Contents</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Contents</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">callback called with an error if one occurred and the {FeatureDao}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="queryForGeoJSONFeaturesInTable" class="function public"><span class="name">queryForGeoJSONFeaturesInTable</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">boundingBox</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Queries for GeoJSON features in a feature table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>Table name to query</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>boundingBox</code></td>
+							<td><span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span></td>
+							<td class="last">
+									<p>BoundingBox to query</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>Caled with err, featureArray</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-381">line 381</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getFeatureDaoWithGeometryColumns"><span class="type-signature"></span>getFeatureDaoWithGeometryColumns(geometryColumns, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a Feature DAO from Geometry Columns
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>geometryColumns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">GeometryColumns</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Geometry Columns</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the {FeatureDao}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="iterateGeoJSONFeaturesInTableWithinBoundingBox" class="function public"><span class="name">iterateGeoJSONFeaturesInTableWithinBoundingBox</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">boundingBox</span>, <span class="signature-param">rowCallback</span>, <span class="signature-param">doneCallback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>iterates GeoJSON features in a feature table within a bounding box</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>Table name to query</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>boundingBox</code></td>
+							<td><span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span></td>
+							<td class="last">
+									<p>BoundingBox to query</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>rowCallback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>Caled with err, geoJSON</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>doneCallback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>Caled with err if one occurred</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-398">line 398</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getFeatureDaoWithTableName"><span class="type-signature"></span>getFeatureDaoWithTableName(tableName, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get a Feature DAO from Contents
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>tableName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">table name</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">callback called with an error if one occurred and the {FeatureDao}</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createGeometryColumnsTable" class="function public"><span class="name">createGeometryColumnsTable</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create the Geometry Columns table if it does not already exist</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-407">line 407</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getFeatureTables"><span class="type-signature"></span>getFeatureTables(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the feature tables
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the array of {FeatureTable} names</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAttributeDaoWithTableName" class="function public"><span class="name">getAttributeDaoWithTableName</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get a Attribute DAO</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>callback called with an error if one occurred and the {AttributeDao}</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-420">line 420</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getName"><span class="type-signature"></span>getName()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the GeoPackage name
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    the GeoPackage name
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-
-    </dd>
-</dl>
-
-
-        
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAttributeDaoWithContents" class="function public"><span class="name">getAttributeDaoWithContents</span><span class="signature-params">( <span class="signature-param">contents</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get a Attribute DAO</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>contents</code></td>
+							<td><span class="param-type">Contents</span></td>
+							<td class="last">
+									<p>Contents</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>callback called with an error if one occurred and the {AttributeDao}</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-431">line 431</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getTables"><span class="type-signature"></span>getTables(geopackage, callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Gets the tables from the GeoPackage
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>geopackage</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">GeoPackage</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">open GeoPackage object</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and an object containing a 'features' property which is an array of feature table names and a 'tiles' property which is an array of tile table names</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createFeatureTable" class="function public"><span class="name">createFeatureTable</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create a new feature table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type">FeatureTable</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now existscreateTileTableWithTableName</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-476">line 476</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="getTileTables"><span class="type-signature"></span>getTileTables(callback)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        Get the tile tables
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">callback</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">called with an error if one occurred and the array of {TileTable} names</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createTileMatrixSetTable" class="function public"><span class="name">createTileMatrixSetTable</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create the Tile Matrix Set table if it does not already exist</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-524">line 524</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
 </dd>
-
-        </dl>
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createTileMatrixTable" class="function public"><span class="name">createTileMatrixTable</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create the Tile Matrix table if it does not already exist</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-536">line 536</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createTileTable" class="function public"><span class="name">createTileTable</span><span class="signature-params">( <span class="signature-param">tileTable</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create a new tile table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tileTable</code></td>
+							<td><span class="param-type">TileTable</span></td>
+							<td class="last">
+									<p>tile table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-549">line 549</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createTileTableWithTableName" class="function public"><span class="name">createTileTableWithTableName</span><span class="signature-params">( <span class="signature-param">tableName</span>, <span class="signature-param">contentsBoundingBox</span>, <span class="signature-param">contentsSrsId</span>, <span class="signature-param">tileMatrixSetBoundingBox</span>, <span class="signature-param">tileMatrixSetSrsId</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create a new tile table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>tile table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>contentsBoundingBox</code></td>
+							<td><span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span></td>
+							<td class="last">
+									<p>bounding box of the contents table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>contentsSrsId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>srs id of the contents table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tileMatrixSetBoundingBox</code></td>
+							<td><span class="param-type"><a href="BoundingBox.html">BoundingBox</a></span></td>
+							<td class="last">
+									<p>bounding box of the matrix set</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tileMatrixSetSrsId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>srs id of the matrix set</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-562">line 562</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="addTile" class="function public"><span class="name">addTile</span><span class="signature-params">( <span class="signature-param">tile</span>, <span class="signature-param">tableName</span>, <span class="signature-param">zoom</span>, <span class="signature-param">tileRow</span>, <span class="signature-param">tileColumn</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Adds a tile to the GeoPackage</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>tile</code></td>
+							<td><span class="param-type">object</span></td>
+							<td class="last">
+									<p>Byte array or Buffer containing the tile bytes</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>Table name to add the tile to</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>zoom</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>zoom level of this tile</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tileRow</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>row of this tile</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tileColumn</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>column of this tile</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an eror if one occurred and the inserted row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-637">line 637</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createDataColumns" class="function public"><span class="name">createDataColumns</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create the Data Columns table if it does not already exist</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-651">line 651</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="createDataColumnConstraintsTable" class="function public"><span class="name">createDataColumnConstraintsTable</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create the Data Column Constraints table if it does not already exist</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>called with an error if one occurred otherwise the table now exists</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-663">line 663</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getApplicationId" class="function public"><span class="name">getApplicationId</span><span class="signature-params">( <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the application id of the GeoPackage</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>callback called with the application id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="geoPackage.js.html">geoPackage.js</a>, <a href="geoPackage.js.html#line-715">line 715</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+									</dl>
+							</article>
+					</section>
+			</div>
+				<div class="col-md-3 side-content">
+					<nav class="toc hidden-print hidden-sm hidden-xs"></nav>
+				</div>
 		</div>
 	</div>
-
-	<div class="clearfix"></div>
-
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
 		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
 	
-
-</div>
-</div>
-
-
-    <div class="modal fade" id="searchResults">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Search results</h4>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div>
-
-
-<footer>
-
-
-<span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
-	
-		on 2018-06-20T07:42:45-06:00
-	
-	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
-</span>
-</footer>
-
-<script src="scripts/docstrap.lib.js"></script>
-<script src="scripts/toc.js"></script>
-
-    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
-
-
-<script>
-$( function () {
-	$( "[id*='$']" ).each( function () {
-		var $this = $( this );
-
-		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-	} );
-
-	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
-		var $this = $( this );
-
-		var example = $this.find( "code" );
-		exampleText = example.html();
-		var lang = /{@lang (.*?)}/.exec( exampleText );
-		if ( lang && lang[1] ) {
-			exampleText = exampleText.replace( lang[0], "" );
-			example.html( exampleText );
-			lang = lang[1];
-		} else {
-			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
-			lang = langClassMatch ? langClassMatch[1] : "javascript";
-		}
-
-		if ( lang ) {
-
-			$this
-			.addClass( "sunlight-highlight-" + lang )
-			.addClass( "linenums" )
-			.html( example.html() );
-
-		}
-	} );
-
-	Sunlight.highlightAll( {
-		lineNumbers : false,
-		showMenu : true,
-		enableDoclinks : true
-	} );
-
-	$.catchAnchorLinks( {
-        navbarOffset: 10
-	} );
-	$( "#toc" ).toc( {
-		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
-		},
-		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
-		showAndHide : false,
-		smoothScrolling: true
-	} );
-
-	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-	$( '.dropdown-toggle' ).dropdown();
-
-    $( "table" ).each( function () {
-      var $this = $( this );
-      $this.addClass('table');
-    } );
-
-} );
-</script>
-
-
-
-<!--Navigation and Symbol Display-->
-
-
-<!--Google Analytics-->
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            SearcherDisplay.init();
-        });
-    </script>
-
-
 </body>
 </html>

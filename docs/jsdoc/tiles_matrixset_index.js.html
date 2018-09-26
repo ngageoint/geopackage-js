@@ -1,0 +1,285 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>tiles/matrixset/index.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">tiles/matrixset/index.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * TileMatrixSet module.
+ * @module tiles/matrixset
+ * @see module:dao/dao
+ */
+
+var Dao = require('../../dao/dao')
+  , BoundingBox = require('../../boundingBox')
+  , SpatialReferenceSystemDao = require('../../core/srs').SpatialReferenceSystemDao;
+  // , ContentsDao = require('../../core/contents').ContentsDao;
+
+var util = require('util');
+
+/**
+ * Tile Matrix Set object. Defines the minimum bounding box (min_x, min_y,
+ * max_x, max_y) and spatial reference system (srs_id) for all content in a tile
+ * pyramid user data table.
+ * @class TileMatrixSet
+ */
+var TileMatrixSet = function() {
+
+  /**
+   * TilePyramid User Data Table Name
+   * @member {string}
+   */
+  this.table_name;
+
+  /**
+   * Unique identifier for each Spatial Reference System within a GeoPackage
+   * @member {Number}
+   */
+  this.srs_id;
+
+  /**
+   * Bounding box minimum easting or longitude for all content in table_name
+   * @member {Number}
+   */
+  this.min_x;
+
+  /**
+   * Bounding box minimum northing or latitude for all content in table_name
+   * @member {Number}
+   */
+  this.min_y;
+
+  /**
+   * Bounding box maximum easting or longitude for all content in table_name
+   * @member {Number}
+   */
+  this.max_x;
+
+  /**
+   * Bounding box maximum northing or latitude for all content in table_name
+   * @member {Number}
+   */
+  this.max_y;
+};
+
+TileMatrixSet.prototype.setBoundingBox = function (boundingBox) {
+  this.min_x = boundingBox.minLongitude;
+  this.max_x = boundingBox.maxLongitude;
+  this.min_y = boundingBox.minLatitude;
+  this.max_y = boundingBox.maxLatitude;
+};
+
+TileMatrixSet.prototype.getBoundingBox = function () {
+  return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
+};
+
+TileMatrixSet.prototype.setContents = function(contents) {
+  if (contents &amp;&amp; contents.data_type === 'tiles') {
+    this.table_name = contents.table_name;
+  }
+}
+
+/**
+ * Tile Matrix Set Data Access Object
+ * @class TileMatrixSetDao
+ * @extends {module:dao/dao~Dao}
+ */
+var TileMatrixSetDao = function(geoPackage) {
+  Dao.call(this, geoPackage);
+}
+
+util.inherits(TileMatrixSetDao, Dao);
+
+TileMatrixSetDao.prototype.createObject = function () {
+  return new TileMatrixSet();
+};
+
+/**
+ * Get the tile table names
+ * @param  {Function} callback returns the tile table names
+ */
+TileMatrixSetDao.prototype.getTileTables = function () {
+  var tableNames = [];
+  for (var result of this.connection.each('select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME)) {
+    tableNames.push(result[TileMatrixSetDao.COLUMN_TABLE_NAME]);
+  }
+  return tableNames;
+};
+
+TileMatrixSetDao.prototype.getProjection = function (tileMatrixSet) {
+  var srs = this.getSrs(tileMatrixSet);
+  if (!srs) return;
+  var srsDao = this.geoPackage.getSpatialReferenceSystemDao();
+  return srsDao.getProjection(srs);
+};
+
+/**
+ * Get the Spatial Reference System of the Tile Matrix set
+ * @param  {TileMatrixSet}   tileMatrixSet tile matrix set
+ * @param  {Function} callback      called with an error if one occurred and the srs
+ */
+TileMatrixSetDao.prototype.getSrs = function (tileMatrixSet, callback) {
+  var dao = this.geoPackage.getSpatialReferenceSystemDao();
+  return dao.queryForId(tileMatrixSet.srs_id);
+};
+
+TileMatrixSetDao.prototype.getContents = function (tileMatrixSet, callback) {
+  var dao = this.geoPackage.getContentsDao();
+  return dao.queryForId(tileMatrixSet.table_name);
+};
+
+TileMatrixSet.TABLE_NAME = "tableName";
+TileMatrixSet.MIN_X = "minX";
+TileMatrixSet.MIN_Y = "minY";
+TileMatrixSet.MAX_X = "maxX";
+TileMatrixSet.MAX_Y = "maxY";
+TileMatrixSet.SRS_ID = "srsId";
+
+TileMatrixSetDao.TABLE_NAME = "gpkg_tile_matrix_set";
+TileMatrixSetDao.COLUMN_PK = "table_name";
+TileMatrixSetDao.COLUMN_TABLE_NAME = "table_name";
+TileMatrixSetDao.COLUMN_SRS_ID = "srs_id";
+TileMatrixSetDao.COLUMN_MIN_X = "min_x";
+TileMatrixSetDao.COLUMN_MIN_Y = "min_y";
+TileMatrixSetDao.COLUMN_MAX_X = "max_x";
+TileMatrixSetDao.COLUMN_MAX_Y = "max_y";
+
+TileMatrixSetDao.prototype.gpkgTableName = 'gpkg_tile_matrix_set';
+TileMatrixSetDao.prototype.idColumns = [TileMatrixSetDao.COLUMN_PK];
+TileMatrixSetDao.prototype.columns = [TileMatrixSetDao.COLUMN_TABLE_NAME, TileMatrixSetDao.COLUMN_SRS_ID, TileMatrixSetDao.COLUMN_MIN_X, TileMatrixSetDao.COLUMN_MIN_Y, TileMatrixSetDao.COLUMN_MAX_X, TileMatrixSetDao.COLUMN_MAX_Y];
+
+TileMatrixSetDao.prototype.columnToPropertyMap = {};
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_TABLE_NAME] = TileMatrixSet.TABLE_NAME;
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_SRS_ID] = TileMatrixSet.SRS_ID;
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_X] = TileMatrixSet.MIN_X;
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_Y] = TileMatrixSet.MIN_Y;
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_X] = TileMatrixSet.MAX_X;
+TileMatrixSetDao.prototype.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
+
+module.exports.TileMatrixSetDao = TileMatrixSetDao;
+module.exports.TileMatrixSet = TileMatrixSet;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

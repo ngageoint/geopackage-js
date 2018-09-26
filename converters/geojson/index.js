@@ -5,262 +5,259 @@ var fs = require('fs')
   , path = require('path')
   , bbox = require('@turf/bbox');
 
-module.exports.addLayer = function(options, progressCallback, doneCallback) {
-  doneCallback = arguments[arguments.length - 1];
-  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+module.exports.addLayer = function(options, progressCallback) {
+  progressCallback = progressCallback || function() { return Promise.resolve(); };
 
   options.append = true;
 
-  setupConversion(options, progressCallback, doneCallback);
+  return setupConversion(options, progressCallback);
 };
 
-module.exports.convert = function(options, progressCallback, doneCallback) {
-  doneCallback = arguments[arguments.length - 1];
-  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+module.exports.convert = function(options, progressCallback) {
+  progressCallback = progressCallback || function() { return Promise.resolve(); };
 
   options.append = false;
 
-  setupConversion(options, progressCallback, doneCallback);
+  return setupConversion(options, progressCallback);
 };
 
-module.exports.extract = function(geopackage, tableName, callback) {
+module.exports.extract = function(geopackage, tableName) {
   var geoJson = {
     type: 'FeatureCollection',
     features: []
   };
-  GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
+  var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName);
+  for (var feature of iterator.results) {
     geoJson.features.push(feature);
-    done();
-  }, function(err) {
-    callback(err, geoJson);
-  });
+  }
+  return geoJson;
 };
 
-function setupConversion(options, progressCallback, doneCallback) {
+function createOrOpenGeoPackage(geopackage, options, progressCallback) {
+  return Promise.resolve()
+  .then(function() {
+    if (typeof geopackage === 'object') {
+      return progressCallback({status: 'Opening GeoPackage'})
+      .then(function() {
+        return geopackage;
+      });
+    } else {
+      try {
+        var stats = fs.statSync(geopackage);
+        if (!options.append) {
+          console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+          throw new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+        } else {
+          console.log('open geopackage');
+          return GeoPackage.open(geopackage);
+        }
+      } catch (e) {}
+      return progressCallback({status: 'Creating GeoPackage'})
+      .then(function() {
+        console.log('Create new geopackage', geopackage);
+        return GeoPackage.create(geopackage);
+      });
+    }
+  });
+}
+
+function setupConversion(options, progressCallback) {
   var geopackage = options.geopackage;
   var srsNumber = options.srsNumber || 4326;
   var append = options.append;
   var geoJson = options.geojson;
 
-  if (!doneCallback) {
-    doneCallback = progressCallback;
-    progressCallback = function(status, cb) {
-      cb();
-    }
-  }
-  async.waterfall([
-    // create or open the geopackage
-    function(callback) {
-      if (typeof geopackage === 'object') {
-        return progressCallback({status: 'Opening GeoPackage'}, function() {
-          callback(null, geopackage);
-        });
-      }
-
-      try {
-        var stats = fs.statSync(geopackage);
-        if (!append) {
-          console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
-          return callback(new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage));
-        } else {
-          return GeoPackage.openGeoPackage(geopackage, callback);
-        }
-      } catch (e) {}
-      return progressCallback({status: 'Creating GeoPackage'}, function() {
-        GeoPackage.createGeoPackage(geopackage, callback);
-      });
-    },
+  return createOrOpenGeoPackage(geopackage, options, progressCallback)
+  .then(function(geopackage) {
     // figure out the table name to put the data into
-    function(geopackage, callback) {
-      var name = 'features';
-      if (typeof geoJson === 'string') {
-        name = path.basename(geoJson, path.extname(geoJson));
-      }
-      geopackage.getFeatureTables(function(err, tables) {
-        var count = 1;
-        while(tables.indexOf(name) !== -1) {
-          name = name + '_' + count;
-          count++;
-        }
-        callback(null, geopackage, name);
-      });
-    },
-    // get the GeoJSON data
-    function(geopackage, tableName, callback) {
-      if (typeof geoJson === 'string') {
-        progressCallback({status: 'Reading GeoJSON file'}, function() {
+    var name = 'features';
+    if (typeof geoJson === 'string') {
+      name = path.basename(geoJson, path.extname(geoJson));
+    }
+    var tables = geopackage.getFeatureTables();
+    var count = 1;
+    while(tables.indexOf(name) !== -1) {
+      name = name + '_' + count;
+      count++;
+    }
+    return {
+      geopackage: geopackage,
+      options: options,
+      tableName: name
+    };
+  })
+  .then(function(results) {
+    if (typeof geoJson === 'string') {
+      return progressCallback({status: 'Reading GeoJSON file'})
+      .then(function() {
+        return new Promise(function(resolve, reject) {
           fs.readFile(geoJson, 'utf8', function(err, data) {
             geoJson = JSON.parse(data);
-            callback(null, geopackage, tableName, geoJson);
+            resolve({
+              geopackage: results.geopackage,
+              tableName: results.tableName,
+              geoJson: geoJson
+            });
           });
         });
-      } else {
-        callback(null, geopackage, tableName, geoJson);
-      }
-    },
-    function(geopackage, tableName, geoJson, callback) {
-      var correctedGeoJson = {
-        type: 'FeatureCollection',
-        features: []
-      };
-      async.eachSeries(geoJson.features, function featureIterator(feature, featureCallback) {
-        async.setImmediate(function() {
-          var splitType = '';
-          if (feature.geometry.type === 'MultiPolygon') {
-            splitType = 'Polygon';
-          } else if (feature.geometry.type === 'MultiLineString') {
-            splitType = 'LineString';
-          } else {
-            correctedGeoJson.features.push(feature);
-            return featureCallback();
-          }
-
-          // split if necessary
-          async.eachSeries(feature.geometry.coordinates, function splitIterator(coords, splitCallback) {
-            async.setImmediate(function() {
-              correctedGeoJson.features.push({
-                type: 'Feature',
-                properties: feature.properties,
-                geometry: {
-                  type: splitType,
-                  coordinates: coords
-                }
-              });
-              splitCallback();
-            });
-          }, featureCallback);
-
-        });
-      }, function done() {
-        callback(null, geopackage, tableName, correctedGeoJson);
       });
-    },
-    // Go
-    function(geopackage, tableName, geoJson, callback) {
-      convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, doneCallback);
+    } else {
+      return {
+        geopackage: results.geopackage,
+        tableName: results.tableName,
+        geoJson: geoJson
+      };
     }
-  ], function done(err) {
-    doneCallback(err, geopackage);
+  })
+  .then(function(results) {
+    var geoJson = results.geoJson;
+    var geopackage = results.geopackage;
+    var tableName = results.tableName;
+
+    var correctedGeoJson = {
+      type: 'FeatureCollection',
+      features: []
+    };
+
+    var properties = {};
+
+    return geoJson.features.reduce(function(sequence, feature) {
+      return sequence.then(function() {
+        addFeatureProperties(feature, properties);
+        var splitType = '';
+        if (feature.geometry.type === 'MultiPolygon') {
+          splitType = 'Polygon';
+        } else if (feature.geometry.type === 'MultiLineString') {
+          splitType = 'LineString';
+        } else {
+          correctedGeoJson.features.push(feature);
+          return;
+        }
+
+        // split if necessary
+        return feature.geometry.coordinates.reduce(function(splitSequence, coords) {
+          return splitSequence.then(function() {
+            correctedGeoJson.features.push({
+              type: 'Feature',
+              properties: feature.properties,
+              geometry: {
+                type: splitType,
+                coordinates: coords
+              }
+            });
+          });
+        }, Promise.resolve());
+      });
+    }, Promise.resolve())
+    .then(function() {
+      return {
+        geopackage: results.geopackage,
+        tableName: results.tableName,
+        geoJson: correctedGeoJson,
+        properties: properties
+      }
+    });
+  })
+  .then(function(results) {
+    return convertGeoJSONToGeoPackage(results.geoJson, results.geopackage, results.tableName, results.properties, progressCallback);
   });
 };
 
-function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
-  convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, 4326, progressCallback, callback);
-}
+function addFeatureProperties(feature, currentProperties) {
+  if (feature.properties.geometry) {
+    feature.properties.geometry_property = feature.properties.geometry;
+    delete feature.properties.geometry;
+  }
 
-function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNumber, progressCallback, callback) {
-  async.waterfall([function(callback) {
-    var properties = {};
-    var count = 0;
-    var featureCount = geoJson.features.length;
-    var fivePercent = Math.floor(featureCount/20);
-    progressCallback({status: 'Reading GeoJSON feature properties'}, function() {
-      // first loop to find all properties of all features.  Has to be a better way...
-      async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
-        async.setImmediate(function() {
-          if (feature.properties.geometry) {
-            feature.properties.geometry_property = feature.properties.geometry;
-            delete feature.properties.geometry;
+  if (feature.id) {
+    if (!currentProperties['_feature_id']) {
+      currentProperties['_feature_id'] = currentProperties['_feature_id'] || {
+        name: '_feature_id'
+      };
+    }
+  }
+
+  for (var key in feature.properties) {
+    if (!currentProperties[key]) {
+      currentProperties[key] = currentProperties[key] || {
+        name: key
+      };
+
+      var type = typeof feature.properties[key];
+      if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
+        if (type === 'object') {
+          if (feature.properties[key] instanceof Date) {
+            type = 'Date';
           }
-
-          if (feature.id) {
-            if (!properties['_feature_id']) {
-              properties['_feature_id'] = properties['_feature_id'] || {
-                name: '_feature_id'
-              };
-            }
-          }
-
-          for (var key in feature.properties) {
-            if (!properties[key]) {
-              properties[key] = properties[key] || {
-                name: key
-              };
-
-              var type = typeof feature.properties[key];
-              if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
-                if (type === 'object') {
-                  if (feature.properties[key] instanceof Date) {
-                    type = 'Date';
-                  }
-                }
-                switch(type) {
-                  case 'Date':
-                    type = 'DATETIME';
-                    break;
-                  case 'number':
-                    type = 'DOUBLE';
-                    break;
-                  case 'string':
-                    type = 'TEXT';
-                    break;
-                  case 'boolean':
-                    type = 'BOOLEAN';
-                    break;
-                }
-                properties[key] = {
-                  name: key,
-                  type: type
-                };
-              }
-            }
-          }
-          if (count++ % fivePercent === 0) {
-            progressCallback({
-              status: 'Reading GeoJSON feature properties',
-              completed: count,
-              total: featureCount
-            }, callback);
-          } else {
-            callback();
-          }
-        });
-      }, function done(err) {
-        progressCallback({
-          status: 'Done reading GeoJSON properties'
-        }, function() {
-          callback(err, properties);
-        });
-      });
-    });
-  }, function(properties, callback) {
-    var FeatureColumn = GeoPackage.FeatureColumn;
-    var GeometryColumns = GeoPackage.GeometryColumns;
-    var DataTypes = GeoPackage.DataTypes;
-
-    var geometryColumns = new GeometryColumns();
-    geometryColumns.table_name = tableName;
-    geometryColumns.column_name = 'geometry';
-    geometryColumns.geometry_type_name = 'GEOMETRY';
-    geometryColumns.z = 0;
-    geometryColumns.m = 0;
-
-    var columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-    var index = 2;
-
-    for (var key in properties) {
-      var prop = properties[key];
-      if (prop.name.toLowerCase() !== 'id') {
-        columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
-        index++;
-      } else if (prop.name.toLowerCase() === 'id') {
-        columns.push(FeatureColumn.createColumnWithIndex(index, '_properties_'+prop.name, DataTypes.fromName(prop.type), false, null));
-        index++;
+        }
+        switch(type) {
+          case 'Date':
+            type = 'DATETIME';
+            break;
+          case 'number':
+            type = 'DOUBLE';
+            break;
+          case 'string':
+            type = 'TEXT';
+            break;
+          case 'boolean':
+            type = 'BOOLEAN';
+            break;
+        }
+        currentProperties[key] = {
+          name: key,
+          type: type
+        };
       }
     }
-    progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-      var tmp = bbox(geoJson);
-      var boundingBox = new GeoPackage.BoundingBox(Math.max(-180, tmp[0]), Math.min(180, tmp[2]), Math.max(-90, tmp[1]), Math.min(90, tmp[3]));
-      GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, srsNumber, callback);
-    });
-  }, function(featureDao, callback) {
+  }
+}
+
+function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, properties, progressCallback) {
+  return convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, properties, 4326, progressCallback);
+}
+
+function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, properties, srsNumber, progressCallback) {
+
+  var FeatureColumn = GeoPackage.FeatureColumn;
+  var GeometryColumns = GeoPackage.GeometryColumns;
+  var DataTypes = GeoPackage.DataTypes;
+
+  var geometryColumns = new GeometryColumns();
+  geometryColumns.table_name = tableName;
+  geometryColumns.column_name = 'geometry';
+  geometryColumns.geometry_type_name = 'GEOMETRY';
+  geometryColumns.z = 2;
+  geometryColumns.m = 2;
+
+  var columns = [];
+  columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+  columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+  var index = 2;
+
+  for (var key in properties) {
+    var prop = properties[key];
+    if (prop.name.toLowerCase() !== 'id') {
+      columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
+      index++;
+    } else if (prop.name.toLowerCase() === 'id') {
+      columns.push(FeatureColumn.createColumnWithIndex(index, '_properties_'+prop.name, DataTypes.fromName(prop.type), false, null));
+      index++;
+    }
+  }
+  return progressCallback({status: 'Creating table "' + tableName + '"'})
+  .then(function() {
+    var tmp = bbox(geoJson);
+    var boundingBox = new GeoPackage.BoundingBox(Math.max(-180, tmp[0]), Math.min(180, tmp[2]), Math.max(-90, tmp[1]), Math.min(90, tmp[3]));
+    return GeoPackage.createFeatureTableWithDataColumnsAndBoundingBox(geopackage, tableName, geometryColumns, columns, null, boundingBox, srsNumber);
+  })
+  .then(function(featureDao) {
     var count = 0;
     var featureCount = geoJson.features.length;
     var fivePercent = Math.floor(featureCount / 20);
-    async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
-      async.setImmediate(function() {
+
+    return geoJson.features.reduce(function(sequence, feature) {
+      return sequence.then(function() {
         if (feature.id) {
           feature.properties._feature_id = feature.id;
         }
@@ -273,27 +270,22 @@ function convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, srsNu
           feature.properties._properties_ID = feature.properties.ID;
           delete feature.properties.ID;
         }
-
-        GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
-          if (count++ % fivePercent === 0) {
-            progressCallback({
-              status: 'Inserting features into table "' + tableName + '"',
-              completed: count,
-              total: featureCount
-            }, callback);
-          } else {
-            callback();
-          }
-        });
+        var featureId = GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName);
+        if (count++ % fivePercent === 0) {
+          return progressCallback({
+            status: 'Inserting features into table "' + tableName + '"',
+            completed: count,
+            total: featureCount
+          });
+        }
       });
-    }, function done() {
-      progressCallback({
+    }, Promise.resolve())
+    .then(function() {
+      return progressCallback({
         status: 'Done inserted features into table "' + tableName + '"'
-      }, callback);
+      });
     });
-  }
-
-], function done(err) {
-  callback(err, geopackage);
+  }).then(function() {
+    return geopackage;
   });
 }

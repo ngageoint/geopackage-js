@@ -8,8 +8,7 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , testSetup = require('../../fixtures/testSetup')
   , wkx = require('wkx')
   , should = require('chai').should()
-  , path = require('path')
-  , async = require('async');
+  , path = require('path');
 
 describe('TableCreator tests', function() {
 
@@ -30,126 +29,134 @@ describe('TableCreator tests', function() {
     testSetup.deleteGeoPackage(testGeoPackage, done);
   });
 
-  it('should create the spatial reference system table', function(done) {
+  it('should create the spatial reference system table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createSpatialReferenceSystem(function(err, result) {
-      should.not.exist(err);
-      Verification.verifySRS(geopackage, done);
+    return tc.createSpatialReferenceSystem()
+    .then(function(result) {
+      result.should.be.equal(true);
+      var verified = Verification.verifySRS(geopackage);
+      verified.should.be.equal(true);
     });
   });
 
-  it('should create the contents table', function(done) {
+  it('should create the contents table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createContents(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyContents(geopackage, done);
+    return tc.createContents()
+    .then(function(result) {
+      result.should.be.equal(true);
+      var verified = Verification.verifyContents(geopackage);
+      verified.should.be.equal(true);
     });
   });
 
-  it('should create the geometry columns table', function(done) {
+  it('should create the geometry columns table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createGeometryColumns(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyGeometryColumns(geopackage, done);
+    return tc.createGeometryColumns()
+    .then(function(result) {
+      result.should.be.equal(true);
+      var verified = Verification.verifyGeometryColumns(geopackage);
+      verified.should.be.equal(true);
     });
   });
 
-  it('should create the tile matrix set table', function(done) {
+  it('should create the tile matrix set table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createTileMatrixSet(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyTileMatrixSet(geopackage, done);
+    return tc.createTileMatrixSet()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the tile matrix table', function(done) {
+  it('should create the tile matrix table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createTileMatrix(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyTileMatrix(geopackage, done);
+    return tc.createTileMatrix()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyTileMatrix(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the data columns table', function(done) {
+  it('should create the data columns table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createDataColumns(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyDataColumns(geopackage, done);
+    return tc.createDataColumns()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyDataColumns(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the data column constraints table', function(done) {
+  it('should create the data column constraints table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createDataColumnConstraints(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyDataColumnConstraints(geopackage, done);
+    return tc.createDataColumnConstraints()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the metadata table', function(done) {
+  it('should create the metadata table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createMetadata(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyMetadata(geopackage, done);
+    return tc.createMetadata()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyMetadata(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the metadata reference', function(done) {
+  it('should create the metadata reference', function() {
     var tc = new TableCreator(geopackage);
-    tc.createMetadataReference(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyMetadataReference(geopackage, done);
+    return tc.createMetadataReference()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyMetadataReference(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the extensions table', function(done) {
+  it('should create the extensions table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createExtensions(function(err, result) {
-      should.not.exist(err);
-      console.log('result', result);
-      Verification.verifyExtensions(geopackage, done);
+    return tc.createExtensions()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyExtensions(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the table index table', function(done) {
+  it('should create the table index table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createTableIndex(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyTableIndex(geopackage, done);
+    return tc.createTableIndex()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyTableIndex(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the geometry index table', function(done) {
+  it('should create the geometry index table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createGeometryIndex(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyGeometryIndex(geopackage, done);
+    return tc.createGeometryIndex()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the feature tile link table', function(done) {
+  it('should create the feature tile link table', function() {
     var tc = new TableCreator(geopackage);
-    tc.createFeatureTileLink(function(err, result) {
-      should.not.exist(err);
-      Verification.verifyFeatureTileLink(geopackage, done);
+    return tc.createFeatureTileLink()
+    .then(function(result) {
+      result.should.be.equal(true);
+      Verification.verifyFeatureTileLink(geopackage).should.be.equal(true);
     });
   });
 
-  it('should create the required tables', function(done) {
+  it('should create the required tables', function() {
     var tc = new TableCreator(geopackage);
-    tc.createRequired(function(err, result) {
-      async.series([
-        Verification.verifyContents.bind(this, geopackage),
-        Verification.verifySRS.bind(this, geopackage),
-        function(callback) {
-          geopackage.getDatabase().count('gpkg_spatial_ref_sys', function(err, count) {
-            count.should.be.equal(4);
-            callback();
-          });
-        }
-      ], function() {
-        done();
-      });
+    tc.createRequired()
+    .then(function(result) {
+      Verification.verifyContents(geopackage).should.be.equal(true);
+      Verification.verifySRS(geopackage).should.be.equal(true);
+      var count = geopackage.getDatabase().count('gpkg_spatial_ref_sys');
+      count.should.be.equal(4);
     });
   });
 
@@ -157,17 +164,17 @@ describe('TableCreator tests', function() {
     var columns = TileTable.createRequiredColumns();
     var tileTable = new TileTable('test_tiles', columns);
     var tc = new TableCreator(geopackage);
-    tc.createUserTable(tileTable, function(err, result) {
-      Verification.verifyTableExists(geopackage, 'test_tiles', done);
-    });
+    var result = tc.createUserTable(tileTable);
+    Verification.verifyTableExists(geopackage, 'test_tiles').should.be.equal(true);
+    done();
   });
 
   it('should create a user feature table', function(done) {
     var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom', wkx.Types.wkt.Point);
     var tc = new TableCreator(geopackage);
-    tc.createUserTable(featureTable, function(err, result) {
-      Verification.verifyTableExists(geopackage, 'test_features', done);
-    });
+    var result = tc.createUserTable(featureTable);
+    Verification.verifyTableExists(geopackage, 'test_features').should.be.equal(true);
+    done();
   });
 
 });

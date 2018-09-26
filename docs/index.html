@@ -116,6 +116,7 @@
 
   <script id="feature-table-template" type="x-tmpl-mustache">
   <div>
+    <div class="status" id="status-{{tableName}}"><span></span></div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
       <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -209,7 +210,7 @@
   </div>
   </script>
   <script id="all-features-template" type="x-tmpl-mustache">
-    <table onmouseout="clearHighlights()">
+    <table id="{{tableName}}-feature-table" onmouseout="clearHighlights()">
       <thead>
         <tr>
           <th></th>
@@ -227,6 +228,14 @@
       </tr>
       {{/features}}
     </table>
+  </script>
+  <script id="feature-template" type="x-tmpl-mustache">
+    <tr onmouseover="highlightFeature('{{id}}', '{{tableName}}')" ondblclick="zoomToFeature('{{id}}', '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
+    <td><i class="fa fa-circle-o" onclick="toggleFeature('{{id}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
+      {{#values}}
+        <td>{{{.}}}</td>
+      {{/values}}
+    </tr>
   </script>
   <script id="tile-table-template" type="x-tmpl-mustache">
   <div>

@@ -1,51 +1,47 @@
 var fs = require('fs')
-  , async = require('async')
   , path = require('path')
+  , crypto = require('crypto')
   , pureimage = require('pureimage')
+  , CanvasCompare = require('canvas-compare')
   , Duplex = require('stream').Duplex
   , TableCreator = require('../../lib/db/tableCreator')
   , GeoPackage = require('../../lib/geoPackage')
+  , GeoPackageAPI = require('../..')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
 
+module.exports.createTempName = function() {
+  return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
+}
+
 module.exports.createGeoPackage = function(gppath, callback) {
-  async.series([
-    function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.mkdir(path.dirname(gppath), function() {
-          fs.open(gppath, 'w', callback);
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.mkdir(path.dirname(gppath), function() {
+      fs.open(gppath, 'w', function() {
+        GeoPackageAPI.create(gppath)
+        .then(function(geopackage) {
+          callback(null, geopackage);
         });
-      } else {
-        callback();
-      }
-    }
-  ], function() {
-    GeoPackageConnection.connect(gppath, function(err, connection) {
-      var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-      var tc = new TableCreator(geopackage);
-      tc.createRequired(function() {
-        callback(null, geopackage);
       });
     });
-  });
+  } else {
+    callback();
+  }
 }
 
 module.exports.createBareGeoPackage = function(gppath, callback) {
-  async.series([
-    function(callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.mkdir(path.dirname(gppath), function() {
-          fs.open(gppath, 'w', callback);
+  if (typeof(process) !== 'undefined' && process.version) {
+    fs.mkdir(path.dirname(gppath), function() {
+      fs.open(gppath, 'w', function() {
+        GeoPackageConnection.connect(gppath)
+        .then(function(connection) {
+          var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
+          callback(null, geopackage);
         });
-      } else {
-        callback();
-      }
-    }
-  ], function() {
-    GeoPackageConnection.connect(gppath, function(err, connection) {
-      var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-      callback(null, geopackage);
+      });
     });
-  });
+  } else {
+    callback();
+  }
 }
 
 module.exports.deleteGeoPackage = function(gppath, callback) {
@@ -95,20 +91,19 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
       callback(null, same);
     });
   } else {
+
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
       var expectedBase64 = new Buffer(expectedTile).toString('base64');
-
-      var expected = document.createElement('canvas');
-      expected.width = actualCanvas.width;
-      expected.height = actualCanvas.height;
-      var ctx2 = expected.getContext('2d');
-
-      var image2 = new Image();
-      image2.onload = function() {
-        ctx2.drawImage(image2, 0, 0);
-        return callback(null, module.exports.diffCanvasesContexts(actualCanvas.getContext('2d'), ctx2), actualCanvas.width, actualCanvas.height);
-      }
-      image2.src = 'data:image/png;base64,' + expectedBase64;
+      CanvasCompare({
+        baseImageUrl: actualCanvas.toDataURL(),
+        targetImageUrl: 'data:image/png;base64,' + expectedBase64
+      })
+      .then(function(result) {
+        callback(null, true);
+      })
+      .catch(function(reason) {
+        callback(null, false);
+      });
     });
   }
 }
@@ -207,8 +202,25 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(div);
             currentTag.appendChild(actual);
             currentTag.appendChild(expected);
+
+            console.log('canvas compare', CanvasCompare);
+
+            CanvasCompare.canvasCompare({
+              baseImageUrl: actualTile,
+              targetImageUrl: 'data:image/png;base64,' + expectedBase64
+            })
+            .then(function(result) {
+              console.log('result', result);
+              currentTag.appendChild(result.producePreview());
+              callback(null, false);
+            })
+            .catch(function(reason) {
+              console.log('reason', reason);
+              callback(null, false);
+            });
+          } else {
+            callback(null, equal);
           }
-          callback(null, equal);
         }
         image2.src = 'data:image/png;base64,' + expectedBase64;
       });

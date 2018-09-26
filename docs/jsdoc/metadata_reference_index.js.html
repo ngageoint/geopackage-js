@@ -1,0 +1,315 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>metadata/reference/index.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">metadata/reference/index.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * MetadataReference module.
+ * @module metadata/reference
+ * @see module:dao/dao
+ */
+
+var Dao = require('../../dao/dao')
+  , ColumnValues = require('../../dao/columnValues');
+
+var util = require('util');
+
+/**
+ * Links metadata in the gpkg_metadata table to data in the feature, and tiles tables
+ * @class MetadataReference
+ */
+var MetadataReference = function() {
+
+  /**
+   * Lowercase metadata reference scope; one of ‘geopackage’, ‘table’, ‘column’, ’row’, ’row/col’
+   * @member {string}
+   */
+  this.reference_scope;
+
+  /**
+   * Name of the table to which this metadata reference applies, or NULL for reference_scope of ‘geopackage’.
+   * @member {string}
+   */
+  this.table_name;
+
+  /**
+   * Name of the column to which this metadata reference applies; NULL for
+   * reference_scope of ‘geopackage’,‘table’ or ‘row’, or the name of a column
+   * in the table_name table for reference_scope of ‘column’ or ‘row/col’
+   * @member {string}
+   */
+  this.column_name;
+
+  /**
+   * NULL for reference_scope of ‘geopackage’, ‘table’ or ‘column’, or the
+   * rowed of a row record in the table_name table for reference_scope of
+   * ‘row’ or ‘row/col’
+   * @member {Number}
+   */
+  this.row_id_value;
+
+  /**
+   * timestamp value in ISO 8601 format as defined by the strftime function
+   * '%Y-%m-%dT%H:%M:%fZ' format string applied to the current time
+   * @member {Date}
+   */
+  this.timestamp;
+
+  /**
+   * gpkg_metadata table id column value for the metadata to which this
+   * gpkg_metadata_reference applies
+   * @member {Number}
+   */
+  this.md_file_id;
+
+  /**
+   * gpkg_metadata table id column value for the hierarchical parent
+   * gpkg_metadata for the gpkg_metadata to which this gpkg_metadata_reference
+   * applies, or NULL if md_file_id forms the root of a metadata hierarchy
+   * @member {Number}
+   */
+  this.md_parent_id;
+}
+
+MetadataReference.prototype.toDatabaseValue = function(columnName) {
+  if (columnName === 'timestamp') {
+    return this.timestamp.toISOString();
+  }
+  return this[columnName];
+}
+
+/**
+ * Set the metadata
+ * @param  {Metadata} metadata metadata
+ */
+MetadataReference.prototype.setMetadata = function(metadata) {
+  if (metadata) {
+    this.md_file_id = metadata.id;
+  } else {
+    this.md_file_id = -1;
+  }
+}
+
+/**
+ * Set the parent metadata
+ * @param  {Metadata} metadata parent metadata
+ */
+MetadataReference.prototype.setParentMetadata = function(metadata) {
+  if (metadata) {
+    this.md_parent_id = metadata.id;
+  } else {
+    this.md_parent_id = -1;
+  }
+}
+
+MetadataReference.prototype.setReferenceScopeType = function(referenceScopeType) {
+  this.reference_scope = referenceScopeType;
+  switch(referenceScopeType) {
+    case MetadataReference.GEOPACKAGE:
+      this.table_name = undefined;
+      this.column_name = undefined;
+      this.row_id_value = undefined;
+      break;
+    case MetadataReference.TABLE:
+      this.column_name = undefined;
+      this.row_id_value = undefined;
+      break;
+    case MetadataReference.ROW:
+      this.column_name = undefined;
+      break;
+    case MetadataReference.COLUMN:
+      this.row_id_value = undefined;
+      break;
+  }
+}
+
+MetadataReference.GEOPACKAGE = "geopackage";
+MetadataReference.TABLE = "table";
+MetadataReference.COLUMN = "column";
+MetadataReference.ROW = "row";
+MetadataReference.ROW_COL = "row/col";
+
+/**
+ * Metadata Reference Data Access Object
+ * @class
+ * @extends {module:dao/dao~Dao}
+ */
+var MetadataReferenceDao = function(geoPackage) {
+  Dao.call(this, geoPackage);
+};
+
+util.inherits(MetadataReferenceDao, Dao);
+
+MetadataReferenceDao.prototype.createObject = function() {
+  return new MetadataReference();
+};
+
+MetadataReferenceDao.prototype.removeMetadataParent = function(parentId) {
+  var values = {};
+  values[MetadataReferenceDao.COLUMN_MD_PARENT_ID] = null;
+
+  var where = this.buildWhereWithFieldAndValue(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  var whereArgs = this.buildWhereArgs(parentId);
+  return this.updateWithValues(values, where, whereArgs);
+}
+
+MetadataReferenceDao.prototype.queryByMetadataAndParent = function (fileId, parentId) {
+  var columnValues = new ColumnValues();
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  return this.queryForFieldValues(columnValues);
+};
+
+MetadataReferenceDao.prototype.queryByMetadata = function(fileId) {
+  var columnValues = new ColumnValues();
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_FILE_ID, fileId);
+  return this.queryForFieldValues(columnValues);
+};
+
+MetadataReferenceDao.prototype.queryByMetadataParent = function(parentId) {
+  var columnValues = new ColumnValues();
+  columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
+  return this.queryForFieldValues(columnValues);
+};
+
+MetadataReferenceDao.TABLE_NAME = "gpkg_metadata_reference";
+MetadataReferenceDao.COLUMN_REFERENCE_SCOPE = "reference_scope";
+MetadataReferenceDao.COLUMN_TABLE_NAME = "table_name";
+MetadataReferenceDao.COLUMN_COLUMN_NAME = "column_name";
+MetadataReferenceDao.COLUMN_ROW_ID = "row_id";
+MetadataReferenceDao.COLUMN_TIMESTAMP = "timestamp";
+MetadataReferenceDao.COLUMN_MD_FILE_ID = "md_file_id";
+MetadataReferenceDao.COLUMN_MD_PARENT_ID = "md_parent_id";
+
+
+MetadataReferenceDao.prototype.gpkgTableName = MetadataReferenceDao.TABLE_NAME;
+MetadataReferenceDao.prototype.idColumns = [MetadataReferenceDao.COLUMN_MD_FILE_ID, MetadataReferenceDao.COLUMN_MD_PARENT_ID];
+
+module.exports.MetadataReferenceDao = MetadataReferenceDao;
+module.exports.MetadataReference = MetadataReference;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

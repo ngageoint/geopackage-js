@@ -1,0 +1,361 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>db/sqliteAdapter.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">db/sqliteAdapter.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
+ * @module db/sqliteAdapter
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
+ */
+
+var fs = require('fs')
+  , path = require('path')
+  , os = require('os');
+
+/**
+ * Returns a Promise which, when resolved, returns a {module:db/sqliteAdapter~Adapter} which has connected to the GeoPackage database file
+ * @param  {string|Buffer} [filePath] string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
+ * @return {Promise&lt;module:db/sqliteAdapter~Adapter>}
+ */
+module.exports.createAdapter = function(filePath) {
+  var promise = new Promise(function(resolve, reject) {
+    var Database = require('better-sqlite3');
+    try {
+      var db;
+      if (filePath &amp;&amp; typeof filePath === 'string') {
+        db = new Database(filePath);
+      } else if (filePath) {
+        // write this byte array to a file then open it
+        var byteArray = filePath;
+        var tmpPath = path.join(os.tmpDir(), Date.now() + '.gpkg');
+        return fs.writeFile(tmpPath, byteArray, function(err) {
+          db = new Database(tmpPath);
+          // verify that this is an actual database
+          try {
+            var applicationId = db.pragma('application_id');
+            db.pragma('journal_mode = WAL');
+          } catch (err) {
+            console.log('error', err);
+            return reject(err);
+          }
+          var adapter = new Adapter(db);
+          adapter.filePath = tmpPath;
+          resolve(adapter);
+        });
+      } else {
+        console.log('create in memory');
+        db = new Database("memory", {
+          memory: !filePath
+        });
+      }
+      var adapter = new Adapter(db);
+      adapter.filePath = filePath;
+      resolve(adapter);
+    } catch (err) {
+      console.log('Error opening database', err);
+      return reject(err);
+    }
+  });
+  return promise;
+}
+/**
+ * Creates an adapter from an already established better-sqlite3 database connection
+ * @param  {better-sqlite3.Database} db better-sqlite3 database connection
+ * @return {module:db/sqliteAdapter~Adapter}
+ */
+module.exports.createAdapterFromDb = function(db) {
+  return new Adapter(db);
+}
+
+/**
+ * Class which adapts generic GeoPackage queries to better-sqlite3 queries
+ * @class Adapter
+ * @param {better-sqlite3.Database} db better-sqlite3 database connection
+ */
+function Adapter(db) {
+  this.db = db;
+}
+
+/**
+ * Closes the connection to the GeoPackage
+ */
+Adapter.prototype.close = function() {
+  this.db.close();
+}
+
+/**
+ * Get the connection to the database file
+ * @return {better-sqlite3.Database}
+ */
+Adapter.prototype.getDBConnection = function () {
+  return this.db;
+};
+
+/**
+ * Returns a Buffer containing the contents of the database as a file
+ * @param  {Function} callback called when export is complete
+ */
+Adapter.prototype.export = function(callback) {
+  fs.readFile(this.filePath, callback);
+}
+
+/**
+ * Registers the given function so that it can be used by SQL statements
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#registeroptions-function---this|better-sqlite3 register}
+ * @param  {string} name               name of function to register
+ * @param  {Function} functionDefinition function to register
+ * @return {module:db/sqliteAdapter~Adapter} this
+ */
+Adapter.prototype.registerFunction = function(name, functionDefinition) {
+  this.db.register({name: name}, functionDefinition);
+  return this;
+}
+
+/**
+ * Gets one row of results from the statement
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#getbindparameters---row|better-sqlite3 get}
+ * @param  {string} sql    statement to run
+ * @param  {Array|Object} [params] bind parameters
+ * @return {Object}
+ */
+Adapter.prototype.get = function (sql, params) {
+  var statement = this.db.prepare(sql);
+  if (params) {
+    return statement.get(params);
+  } else {
+    return statement.get();
+  }
+};
+
+/**
+ * Gets all results from the statement in an array
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#allbindparameters---array-of-rows|better-sqlite3 all}
+ * @param  {string} sql    statement to run
+ * @param  {Array|Object} [params] bind parameters
+ * @return {Object[]}
+ */
+Adapter.prototype.all = function (sql, params) {
+  var statement = this.db.prepare(sql);
+  if (params) {
+    return statement.all(params);
+  } else {
+    return statement.all();
+  }
+};
+
+/**
+ * Returns an Iterable with results from the query
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#iteratebindparameters---iterator|better-sqlite3 iterate}
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Iterable&lt;Object>}
+ */
+Adapter.prototype.each = function (sql, params) {
+  var statement = this.db.prepare(sql);
+  if (params) {
+    return statement.iterate(params);
+  } else {
+    return statement.iterate();
+  }
+};
+
+/**
+ * Runs the statement specified, returning information about what changed
+ * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#runbindparameters---object|better-sqlite3}
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Object} object containing a changes property indicating the number of rows changed and a lastInsertROWID indicating the last inserted row
+ */
+Adapter.prototype.run = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  if (params) {
+    return statement.run(params);
+  } else {
+    return statement.run();
+  }
+}
+
+/**
+ * Runs the specified insert statement and returns the last inserted id or undefined if no insert happened
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} [params] bind parameters
+ * @return {Number} last inserted row id
+ */
+Adapter.prototype.insert = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  return statement.run(params).lastInsertROWID;
+};
+
+/**
+ * Runs the specified delete statement and returns the number of deleted rows
+ * @param  {string} sql    statement to run
+ * @param  {Object|Array} params bind parameters
+ * @return {number} deleted rows
+ */
+Adapter.prototype.delete = function(sql, params) {
+  var statement = this.db.prepare(sql);
+  return statement.run(params).changes;
+};
+
+/**
+ * Drops the table
+ * @param  {string} table table name
+ * @return {Boolean} indicates if the table was dropped
+ */
+Adapter.prototype.dropTable = function(table) {
+  try {
+    var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
+    var result = statement.run();
+    return result.changes == 0;
+  } catch (e) {
+    console.log('Drop Table Error', e);
+    return false;
+  }
+};
+
+/**
+ * Counts rows that match the query
+ * @param  {string} tableName table name from which to count
+ * @param  {string} [where]     where clause
+ * @param  {Object|Array} [whereArgs] where args
+ * @return {Number} count
+ */
+Adapter.prototype.count = function (tableName, where, whereArgs) {
+  var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
+  if (where) {
+    sql += ' where ' + where;
+  }
+  var statement = this.db.prepare(sql);
+  if (whereArgs) {
+    return statement.get(whereArgs).count;
+  } else {
+    return statement.get().count;
+  }
+};
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

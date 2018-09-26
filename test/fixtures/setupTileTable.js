@@ -3,7 +3,7 @@
 //     // Get existing SRS objects
 //     GPKGSpatialReferenceSystemDao * srsDao = [geoPackage getSpatialReferenceSystemDao];
 //
-//     GPKGSpatialReferenceSystem * epsgSrs = (GPKGSpatialReferenceSystem *)[srsDao queryForIdObject:[NSNumber numberWithInt:4326]];
+//     GPKGSpatialReferenceSystem * epsgSrs = (GPKGSpatialReferenceSystem *)[srsDao queryForId:[NSNumber numberWithInt:4326]];
 //
 //     [GPKGTestUtils assertNotNil:epsgSrs];
 //

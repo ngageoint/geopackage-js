@@ -1,4 +1,5 @@
 var GeoPackage = require('../index.js')
+  , BoundingBox = require('../lib/boundingBox.js')
   , testSetup = require('./fixtures/testSetup');
 
 var path = require('path')
@@ -15,16 +16,50 @@ describe('GeoPackageAPI tests', function() {
 
 
   it('should open the geopackage', function(done) {
-    GeoPackage.openGeoPackage(existingPath, function(err, geopackage) {
+    GeoPackage.open(existingPath, function(err, geopackage) {
       should.not.exist(err);
       should.exist(geopackage);
+      should.exist(geopackage.getTables);
       done();
+    });
+  });
+
+  it('should open the geopackage with a promise', function() {
+    return GeoPackage.open(existingPath)
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      should.exist(geopackage.getTables);
+    });
+  });
+
+  it('should not open a file without the minimum tables', function(done) {
+    testSetup.createBareGeoPackage(geopackageToCreate, function(err, gp) {
+      GeoPackage.open(geopackageToCreate, function(err, geopackage) {
+        should.exist(err);
+        should.not.exist(geopackage);
+        testSetup.deleteGeoPackage(geopackageToCreate, done);
+      });
+    });
+  });
+
+  it('should not open a file without the correct extension', function(done) {
+    GeoPackage.open(tilePath, function(err, geopackage) {
+      should.exist(err);
+      should.not.exist(geopackage);
+      done();
+    });
+  });
+
+  it('should not open a file without the correct extension via promise', function() {
+    GeoPackage.open(tilePath)
+    .catch(function(error) {
+      should.exist(error);
     });
   });
 
   it('should open the geopackage byte array', function(done) {
     fs.readFile(existingPath, function(err, data) {
-      GeoPackage.openGeoPackageByteArray(data, function(err, geopackage) {
+      GeoPackage.open(data, function(err, geopackage) {
         should.not.exist(err);
         should.exist(geopackage);
         done();
@@ -32,16 +67,55 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  it('should create a geopackage', function(done) {
-    GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
-      should.not.exist(err);
-      should.exist(gp);
+  it('should not open a byte array that is not a geopackage', function(done) {
+    fs.readFile(tilePath, function(err, data) {
+      GeoPackage.open(data, function(err, geopackage) {
+        should.exist(err);
+        should.not.exist(geopackage);
+        done();
+      });
+    });
+  });
+
+  it('should not create a geopackage without the correct extension', function(done) {
+    GeoPackage.create(tilePath, function(err, geopackage) {
+      should.exist(err);
+      should.not.exist(geopackage);
       done();
     });
   });
 
+  it('should not create a geopackage without the correct extension return promise', function(done) {
+    GeoPackage.create(tilePath)
+    .then(function(geopackage) {
+      // should not get called
+      false.should.be.equal(true);
+    })
+    .catch(function(error) {
+      should.exist(error);
+      done();
+    });
+  });
+
+  it('should create a geopackage', function(done) {
+    GeoPackage.create(geopackageToCreate, function(err, gp) {
+      should.not.exist(err);
+      should.exist(gp);
+      should.exist(gp.getTables);
+      done();
+    });
+  });
+
+  it('should create a geopackage with a promise', function() {
+    GeoPackage.create(geopackageToCreate)
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      should.exist(geopackage.getTables);
+    });
+  });
+
   it('should create a geopackage and export it', function(done) {
-    GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+    GeoPackage.create(geopackageToCreate, function(err, gp) {
       should.not.exist(err);
       should.exist(gp);
       gp.export(function(err, buffer) {
@@ -52,11 +126,19 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
+  it('should create a geopackage in memory', function(done) {
+    GeoPackage.create(function(err, gp) {
+      should.not.exist(err);
+      should.exist(gp);
+      done();
+    });
+  });
+
   describe('should operate on an indexed geopackage', function() {
 
     var indexedGeopackage;
     var originalFilename = indexedPath;
-    var filename = path.join(__dirname, 'fixtures', 'tmp', 'rivers_indexed.gpkg');
+    var filename;
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
@@ -69,8 +151,9 @@ describe('GeoPackageAPI tests', function() {
     }
 
     beforeEach('should open the geopackage', function(done) {
+      filename = path.join(__dirname, 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackage.openGeoPackage(filename, function(err, geopackage) {
+        GeoPackage.open(filename, function(err, geopackage) {
           should.not.exist(err);
           should.exist(geopackage);
           indexedGeopackage = geopackage;
@@ -81,15 +164,73 @@ describe('GeoPackageAPI tests', function() {
 
     afterEach('should close the geopackage', function(done) {
       indexedGeopackage.close();
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.unlink(filename, done);
-      } else {
-        done();
-      }
+      testSetup.deleteGeoPackage(filename, done);
     });
 
-    it('should add geojson to the geopackage and keep it indexed', function(done) {
-      GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+    it('should get the tables', function() {
+      var tables = indexedGeopackage.getTables();
+      tables.should.be.deep.equal({ attributes: [], features: [ 'rivers' ], tiles: [ 'rivers_tiles' ] });
+    });
+
+    it('should get the tile tables', function() {
+      var tables = indexedGeopackage.getTileTables();
+      tables.should.be.deep.equal([ 'rivers_tiles' ]);
+    });
+
+    it('should get the feature tables', function() {
+      var tables = indexedGeopackage.getFeatureTables();
+      tables.should.be.deep.equal([ 'rivers' ]);
+    });
+
+    it('should check if it has feature table', function() {
+      var exists = indexedGeopackage.hasFeatureTable('rivers');
+      exists.should.be.equal(true);
+    });
+
+    it('should check if does not have feature table', function() {
+      var exists = indexedGeopackage.hasFeatureTable('rivers_no');
+      exists.should.be.equal(false);
+    });
+
+    it('should check if it has tile table', function() {
+      var exists = indexedGeopackage.hasTileTable('rivers_tiles');
+      exists.should.be.equal(true);
+    });
+
+    it('should check if does not have tile table', function() {
+      var exists = indexedGeopackage.hasTileTable('rivers_tiles_no');
+      exists.should.be.equal(false);
+    });
+
+    it('should get the 0 0 0 tile', function() {
+      return GeoPackage.getTileFromXYZ(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256)
+      .then(function(tile) {
+        should.exist(tile);
+      });
+    });
+
+    it('should get the 0 0 0 tile in a canvas', function() {
+      var canvas;
+      if (typeof(process) !== 'undefined' && process.version) {
+        canvas = PureImage.make(256, 256);
+      } else {
+        canvas = document.createElement('canvas');
+      }
+      return GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
+    });
+
+    it('should get the 0 0 0 vector tile', function() {
+      var vectorTile = GeoPackage.getVectorTile(indexedGeopackage, 'rivers', 0, 0, 0);
+      should.exist(vectorTile);
+    });
+
+    it('should query for the tiles in the bounding box', function() {
+      var tiles = GeoPackage.getTilesInBoundingBoxWebZoom(indexedGeopackage, 'rivers_tiles', 0, -180, 180, -80, 80);
+      tiles.tiles.length.should.be.equal(1);
+    });
+
+    it('should add geojson to the geopackage and keep it indexed', function() {
+      var id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
         "type": "Feature",
         "properties": {
           'property_0': 'test'
@@ -101,41 +242,85 @@ describe('GeoPackageAPI tests', function() {
             40.17887331434696
           ]
         }
-      }, 'rivers', function(err, id) {
-        // ensure the last indexed changed
-        var db = indexedGeopackage.getDatabase();
-        db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id], function(err, index) {
-          should.not.exist(err);
-          index.geom_id.should.be.equal(id);
-          done();
-        });
-      });
+      }, 'rivers');
+      // ensure the last indexed changed
+      var db = indexedGeopackage.getDatabase();
+      var index = db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id]);
+      index.geom_id.should.be.equal(id);
+    });
+
+    it('should add geojson to the geopackage and keep it indexed and query it', function() {
+      var id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers');
+      var features = GeoPackage.queryForGeoJSONFeaturesInTable(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18));
+      features.length.should.be.equal(1);
+    });
+
+    it('should add geojson to the geopackage and keep it indexed and iterate it', function() {
+      var id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers')
+      var iterator = GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(indexedGeopackage, 'rivers', new BoundingBox(-99.9, -99.8, 40.16, 40.18))
+      for (var geoJson of iterator) {
+        geoJson.properties.Scalerank.should.be.equal('test');
+      }
+    });
+
+    it('should add geojson to the geopackage and keep it indexed and iterate it and pull the features', function() {
+      var id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(indexedGeopackage, {
+        "type": "Feature",
+        "properties": {
+          'property_0': 'test'
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -99.84374999999999,
+            40.17887331434696
+          ]
+        }
+      }, 'rivers')
+      var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(indexedGeopackage, 'rivers');
+      for (var geoJson of iterator.results) {
+        should.exist(geoJson.properties);
+      }
     });
   });
 
   describe('should operate on a new geopackage', function() {
     var geopackage;
 
-    before(function(done) {
-      console.log('delete geopackage');
+    beforeEach(function(done) {
       fs.unlink(geopackageToCreate, function() {
-        console.log('create geopackage');
-        GeoPackage.createGeoPackage(geopackageToCreate, function(err, gp) {
+        GeoPackage.create(geopackageToCreate, function(err, gp) {
           geopackage = gp;
           done();
         });
       });
     });
 
-    beforeEach(function(done) {
-      console.log('open geopackage');
-      GeoPackage.openGeoPackage(geopackageToCreate, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
-    });
-
-    it('should create a feature table', function(done) {
+    it('should create a feature table', function() {
       var columns = [];
 
       var FeatureColumn = GeoPackage.FeatureColumn;
@@ -161,65 +346,64 @@ describe('GeoPackageAPI tests', function() {
       columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
       columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
-        should.not.exist(err);
+      return GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
+      .then(function(featureDao) {
         should.exist(featureDao);
-        GeoPackage.hasFeatureTable(geopackage, tableName, function(err, exists) {
-          exists.should.be.equal(true);
-          should.not.exist(err);
-          GeoPackage.getFeatureTables(geopackage, function(err, results) {
-            results.length.should.be.equal(1);
-            results[0].should.be.equal(tableName);
-            GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
-              "type": "Feature",
-              "properties": {
-                'test_text_limited.test': 'test'
-              },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [
-                  -99.84374999999999,
-                  40.17887331434696
-                ]
-              }
-            }, tableName, function(err, id) {
-              id.should.be.equal(1);
-              GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
-                "type": "Feature",
-                "properties": {
-                  'test_text_limited.test': 'test'
-                },
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [
-                    -99.84374999999999,
-                    40.17887331434696
-                  ]
-                }
-              }, tableName, function(err, id) {
-                id.should.be.equal(2);
-                GeoPackage.getFeature(geopackage, tableName, 2, function(err, feature) {
-                  should.not.exist(err);
-                  should.exist(feature);
-                  feature.id.should.be.equal(2);
-                  should.exist(feature.geometry);
-                  var count = 0;
-                  GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, rowCallback) {
-                    count++;
-                    rowCallback();
-                  }, function(err) {
-                    count.should.be.equal(2);
-                    done();
-                  });
-                });
-              });
-            });
-          });
-        });
+        var exists = geopackage.hasFeatureTable(tableName);
+        exists.should.be.equal(true);
+        var results = geopackage.getFeatureTables();
+        results.length.should.be.equal(1);
+        results[0].should.be.equal(tableName);
+        return GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
+          "type": "Feature",
+          "properties": {
+            'test_text_limited.test': 'test'
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -99.84374999999999,
+              40.17887331434696
+            ]
+          }
+        }, tableName)
+      })
+      .then(function(id) {
+        id.should.be.equal(1);
+        return GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, {
+          "type": "Feature",
+          "properties": {
+            'test_text_limited.test': 'test'
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -99.84374999999999,
+              40.17887331434696
+            ]
+          }
+        }, tableName);
+      })
+      .then(function(id) {
+        id.should.be.equal(2);
+        return GeoPackage.getFeature(geopackage, tableName, 2);
+      })
+      .then(function(feature) {
+        should.exist(feature);
+        feature.id.should.be.equal(2);
+        should.exist(feature.geometry);
+        return GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName);
+      })
+      .then(function(each) {
+        var count = 0;
+        for (var row of each.results) {
+          count++;
+        }
+        count.should.be.equal(2);
       });
     });
 
-    it.skip('should create a tile table', function(done) {
+    it('should create a tile table', function() {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -232,21 +416,18 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
       var tileMatrixSetSrsId = 4326;
-      GeoPackage.createTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
-        GeoPackage.hasTileTable(geopackage, 'tiles', function(err, exists) {
-          exists.should.be.equal(true);
-          GeoPackage.getTileTables(geopackage, function(err, tables) {
-            tables.length.should.be.equal(1);
-            tables[0].should.be.equal('tiles');
-            done();
-          });
-        });
+        var exists = geopackage.hasTileTable('tiles');
+        exists.should.be.equal(true);
+        var tables = geopackage.getTileTables();
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('tiles');
       });
     });
 
-    it.skip('should create a standard web mercator tile table', function(done) {
+    it('should create a standard web mercator tile table', function() {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -259,11 +440,9 @@ describe('GeoPackageAPI tests', function() {
       var contentsSrsId = 3857;
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
-
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      return GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
-        done();
       });
     });
 
@@ -281,24 +460,22 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         testSetup.loadTile(tilePath, function(err, tileData) {
-          GeoPackage.addTileToGeoPackage(geopackage, tileData, tableName, 0, 0, 0, function(err, result) {
-            result.should.be.equal(1);
-            GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0, function(err, tileRow) {
-              testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
-                equal.should.be.equal(true);
-                done();
-              });
-            });
+          var result = geopackage.addTile(tileData, tableName, 0, 0, 0);
+          result.should.be.equal(1);
+          var tileRow = GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0);
+          testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
+            equal.should.be.equal(true);
+            done();
           });
         });
       });
     });
 
-    it.skip('should add a tile to the tile table and get it via xyz', function(done) {
+    it('should add a tile to the tile table and get it via xyz', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -312,24 +489,24 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          GeoPackage.addTileToGeoPackage(geopackage, tile, tableName, 0, 0, 0, function(err, result) {
-            result.should.be.equal(1);
-            GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256, function(err, tile) {
-              testSetup.diffImages(tile, tilePath, function(err, equal) {
-                equal.should.be.equal(true);
-                done();
-              });
+          var result = geopackage.addTile(tile, tableName, 0, 0, 0);
+          result.should.be.equal(1);
+          GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256)
+          .then(function(tile) {
+            testSetup.diffImages(tile, tilePath, function(err, equal) {
+              equal.should.be.equal(true);
+              done();
             });
           });
         });
       });
     });
 
-    it.skip('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
+    it('should add a tile to the tile table and get it into a canvas via xyz', function(done) {
       var columns = [];
 
       var TileColumn = GeoPackage.TileColumn;
@@ -343,23 +520,23 @@ describe('GeoPackageAPI tests', function() {
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var tileMatrixSetSrsId = 3857;
 
-      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0, function(err, tileMatrixSet) {
-        should.not.exist(err);
+      GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 0)
+      .then(function(tileMatrixSet) {
         should.exist(tileMatrixSet);
         fs.readFile(tilePath, function(err, tile) {
-          GeoPackage.addTileToGeoPackage(geopackage, tile, tableName, 0, 0, 0, function(err, result) {
-            result.should.be.equal(1);
-            var canvas;
-            if (typeof(process) !== 'undefined' && process.version) {
-              canvas = PureImage.make(256, 256);
-            } else {
-              canvas = document.createElement('canvas');
-            }
-            GeoPackage.drawXYZTileInCanvas(geopackage, tableName, 0, 0, 0, 256, 256, canvas, function(err, tile) {
-              testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
-                equal.should.be.equal(true);
-                done();
-              });
+          var result = geopackage.addTile(tile, tableName, 0, 0, 0);
+          result.should.be.equal(1);
+          var canvas;
+          if (typeof(process) !== 'undefined' && process.version) {
+            canvas = PureImage.make(256, 256);
+          } else {
+            canvas = document.createElement('canvas');
+          }
+          GeoPackage.drawXYZTileInCanvas(geopackage, tableName, 0, 0, 0, 256, 256, canvas)
+          .then(function(tile) {
+            testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
+              equal.should.be.equal(true);
+              done();
             });
           });
         });
