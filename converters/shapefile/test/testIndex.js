@@ -6,418 +6,273 @@ var path = require('path')
 
 describe('Shapefile to GeoPackage tests', function() {
 
-  describe.only('conversion tests', function(done) {
-    it('contours', function(done) {
-      try {
-        fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'contours.gpkg'));
-      } catch (e) {}
-
-      ShapefileToGeoPackage.convert({
-        shapefile: path.join(__dirname, 'fixtures', 'tmp', 'contours.zip'),
-        geopackage: path.join(__dirname, 'fixtures', 'tmp', 'contours.gpkg')
-      }, function(status, callback) {
-        callback();
-      }, function(err, geopackage) {
-        should.not.exist(err);
-        should.exist(geopackage);
-        geopackage.getFeatureTables(function(err, tables) {
-          tables.length.should.be.equal(1);
-          tables[0].should.be.equal('ne_110m_land');
-          geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-            featureDao.getCount(function(err, count) {
-              count.should.be.equal(127);
-              done();
-            });
-          });
-        });
-      });
-    });
-
-    it('tracks', function(done) {
-      try {
-        fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '20180709141322.gpkg'));
-      } catch (e) {}
-
-      ShapefileToGeoPackage.convert({
-        shapefile: path.join(__dirname, 'fixtures', '20180709141322.zip'),
-        geopackage: path.join(__dirname, 'fixtures', 'tmp', '20180709141322.gpkg')
-      }, function(status, callback) {
-        callback();
-      }, function(err, geopackage) {
-        should.not.exist(err);
-        should.exist(geopackage);
-        geopackage.getFeatureTables(function(err, tables) {
-          tables.length.should.be.equal(2);
-          done();
-        });
-      });
-    });
-
-    it.only('tracks3', function(done) {
-      try {
-        fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', '20180709.gpkg'));
-      } catch (e) {}
-
-      ShapefileToGeoPackage.convert({
-        shapefile: path.join(__dirname, 'fixtures', '20180709.zip'),
-        geopackage: path.join(__dirname, 'fixtures', 'tmp', '20180709.gpkg')
-      }, function(status, callback) {
-        callback();
-      }, function(err, geopackage) {
-        should.not.exist(err);
-        should.exist(geopackage);
-        geopackage.getFeatureTables(function(err, tables) {
-          tables.length.should.be.equal(2);
-          done();
-        });
-      });
-    });
-  });
-
-  it('should convert the natural earth 110m file', function(done) {
+  it('should convert the natural earth 110m file and add read it out as geojson', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
-
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            done();
-          });
-        });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+
+      return ShapefileToGeoPackage.extract(geopackage, 'ne_110m_land')
+      .then(function(result) {
+        should.exist(result);
+
       });
+      // geoJson.features.length.should.be.equal(127);
     });
   });
 
-  it('should convert the natural earth 110m file no progress callback', function(done) {
+  it('should convert the natural earth 110m file', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            done();
-          });
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
     });
   });
 
-  it('should convert the natural earth 110m zip', function(done) {
+  it('should convert the natural earth 110m file no progress callback', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
+      shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    })
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+    });
+  });
+
+  it('should convert the natural earth 110m zip', function() {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land.zip'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            done();
-          });
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
     });
   });
 
-  it('should convert the natural earth 110m zip buffer', function(done) {
-    this.timeout(0);
-    try {
-      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'RIMPAC.gpkg'));
-    } catch (e) {}
-
-    var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'RIMPAC.zip'));
-
-    ShapefileToGeoPackage.convert({
-      shapefile: path.join(__dirname, 'fixtures', 'RIMPAC.zip'),
-      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'RIMPAC.gpkg')
-    }, function(status, callback) {
-      console.log('Progress status', status);
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
-      should.exist(geopackage);
-      done();
-      // geopackage.getFeatureTables(function(err, tables) {
-        // tables.length.should.be.equal(1);
-        // tables[0].should.be.equal('features');
-        // geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
-        //   featureDao.getCount(function(err, count) {
-        //     count.should.be.equal(127);
-        //     done();
-        //   });
-        // });
-      // });
-    });
-  });
-
-  it('should convert the natural earth 110m zip buffer with no geopackage argument', function(done) {
+  it('should convert the natural earth 110m zip buffer with no geopackage argument', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
     var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'ne_110m_land.zip'));
 
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapezipData: zipData
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('features');
-        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            done();
-          });
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
     });
   });
 
-  it('should convert the shapefile buffer', function(done) {
-
+  it('should convert the shapefile buffer', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    var shpStream = fs.createReadStream(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'));
-    var dbfStream = fs.createReadStream(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.dbf'));
-    ShapefileToGeoPackage.convert({
-      shapeData: shpStream,
-      dbfData: dbfStream,
+    var shpData = fs.readFileSync(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'));
+    var dbfData = fs.readFileSync(path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.dbf'));
+    return ShapefileToGeoPackage.convert({
+      shapeData: shpData,
+      dbfData: dbfData,
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('features');
-        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            done();
-          });
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('features');
+      var featureDao = geopackage.getFeatureDao('features');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
     });
   });
 
-  it('should convert the natural earth 110m file and add the layer twice', function(done) {
-    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+  it('should convert the natural earth 110m file and add the layer twice', function() {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
 
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+      return ShapefileToGeoPackage.addLayer({
+        shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+        geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+      })
+      .then(function(geopackage) {
+        should.exist(geopackage);
+        var tables = geopackage.getFeatureTables();
+        tables.length.should.be.equal(2);
         tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            ShapefileToGeoPackage.addLayer({
-              shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
-              geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-            }, function(status, callback) {
-              callback();
-            }, function(err, geopackage) {
-              should.not.exist(err);
-              should.exist(geopackage);
-              geopackage.getFeatureTables(function(err, tables) {
-                tables.length.should.be.equal(2);
-                tables[0].should.be.equal('ne_110m_land');
-                tables[1].should.be.equal('ne_110m_land_1');
-                geopackage.getFeatureDaoWithTableName('ne_110m_land_1', function(err, featureDao) {
-                  featureDao.getCount(function(err, count) {
-                    count.should.be.equal(127);
-                    done();
-                  });
-                });
-              });
-            });
-          });
-        });
+        tables[1].should.be.equal('ne_110m_land_1');
+        var featureDao = geopackage.getFeatureDao('ne_110m_land_1');
+        var count = featureDao.getCount();
+        count.should.be.equal(127);
       });
     });
   });
 
-  it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function(done) {
-    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
-    ShapefileToGeoPackage.convert({
+  it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function() {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+      return ShapefileToGeoPackage.addLayer({
+        shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
+        geopackage: geopackage
+      })
+      .then(function(geopackage) {
+        should.exist(geopackage);
+        var tables = geopackage.getFeatureTables();
+        tables.length.should.be.equal(2);
         tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
-            ShapefileToGeoPackage.addLayer({
-              shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
-              geopackage: geopackage
-            }, function(status, callback) {
-              callback();
-            }, function(err, geopackage) {
-              should.not.exist(err);
-              should.exist(geopackage);
-              geopackage.getFeatureTables(function(err, tables) {
-                tables.length.should.be.equal(2);
-                tables[0].should.be.equal('ne_110m_land');
-                tables[1].should.be.equal('ne_110m_land_1');
-                geopackage.getFeatureDaoWithTableName('ne_110m_land_1', function(err, featureDao) {
-                  featureDao.getCount(function(err, count) {
-                    count.should.be.equal(127);
-                    done();
-                  });
-                });
-              });
-            });
-          });
-        });
+        tables[1].should.be.equal('ne_110m_land_1');
+        var featureDao = geopackage.getFeatureDao('ne_110m_land_1');
+        var count = featureDao.getCount();
+        count.should.be.equal(127);
       });
     });
   });
 
-  it('should convert the natural earth 110m file and add read it out as geojson', function(done) {
-    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
-    ShapefileToGeoPackage.convert({
+  it('should convert the natural earth 110m file and add read it out as geojson', function() {
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+
+    return ShapefileToGeoPackage.convert({
       shapefile: path.join(__dirname, 'fixtures', 'ne_110m_land', 'ne_110m_land.shp'),
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('ne_110m_land');
-        geopackage.getFeatureDaoWithTableName('ne_110m_land', function(err, featureDao) {
-          featureDao.getCount(function(err, count) {
-            count.should.be.equal(127);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
 
-            ShapefileToGeoPackage.extract(geopackage, 'ne_110m_land', function(err, zip) {
-              // var zipFile = path.join(__dirname, 'fixtures', 'tmp', 'test.zip');
-              // try { fs.unlinkSync(zipFile); } catch (e) {}
-              // fs.writeFile(zipFile, zip, function(err) {
-                done();
-              // });
-            });
-          });
-        });
+      return ShapefileToGeoPackage.extract(geopackage, 'ne_110m_land')
+      .then(function(result) {
+        should.exist(result);
       });
     });
   });
 
-  it('should convert the MGRS_100kmSQ_ID file with features defined as 3857', function(done) {
+  it('should convert the MGRS_100kmSQ_ID file with features defined as 3857', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'MGRS_100kmSQ_ID.gpkg'));
     } catch (e) {}
 
     var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'MGRS_100kmSQ_ID_60K.zip'));
 
-
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapezipData: zipData,
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'MGRS_100kmSQ_ID.gpkg')
-    }, function(status, callback) {
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('features');
-        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
-          featureDao.getSrs(function(err, srs) {
-            srs.srs_id.should.be.equal(4326);
-            featureDao.getCount(function(err, count) {
-              count.should.be.equal(80);
-              done();
-            });
-          });
-
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('MGRS_100kmSQ_ID_60K');
+      var featureDao = geopackage.getFeatureDao('MGRS_100kmSQ_ID_60K');
+      var srs = featureDao.getSrs();
+      srs.srs_id.should.be.equal(4326);
+      var count = featureDao.getCount();
+      count.should.be.equal(80);
     });
   });
 
-  it('should convert the MGRS_worldwide file with features defined as 3857', function(done) {
+  it('should convert the MGRS_worldwide file with features defined as 3857', function() {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'MGRS_GZD_WorldWide.gpkg'));
     } catch (e) {}
 
     var zipData = fs.readFileSync(path.join(__dirname, 'fixtures', 'MGRS_GZD_WorldWide.zip'));
-    console.log('got the zip data');
-
-    ShapefileToGeoPackage.convert({
+    return ShapefileToGeoPackage.convert({
       shapezipData: zipData,
       geopackage: path.join(__dirname, 'fixtures', 'tmp', 'MGRS_GZD_WorldWide.gpkg')
-    }, function(status, callback) {
-      console.log('Progress', status);
-      callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    })
+    .then(function(geopackage) {
       should.exist(geopackage);
-      geopackage.getFeatureTables(function(err, tables) {
-        tables.length.should.be.equal(1);
-        tables[0].should.be.equal('features');
-        geopackage.getFeatureDaoWithTableName('features', function(err, featureDao) {
-          featureDao.getSrs(function(err, srs) {
-            srs.srs_id.should.be.equal(4326);
-            featureDao.getCount(function(err, count) {
-              count.should.be.equal(80);
-              done();
-            });
-          });
-
-        });
-      });
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('MGRS_GZD_WorldWide');
+      var featureDao = geopackage.getFeatureDao('MGRS_GZD_WorldWide');
+      var srs = featureDao.getSrs();
+      srs.srs_id.should.be.equal(4326);
+      var count = featureDao.getCount();
+      count.should.be.equal(1197);
     });
   });
 });
