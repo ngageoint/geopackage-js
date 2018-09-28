@@ -40,7 +40,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
     xhr.responseType = 'arraybuffer';
     xhr.onload = function(e) {
       var uInt8Array = new Uint8Array(this.response);
-      GeoPackageAPI.openGeoPackageByteArray(uInt8Array, function(err, gp) {
+      GeoPackageAPI.open(uInt8Array, function(err, gp) {
         console.timeEnd('Loading GeoPackage ' + layer.options.geoPackageUrl);
         layer.geoPackageLoaded = true;
         layer.geoPackage = gp;
@@ -63,7 +63,7 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
   }
 });
 
-function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
+function maybeDrawTile(gridLayer, tilePoint, canvas, dpme) {
   var geoPackage = gridLayer.geoPackage;
   var layerName = gridLayer.options.layerName;
   var map = gridLayer._map;
@@ -82,13 +82,17 @@ function maybeDrawTile(gridLayer, tilePoint, canvas, callback) {
       nw = map.unproject(nwPoint, tilePoint.z),
       se = map.unproject(sePoint, tilePoint.z);
       console.log('Draw 4326 tile');
-      GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas);
-      console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-      callback(err, canvas);
+      GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas)
+      .then(function() {
+        console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+        callback(err, canvas);
+      });
     } else {
-      GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas);
-      console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-      callback(err, canvas);
+      GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas)
+      .then(function() {
+        console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+        callback(err, canvas);
+      });
     }
   }, 0);
 }
