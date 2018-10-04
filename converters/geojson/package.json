@@ -1,6 +1,6 @@
 {
   "name": "geojson-to-geopackage",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "GeoJSON to GeoPackage converter",
   "keywords": [
     "NGA",
@@ -24,7 +24,7 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/geopackage": "../../.",
+    "@ngageoint/geopackage": "2.0.x",
     "@turf/bbox": "^4.3.0",
     "JSONStream": "^1.3.3"
   },
