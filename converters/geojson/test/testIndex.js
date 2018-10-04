@@ -11,8 +11,8 @@ describe('GeoJSON to GeoPackage tests', function() {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
 
-    return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
-      return Promise.resolve();
+    return GeoJSONToGeoPackage.convert({
+      geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
     })
     .then(function(geopackage) {
       should.exist(geopackage);
@@ -83,7 +83,9 @@ describe('GeoJSON to GeoPackage tests', function() {
   });
 
   it('should convert the natural earth 110m file and add the layer twice', function() {
+    try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e){}
     return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
@@ -118,7 +120,9 @@ describe('GeoJSON to GeoPackage tests', function() {
   });
 
   it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function() {
+    try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
     return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
@@ -150,7 +154,9 @@ describe('GeoJSON to GeoPackage tests', function() {
   });
 
   it('should convert the natural earth 110m file and add read it out as geojson', function() {
+    try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
     return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
@@ -163,8 +169,10 @@ describe('GeoJSON to GeoPackage tests', function() {
       var count = featureDao.getCount();
       count.should.be.equal(127);
 
-      var geoJson = GeoJSONToGeoPackage.extract(geopackage, 'ne_110m_land');
-      geoJson.features.length.should.be.equal(127);
+      return GeoJSONToGeoPackage.extract(geopackage, 'ne_110m_land')
+      .then(function(geoJson) {
+        geoJson.features.length.should.be.equal(127);
+      });
     });
   });
 
@@ -208,25 +216,26 @@ describe('GeoJSON to GeoPackage tests', function() {
         row.getValueWithColumnName('_feature_id').should.be.equal('gserg#897');
       }
 
-      var geoJson = GeoJSONToGeoPackage.extract(geopackage, 'zandm');
+      return GeoJSONToGeoPackage.extract(geopackage, 'zandm')
+      .then(function(geoJson) {
+        geoJson.features.length.should.be.equal(2);
+        var feature = geoJson.features[0];
+        feature.id.should.be.equal('asdf#456');
+        feature.properties.ID.should.be.equal(456);
+        feature.geometry.coordinates[0].should.be.equal(-5.78);
+        feature.geometry.coordinates[1].should.be.equal(4.3);
+        // https://tools.ietf.org/html/rfc7946 m values should not be used
+        // feature.geometry.coordinates[2].should.be.equal(121.0);
 
-      geoJson.features.length.should.be.equal(2);
-      var feature = geoJson.features[0];
-      feature.id.should.be.equal('asdf#456');
-      feature.properties.ID.should.be.equal(456);
-      feature.geometry.coordinates[0].should.be.equal(-5.78);
-      feature.geometry.coordinates[1].should.be.equal(4.3);
-      // https://tools.ietf.org/html/rfc7946 m values should not be used
-      // feature.geometry.coordinates[2].should.be.equal(121.0);
-
-      var feature = geoJson.features[1];
-      feature.id.should.be.equal('gserg#897');
-      feature.properties.ID.should.be.equal(897);
-      feature.geometry.coordinates[0][0].should.be.equal(-8.6);
-      feature.geometry.coordinates[0][1].should.be.equal(2.86);
-      feature.geometry.coordinates[0][2].should.be.equal(7.7);
-      // https://tools.ietf.org/html/rfc7946 m values should not be used
-      // feature.geometry.coordinates[0][3].should.be.equal(131);
+        var feature = geoJson.features[1];
+        feature.id.should.be.equal('gserg#897');
+        feature.properties.ID.should.be.equal(897);
+        feature.geometry.coordinates[0][0].should.be.equal(-8.6);
+        feature.geometry.coordinates[0][1].should.be.equal(2.86);
+        feature.geometry.coordinates[0][2].should.be.equal(7.7);
+        // https://tools.ietf.org/html/rfc7946 m values should not be used
+        // feature.geometry.coordinates[0][3].should.be.equal(131);
+      });
     });
   });
 });

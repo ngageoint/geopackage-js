@@ -1,7 +1,6 @@
 var GeoPackage = require('@ngageoint/geopackage');
 
 var fs = require('fs')
-  , async = require('async')
   , path = require('path')
   , bbox = require('@turf/bbox');
 
@@ -30,7 +29,7 @@ module.exports.extract = function(geopackage, tableName) {
   for (var feature of iterator.results) {
     geoJson.features.push(feature);
   }
-  return geoJson;
+  return Promise.resolve(geoJson);
 };
 
 function createOrOpenGeoPackage(geopackage, options, progressCallback) {
