@@ -610,7 +610,7 @@ window.toggleLayer = function(layerType, table) {
         radius: 3
       };
 
-      var featureLayer = L.vectorGrid.protobuf('',{
+      var vectorLayer = L.vectorGrid.protobuf('',{
         maxNativeZoom: 18,
         vectorTileLayerStyles: styles,
         interactive: true,
@@ -639,31 +639,31 @@ window.toggleLayer = function(layerType, table) {
         return string;
       });
 
-      featureLayer._getVectorTilePromise = function(coords, tileBounds) {
+      vectorLayer._getVectorTilePromise = function(coords, tileBounds) {
         var x = coords.x;
   			var y = coords.y;
   		  var z = coords.z;
         return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
         .then(function(json) {
-    			// Normalize feature getters into actual instanced features
-    			for (var layerName in json.layers) {
-    				var feats = [];
+          // Normalize feature getters into actual instanced features
+          for (var layerName in json.layers) {
+            var feats = [];
 
-    				for (var i=0; i<json.layers[layerName].length; i++) {
-    					var feat = json.layers[layerName].feature(i);
-    					feat.geometry = feat.loadGeometry();
-    					feats.push(feat);
-    				}
+            for (var i=0; i<json.layers[layerName].length; i++) {
+              var feat = json.layers[layerName].feature(i);
+              feat.geometry = feat.loadGeometry();
+              feats.push(feat);
+            }
 
-    				json.layers[layerName].features = feats;
-    			}
+            json.layers[layerName].features = feats;
+          }
 
-    			return json;
-    		});
+          return json;
+        });
       }
-      featureLayer.addTo(map);
-      featureLayer.bringToFront();
-      tableLayers[table] = featureLayer;
+      vectorLayer.addTo(map);
+      vectorLayer.bringToFront();
+      tableLayers[table] = vectorLayer;
     });
   } else if(layerType === 'vectortile') {
     if (window.Piwik) {
