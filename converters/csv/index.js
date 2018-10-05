@@ -29,11 +29,43 @@ module.exports.extract = function(geopackage, tableName) {
     type: 'FeatureCollection',
     features: []
   };
+  var properties = {};
   var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName);
   for (var feature of iterator.results) {
+    for (var prop in feature.properties) {
+      properties[prop] = true;
+    }
     geoJson.features.push(feature);
   }
-  return geoJson;
+
+  var csvString = '';
+
+  var fields = ['geometry'];
+  for (var prop in properties) {
+    fields.push(prop);
+  }
+
+  csvString += fields.join(',');
+  csvString += '\n';
+
+  for (var i = 0; i < geoJson.features.length; i++) {
+    var feature = geoJson.features[i];
+    var row = [];
+    for (var f = 0; f < fields.length; f++) {
+      var field = fields[f];
+      if (field === 'geometry') {
+        row.push('"'+wkx.Geometry.parseGeoJSON(feature.geometry).toWkt()+'"');
+      }
+      if (feature.properties[field]) {
+        row.push(feature.properties[field]);
+      } else {
+        row.push(undefined);
+      }
+    }
+    csvString += row.join(',');
+    csvString += '\n';
+  }
+  return Promise.resolve(csvString);
 };
 
 function createOrOpenGeoPackage(geopackage, options, progressCallback) {
@@ -51,7 +83,7 @@ function createOrOpenGeoPackage(geopackage, options, progressCallback) {
           console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
           throw new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage);
         } else {
-          console.log('open geopackage');
+          console.log('Open the GeoPackage');
           return GeoPackage.open(geopackage);
         }
       } catch (e) {}
@@ -160,7 +192,6 @@ function setupConversion(options, progressCallback) {
 
         if (options.csv && typeof options.csv === 'string') {
           fs.createReadStream(csv).pipe(parser).on('end', function() {
-            console.log('data end');
             resolve({
               geopackage: results.geopackage,
               tableName: results.tableName,
@@ -171,7 +202,6 @@ function setupConversion(options, progressCallback) {
           var bufferStream = new stream.PassThrough();
           bufferStream.end(options.csvData);
           bufferStream.pipe(parser).on('end', function() {
-            console.log('data end');
             resolve({
               geopackage: results.geopackage,
               tableName: results.tableName,
