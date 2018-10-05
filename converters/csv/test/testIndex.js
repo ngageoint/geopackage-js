@@ -150,8 +150,10 @@ describe('CSV to GeoPackage tests', function() {
       var count = featureDao.getCount();
       count.should.be.equal(286);
 
-      var geoJson = CSVToGeoPackage.extract(geopackage, '110m-admin-0-countries');
-      geoJson.features.length.should.be.equal(286);
+      CSVToGeoPackage.extract(geopackage, '110m-admin-0-countries')
+      .then(function(csv) {
+        csv.split(/\r\n|\r|\n/).length.should.be.equal(288);
+      })
     });
   });
 
