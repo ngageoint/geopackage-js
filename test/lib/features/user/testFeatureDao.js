@@ -106,7 +106,6 @@ describe('FeatureDao tests', function() {
       var count = 0;
       var bbox = new BoundingBox(-13189576.119, -13126488.564, 6637372.21, 6607360.178);
       var iterator = featureDao.queryIndexedFeaturesWithWebMercatorBoundingBox(bbox);
-
       for (var row of iterator) {
         count++;
         row.values.property_1.should.be.equal('Columbia');
