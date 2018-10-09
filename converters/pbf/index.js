@@ -1,113 +1,101 @@
-var GeoPackage = require('@ngageoint/geopackage');
+var GeoPackage = require('@ngageoint/geopackage')
+  , GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage');
 
 var fs = require('fs')
-  , async = require('async')
   , path = require('path')
   , PBF = require('pbf')
   , clip = require('geojson-clip-polygon')
-  //, intersect = require('@turf/intersect')
   , GlobalMercator = require('global-mercator')
-  , VectorTile = require('vector-tile').VectorTile;
+  , VectorTile = require('@mapbox/vector-tile').VectorTile;
 
-module.exports.addLayer = function(options, progressCallback, doneCallback) {
-  doneCallback = arguments[arguments.length - 1];
-  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+module.exports.addLayer = function(options, progressCallback) {
+  progressCallback = progressCallback || function() { return Promise.resolve(); };
 
   options.append = true;
 
-  setupConversion(options, progressCallback, doneCallback);
+  return setupConversion(options, progressCallback);
 };
 
 module.exports.convert = function(options, progressCallback, doneCallback) {
-  doneCallback = arguments[arguments.length - 1];
-  progressCallback = typeof arguments[arguments.length - 2] === 'function' ? arguments[arguments.length - 2] : undefined;
+  progressCallback = progressCallback || function() { return Promise.resolve(); };
 
   options.append = options.append || false;
 
-  setupConversion(options, progressCallback, doneCallback);
+  return setupConversion(options, progressCallback);
 };
 
-module.exports.extract = function(geopackage, tableName, callback) {
+module.exports.extract = function(geopackage, tableName) {
   var geoJson = {
     type: 'FeatureCollection',
     features: []
   };
-  GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName, function(err, feature, done) {
+  var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(geopackage, tableName);
+  for (var feature of iterator.results) {
     geoJson.features.push(feature);
-    done();
-  }, function(err) {
-    callback(err, geoJson);
-  });
+  }
+  return Promise.resolve(geoJson);
 };
 
-function setupConversion(options, progressCallback, doneCallback) {
-  if (!progressCallback) {
-    progressCallback = function(status, cb) {
-      cb();
+function createOrOpenGeoPackage(geopackage, options, progressCallback) {
+  return Promise.resolve()
+  .then(function() {
+    if (typeof geopackage === 'object') {
+      return progressCallback({status: 'Opening GeoPackage'})
+      .then(function() {
+        return geopackage;
+      });
+    } else {
+      try {
+        var stats = fs.statSync(geopackage);
+        if (!options.append) {
+          console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+          throw new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+        } else {
+          console.log('open geopackage');
+          return GeoPackage.open(geopackage);
+        }
+      } catch (e) {}
+      return progressCallback({status: 'Creating GeoPackage'})
+      .then(function() {
+        console.log('Create new geopackage', geopackage);
+        return GeoPackage.create(geopackage);
+      });
     }
-  }
+  });
+}
 
+function setupConversion(options, progressCallback) {
   var geopackage = options.geopackage;
   var pbf = options.pbf;
   var append = options.append;
 
-  async.waterfall([
-    // create or open the geopackage
-    function(callback) {
-      if (typeof geopackage === 'object') {
-        return progressCallback({status: 'Opening GeoPackage'}, function() {
-          callback(null, geopackage);
-        });
-      }
-
-      try {
-        var stats = fs.statSync(geopackage);
-        if (!append) {
-          console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
-          return callback(new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage));
-        } else {
-          return GeoPackage.openGeoPackage(geopackage, callback);
-        }
-      } catch (e) {}
-      return progressCallback({status: 'Creating GeoPackage'}, function() {
-        GeoPackage.createGeoPackage(geopackage, callback);
-      });
-    },
-    // figure out the table name to put the data into
-    function(geopackage, callback) {
-      if (options.tableName) {
-        return callback(null, geopackage, options.tableName);
-      }
-      var name = 'features';
-      if (typeof pbf === 'string') {
-        name = path.basename(pbf, path.extname(pbf));
-      }
-      geopackage.getFeatureTables(function(err, tables) {
-        var count = 1;
-        while(tables.indexOf(name) !== -1) {
-          name = name + '_' + count;
-          count++;
-        }
-        callback(null, geopackage, name);
-      });
-    },
-    // get the PBF data
-    function(geopackage, tableName, callback) {
-      if (typeof pbf === 'string') {
-        progressCallback({status: 'Reading PBF file'}, function() {
-          fs.readFile(pbf, function(err, data) {
-            callback(null, geopackage, tableName, data);
+  return createOrOpenGeoPackage(geopackage, options, progressCallback)
+  .then(function(results) {
+    if (typeof pbf === 'string') {
+      return progressCallback({status: 'Reading PBF file'})
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          fs.readFile(pbf, function(err, buffer) {
+            resolve({
+              geopackage: results.geopackage,
+              buffer: buffer
+            });
           });
         });
-      } else {
-        callback(null, geopackage, tableName, pbf);
-      }
-    },
-    function(geopackage, tableName, buffer, callback) {
-      var pbf = new PBF(buffer);
-      var tile = new VectorTile(pbf);
-      async.forEachOf(tile.layers, function(layer, layerName, layerDone){
-        console.log('layerName', layerName);
+      });
+    } else {
+      return {
+        geopackage: results.geopackage,
+        buffer: pbf
+      };
+    }
+  })
+  .then(function(results) {
+    var pbf = new PBF(results.buffer);
+    var tile = new VectorTile(pbf);
+    return Object.keys(tile.layers).reduce(function(sequence, layerName) {
+      return sequence.then(function() {
+        var layer = tile.layers[layerName];
         var geojson = {
           "type": "FeatureCollection",
           "features": []
@@ -118,29 +106,26 @@ function setupConversion(options, progressCallback, doneCallback) {
           var featureJson = feature.toGeoJSON(options.x, options.y, options.zoom);
           geojson.features.push(featureJson);
         }
-        correctGeoJson(geojson, options.x, options.y, options.zoom, function(err, correctedGeoJson) {
-          convertGeoJSONToGeoPackage(correctedGeoJson, geopackage, layerName, progressCallback, function(err, geopackage){
-            layerDone();
-          });
-        });
-      }, function() {
-        callback(null, geopackage);
+        return correctGeoJson(geojson, options.x, options.y, options.zoom);
+      })
+      .then(function(correctedGeoJson) {
+        return convertGeoJSONToGeoPackage(correctedGeoJson, geopackage, layerName, progressCallback);
       });
-    }
-  ], doneCallback);
+    }, Promise.resolve());
+  });
 };
 
-function correctGeoJson(geoJson, x, y, z, callback) {
+function correctGeoJson(geoJson, x, y, z) {
   var tileBounds = GlobalMercator.googleToBBox([x, y, z]);
 
   var correctedGeoJson = {
     type: 'FeatureCollection',
     features: []
   };
-  async.eachSeries(geoJson.features, function featureIterator(feature, featureCallback) {
-    var props = feature.properties;
-    var ogfeature = feature;
-    async.setImmediate(function() {
+  return geoJson.features.reduce(function(sequence, feature) {
+    return sequence.then(function() {
+      var props = feature.properties;
+      var ogfeature = feature;
       var splitType = '';
       if (feature.geometry.type === 'MultiPolygon') {
         splitType = 'Polygon';
@@ -187,12 +172,12 @@ function correctGeoJson(geoJson, x, y, z, callback) {
         } else {
           correctedGeoJson.features.push(ogfeature);
         }
-        return featureCallback();
+        return;
       }
 
       // split if necessary
-      async.eachSeries(feature.geometry.coordinates, function splitIterator(coords, splitCallback) {
-        async.setImmediate(function() {
+      return feature.geometry.coordinates.reduce(function(sequence, coords) {
+        return sequence.then(function(){
           var f = {
             "type": "Feature",
             "properties": {},
@@ -247,140 +232,20 @@ function correctGeoJson(geoJson, x, y, z, callback) {
               }
             });
           }
-          splitCallback();
         });
-      }, featureCallback);
-
+      }, Promise.resolve());
     });
-  }, function done() {
-    callback(null, correctedGeoJson);
+  }, Promise.resolve())
+  .then(function() {
+    return correctedGeoJson;
   });
 }
 
-
-function convertGeoJSONToGeoPackage(geoJson, geopackage, tableName, progressCallback, callback) {
-  async.waterfall([function(callback) {
-    var properties = {};
-    var count = 0;
-    var featureCount = geoJson.features.length;
-    var fivePercent = Math.floor(featureCount/20);
-    progressCallback({status: 'Reading GeoJSON feature properties'}, function() {
-      // first loop to find all properties of all features.  Has to be a better way...
-      async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
-        if (!feature.geometry) {
-          console.log('feature with no geometry', feature);
-        }
-        async.setImmediate(function() {
-          if (feature.properties.geometry) {
-            feature.properties.geometry_property = feature.properties.geometry;
-            delete feature.properties.geometry;
-          }
-          for (var key in feature.properties) {
-            if (!properties[key]) {
-              properties[key] = properties[key] || {
-                name: key
-              };
-
-              var type = typeof feature.properties[key];
-              if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
-                if (type === 'object') {
-                  if (feature.properties[key] instanceof Date) {
-                    type = 'Date';
-                  }
-                }
-                switch(type) {
-                  case 'Date':
-                    type = 'DATETIME';
-                    break;
-                  case 'number':
-                    type = 'DOUBLE';
-                    break;
-                  case 'string':
-                    type = 'TEXT';
-                    break;
-                  case 'boolean':
-                    type = 'BOOLEAN';
-                    break;
-                }
-                properties[key] = {
-                  name: key,
-                  type: type
-                };
-              }
-            }
-          }
-          if (count++ % fivePercent === 0) {
-            progressCallback({
-              status: 'Reading GeoJSON feature properties',
-              completed: count,
-              total: featureCount
-            }, callback);
-          } else {
-            callback();
-          }
-        });
-      }, function done(err) {
-        progressCallback({
-          status: 'Done reading GeoJSON properties'
-        }, function() {
-          callback(err, properties);
-        });
-      });
-    });
-  }, function(properties, callback) {
-    var FeatureColumn = GeoPackage.FeatureColumn;
-    var GeometryColumns = GeoPackage.GeometryColumns;
-    var DataTypes = GeoPackage.DataTypes;
-
-    var geometryColumns = new GeometryColumns();
-    geometryColumns.table_name = tableName;
-    geometryColumns.column_name = 'geometry';
-    geometryColumns.geometry_type_name = 'GEOMETRY';
-    geometryColumns.z = 0;
-    geometryColumns.m = 0;
-
-    var columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-    var index = 2;
-    for (var key in properties) {
-      var prop = properties[key];
-      if (prop.name.toLowerCase() !== 'id') {
-        columns.push(FeatureColumn.createColumnWithIndex(index, prop.name, DataTypes.fromName(prop.type), false, null));
-        index++;
-      }
-    }
-    progressCallback({status: 'Creating table "' + tableName + '"'}, function() {
-      GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns, function(err, featureDao) {
-        callback(err, featureDao);
-      });
-    });
-  }, function(featureDao, callback) {
-    var count = 0;
-    var featureCount = geoJson.features.length;
-    var fivePercent = Math.floor(featureCount / 20);
-    async.eachSeries(geoJson.features, function featureIterator(feature, callback) {
-      async.setImmediate(function() {
-        GeoPackage.addGeoJSONFeatureToGeoPackage(geopackage, feature, tableName, function() {
-          if (count++ % fivePercent === 0) {
-            progressCallback({
-              status: 'Inserting features into table "' + tableName + '"',
-              completed: count,
-              total: featureCount
-            }, callback);
-          } else {
-            callback();
-          }
-        });
-      });
-    }, function done() {
-      progressCallback({
-        status: 'Done inserted features into table "' + tableName + '"'
-      }, function() {
-        callback(null, geopackage);
-      });
-    });
-  }
-
-], callback);
+function convertGeoJSONToGeoPackage(geojson, geopackage, tableName, progressCallback) {
+  return GeoJSONToGeoPackage.convert({
+    geojson: geojson,
+    geopackage: geopackage,
+    tableName: tableName,
+    append: true
+  }, progressCallback);
 }
