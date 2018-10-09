@@ -99,15 +99,12 @@ window.saveGeoPackage = function() {
 }
 
 window.downloadGeoJSON = function(tableName) {
-  GeoJSONToGeoPackage.extract(geoPackage, tableName, function(err, geoJson) {
+  GeoJSONToGeoPackage.extract(geoPackage, tableName)
+  .then(function(geoJson) {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geoJson));
 
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = dataStr;
-    a.download = tableName + '.geojson';
-    a.click();
+    var blob = new Blob([JSON.stringify(geoJson)], {type: "data:text/json;charset=utf-8"});
+    FileSaver.saveAs(blob, tableName + '.geojson');
   });
 }
 
