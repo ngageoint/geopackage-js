@@ -13,6 +13,7 @@ describe('GeoPackageAPI tests', function() {
   var geopackageToCreate = path.join(__dirname, 'tmp', 'tmp.gpkg');
   var tilePath = path.join(__dirname, 'fixtures', 'tiles', '0', '0', '0.png');
   var indexedPath = path.join(__dirname, 'fixtures', 'rivers_indexed.gpkg');
+  var countriesPath = path.join(__dirname, 'fixtures', 'countries_0.gpkg')
 
 
   it('should open the geopackage', function(done) {
@@ -133,6 +134,58 @@ describe('GeoPackageAPI tests', function() {
       done();
     });
   });
+
+  describe('should operate on a GeoPacakge with lots of features', function() {
+
+    var indexedGeopackage;
+    var originalFilename = countriesPath;
+    var filename;
+
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(originalFilename, filename, callback);
+      } else {
+        filename = originalFilename;
+        callback();
+      }
+    }
+
+    beforeEach('should open the geopackage', function(done) {
+      filename = path.join(__dirname, 'fixtures', 'tmp', testSetup.createTempName());
+      copyGeopackage(originalFilename, filename, function(err) {
+        GeoPackage.open(filename, function(err, geopackage) {
+          should.not.exist(err);
+          should.exist(geopackage);
+          indexedGeopackage = geopackage;
+          done();
+        });
+      });
+    });
+
+    afterEach('should close the geopackage', function(done) {
+      indexedGeopackage.close();
+      testSetup.deleteGeoPackage(filename, done);
+    });
+
+    it('should get a vector tile countries_0 pbf tile', function() {
+      this.timeout(0);
+      return GeoPackage.getVectorTile(indexedGeopackage, 'country', 1, 2, 3)
+      .then(function(json) {
+        should.exist(json.layers['country']);
+        json.layers['country'].length.should.be.equal(14);
+      });
+    });
+
+    it('should get a vector tile country-name pbf tile', function() {
+      this.timeout(0);
+      return GeoPackage.getVectorTile(indexedGeopackage, 'country-name', 1, 2, 3)
+      .then(function(json) {
+        should.exist(json.layers['country-name']);
+        json.layers['country-name'].length.should.be.equal(1);
+      });
+    });
+  })
 
   describe('should operate on an indexed geopackage', function() {
 

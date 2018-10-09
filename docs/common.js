@@ -475,7 +475,7 @@ window.toggleLayer = function(layerType, table) {
     })
     .then(function(indexed) {
       var styles = {};
-      styles[table.name] = {
+      styles[table] = {
         weight: 2,
         radius: 3
       };
@@ -510,32 +510,36 @@ window.toggleLayer = function(layerType, table) {
       });
 
       vectorLayer._getVectorTilePromise = function(coords, tileBounds) {
-        var x = coords.x;
-  			var y = coords.y;
-  		  var z = coords.z;
-        return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
-        .then(function(json) {
-          // Normalize feature getters into actual instanced features
-          for (var layerName in json.layers) {
-            var feats = [];
-
-            for (var i=0; i<json.layers[layerName].length; i++) {
-              var feat = json.layers[layerName].feature(i);
-              feat.geometry = feat.loadGeometry();
-              feats.push(feat);
-            }
-
-            json.layers[layerName].features = feats;
-          }
-
-          return json;
-        });
+        return getTile(coords, tileBounds, table);
       }
       vectorLayer.addTo(map);
       vectorLayer.bringToFront();
       tableLayers[table] = vectorLayer;
     });
   }
+}
+
+function getTile(coords, tileBounds, table) {
+  var x = coords.x;
+  var y = coords.y;
+  var z = coords.z;
+  return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
+  .then(function(json) {
+    // Normalize feature getters into actual instanced features
+    for (var layerName in json.layers) {
+      var feats = [];
+
+      for (var i=0; i<json.layers[layerName].length; i++) {
+        var feat = json.layers[layerName].feature(i);
+        feat.geometry = feat.loadGeometry();
+        feats.push(feat);
+      }
+
+      json.layers[layerName].features = feats;
+    }
+
+    return json;
+  });
 }
 
 function addRowToLayer(iterator, row, featureDao, srs, layer) {
@@ -865,50 +869,37 @@ window.loadFeatures = function(tableName, featuresElement) {
 
   var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
 
-  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName)
-  .then(function(each) {
-    var promise = Promise.resolve();
+  var each = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName);
+  var promise = Promise.resolve();
+  for (var row of each.results) {
+    var feature = row;
+    feature.tableName = tableName;
+    feature.values = [];
 
-    for (var row of each.results) {
-      promise = featureParsePromise(promise, row, each, features, tableName)
-      .then(function(feature) {
-        featuresTable.append(Mustache.render(featureTemplate, feature));
-      });
-    }
-    return promise.then(function() {
-      return features;
-    });
-  });
-}
+    for (var i = 0; i < features.columns.length; i++) {
+      var value = feature.properties[features.columns[i].name];
 
-function featureParsePromise(promise, row, each, features, tableName) {
-  return promise.then(function() {
-    return new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        var currentRow = each.featureDao.getFeatureRow(row);
-        var feature = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, each.srs);
-        feature.tableName = tableName;
-        feature.values = [];
+      if (features.columns[i].displayName) {
+        value = feature.properties[features.columns[i].displayName];
+      }
 
-        for (var i = 0; i < features.columns.length; i++) {
-          var value = feature.properties[features.columns[i].name];
-
-          if (features.columns[i].name == features.geometryColumns.geometryColumn) {
-            if (feature.geometry) {
-              feature.values.push(feature.geometry.type);
-            } else {
-              feature.values.push('Unknown');
-            }
-          } else if (value === null || value === 'null' || value == undefined) {
-            feature.values.push('');
-          } else {
-            feature.values.push(value.toString());
-          }
+      if (features.columns[i].name == features.geometryColumns.geometryColumn) {
+        if (feature.geometry) {
+          feature.values.push(feature.geometry.type);
+        } else {
+          feature.values.push('Unknown');
         }
-        resolve(feature);
-      });
-    });
-  });
+      } else if (features.columns[i].name === 'id') {
+        feature.values.push(feature.id);
+      } else if (value === null || value === 'null' || value == undefined) {
+        feature.values.push('');
+      } else {
+        feature.values.push(value.toString());
+      }
+    }
+    featuresTable.append(Mustache.render(featureTemplate, feature));
+  }
+  return features;
 }
 
 var highlightLayer = L.geoJson([], {
@@ -951,13 +942,11 @@ map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
-  .then(function(geoJson) {
-    geoJson.properties.tableName = tableName;
-    highlightLayer.clearLayers();
-    highlightLayer.addData(geoJson);
-    highlightLayer.bringToFront();
-  });
+  var geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
+  geoJson.properties.tableName = tableName;
+  highlightLayer.clearLayers();
+  highlightLayer.addData(geoJson);
+  highlightLayer.bringToFront();
 }
 
 window.zoomToFeature = function(featureId, tableName) {
@@ -1014,15 +1003,13 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
 
   currentFeature = featureId;
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
-  .then(function(geoJson) {
-    geoJson.properties.tableName = tableName;
-    featureLayer.addData(geoJson);
-    featureLayer.bringToFront();
-    if (zoom) {
-      map.fitBounds(featureLayer.getBounds());
-    }
-  });
+  var geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId);
+  geoJson.properties.tableName = tableName;
+  featureLayer.addData(geoJson);
+  featureLayer.bringToFront();
+  if (zoom) {
+    map.fitBounds(featureLayer.getBounds());
+  }
 }
 
 window.clearHighlights = function() {
