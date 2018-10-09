@@ -263,13 +263,13 @@ function convertShapefileReaders(readers, geopackage, progressCallback) {
 function getReadersFromZip(zip) {
   var readers = [];
   var shpfileArray = zip.filter(function (relativePath, file){
-    return path.extname(relativePath) === '.shp';
+    return path.extname(relativePath) === '.shp' && relativePath.indexOf('__MACOSX') == -1;
   });
   var dbffileArray = zip.filter(function (relativePath, file){
-    return path.extname(relativePath) === '.dbf';
+    return path.extname(relativePath) === '.dbf' && relativePath.indexOf('__MACOSX') == -1;
   });
   var prjfileArray = zip.filter(function (relativePath, file){
-    return path.extname(relativePath) === '.prj';
+    return path.extname(relativePath) === '.prj' && relativePath.indexOf('__MACOSX') == -1;
   });
 
   for (var i = 0; i < shpfileArray.length; i++) {

@@ -1,5 +1,5 @@
 {
-  "name": "shapefile-to-geopackage",
+  "name": "@ngageoint/shapefile-to-geopackage",
   "version": "2.0.0",
   "description": "Shapefile to GeoPackage converter",
   "keywords": [

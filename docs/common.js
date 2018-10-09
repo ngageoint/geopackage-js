@@ -168,17 +168,15 @@ function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
   });
   ShapefileToGeoPackage.convert({
     shapezipData: array
-  }, function(status, callback) {
+  }, function(status) {
     var text = status.status;
     if (status.completed) {
       text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
     }
     $('#status').text(text);
-    setTimeout(callback, 0);
-  }, function(err, gp) {
-    if (err) {
-      return shapefileZipDoneCallback ? shapefileZipDoneCallback(err) : null;
-    }
+    return Promise.resolve();
+  })
+  .then(function(gp) {
     geoPackage = gp;
     clearInfo();
     readGeoPackage();

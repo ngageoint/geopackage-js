@@ -27,6 +27,6 @@ require('leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js');
 window.GeoPackageAPI = require('../lib/api');
 //window.GeoPackageAPI = require('@ngageoint/geopackage');
 // window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
-// window.ShapefileToGeoPackage = require('shapefile-to-geopackage');
+window.ShapefileToGeoPackage = require('@ngageoint/shapefile-to-geopackage');
 // window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
 // window.PBFToGeoPackage = require('pbf-to-geopackage');
