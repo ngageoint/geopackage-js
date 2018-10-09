@@ -10,7 +10,8 @@ var async = require('async')
   , proj4 = require('proj4')
   , async = require('async')
   , Mustache = require('mustache')
-  , fileType = require('file-type');
+  , fileType = require('file-type')
+  , FileSaver = require('file-saver');
 
 window.proj4 = proj4;
 window.async = async;
@@ -19,13 +20,14 @@ window.L = L;
 window.fileType = fileType;
 window.reproject = reproject;
 window.Mustache = Mustache;
+window.FileSaver = FileSaver;
 
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
 require('leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js');
 
 window.GeoPackageAPI = require('@ngageoint/geopackage');
-// window.GeoJSONToGeoPackage = require('geojson-to-geopackage');
+window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage');
 window.ShapefileToGeoPackage = require('@ngageoint/shapefile-to-geopackage');
 // window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
 // window.PBFToGeoPackage = require('pbf-to-geopackage');
