@@ -162,7 +162,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-34">line 34</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-35">line 35</a></p>
 								</div>
 							</div>
 			
@@ -211,7 +211,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-45">line 45</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-46">line 46</a></p>
 								</div>
 							</div>
 			
@@ -277,7 +277,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-57">line 57</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-58">line 58</a></p>
 								</div>
 							</div>
 			
@@ -335,7 +335,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-68">line 68</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-69">line 69</a></p>
 								</div>
 							</div>
 			
@@ -408,7 +408,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-79">line 79</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-80">line 80</a></p>
 								</div>
 							</div>
 			
@@ -474,7 +474,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-88">line 88</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-89">line 89</a></p>
 								</div>
 							</div>
 			
@@ -486,12 +486,35 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="getRelationships" class="function public"><span class="name">getRelationships</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;<a href="module-extension_relatedTables-ExtendedRelation.html">module:extension/relatedTables~ExtendedRelation</a>>}</span></h4>
+			<h4 id="getRelationships" class="function public"><span class="name">getRelationships</span><span class="signature-params">( [&nbsp;<span class="signature-param">baseTableName</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;<a href="module-extension_relatedTables-ExtendedRelation.html">module:extension/relatedTables~ExtendedRelation</a>>}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Gets all relationships in the GeoPackage</p></div>
-			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Gets all relationships in the GeoPackage with an optional base table name and an optional base id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+							<th>Attributes</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>baseTableName</code></td>
+							<td><span class="param-type">string</span></td>
+								<td class="attributes">&lt;optional&gt;<br/></td>
+							<td class="last">
+									<p>base table name</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
 								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;<a href="module-extension_relatedTables-ExtendedRelation.html">module:extension/relatedTables~ExtendedRelation</a>></span></label>
 								<div class="col-sm-9">
@@ -519,7 +542,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-99">line 99</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-101">line 101</a></p>
 								</div>
 							</div>
 			
@@ -585,7 +608,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-138">line 138</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-166">line 166</a></p>
 								</div>
 							</div>
 			
@@ -651,7 +674,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-188">line 188</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-216">line 216</a></p>
 								</div>
 							</div>
 			
@@ -718,7 +741,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-200">line 200</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-228">line 228</a></p>
 								</div>
 							</div>
 			
@@ -786,7 +809,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-216">line 216</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-244">line 244</a></p>
 								</div>
 							</div>
 			
@@ -854,7 +877,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-232">line 232</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-260">line 260</a></p>
 								</div>
 							</div>
 			
@@ -920,7 +943,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-246">line 246</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-274">line 274</a></p>
 								</div>
 							</div>
 			
@@ -988,7 +1011,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-292">line 292</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-320">line 320</a></p>
 								</div>
 							</div>
 			
@@ -1056,7 +1079,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-313">line 313</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-341">line 341</a></p>
 								</div>
 							</div>
 			
@@ -1136,7 +1159,101 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-335">line 335</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-363">line 363</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="linkRelatedIds" class="function public"><span class="name">linkRelatedIds</span><span class="signature-params">( <span class="signature-param">baseTableName</span>, <span class="signature-param">baseId</span>, <span class="signature-param">relatedTableName</span>, <span class="signature-param">relatedId</span>, <span class="signature-param">relationType</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Link related Ids</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>baseTableName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>base table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>baseId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>base row id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>relatedTableName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>related table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>relatedId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>related row id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>relationType</code></td>
+							<td><span class="param-type"><a href="module-extension_relatedTables-RelationType.html">module:extension/relatedTables~RelationType</a></span></td>
+							<td class="last">
+									<p>relation type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-406">line 406</a></p>
 								</div>
 							</div>
 			
@@ -1209,7 +1326,80 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-375">line 375</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-422">line 422</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getMappingRowsForBase" class="function public"><span class="name">getMappingRowsForBase</span><span class="signature-params">( <span class="signature-param">mappingTableName</span>, <span class="signature-param">baseId</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;<a href="module-extension_relatedTables-UserMappingRow.html">module:extension/relatedTables~UserMappingRow</a>>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the related id mapping rows for the base id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingTableName</code></td>
+							<td><span class="param-type">string</span></td>
+							<td class="last">
+									<p>mapping table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>baseId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>base id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;<a href="module-extension_relatedTables-UserMappingRow.html">module:extension/relatedTables~UserMappingRow</a>></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>user mapping rows</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-439">line 439</a></p>
 								</div>
 							</div>
 			
@@ -1282,7 +1472,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-392">line 392</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-450">line 450</a></p>
 								</div>
 							</div>
 			
@@ -1348,7 +1538,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-408">line 408</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-466">line 466</a></p>
 								</div>
 							</div>
 			
@@ -1414,7 +1604,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-430">line 430</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-488">line 488</a></p>
 								</div>
 							</div>
 			
@@ -1487,7 +1677,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-453">line 453</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-511">line 511</a></p>
 								</div>
 							</div>
 			
@@ -1524,7 +1714,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-460">line 460</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-518">line 518</a></p>
 								</div>
 							</div>
 			
@@ -1592,7 +1782,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-478">line 478</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_index.js.html">extension/relatedTables/index.js</a>, <a href="extension_relatedTables_index.js.html#line-536">line 536</a></p>
 								</div>
 							</div>
 			
@@ -1879,7 +2069,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 10th Oct 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
