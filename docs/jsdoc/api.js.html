@@ -119,8 +119,19 @@ var GeoPackage = require('./geoPackage')
   , FeatureTile = require('./tiles/features')
   , FeatureTableIndex = require('./extension/index/featureTableIndex')
   , DataColumnsDao = require('./dataColumns').DataColumnsDao
-  , DataTypes = require('./db/dataTypes');
+  , DataColumns = require('./dataColumns').DataColumns
+  , DataTypes = require('./db/dataTypes')
+  , GeometryColumns = require('./features/columns').GeometryColumns
+  , FeatureColumn = require('./features/user/featureColumn')
+  , RelationType = require('./extension/relatedTables/relationType')
+  , MediaTable = require('./extension/relatedTables/mediaTable')
+  , SimpleAttributesTable = require('./extension/relatedTables/simpleAttributesTable')
+  , UserColumn = require('./user/userColumn');
 
+/**
+ * GeoPackageAPI
+ * @constructor
+ */
 function GeoPackageAPI() {
 }
 
@@ -258,6 +269,150 @@ GeoPackageAPI.createFeatureTableWithDataColumnsAndBoundingBox = function(geopack
 };
 
 /**
+ * Create a feature table with the properties specified.
+ * @param {module:geoPackage~GeoPackage} geopackage the geopackage object
+ * @param {Object[]} properties properties to create columns from
+ * @param {string} properties.name name of the column
+ * @param {string} properties.dataType name of the data type
+ * @return {Promise}
+ */
+GeoPackageAPI.createFeatureTableWithProperties = function(geopackage, tableName, properties) {
+  var geometryColumns = new GeometryColumns();
+  geometryColumns.table_name = tableName;
+  geometryColumns.column_name = 'geometry';
+  geometryColumns.geometry_type_name = 'GEOMETRY';
+  geometryColumns.z = 0;
+  geometryColumns.m = 0;
+
+  var boundingBox = new BoundingBox(-180, 180, -80, 80);
+
+  var columns = [];
+  var columnNumber = 0;
+  columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+  columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geometry', 'GEOMETRY', false, null));
+
+  for (var i = 0; i &lt; properties.length; i++) {
+    var property = properties[i];
+    columns.push(FeatureColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
+  }
+
+  return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns);
+};
+
+/**
+ * Create a feature table with the properties specified.
+ * @param {module:geoPackage~GeoPackage} geopackage the geopackage object
+ * @param {Object[]} properties properties to create columns from
+ * @param {string} properties.name name of the column
+ * @param {string} properties.dataType name of the data type
+ * @return {Promise}
+ */
+GeoPackageAPI.createAttributeTableWithProperties = function(geopackage, tableName, properties) {
+  var columns = [];
+  var columnNumber = 0;
+  columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+
+  var dataColumns = [];
+
+  for (var i = 0; i &lt; properties.length; i++) {
+    var property = properties[i];
+    columns.push(UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
+    if (property.dataColumn) {
+      var dc = new DataColumns();
+      dc.table_name = property.dataColumn.table_name;
+      dc.column_name = property.dataColumn.column_name;
+      dc.name = property.dataColumn.name;
+      dc.title = property.dataColumn.title;
+      dc.description = property.dataColumn.description;
+      dc.mime_type = property.dataColumn.mime_type;
+      dc.constraint_name = property.dataColumn.constraint_name;
+      dataColumns.push(dc);
+    }
+  }
+
+  return geopackage.createAttributeTable(tableName, columns, dataColumns.length ? dataColumns : undefined);
+};
+
+GeoPackageAPI.addAttributeRow = function(geopackage, tableName, row) {
+  var attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
+  var attributeRow = attributeDao.newRow(row);
+  return attributeDao.create(attributeRow);
+}
+
+/**
+ * Create a simple attributes table with the properties specified.
+ * @param {module:geoPackage~GeoPackage} geopackage the geopackage object
+ * @param {Object[]} properties properties to create columns from
+ * @param {string} properties.name name of the column
+ * @param {string} properties.dataType name of the data type
+ * @return {Promise}
+ */
+GeoPackageAPI.createSimpleAttributesTableWithProperties = function(geopackage, tableName, properties) {
+  var relatedTables = geopackage.getRelatedTablesExtension();
+  var columns = [];
+  var columnNumber = SimpleAttributesTable.numRequiredColumns();
+  if (properties) {
+    for (var i = 0; i &lt; properties.length; i++) {
+      var property = properties[i];
+      columns.push(UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
+    }
+  }
+  var simpleAttributesTable = SimpleAttributesTable.create(tableName, columns)
+  relatedTables.createRelatedTable(simpleAttributesTable);
+  return relatedTables.getSimpleAttributesDao(simpleAttributesTable);
+};
+
+/**
+ * Create a media table with the properties specified.  These properties are added to the required columns
+ * @param {module:geoPackage~GeoPackage} geopackage the geopackage object
+ * @param {Object[]} properties properties to create columns from
+ * @param {string} properties.name name of the column
+ * @param {string} properties.dataType name of the data type
+ * @return {Promise}
+ */
+GeoPackageAPI.createMediaTableWithProperties = function(geopackage, tableName, properties) {
+  var relatedTables = geopackage.getRelatedTablesExtension();
+  var columns = [];
+  var columnNumber = MediaTable.numRequiredColumns();
+  if (properties) {
+    for (var i = 0; i &lt; properties.length; i++) {
+      var property = properties[i];
+      columns.push(UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
+    }
+  }
+  var mediaTable = MediaTable.create(tableName, columns)
+  relatedTables.createRelatedTable(mediaTable);
+  return relatedTables.getMediaDao(mediaTable);
+};
+
+GeoPackageAPI.addMedia = function(geopackage, tableName, dataBuffer, contentType, additionalProperties) {
+  var relatedTables = geopackage.getRelatedTablesExtension();
+  var mediaDao = relatedTables.getMediaDao(tableName);
+  var row = mediaDao.newRow();
+  row.setContentType(contentType);
+  row.setData(dataBuffer);
+  for (var key in additionalProperties) {
+    row.setValueWithColumnName(key, additionalProperties[key]);
+  }
+  return mediaDao.create(row);
+}
+
+GeoPackageAPI.linkMedia = function(geopackage, baseTableName, baseId, mediaTableName, mediaId) {
+  var relatedTables = geopackage.getRelatedTablesExtension();
+  return relatedTables.linkRelatedIds(baseTableName, baseId, mediaTableName, mediaId, RelationType.MEDIA);
+}
+
+GeoPackageAPI.getLinkedMedia = function(geopackage, baseTableName, baseId) {
+  var relatedTables = geopackage.getRelatedTablesExtension();
+
+  return relatedTables.linkRelatedIds(baseTableName, baseId, mediaTableName, mediaId, RelationType.MEDIA);
+}
+
+GeoPackageAPI.getRelatedRows = function(geopackage, baseTableName, baseId) {
+  return geopackage.getRelatedTablesExtension().getRelatedRows(baseTableName, baseId);
+}
+
+/**
  * Adds a GeoJSON feature to the GeoPackage
  * @param  {GeoPackage}   geopackage open GeoPackage object
  * @param  {object}   feature    GeoJSON feature to add
@@ -269,9 +424,12 @@ GeoPackageAPI.addGeoJSONFeatureToGeoPackage = function(geopackage, feature, tabl
   var featureRow = featureDao.newRow();
   var geometryData = new GeometryData();
   geometryData.setSrsId(srs.srs_id);
-  var reprojectedFeature = reproject.reproject(feature, 'EPSG:4326', featureDao.projection);
+  var srs = featureDao.getSrs();
+  if (!(srs.organization === 'EPSG' &amp;&amp; srs.organization_coordsys_id === 4326)) {
+    feature = reproject.reproject(feature, 'EPSG:4326', featureDao.projection);
+  }
 
-  var featureGeometry = typeof reprojectedFeature.geometry === 'string' ? JSON.parse(reprojectedFeature.geometry) : reprojectedFeature.geometry;
+  var featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
   var geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
   geometryData.setGeometry(geometry);
   featureRow.setGeometry(geometryData);
@@ -398,8 +556,7 @@ GeoPackageAPI.createDataColumnMap = function(featureDao) {
  * Iterate GeoJSON features from table
  * @param  {GeoPackage} geopackage      open GeoPackage object
  * @param  {String} table           Table name to Iterate
- * @param  {Function} featureCallback called with an error if one occurred and the next GeoJSON feature in the table
- * @param  {Function} doneCallback    called when all rows are complete
+ * @return {Iterator&lt;module:user/feature/featureRow~FeatureRow>}
  */
 GeoPackageAPI.iterateGeoJSONFeaturesFromTable = function(geopackage, table) {
   var featureDao = geopackage.getFeatureDao(table);
@@ -696,9 +853,8 @@ GeoPackageAPI.getFeatureTileFromXYZ = function(geopackage, table, x, y, z, width
  * @param  {Number}   east       EPSG:4326 eastern boundary
  * @param  {Number}   south      EPSG:4326 southern boundary
  * @param  {Number}   north      EPSG:4326 northern boundary
- * @param  {Function} callback   called with an error if one occurred and a features array
  */
-GeoPackageAPI.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z) {
+GeoPackageAPI.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z, skipVerification) {
   var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
   var bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
   return geopackage.indexFeatureTable(table)
@@ -708,7 +864,7 @@ GeoPackageAPI.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z) {
   .then(function(featureDao) {
     if (!featureDao) return;
     var features = [];
-    var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+    var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb, skipVerification);
     for (var feature of iterator) {
       features.push(feature);
     }
@@ -719,8 +875,37 @@ GeoPackageAPI.getGeoJSONFeaturesInTile = function(geopackage, table, x, y, z) {
   });
 }
 
+GeoPackageAPI.convertPBFToVectorTile = function(pbf) {
+  return new VectorTile.VectorTile(new Pbf(pbf));
+}
+
+/**
+ * Gets a mapbox VectorTile for the x y z web mercator tile specified
+ * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
+ * @param  {String} table      table name
+ * @param  {Number} x          x tile
+ * @param  {Number} y          y tile
+ * @param  {Number} z          web zoom
+ * @return {VectorTile}
+ */
 GeoPackageAPI.getVectorTile = function(geopackage, table, x, y, z) {
-  return GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, table, x, y, z)
+  return GeoPackageAPI.getVectorTileProtobuf(geopackage, table, x, y, z)
+  .then(function(pbf) {
+    return new VectorTile.VectorTile(new Pbf(pbf));
+  });
+}
+
+/**
+ * Gets a protobuf for the x y z web mercator tile specified
+ * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
+ * @param  {String} table      table name
+ * @param  {Number} x          x tile
+ * @param  {Number} y          y tile
+ * @param  {Number} z          web zoom
+ * @return {Protobuf}
+ */
+GeoPackageAPI.getVectorTileProtobuf = function(geopackage, table, x, y, z) {
+  return GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, table, x, y, z, true)
   .then(function(features) {
     var featureCollection = {
       type: 'FeatureCollection',
@@ -738,10 +923,8 @@ GeoPackageAPI.getVectorTile = function(geopackage, table, x, y, z) {
     } else {
       gjvt[table] = {features:[]};
     }
-    // var vectorTile = new VectorTile.VectorTile(tile);
 
-    // return vectorTile;
-    return new VectorTile.VectorTile(new Pbf(vtpbf.fromGeojsonVt(gjvt)));
+    return vtpbf.fromGeojsonVt(gjvt);
   });
 }
 
@@ -753,7 +936,6 @@ GeoPackageAPI.getVectorTile = function(geopackage, table, x, y, z) {
  * @param  {Number}   east       EPSG:4326 eastern boundary
  * @param  {Number}   south      EPSG:4326 southern boundary
  * @param  {Number}   north      EPSG:4326 northern boundary
- * @param  {Function} callback   called with an error if one occurred and a features array
  */
 GeoPackageAPI.getFeaturesInBoundingBox = function(geopackage, table, west, east, south, north) {
   return geopackage.indexFeatureTable(table)
@@ -776,7 +958,7 @@ GeoPackageAPI.getFeaturesInBoundingBox = function(geopackage, table, west, east,
  * @param  {Number}   z          zoom level of the tile
  * @param  {Number}   width      width of the resulting tile
  * @param  {Number}   height     height of the resulting tile
- * @param  {Function} callback   Called with an error if one occurred and the tile buffer
+ * @return {Promise}
  */
 GeoPackageAPI.getTileFromXYZ = function(geopackage, table, x, y, z, width, height) {
   x = Number(x);
@@ -840,7 +1022,7 @@ GeoPackageAPI.draw4326TileInCanvas = function(geopackage, table, minLat, minLon,
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 13th Sep 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 10th Oct 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
