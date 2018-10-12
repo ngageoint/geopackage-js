@@ -952,34 +952,13 @@ window.loadFeatures = function(tableName, featuresElement) {
 }
 
 window.loadVectorLayers = function(tableName, vectorLayersElement) {
-  console.log("loading vector layers");
   var layersTableTemplate = $('#all-vector-layers-template').html();
   Mustache.parse(layersTableTemplate);
 
-  var layerTemplate = $('#vector-layer-template').html();
-  Mustache.parse(layerTemplate);
-
-  vectorLayersElement.empty();
-
-  var layers = {
-    name: "example name",
-    description: "example description"
-  };
-
-  var sanitizedColumns = [];
-  for (var i = 0; i < 2; i++) {
-    sanitizedColumns.push(layers);
-  }
-
-  vectorLayersElement.append(Mustache.render(layersTableTemplate, sanitizedColumns));
-
-  var layersTable = vectorLayersElement.find('#'+tableName+'-layers-table');
   var layers = GeoPackageAPI.getLayersInTable(geoPackage, tableName);
-  console.log(layersTable);
-  console.log(layersTableTemplate);
-  for (var row in layers) {
-    layersTable.append(Mustache.render(layersTableTemplate, layers[row]));
-  }
+  var rendered = Mustache.render(layersTableTemplate, layers);
+  vectorLayersElement.empty();
+  vectorLayersElement.append(rendered);
 }
 
 function featureParsePromise(promise, row, each, features, tableName) {
@@ -1104,6 +1083,60 @@ var featureLayer = L.geoJson([], {
     }
 });
 map.addLayer(featureLayer);
+
+var highlighedStyle = {
+  color: "#11FF22",
+  weight: 3,
+  opacity: 1
+}
+
+var vectorLayerHighlights = L.vectorGrid.protobuf('', {
+    maxNativeZoom: 18,
+    vectorTileLayerStyles: {},
+    interactive: true,
+    rendererFactory: L.canvas.tile
+    });
+var vtpromise = function (tilePoint) {
+      var size = this.getTileSize();
+      if(this.activeVTTable) {
+          var activeTable = this.activeVTTable;
+          var activeLayer = this.activeVTLayer;
+          return GeoPackageAPI.getTileDataFromXYZ(geoPackage, activeTable, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y)
+              .then(function(vectorTile) {
+                    var thisLayer = vectorTile.layers[activeLayer];
+                    vectorTile.layers = [];
+                        if(thisLayer) {
+                            vectorLayerHighlights.options.vectorTileLayerStyles[activeLayer] = highlighedStyle;
+                            var feats = [];
+
+                            for (var i=0; i< thisLayer.length; i++) {
+                                var feat = thisLayer.feature(i);
+                                feat.geometry = feat.loadGeometry();
+                                feats.push(feat);
+                            }
+                            thisLayer.features = feats;
+                            vectorTile.layers[activeLayer] = thisLayer;
+                        }
+                        return vectorTile;
+                    });
+        }
+        else {
+            var empty = {
+                layers: []
+            };
+            return $.when(empty);
+        }
+    };
+
+vectorLayerHighlights._getVectorTilePromise = vtpromise;
+map.addLayer(vectorLayerHighlights);
+
+window.highlightVectorLayer = function(tableName, layer) {
+    vectorLayerHighlights.activeVTTable = tableName;
+    vectorLayerHighlights.activeVTLayer = layer;
+    vectorLayerHighlights.redraw();
+    vectorLayerHighlights.bringToFront();
+}
 
 window.toggleFeature = function(featureId, tableName, zoom, force) {
   featureLayer.clearLayers();

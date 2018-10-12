@@ -31,93 +31,93 @@
 
 <body>
 
-  <div id="map" class="map"></div>
+<div id="map" class="map"></div>
 
-  <div class="side-bar">
-    <div style="padding-top: 7px; padding-right: 100px; padding-left: 4px; padding-bottom: 7px;">
-      <div style="font-size: 14px; font-weight: bold;">
-        <div style="padding: 7px;">
-          <a href="./jsdoc/module-geoPackage-GeoPackage.html" target="_blank">API Documentation</a>
-        </div>
-      </div>
-
-      <div style="padding: 7px; font-size: 14px;">
-        You can load a GeoPackage directly from a URL by including a gpkg parameter in the URL.  Specify which layers (if any) you would like to load with layers parameters.
-      </div>
-      <div style="padding: 7px; font-size: 14px;">
-        For Example <a target="_blank" href="http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers">http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers</a>
-      </div>
-
-      <div style="font-size: 12px; display: none;" id="loadFromUrl">
-        <div style="padding: 3px;">
-          Loading GeoPackage from: <span id="geoPackageFromUrl"></span>
-          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
-        </div>
-      </div>
-
+<div class="side-bar">
+  <div style="padding-top: 7px; padding-right: 100px; padding-left: 4px; padding-bottom: 7px;">
+    <div style="font-size: 14px; font-weight: bold;">
       <div style="padding: 7px;">
-        <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
-        <label id="choose-label" for="file"><span>Open a GeoPackage or Convert a Supported File Type </span> <i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
-      </div>
-      <div style="padding: 7px">
-        <span style="font-size: 12px;">Supported file types for conversion are GeoJSON, Shapefile, Shapefile Zip, MBTiles</span>
-      </div>
-      <div style="padding: 7px;" id="status" class="gone">
-      </div>
-      <div style="padding: 7px;" id="download" class="gone">
-        <a href="javascript:void(0);" onclick="saveGeoPackage()">Download As GeoPackage</a>
-      </div>
-
-      <div style="padding: 7px;">
-        - or -
-      </div>
-
-      <div style="padding: 7px;">
-        Open one of these samples:
-      </div>
-
-      <div style="font-size: 12px;">
-        <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg', $(this).next(), 'Natural Earth Rivers')">Natural Earth Rivers (http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)</a>
-          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
-        </div>
-        <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/simple_sewer_features.gpkg', $(this).next(), 'Simple Sewers test data set')">Simple Sewers test data set (http://www.geopackage.org/data/simple_sewer_features.gpkg)</a>
-          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
-        </div>
-        <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/gdal_sample.gpkg', $(this).next(), 'Technology Test Data Set')">Technology Test Data Set (http://www.geopackage.org/data/gdal_sample.gpkg)</a>
-          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
-        </div>
-
-        <!-- <div style="padding: 3px;">
-          <a href="javascript:void(0);" onclick="loadUrl('../../test/fixtures/rivers.gpkg', $(this).next(), 'Local Test')">Local Test (Safari only if running local code) (../../test/fixtures/rivers.gpkg)</a>
-          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
-        </div> -->
-
-        <span>More sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
+        <a href="./jsdoc/module-geoPackage-GeoPackage.html" target="_blank">API Documentation</a>
       </div>
     </div>
-    <div id="information" class="information hidden">
-      <hr>
-      <div class="tableGroup">
-        <div id="tile-tables"></div>
+
+    <div style="padding: 7px; font-size: 14px;">
+      You can load a GeoPackage directly from a URL by including a gpkg parameter in the URL.  Specify which layers (if any) you would like to load with layers parameters.
+    </div>
+    <div style="padding: 7px; font-size: 14px;">
+      For Example <a target="_blank" href="http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers">http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers</a>
+    </div>
+
+    <div style="font-size: 12px; display: none;" id="loadFromUrl">
+      <div style="padding: 3px;">
+        Loading GeoPackage from: <span id="geoPackageFromUrl"></span>
+        <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
       </div>
-      <div class="tableGroup">
-        <div id="feature-tables"></div>
+    </div>
+
+    <div style="padding: 7px;">
+      <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
+      <label id="choose-label" for="file"><span>Open a GeoPackage or Convert a Supported File Type </span> <i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
+    </div>
+    <div style="padding: 7px">
+      <span style="font-size: 12px;">Supported file types for conversion are GeoJSON, Shapefile, Shapefile Zip, MBTiles</span>
+    </div>
+    <div style="padding: 7px;" id="status" class="gone">
+    </div>
+    <div style="padding: 7px;" id="download" class="gone">
+      <a href="javascript:void(0);" onclick="saveGeoPackage()">Download As GeoPackage</a>
+    </div>
+
+    <div style="padding: 7px;">
+      - or -
+    </div>
+
+    <div style="padding: 7px;">
+      Open one of these samples:
+    </div>
+
+    <div style="font-size: 12px;">
+      <div style="padding: 3px;">
+        <a href="javascript:void(0);" onclick="loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg', $(this).next(), 'Natural Earth Rivers')">Natural Earth Rivers (http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg)</a>
+        <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
       </div>
-      <div class="tableGroup">
-        <div id="vector-tile-tables"></div>
+      <div style="padding: 3px;">
+        <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/simple_sewer_features.gpkg', $(this).next(), 'Simple Sewers test data set')">Simple Sewers test data set (http://www.geopackage.org/data/simple_sewer_features.gpkg)</a>
+        <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
       </div>
+      <div style="padding: 3px;">
+        <a href="javascript:void(0);" onclick="loadUrl('http://www.geopackage.org/data/gdal_sample.gpkg', $(this).next(), 'Technology Test Data Set')">Technology Test Data Set (http://www.geopackage.org/data/gdal_sample.gpkg)</a>
+        <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
+      </div>
+
+      <!-- <div style="padding: 3px;">
+        <a href="javascript:void(0);" onclick="loadUrl('../../test/fixtures/rivers.gpkg', $(this).next(), 'Local Test')">Local Test (Safari only if running local code) (../../test/fixtures/rivers.gpkg)</a>
+        <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
+      </div> -->
+
+      <span>More sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
     </div>
   </div>
+  <div id="information" class="information hidden">
+    <hr>
+    <div class="tableGroup">
+      <div id="tile-tables"></div>
+    </div>
+    <div class="tableGroup">
+      <div id="feature-tables"></div>
+    </div>
+    <div class="tableGroup">
+      <div id="vector-tile-tables"></div>
+    </div>
+  </div>
+</div>
 
-  <a href="https://github.com/ngageoint/geopackage-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+<a href="https://github.com/ngageoint/geopackage-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
-  <script type="text/javascript" src="gp.js"></script>
-  <script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="gp.js"></script>
+<script type="text/javascript" src="common.js"></script>
 
-  <script id="feature-table-template" type="x-tmpl-mustache">
+<script id="feature-table-template" type="x-tmpl-mustache">
   <div>
     <div class="status" id="status-{{tableName}}"><span></span></div>
     <div class="onoffswitch" style="display: inline-block;">
@@ -212,7 +212,7 @@
     <hr>
   </div>
   </script>
-  <script id="all-features-template" type="x-tmpl-mustache">
+<script id="all-features-template" type="x-tmpl-mustache">
     <table id="{{tableName}}-feature-table" onmouseout="clearHighlights()">
       <thead>
         <tr>
@@ -232,7 +232,7 @@
       {{/features}}
     </table>
   </script>
-  <script id="feature-template" type="x-tmpl-mustache">
+<script id="feature-template" type="x-tmpl-mustache">
     <tr onmouseover="highlightFeature('{{id}}', '{{tableName}}')" ondblclick="zoomToFeature('{{id}}', '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
     <td><i class="fa fa-circle-o" onclick="toggleFeature('{{id}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
       {{#values}}
@@ -240,7 +240,7 @@
       {{/values}}
     </tr>
   </script>
-  <script id="tile-table-template" type="x-tmpl-mustache">
+<script id="tile-table-template" type="x-tmpl-mustache">
   <div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('tile', '{{tableName}}')">
@@ -324,7 +324,7 @@
     <hr>
   </div>
   </script>
-  <script id="vector-tile-table-template" type="x-tmpl-mustache">
+<script id="vector-tile-table-template" type="x-tmpl-mustache">
   <div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('vectortile', '{{tableName}}')">
@@ -412,7 +412,7 @@
     <hr>
   </div>
   </script>
-  <script id="tile-zoom-levels-template" type="x-tmpl-mustache">
+<script id="tile-zoom-levels-template" type="x-tmpl-mustache">
   <span style="font-size: 12px;" class="label">Zoom:</span>
   {{#zooms}}
   <input type="radio" name="zoomLevel" value="{{zoom}}" onchange="loadTiles('{{tableName}}', {{zoom}}, $(this).parent().find('.tiles'))"><span class="value" style="font-size: 12px;">{{zoom}}</span>
@@ -420,7 +420,7 @@
   <div class="tiles">
   </div>
   </script>
-  <script id="all-tiles-template" type="x-tmpl-mustache">
+<script id="all-tiles-template" type="x-tmpl-mustache">
   <div class="section">
     <div class="item"><span class="label">West: </span><span class="value">{{west}}</span></div>
     <div class="item"><span class="label">South: </span><span class="value">{{south}}</span></div>
@@ -447,36 +447,28 @@
       {{/tiles}}
     </table>
   </script>
-  <script id="all-vector-layers-template" type="x-tmpl-mustache">
-    <table id="{{tableName}}-layers-table" onmouseout="clearHighlights()">
+<script id="all-vector-layers-template" type="x-tmpl-mustache">
+    <table onmouseout="clearHighlights()">
       <thead>
         <tr>
           <th></th>
           {{#columns}}
-            <th>{{displayName}}</th>
+            <th>{{name}}</th>
           {{/columns}}
         </tr>
       </thead>
-      {{#features}}
-      <tr onmouseover="highlightLayer('{{id}}', '{{tableName}}')">
-      <td><i class="fa fa-circle-o"></i></td>
+      {{#layers}}
+      <tr onmouseover="highlightVectorLayer('{{table_name}}','{{name}}')">
+        <td><i></i></td>
         {{#values}}
-          <td>{{{.}}}</td>
+          <td>{{.}}</td>
         {{/values}}
       </tr>
-      {{/features}}
+      {{/layers}}
     </table>
   </script>
-  <script id="vector-layer-template" type="x-tmpl-mustache">
-    <tr onmouseover="highlightLayer('{{id}}', '{{tableName}}')" >
-    <td><i class="fa fa-circle-o"></i></td>
-      {{#values}}
-        <td>{{{.}}}</td>
-      {{/values}}
-    </tr>
-  </script>
 
-  <!-- Matomo -->
+<!-- Matomo -->
 <script type="text/javascript">
   var _paq = _paq || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
