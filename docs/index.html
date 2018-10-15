@@ -335,9 +335,10 @@
     </div>
     <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minWebMapZoom}} - {{maxWebMapZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a id="zoom-{{tableName}}" style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
-      <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.layerListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); $(this).parent().find('.layer-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
-      <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); $(this).parent().find('.layerListing').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); $(this).parent().find('.layer-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
-      <div class="tab layer-tab" style="display: inline-block;" onclick="$(this).parent().find('.layerListing').show(); $(this).parent().find('.metadata').hide(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.layer-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}'); loadVectorLayers('{{tableName}}', $(this).parent().find('.layerListing'));">Layers</div>
+      <div class="tab metadata-tab active" style="display: inline-block;" onclick="deactivateTabs($(this).parent()); activateTab($(this).parent().find('.metadata-tab'), $(this).parent().find('.metadata')); unregisterTileTable('{{tableName}}')">Metadata</div>
+      <div class="tab tile-tab" style="display: inline-block;" onclick="loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); deactivateTabs($(this).parent()); activateTab($(this).parent().find('.tile-tab'), $(this).parent().find('.tileListing')); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
+      <div class="tab layer-tab" style="display: inline-block;" onclick="deactivateTabs($(this).parent()); activateTab($(this).parent().find('.layer-tab'), $(this).parent().find('.layerListing')); unregisterTileTable('{{tableName}}'); loadVectorLayers('{{tableName}}', $(this).parent().find('.layerListing'));">Layers</div>
+      <div class="tab feature-tab" style="display: inline-block;" onclick="deactivateTabs($(this).parent()); activateTab($(this).parent().find('.feature-tab'), $(this).parent().find('.featureListing')); unregisterTileTable('{{tableName}}'); loadVTFeatures('{{tableName}}', $(this).parent().find('.featureListing'));">Features</div>
       <div class="metadata">
         <div class="tiles">
           <div class="section-title">Tile Information</div>
@@ -408,6 +409,9 @@
       <div class="layerListing">
         <div class="section-title">Layers in the vector tile table</div>
       </div>
+      <div class="featureListing">
+        <div class="section-title">Features in the vector tile table</div>
+      </div>
     </div>
     <hr>
   </div>
@@ -448,10 +452,9 @@
     </table>
   </script>
 <script id="all-vector-layers-template" type="x-tmpl-mustache">
-    <table onmouseout="clearHighlights()">
+    <table onmouseout="clearVectorLayerHighlights()">
       <thead>
         <tr>
-          <th></th>
           {{#columns}}
             <th>{{name}}</th>
           {{/columns}}
@@ -459,13 +462,37 @@
       </thead>
       {{#layers}}
       <tr onmouseover="highlightVectorLayer('{{table_name}}','{{name}}')">
-        <td><i></i></td>
         {{#values}}
           <td>{{.}}</td>
         {{/values}}
       </tr>
       {{/layers}}
     </table>
+  </script>
+<script id="all-vt-features-template" type="x-tmpl-mustache">
+    <table id="{{tableName}}-feature-table" onmouseout="clearHighlights()">
+      <thead>
+        <tr>
+          {{#columns}}
+            <th>{{displayName}}</th>
+          {{/columns}}
+        </tr>
+      </thead>
+      {{#features}}
+      <tr>
+        {{#values}}
+          <td>{{{.}}}</td>
+        {{/values}}
+      </tr>
+      {{/features}}
+    </table>
+  </script>
+<script id="vt-feature-template" type="x-tmpl-mustache">
+    <tr>
+      {{#values}}
+        <td>{{{.}}}</td>
+      {{/values}}
+    </tr>
   </script>
 
 <!-- Matomo -->
