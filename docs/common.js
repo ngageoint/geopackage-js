@@ -827,9 +827,23 @@ window.unregisterTileTable = function(tableName) {
   delete visibleTileTables[tableName];
 }
 
+var visibleVTFeaturesTables = {};
+
+window.registerVTFeaturesTable = function(tableName, featuresElement) {
+  visibleVTFeaturesTables[tableName] = featuresElement;
+  loadVTFeatures(tableName, featuresElement);
+}
+
+window.unregisterVTFeaturesTable = function(tableName) {
+  delete visibleVTFeaturesTables[tableName];
+}
+
 map.on('moveend', function() {
   for (var table in visibleTileTables) {
     window.loadTiles(table, map.getZoom(), visibleTileTables[table]);
+  }
+  for (var table in visibleVTFeaturesTables) {
+    window.loadVTFeatures(table, visibleVTFeaturesTables[table]);
   }
 });
 
@@ -1171,7 +1185,8 @@ window.loadVTFeatures = function(tableName, featuresElement) {
 
   var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
 
-  var featureData = GeoPackageAPI.getFeatureDataAtZoomLevel(geoPackage, tableName, map.getZoom());
+  var mapBounds = map.getBounds();
+  var featureData = GeoPackageAPI.getFeatureDataAtWebZoom(geoPackage, tableName, map.getZoom(), Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
   var attributes = [];
   var columnHeaders = [];
   var attributeValues = [];
