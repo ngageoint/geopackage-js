@@ -423,6 +423,111 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   }
 }
 
+var style = {
+  color: "#840032",
+  weight: 2,
+  opacity: 1,
+  fill: true,
+  fillColor: "#808A9F",
+  fillOpacity: 0.5
+}
+var ptStyle = Object.assign({}, style);
+ptStyle.radius = 7;
+ptStyle.fillColor = "#CCF5AC";
+ptStyle.fillOpacity = 1;
+ptStyle.color = "#579625";
+var polygonStyle = Object.assign({}, style);
+polygonStyle.color = "#002642" ;
+
+var featureStyle = function(properties, zoom, geometryDimension) {
+    if(geometryDimension == 1) return ptStyle;
+    if(geometryDimension == 3) return polygonStyle;
+    return style;
+}
+
+// Copied from Leaflet.VectorGrid, modified slightly to pass feature type information to style function
+var createTile = function(coords, done) {
+		var storeFeatures = this.options.getFeatureId;
+
+		var tileSize = this.getTileSize();
+		var renderer = this.options.rendererFactory(coords, tileSize, this.options);
+
+		var vectorTilePromise = this._getVectorTilePromise(coords);
+
+		if (storeFeatures) {
+			this._vectorTiles[this._tileCoordsToKey(coords)] = renderer;
+			renderer._features = {};
+		}
+
+		vectorTilePromise.then( function renderTile(vectorTile) {
+			for (var layerName in vectorTile.layers) {
+				this._dataLayerNames[layerName] = true;
+				var layer = vectorTile.layers[layerName];
+
+				var pxPerExtent = this.getTileSize().divideBy(layer.extent);
+
+				var layerStyle = this.options.vectorTileLayerStyles[ layerName ] ||
+				L.Path.prototype.options;
+
+				for (var i = 0; i < layer.features.length; i++) {
+					var feat = layer.features[i];
+					var id;
+
+					var styleOptions = layerStyle;
+					if (storeFeatures) {
+						id = this.options.getFeatureId(feat);
+						var styleOverride = this._overriddenStyles[id];
+						if (styleOverride) {
+							if (styleOverride[layerName]) {
+								styleOptions = styleOverride[layerName];
+							} else {
+								styleOptions = styleOverride;
+							}
+						}
+					}
+
+					if (styleOptions instanceof Function) {
+						styleOptions = styleOptions(feat.properties, coords.z, feat.type);
+					}
+
+					if (!(styleOptions instanceof Array)) {
+						styleOptions = [styleOptions];
+					}
+
+					if (!styleOptions.length) {
+						continue;
+					}
+
+					var featureLayer = this._createLayer(feat, pxPerExtent);
+
+					for (var j = 0; j < styleOptions.length; j++) {
+						var style = L.extend({}, L.Path.prototype.options, styleOptions[j]);
+						featureLayer.render(renderer, style);
+						renderer._addPath(featureLayer);
+					}
+
+					if (this.options.interactive) {
+						featureLayer.makeInteractive();
+					}
+
+					if (storeFeatures) {
+						renderer._features[id] = {
+							layerName: layerName,
+							feature: featureLayer
+						};
+					}
+				}
+
+			}
+			if (this._map != null) {
+				renderer.addTo(this._map);
+			}
+			L.Util.requestAnimFrame(done.bind(coords, null, null));
+		}.bind(this));
+
+		return renderer.getContainer();
+	}
+
 window.toggleLayer = function(layerType, table) {
   if (tableLayers[table]) {
     map.removeLayer(tableLayers[table]);
@@ -567,14 +672,9 @@ window.toggleLayer = function(layerType, table) {
     // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
     var maxZoom = tileDao.maxWebMapZoom;
     var minZoom = tileDao.minWebMapZoom;
-    var styles = {};
-    styles[table.name] = {
-      weight: 2,
-      radius: 3
-    };
     var vectorGridLayer = L.vectorGrid.protobuf('',{
       maxNativeZoom: 18,
-      vectorTileLayerStyles: styles,
+      vectorTileLayerStyles: {},
       interactive: true,
       rendererFactory: L.canvas.tile,
       getFeatureId: function(feature) {
@@ -589,7 +689,7 @@ window.toggleLayer = function(layerType, table) {
           .then(function(vectorTile) {
                 // Normalize feature getters into actual instanced features
                 for (var layerName in vectorTile.layers) {
-
+                    vectorGridLayer.options.vectorTileLayerStyles[layerName] = featureStyle;
                     var feats = [];
 
                     for (var i=0; i< vectorTile.layers[layerName].length; i++) {
@@ -602,6 +702,7 @@ window.toggleLayer = function(layerType, table) {
                 return vectorTile;
             });
     }
+    vectorGridLayer.createTile = createTile;
 
     map.addLayer(vectorGridLayer);
     vectorGridLayer.bringToFront();
@@ -1099,7 +1200,7 @@ var featureLayer = L.geoJson([], {
 map.addLayer(featureLayer);
 
 var highlighedStyle = {
-  color: "#b300d3",
+  color: "#FFD800",
   weight: 3,
   opacity: 1
 }
