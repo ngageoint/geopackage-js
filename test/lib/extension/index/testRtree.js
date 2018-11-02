@@ -156,7 +156,7 @@ describe('RTree tests', function() {
 
     it('should add the RTree extension to the GeoPackage', function() {
       var rtreeIndex = new RTreeIndex(geoPackage, featureDao);
-      return rtreeIndex.getOrCreateExtension()
+      return rtreeIndex.create()
       .then(function(extension) {
         var fti = new FeatureTableIndex(geoPackage, featureDao);
         var indexed = fti.isIndexed();

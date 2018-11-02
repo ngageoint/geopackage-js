@@ -418,11 +418,9 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'NGA_Logo.png'));
   })
   .then(function(ngaLogoBuffer) {
-    var ngaLogo = mediaDao.newRow();
-    ngaLogo.setContentType('image/png');
-    ngaLogo.setData(ngaLogoBuffer);
-    var ngaRowId = mediaDao.create(ngaLogo);
-    ngaLogo = mediaDao.queryForId(ngaRowId);
+
+    var ngaRowId = GeoPackageAPI.addMedia(geopackage, 'media', ngaLogoBuffer, 'image/png');
+    var ngaLogo = mediaDao.queryForId(ngaRowId);
 
     var featureDao = geopackage.getFeatureDao('geometry2');
     var rows = featureDao.queryForLike('text', 'NGA%');
@@ -430,7 +428,13 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
     return rows.reduce(function(sequence, row) {
       return sequence.then(function() {
         var featureRow = featureDao.getRow(row);
-        return featureDao.linkMediaRow(featureRow, ngaLogo);
+        GeoPackageAPI.linkMedia(geopackage, 'geometry2', featureRow.getId(), 'media', ngaRowId)
+        .then(function() {
+          var relationships = GeoPackageAPI.getLinkedMedia(geopackage, 'geometry2', featureRow.getId());
+          relationships.length.should.be.equal(1);
+          relationships[0].id.should.be.equal(ngaRowId);
+        });
+
       });
     }, Promise.resolve())
   })

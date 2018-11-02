@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage-mobile-optimizer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Utility to optimize a GeoPackage for use on mobile devices",
   "keywords": [
     "NGA",
@@ -23,10 +23,11 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "main": "index.js",
-  "bin": "mobile-optimizer",
+  "bin": {
+    "geopackage-mobile-optimizer": "./mobile-optimizer"
+  },
   "dependencies": {
-    "@ngageoint/geopackage": "^1.1.1",
-    "async": "2.6.0",
+    "@ngageoint/geopackage": "../.",
     "chalk": "2.4.1",
     "proj4": "^2.4.3"
   },

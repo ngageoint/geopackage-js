@@ -115,8 +115,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var tileWidth = 256;
 
     var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
-
-    p.xPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileStart.should.be.lessThan(0);
     p.yPositionInFinalTileStart.should.be.equal(0);
     p.dx.should.be.lessThan(0);
     p.dy.should.be.equal(0);
@@ -157,7 +156,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
 
     p.xPositionInFinalTileStart.should.be.equal(0);
-    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.yPositionInFinalTileStart.should.be.lessThan(0);
     p.dx.should.be.equal(0);
     p.dy.should.be.lessThan(0);
     p.dWidth.should.be.equal(256);
@@ -196,8 +195,8 @@ describe('TileBoundingBoxUtils tests', function() {
 
     var p = TileBoundingBoxUtils.determinePositionAndScale(geoPackageBoundingBox, tileHeight, tileWidth, totalBoundingBox, totalHeight, totalWidth);
 
-    p.xPositionInFinalTileStart.should.be.equal(0);
-    p.yPositionInFinalTileStart.should.be.equal(0);
+    p.xPositionInFinalTileStart.should.be.lessThan(0);
+    p.yPositionInFinalTileStart.should.be.lessThan(0);
     p.dx.should.be.lessThan(0);
     p.dy.should.be.lessThan(0);
     p.dWidth.should.be.greaterThan(256);

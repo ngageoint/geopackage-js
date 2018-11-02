@@ -16,42 +16,24 @@ if (!geoPackageFile || !outputGeoPackageFile) {
   process.exit(1);
 }
 
-async.series({
-  fileExists: function(callback) {
-    fs.stat(geoPackageFile, function(err, stats) {
-      if (err || !stats || !stats.isFile()) {
-        return callback('File does not exist.');
-      }
-      return callback(null, true);
-    });
-  },
-  geoPackage: function(callback) {
-    GeoPackageAPI.openGeoPackage(geoPackageFile, function(err, result) {
-      if (err || !result) {
-        return callback('Invalid GeoPackage file.');
-      }
-      console.log('Processing %s', geoPackageFile);
-      callback(null, result);
-    });
-  },
-  outputGeoPackage: function (callback) {
-    GeoPackageAPI.createGeoPackage(outputGeoPackageFile, function(err, result) {
-      if (err || !result) {
-        return callback('Invalid GeoPackage file.');
-      }
-      console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
-      callback(null, result);
-    });
-  }
-},
-function(err, results) {
-  if (err) {
-    console.log('Failed to convert with error', err);
+fs.stat(geoPackageFile, function(err, stats) {
+  if (err || !stats || !stats.isFile()) {
+    console.log('File does not exist.', geoPackageFile);
     process.exit(1);
-  } else {
-    GeoPackageOptimizer(results.geoPackage, results.outputGeoPackage, function(err) {
-      console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
-      process.exit(0);
-    });
   }
+  return GeoPackageAPI.open(geoPackageFile)
+  .then(function(inputGeoPackage) {
+    console.log('Processing %s', geoPackageFile);
+    return GeoPackageAPI.create(outputGeoPackageFile)
+    .then(function(outputGeoPackage) {
+      console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
+      console.log('inputGeoPackage', inputGeoPackage);
+      console.log('outputGeoPackage', outputGeoPackage);
+      return GeoPackageOptimizer(inputGeoPackage, outputGeoPackage)
+      .then(function() {
+        console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
+        process.exit(0);
+      });
+    });
+  });
 });

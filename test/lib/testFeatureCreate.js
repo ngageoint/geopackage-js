@@ -1,5 +1,6 @@
 var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../lib/geoPackage')
+  , GeoPackageAPI = require('../../.')
   , FeatureColumn = require('../../lib/features/user/featureColumn')
   , DataColumns = require('../../lib/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/dataColumns').DataColumnsDao
@@ -77,6 +78,49 @@ describe('GeoPackage Feature table create tests', function() {
 
   });
 
+  it('should create a feature table from properties', function() {
+    var properties = [];
+    properties.push({
+      name: 'Name',
+      dataType: DataTypes.GPKG_DT_TEXT_NAME
+    });
+    properties.push({
+      name: 'Number',
+      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+    });
+
+    GeoPackageAPI.createFeatureTableWithProperties(geopackage, 'NewTable', properties)
+    .then(function(result) {
+      var reader = new FeatureTableReader('NewTable');
+      var result = reader.readFeatureTable(geopackage);
+      var columns = result.columns;
+
+      var plainObject = JSON.parse(JSON.stringify(columns));
+
+      plainObject.should.deep.include.members([{
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true },
+      { index: 1,
+        name: 'geometry',
+        notNull: false,
+        primaryKey: false,
+        geometryType: 7 },
+      { index: 2,
+        name: 'Name',
+        dataType: 9,
+        notNull: false,
+        primaryKey: false },
+      { index: 3,
+        name: 'Number',
+        dataType: 5,
+        notNull: false,
+        primaryKey: false } ]);
+    });
+  });
+
   it('should create a feature table and read the information about it', function() {
     var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
@@ -119,7 +163,7 @@ describe('GeoPackage Feature table create tests', function() {
          name: 'geom.test',
          notNull: false,
          primaryKey: false,
-         geometryType: 1 },
+         geometryType: 7 },
        { index: 2,
          name: 'test_text.test',
          dataType: 9,

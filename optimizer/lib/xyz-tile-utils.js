@@ -1,5 +1,3 @@
-var async = require('async');
-
 Math.radians = function(degrees) {
   return degrees * Math.PI / 180;
 };
@@ -102,67 +100,34 @@ exports.tileCountInExtent = function(extent, minZoom, maxZoom) {
   return tiles;
 };
 
-exports.iterateAllTilesInExtent = function(extent, minZoom, maxZoom, data, processTileCallback, zoomCompleteCallback, completeCallback) {
-  var zoom = minZoom;
-  async.whilst(
-    function (stopIterating) {
-      return zoom <= maxZoom && !stopIterating;
-    },
-    function (zoomLevelDone) {
-      var yRange = exports.calculateYTileRange(extent, zoom);
-      var xRange = exports.calculateXTileRange(extent, zoom);
-      var currentx = xRange.min;
-
-      async.doWhilst(
-        function(xRowDone) {
-          getXRow(data, currentx, yRange, zoom, xRowDone, processTileCallback);
-        },
-        function (stopIterating) {
-          currentx++;
-          return currentx <= xRange.max && !stopIterating;
-        },
-        function (stop) {
-          zoomCompleteCallback(zoom, function() {
-            zoom++;
-            zoomLevelDone(stop);
-          });
-        }
-      );
-    },
-    function (err) {
-      completeCallback(err, data);
-    }
-  );
-};
-
-function pushNextTileTasks(q, data, zoom, x, yRange, numberOfTasks, stopCallback) {
-  if (yRange.current > yRange.max) return false;
-  for (var i = yRange.current; i <= yRange.current + numberOfTasks && i <= yRange.max; i++) {
-    q.push({z:zoom, x: x, y: i, data: data}, stopCallback);
+exports.iterateAllTilesInExtent = function(extent, minZoom, maxZoom, tileDao, processTile) {
+  var zooms = [];
+  for (var i = minZoom; i <= maxZoom; i++) {
+    zooms.push(i);
   }
-  yRange.current = yRange.current + numberOfTasks + 1;
-  return true;
-}
 
-function getXRow(data, xRow, yRange, zoom, xRowDone, processTileCallback) {
-  var q = async.queue(processTileCallback, 100);
-
-  q.drain = function() {
-    var tasksPushed = pushNextTileTasks(q, data, zoom, xRow, yRange, 10, function(stop) {
-      if (stop) {
-        q.kill();
-        xRowDone(true);
+  return zooms.reduce(function(zoomSequence, zoom) {
+    return zoomSequence.then(function() {
+      var xRange = exports.calculateXTileRange(extent, zoom);
+      var xtiles = [];
+      for (var i = xRange.min; i <= xRange.max; i++) {
+        xtiles.push(i);
       }
+      var yRange = exports.calculateYTileRange(extent, zoom);
+      var ytiles = [];
+      for (var i = yRange.min; i <= yRange.max; i++) {
+        ytiles.push(i);
+      }
+
+      return xtiles.reduce(function(xSequence, x) {
+        return xSequence.then(function() {
+          return ytiles.reduce(function(ySequence, y) {
+            return ySequence.then(function() {
+              return processTile(x, y, zoom, tileDao);
+            });
+          }, Promise.resolve());
+        });
+      }, Promise.resolve());
     });
-    if (!tasksPushed) {
-      yRange.current = yRange.min;
-      xRowDone();
-    }
-  };
-  pushNextTileTasks(q, data, zoom, xRow, yRange, 10, function(stop) {
-    if (stop) {
-      q.kill();
-      xRowDone(true);
-    }
-  });
-}
+  }, Promise.resolve());
+};
