@@ -1,11 +1,13 @@
 var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../lib/geoPackage')
+  , GeoPackageAPI = require('../../../.')
   , testSetup = require('../../fixtures/testSetup')
   , Verification = require('../../fixtures/verification')
   , DataColumns = require('../../../lib/dataColumns').DataColumns
   , DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
   , AttributeDao = require('../../../lib/attributes/attributeDao')
   , AttributeTableReader = require('../../../lib/attributes/attributeTableReader')
+  , UserTableReader = require('../../../lib/user/userTableReader')
   , AttributeTable = require('../../../lib/attributes/attributeTable')
   , UserColumn = require('../../../lib/user/userColumn')
   , DataTypes = require('../../../lib/db/dataTypes')
@@ -49,6 +51,145 @@ describe('GeoPackage Attribute table create tests', function() {
       var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
       attributesTableExists.should.be.equal(true);
     });
+  });
+
+  it('should create an attribute table from properties', function() {
+    var properties = [];
+    properties.push({
+      name: 'Name',
+      dataType: DataTypes.GPKG_DT_TEXT_NAME,
+      dataColumn: {
+        table_name: 'NewTable',
+        column_name: 'Name',
+        name: 'The Name',
+        title: 'The Title',
+        description: 'Description',
+        mime_type: 'text'
+      }
+    });
+    properties.push({
+      name: 'Number',
+      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+    });
+
+    GeoPackageAPI.createAttributeTableWithProperties(geopackage, 'NewTable', properties)
+    .then(function(result) {
+      var reader = new AttributeTableReader('NewTable');
+      var result = reader.readTable(geopackage.connection);
+      var columns = result.columns;
+
+      var plainObject = JSON.parse(JSON.stringify(columns));
+
+      plainObject.should.deep.include.members([{
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true },
+      { index: 1,
+        name: 'Name',
+        dataType: 9,
+        notNull: false,
+        primaryKey: false },
+      { index: 2,
+        name: 'Number',
+        dataType: 5,
+        notNull: false,
+        primaryKey: false } ]);
+
+      var dc = new DataColumnsDao(geopackage);
+      var dataColumn = dc.getDataColumns('NewTable', 'Name');
+      dataColumn.should.be.deep.equal({
+        table_name: 'NewTable',
+        column_name: 'Name',
+        name: 'The Name',
+        title: 'The Title',
+        description: 'Description',
+        mime_type: 'text',
+        constraint_name: null });
+    });
+  });
+
+  it('should create a media table from properties', function() {
+    var properties = [];
+    properties.push({
+      name: 'Name',
+      dataType: DataTypes.GPKG_DT_TEXT_NAME
+    });
+    properties.push({
+      name: 'Number',
+      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+    });
+
+    var dao = GeoPackageAPI.createMediaTableWithProperties(geopackage, 'NewTable', properties);
+    var reader = new UserTableReader('NewTable');
+    var result = reader.readTable(geopackage.connection);
+    var columns = result.columns;
+
+    var plainObject = JSON.parse(JSON.stringify(columns));
+
+    plainObject.should.deep.include.members([ {
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true },
+      { index: 1,
+        name: 'data',
+        dataType: 10,
+        notNull: true,
+        primaryKey: false },
+      { index: 2,
+        name: 'content_type',
+        dataType: 9,
+        notNull: true,
+        primaryKey: false },
+      { index: 3,
+        name: 'Name',
+        dataType: 9,
+        notNull: false,
+        primaryKey: false },
+      { index: 4,
+        name: 'Number',
+        dataType: 5,
+        notNull: false,
+        primaryKey: false } ]);
+  });
+
+  it('should create a simple attribute table from properties', function() {
+    var properties = [];
+    properties.push({
+      name: 'Name',
+      dataType: DataTypes.GPKG_DT_TEXT_NAME
+    });
+    properties.push({
+      name: 'Number',
+      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+    });
+
+    var dao = GeoPackageAPI.createSimpleAttributesTableWithProperties(geopackage, 'NewTable', properties);
+    var reader = new AttributeTableReader('NewTable');
+    var result = reader.readTable(geopackage.connection);
+    var columns = result.columns;
+
+    var plainObject = JSON.parse(JSON.stringify(columns));
+
+    plainObject.should.deep.include.members([{
+      index: 0,
+      name: 'id',
+      dataType: 5,
+      notNull: true,
+      primaryKey: true },
+    { index: 1,
+      name: 'Name',
+      dataType: 9,
+      notNull: true,
+      primaryKey: false },
+    { index: 2,
+      name: 'Number',
+      dataType: 5,
+      notNull: true,
+      primaryKey: false } ]);
   });
 
   it('should not allow two primary key columns', function() {

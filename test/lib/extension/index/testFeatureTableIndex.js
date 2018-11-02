@@ -10,92 +10,6 @@ var GeoPackageAPI = require('../../../..')
 
 describe('GeoPackage Feature Table Index Extension tests', function() {
 
-  describe.skip('Create new index', function() {
-    var geoPackage;
-    var featureDao;
-
-    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'RIMPACFeatures.gpkg');
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', 'RIMPACFeatures2.gpkg');
-
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
-      } else {
-        filename = originalFilename;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
-      copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageManager.open(filename, function(err, gp) {
-          geoPackage = gp;
-          should.not.exist(err);
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          done();
-          // geoPackage.getFeatureDaoWithTableName('FEATURESriversds', function(err, riverFeatureDao) {
-          //   featureDao = riverFeatureDao;
-          //   done();
-          // });
-        });
-      });
-    });
-
-    afterEach('should close the geopackage', function(done) {
-      geoPackage.close();
-      if (typeof(process) !== 'undefined' && process.version) {
-        fs.unlink(filename, done);
-      } else {
-        done();
-      }
-    });
-
-    it('should return the index status of false', function(done) {
-      var fti = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-      fti.isIndexed(function(err, indexed){
-        should.not.exist(err);
-        indexed.should.be.equal(false);
-        done();
-      });
-    });
-
-    it('should index the tables', function(done) {
-      this.timeout(10000);
-      geoPackage.getFeatureTables(function(err, tables) {
-        async.eachSeries(tables, function(table, done) {
-          geoPackage.getFeatureDaoWithTableName(table, function(err, featureDao){
-            var fti = featureDao.featureTableIndex;
-            fti.getTableIndex(function(err, tableIndex) {
-              should.not.exist(tableIndex);
-              should.not.exist(err);
-              fti.index(function() {
-                console.log('progress', arguments);
-              }, function(err) {
-                should.not.exist(err);
-                done();
-                // // ensure it was created
-                // var fti2 = new FeatureTableIndex(geoPackage.getDatabase(), featureDao);
-                // fti2.getTableIndex(function(err, tableIndex) {
-                //   should.exist(tableIndex);
-                //   should.not.exist(err);
-                //   should.exist(tableIndex.last_indexed);
-                //   done();
-                // });
-              });
-            });
-          });
-        }, function(err) {
-          console.log('series done');
-          done();
-        });
-      });
-    });
-  });
-
-
   describe('Create new index', function() {
     var geoPackage;
     var featureDao;
@@ -116,9 +30,9 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     beforeEach('should open the geopackage', function(done) {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageAPI.open(filename, function(err, gp) {
+        GeoPackageAPI.open(filename)
+        .then(function(gp) {
           geoPackage = gp;
-          should.not.exist(err);
           should.exist(gp);
           should.exist(gp.getDatabase().getDBConnection());
           gp.getPath().should.be.equal(filename);

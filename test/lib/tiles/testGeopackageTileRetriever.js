@@ -9,6 +9,19 @@ var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
 
 describe('GeoPackage Tile Retriever tests', function() {
 
+  describe('tmp', function() {
+    var filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', 'tmp_test.gpkg');
+    var table = 'imagery';
+
+    GeoPackageAPI.open(filename)
+    .then(function(gp) {
+      GeoPackageAPI.getTileFromXYZ(gp, table, 11344, 6491, 14, 256, 256)
+      .then(function(data) {
+        fs.writeFileSync('/tmp/14_11344_6491.png', data);
+      });
+    })
+  });
+
   describe('Rivers GeoPackage tests', function() {
 
     var geoPackage;
@@ -69,14 +82,14 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
 
-    it.skip('should get the tile with wgs84 bounds', function(done) {
+    it('should get the tile with wgs84 bounds', function(done) {
       this.timeout(30000);
       var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311185);
 
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTileWithWgs84BoundsInProjection(wgs84BoundingBox, 2, 'EPSG:3857')
       .then(function(tile) {
-        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','reprojTile.png'), function(err, equal) {
           equal.should.be.equal(true);
           done();
         });
