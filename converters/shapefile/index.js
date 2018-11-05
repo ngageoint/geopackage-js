@@ -6,7 +6,6 @@ var DataTypes = GeoPackage.DataTypes;
 var BoundingBox = GeoPackage.BoundingBox;
 
 var fs = require('fs')
-  , async = require('async')
   , path = require('path')
   , stream = require('stream')
   , shp = require('shp-stream')
