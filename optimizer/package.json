@@ -27,7 +27,7 @@
     "geopackage-mobile-optimizer": "./mobile-optimizer"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "../.",
+    "@ngageoint/geopackage": "2.0.1",
     "chalk": "2.4.1",
     "proj4": "^2.4.3"
   },
