@@ -793,25 +793,23 @@ window.zoomToTile = function(tileColumn, tileRow, zoom, minLongitude, minLatitud
   var sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
   var ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
 
-  GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn)
-  .then(function(tile) {
-    var tileData = tile.getTileData();
-    var type = fileType(tileData);
-    var binary = '';
-    var bytes = tileData;
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-      binary += String.fromCharCode( bytes[ i ] );
-    }
-    var base64Data = btoa( binary );
-    var url = 'data:'+type.mime+';base64,' + base64Data;
-    imageOverlay = L.imageOverlay(url, [[sw[1], sw[0]], [ne[1], ne[0]]]);
-    currentTile.tileColumn = tileColumn;
-    currentTile.tileRow = tileRow;
-    currentTile.zoom = zoom;
-    currentTile.tableName = tableName;
-    imageOverlay.addTo(map);
-  });
+  var tile = GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn);
+  var tileData = tile.getTileData();
+  var type = fileType(tileData);
+  var binary = '';
+  var bytes = tileData;
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode( bytes[ i ] );
+  }
+  var base64Data = btoa( binary );
+  var url = 'data:'+type.mime+';base64,' + base64Data;
+  imageOverlay = L.imageOverlay(url, [[sw[1], sw[0]], [ne[1], ne[0]]]);
+  currentTile.tileColumn = tileColumn;
+  currentTile.tileRow = tileRow;
+  currentTile.zoom = zoom;
+  currentTile.tableName = tableName;
+  imageOverlay.addTo(map);
 }
 
 window.highlightTile = function(minLongitude, minLatitude, maxLongitude, maxLatitude, projection) {
