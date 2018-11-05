@@ -9,19 +9,6 @@ var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
 
 describe('GeoPackage Tile Retriever tests', function() {
 
-  describe('tmp', function() {
-    var filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', 'tmp_test.gpkg');
-    var table = 'imagery';
-
-    GeoPackageAPI.open(filename)
-    .then(function(gp) {
-      GeoPackageAPI.getTileFromXYZ(gp, table, 11344, 6491, 14, 256, 256)
-      .then(function(data) {
-        fs.writeFileSync('/tmp/14_11344_6491.png', data);
-      });
-    })
-  });
-
   describe('Rivers GeoPackage tests', function() {
 
     var geoPackage;
