@@ -1,5 +1,5 @@
 {
-  "name": "pbf-to-geopackage",
+  "name": "@ngageoint/pbf-to-geopackage",
   "version": "1.0.0",
   "description": "PBF to GeoPackage converter",
   "keywords": [

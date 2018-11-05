@@ -1,7 +1,7 @@
 var GeoPackage = require('@ngageoint/geopackage')
   , TileBoundingBoxUtils = require('@ngageoint/geopackage/lib/tiles/tileBoundingBoxUtils')
   , BoundingBox = require('@ngageoint/geopackage/lib/boundingBox')
-  , PBFToGeoPackage = require('pbf-to-geopackage');
+  , PBFToGeoPackage = require('@ngageoint/pbf-to-geopackage');
 
 var fs = require('fs')
   , async = require('async')
