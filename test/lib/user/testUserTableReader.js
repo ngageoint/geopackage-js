@@ -19,7 +19,7 @@ describe('UserTableReader tests', function() {
   });
 
   afterEach('close the geopackage connection', function() {
-    connection.close();
+    geoPackage.close();
   });
 
   it('should read the table', function() {

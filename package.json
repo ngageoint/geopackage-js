@@ -59,11 +59,11 @@
     "coveralls": "^3.0.0",
     "foodoc": "0.0.9",
     "fs-extra": "^2.1.2",
-    "istanbul": "^0.4.2",
     "jsdoc": "~3.5.5",
     "lcov-badge": "^1.0.4",
     "mocha": "^5.2.0",
     "mocha-lcov-reporter": "^1.3.0",
+    "nyc": "^13.1.0",
     "uglify-es": "^3.0.27",
     "watchify": "^3.7.0",
     "webworkify": "^1.1.0"
@@ -84,13 +84,20 @@
   "browser": {
     "sqlite3": false
   },
+  "nyc": {
+    "temp-dir": "./.test_run",
+    "report-dir": "./docs/coverage",
+    "reporter": [
+      "lcov"
+    ]
+  },
   "scripts": {
-    "test": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha",
-    "coveralls": "cat ./docs/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "build-browser-test": "browserify ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
-    "prebrowser-test": "browserify -t browserify-istanbul ./test/test.js --standalone tests --exclude sqlite3 --exclude inquirer -o bundle/test.bundle.js -d",
-    "browser-test": "./test/cli",
-    "postbrowser-test": "istanbul report --dir coverage/browser --root coverage/browser lcov",
+    "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage",
+    "test-sqlnode": "nyc --no-clean mocha",
+    "test-sqljs": "FORCE_SQLJS=true nyc --no-clean mocha",
+    "test": "npm run clean && npm run test-sqlnode && npm run test-sqljs && npm run report",
+    "report": "nyc report",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "predoc": "rm -rf docs/jsdoc/*; ./docs/tutorials/createTutorials.js",
     "doc": "jsdoc --verbose -c jsdoc.conf",
     "build": "browserify -t browserify-css index.js --standalone geopackage --exclude sqlite3 --exclude inquirer -o static/geopackage.js",
