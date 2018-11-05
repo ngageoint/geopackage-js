@@ -1,5 +1,5 @@
 {
-  "name": "geojson-to-geopackage",
+  "name": "@ngageoint/geojson-to-geopackage",
   "version": "2.0.0",
   "description": "GeoJSON to GeoPackage converter",
   "keywords": [

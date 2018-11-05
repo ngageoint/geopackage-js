@@ -65,18 +65,20 @@ function setupConversion(options, progressCallback) {
   var srsNumber = options.srsNumber || 4326;
   var append = options.append;
   var geoJson = options.geojson;
+  var tableName = options.tableName;
 
   return createOrOpenGeoPackage(geopackage, options, progressCallback)
   .then(function(geopackage) {
     // figure out the table name to put the data into
-    var name = 'features';
+    var name;
     if (typeof geoJson === 'string') {
       name = path.basename(geoJson, path.extname(geoJson));
     }
+    name = name || tableName || 'features';
     var tables = geopackage.getFeatureTables();
     var count = 1;
     while(tables.indexOf(name) !== -1) {
-      name = name + '_' + count;
+      name = (tableName || 'features') + '_' + count;
       count++;
     }
     return {
