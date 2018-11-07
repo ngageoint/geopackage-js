@@ -3,7 +3,6 @@
 var GeoPackageOptimizer = require('./index.js');
 
 var fs = require('fs')
-  , async = require('async')
   , GeoPackageAPI = require('@ngageoint/geopackage');
 
 console.log('GeoPackage Optimizer For Mobile Clients');
@@ -12,9 +11,13 @@ var geoPackageFile = process.argv[2];
 var outputGeoPackageFile = process.argv[3];
 
 if (!geoPackageFile || !outputGeoPackageFile) {
-  console.log('Usage: mobile-optimizer <geoPackageToProcess> <geoPackageToWrite>')
+  console.log('Usage: mobile-optimizer <GeoPackage To Process> <GeoPackage To Write>');
+  console.log('If <GeoPackage To Process> and <GeoPackage To Write> are the same, the GeoPackage To Process');
+  console.log('will be modified.');
   process.exit(1);
 }
+
+var same = outputGeoPackageFile === geoPackageFile;
 
 fs.stat(geoPackageFile, function(err, stats) {
   if (err || !stats || !stats.isFile()) {
@@ -24,16 +27,34 @@ fs.stat(geoPackageFile, function(err, stats) {
   return GeoPackageAPI.open(geoPackageFile)
   .then(function(inputGeoPackage) {
     console.log('Processing %s', geoPackageFile);
+    if (same) {
+      return GeoPackageAPI.open(outputGeoPackageFile)
+      .then(function(outputGeoPackage) {
+        return {
+          inputGeoPackage: inputGeoPackage,
+          outputGeoPackage: outputGeoPackage
+        };
+      });
+    }
     return GeoPackageAPI.create(outputGeoPackageFile)
     .then(function(outputGeoPackage) {
-      console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
-      console.log('inputGeoPackage', inputGeoPackage);
-      console.log('outputGeoPackage', outputGeoPackage);
-      return GeoPackageOptimizer(inputGeoPackage, outputGeoPackage)
-      .then(function() {
-        console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
-        process.exit(0);
-      });
+      return {
+        inputGeoPackage: inputGeoPackage,
+        outputGeoPackage: outputGeoPackage
+      };
+    });
+  })
+  .then(function(options) {
+    var outputGeoPackage = options.outputGeoPackage;
+    var inputGeoPackage = options.inputGeoPackage;
+
+    console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
+    console.log('inputGeoPackage', inputGeoPackage);
+    console.log('outputGeoPackage', outputGeoPackage);
+    return GeoPackageOptimizer.optimize(inputGeoPackage, outputGeoPackage, same)
+    .then(function() {
+      console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
+      process.exit(0);
     });
   });
 });

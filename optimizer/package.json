@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage-mobile-optimizer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Utility to optimize a GeoPackage for use on mobile devices",
   "keywords": [
     "NGA",
@@ -27,7 +27,7 @@
     "geopackage-mobile-optimizer": "./mobile-optimizer"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "2.0.1",
+    "@ngageoint/geopackage": "2.0.x",
     "chalk": "2.4.1",
     "proj4": "^2.4.3"
   },
