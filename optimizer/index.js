@@ -7,46 +7,105 @@ var GeoPackageAPI = require('@ngageoint/geopackage')
 
 proj4 = 'default' in proj4 ? proj4['default'] : proj4; // Module loading hack
 
-module.exports = function(inputGeoPackage, outputGeoPackage) {
+module.exports = {
+  optimize: optimize
+  processTileTable: processTileTable,
+  copyFeatures: copyFeatures,
+  indexTable: indexTable
+}
+
+function optimize(inputGeoPackage, outputGeoPackage, same) {
   var tileTables = inputGeoPackage.getTileTables() || [];
   var featureTables = inputGeoPackage.getFeatureTables() || [];
   outputGeoPackage.getSpatialReferenceSystemDao().createWebMercator();
-  return tileTables.reduce(function(sequence, table) {
-    return sequence.then(function() {
-      var tileDao = inputGeoPackage.getTileDao(table);
-      return processTileTable(inputGeoPackage, outputGeoPackage, tileDao);
-    });
-  }, Promise.resolve())
-  .then(function() {
-    return featureTables.reduce(function(sequence, table) {
+
+  if (!same) {
+    return tileTables.reduce(function(sequence, table) {
       return sequence.then(function() {
-        var featureDao = inputGeoPackage.getFeatureDao(table);
-        var featureTable = featureDao.getFeatureTable();
-
-        var geometryColumns = inputGeoPackage.getGeometryColumnsDao().queryForTableName(table);
-        var boundingBox = featureDao.getBoundingBox();
-        var srsId = featureDao.getSrs().srs_id;
-        var columns = featureTable.columns;
-
-        return outputGeoPackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, srsId, columns);
-      })
-      .then(function() {
-        var outputFeatureDao = outputGeoPackage.getFeatureDao(table);
-        var featureDao = inputGeoPackage.getFeatureDao(table);
-
-        var iterator = featureDao.queryForAll();
-        for (var feature of iterator) {
-          outputFeatureDao.create(featureDao.createObject(feature));
-        }
-        return outputFeatureDao;
-      })
-      .then(function(outputFeatureDao) {
-        return outputFeatureDao.featureTableIndex.index()
-        .then(function() {
-          return outputFeatureDao.featureTableIndex.rtreeIndex.create();
+        var tileDao = inputGeoPackage.getTileDao(table);
+        return processTileTable({
+          inputGeoPackage: inputGeoPackage,
+          outputGeoPackage: outputGeoPackage,
+          tableDao: tileDao,
+          tableName: table
         });
       });
-    }, Promise.resolve());
+    }, Promise.resolve())
+    .then(function() {
+      return featureTables.reduce(function(sequence, table) {
+        return sequence.then(function() {
+          return copyFeatures({
+            inputGeoPackage: inputGeoPackage,
+            outputGeoPackage: outputGeoPackage,
+            tableName: table
+          })
+          .then(indexTable);
+        });
+      }, Promise.resolve());
+    });
+  } else {
+    return tileTables.reduce(function(sequence, table) {
+      return sequence.then(function() {
+        var tileDao = inputGeoPackage.getTileDao(table);
+        return processTileTable({
+          inputGeoPackage: inputGeoPackage,
+          outputGeoPackage: outputGeoPackage,
+          tableDao: tileDao,
+          tableName: table+'_web'
+        })
+        .then(function() {
+          // delete the original table
+          var tileDao = outputGeoPackage.getTileDao(table);
+          return tileDao.dropTable();
+        })
+        .then(function(dropResult) {
+          var tileDao = outputGeoPackage.getTileDao(table+'_web');
+          return tileDao.rename(table);
+          // rename the new table
+        });
+      });
+    }, Promise.resolve())
+    .then(function(){
+      return featureTables.reduce(function(sequence, table) {
+        return sequence.then(function() {
+          var featureDao = inputGeoPackage.getFeatureDao(table);
+          return indexTable(featureDao);
+        });
+      }, Promise.resolve());
+    });
+  }
+}
+
+function copyFeatures(options) {
+  var inputGeoPackage = options.inputGeoPackage;
+  var outputGeoPackage = options.outputGeoPackage;
+  var table = options.tableName;
+
+  var featureDao = inputGeoPackage.getFeatureDao(table);
+  var featureTable = featureDao.getFeatureTable();
+
+  var geometryColumns = inputGeoPackage.getGeometryColumnsDao().queryForTableName(table);
+  var boundingBox = featureDao.getBoundingBox();
+  var srsId = featureDao.getSrs().srs_id;
+  var columns = featureTable.columns;
+
+  return outputGeoPackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, srsId, columns)
+  .then(function() {
+    var outputFeatureDao = outputGeoPackage.getFeatureDao(table);
+    var featureDao = inputGeoPackage.getFeatureDao(table);
+
+    var iterator = featureDao.queryForAll();
+    for (var feature of iterator) {
+      outputFeatureDao.create(featureDao.createObject(feature));
+    }
+    return outputFeatureDao;
+  });
+}
+
+function indexTable(featureDao) {
+  return featureDao.featureTableIndex.index()
+  .then(function() {
+    return featureDao.featureTableIndex.rtreeIndex.create();
   });
 }
 
@@ -55,14 +114,19 @@ function tile2lat(y,z) {
   return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 }
 
-function processTileTable(inputGeoPackage, outputGeoPackage, tableDao) {
+function processTileTable(options) {
+  var inputGeoPackage = options.inputGeoPackage;
+  var outputGeoPackage = options.outputGeoPackage;
+  var tableDao = options.tableDao;
+  var outputTableName = options.tableName;
+
   var info = outputTileTableInfo(inputGeoPackage, tableDao);
 
   var minZoom = info.minZoom;
   var maxZoom = info.maxZoom;
   var data = tableDao;
   var projection = info.contents.srs.organization.toUpperCase() + ':' + info.contents.srs.organization_coordsys_id;
-  var tableName = info.tableName;
+  var tableName = outputTableName || info.tableName;
 
   var sw = proj4(projection, 'EPSG:4326', [info.contents.minX, info.contents.minY]);
   var ne = proj4(projection, 'EPSG:4326', [info.contents.maxX, info.contents.maxY]);
