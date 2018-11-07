@@ -1,5 +1,6 @@
 var GeoPackageAPI = require('../../..')
   , TileDao = require('../../../lib/tiles/user/tileDao')
+  , testSetup = require('../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 
@@ -10,21 +11,35 @@ describe('TileDao tests', function() {
     var geoPackage;
     var tileDao;
 
-    beforeEach('should open the geopackage', function(done) {
-      var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        should.not.exist(err);
-        should.exist(gp);
-        should.exist(gp.getDatabase().getDBConnection());
-        gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDao('TILESosmds');
-        done();
+    function copyGeopackage(orignal, copy, callback) {
+      if (typeof(process) !== 'undefined' && process.version) {
+        var fsExtra = require('fs-extra');
+        fsExtra.copy(orignal, copy, callback);
+      } else {
+        filename = orignal;
+        callback();
+      }
+    }
+    var filename;
+    beforeEach('create the GeoPackage connection', function(done) {
+      var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
+      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      copyGeopackage(originalFilename, filename, function() {
+        GeoPackageAPI.open(filename, function(err, gp) {
+          geoPackage = gp;
+          should.not.exist(err);
+          should.exist(gp);
+          should.exist(gp.getDatabase().getDBConnection());
+          gp.getPath().should.be.equal(filename);
+          tileDao = geoPackage.getTileDao('TILESosmds');
+          done();
+        });
       });
     });
 
-    afterEach('should close the geopackage', function() {
+    afterEach('close the geopackage connection', function(done) {
       geoPackage.close();
+      testSetup.deleteGeoPackage(filename, done);
     });
 
     it('should get the zoom levels', function(done) {
@@ -140,6 +155,13 @@ describe('TileDao tests', function() {
       }
       count.should.be.equal(2);
     });
+
+    it('should rename the tile table', function() {
+      tileDao.rename('Tiles');
+      tileDao.gpkgTableName.should.be.equal('Tiles');
+      var tileTables = geoPackage.getTileTables();
+      tileTables[0].should.be.equal('Tiles');
+    })
   });
 
   describe.skip('Alaska GeoPackage tests', function() {
