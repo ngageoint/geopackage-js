@@ -178,9 +178,6 @@ describe('GeoPackage Tile table create tests', function() {
       count.should.be.equal(84);
       var result = tileDao.dropTable();
       result.should.be.equal(true);
-      var tileMatrixSetDao = geopackage.getTileMatrixSetDao();
-      var results = tileMatrixSetDao.delete(tileMatrixSet);
-      results.should.be.equal(1);
     });
   });
 });
