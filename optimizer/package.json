@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage-mobile-optimizer",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "Utility to optimize a GeoPackage for use on mobile devices",
   "keywords": [
     "NGA",

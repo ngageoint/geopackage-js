@@ -49,9 +49,13 @@ fs.stat(geoPackageFile, function(err, stats) {
     var inputGeoPackage = options.inputGeoPackage;
 
     console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
-    console.log('inputGeoPackage', inputGeoPackage);
-    console.log('outputGeoPackage', outputGeoPackage);
-    return GeoPackageOptimizer.optimize(inputGeoPackage, outputGeoPackage, same)
+    return GeoPackageOptimizer.optimize({inputGeoPackage: inputGeoPackage, outputGeoPackage: outputGeoPackage, same: same, progress: function(progress) {
+      if (progress.description) {
+        console.log('Processing %s: %s', progress.layer, progress.description);
+      } else {
+        console.log('Processing %s: %s of %s tiles complete.', progress.layer, progress.count, progress.totalCount);
+      }
+    }})
     .then(function() {
       console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
       process.exit(0);
