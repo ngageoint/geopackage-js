@@ -34,6 +34,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 2.0
+
+- All new API utilizing Promises
+
 ##### 1.1.4
 
 - Adds a method to retrieve tiles in EPSG:4326
