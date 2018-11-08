@@ -54,6 +54,7 @@ describe('Related Media tests', function() {
   }
 
   it('should create a media relationship', function() {
+    this.timeout(5000);
     var rte = geoPackage.getRelatedTablesExtension();
     rte.has().should.be.equal(false);
 
