@@ -132,14 +132,17 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
   var json = JSON.parse(jsonString);
   GeoJSONToGeoPackage.convert({
     geojson:json
-  }, function(status, callback) {
+  }, function(status) {
     var text = status.status;
     if (status.completed) {
       text += ' - ' + ((status.completed / status.total) * 100).toFixed(2) + ' (' + status.completed + ' of ' + status.total + ')';
     }
     $('#status').text(text);
-    setTimeout(callback, 0);
-  }, function(err, gp) {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {resolve();}, 0);
+    })
+  })
+  .then(function(gp) {
     geoPackage = gp;
     clearInfo();
     readGeoPackage();
