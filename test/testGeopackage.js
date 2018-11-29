@@ -658,5 +658,4 @@ describe('GeoPackageAPI tests', function() {
     });
 
   });
-
 });
