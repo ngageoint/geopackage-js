@@ -1,7 +1,3 @@
-var Promise = require('promise-polyfill');
-if (!window.Promise) {
-  window.Promise = Promise;
-}
 var GeoPackageAPI = require('@ngageoint/geopackage');
 
 var geoPackageCache = {};
@@ -63,13 +59,13 @@ L.GeoPackageTileLayer = L.GridLayer.extend({
   }
 });
 
-function maybeDrawTile(gridLayer, tilePoint, canvas, dpme) {
+function maybeDrawTile(gridLayer, tilePoint, canvas, done) {
   var geoPackage = gridLayer.geoPackage;
   var layerName = gridLayer.options.layerName;
   var map = gridLayer._map;
   if (!geoPackage) {
     // not loaded yet, just wait
-    setTimeout(maybeDrawTile, 250, gridLayer, tilePoint, canvas, callback);
+    setTimeout(maybeDrawTile, 250, gridLayer, tilePoint, canvas, done);
     return;
   }
   setTimeout(function() {
@@ -85,13 +81,13 @@ function maybeDrawTile(gridLayer, tilePoint, canvas, dpme) {
       GeoPackageAPI.draw4326TileInCanvas(geoPackage, layerName, se.lat, nw.lng, nw.lat, se.lng, tilePoint.z, canvas.width, canvas.height, canvas)
       .then(function() {
         console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        callback(err, canvas);
+        done(null, canvas);
       });
     } else {
       GeoPackageAPI.drawXYZTileInCanvas(geoPackage, layerName, tilePoint.x, tilePoint.y, tilePoint.z, canvas.width, canvas.height, canvas)
       .then(function() {
         console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        callback(err, canvas);
+        done(null, canvas);
       });
     }
   }, 0);
@@ -105,6 +101,7 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
 	options: {
 		layerName: '',
     geoPackageUrl: '',
+    geoPackage: undefined,
     noCache: false,
     style: function (feature) {
       return {
