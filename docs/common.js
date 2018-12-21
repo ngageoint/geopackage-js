@@ -380,6 +380,7 @@ function readGeoPackage() {
   var tileTableTemplate = $('#tile-table-template').html();
   Mustache.parse(tileTableTemplate);
 
+// A vector tile table combines the features of the tile table and feature tables, and also includes a "layers" tab
   var vectorTileTableTemplate = $('#vector-tile-table-template').html();
   Mustache.parse(vectorTileTableTemplate);
 
@@ -423,6 +424,9 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
   }
 }
 
+// Arbitrary styling information defined here for vector tiles
+
+// For lines
 var style = {
   color: "#840032",
   weight: 2,
@@ -431,11 +435,13 @@ var style = {
   fillColor: "#808A9F",
   fillOpacity: 0.5
 }
+// For points
 var ptStyle = Object.assign({}, style);
 ptStyle.radius = 7;
 ptStyle.fillColor = "#CCF5AC";
 ptStyle.fillOpacity = 1;
 ptStyle.color = "#579625";
+// For polygons
 var polygonStyle = Object.assign({}, style);
 polygonStyle.color = "#002642" ;
 
@@ -445,7 +451,11 @@ var featureStyle = function(properties, zoom, geometryDimension) {
     return style;
 }
 
-// Copied from Leaflet.VectorGrid, modified slightly to pass feature type information to style function
+// This section of code is copied from Leaflet.VectorGrid.
+// It has been modified slightly to allow us to pass in the featureStyle method, which assigns different styles to
+// features based on their type (point, line, polygon).
+// Documentation suggests that the leaflet developers intended to allow users to do this, but the current version does
+// not support using different styles based on the geometry dimension.
 var createTile = function(coords, done) {
 		var storeFeatures = this.options.getFeatureId;
 
@@ -527,6 +537,7 @@ var createTile = function(coords, done) {
 
 		return renderer.getContainer();
 	}
+// End leaflet block
 
 window.toggleLayer = function(layerType, table) {
   if (tableLayers[table]) {
@@ -683,6 +694,7 @@ window.toggleLayer = function(layerType, table) {
       }
     });
 
+    // Calls the getTileDataFromXYZ method and extracts the individual features
     vectorGridLayer._getVectorTilePromise = function(tilePoint) {
     var size = this.getTileSize();
       return GeoPackageAPI.getTileDataFromXYZ(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y)
@@ -702,6 +714,8 @@ window.toggleLayer = function(layerType, table) {
                 return vectorTile;
             });
     }
+
+    // Overwrite the createTile function with our version
     vectorGridLayer.createTile = createTile;
 
     map.addLayer(vectorGridLayer);
@@ -1205,6 +1219,8 @@ var highlighedStyle = {
   opacity: 1
 }
 
+// MapBox Vector Tiles may have multiple layers within a tile in a single GPKG table.
+// Add a highlight layer which uses different styling to display only the data within a selected layer
 var vectorLayerHighlights = L.vectorGrid.protobuf('', {
     maxNativeZoom: 18,
     vectorTileLayerStyles: {},
@@ -1247,6 +1263,7 @@ var vtLayerPromise = function (tilePoint) {
 vectorLayerHighlights._getVectorTilePromise = vtLayerPromise;
 map.addLayer(vectorLayerHighlights);
 
+// Update the vector tile highlight layer when a user mouses over a layer in the layers table.
 window.highlightVectorLayer = function(tableName, layer) {
     vectorLayerHighlights.activeVTTable = tableName;
     vectorLayerHighlights.activeVTLayer = layer;
@@ -1275,6 +1292,10 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
   });
 }
 
+// Displays a table with the attributes of the features in view
+// Because the VT spec allows any combination of attributes for features (in contrast to GPKG feature tables,
+// which define columns), we must discover all attributes in the feature data to create a table.
+// This is very slow.
 window.loadVTFeatures = function(tableName, featuresElement) {
   var featuresTableTemplate = $('#all-vt-features-template').html();
   Mustache.parse(featuresTableTemplate);
