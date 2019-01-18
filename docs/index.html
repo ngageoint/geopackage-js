@@ -106,6 +106,9 @@
       <div class="tableGroup">
         <div id="feature-tables"></div>
       </div>
+      <div class="tableGroup">
+        <div id="vector-tile-tables"></div>
+      </div>
     </div>
   </div>
 
@@ -321,6 +324,94 @@
     <hr>
   </div>
   </script>
+  <script id="vector-tile-table-template" type="x-tmpl-mustache">
+  <div>
+    <div class="onoffswitch" style="display: inline-block;">
+      <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('vectortile', '{{tableName}}')">
+      <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
+        <span class="onoffswitch-inner"></span>
+        <span class="onoffswitch-switch"></span>
+      </label>
+    </div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minWebMapZoom}} - {{maxWebMapZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a id="zoom-{{tableName}}" style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
+    <div class="table-info" style="display: none;">
+      <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.layerListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); $(this).parent().find('.layer-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
+      <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); $(this).parent().find('.layerListing').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); $(this).parent().find('.layer-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
+      <div class="tab layer-tab" style="display: inline-block;" onclick="$(this).parent().find('.layerListing').show(); $(this).parent().find('.metadata').hide(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.layer-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}'); loadVectorLayers('{{tableName}}', $(this).parent().find('.layerListing'));">Layers</div>
+      <div class="metadata">
+        <div class="tiles">
+          <div class="section-title">Tile Information</div>
+          <div class="section">
+            <div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
+            <div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
+            <div class="item"><span class="label">Min GeoPackage File Zoom: </span><span class="value">{{minZoom}}</span></div>
+            <div class="item"><span class="label">Max GeoPackage File Zoom: </span><span class="value">{{maxZoom}}</span></div>
+            <div class="item"><span class="label">Min Web Map Zoom: </span><span class="value">{{minWebMapZoom}}</span></div>
+            <div class="item"><span class="label">Max Web Map Zoom: </span><span class="value">{{maxWebMapZoom}}</span></div>
+          </div>
+        </div>
+        <div class="srs">
+          <div class="section-title">Tile Matrix Spatial Reference System</div>
+          <div class="section">
+            <div class="item"><span class="label">SRS Name: </span><span class="value">{{srs.name}}</span></div>
+            <div class="item"><span class="label">SRS ID: </span><span class="value">{{srs.id}}</span></div>
+            <div class="item"><span class="label">Organization: </span><span class="value">{{srs.organization}}</span></div>
+            <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{srs.organization_coordsys_id}}</span></div>
+            <div class="item"><span class="label">Definition: </span><span class="value">{{srs.definition}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{srs.description}}</span></div>
+          </div>
+        </div>
+        <div class="contents">
+          <div class="section-title">Contents</div>
+          <div class="section">
+            <div class="item"><span class="label">Table Name: </span><span class="value">{{contents.tableName}}</span></div>
+            <div class="item"><span class="label">Data Type: </span><span class="value">{{contents.dataType}}</span></div>
+            <div class="item"><span class="label">Identifier: </span><span class="value">{{contents.identifier}}</span></div>
+            <div class="item"><span class="label">Description: </span><span class="value">{{contents.description}}</span></div>
+            <div class="item"><span class="label">Last Change: </span><span class="value">{{contents.lastChange}}</span></div>
+            <div class="item"><span class="label">Min X: </span><span class="value">{{contents.minX}}</span></div>
+            <div class="item"><span class="label">Min Y: </span><span class="value">{{contents.minY}}</span></div>
+            <div class="item"><span class="label">Max X: </span><span class="value">{{contents.maxX}}</span></div>
+            <div class="item"><span class="label">Max Y: </span><span class="value">{{contents.maxY}}</span></div>
+            <div class="srs">
+              <div class="section-title">Contents Spatial Reference System</div>
+              <div class="section">
+                <div class="item"><span class="label">SRS Name: </span><span class="value">{{contents.srs.name}}</span></div>
+                <div class="item"><span class="label">SRS ID: </span><span class="value">{{contents.srs.id}}</span></div>
+                <div class="item"><span class="label">Organization: </span><span class="value">{{contents.srs.organization}}</span></div>
+                <div class="item"><span class="label">Coordsys ID: </span><span class="value">{{contents.srs.organization_coordsys_id}}</span></div>
+                <div class="item"><span class="label">Definition: </span><span class="value">{{contents.srs.definition}}</span></div>
+                <div class="item"><span class="label">Description: </span><span class="value">{{contents.srs.description}}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="section-title">{{tableName}} columns:</div>
+          <div class="section">
+            {{#columns}}
+            <div class="column">
+              <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
+              <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+              <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
+              <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
+              <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
+              <div class="item"><span class="label">Primary Key: </span><span class="value">{{primaryKey}}</span></div>
+            </div>
+            {{/columns}}
+          </div>
+        </div>
+      </div>
+      <div class="tileListing">
+        <div class="section-title">Tiles in the current map view (zoom and pan in the map to see other tiles)</div>
+      </div>
+      <div class="layerListing">
+        <div class="section-title">Layers in the vector tile table</div>
+      </div>
+    </div>
+    <hr>
+  </div>
+  </script>
   <script id="tile-zoom-levels-template" type="x-tmpl-mustache">
   <span style="font-size: 12px;" class="label">Zoom:</span>
   {{#zooms}}
@@ -355,6 +446,34 @@
       </tr>
       {{/tiles}}
     </table>
+  </script>
+  <script id="all-vector-layers-template" type="x-tmpl-mustache">
+    <table id="{{tableName}}-layers-table" onmouseout="clearHighlights()">
+      <thead>
+        <tr>
+          <th></th>
+          {{#columns}}
+            <th>{{displayName}}</th>
+          {{/columns}}
+        </tr>
+      </thead>
+      {{#features}}
+      <tr onmouseover="highlightLayer('{{id}}', '{{tableName}}')">
+      <td><i class="fa fa-circle-o"></i></td>
+        {{#values}}
+          <td>{{{.}}}</td>
+        {{/values}}
+      </tr>
+      {{/features}}
+    </table>
+  </script>
+  <script id="vector-layer-template" type="x-tmpl-mustache">
+    <tr onmouseover="highlightLayer('{{id}}', '{{tableName}}')" >
+    <td><i class="fa fa-circle-o"></i></td>
+      {{#values}}
+        <td>{{{.}}}</td>
+      {{/values}}
+    </tr>
   </script>
 
   <!-- Matomo -->
