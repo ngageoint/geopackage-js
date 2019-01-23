@@ -347,6 +347,8 @@ function clearInfo() {
   tileTableNode.empty();
   var featureTableNode = $('#feature-tables');
   featureTableNode.empty();
+  var vectorTileTableNode = $('#vector-tile-tables');
+  vectorTileTableNode.empty();
 
   for (layerName in tableLayers) {
     map.removeLayer(tableLayers[layerName]);
@@ -376,8 +378,13 @@ function readGeoPackage() {
   var tileTableTemplate = $('#tile-table-template').html();
   Mustache.parse(tileTableTemplate);
 
+// A vector tile table combines the features of the tile table and feature tables, and also includes a "layers" tab
+  var vectorTileTableTemplate = $('#vector-tile-table-template').html();
+  Mustache.parse(vectorTileTableTemplate);
+
   var tileTableNode = $('#tile-tables');
   var featureTableNode = $('#feature-tables');
+  var vectorTileTableNode = $('#vector-tile-tables');
 
   var tileTables = geoPackage.getTileTables();
   tileTables.forEach(function(table) {
@@ -395,6 +402,14 @@ function readGeoPackage() {
     var rendered = Mustache.render(featureTableTemplate, info);
     featureTableNode.append(rendered);
   });
+  var vectorTileTables = geoPackage.getVectorTileTables();
+  vectorTileTables.forEach(function(table) {
+    var tileDao = geoPackage.getTileDao(table);
+    var info = geoPackage.getInfoForTable(tileDao);
+    tableInfos[table] = info;
+    var rendered = Mustache.render(vectorTileTableTemplate, info);
+    vectorTileTableNode.append(rendered);
+  });
 }
 
 window.zoomTo = function(minX, minY, maxX, maxY, projection) {
@@ -406,6 +421,121 @@ window.zoomTo = function(minX, minY, maxX, maxY, projection) {
     map.fitBounds([[minY, minX], [maxY, maxX]]);
   }
 }
+
+// Arbitrary styling information defined here for vector tiles
+
+// For lines
+var style = {
+  color: "#840032",
+  weight: 2,
+  opacity: 1,
+  fill: true,
+  fillColor: "#808A9F",
+  fillOpacity: 0.5
+}
+// For points
+var ptStyle = Object.assign({}, style);
+ptStyle.radius = 7;
+ptStyle.fillColor = "#CCF5AC";
+ptStyle.fillOpacity = 1;
+ptStyle.color = "#579625";
+// For polygons
+var polygonStyle = Object.assign({}, style);
+polygonStyle.color = "#002642" ;
+
+var featureStyle = function(properties, zoom, geometryDimension) {
+    if(geometryDimension == 1) return ptStyle;
+    if(geometryDimension == 3) return polygonStyle;
+    return style;
+}
+
+// This section of code is copied from Leaflet.VectorGrid.
+// It has been modified slightly to allow us to pass in the featureStyle method, which assigns different styles to
+// features based on their type (point, line, polygon).
+// Documentation suggests that the leaflet developers intended to allow users to do this, but the current version does
+// not support using different styles based on the geometry dimension.
+var createTile = function(coords, done) {
+		var storeFeatures = this.options.getFeatureId;
+
+		var tileSize = this.getTileSize();
+		var renderer = this.options.rendererFactory(coords, tileSize, this.options);
+
+		var vectorTilePromise = this._getVectorTilePromise(coords);
+
+		if (storeFeatures) {
+			this._vectorTiles[this._tileCoordsToKey(coords)] = renderer;
+			renderer._features = {};
+		}
+
+		vectorTilePromise.then( function renderTile(vectorTile) {
+			for (var layerName in vectorTile.layers) {
+				this._dataLayerNames[layerName] = true;
+				var layer = vectorTile.layers[layerName];
+
+				var pxPerExtent = this.getTileSize().divideBy(layer.extent);
+
+				var layerStyle = this.options.vectorTileLayerStyles[ layerName ] ||
+				L.Path.prototype.options;
+
+				for (var i = 0; i < layer.features.length; i++) {
+					var feat = layer.features[i];
+					var id;
+
+					var styleOptions = layerStyle;
+					if (storeFeatures) {
+						id = this.options.getFeatureId(feat);
+						var styleOverride = this._overriddenStyles[id];
+						if (styleOverride) {
+							if (styleOverride[layerName]) {
+								styleOptions = styleOverride[layerName];
+							} else {
+								styleOptions = styleOverride;
+							}
+						}
+					}
+
+					if (styleOptions instanceof Function) {
+						styleOptions = styleOptions(feat.properties, coords.z, feat.type);
+					}
+
+					if (!(styleOptions instanceof Array)) {
+						styleOptions = [styleOptions];
+					}
+
+					if (!styleOptions.length) {
+						continue;
+					}
+
+					var featureLayer = this._createLayer(feat, pxPerExtent);
+
+					for (var j = 0; j < styleOptions.length; j++) {
+						var style = L.extend({}, L.Path.prototype.options, styleOptions[j]);
+						featureLayer.render(renderer, style);
+						renderer._addPath(featureLayer);
+					}
+
+					if (this.options.interactive) {
+						featureLayer.makeInteractive();
+					}
+
+					if (storeFeatures) {
+						renderer._features[id] = {
+							layerName: layerName,
+							feature: featureLayer
+						};
+					}
+				}
+
+			}
+			if (this._map != null) {
+				renderer.addTo(this._map);
+			}
+			L.Util.requestAnimFrame(done.bind(coords, null, null));
+		}.bind(this));
+
+		return renderer.getContainer();
+	}
+// End leaflet block
 
 window.toggleLayer = function(layerType, table) {
   if (tableLayers[table]) {
@@ -508,12 +638,87 @@ window.toggleLayer = function(layerType, table) {
       });
 
       vectorLayer._getVectorTilePromise = function(coords, tileBounds) {
-        return getTile(coords, tileBounds, table);
+        var x = coords.x;
+  			var y = coords.y;
+  		  var z = coords.z;
+        return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
+        .then(function(json) {
+          // Normalize feature getters into actual instanced features
+          for (var layerName in json.layers) {
+            var feats = [];
+
+            for (var i=0; i<json.layers[layerName].length; i++) {
+              var feat = json.layers[layerName].feature(i);
+              feat.geometry = feat.loadGeometry();
+              feats.push(feat);
+            }
+
+            json.layers[layerName].features = feats;
+          }
+
+          return json;
+        });
       }
       vectorLayer.addTo(map);
       vectorLayer.bringToFront();
       tableLayers[table] = vectorLayer;
     });
+  } else if(layerType === 'vectortile') {
+    if (window.Piwik) {
+    Piwik.getAsyncTracker().trackEvent(
+      'Layer',
+      'load',
+      'Tile Layer'
+    );
+    }
+    ga('send', {
+    hitType: 'event',
+    eventCategory: 'Layer',
+    eventAction: 'load',
+    eventLabel: 'Tile Layer'
+    });
+    var tileDao = geoPackage.getTileDao(table);
+    // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
+    var maxZoom = tileDao.maxWebMapZoom;
+    var minZoom = tileDao.minWebMapZoom;
+    var vectorGridLayer = L.vectorGrid.protobuf('',{
+      maxNativeZoom: 18,
+      vectorTileLayerStyles: {},
+      interactive: true,
+      rendererFactory: L.canvas.tile,
+      getFeatureId: function(feature) {
+        feature.properties.id = table + feature.id;
+        return feature.properties.id;
+      }
+    });
+
+    // Calls the getTileDataFromXYZ method and extracts the individual features
+    vectorGridLayer._getVectorTilePromise = function(tilePoint) {
+    var size = this.getTileSize();
+      return GeoPackageAPI.getTileDataFromXYZ(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y)
+          .then(function(vectorTile) {
+                // Normalize feature getters into actual instanced features
+                for (var layerName in vectorTile.layers) {
+                    vectorGridLayer.options.vectorTileLayerStyles[layerName] = featureStyle;
+                    var feats = [];
+
+                    for (var i=0; i< vectorTile.layers[layerName].length; i++) {
+                        var feat = vectorTile.layers[layerName].feature(i);
+                        feat.geometry = feat.loadGeometry();
+                        feats.push(feat);
+                    }
+                    vectorTile.layers[layerName].features = feats;
+                }
+                return vectorTile;
+            });
+    }
+
+    // Overwrite the createTile function with our version
+    vectorGridLayer.createTile = createTile;
+
+    map.addLayer(vectorGridLayer);
+    vectorGridLayer.bringToFront();
+    tableLayers[table] = vectorGridLayer;
   }
 }
 
@@ -657,8 +862,7 @@ window.loadUrl = function(url, loadingElement, gpName, type) {
         break;
       case 'gpkg':
       default:
-        loadByteArray(uInt8Array)
-        .then(function() {
+        loadByteArray(uInt8Array, function() {
           $('#download').removeClass('gone');
           $('#choose-label').find('i').toggle();
           loadingElement.toggle();
@@ -759,9 +963,23 @@ window.unregisterTileTable = function(tableName) {
   delete visibleTileTables[tableName];
 }
 
+var visibleVTFeaturesTables = {};
+
+window.registerVTFeaturesTable = function(tableName, featuresElement) {
+  visibleVTFeaturesTables[tableName] = featuresElement;
+  loadVTFeatures(tableName, featuresElement);
+}
+
+window.unregisterVTFeaturesTable = function(tableName) {
+  delete visibleVTFeaturesTables[tableName];
+}
+
 map.on('moveend', function() {
   for (var table in visibleTileTables) {
     window.loadTiles(table, map.getZoom(), visibleTileTables[table]);
+  }
+  for (var table in visibleVTFeaturesTables) {
+    window.loadVTFeatures(table, visibleVTFeaturesTables[table]);
   }
 });
 
@@ -865,37 +1083,60 @@ window.loadFeatures = function(tableName, featuresElement) {
 
   var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
 
-  var each = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName);
-  var promise = Promise.resolve();
-  for (var row of each.results) {
-    var feature = row;
-    feature.tableName = tableName;
-    feature.values = [];
+  GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName)
+  .then(function(each) {
+    var promise = Promise.resolve();
 
-    for (var i = 0; i < features.columns.length; i++) {
-      var value = feature.properties[features.columns[i].name];
-
-      if (features.columns[i].displayName) {
-        value = feature.properties[features.columns[i].displayName];
-      }
-
-      if (features.columns[i].name == features.geometryColumns.geometryColumn) {
-        if (feature.geometry) {
-          feature.values.push(feature.geometry.type);
-        } else {
-          feature.values.push('Unknown');
-        }
-      } else if (features.columns[i].name === 'id') {
-        feature.values.push(feature.id);
-      } else if (value === null || value === 'null' || value == undefined) {
-        feature.values.push('');
-      } else {
-        feature.values.push(value.toString());
-      }
+    for (var row of each.results) {
+      promise = featureParsePromise(promise, row, each, features, tableName)
+      .then(function(feature) {
+        featuresTable.append(Mustache.render(featureTemplate, feature));
+      });
     }
-    featuresTable.append(Mustache.render(featureTemplate, feature));
-  }
-  return features;
+    return promise.then(function() {
+      return features;
+    });
+  });
+}
+
+window.loadVectorLayers = function(tableName, vectorLayersElement) {
+  var layersTableTemplate = $('#all-vector-layers-template').html();
+  Mustache.parse(layersTableTemplate);
+
+  var layers = GeoPackageAPI.getLayersInTable(geoPackage, tableName);
+  var rendered = Mustache.render(layersTableTemplate, layers);
+  vectorLayersElement.empty();
+  vectorLayersElement.append(rendered);
+}
+
+function featureParsePromise(promise, row, each, features, tableName) {
+  return promise.then(function() {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        var currentRow = each.featureDao.getFeatureRow(row);
+        var feature = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, each.srs);
+        feature.tableName = tableName;
+        feature.values = [];
+
+        for (var i = 0; i < features.columns.length; i++) {
+          var value = feature.properties[features.columns[i].name];
+
+          if (features.columns[i].name == features.geometryColumns.geometryColumn) {
+            if (feature.geometry) {
+              feature.values.push(feature.geometry.type);
+            } else {
+              feature.values.push('Unknown');
+            }
+          } else if (value === null || value === 'null' || value == undefined) {
+            feature.values.push('');
+          } else {
+            feature.values.push(value.toString());
+          }
+        }
+        resolve(feature);
+      });
+    });
+  });
 }
 
 var highlightLayer = L.geoJson([], {
@@ -989,6 +1230,64 @@ var featureLayer = L.geoJson([], {
 });
 map.addLayer(featureLayer);
 
+var highlighedStyle = {
+  color: "#FFD800",
+  weight: 3,
+  opacity: 1
+}
+
+// MapBox Vector Tiles may have multiple layers within a tile in a single GPKG table.
+// Add a highlight layer which uses different styling to display only the data within a selected layer
+var vectorLayerHighlights = L.vectorGrid.protobuf('', {
+    maxNativeZoom: 18,
+    vectorTileLayerStyles: {},
+    interactive: true,
+    rendererFactory: L.canvas.tile,
+    activeVTFeatures: []
+    });
+var vtLayerPromise = function (tilePoint) {
+      var size = this.getTileSize();
+      if(this.activeVTTable) {
+          var activeTable = this.activeVTTable;
+          var activeLayer = this.activeVTLayer;
+          return GeoPackageAPI.getTileDataFromXYZ(geoPackage, activeTable, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y)
+              .then(function(vectorTile) {
+                    var thisLayer = vectorTile.layers[activeLayer];
+                    vectorTile.layers = [];
+                        if(thisLayer) {
+                            vectorLayerHighlights.options.vectorTileLayerStyles[activeLayer] = highlighedStyle;
+                            var feats = [];
+
+                            for (var i=0; i< thisLayer.length; i++) {
+                                var feat = thisLayer.feature(i);
+                                feat.geometry = feat.loadGeometry();
+                                feats.push(feat);
+                            }
+                            thisLayer.features = feats;
+                            vectorTile.layers[activeLayer] = thisLayer;
+                        }
+                        return vectorTile;
+                    });
+        }
+        else {
+            var empty = {
+                layers: []
+            };
+            return $.when(empty);
+        }
+    };
+
+vectorLayerHighlights._getVectorTilePromise = vtLayerPromise;
+map.addLayer(vectorLayerHighlights);
+
+// Update the vector tile highlight layer when a user mouses over a layer in the layers table.
+window.highlightVectorLayer = function(tableName, layer) {
+    vectorLayerHighlights.activeVTTable = tableName;
+    vectorLayerHighlights.activeVTLayer = layer;
+    vectorLayerHighlights.redraw();
+    vectorLayerHighlights.bringToFront();
+}
+
 window.toggleFeature = function(featureId, tableName, zoom, force) {
   featureLayer.clearLayers();
 
@@ -1008,6 +1307,82 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
   }
 }
 
+// Displays a table with the attributes of the features in view
+// Because the VT spec allows any combination of attributes for features (in contrast to GPKG feature tables,
+// which define columns), we must discover all attributes in the feature data to create a table.
+// This is very slow.
+window.loadVTFeatures = function(tableName, featuresElement) {
+  var featuresTableTemplate = $('#all-vt-features-template').html();
+  Mustache.parse(featuresTableTemplate);
+
+  var featureTemplate = $('#vt-feature-template').html();
+  Mustache.parse(featureTemplate);
+
+  featuresElement.empty();
+
+  var featuresTable = featuresElement.find('#'+tableName+'-feature-table');
+
+  var mapBounds = map.getBounds();
+  var featureData = GeoPackageAPI.getFeatureDataAtWebZoom(geoPackage, tableName, map.getZoom(), Math.max(-180, mapBounds.getWest()), Math.min(mapBounds.getEast(), 180), mapBounds.getSouth(), mapBounds.getNorth());
+  var attributes = [];
+  var columnHeaders = [];
+  var attributeValues = [];
+  for(var feature in featureData) {
+   for(var attribute in featureData[feature]) {
+    if(!attributes.includes(attribute)) {
+        attributes.push(attribute);
+        columnHeaders.push({displayName: attribute});
+    }
+   }
+  }
+
+  for(var feature in featureData) {
+    var featureValues = featureData[feature];
+    var attVals = [];
+    for(var attribute in attributes) {
+        var val = featureValues[attributes[attribute]];
+       attVals.push(val);
+    }
+    var row = {values: attVals}
+    attributeValues.push(row);
+  }
+
+  var rendered = Mustache.render(featuresTableTemplate, { columns: columnHeaders, features: attributeValues });
+  featuresElement.append(rendered);
+
+}
+
 window.clearHighlights = function() {
   highlightLayer.clearLayers();
+}
+
+window.clearVectorLayerHighlights = function() {
+  vectorLayerHighlights.activeVTTable = null;
+  vectorLayerHighlights.activeVTLayer = null;
+  vectorLayerHighlights.activeVTFeatures = [];
+  vectorLayerHighlights.redraw();
+}
+
+window.activateTab = function(tab, toShow) {
+    tab.addClass('active');
+    toShow.show();
+}
+
+window.deactivateTabs = function(tabsHolder) {
+    var metadataTab = tabsHolder.find('.metadata-tab');
+    var tileTab = tabsHolder.find('.tile-tab');
+    var layerTab = tabsHolder.find('.layer-tab');
+    var featureTab = tabsHolder.find('.feature-tab');
+    var metadata = tabsHolder.find('.metadata');
+    var tileListing = tabsHolder.find('.tileListing');
+    var layerListing = tabsHolder.find('.layerListing');
+    var featureListing = tabsHolder.find('.featureListing');
+    if(metadataTab) metadataTab.removeClass('active');
+    if(tileTab) tileTab.removeClass('active');
+    if(layerTab) layerTab.removeClass('active');
+    if(featureTab) featureTab.removeClass('active');
+    if(metadata) metadata.hide();
+    if(tileListing) tileListing.hide();
+    if(layerListing) layerListing.hide();
+    if(featureListing) featureListing.hide();
 }

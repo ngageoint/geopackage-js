@@ -49,3 +49,5 @@ test/fixtures/private
 dist
 
 docs/coverage
+
+.idea/*
