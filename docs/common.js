@@ -603,7 +603,7 @@ window.toggleLayer = function(layerType, table) {
     })
     .then(function(indexed) {
       var styles = {};
-      styles[table.name] = {
+      styles[table] = {
         weight: 2,
         radius: 3
       };
@@ -720,6 +720,29 @@ window.toggleLayer = function(layerType, table) {
     vectorGridLayer.bringToFront();
     tableLayers[table] = vectorGridLayer;
   }
+}
+
+function getTile(coords, tileBounds, table) {
+  var x = coords.x;
+  var y = coords.y;
+  var z = coords.z;
+  return GeoPackageAPI.getVectorTile(geoPackage, table, x, y, z)
+  .then(function(json) {
+    // Normalize feature getters into actual instanced features
+    for (var layerName in json.layers) {
+      var feats = [];
+
+      for (var i=0; i<json.layers[layerName].length; i++) {
+        var feat = json.layers[layerName].feature(i);
+        feat.geometry = feat.loadGeometry();
+        feats.push(feat);
+      }
+
+      json.layers[layerName].features = feats;
+    }
+
+    return json;
+  });
 }
 
 function addRowToLayer(iterator, row, featureDao, srs, layer) {
@@ -1156,13 +1179,11 @@ map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
-  .then(function(geoJson) {
-    geoJson.properties.tableName = tableName;
-    highlightLayer.clearLayers();
-    highlightLayer.addData(geoJson);
-    highlightLayer.bringToFront();
-  });
+  var geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
+  geoJson.properties.tableName = tableName;
+  highlightLayer.clearLayers();
+  highlightLayer.addData(geoJson);
+  highlightLayer.bringToFront();
 }
 
 window.zoomToFeature = function(featureId, tableName) {
@@ -1277,15 +1298,13 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
 
   currentFeature = featureId;
 
-  GeoPackageAPI.getFeature(geoPackage, tableName, featureId)
-  .then(function(geoJson) {
-    geoJson.properties.tableName = tableName;
-    featureLayer.addData(geoJson);
-    featureLayer.bringToFront();
-    if (zoom) {
-      map.fitBounds(featureLayer.getBounds());
-    }
-  });
+  var geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId);
+  geoJson.properties.tableName = tableName;
+  featureLayer.addData(geoJson);
+  featureLayer.bringToFront();
+  if (zoom) {
+    map.fitBounds(featureLayer.getBounds());
+  }
 }
 
 // Displays a table with the attributes of the features in view
