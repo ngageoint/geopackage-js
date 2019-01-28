@@ -95,24 +95,42 @@
 		<section class="source-section">
 			<article></article>
 			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">
-var BoundingBox = require('../boundingBox')
-  , TileGrid = require('./tileGrid');
+/**
+ * This module exports utility functions for [slippy map (XYZ)](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
+ * tile calculations.
+ *
+ * @module tiles/tileBoundingBoxUtils
+ */
 
-var proj4 = require('proj4');
-proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+const BoundingBox = require('../boundingBox');
+const TileGrid = require('./tileGrid');
+const proj4 = ((proj4) => { return 'default' in proj4 ? proj4['default'] : proj4 })(require('proj4'));
 
 var WEB_MERCATOR_HALF_WORLD_WIDTH = proj4('EPSG:4326', 'EPSG:3857').forward([180, 0])[0];
 
+/**
+ * Calculate the bounds in tile coordinates that covers the given bounding box
+ * at the given zoom level.  The result object contains the keys `minX`, `maxX`,
+ * `minY`, and `maxY`, which are tile column and row values in the XYZ tile
+ * scheme.
+ *
+ * @param {BoundingBox} webMercatorBoundingBox bounds in EPSG:3857 coordinates (meters)
+ * @param {number} zoom the integral zoom level
+ * @returns {{minX: number, maxX: number, minY: number, maxY: number}} bounds in tile column and row coordinates
+ */
 module.exports.webMercatorTileBox = function(webMercatorBoundingBox, zoom) {
-  var totalBox = new BoundingBox(-WEB_MERCATOR_HALF_WORLD_WIDTH, WEB_MERCATOR_HALF_WORLD_WIDTH, -WEB_MERCATOR_HALF_WORLD_WIDTH, WEB_MERCATOR_HALF_WORLD_WIDTH);
-
   var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
   var tileSize = module.exports.tileSizeWithTilesPerSide(tilesPerSide);
 
-  var minX = Math.floor((webMercatorBoundingBox.minLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
-  var maxX = Math.max(0,Math.floor(((webMercatorBoundingBox.maxLongitude - (-1 * WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
-  var maxY = Math.max(0,Math.ceil(((-1 * (webMercatorBoundingBox.minLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize) - 1));
-  var minY = Math.floor((-1 * (webMercatorBoundingBox.maxLatitude - WEB_MERCATOR_HALF_WORLD_WIDTH)) / tileSize);
+  const minLonClip = Math.max(-WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.minLongitude);
+  const maxLonClip = Math.min(WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLongitude);
+  const minLatClip = Math.max(-WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.minLatitude);
+  const maxLatClip = Math.min(WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLatitude);
+
+  var minX = Math.floor((minLonClip + WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
+  var maxX = Math.max(0, Math.ceil((maxLonClip + WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize) - 1);
+  var minY = Math.floor((WEB_MERCATOR_HALF_WORLD_WIDTH - maxLatClip) / tileSize);
+  var maxY = Math.max(0, Math.ceil((WEB_MERCATOR_HALF_WORLD_WIDTH - minLatClip) / tileSize) - 1);
 
   return {
     minX: minX,
@@ -149,10 +167,10 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
   var yPositionInFinalTileUnits = ((totalBoundingBox.maxLatitude - geoPackageTileBoundingBox.maxLatitude) * finalTilePixelsPerUnitHeight);
   var heightInFinalTileUnits = (geoPackageTileBoundingBox.maxLatitude - geoPackageTileBoundingBox.minLatitude) * finalTilePixelsPerUnitHeight;
 
-  p.yPositionInFinalTileStart = Math.round(Math.max(0, ypercentageMax * totalHeight));
-  p.xPositionInFinalTileStart = Math.round(Math.max(0, xpercentageMin * totalWidth));
-  p.dx = xPositionInFinalTileUnits;
-  p.dy = yPositionInFinalTileUnits;
+  p.yPositionInFinalTileStart = Math.round(ypercentageMax * totalHeight);
+  p.xPositionInFinalTileStart = Math.round(xpercentageMin * totalWidth);
+  p.dx = p.xPositionInFinalTileStart;
+  p.dy = p.yPositionInFinalTileStart;
   p.sx = 0;
   p.sy = 0;
   p.dWidth = widthInFinalTileUnits;
@@ -164,14 +182,13 @@ module.exports.determinePositionAndScale = function(geoPackageTileBoundingBox, t
 }
 
 /**
- * Get the Web Mercator tile bounding box from the Standard Maps API tile
- * coordinates and zoom level
+ * Calculate the bounds in EPSG:3857 coordinates of the tile at the given XYZ
+ * coordinates coordinates and zoom level.
  *
- *  @param x    x
- *  @param y    y
- *  @param zoom zoom level
- *
- *  @return web mercator bounding box
+ *  @param {number} x tile column
+ *  @param {number} y tile row
+ *  @param {number} zoom zoom level
+ *  @return {BoundingBox} a bounding box in EPSG:3857 meters
  */
 module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom, options) {
   var tilesPerSide = module.exports.tilesPerSideWithZoom(zoom);
@@ -207,7 +224,7 @@ module.exports.getWebMercatorBoundingBoxFromXYZ = function(x, y, zoom, options) 
  *  @return meters
  */
 module.exports.tileSizeWithTilesPerSide = function(tilesPerSide) {
-  return (2*WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+  return (2 * WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
 }
 
 /**
@@ -218,7 +235,7 @@ module.exports.tileSizeWithTilesPerSide = function(tilesPerSide) {
  *  @return tiles per side
  */
 module.exports.tilesPerSideWithZoom = function(zoom) {
-  return Math.pow(2,zoom);
+  return 1 &lt;&lt; zoom;
 }
 
 /**
@@ -394,7 +411,7 @@ module.exports.getTileGridBoundingBox = function(matrixSetBoundingBox, tileMatri
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 10th Oct 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 28th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
