@@ -358,14 +358,14 @@ function clearInfo() {
 function loadByteArray(array, callback) {
   clearInfo();
 
-  GeoPackageAPI.open(array, function(err, gp) {
+  return GeoPackageAPI.open(array)
+  .then(function(gp) {
     geoPackage = gp;
-    readGeoPackage();
-    callback();
+    readGeoPackage(gp);
   });
 }
 
-function readGeoPackage() {
+function readGeoPackage(geoPackage) {
   tableInfos = {};
   var featureTableTemplate = $('#feature-table-template').html();
   Mustache.parse(featureTableTemplate);
