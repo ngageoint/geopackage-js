@@ -543,11 +543,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="run" class="function public"><span class="name">run</span><span class="signature-params">( <span class="signature-param">sql</span> [,&nbsp;<span class="signature-param">params</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{object}</span></h4>
+			<h4 id="run" class="function public"><span class="name">run</span><span class="signature-params">( <span class="signature-param">sql</span> [,&nbsp;<span class="signature-param">params</span>&nbsp;]&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Object}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Runs the sql provided and returns the results</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Run the given SQL and return the results.</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -581,9 +581,13 @@
 			</div>
 			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">object</span></label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Object</span></label>
 								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
+									<div class="form-control-static returns-description"><p>object: <code>{ &quot;changes&quot;: number, &quot;lastInsertROWID&quot;: number }</code></p>
+			<ul>
+			<li><code>changes</code>: number of rows the statement changed</li>
+			<li><code>lastInsertROWID</code>: ID of the last inserted row</li>
+			</ul></div>
 								</div>
 							</div>
 					</form>
@@ -607,7 +611,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-105">line 105</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-107">line 107</a></p>
 								</div>
 							</div>
 			
@@ -649,7 +653,7 @@
 							<td><span class="param-type">Array</span> | <span class="param-type">Object</span></td>
 								<td class="attributes">&lt;optional&gt;<br/></td>
 							<td class="last">
-									<p>Array of substitution parameters</p>
+									<p>substitution parameters</p>
 							</td>
 						</tr>
 					</tbody>
@@ -683,7 +687,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-115">line 115</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-117">line 117</a></p>
 								</div>
 							</div>
 			
@@ -759,7 +763,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-125">line 125</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-127">line 127</a></p>
 								</div>
 							</div>
 			
@@ -851,7 +855,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-137">line 137</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-139">line 139</a></p>
 								</div>
 							</div>
 			
@@ -943,7 +947,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-157">line 157</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-159">line 159</a></p>
 								</div>
 							</div>
 			
@@ -1027,7 +1031,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-176">line 176</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-178">line 178</a></p>
 								</div>
 							</div>
 			
@@ -1100,7 +1104,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-186">line 186</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-188">line 188</a></p>
 								</div>
 							</div>
 			
@@ -1184,7 +1188,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-197">line 197</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-199">line 199</a></p>
 								</div>
 							</div>
 			
@@ -1250,7 +1254,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-212">line 212</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-214">line 214</a></p>
 								</div>
 							</div>
 			
@@ -1316,7 +1320,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-221">line 221</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-223">line 223</a></p>
 								</div>
 							</div>
 			
@@ -1389,7 +1393,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-231">line 231</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-233">line 233</a></p>
 								</div>
 							</div>
 			
@@ -1426,7 +1430,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-244">line 244</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-246">line 246</a></p>
 								</div>
 							</div>
 			
@@ -1471,7 +1475,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-255">line 255</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-257">line 257</a></p>
 								</div>
 							</div>
 			
@@ -1537,7 +1541,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-269">line 269</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-271">line 271</a></p>
 								</div>
 							</div>
 			
@@ -1614,7 +1618,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-278">line 278</a></p>
+									<p class="form-control-static"><a href="db_geoPackageConnection.js.html">db/geoPackageConnection.js</a>, <a href="db_geoPackageConnection.js.html#line-280">line 280</a></p>
 								</div>
 							</div>
 			
@@ -1635,7 +1639,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 28th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 29th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

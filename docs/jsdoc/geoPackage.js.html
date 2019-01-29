@@ -199,18 +199,30 @@ GeoPackage.prototype.getName = function() {
   return this.name;
 }
 
+/**
+ * @returns {module:core/srs~SpatialReferenceSystemDao} the DAO to access the [SRS table]{@link module:core/srs~SpatialReferenceSystem} in this `GeoPackage`
+ */
 GeoPackage.prototype.getSpatialReferenceSystemDao = function() {
   return this.spatialReferenceSystemDao || (this.spatialReferenceSystemDao = new SpatialReferenceSystemDao(this));
 }
 
+/**
+ * @returns {module:core/contents~ContentsDao} the DAO to access the [contents table]{@link module:core/contents~Contents} in this `GeoPackage`
+ */
 GeoPackage.prototype.getContentsDao = function() {
   return this.contentsDao || (this.contentsDao = new ContentsDao(this));
 }
 
+/**
+ * @returns {module:tiles/matrixset~TileMatrixSetDao} the DAO to access the [tile matrix set]{@link module:tiles/matrixset~TileMatrixSet} in this `GeoPackage`
+ */
 GeoPackage.prototype.getTileMatrixSetDao = function () {
   return this.tileMatrixSetDao || (this.tileMatrixSetDao = new TileMatrixSetDao(this));
 };
 
+/**
+ * @returns {module:tiles/matrixset~TileMatrixDao} the DAO to access the [tile matrix]{@link module:tiles/matrixset~TileMatrix} in this `GeoPackage`
+ */
 GeoPackage.prototype.getTileMatrixDao = function() {
   return this.tileMatrixDao || (this.tileMatrixDao = new TileMatrixDao(this));
 }
@@ -276,6 +288,9 @@ GeoPackage.prototype.createSupportedExtensions = function() {
   return this;
 }
 
+/**
+ * @returns {module:tiles/user/tileDao~TileDao} the `TileDao` to access [tiles]{@link module:tiles/user/tileTable}
+ */
 GeoPackage.prototype.getTileDaoWithTileMatrixSet = function (tileMatrixSet) {
   var tileMatrices = [];
   var tileMatrixDao = this.getTileMatrixDao();
@@ -646,29 +661,29 @@ GeoPackage.prototype.createTileMatrixTable = function() {
 };
 
 /**
- * Create a new tile table
- * @param  {TileTable}   tileTable    tile table
- * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ * Create the given tile table in this GeoPackage.
+ *
+ * @param  {module:tiles/user/tileTable~TileTable} tileTable
+ * @returns {@link module:db/tableCreator~TableCreator#createUserTable}
  */
 GeoPackage.prototype.createTileTable = function(tileTable) {
   return this.tableCreator.createUserTable(tileTable);
 };
 
 /**
- * Create a new tile table
- * @param  {String}   tableName    tile table name
- * @param  {BoundingBox} contentsBoundingBox  bounding box of the contents table
- * @param  {Number} contentsSrsId srs id of the contents table
- * @param  {BoundingBox}  tileMatrixSetBoundingBox  bounding box of the matrix set
- * @param  {Number} tileMatrixSetSrsId  srs id of the matrix set
- * @param  {Function} callback called with an error if one occurred otherwise the table now exists
+ * Create a new [tile table]{@link module:tiles/user/tileTable~TileTable} in this GeoPackage.
+ *
+ * @param {String} tableName tile table name
+ * @param {BoundingBox} contentsBoundingBox bounding box of the contents table
+ * @param {Number} contentsSrsId srs id of the contents table
+ * @param {BoundingBox} tileMatrixSetBoundingBox bounding box of the matrix set
+ * @param {Number} tileMatrixSetSrsId srs id of the matrix set
+ * @returns {Promise&lt;module:tiles/matrixset~TileMatrixSet>} `Promise` of the created {@link module:tiles/matrixset~TileMatrixSet}
  */
 GeoPackage.prototype.createTileTableWithTableName = function(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId) {
-  var tileMatrixSet;
-
-  var columns = TileTable.createRequiredColumns();
-  var tileTable = new TileTable(tableName, columns);
-  var contents = new Contents();
+  const columns = TileTable.createRequiredColumns();
+  const tileTable = new TileTable(tableName, columns);
+  const contents = new Contents();
   contents.table_name = tableName;
   contents.data_type = ContentsDao.GPKG_CDT_TILES_NAME;
   contents.identifier = tableName;
@@ -679,7 +694,7 @@ GeoPackage.prototype.createTileTableWithTableName = function(tableName, contents
   contents.max_y = contentsBoundingBox.maxLatitude;
   contents.srs_id = contentsSrsId;
 
-  tileMatrixSet = new TileMatrixSet();
+  const tileMatrixSet = new TileMatrixSet();
   tileMatrixSet.setContents(contents);
   tileMatrixSet.srs_id = tileMatrixSetSrsId;
   tileMatrixSet.min_x = tileMatrixSetBoundingBox.minLongitude;
@@ -705,7 +720,20 @@ GeoPackage.prototype.createTileTableWithTableName = function(tableName, contents
     });
 };
 
-GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom) {
+/**
+ * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
+ * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
+ * for every integral zoom level in the range `[minZoom..maxZoom]`.
+ *
+ * @param {BoundingBox} epsg3857TileBoundingBox
+ * @param {module:tiles/matrixset~TileMatrixSet} tileMatrixSet
+ * @param {number} minZoom
+ * @param {number} maxZoom
+ * @param {number} [tileSize=256] optional tile size in pixels
+ * @returns {module:geoPackage~GeoPackage} `this` `GeoPackage`
+ */
+GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857TileBoundingBox, tileMatrixSet, minZoom, maxZoom, tileSize) {
+  tileSize = tileSize || 256;
   var tileMatrixDao = this.getTileMatrixDao();
 
   for (var zoom = minZoom; zoom &lt;= maxZoom; zoom++) {
@@ -713,20 +741,22 @@ GeoPackage.prototype.createStandardWebMercatorTileMatrix = function(epsg3857Tile
     var matrixWidth = (box.maxX - box.minX) + 1;
     var matrixHeight = (box.maxY - box.minY) + 1;
 
-    var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / 256;
-    var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / 256;
+    var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / tileSize;
+    var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / tileSize;
 
     var tileMatrix = new TileMatrix();
     tileMatrix.table_name = tileMatrixSet.table_name;
     tileMatrix.zoom_level = zoom;
     tileMatrix.matrix_width = matrixWidth;
     tileMatrix.matrix_height = matrixHeight;
-    tileMatrix.tile_width = 256;
-    tileMatrix.tile_height = 256;
+    tileMatrix.tile_width = tileSize;
+    tileMatrix.tile_height = tileSize;
     tileMatrix.pixel_x_size = pixelXSize;
     tileMatrix.pixel_y_size = pixelYSize;
     tileMatrixDao.create(tileMatrix);
   }
+
+  return this;
 };
 
 /**
@@ -917,7 +947,7 @@ GeoPackage.prototype.getInfoForTable = function (tableDao) {
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 28th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 29th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
