@@ -1,16 +1,7 @@
-var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../lib/geoPackage')
-  , FeatureColumn = require('../../lib/features/user/featureColumn')
-  , Verification = require('../fixtures/verification')
+const
+    Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable')
-  , TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils')
-  , SetupFeatureTable = require('../fixtures/setupFeatureTable')
-  , TableCreator = require('../../lib/db/tableCreator')
   , BoundingBox = require('../../lib/boundingBox')
-  , DataTypes = require('../../lib/db/dataTypes')
-  , GeometryData = require('../../lib/geom/geometryData')
-  , should = require('chai').should()
-  , wkx = require('wkx')
   , path = require('path')
   , testSetup = require('../fixtures/testSetup');
 
@@ -75,11 +66,43 @@ describe('GeoPackage Tile table create tests', function() {
       });
     });
 
-    it('should create the tile matrix for the zoom levels', function(){
+    it('should create the standard xyz tile matrix for the zoom levels with default tile size of 256', function(){
       geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      let zoom = 4;
+      while (zoom-- > 0) {
+        const matrix = geopackage.getTileMatrixDao().queryForId([tableName, zoom]);
+        const numTiles = Math.pow(2, zoom);
+        matrix.table_name.should.equal(tableName);
+        matrix.zoom_level.should.equal(zoom);
+        matrix.matrix_width.should.equal(Math.pow(2, zoom));
+        matrix.matrix_height.should.equal(Math.pow(2, zoom));
+        matrix.tile_width.should.equal(256);
+        matrix.tile_height.should.equal(256);
+        const metersPerTile = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / numTiles;
+        matrix.pixel_x_size.should.equal(metersPerTile / 256);
+        matrix.pixel_y_size.should.equal(metersPerTile / 256);
+      }
     });
 
-    it('should add all of the tiles to the tile matrix', function(){
+    it('should create the standard xyz tile matrix for the zoom levels with a custom tile size', function(){
+      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, 100);
+      let zoom = 4;
+      while (zoom-- > 0) {
+        const matrix = geopackage.getTileMatrixDao().queryForId([tableName, zoom]);
+        const numTiles = Math.pow(2, zoom);
+        matrix.table_name.should.equal(tableName);
+        matrix.zoom_level.should.equal(zoom);
+        matrix.matrix_width.should.equal(Math.pow(2, zoom));
+        matrix.matrix_height.should.equal(Math.pow(2, zoom));
+        matrix.tile_width.should.equal(100);
+        matrix.tile_height.should.equal(100);
+        const metersPerTile = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / numTiles;
+        matrix.pixel_x_size.should.equal(metersPerTile / 100);
+        matrix.pixel_y_size.should.equal(metersPerTile / 100);
+      }
+    });
+
+    it('should add all of the tiles to the tile matrix', function() {
 
       geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
 

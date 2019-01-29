@@ -103,9 +103,19 @@
 </dt>
 <dd class="symbol-details class" style="max-height: 9999px;">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Tile Matrix Set object. Defines the minimum bounding box (min_x, min_y,
-			max_x, max_y) and spatial reference system (srs_id) for all content in a tile
-			pyramid user data table.</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p><code>TileMatrixSet</code> models the <a href="https://www.geopackage.org/spec121/index.html#_tile_matrix_set"><code>gpkg_tile_matrix_set</code></a>
+			table.  A row in this table defines the minimum bounding box (min_x, min_y,
+			max_x, max_y) and spatial reference system (srs_id) for all tiles in a
+			<a href="https://www.geopackage.org/spec121/index.html#tiles_user_tables">tile pyramid</a>
+			user data table.  While the parent <a href="module-core_contents-Contents.html"><code>Contents</code></a>
+			row/object also defines a bounding box, the tile matrix set bounding box is
+			used as the reference for calculating tile column/row matrix coordinates, so
+			(min_x, max_y) in SRS coordinates would be the upper-left corner of the tile
+			at tile matrix coordinate (0, 0).  The parent <code>Contents</code> bounding box may be
+			smaller or larger than the <code>TileMatrixSet</code> bounding box, and its purpose is
+			to guide a user-facing application to the target region of the tile pyramid.
+			The <a href="module-tiles_matrixset-TileMatrixSet.html#srs_id"><code><code>srs_id</code></code></a> of the <code>TileMatrixSet</code>, on the other hand, must
+			match that of the parent <a href="module-core_contents-Contents.html#srs_id"><code><code>Contents</code></code></a>.</p></div>
 			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 			
@@ -126,7 +136,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-14">line 14</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-13">line 13</a></p>
 								</div>
 							</div>
 			
@@ -146,7 +156,8 @@
 		</dt>
 <dd class="symbol-details member public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>TilePyramid User Data Table Name</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Name of the <a href="https://www.geopackage.org/spec121/index.html#tiles_user_tables">tile pyramid user data table</a>
+			that stores the tiles</p></div>
 			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
 			
 							<!-- type -->
@@ -174,7 +185,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-26">line 26</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-37">line 37</a></p>
 								</div>
 							</div>
 			
@@ -186,7 +197,7 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title member public">
-			<h4 id="srs_id" class="member public"><span class="name">srs_id</span><span class="signature-type"> :Number</span></h4>
+			<h4 id="srs_id" class="member public"><span class="name">srs_id</span><span class="signature-type"> :<a href="global.html#SRSRef">SRSRef</a></span></h4>
 		</dt>
 <dd class="symbol-details member public">
 	<div class="symbol-details-inner">
@@ -197,7 +208,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Type</label>
 								<div class="col-sm-9">
-									<div class="form-control-static type-names"><span class="param-type">Number</span></div>
+									<div class="form-control-static type-names"><span class="param-type"><a href="global.html#SRSRef">SRSRef</a></span></div>
 								</div>
 							</div>
 			
@@ -218,7 +229,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-32">line 32</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-43">line 43</a></p>
 								</div>
 							</div>
 			
@@ -262,7 +273,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-38">line 38</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-49">line 49</a></p>
 								</div>
 							</div>
 			
@@ -306,7 +317,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-44">line 44</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-55">line 55</a></p>
 								</div>
 							</div>
 			
@@ -350,7 +361,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-50">line 50</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-61">line 61</a></p>
 								</div>
 							</div>
 			
@@ -394,7 +405,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-56">line 56</a></p>
+									<p class="form-control-static"><a href="tiles_matrixset_index.js.html">tiles/matrixset/index.js</a>, <a href="tiles_matrixset_index.js.html#line-67">line 67</a></p>
 								</div>
 							</div>
 			
@@ -415,7 +426,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 10th Oct 2018 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 29th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

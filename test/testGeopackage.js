@@ -422,7 +422,7 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  describe('should operate on a new geopackage', function() {
+  describe('operating on a new geopackage', function() {
     var geopackage;
 
     beforeEach(function(done) {
@@ -541,34 +541,71 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should create a standard web mercator tile table', function() {
-      var columns = [];
+    it('should create a standard web mercator tile table with the default tile size', function() {
 
-      var TileColumn = GeoPackage.TileColumn;
-      var DataTypes = GeoPackage.DataTypes;
-      var BoundingBox = GeoPackage.BoundingBox;
+      const tableName = 'tiles_web_mercator';
+      const contentsBounds = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      const contentsSrsId = 3857;
+      const matrixSetBounds = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      const tileMatrixSetSrsId = 3857;
 
-      var tableName = 'tiles_web_mercator';
+      return GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBounds, contentsSrsId, matrixSetBounds, tileMatrixSetSrsId, 0, 3)
+      .then(function(matrixSet) {
+        matrixSet.table_name.should.equal(tableName);
+        matrixSet.srs_id.should.equal(3857);
+        matrixSet.min_x.should.equal(matrixSetBounds.minLongitude);
+        matrixSet.max_x.should.equal(matrixSetBounds.maxLongitude);
+        matrixSet.min_y.should.equal(matrixSetBounds.minLatitude);
+        matrixSet.max_y.should.equal(matrixSetBounds.maxLatitude);
 
-      var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
-      var contentsSrsId = 3857;
-      var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
-      var tileMatrixSetSrsId = 3857;
-      return GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId, 0, 3)
-      .then(function(tileMatrixSet) {
-        should.exist(tileMatrixSet);
+        const dbMatrixSet = geopackage.getTileMatrixSetDao().queryForId(tableName);
+        dbMatrixSet.should.deep.equal(matrixSet);
+
+        const matrixDao = geopackage.getTileMatrixDao();
+        const matrices = matrixDao.queryForAll();
+
+        matrices.length.should.equal(4);
+        matrices.forEach(matrix => {
+          matrix.tile_width.should.equal(256);
+          matrix.tile_height.should.equal(256);
+        });
+      });
+    });
+
+    it('should create a standard web mercator tile table with a custom tile size', function() {
+
+      const tableName = 'custom_tile_size';
+      const contentsBounds = new BoundingBox(-31644.9297, 6697565.2924, 4127.5995, 6723706.7561);
+      const matrixSetBounds = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+      const tileSize = 320;
+
+      return GeoPackage.createStandardWebMercatorTileTable(geopackage, tableName, contentsBounds, 3857, matrixSetBounds, 3857, 9, 13, tileSize)
+      .then(function(matrixSet) {
+        matrixSet.table_name.should.equal(tableName);
+        matrixSet.srs_id.should.equal(3857);
+        matrixSet.min_x.should.equal(matrixSetBounds.minLongitude);
+        matrixSet.max_x.should.equal(matrixSetBounds.maxLongitude);
+        matrixSet.min_y.should.equal(matrixSetBounds.minLatitude);
+        matrixSet.max_y.should.equal(matrixSetBounds.maxLatitude);
+
+        const dbMatrixSet = geopackage.getTileMatrixSetDao().queryForId(tableName);
+        dbMatrixSet.should.deep.equal(matrixSet);
+
+        const matrixDao = geopackage.getTileMatrixDao();
+        const matrices = matrixDao.queryForAll();
+
+        matrices.length.should.equal(5);
+        matrices.forEach(matrix => {
+          matrix.tile_width.should.equal(tileSize);
+          matrix.tile_height.should.equal(tileSize);
+        });
       });
     });
 
     it('should add a tile to the tile table', function(done) {
-      var columns = [];
 
-      var TileColumn = GeoPackage.TileColumn;
-      var DataTypes = GeoPackage.DataTypes;
       var BoundingBox = GeoPackage.BoundingBox;
-
       var tableName = 'tiles_web_mercator_2';
-
       var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
       var contentsSrsId = 3857;
       var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
@@ -656,6 +693,5 @@ describe('GeoPackageAPI tests', function() {
         });
       });
     });
-
   });
 });

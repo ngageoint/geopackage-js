@@ -165,6 +165,7 @@ describe('TableCreator tests', function() {
     var tileTable = new TileTable('test_tiles', columns);
     var tc = new TableCreator(geopackage);
     var result = tc.createUserTable(tileTable);
+    should.exist(result);
     Verification.verifyTableExists(geopackage, 'test_tiles').should.be.equal(true);
     done();
   });

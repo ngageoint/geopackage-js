@@ -1,6 +1,9 @@
-var TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils')
+const
+    TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils')
   , TileUtils = require('../../../lib/tiles/creator/tileUtilities')
   , BoundingBox = require('../../../lib/boundingBox');
+
+require('chai').should();
 
 describe('TileBoundingBoxUtils tests', function() {
 
@@ -317,4 +320,24 @@ describe('TileBoundingBoxUtils tests', function() {
     }
   });
 
+  it('should produce the correct tile bounding box without high precision input bounds', function() {
+    const webMercatorBox = new BoundingBox(-20037508.3, 20037508.3, -20037508.3, 20037508.3);
+    const tileBox = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, 12);
+
+    tileBox.minX.should.equal(0);
+    tileBox.maxX.should.equal(4095);
+    tileBox.minY.should.equal(0);
+    tileBox.maxY.should.equal(4095);
+  });
+
+  it('should clamp bounds outside 3857 bounds', function() {
+
+    const webMercatorBox = new BoundingBox(-20037509, 20037509, -20037509, 20037509);
+    const tileBox = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, 12);
+
+    tileBox.minX.should.equal(0);
+    tileBox.maxX.should.equal(4095);
+    tileBox.minY.should.equal(0);
+    tileBox.maxY.should.equal(4095);
+  });
 });
