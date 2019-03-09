@@ -6,7 +6,6 @@
 var wkx = require('wkx')
   , reproject = require('reproject')
   , path = require('path')
-  , SQL = require('sql.js')
   , async = require('async')
   , fs = require('fs');
 
@@ -42,6 +41,7 @@ module.exports.openGeoPackage = function(gppath, callback) {
  * @param  {Function} callback called with an error if it occurred and the open GeoPackage object
  */
 module.exports.openGeoPackageByteArray = function(array, callback) {
+  var SQL = require('sql.js');
   var db = new SQL.Database(array);
   GeoPackageConnection.connectWithDatabase(db, function(err, connection) {
     var geoPackage = new GeoPackage('', '', connection);
