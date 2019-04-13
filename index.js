@@ -1,5 +1,5 @@
 /**
- * GeoPackage module.
+ * GeoPackage module. 1.1.8
  * @module GeoPackage
  */
 
@@ -18,9 +18,18 @@ var GeoPackageManager = require('./lib/geoPackageManager')
   , TableCreator = require('./lib/db/tableCreator')
   , TileBoundingBoxUtils = require('./lib/tiles/tileBoundingBoxUtils')
   , FeatureTile = require('./lib/tiles/features')
-  , FeatureTableIndex = require('./lib/extension/index/featureTableIndex');
+  , FeatureTableIndex = require('./lib/extension/index/featureTableIndex')
+  , proj4 = require('proj4');
+
+proj4 = 'default' in proj4 ? proj4['default'] : proj4; // Module loading hack
 
 var proj4Defs = require('./lib/proj4Defs');
+for (var name in proj4Defs) {
+  if (proj4Defs[name]) {
+    proj4.defs(name, proj4Defs[name]);
+  }
+};
+
 module.exports.proj4Defs = proj4Defs;
 module.exports.GeoPackageTileRetriever = GeoPackageTileRetriever;
 module.exports.GeoPackageConnection = GeoPackageConnection;
@@ -349,7 +358,20 @@ module.exports.getFeature = function(geopackage, table, featureId, callback) {
   });
 };
 
+function getProjection(srs) {
+  if(srs.organization_coordsys_id === 4326 && (srs.organization === 'EPSG' || srs.organization === 'epsg')) {
+    return proj4('EPSG:4326');
+  } else if (srs.definition && srs.definition !== '' && srs.definition !== 'undefined') {
+      return proj4(srs.definition);
+  } else if (srs.organization && srs.organization_coordsys_id) {
+    return proj4(srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id);
+  } else {
+    return {};
+  }
+}
+
 function parseFeatureRowIntoGeoJSON(featureRow, srs) {
+  var projection = getProjection(srs);
   var geoJson = {
     type: 'Feature',
     properties: {}
@@ -359,7 +381,8 @@ function parseFeatureRowIntoGeoJSON(featureRow, srs) {
     var geom = geometry.geometry;
     var geoJsonGeom = geometry.geometry.toGeoJSON();
     if (srs.definition && srs.definition !== 'undefined' && (srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id) != 'EPSG:4326') {
-      geoJsonGeom = reproject.reproject(geoJsonGeom, srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id, 'EPSG:4326');
+      console.log('projection is', projection)
+      geoJsonGeom = reproject.reproject(geoJsonGeom, projection, 'EPSG:4326');
     }
     geoJson.geometry = geoJsonGeom;
   }

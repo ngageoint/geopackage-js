@@ -1,6 +1,7 @@
 var GeoPackage = require('../../lib/geoPackage')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackageTileRetriever = require('../../lib/tiles/retriever')
+  , BoundingBox = require('../../lib/boundingBox')
   , proj4 = require('proj4')
   , should = require('chai').should()
   , path = require('path')
@@ -36,6 +37,31 @@ describe('GeoPackage tests', function() {
         ]);
         connection.close();
         done();
+      });
+    });
+  });
+
+
+  it.only('should get the features hydrants', function(done) {
+    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'tmp', 'sh_water_hydrants.gpkg'), function(err, connection) {
+      var geoPackage = new GeoPackage('', '', connection);
+      geoPackage.getFeatureDaoWithTableName('sh_water_hydrants', function(err, featureDao) {
+        var boundingBox = new BoundingBox(-180, 180, -80, 80);
+        featureDao.featureTableIndex.index(function(progress) {
+          console.log('progress', progress);
+        }, function(result) {
+          console.log('result', result);
+          featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox, function(err, row, rowDone) {
+            console.log('row', row);
+            // var currentRow = featureDao.getFeatureRow(row);
+            // console.log('currentRow', currentRow)
+            // var geometry = currentRow.getGeometry();
+            rowDone();
+          }, function(err) {
+            connection.close();
+            done();
+          });
+        });
       });
     });
   });
