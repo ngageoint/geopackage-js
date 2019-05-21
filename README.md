@@ -34,6 +34,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 2.0.8
+
+- Checks for Electron when returning a tile creator
+
 ##### 2.0
 
 - All new API utilizing Promises
