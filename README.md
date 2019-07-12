@@ -177,9 +177,9 @@ function loadByteArray(array, callback) {
 
 ```javascript
 var GeoPackageAPI = require('@ngageoint/geopackage')
-  , GeoPackageManager = geopackage.GeoPackageManager
-  , GeoPackageConnection = geopackage.GeoPackageConnection
-  , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
+  , GeoPackageManager = GeoPackageAPI.GeoPackageManager
+  , GeoPackageConnection = GeoPackageAPI.GeoPackageConnection
+  , GeoPackageTileRetriever = GeoPackageAPI.GeoPackageTileRetriever;
 
 GeoPackageAPI.open(filename, function(err, geoPackage) {
 
