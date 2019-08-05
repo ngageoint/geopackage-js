@@ -33,6 +33,7 @@ require('./lib/issues/issue68.js');
 require('./lib/tiles/features/testFeatureTiles');
 require('./lib/extension/index/testFeatureTableIndex');
 require('./lib/extension/testExtensionDao');
+require('./lib/extension/contents/testContentsIdDao');
 
 describe('Array', function() {
   describe('#indexOf()', function() {
