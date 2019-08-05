@@ -76,6 +76,10 @@ module.exports.verifyMetadataReference = function(geopackage) {
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_metadata_reference_timestamp_update']);
 }
 
+module.exports.verifyContentsId = function(geopackage) {
+  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_contents_id']);
+}
+
 module.exports.verifyExtensions = function(geopackage) {
   return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_extensions']);
 }
