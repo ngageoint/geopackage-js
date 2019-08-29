@@ -1,0 +1,298 @@
+<!-- start:source.tmpl.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+		<title>extension/style/iconTable.js</title>
+		<link rel="icon" type="image/png" href="favicon.png"/>
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+		<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+		<link type="text/css" rel="stylesheet" href="css/prism.min.css">
+		<link type="text/css" rel="stylesheet" href="css/template.min.css">
+			<style>
+				.page-header,
+				pre.code-toolbar > .toolbar:hover {
+					background-color: #154e7d;
+				}
+				.callout-primary,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus,
+				pre.code-toolbar > .toolbar:hover {
+					border-left-color: #154e7d;
+				}
+				pre.code-toolbar > .toolbar:hover {
+					border-bottom-color: #154e7d;
+				}
+				.callout-primary h5,
+				.symbol-title.collapsible-symbol .toggle-icon,
+				.breadcrumb li a,
+				.toc .nav > li > a:hover,
+				.toc .nav > li > a:focus,
+				.toc .nav > li.active > a,
+				.toc .nav > li.active > a:hover,
+				.toc .nav > li.active > a:focus {
+					color: #154e7d;
+				}
+			</style>
+		<script type="text/javascript">
+			window.TEMPLATE_OPTIONS = {"includeDate":true,"dateFormat":"Do MMM YYYY","systemName":"GeoPackage JS","systemSummary":"NGA GeoPackage JavaScript library","systemLogo":"img/icon.png","systemColor":"#154e7d","navMembers":[{"kind":"class","title":"Classes","summary":"All documented classes."},{"kind":"external","title":"Externals","summary":"All documented external members."},{"kind":"global","title":"Globals","summary":"All documented globals."},{"kind":"mixin","title":"Mixins","summary":"All documented mixins."},{"kind":"interface","title":"Interfaces","summary":"All documented interfaces."},{"kind":"module","title":"Modules","summary":"All documented modules."},{"kind":"namespace","title":"Namespaces","summary":"All documented namespaces."},{"kind":"tutorial","title":"Tutorials","summary":"All available tutorials."}],"footer":"<span class=\"site-footer-owner\"><a href=\"https://github.com/ngageoint/GeoPackage\">GeoPackage</a> is maintained by:</span><br><a href=\"https://github.com/ngageoint\"><img src=\"http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png\" align=\"middle\" height=\"60\">National Geospatial-Intelligence Agency</a><a style=\"padding-left: 30px;\" href=\"http://www.bit-sys.com/\"><img src=\"http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png\" align=\"middle\" height=\"40\"></a><br>","copyright":"","linenums":true,"collapseSymbols":false,"inverseNav":true,"inlineNav":true,"outputSourceFiles":true,"sourceRootPath":null,"disablePackagePath":true,"outputSourcePath":false,"showTableOfContents":true,"showAccessFilter":true,"analytics":null,"methodHeadingReturns":true,"sort":"linenum, longname, version, since","search":true,"favicon":"favicon.png","stylesheets":[],"scripts":[],"monospaceLinks":true,"cleverLinks":true,"referenceTitle":"GeoPackage JS","useLongnameInNav":false,"showInheritedInNav":true};
+			window.DOCLET_TOC_ENABLED = false;
+			window.DOCLET_AFILTER_ENABLED = false;
+		</script>
+</head>
+<body>
+	<!-- start:navbar.hbs -->
+	<header class="navbar navbar-default navbar-fixed-top navbar-inverse">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand branding-logo" href="index.html" style="background-image: url(img/icon.png);">
+					GeoPackage JS
+				</a>
+				<!-- displayed on small devices -->
+				<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="navbar-collapse collapse" id="topNavigation">
+				<ul class="nav navbar-nav">
+							<li><a href="global.html">Globals</a></li>
+							<li><a href="list_class.html">Classes</a></li>
+							<li><a href="list_module.html">Modules</a></li>
+							<li><a href="list_tutorial.html">Tutorials</a></li>
+				</ul>
+					<!-- start:lunr-search-navbar.hbs -->
+					<form class="navbar-form navbar-right" role="search">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search" id="lunr-search-input">
+							<div class="input-group-btn">
+								<button class="btn btn-default" id="lunr-search-submit">
+									<i class="glyphicon glyphicon-search"></i>
+								</button>
+							</div>
+						</div>
+					</form>
+					<!-- start:lunr-search-navbar.hbs -->		</div>
+		</div>
+	</header>
+	<!-- end:navbar.hbs -->		<div class="page-header">
+			<div class="container">
+				<span class="kind">source</span>
+				<h1><span class="name">extension/style/iconTable.js</span></h1>
+			</div>
+		</div>
+	<div class="container content">
+		<div class="row">
+			<div class="col-md-12 main-content">
+		<section class="source-section">
+			<article></article>
+			<pre class="prettyprint source language-javascript line-numbers"><code class="language-javascript">/**
+ * @memberOf module:extension/style
+ * @class IconTable
+ */
+
+var MediaTable = require('../relatedTables/mediaTable')
+  , UserCustomColumn = require('../../user/custom/userCustomColumn')
+  , DataType = require('../../db/dataTypes');
+
+var util = require('util');
+
+/**
+ * Icon Requirements Class Media Table
+ * @class
+ * @extends {module:extension/relatedTables~MediaTable}
+ * @param  {string} tableName table name
+ * @param  {module:user/userColumn~UserColumn[]} columns   media columns
+ * @param {string[]} requiredColumns required column names
+ */
+var IconTable = function(tableName, columns, requiredColumns) {
+  MediaTable.call(this, tableName, columns, requiredColumns);
+};
+
+util.inherits(IconTable, MediaTable);
+
+/**
+ * Create a media table with a minimum required columns followed by the additional columns
+ * @return {module:extension/relatedTables~MediaTable}
+ */
+IconTable.create = function() {
+  return new IconTable(IconTable.TABLE_NAME, IconTable.createColumns(), IconTable.requiredColumns());
+};
+
+IconTable.createRequiredColumns = function() {
+  return MediaTable.createRequiredColumns();
+};
+
+/**
+ * Get the required columns
+ * @return {string[]}
+ */
+IconTable.requiredColumns = function() {
+  return MediaTable.requiredColumns();
+};
+
+/**
+ * Create the columns
+ * @return {module:user/userColumn~UserColumn[]}
+ */
+IconTable.createColumns = function() {
+  var columns = IconTable.createRequiredColumns();
+  var index = columns.length;
+  columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_NAME, DataType.GPKG_DT_TEXT_NAME, undefined, false, undefined));
+  columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, DataType.GPKG_DT_TEXT_NAME, undefined, false, undefined));
+  columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_WIDTH, DataType.GPKG_DT_REAL_NAME, undefined, false, undefined));
+  columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, DataType.GPKG_DT_REAL_NAME, undefined, false, undefined));
+  columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, DataType.GPKG_DT_REAL_NAME, undefined, false, undefined));
+  columns.push(UserCustomColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, DataType.GPKG_DT_REAL_NAME, undefined, false, undefined));
+  return columns;
+};
+
+/**
+ * Get the name column index
+ * @return int
+ */
+IconTable.prototype.getNameColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_NAME);
+};
+
+/**
+ * Get the name column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getNameColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_NAME);
+};
+
+/**
+ * Get the description column index
+ * @return int
+ */
+IconTable.prototype.getDescriptionColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_DESCRIPTION);
+};
+
+/**
+ * Get the description column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getDescriptionColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_DESCRIPTION);
+};
+
+/**
+ * Get the width column index
+ * @return int
+ */
+IconTable.prototype.getWidthColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_WIDTH);
+};
+
+/**
+ * Get the width column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getWidthColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_WIDTH);
+};
+
+/**
+ * Get the height column index
+ * @return int
+ */
+IconTable.prototype.getHeightColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_HEIGHT);
+};
+
+/**
+ * Get the height column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getHeightColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_HEIGHT);
+};
+
+/**
+ * Get the anchor_u column index
+ * @return int
+ */
+IconTable.prototype.getAnchorUColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_ANCHOR_U);
+};
+
+/**
+ * Get the anchor_u column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getAnchorUColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_ANCHOR_U);
+};
+
+/**
+ * Get the anchor_v column index
+ * @return int
+ */
+IconTable.prototype.getAnchorVColumnIndex = function() {
+  return this.getColumnIndex(IconTable.COLUMN_ANCHOR_V);
+};
+
+/**
+ * Get the anchor_v column
+ * @return {module:user/userColumn~UserColumn}
+ */
+IconTable.prototype.getAnchorVColumn = function() {
+  return this.getColumnWithColumnName(IconTable.COLUMN_ANCHOR_V);
+};
+
+IconTable.TABLE_NAME = 'nga_icon';
+IconTable.COLUMN_NAME = 'name';
+IconTable.COLUMN_DESCRIPTION = 'description';
+IconTable.COLUMN_WIDTH = 'width';
+IconTable.COLUMN_HEIGHT = 'height';
+IconTable.COLUMN_ANCHOR_U = 'anchor_u';
+IconTable.COLUMN_ANCHOR_V = 'anchor_v';
+IconTable.prototype.TABLE_TYPE = 'media';
+
+module.exports = IconTable;
+</code></pre>
+		</section>
+			</div>
+		</div>
+	</div>
+	<footer>
+				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 28th Aug 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+	</footer>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/prism.min.js"></script>
+	<script src="js/template.min.js"></script>
+		<!-- start:lunr-search-modal.hbs -->
+		<div class="modal fade" id="lunr-search-modal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title">Search results</h4>
+					</div>
+					<div class="modal-body" id="lunr-search-body">
+					</div>
+					<div class="modal-footer" id="lunr-search-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+		<!-- end:lunr-search-modal.hbs -->		<script src="js/lunr.min.js"></script>
+	
+</body>
+</html>
+<!-- end:source.tmpl.hbs -->

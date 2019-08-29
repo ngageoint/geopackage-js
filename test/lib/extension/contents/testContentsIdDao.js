@@ -48,7 +48,7 @@ describe('ContentsIdExtension Tests', function() {
     geopackage.getContentsIdExtension().createId(contents).table_name.should.be.equal(tableName);
   });
 
-  it('should retrieve \'table_name\'s of contents without record in contentsId table', function() {
+  it('should retrieve table_name\'s of contents without record in contentsId table', function() {
     // test getMissing
     var missing = geopackage.getContentsIdExtension().getMissing("");
     missing.length.should.be.equal(1);
@@ -57,6 +57,18 @@ describe('ContentsIdExtension Tests', function() {
     contentsId.table_name.should.be.equal(tableName);
     // test getMissing returns nothing when all contents records have entry in contentsId table
     missing = geopackage.getContentsIdExtension().getMissing("");
+    missing.length.should.be.equal(0);
+  });
+
+  it('should retrieve table_name\'s of contents without record in contentsId table for given type', function() {
+    // test getMissing
+    var missing = geopackage.getContentsIdExtension().getMissing(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    missing.length.should.be.equal(1);
+    // test create
+    var contentsId = geopackage.getContentsIdExtension().create(contents);
+    contentsId.table_name.should.be.equal(tableName);
+    // test getMissing returns nothing when all contents records have entry in contentsId table
+    missing = geopackage.getContentsIdExtension().getMissing(ContentsDao.GPKG_CDT_FEATURES_NAME);
     missing.length.should.be.equal(0);
   });
 
@@ -93,6 +105,11 @@ describe('ContentsIdExtension Tests', function() {
     // test deleteIds when no ids to be deleted
     numDeleted = geopackage.getContentsIdExtension().deleteIds(ContentsDao.GPKG_CDT_FEATURES_NAME);
     numDeleted.should.be.equal(0);
+  });
+
+  it('should getId for contents', function() {
+    var id = geopackage.getContentsIdExtension().create(contents).id;
+    geopackage.getContentsIdExtension().getId(contents).should.be.equal(id);
   });
 
   it('should create contentsIds for all contents without contentsIds', function() {
