@@ -30,10 +30,13 @@ require('./lib/testGeoPackageCreate');
 require('./lib/testGeoPackageManagerCreate');
 require('./lib/testTileCreate');
 require('./lib/issues/issue68.js');
+require('./lib/tiles/features/testFeaturePaintCache');
 require('./lib/tiles/features/testFeatureTiles');
 require('./lib/extension/index/testFeatureTableIndex');
 require('./lib/extension/testExtensionDao');
 require('./lib/extension/contents/testContentsIdDao');
+require('./lib/extension/style/testIconCache');
+require('./lib/extension/style/testStyleExtension');
 
 describe('Array', function() {
   describe('#indexOf()', function() {

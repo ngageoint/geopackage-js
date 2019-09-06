@@ -104,7 +104,7 @@
  * @constructor
  */
 var IconCache = function(size = null) {
-  this.cacheSize = size | IconCache.DEFAULT_CACHE_SIZE;
+  this.cacheSize = size !== null ? size : IconCache.DEFAULT_CACHE_SIZE;
   this.iconCache = {};
   this.accessHistory = [];
 };
@@ -112,7 +112,7 @@ var IconCache = function(size = null) {
 /**
  * Get the cached image for the icon row or null if not cached
  * @param {module:extension/style.IconRow} iconRow icon row
- * @return {Bitmap} icon image or null
+ * @return {Image} icon image or null
  */
 IconCache.prototype.getIconForIconRow = function(iconRow) {
   return this.get(iconRow.getId());
@@ -121,25 +121,25 @@ IconCache.prototype.getIconForIconRow = function(iconRow) {
 /**
  * Get the cached image for the icon row id or null if not cached
  * @param {Number} iconRowId icon row id
- * @return {Bitmap} icon image or null
+ * @return {Image} icon image or null
  */
 IconCache.prototype.get = function(iconRowId) {
-  var bitmap = this.iconCache.get(iconRowId);
-  if (!!bitmap) {
+  var image = this.iconCache[iconRowId];
+  if (!!image) {
     var index = this.accessHistory.indexOf(iconRowId);
     if (index > -1) {
       this.accessHistory.splice(index, 1);
     }
     this.accessHistory.push(iconRowId);
   }
-  return bitmap;
+  return image;
 };
 
 /**
  * Cache the icon image for the icon row
  * @param {module:extension/style.IconRow} iconRow icon row
- * @param {Bitmap} image icon image
- * @return {Bitmap} previous cached icon image or null
+ * @param {Image} image icon image
+ * @return {Image} previous cached icon image or null
  */
 IconCache.prototype.putIconForIconRow = function(iconRow, image) {
   return this.put(iconRow.getId(), image);
@@ -148,8 +148,8 @@ IconCache.prototype.putIconForIconRow = function(iconRow, image) {
 /**
  * Cache the icon image for the icon row id
  * @param {Number} iconRowId icon row id
- * @param {Bitmap} image icon image
- * @return {Bitmap} previous cached icon image or null
+ * @param {Image} image icon image
+ * @return {Image} previous cached icon image or null
  */
 IconCache.prototype.put = function(iconRowId, image) {
   var previous = this.iconCache[iconRowId];
@@ -173,7 +173,7 @@ IconCache.prototype.put = function(iconRowId, image) {
 /**
  * Remove the cached image for the icon row
  * @param {module:extension/style.IconRow} iconRow icon row
- * @return {Bitmap} removed icon image or null
+ * @return {Image} removed icon image or null
  */
 IconCache.prototype.removeIconForIconRow = function(iconRow) {
   return this.remove(iconRow.getId());
@@ -182,7 +182,7 @@ IconCache.prototype.removeIconForIconRow = function(iconRow) {
 /**
  * Remove the cached image for the icon row id
  * @param {Number} iconRowId icon row id
- * @return {Bitmap} removed icon image or null
+ * @return {Image} removed icon image or null
  */
 IconCache.prototype.remove = function(iconRowId) {
   var removed = this.iconCache[iconRowId];
@@ -213,10 +213,7 @@ IconCache.prototype.resize = function(maxSize) {
   if (keys.length > maxSize) {
     var numberToRemove = keys.length - maxSize;
     for (var i = 0; i &lt; numberToRemove; i++) {
-      var iconId = this.accessHistory.shift();
-      if (!!iconId) {
-        delete this.iconCache[iconId];
-      }
+      delete this.iconCache[this.accessHistory.shift()];
     }
   }
 };
@@ -224,7 +221,7 @@ IconCache.prototype.resize = function(maxSize) {
 /**
  * Create or retrieve from cache an icon image for the icon row
  * @param {module:extension/style.IconRow} icon icon row
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
 IconCache.prototype.createIcon = function(icon) {
   return this.createAndCacheIcon(icon, this);
@@ -234,7 +231,7 @@ IconCache.prototype.createIcon = function(icon) {
  * Create or retrieve from cache an icon image for the icon row
  * @param {module:extension/style.IconRow} icon icon row
  * @param {Number} scale scale factor
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
 IconCache.prototype.createScaledIcon = function(icon, scale) {
   return this.createAndCacheScaledIcon(icon, scale, this);
@@ -243,17 +240,17 @@ IconCache.prototype.createScaledIcon = function(icon, scale) {
 /**
  * Create an icon image for the icon row without caching
  * @param {module:extension/style.IconRow} icon icon row
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
 IconCache.prototype.createIconNoCache = function(icon) {
-  return this.createAndCacheIcon(icon, null);
+  return this.createScaledIconNoCache(icon, 1.0);
 };
 
 /**
  * Create an icon image for the icon row without caching
  * @param icon icon row
  * @param scale scale factor
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
 IconCache.prototype.createScaledIconNoCache = function(icon, scale) {
   return this.createAndCacheScaledIcon(icon, scale, null);
@@ -263,7 +260,7 @@ IconCache.prototype.createScaledIconNoCache = function(icon, scale) {
  * Create or retrieve from cache an icon image for the icon row
  * @param {module:extension/style.IconRow} icon icon row
  * @param {module:extension/style.IconCache} iconCache icon cache
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
 IconCache.prototype.createAndCacheIcon = function(icon, iconCache) {
   return this.createAndCacheScaledIcon(icon, 1.0, iconCache);
@@ -274,21 +271,19 @@ IconCache.prototype.createAndCacheIcon = function(icon, iconCache) {
  * @param {module:extension/style.IconRow} icon icon row
  * @param {Number} scale scale factor
  * @param {module:extension/style.IconCache} iconCache icon cache
- * @return {Bitmap} icon image
+ * @return {Promise&lt;Image>} icon image
  */
-IconCache.prototype.createAndCacheScaledIcon = function(icon, scale, iconCache) {
+IconCache.prototype.createAndCacheScaledIcon = async function(icon, scale, iconCache) {
   var iconImage = null;
   if (icon != null) {
     var iconId = icon.getId();
     if (iconCache !== null) {
-      iconImage = this.iconCache.get(iconId);
+      iconImage = iconCache.get(iconId);
     }
-    if (iconImage === null || iconImage.width !== icon.getWidth() || iconImage.height !== icon.getHeight()) {
-      try {
-        iconImage = icon.getScaledDataImage(scale);
-      } catch (e) {
-        throw new Error("Failed to get the Icon Row image. Id: " + iconId);
-      }
+    var iconScaledWidth = Math.round(icon.getWidth() * scale);
+    var iconScaledHeight = Math.round(icon.getHeight() * scale);
+    if (!iconImage || iconImage.width !== iconScaledWidth || iconImage.height !== iconScaledHeight) {
+      iconImage = await icon.getScaledDataImage(scale);
     }
     if (iconCache !== null) {
       iconCache.putIconForIconRow(icon, iconImage);
@@ -307,7 +302,7 @@ module.exports = IconCache;
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 28th Aug 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 6th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

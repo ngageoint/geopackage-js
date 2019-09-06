@@ -48,12 +48,24 @@ describe('GeoPackage FeatureTiles tests', function() {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1)
-      .then(function(image) {
-        testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles','1_1_0.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles','1_1_0.png'), function(err, equal) {
+            equal.should.be.equal(true);
+            done();
+          });
         });
-      });
+    });
+
+    it('should get the x: 0, y: 0, z: 0 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles','0_0_0.png'), function(err, equal) {
+            equal.should.be.equal(true);
+            done();
+          });
+        });
     });
 
     it('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {

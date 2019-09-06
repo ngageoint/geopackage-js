@@ -1,10 +1,7 @@
 var fs = require('fs')
   , path = require('path')
   , crypto = require('crypto')
-  , pureimage = require('pureimage')
-  , CanvasCompare = require('canvas-compare')
-  , Duplex = require('stream').Duplex
-  , TableCreator = require('../../lib/db/tableCreator')
+  , ImageUtils = require('../../lib/tiles/imageUtils')
   , GeoPackage = require('../../lib/geoPackage')
   , GeoPackageAPI = require('../..')
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
@@ -79,33 +76,30 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
 
 module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
-    pureimage.decodePNGFromStream(fs.createReadStream(expectedTilePath)).then(function(expectedImage) {
-      var same = true;
-      for (var x = 0; x < actualCanvas.width && same; x++) {
-        for (var y = 0; y < actualCanvas.height && same; y++) {
-          var actualRGBA = actualCanvas.getPixelRGBA(x,y);
-          var expectedRGBA = expectedImage.getPixelRGBA(x,y);
-          same = actualRGBA === expectedRGBA;
-        }
-      }
-      callback(null, same);
+    ImageUtils.getImage(expectedTilePath).then(img => {
+      var Canvas = require('canvas');
+      var expectedCanvas = Canvas.createCanvas(256, 256);
+      expectedCanvas.getContext('2d').drawImage(img, 0, 0);
+      callback(null, actualCanvas.toDataURL() === expectedCanvas.toDataURL());
     });
   } else {
-
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
       var expectedBase64 = new Buffer(expectedTile).toString('base64');
-      CanvasCompare({
+      var CanvasCompare = require('canvas-compare');
+      CanvasCompare.setImageData(ImageData);
+      CanvasCompare.canvasCompare({
         baseImageUrl: actualCanvas.toDataURL(),
         targetImageUrl: 'data:image/png;base64,' + expectedBase64
       })
-      .then(function(result) {
-        callback(null, true);
-      })
-      .catch(function(reason) {
-        callback(null, false);
-      });
+        .then(function(result) {
+          callback(null, true);
+        })
+        .catch(function(reason) {
+          callback(null, false);
+        });
     });
   }
+
 }
 
 module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, height) {
@@ -123,22 +117,17 @@ module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, he
 
 module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
-
-    var chunkStream = new Duplex();
-    chunkStream.push(actualTile);
-    chunkStream.push(null);
-    pureimage.decodePNGFromStream(chunkStream).then(function(actualImage) {
-      pureimage.decodePNGFromStream(fs.createReadStream(expectedTilePath)).then(function(expectedImage) {
-        var same = true;
-        for (var x = 0; x < actualImage.width && same; x++) {
-          for (var y = 0; y < actualImage.height && same; y++) {
-            var actualRGBA = actualImage.getPixelRGBA(x,y);
-            var expectedRGBA = expectedImage.getPixelRGBA(x,y);
-            same = actualRGBA === expectedRGBA;
-          }
-        }
-        callback(null, same);
-      });
+    ImageUtils.getImage(actualTile).then(actualImage => {
+      var Canvas = require('canvas');
+      var actualCanvas = Canvas.createCanvas(width, height);
+      var actualCtx = actualCanvas.getContext('2d');
+      actualCtx.drawImage(actualImage, 0, 0);
+      ImageUtils.getImage(expectedTilePath).then(expectedImage => {
+        var expectedCanvas = Canvas.createCanvas(width, height);
+        var expectedCtx = expectedCanvas.getContext('2d');
+        expectedCtx.drawImage(expectedImage, 0, 0);
+        callback(null, actualCanvas.toDataURL() === expectedCanvas.toDataURL());
+      })
     });
   } else {
     if (actualTile instanceof Uint8Array) {
@@ -150,7 +139,6 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
       }
       actualTile = 'data:image/png;base64,' + btoa( binary );
     }
-
 
     var actual = document.createElement('canvas');
     actual.width = width;
@@ -203,19 +191,17 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
             currentTag.appendChild(actual);
             currentTag.appendChild(expected);
 
-            console.log('canvas compare', CanvasCompare);
-
+            var CanvasCompare = require('canvas-compare');
+            CanvasCompare.setImageData(ImageData);
             CanvasCompare.canvasCompare({
-              baseImageUrl: actualTile,
-              targetImageUrl: 'data:image/png;base64,' + expectedBase64
+              baseImageUrl: actual.toDataURL(),
+              targetImageUrl: expected.toDataURL()
             })
             .then(function(result) {
-              console.log('result', result);
               currentTag.appendChild(result.producePreview());
-              callback(null, false);
+              callback(null, true);
             })
             .catch(function(reason) {
-              console.log('reason', reason);
               callback(null, false);
             });
           } else {

@@ -9,10 +9,10 @@ var FeatureStyleExtension = require('../../../../lib/extension/style')
   , IconTable = require('../../../../lib/extension/style/iconTable')
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao')
   , testSetup = require('../../../fixtures/testSetup')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils')
   , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
-  , PureImage = require('pureimage')
   , GeoPackageAPI = require('../../../../lib/api')
   , wkx = require('wkx')
   , fs = require('fs')
@@ -100,7 +100,7 @@ describe('StyleExtension Tests', function() {
           geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension().then(function () {
             geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension().then(function () {
               featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
-              PureImage.decodePNGFromStream(fs.createReadStream(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))).then(function(expectedImage) {
+              ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(function (expectedImage) {
                 iconImage = expectedImage;
                 testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'), function(err, buffer) {
                   iconImageBuffer = buffer;

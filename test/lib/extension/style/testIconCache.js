@@ -3,7 +3,7 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path')
-  , PureImage = require('pureimage')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils')
   , GeoPackageAPI = require('../../../../lib/api')
   , fs = require('fs');
 
@@ -30,6 +30,31 @@ describe('IconCache Tests', function() {
     return iconRow;
   };
 
+  var compareImages = function (imageA, imageB) {
+    return new Promise(function(resolve) {
+      var actualCanvas, actualCtx, expectedCanvas, expectedCtx;
+      if (typeof(process) !== 'undefined' && process.version) {
+        var Canvas = require('canvas');
+        actualCanvas = Canvas.createCanvas(imageA.width, imageA.height);
+        actualCtx = actualCanvas.getContext('2d');
+        expectedCanvas = Canvas.createCanvas(imageB.width, imageB.height);
+        expectedCtx = expectedCanvas.getContext('2d');
+      } else {
+        actualCanvas = document.getElementById('canvas');
+        actualCanvas.width = imageA.width;
+        actualCanvas.height = imageA.height;
+        actualCtx = actualCanvas.getContext('2d');
+        expectedCanvas = document.getElementById('canvas');
+        expectedCanvas.width = imageB.width;
+        expectedCanvas.height = imageB.height;
+        expectedCtx = expectedCanvas.getContext('2d');
+      }
+      actualCtx.drawImage(imageA, 0, 0);
+      expectedCtx.drawImage(imageB, 0, 0);
+      resolve(actualCanvas.toDataURL() === expectedCanvas.toDataURL());
+    });
+  }
+
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', function(done) {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
     testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
@@ -42,7 +67,7 @@ describe('IconCache Tests', function() {
             geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension().then(function () {
               featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
               featureTableStyles.createIconRelationship().then(function () {
-                PureImage.decodePNGFromStream(fs.createReadStream(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))).then(function(expectedImage) {
+                ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(function (expectedImage) {
                   iconImage = expectedImage;
                   testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'), function(err, buffer) {
                     iconImageBuffer = buffer;
@@ -140,14 +165,9 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0);
-    var bitmap = await iconCache.createIcon(iconRow);
-    bitmap.width.should.be.equal(iconImage.width);
-    bitmap.height.should.be.equal(iconImage.height);
-    for (var i = 0; i < bitmap.width; i++) {
-      for (var j = 0; j < bitmap.height; j++) {
-        bitmap.getPixelRGBA(i, j).should.be.equal(iconImage.getPixelRGBA(i, j));
-      }
-    }
+    var image = await iconCache.createIcon(iconRow);
+    var result = await compareImages(image, iconImage);
+    result.should.be.equal(true);
     should.exist(iconCache.getIconForIconRow(iconRow));
   }));
 
@@ -155,14 +175,9 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0);
-    var bitmap = await iconCache.createIconNoCache(iconRow);
-    bitmap.width.should.be.equal(iconImage.width);
-    bitmap.height.should.be.equal(iconImage.height);
-    for (var i = 0; i < bitmap.width; i++) {
-      for (var j = 0; j < bitmap.height; j++) {
-        bitmap.getPixelRGBA(i, j).should.be.equal(iconImage.getPixelRGBA(i, j));
-      }
-    }
+    var image = await iconCache.createIconNoCache(iconRow);
+    var result = await compareImages(image, iconImage);
+    result.should.be.equal(true);
     should.not.exist(iconCache.getIconForIconRow(iconRow));
   }));
 
@@ -170,16 +185,10 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0);
-    var expectedBitmap = await PureImage.decodePNGFromStream(fs.createReadStream(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png')));
-    var bitmap = await iconCache.createScaledIconNoCache(iconRow, 2.0);
-    bitmap.width.should.be.equal(expectedBitmap.width);
-    bitmap.height.should.be.equal(expectedBitmap.height);
-
-    for (var i = 0; i < bitmap.width; i++) {
-      for (var j = 0; j < bitmap.height; j++) {
-        bitmap.getPixelRGBA(i, j).should.be.equal(expectedBitmap.getPixelRGBA(i, j));
-      }
-    }
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
+    var result = await compareImages(expectedImage, image);
+    result.should.be.equal(true);
     should.not.exist(iconCache.getIconForIconRow(iconRow));
   }));
 
@@ -187,36 +196,22 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0);
-    var expectedBitmap = await PureImage.decodePNGFromStream(fs.createReadStream(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png')));
-    var bitmap = await iconCache.createScaledIcon(iconRow, 2.0);
-    bitmap.width.should.be.equal(expectedBitmap.width);
-    bitmap.height.should.be.equal(expectedBitmap.height);
-
-    for (var i = 0; i < bitmap.width; i++) {
-      for (var j = 0; j < bitmap.height; j++) {
-        bitmap.getPixelRGBA(i, j).should.be.equal(expectedBitmap.getPixelRGBA(i, j));
-      }
-    }
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var image = await iconCache.createScaledIcon(iconRow, 2.0);
+    var result = await compareImages(expectedImage, image);
+    result.should.be.equal(true);
     should.exist(iconCache.getIconForIconRow(iconRow));
   }));
-
-
 
   it('should create scaled icon and cache it even when already cached', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.setId(0);
     iconCache.putIconForIconRow(iconRow, iconImage);
-    var expectedBitmap = await PureImage.decodePNGFromStream(fs.createReadStream(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png')));
-    var bitmap = await iconCache.createScaledIcon(iconRow, 2.0);
-    bitmap.width.should.be.equal(expectedBitmap.width);
-    bitmap.height.should.be.equal(expectedBitmap.height);
-
-    for (var i = 0; i < bitmap.width; i++) {
-      for (var j = 0; j < bitmap.height; j++) {
-        bitmap.getPixelRGBA(i, j).should.be.equal(expectedBitmap.getPixelRGBA(i, j));
-      }
-    }
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var image = await iconCache.createScaledIcon(iconRow, 2.0);
+    var result = await compareImages(expectedImage, image);
+    result.should.be.equal(true);
     should.exist(iconCache.getIconForIconRow(iconRow));
   }));
 });
