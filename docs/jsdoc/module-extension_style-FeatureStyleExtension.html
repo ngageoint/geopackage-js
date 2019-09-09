@@ -5155,11 +5155,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="getFeatureTableName" class="function public"><span class="name">getFeatureTableName</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{String}</span></h4>
+			<h4 id="setStyleForFeatureRowAndGeometryType" class="function public"><span class="name">setStyleForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get name of feature table</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the style of the feature row for the specified geometry type</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -5172,9 +5172,24 @@
 					</thead>
 					<tbody>
 						<tr>
-								<td><code>featureTable</code></td>
-							<td></td>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
 							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>style</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
+							<td class="last">
+									<p>style row</p>
 							</td>
 						</tr>
 					</tbody>
@@ -5182,7 +5197,7 @@
 			</div>
 			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">String</span></label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
 								<div class="col-sm-9">
 									<div class="form-control-static returns-description"></div>
 								</div>
@@ -5208,7 +5223,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1533">line 1533</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-980">line 980</a></p>
 								</div>
 							</div>
 			
@@ -5220,11 +5235,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="getAllIconIds" class="function public"><span class="name">getAllIconIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Number>}</span></h4>
+			<h4 id="setStyleDefaultForFeatureRow" class="function public"><span class="name">setStyleDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique icon row ids the features map to</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default style of the feature row</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -5237,10 +5252,17 @@
 					</thead>
 					<tbody>
 						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
 							<td class="last">
-									<p>feature table</p>
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>style</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
+							<td class="last">
+									<p>style row</p>
 							</td>
 						</tr>
 					</tbody>
@@ -5248,9 +5270,9 @@
 			</div>
 			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Number></span></label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
 								<div class="col-sm-9">
-									<div class="form-control-static returns-description"><p>icon row ids</p></div>
+									<div class="form-control-static returns-description"></div>
 								</div>
 							</div>
 					</form>
@@ -5274,7 +5296,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1519">line 1519</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-990">line 990</a></p>
 								</div>
 							</div>
 			
@@ -5286,2133 +5308,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="getAllStyleIds" class="function public"><span class="name">getAllStyleIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Number>}</span></h4>
+			<h4 id="setStyle" class="function public"><span class="name">setStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique style row ids the features map to</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Number></span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"><p>style row ids</p></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1505">line 1505</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="getAllTableIconIds" class="function public"><span class="name">getAllTableIconIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique icon row ids the table maps to</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"><p>icon row ids</p></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1491">line 1491</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="getAllTableStyleIds" class="function public"><span class="name">getAllTableStyleIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique style row ids the table maps to</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"><p>style row ids</p></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1477">line 1477</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteMapping" class="function public"><span class="name">deleteMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the style mapping with the geometry type value</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1466">line 1466</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteMappingsForFeatureId" class="function public"><span class="name">deleteMappingsForFeatureId</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the style mappings</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1454">line 1454</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteMappings" class="function public"><span class="name">deleteMappings</span><span class="signature-params">( <span class="signature-param">mappingDao</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all style mappings</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1443">line 1443</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIcon" class="function public"><span class="name">deleteIcon</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1435">line 1435</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconForFeatureRowAndGeometryType" class="function public"><span class="name">deleteIconForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1425">line 1425</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconForFeatureRow" class="function public"><span class="name">deleteIconForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the feature row geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1416">line 1416</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconDefault" class="function public"><span class="name">deleteIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default icon</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1408">line 1408</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconDefaultForFeatureRow" class="function public"><span class="name">deleteIconDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default icon</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1399">line 1399</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconsForFeatureId" class="function public"><span class="name">deleteIconsForFeatureId</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row icons</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1391">line 1391</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIconsForFeatureRow" class="function public"><span class="name">deleteIconsForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row icons</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1382">line 1382</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteIcons" class="function public"><span class="name">deleteIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all icons</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1374">line 1374</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyle" class="function public"><span class="name">deleteStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1366">line 1366</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyleForFeatureRowAndGeometryType" class="function public"><span class="name">deleteStyleForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1356">line 1356</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyleForFeatureRow" class="function public"><span class="name">deleteStyleForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the feature row geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1347">line 1347</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyleDefault" class="function public"><span class="name">deleteStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default style</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1339">line 1339</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyleDefaultForFeatureRow" class="function public"><span class="name">deleteStyleDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default style</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1330">line 1330</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStylesForFeatureId" class="function public"><span class="name">deleteStylesForFeatureId</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1322">line 1322</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStylesForFeatureRow" class="function public"><span class="name">deleteStylesForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1313">line 1313</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteStyles" class="function public"><span class="name">deleteStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1305">line 1305</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteFeatureStyles" class="function public"><span class="name">deleteFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all feature styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1296">line 1296</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableMapping" class="function public"><span class="name">deleteTableMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the table style mapping with the geometry type value</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1283">line 1283</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableMappings" class="function public"><span class="name">deleteTableMappings</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the table style mappings</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1268">line 1268</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableIcon" class="function public"><span class="name">deleteTableIcon</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table icon for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1259">line 1259</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableIconDefault" class="function public"><span class="name">deleteTableIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table default icon</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1250">line 1250</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableIcons" class="function public"><span class="name">deleteTableIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table icons</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1242">line 1242</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableStyle" class="function public"><span class="name">deleteTableStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table style for the geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1234">line 1234</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableStyleDefault" class="function public"><span class="name">deleteTableStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table default style</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1225">line 1225</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableStyles" class="function public"><span class="name">deleteTableStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1217">line 1217</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteTableFeatureStyles" class="function public"><span class="name">deleteTableFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table feature styles</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1208">line 1208</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteAllIcons" class="function public"><span class="name">deleteAllIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all icons including table icons and feature row icons</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1199">line 1199</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteAllStyles" class="function public"><span class="name">deleteAllStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all styles including table styles and feature row style</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1190">line 1190</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="deleteAllFeatureStyles" class="function public"><span class="name">deleteAllFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all feature styles including table styles, table icons, style, and icons</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the style of the feature</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -7431,173 +5331,20 @@
 									<p>feature table</p>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1181">line 1181</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="insertStyleMapping" class="function public"><span class="name">insertStyleMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">baseId</span>, <span class="signature-param">relatedId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Insert a style mapping row</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
 						<tr>
-								<td><code>mappingDao</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
-							<td class="last">
-									<p>mapping dao</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>baseId</code></td>
+								<td><code>featureId</code></td>
 							<td><span class="param-type">Number</span></td>
 							<td class="last">
-									<p>base id, either contents id or feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>relatedId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>related id, either style or icon id</p>
+									<p>feature id</p>
 							</td>
 						</tr>
 						<tr>
 								<td><code>geometryType</code></td>
 							<td><span class="param-type">String</span></td>
 							<td class="last">
-									<p>geometry type or null</p>
+									<p>geometry type</p>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1169">line 1169</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="removeExtension" class="function public"><span class="name">removeExtension</span><span class="signature-params">()</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Remove all traces of the extension</p></div>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1540">line 1540</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="getOrInsertStyle" class="function public"><span class="name">getOrInsertStyle</span><span class="signature-params">( <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the style id, either from the existing style or by inserting a new one</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
 						<tr>
 								<td><code>style</code></td>
 							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
@@ -7610,9 +5357,9 @@
 			</div>
 			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
 								<div class="col-sm-9">
-									<div class="form-control-static returns-description"><p>style id</p></div>
+									<div class="form-control-static returns-description"></div>
 								</div>
 							</div>
 					</form>
@@ -7636,7 +5383,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1129">line 1129</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1002">line 1002</a></p>
 								</div>
 							</div>
 			
@@ -7648,11 +5395,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="setIconDefault" class="function public"><span class="name">setIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+			<h4 id="setStyleDefault" class="function public"><span class="name">setStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default icon of the feature</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default style of the feature</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -7666,7 +5413,7 @@
 					<tbody>
 						<tr>
 								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
 							<td class="last">
 									<p>feature table</p>
 							</td>
@@ -7676,6 +5423,232 @@
 							<td><span class="param-type">Number</span></td>
 							<td class="last">
 									<p>feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>style</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
+							<td class="last">
+									<p>style row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1022">line 1022</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="setIconsForFeatureRow" class="function public"><span class="name">setIconsForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icons</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icons for the feature row</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>icons</code></td>
+							<td><span class="param-type"><a href="module-extension_style.Icons.html">module:extension/style.Icons</a></span></td>
+							<td class="last">
+									<p>icons</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1032">line 1032</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="setIcons" class="function public"><span class="name">setIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">icons</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icons for the feature table and feature id</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>icons</code></td>
+							<td><span class="param-type"><a href="module-extension_style.Icons.html">module:extension/style.Icons</a></span></td>
+							<td class="last">
+									<p>icons</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1043">line 1043</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="setIconForFeatureRow" class="function public"><span class="name">setIconForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icon of the feature row</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
 							</td>
 						</tr>
 						<tr>
@@ -7716,7 +5689,160 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1120">line 1120</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1066">line 1066</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="setIconForFeatureRowAndGeometryType" class="function public"><span class="name">setIconForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icon of the feature row for the specified geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>icon</code></td>
+							<td><span class="param-type"><a href="module-extension_style.IconRow.html">module:extension/style.IconRow</a></span></td>
+							<td class="last">
+									<p>icon row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1077">line 1077</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="setIconDefaultForFeatureRow" class="function public"><span class="name">setIconDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default icon of the feature row</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>icon</code></td>
+							<td><span class="param-type"><a href="module-extension_style.IconRow.html">module:extension/style.IconRow</a></span></td>
+							<td class="last">
+									<p>icon row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1087">line 1087</a></p>
 								</div>
 							</div>
 			
@@ -7816,11 +5942,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="setIconDefaultForFeatureRow" class="function public"><span class="name">setIconDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+			<h4 id="setIconDefault" class="function public"><span class="name">setIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default icon of the feature row</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default icon of the feature</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -7833,10 +5959,17 @@
 					</thead>
 					<tbody>
 						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
 							<td class="last">
-									<p>feature row</p>
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
 							</td>
 						</tr>
 						<tr>
@@ -7877,7 +6010,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1087">line 1087</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1120">line 1120</a></p>
 								</div>
 							</div>
 			
@@ -7889,11 +6022,11 @@
 </dd>
 											<hr/>
 											<dt class="symbol-title function public">
-			<h4 id="setIconForFeatureRowAndGeometryType" class="function public"><span class="name">setIconForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
+			<h4 id="getOrInsertStyle" class="function public"><span class="name">getOrInsertStyle</span><span class="signature-params">( <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Number}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
 	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icon of the feature row for the specified geometry type</p></div>
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the style id, either from the existing style or by inserting a new one</p></div>
 			</div>			<div class="callout callout-info">
 				<h5>Parameters</h5>
 				<table class="params table table-striped">
@@ -7905,326 +6038,6 @@
 					</tr>
 					</thead>
 					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>icon</code></td>
-							<td><span class="param-type"><a href="module-extension_style.IconRow.html">module:extension/style.IconRow</a></span></td>
-							<td class="last">
-									<p>icon row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1077">line 1077</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setIconForFeatureRow" class="function public"><span class="name">setIconForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icon</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icon of the feature row</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>icon</code></td>
-							<td><span class="param-type"><a href="module-extension_style.IconRow.html">module:extension/style.IconRow</a></span></td>
-							<td class="last">
-									<p>icon row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1066">line 1066</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setIcons" class="function public"><span class="name">setIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">icons</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icons for the feature table and feature id</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>icons</code></td>
-							<td><span class="param-type"><a href="module-extension_style.Icons.html">module:extension/style.Icons</a></span></td>
-							<td class="last">
-									<p>icons</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1043">line 1043</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setIconsForFeatureRow" class="function public"><span class="name">setIconsForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">icons</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the icons for the feature row</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>icons</code></td>
-							<td><span class="param-type"><a href="module-extension_style.Icons.html">module:extension/style.Icons</a></span></td>
-							<td class="last">
-									<p>icons</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1032">line 1032</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setStyleDefault" class="function public"><span class="name">setStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default style of the feature</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
 						<tr>
 								<td><code>style</code></td>
 							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
@@ -8237,9 +6050,9 @@
 			</div>
 			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
 							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Number</span></label>
 								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
+									<div class="form-control-static returns-description"><p>style id</p></div>
 								</div>
 							</div>
 					</form>
@@ -8263,247 +6076,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1022">line 1022</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setStyle" class="function public"><span class="name">setStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the style of the feature</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureTable</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
-							<td class="last">
-									<p>feature table</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>featureId</code></td>
-							<td><span class="param-type">Number</span></td>
-							<td class="last">
-									<p>feature id</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>style</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
-							<td class="last">
-									<p>style row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1002">line 1002</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setStyleDefaultForFeatureRow" class="function public"><span class="name">setStyleDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the default style of the feature row</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>style</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
-							<td class="last">
-									<p>style row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-990">line 990</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public">
-			<h4 id="setStyleForFeatureRowAndGeometryType" class="function public"><span class="name">setStyleForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>, <span class="signature-param">style</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise}</span></h4>
-		</dt>
-<dd class="symbol-details function public">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Set the style of the feature row for the specified geometry type</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>featureRow</code></td>
-							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
-							<td class="last">
-									<p>feature row</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>geometryType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>geometry type</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>style</code></td>
-							<td><span class="param-type"><a href="module-extension_style.StyleRow.html">module:extension/style.StyleRow</a></span></td>
-							<td class="last">
-									<p>style row</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise</span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-980">line 980</a></p>
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1129">line 1129</a></p>
 								</div>
 							</div>
 			
@@ -8579,6 +6152,2433 @@
 					</form>
 			</div>	</div>
 </dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="insertStyleMapping" class="function public"><span class="name">insertStyleMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">baseId</span>, <span class="signature-param">relatedId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Insert a style mapping row</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>baseId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>base id, either contents id or feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>relatedId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>related id, either style or icon id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type or null</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1169">line 1169</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteAllFeatureStyles" class="function public"><span class="name">deleteAllFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all feature styles including table styles, table icons, style, and icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html#~FeatureTable">module:features/user/featureTable~FeatureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1181">line 1181</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteAllStyles" class="function public"><span class="name">deleteAllStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all styles including table styles and feature row style</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1190">line 1190</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteAllIcons" class="function public"><span class="name">deleteAllIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all icons including table icons and feature row icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1199">line 1199</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableFeatureStyles" class="function public"><span class="name">deleteTableFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table feature styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1208">line 1208</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableStyles" class="function public"><span class="name">deleteTableStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1217">line 1217</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableStyleDefault" class="function public"><span class="name">deleteTableStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table default style</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1225">line 1225</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableStyle" class="function public"><span class="name">deleteTableStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table style for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1234">line 1234</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableIcons" class="function public"><span class="name">deleteTableIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1242">line 1242</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableIconDefault" class="function public"><span class="name">deleteTableIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table default icon</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1250">line 1250</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableIcon" class="function public"><span class="name">deleteTableIcon</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature table icon for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1259">line 1259</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableMappings" class="function public"><span class="name">deleteTableMappings</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the table style mappings</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1268">line 1268</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteTableMapping" class="function public"><span class="name">deleteTableMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureTable</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the table style mapping with the geometry type value</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1283">line 1283</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteFeatureStyles" class="function public"><span class="name">deleteFeatureStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all feature styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1296">line 1296</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyles" class="function public"><span class="name">deleteStyles</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1305">line 1305</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStylesForFeatureRow" class="function public"><span class="name">deleteStylesForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1313">line 1313</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStylesForFeatureId" class="function public"><span class="name">deleteStylesForFeatureId</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row styles</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1322">line 1322</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyleDefaultForFeatureRow" class="function public"><span class="name">deleteStyleDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default style</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1330">line 1330</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyleDefault" class="function public"><span class="name">deleteStyleDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default style</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1339">line 1339</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyleForFeatureRow" class="function public"><span class="name">deleteStyleForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the feature row geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1347">line 1347</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyleForFeatureRowAndGeometryType" class="function public"><span class="name">deleteStyleForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1356">line 1356</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteStyle" class="function public"><span class="name">deleteStyle</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row style for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1366">line 1366</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIcons" class="function public"><span class="name">deleteIcons</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1374">line 1374</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconsForFeatureRow" class="function public"><span class="name">deleteIconsForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1382">line 1382</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconsForFeatureId" class="function public"><span class="name">deleteIconsForFeatureId</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete feature row icons</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1391">line 1391</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconDefaultForFeatureRow" class="function public"><span class="name">deleteIconDefaultForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default icon</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1399">line 1399</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconDefault" class="function public"><span class="name">deleteIconDefault</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row default icon</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1408">line 1408</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconForFeatureRow" class="function public"><span class="name">deleteIconForFeatureRow</span><span class="signature-params">( <span class="signature-param">featureRow</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the feature row geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1416">line 1416</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIconForFeatureRowAndGeometryType" class="function public"><span class="name">deleteIconForFeatureRowAndGeometryType</span><span class="signature-params">( <span class="signature-param">featureRow</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureRow</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureRow.html">module:features/user/featureRow</a></span></td>
+							<td class="last">
+									<p>feature row</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1425">line 1425</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteIcon" class="function public"><span class="name">deleteIcon</span><span class="signature-params">( <span class="signature-param">featureTable</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the feature row icon for the geometry type</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1435">line 1435</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteMappings" class="function public"><span class="name">deleteMappings</span><span class="signature-params">( <span class="signature-param">mappingDao</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete all style mappings</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1443">line 1443</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteMappingsForFeatureId" class="function public"><span class="name">deleteMappingsForFeatureId</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureId</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the style mappings</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1454">line 1454</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="deleteMapping" class="function public"><span class="name">deleteMapping</span><span class="signature-params">( <span class="signature-param">mappingDao</span>, <span class="signature-param">featureId</span>, <span class="signature-param">geometryType</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Delete the style mapping with the geometry type value</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>mappingDao</code></td>
+							<td><span class="param-type"><a href="module-extension_style.StyleMappingDao.html">module:extension/style.StyleMappingDao</a></span></td>
+							<td class="last">
+									<p>mapping dao</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>featureId</code></td>
+							<td><span class="param-type">Number</span></td>
+							<td class="last">
+									<p>feature id</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geometryType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>geometry type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1466">line 1466</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAllTableStyleIds" class="function public"><span class="name">getAllTableStyleIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique style row ids the table maps to</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>style row ids</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1477">line 1477</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAllTableIconIds" class="function public"><span class="name">getAllTableIconIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique icon row ids the table maps to</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>icon row ids</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1491">line 1491</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAllStyleIds" class="function public"><span class="name">getAllStyleIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Number>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique style row ids the features map to</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Number></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>style row ids</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1505">line 1505</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getAllIconIds" class="function public"><span class="name">getAllIconIds</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Number>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get all the unique icon row ids the features map to</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td><span class="param-type"><a href="module-features_user_featureTable.html">module:features/user/featureTable</a></span> | <span class="param-type">String</span></td>
+							<td class="last">
+									<p>feature table</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Number></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>icon row ids</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1519">line 1519</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="getFeatureTableName" class="function public"><span class="name">getFeatureTableName</span><span class="signature-params">( <span class="signature-param">featureTable</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{String}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get name of feature table</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>featureTable</code></td>
+							<td></td>
+							<td class="last">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">String</span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1533">line 1533</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="removeExtension" class="function public"><span class="name">removeExtension</span><span class="signature-params">()</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Remove all traces of the extension</p></div>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_style_index.js.html">extension/style/index.js</a>, <a href="extension_style_index.js.html#line-1540">line 1540</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
 									</dl>
 							</article>
 					</section>
@@ -8590,7 +8590,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 6th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 9th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

@@ -5,27 +5,27 @@ var wkx = require('wkx')
 
 describe('Geometry Data tests', function() {
 
-  var magic = new Buffer(2);
+  var magic = Buffer.alloc(2);
   magic.write('GP', 0, 2, 'ascii');
-  var version = new Buffer(1);
+  var version = Buffer.alloc(1);
   version.writeUInt8(0);
-  var flags = new Buffer(1);
+  var flags = Buffer.alloc(1);
   flags.writeUInt8(0);
-  var srs = new Buffer(4);
+  var srs = Buffer.alloc(4);
   srs.writeUInt32BE(4326);
 
   var rawPoint = new wkx.Point(1, 2);
   var point = rawPoint.toWkb();
 
   it('should fail the magic number check', function() {
-    var buffer = new Buffer('HI');
+    var buffer = Buffer.from('HI');
     (function() {
       var geometryData = new GeometryData(buffer);
     }).should.throw('Unexpected GeoPackage Geometry magic number: HI, Expected: GP');
   });
 
   it('should fail the version check', function() {
-    var version = new Buffer(1);
+    var version = Buffer.alloc(1);
     version.writeUInt8(1);
     var buffer = Buffer.concat([magic, version]);
     (function() {
@@ -34,7 +34,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should throw unexpected geometry flags where 7 is 1 and 6 is 1', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(255);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
@@ -43,7 +43,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should throw unexpected geometry flags where 7 is 0 and 6 is 1', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(127);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
@@ -52,7 +52,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should throw unexpected geometry flags where 7 is 1 and 6 is 0', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(128);
     var buffer = Buffer.concat([magic, version, flags]);
     (function() {
@@ -61,7 +61,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should set extended to true', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(32);
 
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
@@ -74,7 +74,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should set empty to true', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(32);
 
     var buffer = Buffer.concat([magic, version, flags, srs]);
@@ -88,10 +88,10 @@ describe('Geometry Data tests', function() {
   });
 
   it('should fail to parse the geometry but not throw an error', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(32);
 
-    var badGeom = new Buffer(1);
+    var badGeom = Buffer.alloc(1);
     badGeom.writeUInt8(0);
 
     var buffer = Buffer.concat([magic, version, flags, srs, badGeom]);
@@ -100,7 +100,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should set byte order to little endian', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(1);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
@@ -108,7 +108,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should export byte order as little endian', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(1);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
@@ -120,7 +120,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should set byte order to big endian', function() {
-    var flags = new Buffer(1);
+    var flags = Buffer.alloc(1);
     flags.writeUInt8(0);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeometryData(buffer);
@@ -128,9 +128,9 @@ describe('Geometry Data tests', function() {
   });
 
   it('should parse the big endian envelope', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(2);
-    var envelope = new Buffer(32);
+    var envelope = Buffer.alloc(32);
     envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
@@ -149,9 +149,9 @@ describe('Geometry Data tests', function() {
   });
 
   it('should parse the big endian envelope with z', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(4);
-    var envelope = new Buffer(48);
+    var envelope = Buffer.alloc(48);
     envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
@@ -174,9 +174,9 @@ describe('Geometry Data tests', function() {
   });
 
   it('should parse the big endian envelope with m', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(6);
-    var envelope = new Buffer(48);
+    var envelope = Buffer.alloc(48);
     envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
@@ -199,9 +199,9 @@ describe('Geometry Data tests', function() {
   });
 
   it('should parse the big endian envelope with m and z', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(8);
-    var envelope = new Buffer(64);
+    var envelope = Buffer.alloc(64);
     envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
@@ -228,9 +228,9 @@ describe('Geometry Data tests', function() {
   });
 
   it('should parse the Uint8Array', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(8);
-    var envelope = new Buffer(64);
+    var envelope = Buffer.alloc(64);
     envelope.writeDoubleBE(Number(5.0), 0);
     envelope.writeDoubleBE(Number(78.0), 8);
     envelope.writeDoubleBE(Number(29.0), 16);
@@ -258,7 +258,7 @@ describe('Geometry Data tests', function() {
   });
 
   it('should throw unexpected geometry flags error', function() {
-    var tflags = new Buffer(1);
+    var tflags = Buffer.alloc(1);
     tflags.writeUInt8(12);
     var buffer = Buffer.concat([magic, version, tflags, srs]);
     (function() {

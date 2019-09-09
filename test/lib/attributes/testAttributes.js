@@ -372,10 +372,10 @@ describe('GeoPackage Attribute table create tests', function() {
       attributeRow.setValueWithColumnName('test_real', 3.0);
       attributeRow.setValueWithColumnName('test_boolean', true);
       attributeRow.setValueWithColumnName('test_boolean2', false);
-      attributeRow.setValueWithColumnName('test_blob', new Buffer('test'));
+      attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
       attributeRow.setValueWithColumnName('test_integer', 5);
       attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-      attributeRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+      attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
       attributeRow.setValueWithColumnName('test space', 'space space');
       attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
 
@@ -405,10 +405,10 @@ describe('GeoPackage Attribute table create tests', function() {
         attributeRow.setValueWithColumnName('test_real', 3.0);
         attributeRow.setValueWithColumnName('test_boolean', attributeRow.toObjectValue(3, 1));
         attributeRow.setValueWithColumnName('test_boolean2', attributeRow.toObjectValue(10, 0));
-        attributeRow.setValueWithColumnName('test_blob', new Buffer('test'));
+        attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
         attributeRow.setValueWithColumnName('test_integer', 5);
         attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-        attributeRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+        attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
         attributeRow.setValueWithColumnName('test space', 'space space');
         attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
 

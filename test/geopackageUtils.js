@@ -226,10 +226,10 @@ GeoPackageUtils.createFeature = function(geopackage, geoJson, name, featureDao) 
   featureRow.setValueWithColumnName('text', name);
   featureRow.setValueWithColumnName('real', Math.random() * 5000.0);
   featureRow.setValueWithColumnName('boolean', Math.random() < .5 ? false : true);
-  featureRow.setValueWithColumnName('blob', new Buffer(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
+  featureRow.setValueWithColumnName('blob', Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
   featureRow.setValueWithColumnName('integer', Math.round(Math.random() * 500));
   featureRow.setValueWithColumnName('text_limited', Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
-  featureRow.setValueWithColumnName('blob_limited', new Buffer(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
+  featureRow.setValueWithColumnName('blob_limited', Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
   featureRow.setValueWithColumnName('date', new Date());
   featureRow.setValueWithColumnName('datetime', new Date());
   return featureDao.create(featureRow);
@@ -501,7 +501,7 @@ GeoPackageUtils.loadFile = function(filePath) {
         if (xhr.status !== 200) {
           reject();
         }
-        resolve(new Buffer(this.response));
+        resolve(Buffer.from(this.response));
       };
       xhr.onerror = reject;
       xhr.send();
@@ -623,10 +623,10 @@ GeoPackageUtils.createAttributes = function(geopackage) {
       attributeRow.setValueWithColumnName('text', tableName);
       attributeRow.setValueWithColumnName('real', Math.random() * 5000.0);
       attributeRow.setValueWithColumnName('boolean', Math.random() < .5 ? false : true);
-      attributeRow.setValueWithColumnName('blob', new Buffer(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
+      attributeRow.setValueWithColumnName('blob', Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
       attributeRow.setValueWithColumnName('integer', Math.round(Math.random() * 500));
       attributeRow.setValueWithColumnName('text_limited', Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
-      attributeRow.setValueWithColumnName('blob_limited', new Buffer(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
+      attributeRow.setValueWithColumnName('blob_limited', Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)));
       attributeRow.setValueWithColumnName('date', new Date());
       attributeRow.setValueWithColumnName('datetime', new Date());
       attributeDao.create(attributeRow);

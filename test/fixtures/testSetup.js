@@ -61,7 +61,7 @@ module.exports.loadTile = function(tilePath, callback) {
       if (xhr.status !== 200) {
         return callback();
       }
-      return callback(null, new Buffer(this.response));
+      return callback(null, Buffer.from(this.response));
     };
     xhr.onerror = function(e) {
       return callback();
@@ -84,7 +84,7 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
     });
   } else {
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
-      var expectedBase64 = new Buffer(expectedTile).toString('base64');
+      var expectedBase64 = Buffer.from(expectedTile).toString('base64');
       var CanvasCompare = require('canvas-compare');
       CanvasCompare.setImageData(ImageData);
       CanvasCompare.canvasCompare({
@@ -149,7 +149,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
     image.onload = function() {
       ctx.drawImage(image, 0, 0);
       module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
-        var expectedBase64 = new Buffer(expectedTile).toString('base64');
+        var expectedBase64 = Buffer.from(expectedTile).toString('base64');
 
         var expected = document.createElement('canvas');
         expected.width = width;

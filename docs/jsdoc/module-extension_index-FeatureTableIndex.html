@@ -250,272 +250,6 @@
 									<h3>Methods</h3>
 									<dl class="symbol">
 											<hr/>
-											<dt class="symbol-title function public inherited">
-			<h4 id="getOrCreate" class="function public inherited"><span class="name">getOrCreate</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>, <span class="signature-param">definition</span>, <span class="signature-param">scopeType</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise.&lt;<a href="module-extension_baseExtension-BaseExtension.html">module:extension/baseExtension~BaseExtension</a>>}</span></h4>
-		</dt>
-<dd class="symbol-details function public inherited">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the extension or create as needed</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>extensionName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>extension name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>tableName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>table name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>columnName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>column name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>definition</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>extension definition</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>scopeType</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>extension scope type</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
-							<div class="form-group">
-								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise.&lt;<a href="module-extension_baseExtension-BaseExtension.html">module:extension/baseExtension~BaseExtension</a>></span></label>
-								<div class="col-sm-9">
-									<div class="form-control-static returns-description"></div>
-								</div>
-							</div>
-					</form>
-			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-							<!-- inherits -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Inherited From</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#getOrCreate">module:extension/baseExtension~BaseExtension#getOrCreate</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-29">line 29</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public inherited">
-			<h4 id="getExtension" class="function public inherited"><span class="name">getExtension</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public inherited">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the extension for the name, table name and column name</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>extensionName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>extension name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>tableName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>table name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>columnName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>column name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>callback</code></td>
-							<td><span class="param-type">function</span></td>
-							<td class="last">
-									<p>Called with err if one occurred and the extension</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-							<!-- inherits -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Inherited From</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#getExtension">module:extension/baseExtension~BaseExtension#getExtension</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-47">line 47</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
-											<dt class="symbol-title function public inherited">
-			<h4 id="hasExtension" class="function public inherited"><span class="name">hasExtension</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>&nbsp;)</span><span class="signature-type"></span></h4>
-		</dt>
-<dd class="symbol-details function public inherited">
-	<div class="symbol-details-inner">
-			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Determine if the GeoPackage has the extension</p></div>
-			</div>			<div class="callout callout-info">
-				<h5>Parameters</h5>
-				<table class="params table table-striped">
-					<thead>
-					<tr>
-							<th>Name</th>
-						<th>Type</th>
-						<th class="last">Description</th>
-					</tr>
-					</thead>
-					<tbody>
-						<tr>
-								<td><code>extensionName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>extension name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>tableName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>table name</p>
-							</td>
-						</tr>
-						<tr>
-								<td><code>columnName</code></td>
-							<td><span class="param-type">String</span></td>
-							<td class="last">
-									<p>column name</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
-			
-			
-			
-			
-			
-			
-							<!-- inherits -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Inherited From</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#hasExtension">module:extension/baseExtension~BaseExtension#hasExtension</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-			
-			
-			
-			
-			
-							<!-- source -->
-							<div class="form-group">
-								<label class="col-sm-3 control-label">Source</label>
-								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-60">line 60</a></p>
-								</div>
-							</div>
-			
-			
-			
-			
-					</form>
-			</div>	</div>
-</dd>
-											<hr/>
 											<dt class="symbol-title function public">
 			<h4 id="index" class="function public"><span class="name">index</span><span class="signature-params">( <span class="signature-param">progress</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise.&lt;Boolean>}</span></h4>
 		</dt>
@@ -1583,6 +1317,272 @@
 					</form>
 			</div>	</div>
 </dd>
+											<hr/>
+											<dt class="symbol-title function public inherited">
+			<h4 id="getOrCreate" class="function public inherited"><span class="name">getOrCreate</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>, <span class="signature-param">definition</span>, <span class="signature-param">scopeType</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{Promise.&lt;<a href="module-extension_baseExtension-BaseExtension.html">module:extension/baseExtension~BaseExtension</a>>}</span></h4>
+		</dt>
+<dd class="symbol-details function public inherited">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the extension or create as needed</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>extensionName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>extension name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>columnName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>column name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>definition</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>extension definition</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>scopeType</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>extension scope type</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Promise.&lt;<a href="module-extension_baseExtension-BaseExtension.html">module:extension/baseExtension~BaseExtension</a>></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+							<!-- inherits -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Inherited From</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#getOrCreate">module:extension/baseExtension~BaseExtension#getOrCreate</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-29">line 29</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public inherited">
+			<h4 id="getExtension" class="function public inherited"><span class="name">getExtension</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>, <span class="signature-param">callback</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public inherited">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Get the extension for the name, table name and column name</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>extensionName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>extension name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>columnName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>column name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>callback</code></td>
+							<td><span class="param-type">function</span></td>
+							<td class="last">
+									<p>Called with err if one occurred and the extension</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+							<!-- inherits -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Inherited From</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#getExtension">module:extension/baseExtension~BaseExtension#getExtension</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-47">line 47</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public inherited">
+			<h4 id="hasExtension" class="function public inherited"><span class="name">hasExtension</span><span class="signature-params">( <span class="signature-param">extensionName</span>, <span class="signature-param">tableName</span>, <span class="signature-param">columnName</span>&nbsp;)</span><span class="signature-type"></span></h4>
+		</dt>
+<dd class="symbol-details function public inherited">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Determine if the GeoPackage has the extension</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>extensionName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>extension name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>tableName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>columnName</code></td>
+							<td><span class="param-type">String</span></td>
+							<td class="last">
+									<p>column name</p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+							<!-- inherits -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Inherited From</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="module-extension_baseExtension-BaseExtension.html#hasExtension">module:extension/baseExtension~BaseExtension#hasExtension</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_baseExtension.js.html">extension/baseExtension.js</a>, <a href="extension_baseExtension.js.html#line-60">line 60</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
 									</dl>
 							</article>
 					</section>
@@ -1594,7 +1594,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 6th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 9th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
