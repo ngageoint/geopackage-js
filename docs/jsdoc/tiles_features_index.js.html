@@ -477,7 +477,7 @@ FeatureTiles.prototype.getPolygonFillPaint = function(featureStyle) {
       }
     }
   }
-  if (paint == null &amp;&amp; !hasStyleColor &amp;&amp; this.fillPolygon) {
+  if (paint === null &amp;&amp; !hasStyleColor &amp;&amp; this.fillPolygon) {
     paint = this.polygonFillPaint;
   }
   return paint;
@@ -507,8 +507,8 @@ FeatureTiles.prototype.getFeatureStylePaint = function(featureStyle, drawType) {
  * @return {Paint} paint
  */
 FeatureTiles.prototype.getStylePaint = function(style, drawType) {
-  var paint = this.featurePaintCache.getPaint(style, drawType);
-  if (paint === null) {
+  var paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
+  if (paint === undefined || paint === null) {
     var color = null;
     var strokeWidth = null;
     if (drawType === FeatureDrawType.CIRCLE) {
@@ -528,8 +528,8 @@ FeatureTiles.prototype.getStylePaint = function(style, drawType) {
       stylePaint.setStrokeWidth(strokeWidth);
     }
     paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
-    if (paint === null) {
-      this.featurePaintCache.setPaint(style, drawType, stylePaint);
+    if (paint === undefined || paint === null) {
+      this.featurePaintCache.setPaintForStyleRow(style, drawType, stylePaint);
       paint = stylePaint;
     }
   }
@@ -833,13 +833,15 @@ FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom, til
     canvas = tileCanvas;
   }
   var context;
-  if (typeof(process) !== 'undefined' &amp;&amp; process.version) {
-    var Canvas = require('canvas');
-    canvas = Canvas.createCanvas(width, height);
-  } else {
-    canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+  if (canvas === undefined) {
+    if (typeof(process) !== 'undefined' &amp;&amp; process.version) {
+      var Canvas = require('canvas');
+      canvas = Canvas.createCanvas(width, height);
+    } else {
+      canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+    }
   }
   context = canvas.getContext('2d');
   context.clearRect(0, 0, width, height);
@@ -855,9 +857,6 @@ FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom, til
     var style = this.getFeatureStyle(fr);
     if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
       gj = reproject.toWgs84(gj, featureDao.projection);
-    }
-    if (gj.type === 'Polygon') {
-      gj = PolyToLine(gj);
     }
     this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
   }
@@ -897,7 +896,7 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
   var x = transformedCoords[0];
   var y = transformedCoords[1];
 
-  if (featureStyle != null &amp;&amp; featureStyle.hasIcon()) {
+  if (featureStyle !== undefined &amp;&amp; featureStyle !== null &amp;&amp; featureStyle.hasIcon()) {
     var iconRow = featureStyle.getIcon();
     var image = iconRow.getDataImage(iconRow);
     width = this.scale * iconRow.getWidth();
@@ -909,7 +908,7 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
       iconY = Math.round(y - (anchorV * height));
       context.drawImage(image, iconX, iconY, width, height);
     }
-  } else if (this.pointIcon != null) {
+  } else if (this.pointIcon !== undefined &amp;&amp; this.pointIcon !== null) {
     width = Math.round(this.scale * this.pointIcon.getWidth());
     height = Math.round(this.scale * this.pointIcon.getHeight());
     if (x >= 0 - width &amp;&amp; x &lt;= this.tileWidth + width &amp;&amp; y >= 0 - height
@@ -922,11 +921,10 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
     }
   } else {
     context.save();
-    context.beginPath();
     var radius = null;
-    if (featureStyle != null) {
+    if (featureStyle !== undefined &amp;&amp; featureStyle !== null) {
       var styleRow = featureStyle.getStyle();
-      if (styleRow != null) {
+      if (styleRow !== undefined &amp;&amp; styleRow !== null) {
         radius = this.scale * (styleRow.getWidthOrDefault() / 2.0);
       }
     }
@@ -934,30 +932,15 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
       radius = this.scale * this.pointRadius;
     }
     var pointPaint = this.getPointPaint(featureStyle);
-
     if (x >= 0 - radius &amp;&amp; x &lt;= this.tileWidth + radius &amp;&amp; y >= 0 - radius &amp;&amp; y &lt;= this.tileHeight + radius) {
       var circleX = Math.round(x - radius);
       var circleY = Math.round(y - radius);
-      // Draw the circle border
-      if (this.circleBorderColor != null) {
-        context.fillStyle = pointPaint.getColorRGBA();
-        context.beginPath();
-        context.arc(circleX, circleY, radius + pointPaint.getStrokeWidth(), 0, 2 * Math.PI, true);
-        context.fill();
-        context.closePath()
-      }
-      // Draw the circle
-      if (this.circleFillColor != null) {
-        context.fillStyle = pointPaint.getColorRGBA();
-        context.beginPath();
-        context.arc(circleX, circleY, radius, 0, 2 * Math.PI, true);
-        context.fill();
-        context.closePath()
-      }
-      path(geoJson);
-      context.stroke();
+      context.beginPath();
+      context.arc(circleX, circleY, radius, 0, 2 * Math.PI, true);
+      context.closePath()
+      context.fillStyle = pointPaint.getColorRGBA();
+      context.fill();
     }
-    context.closePath();
     context.restore();
   }
 };
@@ -991,17 +974,17 @@ FeatureTiles.prototype.drawLine = function(path, geoJson, context, featureStyle)
 FeatureTiles.prototype.drawPolygon = function(path, geoJson, context, featureStyle) {
   context.save();
   context.beginPath();
-  var paint = this.getPolygonPaint(featureStyle);
-  context.strokeStyle = paint.getColorRGBA();
-  context.lineWidth = paint.getStrokeWidth();
-  path(geoJson);
-  context.stroke();
+  path(PolyToLine(geoJson));
+  context.closePath();
   var fillPaint = this.getPolygonFillPaint(featureStyle);
-  if (fillPaint !== null) {
+  if (fillPaint !== undefined &amp;&amp; fillPaint !== null) {
     context.fillStyle = fillPaint.getColorRGBA();
     context.fill();
   }
-  context.closePath();
+  var paint = this.getPolygonPaint(featureStyle);
+  context.strokeStyle = paint.getColorRGBA();
+  context.lineWidth = paint.getStrokeWidth();
+  context.stroke();
   context.restore();
 };
 
@@ -1095,7 +1078,7 @@ module.exports = FeatureTiles;
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 9th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 10th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
