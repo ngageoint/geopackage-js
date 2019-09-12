@@ -738,7 +738,7 @@ FeatureTiles.prototype.drawTileQueryAll = function(x, y, zoom, canvas) {
   }
 };
 
-FeatureTiles.prototype.drawTileQueryIndex = function(x, y, z, tileCanvas) {
+FeatureTiles.prototype.drawTileQueryIndex = async function(x, y, z, tileCanvas) {
   var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
   boundingBox = this.expandBoundingBox(boundingBox);
 
@@ -789,7 +789,7 @@ FeatureTiles.prototype.drawTileQueryIndex = function(x, y, z, tileCanvas) {
       if (gj.type === 'Polygon') {
         gj = PolyToLine(gj);
       }
-      this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
+      await this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
     }
   } else if (this.maxFeaturesTileDraw !== null) {
     // Draw the max features tile
@@ -815,7 +815,7 @@ FeatureTiles.prototype.drawTileQueryIndex = function(x, y, z, tileCanvas) {
   }.bind(this));
 };
 
-FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom, tileCanvas) {
+FeatureTiles.prototype.drawTileWithBoundingBox = async function(boundingBox, zoom, tileCanvas) {
   var width = 256;
   var height = 256;
   var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 &lt;&lt; zoom), width * (1 &lt;&lt; zoom));
@@ -858,7 +858,7 @@ FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom, til
     if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
       gj = reproject.toWgs84(gj, featureDao.projection);
     }
-    this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
+    await this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
   }
   return new Promise(function(resolve, reject) {
     if (typeof(process) !== 'undefined' &amp;&amp; process.version) {
@@ -887,7 +887,7 @@ FeatureTiles.prototype.drawTileWithBoundingBox = function(boundingBox, zoom, til
  * @param featureStyle
  * @param drawProjection
  */
-FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox, featureStyle, drawProjection) {
+FeatureTiles.prototype.drawPoint = async function(path, geoJson, context, boundingBox, featureStyle, drawProjection) {
   var width;
   var height;
   var iconX;
@@ -898,11 +898,11 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
 
   if (featureStyle !== undefined &amp;&amp; featureStyle !== null &amp;&amp; featureStyle.hasIcon()) {
     var iconRow = featureStyle.getIcon();
-    var image = iconRow.getDataImage(iconRow);
-    width = this.scale * iconRow.getWidth();
-    height = this.scale * iconRow.getHeight();
+    var image = await iconRow.getDataImage(iconRow);
+    width = Math.round(this.scale * iconRow.getWidth());
+    height = Math.round(this.scale * iconRow.getHeight());
     if (x >= 0 - width &amp;&amp; x &lt;= this.tileWidth + width &amp;&amp; y >= 0 - height &amp;&amp; y &lt;= this.tileHeight + height) {
-      var anchorU =  iconRow.getAnchorUOrDefault();
+      var anchorU = iconRow.getAnchorUOrDefault();
       var anchorV = iconRow.getAnchorVOrDefault();
       iconX = Math.round(x - (anchorU * width));
       iconY = Math.round(y - (anchorV * height));
@@ -933,8 +933,8 @@ FeatureTiles.prototype.drawPoint = function(path, geoJson, context, boundingBox,
     }
     var pointPaint = this.getPointPaint(featureStyle);
     if (x >= 0 - radius &amp;&amp; x &lt;= this.tileWidth + radius &amp;&amp; y >= 0 - radius &amp;&amp; y &lt;= this.tileHeight + radius) {
-      var circleX = Math.round(x - radius);
-      var circleY = Math.round(y - radius);
+      var circleX = Math.round(x);
+      var circleY = Math.round(y);
       context.beginPath();
       context.arc(circleX, circleY, radius, 0, 2 * Math.PI, true);
       context.closePath()
@@ -996,41 +996,45 @@ FeatureTiles.prototype.drawPolygon = function(path, geoJson, context, featureSty
  * @param boundingBox
  * @param featureStyle
  */
-FeatureTiles.prototype.addFeatureToBatch = function(geoJson, context, drawProjection, boundingBox, featureStyle) {
+FeatureTiles.prototype.addFeatureToBatch = async function(geoJson, context, drawProjection, boundingBox, featureStyle) {
   var path = new d3geo.geoPath()
     .context(context)
     .projection(drawProjection);
-    if (geoJson.type === 'Point') {
-      this.drawPoint(path, geoJson, context, boundingBox, featureStyle, drawProjection);
-    } else if (geoJson.type === 'LineString') {
-      this.drawLine(path, geoJson, context, featureStyle);
-    } else if (geoJson.type === 'Polygon') {
-      this.drawPolygon(path, geoJson, context, featureStyle);
-    } else if (geoJson.type === 'MultiPoint') {
-      geoJson.coordinates.forEach(c => {
-        var ptGeom = {
-          type: 'Point',
-          coordinates: c
-        };
-        this.drawPoint(path, ptGeom, context, boundingBox, featureStyle, drawProjection);
-      });
-    } else if (geoJson.type === 'MultiLineString') {
-      geoJson.coordinates.forEach(c => {
-        var lsGeom = {
-          type: 'LineString',
-          coordinates: c
-        };
-        this.drawLine(path, lsGeom, context, featureStyle);
-      });
-    } else if (geoJson.type === 'MultiPolygon') {
-      geoJson.coordinates.forEach(c => {
-        var pGeom = {
-          type: 'Polygon',
-          coordinates: c
-        };
-        this.drawPolygon(path, pGeom, context, featureStyle);
-      });
+  var i, c;
+  if (geoJson.type === 'Point') {
+    await this.drawPoint(path, geoJson, context, boundingBox, featureStyle, drawProjection);
+  } else if (geoJson.type === 'LineString') {
+    this.drawLine(path, geoJson, context, featureStyle);
+  } else if (geoJson.type === 'Polygon') {
+    this.drawPolygon(path, geoJson, context, featureStyle);
+  } else if (geoJson.type === 'MultiPoint') {
+    for (i = 0; i &lt; geoJson.coordinates.length; i++) {
+      c = geoJson.coordinates[i];
+      var ptGeom = {
+        type: 'Point',
+        coordinates: c
+      };
+      await this.drawPoint(path, ptGeom, context, boundingBox, featureStyle, drawProjection);
     }
+  } else if (geoJson.type === 'MultiLineString') {
+    for (i = 0; i &lt; geoJson.coordinates.length; i++) {
+      c = geoJson.coordinates[i];
+      var lsGeom = {
+        type: 'LineString',
+        coordinates: c
+      };
+      this.drawLine(path, lsGeom, context, featureStyle);
+    }
+  } else if (geoJson.type === 'MultiPolygon') {
+    for (i = 0; i &lt; geoJson.coordinates.length; i++) {
+      c = geoJson.coordinates[i];
+      var pGeom = {
+        type: 'Polygon',
+        coordinates: c
+      };
+      this.drawPolygon(path, pGeom, context, featureStyle);
+    }
+  }
 };
 
 /**
@@ -1078,7 +1082,7 @@ module.exports = FeatureTiles;
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 10th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 12th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
