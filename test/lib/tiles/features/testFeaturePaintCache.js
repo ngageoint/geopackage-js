@@ -4,9 +4,7 @@ var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCach
   , should = require('chai').should();
 
 describe('FeaturePaintCache Tests', function() {
-
-
-  it('should create icon cache', function() {
+  it('should create paint cache', function() {
     var featurePaintCache = new FeaturePaintCache();
     featurePaintCache.cacheSize.should.be.equal(FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE);
     var cacheSize = 50;
@@ -14,7 +12,7 @@ describe('FeaturePaintCache Tests', function() {
     featurePaintCache.cacheSize.should.be.equal(cacheSize);
   });
 
-  it('should test icon cache should return icon for icon row', function() {
+  it('should test paint cache should return paint for style row id', function() {
     var featurePaintCache = new FeaturePaintCache();
     var paint = new Paint();
     var styleRowId = 0;
@@ -25,7 +23,22 @@ describe('FeaturePaintCache Tests', function() {
     should.not.exist(featurePaintCache.getFeaturePaint(styleRowId));
   });
 
-  it('should test icon cache should only store up to the cache size', function() {
+  it('should test paint cache should return paint for style row id', function() {
+    var featurePaintCache = new FeaturePaintCache();
+    var paint = new Paint();
+    var styleRow = {
+      getId: function() {
+        return 0;
+      }
+    };
+    should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
+    should.not.exist(featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint));
+    should.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
+    should.exist(featurePaintCache.remove(styleRow.getId()));
+    should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
+  });
+
+  it('should test paint cache should only store up to the cache size', function() {
     var cacheSize = 3;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var paint = new Paint();
@@ -38,7 +51,7 @@ describe('FeaturePaintCache Tests', function() {
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(cacheSize);
   });
 
-  it('should clear icon cache', function() {
+  it('should clear paint cache', function() {
     var cacheSize = 3;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var testId = 0;
@@ -48,7 +61,7 @@ describe('FeaturePaintCache Tests', function() {
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(0);
   });
 
-  it('should resize icon cache', function() {
+  it('should resize paint cache', function() {
     var cacheSize = 5;
     var featurePaintCache = new FeaturePaintCache(cacheSize);
     var paint = new Paint();
@@ -62,7 +75,7 @@ describe('FeaturePaintCache Tests', function() {
     featurePaintCache.resize(newCacheSize);
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(newCacheSize);
 
-    // test resizing to larger number, shouldn't remove any icons from the cache
+    // test resizing to larger number, shouldn't remove any paints from the cache
     featurePaintCache.resize(cacheSize);
     Object.keys(featurePaintCache.paintCache).length.should.be.equal(newCacheSize);
   });

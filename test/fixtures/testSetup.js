@@ -144,6 +144,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
     actual.width = width;
     actual.height = height;
     var ctx = actual.getContext('2d');
+    ctx.clearRect(0, 0, actual.width, actual.height);
 
     var image = new Image();
     image.onload = function() {
@@ -155,6 +156,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         expected.width = width;
         expected.height = height;
         var ctx2 = expected.getContext('2d');
+        ctx2.clearRect(0, 0, actual.width, actual.height);
 
         var image2 = new Image();
         image2.onload = function() {
