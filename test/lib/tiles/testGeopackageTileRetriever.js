@@ -7,6 +7,8 @@ var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
   , should = require('chai').should()
   , path = require('path');
 
+var isLinux = process.platform === 'linux';
+
 describe('GeoPackage Tile Retriever tests', function() {
 
   describe('Rivers GeoPackage tests', function() {
@@ -308,7 +310,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       .then(function(tile) {
         var expectedPath;
         if (typeof(process) !== 'undefined' && process.version) {
-          expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTile.png');
+          expectedPath = path.join(__dirname, '..','..','fixtures','tiles', isLinux ? 'reprojectTileLinux.png' : 'reprojectTile.png');
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
         }

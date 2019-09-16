@@ -8,7 +8,8 @@ var FeatureTiles = require('../../../../lib/tiles/features')
   , should = require('chai').should()
   , path = require('path');
 
-var isWeb = !(typeof(process) !== 'undefined' && process.version)
+var isWeb = !(typeof(process) !== 'undefined' && process.version);
+var isLinux = process.platform === 'linux';
 
 describe('GeoPackage FeatureTiles tests', function() {
 
@@ -629,7 +630,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '', 'max_feature_tile_unindexed.png'), function(err, equal) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '',  isLinux ? 'max_feature_tile_unindexed_linux' : 'max_feature_tile_unindexed.png'), function(err, equal) {
             equal.should.be.equal(true);
             done();
           });
