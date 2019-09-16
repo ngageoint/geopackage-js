@@ -126,6 +126,12 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         var expectedCanvas = Canvas.createCanvas(width, height);
         var expectedCtx = expectedCanvas.getContext('2d');
         expectedCtx.drawImage(expectedImage, 0, 0);
+        if (actualCanvas.toDataURL() !== expectedCanvas.toDataURL()) {
+          console.log('actual');
+          console.log(actualCanvas.toDataURL());
+          console.log('expected');
+          console.log(expectedCanvas.toDataURL());
+        }
         callback(null, actualCanvas.toDataURL() === expectedCanvas.toDataURL());
       })
     });
