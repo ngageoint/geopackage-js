@@ -78,7 +78,7 @@ module.exports.populateRow = function(table, row, skipColumns) {
           value = Math.floor(Math.random() * 500);
           break;
         case DataTypes.GPKGDataType.GPKG_DT_BLOB:
-          value = new Buffer(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
+          value = Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
           break;
         case DataTypes.GPKGDataType.GPKG_DT_DATE:
         case DataTypes.GPKGDataType.GPKG_DT_DATETIME:

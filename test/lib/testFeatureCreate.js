@@ -258,10 +258,10 @@ describe('GeoPackage Feature table create tests', function() {
       featureRow.setValueWithColumnName('test_text.test', 'hello');
       featureRow.setValueWithColumnName('test_real', 3.0);
       featureRow.setValueWithColumnName('test_boolean', true);
-      featureRow.setValueWithColumnName('test_blob', new Buffer('test'));
+      featureRow.setValueWithColumnName('test_blob', Buffer.from('test'));
       featureRow.setValueWithColumnName('test_integer', 5);
       featureRow.setValueWithColumnName('test_text_limited', 'testt');
-      featureRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+      featureRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
       featureRow.setValueWithColumnName('test space', 'space space');
       featureRow.setValueWithColumnName('test-dash', 'dash-dash');
 
@@ -298,10 +298,10 @@ describe('GeoPackage Feature table create tests', function() {
         featureRow.setValueWithColumnName('test_text.test', 'hello');
         featureRow.setValueWithColumnName('test_real', 3.0);
         featureRow.setValueWithColumnName('test_boolean', true);
-        featureRow.setValueWithColumnName('test_blob', new Buffer('test'));
+        featureRow.setValueWithColumnName('test_blob', Buffer.from('test'));
         featureRow.setValueWithColumnName('test_integer', 5);
         featureRow.setValueWithColumnName('test_text_limited', 'testt');
-        featureRow.setValueWithColumnName('test_blob_limited', new Buffer('testtes'));
+        featureRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
 
         var result = featureDao.create(featureRow);
         var count = featureDao.getCount();

@@ -100,7 +100,7 @@
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
  */
 
-var sqljs = require('sql.js/js/sql-memory-growth.js');
+var sqljs = require('sql.js/dist/sql-asm-memory-growth.js');
 // var sqljs = require('sql.js/js/sql.js');
 
 /**
@@ -110,53 +110,72 @@ var sqljs = require('sql.js/js/sql-memory-growth.js');
  */
 module.exports.createAdapter = function(filePath) {
   var promise = new Promise(function(resolve, reject) {
-    if (filePath &amp;&amp; typeof filePath === 'string') {
-      if (filePath.indexOf('http') === 0) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', filePath, true);
-        xhr.responseType = 'arraybuffer';
-
-        xhr.onload = function(e) {
-          if (xhr.status !== 200) {
-            return reject(new Error('Unable to reach url: ' + filePath));
+    sqljs().then(SQL => {
+      if (filePath &amp;&amp; typeof filePath === 'string') {
+        if (typeof (process) !== 'undefined' &amp;&amp; process.version) {
+          var fs = require('fs');
+          if (filePath.indexOf('http') === 0) {
+            var http = require('http');
+            http.get(filePath, function(response) {
+              if (response.statusCode !== 200) {
+                return reject(new Error('Unable to reach url: ' + filePath));
+              }
+              var body = [];
+              response.on('data', chunk => body.push(chunk));
+              response.on('end', function() {
+                var t = new Uint8Array(Buffer.concat(body));
+                var db = new SQL.Database(t);
+                var adapter = new Adapter(db);
+                resolve(adapter);
+              });
+            });
+          } else {
+            try {
+              var stats = fs.statSync(filePath);
+            } catch (e) {
+              var db = new SQL.Database();
+              var adapter = new Adapter(db);
+              return resolve(adapter);
+            }
+            var filebuffer = fs.readFileSync(filePath);
+            var t = new Uint8Array(filebuffer);
+            var db = new SQL.Database(t);
+            // console.log('setting wal mode');
+            // var walMode = db.exec('PRAGMA journal_mode=DELETE');
+            // console.log('walMode', walMode);
+            var adapter = new Adapter(db);
+            return resolve(adapter);
           }
-          var uInt8Array = new Uint8Array(this.response);
-          var db = new sqljs.Database(uInt8Array);
-          var adapter = new Adapter(db);
-          return resolve(adapter);
-        };
-        xhr.onerror = function(e) {
-          return reject(new Error('Error reaching url: ' + filePath));
-        };
-        xhr.send();
-      } else {
-        var fs = require('fs');
-        try {
-          var stats = fs.statSync(filePath);
-        } catch (e) {
-          var db = new sqljs.Database();
-          var adapter = new Adapter(db);
-          return resolve(adapter);
+        } else {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', filePath, true);
+          xhr.responseType = 'arraybuffer';
+
+          xhr.onload = function (e) {
+            if (xhr.status !== 200) {
+              return reject(new Error('Unable to reach url: ' + filePath));
+            }
+            var uInt8Array = new Uint8Array(this.response);
+            var db = new SQL.Database(uInt8Array);
+            var adapter = new Adapter(db);
+            return resolve(adapter);
+          };
+          xhr.onerror = function (e) {
+            return reject(new Error('Error reaching url: ' + filePath));
+          };
+          xhr.send();
         }
-        var filebuffer = fs.readFileSync(filePath);
-        var t = new Uint8Array(filebuffer);
-        var db = new sqljs.Database(t);
-        // console.log('setting wal mode');
-        // var walMode = db.exec('PRAGMA journal_mode=DELETE');
-        // console.log('walMode', walMode);
+      } else if (filePath) {
+        var byteArray = filePath;
+        var db = new SQL.Database(byteArray);
+        var adapter = new Adapter(db);
+        return resolve(adapter);
+      } else {
+        var db = new SQL.Database();
         var adapter = new Adapter(db);
         return resolve(adapter);
       }
-    } else if (filePath) {
-      var byteArray = filePath;
-      var db = new sqljs.Database(byteArray);
-      var adapter = new Adapter(db);
-      return resolve(adapter);
-    } else {
-      var db = new sqljs.Database();
-      var adapter = new Adapter(db);
-      return resolve(adapter);
-    }
+    });
   });
 
   return promise;
@@ -236,6 +255,23 @@ Adapter.prototype.get = function (sql, params) {
 
   statement.free();
   return row;
+};
+
+/**
+ * Determines if a tableName exists in the database
+ * @param {String} tableName
+ * @returns {Boolean}
+ */
+Adapter.prototype.isTableExists = function (tableName) {
+  var statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
+  statement.bind([tableName]);
+  var hasResult = statement.step();
+  var row;
+  if (hasResult) {
+    row = statement.getAsObject();
+  }
+  statement.free();
+  return !!row;
 };
 
 /**
@@ -378,7 +414,7 @@ Adapter.prototype.count = function (tableName, where, whereArgs) {
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 29th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 16th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>

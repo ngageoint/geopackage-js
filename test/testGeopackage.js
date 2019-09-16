@@ -6,7 +6,6 @@ var path = require('path')
   , fs = require('fs')
   , nock = require('nock')
   , mock = require('xhr-mock').default
-  , PureImage = require('pureimage')
   , should = require('chai').should();
 
 describe('GeoPackageAPI tests', function() {
@@ -326,7 +325,8 @@ describe('GeoPackageAPI tests', function() {
     it('should get the 0 0 0 tile in a canvas', function() {
       var canvas;
       if (typeof(process) !== 'undefined' && process.version) {
-        canvas = PureImage.make(256, 256);
+        var Canvas = require('canvas');
+        canvas = Canvas.createCanvas(256, 256);
       } else {
         canvas = document.createElement('canvas');
       }
@@ -679,7 +679,8 @@ describe('GeoPackageAPI tests', function() {
           result.should.be.equal(1);
           var canvas;
           if (typeof(process) !== 'undefined' && process.version) {
-            canvas = PureImage.make(256, 256);
+            var Canvas = require('canvas');
+            canvas = Canvas.createCanvas(256, 256);
           } else {
             canvas = document.createElement('canvas');
           }

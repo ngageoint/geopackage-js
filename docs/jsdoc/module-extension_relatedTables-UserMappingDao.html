@@ -99,7 +99,7 @@
 					<section>
 							<dl class="symbol primary">
 								<dt class="symbol-title class">
-			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">UserMappingDao</span><span class="signature-params">( <span class="signature-param">connection</span>, <span class="signature-param">table</span>&nbsp;)</span><span class="signature-type"></span></h2>
+			<h2 class="class"><span class="signature-new">new&nbsp;</span><span class="name">UserMappingDao</span><span class="signature-params">( <span class="signature-param">table</span>, <span class="signature-param">geoPackage</span>&nbsp;)</span><span class="signature-type"></span></h2>
 </dt>
 <dd class="symbol-details class" style="max-height: 9999px;">
 	<div class="symbol-details-inner">
@@ -116,17 +116,17 @@
 					</thead>
 					<tbody>
 						<tr>
-								<td><code>connection</code></td>
-							<td><span class="param-type"><a href="module-db_geoPackageConnection-GeoPackageConnection.html">module:db/geoPackageConnection~GeoPackageConnection</a></span></td>
-							<td class="last">
-									<p>connection</p>
-							</td>
-						</tr>
-						<tr>
 								<td><code>table</code></td>
 							<td><span class="param-type">string</span></td>
 							<td class="last">
 									<p>table name</p>
+							</td>
+						</tr>
+						<tr>
+								<td><code>geoPackage</code></td>
+							<td><span class="param-type"><a href="module-geoPackage-GeoPackage.html">module:geoPackage~GeoPackage</a></span></td>
+							<td class="last">
+									<p>geopackage object</p>
 							</td>
 						</tr>
 					</tbody>
@@ -175,6 +175,71 @@
 									<dl class="symbol">
 											<hr/>
 											<dt class="symbol-title function public">
+			<h4 id="createMappingTable" class="function public"><span class="name">createMappingTable</span><span class="signature-params">( <span class="signature-param">userCustomDao</span>&nbsp;)</span><span class="signature-type"> &rarr;&nbsp;{<a href="module-user_custom-UserCustomTable.html">module:user/custom~UserCustomTable</a>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>Create a new {module:user/custom~UserCustomTable}</p></div>
+			</div>			<div class="callout callout-info">
+				<h5>Parameters</h5>
+				<table class="params table table-striped">
+					<thead>
+					<tr>
+							<th>Name</th>
+						<th>Type</th>
+						<th class="last">Description</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>
+								<td><code>userCustomDao</code></td>
+							<td><span class="param-type"><a href="module-user_custom-UserCustomDao.html">module:user/custom~UserCustomDao</a></span></td>
+							<td class="last">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type"><a href="module-user_custom-UserCustomTable.html">module:user/custom~UserCustomTable</a></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"><p>userCustomTable user custom table</p></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-30">line 30</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
 			<h4 id="newRow" class="function public"><span class="name">newRow</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{<a href="module-extension_relatedTables-UserMappingRow.html">module:extension/relatedTables~UserMappingRow</a>}</span></h4>
 		</dt>
 <dd class="symbol-details function public">
@@ -208,7 +273,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-29">line 29</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-38">line 38</a></p>
 								</div>
 							</div>
 			
@@ -253,7 +318,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-37">line 37</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-46">line 46</a></p>
 								</div>
 							</div>
 			
@@ -326,7 +391,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-47">line 47</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-56">line 56</a></p>
 								</div>
 							</div>
 			
@@ -392,7 +457,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-56">line 56</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-65">line 65</a></p>
 								</div>
 							</div>
 			
@@ -458,7 +523,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-65">line 65</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-74">line 74</a></p>
 								</div>
 							</div>
 			
@@ -524,7 +589,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-77">line 77</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-86">line 86</a></p>
 								</div>
 							</div>
 			
@@ -597,7 +662,52 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-90">line 90</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-99">line 99</a></p>
+								</div>
+							</div>
+			
+			
+			
+			
+					</form>
+			</div>	</div>
+</dd>
+											<hr/>
+											<dt class="symbol-title function public">
+			<h4 id="uniqueRelatedIds" class="function public"><span class="name">uniqueRelatedIds</span><span class="signature-params">()</span><span class="signature-type"> &rarr;&nbsp;{Array.&lt;Number>}</span></h4>
+		</dt>
+<dd class="symbol-details function public">
+	<div class="symbol-details-inner">
+			<div class="callout callout-primary"><h5>Description</h5>		<div class="description"><p>The unique related ids</p></div>
+			</div>			<div class="callout callout-success"><h5>Returns</h5>		<form class="form-horizontal returns">
+							<div class="form-group">
+								<label class="col-sm-3 control-label returns-type"><span class="param-type">Array.&lt;Number></span></label>
+								<div class="col-sm-9">
+									<div class="form-control-static returns-description"></div>
+								</div>
+							</div>
+					</form>
+			</div>			<div class="callout callout-default"><h5>Details</h5>		<form class="form-horizontal details">
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+							<!-- source -->
+							<div class="form-group">
+								<label class="col-sm-3 control-label">Source</label>
+								<div class="col-sm-9">
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-116">line 116</a></p>
 								</div>
 							</div>
 			
@@ -670,7 +780,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-109">line 109</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-130">line 130</a></p>
 								</div>
 							</div>
 			
@@ -736,7 +846,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-127">line 127</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-148">line 148</a></p>
 								</div>
 							</div>
 			
@@ -802,7 +912,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-144">line 144</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-165">line 165</a></p>
 								</div>
 							</div>
 			
@@ -875,7 +985,7 @@
 							<div class="form-group">
 								<label class="col-sm-3 control-label">Source</label>
 								<div class="col-sm-9">
-									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-162">line 162</a></p>
+									<p class="form-control-static"><a href="extension_relatedTables_userMappingDao.js.html">extension/relatedTables/userMappingDao.js</a>, <a href="extension_relatedTables_userMappingDao.js.html#line-183">line 183</a></p>
 								</div>
 							</div>
 			
@@ -896,7 +1006,7 @@
 	</div>
 	<footer>
 				<div class="footer-option"><span class="site-footer-owner"><a href="https://github.com/ngageoint/GeoPackage">GeoPackage</a> is maintained by:</span><br><a href="https://github.com/ngageoint"><img src="http://ngageoint.github.io/GeoPackage/images/NGA_Logo.png" align="middle" height="60">National Geospatial-Intelligence Agency</a><a style="padding-left: 30px;" href="http://www.bit-sys.com/"><img src="http://ngageoint.github.io/GeoPackage/images/BITSystems_Logo.png" align="middle" height="40"></a><br></div>
-			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on 29th Jan 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
+			<div class="generated-by">Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on 16th Sep 2019 using the <a href="https://github.com/steveush/foodoc">FooDoc template</a>.</div>
 	</footer>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
