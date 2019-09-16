@@ -34,6 +34,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 2.1.0
+
+- Implementation of the Feature Style Extension and Contents ID Extension
+
 ##### 2.0.8
 
 - Checks for Electron when returning a tile creator
