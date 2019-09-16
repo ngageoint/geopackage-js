@@ -630,7 +630,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '',  isLinux ? 'max_feature_tile_unindexed_linux' : 'max_feature_tile_unindexed.png'), function(err, equal) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '',  isLinux ? 'max_feature_tile_unindexed_linux.png' : 'max_feature_tile_unindexed.png'), function(err, equal) {
             equal.should.be.equal(true);
             done();
           });
