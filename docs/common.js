@@ -145,7 +145,7 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
   .then(function(gp) {
     geoPackage = gp;
     clearInfo();
-    readGeoPackage();
+    readGeoPackage(gp);
     geoJsonDoneCallback ? geoJsonDoneCallback() : null;
   });
 }
