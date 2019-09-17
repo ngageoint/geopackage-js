@@ -24,7 +24,7 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/geopackage": "2.0.x",
+    "@ngageoint/geopackage": "2.1.x",
     "@turf/bbox": "^4.3.0",
     "csv-streamify": "^4.0.0",
     "wkx": "^0.4.5"

@@ -24,7 +24,7 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/geopackage": "2.0.x",
+    "@ngageoint/geopackage": "2.1.x",
     "@turf/bbox": "^4.3.0",
     "JSONStream": "^1.3.3"
   },
