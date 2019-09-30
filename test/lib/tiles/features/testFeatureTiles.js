@@ -494,7 +494,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.setHeightDrawOverlap(heightDrawOverlap);
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18.png'), function(err, equal) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_scaled.png'), function(err, equal) {
             equal.should.be.equal(true);
             done();
           });
