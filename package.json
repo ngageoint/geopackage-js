@@ -35,7 +35,7 @@
     "@turf/line-intersect": "^6.0.2",
     "@turf/point-to-line-distance": "^6.0.0",
     "@turf/polygon-to-line": "^6.0.3",
-    "better-sqlite3": "5.4.0",
+    "better-sqlite3": "danielbarela/better-sqlite3#v5.4.4",
     "canvas": "^2.6.0",
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.10.0",
@@ -46,7 +46,7 @@
     "proj4": "2.4.3",
     "rbush": "2.0.2",
     "reproject": "1.2.2",
-    "sql.js": "https://github.com/danielbarela/sql.js.git",
+    "rtree-sql.js": "1.0.0",
     "vt-pbf": "^3.1.1",
     "wkx": "0.4.4"
   },
