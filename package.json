@@ -36,7 +36,7 @@
     "@turf/point-to-line-distance": "^6.0.0",
     "@turf/polygon-to-line": "^6.0.3",
     "better-sqlite3": "danielbarela/better-sqlite3#v5.4.4",
-    "canvas": "^2.6.0",
+    "canvas": "2.6.0",
     "concat-stream": "^1.6.0",
     "d3-geo": "^1.10.0",
     "file-type": "8.1.0",
