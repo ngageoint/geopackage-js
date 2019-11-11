@@ -116,16 +116,7 @@ function copyFeatures(options) {
 
 function indexTable(featureDao, progress) {
   progress = progress || function() {};
-  return featureDao.featureTableIndex.index(function(status) {
-    console.log('status', status);
-    progress({
-      layer: featureDao.table_name,
-      description: status
-    });
-  })
-  .then(function() {
-    return featureDao.featureTableIndex.rtreeIndex.create();
-  });
+  return featureDao.featureTableIndex.rtreeIndex.create();
 }
 
 function tile2lat(y,z) {
