@@ -116,7 +116,7 @@ function copyFeatures(options) {
 
 function indexTable(featureDao, progress) {
   progress = progress || function() {};
-  return featureDao.featureTableIndex.rtreeIndex.create();
+  return featureDao.featureTableIndex.rtreeIndex.create(progress);
 }
 
 function tile2lat(y,z) {
@@ -183,6 +183,13 @@ function processTileTable(options) {
             layer: tableDao.table_name
           });
         }
+      })
+      .then(function() {
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve();
+          });
+        });
       });
     });
   })
