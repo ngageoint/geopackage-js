@@ -472,47 +472,34 @@ window.toggleLayer = function(layerType, table) {
       $('#status-'+table).find('span').html(message);
     })
     .then(function(indexed) {
-      var styles = {};
-      styles[table] = {
-        weight: 2,
-        radius: 3
-      };
+      var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
+      tableLayer.createTile = function(tilePoint, done) {
+        var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+        var size = this.getTileSize();
+        canvas.width = size.x;
+        canvas.height = size.y;
 
-      var vectorLayer = L.vectorGrid.protobuf('',{
-        maxNativeZoom: 18,
-        vectorTileLayerStyles: styles,
-        interactive: true,
-        rendererFactory: L.canvas.tile,
-        getFeatureId: function(feature) {
-          feature.properties.id = table + feature.id;
-          return feature.properties.id;
-        }
-      })
-      .bindPopup(function(feature) {
-        var columnMap = tableInfos[table].columnMap;
-        var string = "";
-        if (feature.properties.name || feature.properties.description) {
-            string += feature.properties.name ? '<div class="item"><span class="label">' +feature.properties.name : '</span></div>';
-            string += feature.properties.description ? feature.properties.description : '';
-        } else {
-          for (var key in feature.properties) {
-            if (columnMap && columnMap[key] && columnMap[key].displayName) {
-              string += '<div class="item"><span class="label">' + columnMap[key].displayName + ': </span>';
-            } else {
-              string += '<div class="item"><span class="label">' + key + ': </span>';
-            }
-            string += '<span class="value">' + feature.properties[key] + '</span></div>';
-          }
-        }
-        return string;
-      });
+        setTimeout(function() {
+          console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
 
-      vectorLayer._getVectorTilePromise = function(coords, tileBounds) {
-        return getTile(coords, tileBounds, table);
+          var width = size.x;
+          var height = size.y;
+          var featureDao = geoPackage.getFeatureDao(table);
+          if (!featureDao) return;
+          var ft = new GeoPackageAPI.FeatureTiles(featureDao, width, height);
+          ft.setMaxFeaturesPerTile(10000);
+          var numberFeaturesTile = new GeoPackageAPI.NumberFeaturesTile();
+          ft.setMaxFeaturesTileDraw(numberFeaturesTile);
+          ft.drawTile(tilePoint.x, tilePoint.y, tilePoint.z, canvas)
+          .then(() => {
+            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+            done(null, canvas);
+          });
+        }, 0);
+        return canvas;
       }
-      vectorLayer.addTo(map);
-      vectorLayer.bringToFront();
-      tableLayers[table] = vectorLayer;
+      map.addLayer(tableLayer);
+      tableLayers[table] = tableLayer;
     });
   }
 }

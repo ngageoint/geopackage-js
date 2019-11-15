@@ -1,4 +1,4 @@
-var GeoPackage = require('geopackage')
+var GeoPackage = require('@ngageoint/geopackage')
   , TileBoundingBoxUtils = require('geopackage/lib/tiles/tileBoundingBoxUtils')
   , BoundingBox = require('geopackage/lib/boundingBox');
 

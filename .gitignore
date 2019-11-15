@@ -47,5 +47,8 @@ test/fixtures/private
 **/*/tmp
 
 dist
+**/*/package-lock.json
 
 docs/coverage
+docs/jsdoc
+docs/gp.js

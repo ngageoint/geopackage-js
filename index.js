@@ -28,3 +28,6 @@ module.exports.MetadataExtension = require('./lib/extension/metadata').MetadataE
 module.exports.WebPExtension = require('./lib/extension/webp').WebPExtension;
 module.exports.DataColumnsDao = require('./lib/dataColumns').DataColumnsDao;
 module.exports.DataColumnConstraintsDao = require('./lib/dataColumnConstraints').DataColumnConstraintsDao;
+module.exports.FeatureTiles = require('./lib/tiles/features');
+module.exports.NumberFeaturesTile = require('./lib/tiles/features/custom/numberFeaturesTile');
+module.exports.ShadedFeaturesTile = require('./lib/tiles/features/custom/shadedFeaturesTile');

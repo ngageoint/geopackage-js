@@ -24,10 +24,9 @@ window.FileSaver = FileSaver;
 
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
-require('leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js');
 
 window.GeoPackageAPI = require('@ngageoint/geopackage');
-window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage');
-window.ShapefileToGeoPackage = require('@ngageoint/shapefile-to-geopackage');
+// window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage');
+// window.ShapefileToGeoPackage = require('@ngageoint/shapefile-to-geopackage');
 // window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');
 // window.PBFToGeoPackage = require('pbf-to-geopackage');

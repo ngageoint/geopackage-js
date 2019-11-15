@@ -26,7 +26,7 @@
   "dependencies": {
     "@turf/intersect": "^3.7.5",
     "geojson-clip-polygon": "^1.0.3",
-    "@ngageoint/geopackage": "../../.",
+    "@ngageoint/geopackage": "ngageoint/geopackage-js",
     "@ngageoint/geojson-to-geopackage": "../geojson",
     "global-mercator": "^1.8.0",
     "jsts": "^1.3.0",
