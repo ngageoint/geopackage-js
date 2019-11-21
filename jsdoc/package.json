@@ -23,8 +23,11 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
+    "better-docs": "^1.4.6",
     "foodoc": "0.0.9",
-    "jsdoc": "^3.6.3"
+    "jsdoc": "^3.6.3",
+    "jsdoc-fresh": "^1.0.2",
+    "jsdoc-template": "1.2.0"
   },
   "main": "index.js",
   "scripts": {

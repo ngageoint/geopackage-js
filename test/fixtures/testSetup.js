@@ -8,38 +8,38 @@ var fs = require('fs')
 
 module.exports.createTempName = function() {
   return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
-}
+};
 
 module.exports.createGeoPackage = function(gppath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
     fs.mkdir(path.dirname(gppath), function() {
       fs.open(gppath, 'w', function() {
         GeoPackageAPI.create(gppath)
-        .then(function(geopackage) {
-          callback(null, geopackage);
-        });
+          .then(function(geopackage) {
+            callback(null, geopackage);
+          });
       });
     });
   } else {
     callback();
   }
-}
+};
 
 module.exports.createBareGeoPackage = function(gppath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
     fs.mkdir(path.dirname(gppath), function() {
       fs.open(gppath, 'w', function() {
         GeoPackageConnection.connect(gppath)
-        .then(function(connection) {
-          var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-          callback(null, geopackage);
-        });
+          .then(function(connection) {
+            var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
+            callback(null, geopackage);
+          });
       });
     });
   } else {
     callback();
   }
-}
+};
 
 module.exports.deleteGeoPackage = function(gppath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
@@ -47,7 +47,7 @@ module.exports.deleteGeoPackage = function(gppath, callback) {
   } else {
     callback();
   }
-}
+};
 
 module.exports.loadTile = function(tilePath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
@@ -68,7 +68,7 @@ module.exports.loadTile = function(tilePath, callback) {
     };
     xhr.send();
   }
-}
+};
 
 module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
@@ -100,7 +100,7 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
     });
   }
 
-}
+};
 
 module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, height) {
   var actualData = actualCtx.getImageData(0, 0, width, height);
@@ -113,7 +113,7 @@ module.exports.diffCanvasesContexts = function(actualCtx, expectedCtx, width, he
     }
   }
   return true;
-}
+};
 
 module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath, width, height, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
@@ -133,7 +133,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
           console.log(expectedCanvas.toDataURL());
         }
         callback(null, actualCanvas.toDataURL() === expectedCanvas.toDataURL());
-      })
+      });
     });
   } else {
     if (actualTile instanceof Uint8Array) {
@@ -205,21 +205,21 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
               baseImageUrl: actual.toDataURL(),
               targetImageUrl: expected.toDataURL()
             })
-            .then(function(result) {
-              currentTag.appendChild(result.producePreview());
-              callback(null, true);
-            })
-            .catch(function(reason) {
-              callback(null, false);
-            });
+              .then(function(result) {
+                currentTag.appendChild(result.producePreview());
+                callback(null, true);
+              })
+              .catch(function(reason) {
+                callback(null, false);
+              });
           } else {
             callback(null, equal);
           }
-        }
+        };
         image2.src = 'data:image/png;base64,' + expectedBase64;
       });
     };
     image.src = actualTile;
   }
 
-}
+};

@@ -2,8 +2,8 @@ var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
   , GeoPackage = require('../../../lib/geoPackage')
-  , Metadata = require('../../../lib/metadata').Metadata
-  , MetadataDao = require('../../../lib/metadata').MetadataDao;
+  , Metadata = require('../../../lib/metadata/metadata')
+  , MetadataDao = require('../../../lib/metadata/metadataDao');
 
 describe('Metadata tests', function() {
 

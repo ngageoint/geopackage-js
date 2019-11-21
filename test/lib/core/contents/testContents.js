@@ -1,7 +1,7 @@
 var GeoPackageAPI = require('../../../..')
-  , ContentsDao = require('../../../../lib/core/contents').ContentsDao
-  , Contents = require('../../../../lib/core/contents').Contents
-  , TileMatrix = require('../../../../lib/tiles/matrix').TileMatrix
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
+  , Contents = require('../../../../lib/core/contents/contents')
+  , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
@@ -41,6 +41,15 @@ describe('Contents tests', function() {
   afterEach('should close the geopackage', function(done) {
     geoPackage.close();
     testSetup.deleteGeoPackage(filename, done);
+  });
+
+  it('should create a new contents entry', function() {
+    var contentsDao = geoPackage.getContentsDao();
+    var contents = contentsDao.createObject();
+    contents.table_name = 'testit';
+    contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
+    // contents.last_change = new Date().toISOString();
+    contentsDao.create(contents);
   });
 
   it('should get the contents', function() {
@@ -119,7 +128,7 @@ describe('Contents tests', function() {
   it('should get the GeometryColumns from the ID TILESosmds', function() {
     var contents = contentsDao.queryForId('TILESosmds');
     should.exist(contents);
-    var columns = contentsDao.getGeometryColumns(contents)
+    var columns = contentsDao.getGeometryColumns(contents);
     should.not.exist(columns);
   });
 

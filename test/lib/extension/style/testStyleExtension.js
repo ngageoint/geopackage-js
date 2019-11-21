@@ -290,11 +290,11 @@ describe('StyleExtension Tests', function() {
     retrievedIcon.validateAnchor(1.0);
     var badAnchor = -1.0;
     assert.throws(() => {
-      retrievedIcon.validateAnchor(badAnchor)
+      retrievedIcon.validateAnchor(badAnchor);
     }, Error, "Anchor must be set inclusively between 0.0 and 1.0, invalid value: " + badAnchor);
     badAnchor = 1.1;
     assert.throws(() => {
-      retrievedIcon.validateAnchor(badAnchor)
+      retrievedIcon.validateAnchor(badAnchor);
     }, Error, "Anchor must be set inclusively between 0.0 and 1.0, invalid value: " + badAnchor);
   }));
 
@@ -548,32 +548,32 @@ describe('StyleExtension Tests', function() {
       var featureRowId = featureRow.getId();
       featureStyles = featureResultsStyles[featureRowId];
       var featureIcons = featureResultsIcons[featureRowId];
-      if (!!featureStyles) {
+      if (featureStyles) {
         // test defaults
         var defaultStyle = featureStyles['null'];
-        if (!!defaultStyle) {
+        if (defaultStyle) {
           style = featureTableStyles.getStyleDefaultForFeatureRow(featureRow);
           defaultStyle.getId().should.be.equal(style.getId());
         }
         for (j = 0; j < types.length; j++) {
           t = types[j];
           typeStyle = featureStyles[t];
-          if (!!typeStyle) {
+          if (typeStyle) {
             style = featureTableStyles.getStyleForFeatureRowAndGeometryType(featureRow, t);
             typeStyle.getId().should.be.equal(style.getId());
           }
         }
       }
-      if (!!featureIcons) {
+      if (featureIcons) {
         var defaultIcon = featureIcons['null'];
-        if (!!defaultIcon) {
+        if (defaultIcon) {
           icon = featureTableStyles.getIconDefaultForFeatureRow(featureRow);
           defaultIcon.getId().should.be.equal(icon.getId());
         }
         for (j = 0; j < types.length; j++) {
           t = types[j];
           typeIcon = featureIcons[t];
-          if (!!typeIcon) {
+          if (typeIcon) {
             icon = featureTableStyles.getIconForFeatureRowAndGeometryType(featureRow, t);
             typeIcon.getId().should.be.equal(icon.getId());
           }

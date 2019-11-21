@@ -1,6 +1,6 @@
 var FeatureColumn = require('../../lib/features/user/featureColumn')
   , FeatureTable = require('../../lib/features/user/featureTable')
-  , GeometryColumns = require('../../lib/features/columns').GeometryColumns
+  , GeometryColumns = require('../../lib/features/columns/geometryColumns')
   , DataTypes = require('../../lib/db/dataTypes');
 
 module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryType) {
@@ -17,7 +17,7 @@ module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryT
   columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
   return new FeatureTable(tableName, columns);
-}
+};
 
 module.exports.buildGeometryColumns = function(tableName, geometryColumn, geometryType) {
   var geometryColumns = new GeometryColumns();
@@ -27,4 +27,4 @@ module.exports.buildGeometryColumns = function(tableName, geometryColumn, geomet
   geometryColumns.z = 0;
   geometryColumns.m = 0;
   return geometryColumns;
-}
+};

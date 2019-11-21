@@ -1,10 +1,8 @@
-var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../../lib/geoPackage')
-  , GeoPackageAPI = require('../../../.')
+var GeoPackageAPI = require('../../../.')
   , testSetup = require('../../fixtures/testSetup')
   , Verification = require('../../fixtures/verification')
-  , DataColumns = require('../../../lib/dataColumns').DataColumns
-  , DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
+  , DataColumns = require('../../../lib/dataColumns/dataColumns')
+  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao')
   , AttributeDao = require('../../../lib/attributes/attributeDao')
   , AttributeTableReader = require('../../../lib/attributes/attributeTableReader')
   , UserTableReader = require('../../../lib/user/userTableReader')
@@ -45,12 +43,12 @@ describe('GeoPackage Attribute table create tests', function() {
     columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
     columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
     return geopackage.createAttributeTable(tableName, columns)
-    .then(function(result) {
-      var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
-      contentsVerified.should.be.equal(true);
-      var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
-      attributesTableExists.should.be.equal(true);
-    });
+      .then(function(result) {
+        var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
+        contentsVerified.should.be.equal(true);
+        var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
+        attributesTableExists.should.be.equal(true);
+      });
   });
 
   it('should create an attribute table from properties', function() {
@@ -73,41 +71,41 @@ describe('GeoPackage Attribute table create tests', function() {
     });
 
     GeoPackageAPI.createAttributeTableWithProperties(geopackage, 'NewTable', properties)
-    .then(function(result) {
-      var reader = new AttributeTableReader('NewTable');
-      var result = reader.readTable(geopackage.connection);
-      var columns = result.columns;
+      .then(function(result) {
+        var reader = new AttributeTableReader('NewTable');
+        var result = reader.readTable(geopackage.connection);
+        var columns = result.columns;
 
-      var plainObject = JSON.parse(JSON.stringify(columns));
+        var plainObject = JSON.parse(JSON.stringify(columns));
 
-      plainObject.should.deep.include.members([{
-        index: 0,
-        name: 'id',
-        dataType: 5,
-        notNull: true,
-        primaryKey: true },
-      { index: 1,
-        name: 'Name',
-        dataType: 9,
-        notNull: false,
-        primaryKey: false },
-      { index: 2,
-        name: 'Number',
-        dataType: 5,
-        notNull: false,
-        primaryKey: false } ]);
+        plainObject.should.deep.include.members([{
+          index: 0,
+          name: 'id',
+          dataType: 5,
+          notNull: true,
+          primaryKey: true },
+        { index: 1,
+          name: 'Name',
+          dataType: 9,
+          notNull: false,
+          primaryKey: false },
+        { index: 2,
+          name: 'Number',
+          dataType: 5,
+          notNull: false,
+          primaryKey: false } ]);
 
-      var dc = new DataColumnsDao(geopackage);
-      var dataColumn = dc.getDataColumns('NewTable', 'Name');
-      dataColumn.should.be.deep.equal({
-        table_name: 'NewTable',
-        column_name: 'Name',
-        name: 'The Name',
-        title: 'The Title',
-        description: 'Description',
-        mime_type: 'text',
-        constraint_name: null });
-    });
+        var dc = new DataColumnsDao(geopackage);
+        var dataColumn = dc.getDataColumns('NewTable', 'Name');
+        dataColumn.should.be.deep.equal({
+          table_name: 'NewTable',
+          column_name: 'Name',
+          name: 'The Name',
+          title: 'The Title',
+          description: 'Description',
+          mime_type: 'text',
+          constraint_name: null });
+      });
   });
 
   it('should create a media table from properties', function() {
@@ -129,31 +127,31 @@ describe('GeoPackage Attribute table create tests', function() {
     var plainObject = JSON.parse(JSON.stringify(columns));
 
     plainObject.should.deep.include.members([ {
-        index: 0,
-        name: 'id',
-        dataType: 5,
-        notNull: true,
-        primaryKey: true },
-      { index: 1,
-        name: 'data',
-        dataType: 10,
-        notNull: true,
-        primaryKey: false },
-      { index: 2,
-        name: 'content_type',
-        dataType: 9,
-        notNull: true,
-        primaryKey: false },
-      { index: 3,
-        name: 'Name',
-        dataType: 9,
-        notNull: false,
-        primaryKey: false },
-      { index: 4,
-        name: 'Number',
-        dataType: 5,
-        notNull: false,
-        primaryKey: false } ]);
+      index: 0,
+      name: 'id',
+      dataType: 5,
+      notNull: true,
+      primaryKey: true },
+    { index: 1,
+      name: 'data',
+      dataType: 10,
+      notNull: true,
+      primaryKey: false },
+    { index: 2,
+      name: 'content_type',
+      dataType: 9,
+      notNull: true,
+      primaryKey: false },
+    { index: 3,
+      name: 'Name',
+      dataType: 9,
+      notNull: false,
+      primaryKey: false },
+    { index: 4,
+      name: 'Number',
+      dataType: 5,
+      notNull: false,
+      primaryKey: false } ]);
   });
 
   it('should create a simple attribute table from properties', function() {
@@ -274,68 +272,68 @@ describe('GeoPackage Attribute table create tests', function() {
     dc.constraint_name = 'test constraint';
 
     return geopackage.createAttributeTable(tableName, columns, [dc])
-    .then(function(result) {
-      var reader = new AttributeTableReader(tableName);
-      var result = reader.readTable(geopackage.connection);
-      var columns = result.columns;
-      var plainObject = JSON.parse(JSON.stringify(columns));
+      .then(function(result) {
+        var reader = new AttributeTableReader(tableName);
+        var result = reader.readTable(geopackage.connection);
+        var columns = result.columns;
+        var plainObject = JSON.parse(JSON.stringify(columns));
 
-      plainObject.should.deep.include.members([{ index: 0,
-         name: 'id',
-         dataType: 5,
-         notNull: true,
-         primaryKey: true },
-       { index: 1,
-         name: 'test_text.test',
-         dataType: 9,
-         notNull: false,
-         defaultValue: "\'default\'",
-         primaryKey: false },
-       { index: 2,
-         name: 'test_real.test',
-         dataType: 8,
-         notNull: false,
-         primaryKey: false },
-       { index: 3,
-         name: 'test_boolean.test',
-         dataType: 0,
-         notNull: false,
-         primaryKey: false },
-       { index: 4,
-         name: 'test_blob.test',
-         dataType: 10,
-         notNull: false,
-         primaryKey: false },
-       { index: 5,
-         name: 'test_integer.test',
-         dataType: 5,
-         notNull: false,
-         defaultValue: '5',
-         primaryKey: false },
-       { index: 6,
-         name: 'test_text_limited.test',
-         dataType: 9,
-         max: 5,
-         notNull: false,
-         primaryKey: false },
-       { index: 7,
-         name: 'test_blob_limited.test',
-         dataType: 10,
-         max: 7,
-         notNull: false,
-         primaryKey: false } ]);
-      var dao = new DataColumnsDao(geopackage);
-      var dataColumn = dao.getDataColumns('test_attributes.test', 'test_text_limited.test');
-      dataColumn.should.be.deep.equal({
-        table_name: 'test_attributes.test',
-        column_name: 'test_text_limited.test',
-        name: 'Test Name',
-        title: 'Test',
-        description: 'Test Description',
-        mime_type: 'text/html',
-        constraint_name: 'test constraint'
+        plainObject.should.deep.include.members([{ index: 0,
+          name: 'id',
+          dataType: 5,
+          notNull: true,
+          primaryKey: true },
+        { index: 1,
+          name: 'test_text.test',
+          dataType: 9,
+          notNull: false,
+          defaultValue: "\'default\'",
+          primaryKey: false },
+        { index: 2,
+          name: 'test_real.test',
+          dataType: 8,
+          notNull: false,
+          primaryKey: false },
+        { index: 3,
+          name: 'test_boolean.test',
+          dataType: 0,
+          notNull: false,
+          primaryKey: false },
+        { index: 4,
+          name: 'test_blob.test',
+          dataType: 10,
+          notNull: false,
+          primaryKey: false },
+        { index: 5,
+          name: 'test_integer.test',
+          dataType: 5,
+          notNull: false,
+          defaultValue: '5',
+          primaryKey: false },
+        { index: 6,
+          name: 'test_text_limited.test',
+          dataType: 9,
+          max: 5,
+          notNull: false,
+          primaryKey: false },
+        { index: 7,
+          name: 'test_blob_limited.test',
+          dataType: 10,
+          max: 7,
+          notNull: false,
+          primaryKey: false } ]);
+        var dao = new DataColumnsDao(geopackage);
+        var dataColumn = dao.getDataColumns('test_attributes.test', 'test_text_limited.test');
+        dataColumn.should.be.deep.equal({
+          table_name: 'test_attributes.test',
+          column_name: 'test_text_limited.test',
+          name: 'Test Name',
+          title: 'Test',
+          description: 'Test Description',
+          mime_type: 'text/html',
+          constraint_name: 'test constraint'
+        });
       });
-    });
   });
 
   describe('GeoPackage attribute CRUD tests', function(done) {
@@ -357,12 +355,12 @@ describe('GeoPackage Attribute table create tests', function() {
       columns.push(UserColumn.createColumnWithIndex(9, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
       return geopackage.createAttributeTable(tableName, columns)
-      .then(function(result) {
-        var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
-        contentsVerified.should.be.equal(true);
-        var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
-        attributesTableExists.should.be.equal(true);
-      });
+        .then(function(result) {
+          var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
+          contentsVerified.should.be.equal(true);
+          var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
+          attributesTableExists.should.be.equal(true);
+        });
     });
 
     it('should create an attribute', function() {

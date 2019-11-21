@@ -1,0 +1,20 @@
+{
+  "parserOptions": {
+      "ecmaVersion": 2017,
+      "sourceType": "module"
+  },
+  "rules": {
+      "indent": [2, 2],
+      "linebreak-style": [2, "unix"],
+      "semi": [2, "always"],
+      "complexity": [2, 10],
+      "no-console": [0],
+      "camelcase": [0],
+      "eqeqeq": [1]
+  },
+  "env": {
+      "node": true,
+      "es6": true
+  },
+  "extends": "eslint:recommended"
+}

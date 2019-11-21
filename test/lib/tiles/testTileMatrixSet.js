@@ -1,6 +1,6 @@
 var GeoPackageAPI = require('../../..')
-  , TileMatrixSetDao = require('../../../lib/tiles/matrixset').TileMatrixSetDao
-  , TileMatrixSet = require('../../../lib/tiles/matrixset').TileMatrixSet
+  , TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao')
+  , TileMatrixSet = require('../../../lib/tiles/matrixset/tileMatrixSet')
   , BoundingBox = require('../../../lib/boundingBox')
   , should = require('chai').should()
   , path = require('path');

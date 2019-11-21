@@ -1,5 +1,6 @@
 var WKB = require('../../../lib/wkb');
 var wkx = require('wkx');
+var should = require('chai').should();
 
 describe('WKB tests', function() {
 

@@ -158,7 +158,7 @@ describe('MBTiles to GeoPackage tests', function() {
               geopackage.getTileTables(function(err, tables) {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('osm');
-                tables[1].should.be.equal('osm_1')
+                tables[1].should.be.equal('osm_1');
                 geopackage.getTileDaoWithTableName('osm_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
@@ -206,7 +206,7 @@ describe('MBTiles to GeoPackage tests', function() {
               geopackage.getTileTables(function(err, tables) {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('osm');
-                tables[1].should.be.equal('osm_1')
+                tables[1].should.be.equal('osm_1');
                 geopackage.getTileDaoWithTableName('osm_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
@@ -251,7 +251,7 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
-  it.only('should convert the mbtiles pbf file containing pbf tiles into a geopackage', function(done) {
+  it('should convert the mbtiles pbf file containing pbf tiles into a geopackage', function(done) {
     this.timeout(0);
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'pbf.gpkg'));

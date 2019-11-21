@@ -162,13 +162,10 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should get a tile specified with wgs84 coordinates', function() {
-      var maxZoom = tileDao.maxZoom;
-      var minZoom = tileDao.minZoom;
-
       var wgs84BoundingBox = new BoundingBox(0, 180, 0, 85.05112877980659);
 
       var gpr = new GeoPackageTileRetriever(tileDao, 512, 512);
-      return gpr.getTileWithWgs84Bounds(wgs84BoundingBox, 2)
+      return gpr.getTileWithWgs84Bounds(wgs84BoundingBox)
       .then(function(tile) {
         should.exist(tile);
       });

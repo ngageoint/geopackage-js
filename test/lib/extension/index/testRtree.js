@@ -1,14 +1,11 @@
 
 var GeoPackageAPI = require('../../../..')
-  , GeoPackage = require('../../../../lib/geoPackage')
   , FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
-  , RTreeIndexDao = require('../../../../lib/extension/rtree').RTreeIndexDao
-  , RTreeIndex = require('../../../../lib/extension/rtree').RTreeIndex
+  , RTreeIndexDao = require('../../../../lib/extension/rtree/rtreeIndexDao')
+  , RTreeIndex = require('../../../../lib/extension/rtree/rtreeIndex')
   , BoundingBox = require('../../../../lib/boundingBox')
-  , Verification = require('../../../fixtures/verification')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
-  , fs = require('fs')
   , path = require('path');
 
 describe('RTree tests', function() {
@@ -56,7 +53,7 @@ describe('RTree tests', function() {
       var indexed = fti.isIndexed();
       fti.rtreeIndexed.should.be.equal(true);
       indexed.should.be.equal(true);
-      var exists = fti.hasExtension(RTreeIndexDao.EXTENSION_NAME, fti.tableName, fti.columnName)
+      var exists = fti.hasExtension(RTreeIndexDao.EXTENSION_NAME, fti.tableName, fti.columnName);
       exists.should.be.equal(true);
 
       var extensionDao = fti.extensionsDao;
@@ -74,9 +71,9 @@ describe('RTree tests', function() {
 
     it('should query the index from the geopackage api', function() {
       return GeoPackageAPI.getGeoJSONFeaturesInTile(geoPackage, 'line1', 0, 0, 0)
-      .then(function(features) {
-        features.length.should.be.equal(1);
-      });
+        .then(function(features) {
+          features.length.should.be.equal(1);
+        });
     });
 
     it('should query the index with a geometry envelope', function() {
@@ -157,26 +154,26 @@ describe('RTree tests', function() {
     it('should add the RTree extension to the GeoPackage', function() {
       var rtreeIndex = new RTreeIndex(geoPackage, featureDao);
       return rtreeIndex.create()
-      .then(function(extension) {
-        var fti = new FeatureTableIndex(geoPackage, featureDao);
-        var indexed = fti.isIndexed();
-        indexed.should.be.equal(true);
-      })
-      .then(function() {
-        var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName)
-        exists.should.be.equal(true);
-      })
-      .then(function() {
-        var extensionDao = rtreeIndex.extensionsDao;
-        var extension = extensionDao.queryByExtension(rtreeIndex.extensionName);
-        extension.getAuthor().should.be.equal('gpkg');
-        extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
-        extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
-        extension.column_name.should.be.equal('geom');
-        extension.table_name.should.be.equal('FEATURESriversds');
-        extension.scope.should.be.equal('write-only');
-        extension.extension_name.should.be.equal('gpkg_rtree_index');
-      })
+        .then(function(extension) {
+          var fti = new FeatureTableIndex(geoPackage, featureDao);
+          var indexed = fti.isIndexed();
+          indexed.should.be.equal(true);
+        })
+        .then(function() {
+          var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName);
+          exists.should.be.equal(true);
+        })
+        .then(function() {
+          var extensionDao = rtreeIndex.extensionsDao;
+          var extension = extensionDao.queryByExtension(rtreeIndex.extensionName);
+          extension.getAuthor().should.be.equal('gpkg');
+          extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
+          extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
+          extension.column_name.should.be.equal('geom');
+          extension.table_name.should.be.equal('FEATURESriversds');
+          extension.scope.should.be.equal('write-only');
+          extension.extension_name.should.be.equal('gpkg_rtree_index');
+        });
     });
   });
 });

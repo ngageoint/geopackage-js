@@ -1,5 +1,7 @@
 var DataTypes = require('../../../lib/db/dataTypes.js');
 
+var should = require('chai').should();
+
 describe('DataTypes tests', function() {
 
   it('get the enum name', function() {

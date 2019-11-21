@@ -1,6 +1,6 @@
 var GeoPackageAPI = require('../../..')
-  , TileMatrixDao = require('../../../lib/tiles/matrix').TileMatrixDao
-  , TileMatrix = require('../../../lib/tiles/matrix').TileMatrix
+  , TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao')
+  , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix')
   , should = require('chai').should()
   , path = require('path');
 

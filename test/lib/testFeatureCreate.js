@@ -2,8 +2,8 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../lib/geoPackage')
   , GeoPackageAPI = require('../../.')
   , FeatureColumn = require('../../lib/features/user/featureColumn')
-  , DataColumns = require('../../lib/dataColumns').DataColumns
-  , DataColumnsDao = require('../../lib/dataColumns').DataColumnsDao
+  , DataColumns = require('../../lib/dataColumns/dataColumns')
+  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao')
   , Verification = require('../fixtures/verification')
   , FeatureTable = require('../../lib/features/user/featureTable')
   , TileTable = require('../../lib/tiles/user/tileTable')
@@ -54,13 +54,13 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
 
     geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
-    .then(function(result) {
-      result.should.be.equal(true);
-      Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-      Verification.verifyGeometryColumnsForTable(geopackage, tableName).should.be.equal(true);
-    })
+      .then(function(result) {
+        result.should.be.equal(true);
+        Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+        Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+        Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+        Verification.verifyGeometryColumnsForTable(geopackage, tableName).should.be.equal(true);
+      });
   });
 
   it('should not create a feature table with two geometry columns', function() {
@@ -90,35 +90,35 @@ describe('GeoPackage Feature table create tests', function() {
     });
 
     GeoPackageAPI.createFeatureTableWithProperties(geopackage, 'NewTable', properties)
-    .then(function(result) {
-      var reader = new FeatureTableReader('NewTable');
-      var result = reader.readFeatureTable(geopackage);
-      var columns = result.columns;
+      .then(function(result) {
+        var reader = new FeatureTableReader('NewTable');
+        var result = reader.readFeatureTable(geopackage);
+        var columns = result.columns;
 
-      var plainObject = JSON.parse(JSON.stringify(columns));
+        var plainObject = JSON.parse(JSON.stringify(columns));
 
-      plainObject.should.deep.include.members([{
-        index: 0,
-        name: 'id',
-        dataType: 5,
-        notNull: true,
-        primaryKey: true },
-      { index: 1,
-        name: 'geometry',
-        notNull: false,
-        primaryKey: false,
-        geometryType: 7 },
-      { index: 2,
-        name: 'Name',
-        dataType: 9,
-        notNull: false,
-        primaryKey: false },
-      { index: 3,
-        name: 'Number',
-        dataType: 5,
-        notNull: false,
-        primaryKey: false } ]);
-    });
+        plainObject.should.deep.include.members([{
+          index: 0,
+          name: 'id',
+          dataType: 5,
+          notNull: true,
+          primaryKey: true },
+        { index: 1,
+          name: 'geometry',
+          notNull: false,
+          primaryKey: false,
+          geometryType: 7 },
+        { index: 2,
+          name: 'Name',
+          dataType: 9,
+          notNull: false,
+          primaryKey: false },
+        { index: 3,
+          name: 'Number',
+          dataType: 5,
+          notNull: false,
+          primaryKey: false } ]);
+      });
   });
 
   it('should create a feature table and read the information about it', function() {
@@ -147,74 +147,74 @@ describe('GeoPackage Feature table create tests', function() {
     dc.constraint_name = 'test constraint';
 
     return geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
-    .then(function() {
-      var reader = new FeatureTableReader(tableName);
-      var result = reader.readFeatureTable(geopackage);
-      var columns = result.columns;
+      .then(function() {
+        var reader = new FeatureTableReader(tableName);
+        var result = reader.readFeatureTable(geopackage);
+        var columns = result.columns;
 
-      var plainObject = JSON.parse(JSON.stringify(columns));
+        var plainObject = JSON.parse(JSON.stringify(columns));
 
-      plainObject.should.deep.include.members([{ index: 0,
-         name: 'id',
-         dataType: 5,
-         notNull: true,
-         primaryKey: true },
-       { index: 1,
-         name: 'geom.test',
-         notNull: false,
-         primaryKey: false,
-         geometryType: 7 },
-       { index: 2,
-         name: 'test_text.test',
-         dataType: 9,
-         notNull: false,
-         defaultValue: "\'default\'",
-         primaryKey: false },
-       { index: 3,
-         name: 'test_real.test',
-         dataType: 8,
-         notNull: false,
-         primaryKey: false },
-       { index: 4,
-         name: 'test_boolean.test',
-         dataType: 0,
-         notNull: false,
-         primaryKey: false },
-       { index: 5,
-         name: 'test_blob.test',
-         dataType: 10,
-         notNull: false,
-         primaryKey: false },
-       { index: 6,
-         name: 'test_integer.test',
-         dataType: 5,
-         notNull: false,
-         defaultValue: '5',
-         primaryKey: false },
-       { index: 7,
-         name: 'test_text_limited.test',
-         dataType: 9,
-         max: 5,
-         notNull: false,
-         primaryKey: false },
-       { index: 8,
-         name: 'test_blob_limited.test',
-         dataType: 10,
-         max: 7,
-         notNull: false,
-         primaryKey: false } ]);
-      var dao = new DataColumnsDao(geopackage);
-      var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
-      dataColumn.should.be.deep.equal({
-        table_name: 'test_features.test',
-        column_name: 'test_text_limited.test',
-        name: 'Test Name',
-        title: 'Test',
-        description: 'Test Description',
-        mime_type: 'text/html',
-        constraint_name: 'test constraint'
+        plainObject.should.deep.include.members([{ index: 0,
+          name: 'id',
+          dataType: 5,
+          notNull: true,
+          primaryKey: true },
+        { index: 1,
+          name: 'geom.test',
+          notNull: false,
+          primaryKey: false,
+          geometryType: 7 },
+        { index: 2,
+          name: 'test_text.test',
+          dataType: 9,
+          notNull: false,
+          defaultValue: "\'default\'",
+          primaryKey: false },
+        { index: 3,
+          name: 'test_real.test',
+          dataType: 8,
+          notNull: false,
+          primaryKey: false },
+        { index: 4,
+          name: 'test_boolean.test',
+          dataType: 0,
+          notNull: false,
+          primaryKey: false },
+        { index: 5,
+          name: 'test_blob.test',
+          dataType: 10,
+          notNull: false,
+          primaryKey: false },
+        { index: 6,
+          name: 'test_integer.test',
+          dataType: 5,
+          notNull: false,
+          defaultValue: '5',
+          primaryKey: false },
+        { index: 7,
+          name: 'test_text_limited.test',
+          dataType: 9,
+          max: 5,
+          notNull: false,
+          primaryKey: false },
+        { index: 8,
+          name: 'test_blob_limited.test',
+          dataType: 10,
+          max: 7,
+          notNull: false,
+          primaryKey: false } ]);
+        var dao = new DataColumnsDao(geopackage);
+        var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
+        dataColumn.should.be.deep.equal({
+          table_name: 'test_features.test',
+          column_name: 'test_text_limited.test',
+          name: 'Test Name',
+          title: 'Test',
+          description: 'Test Description',
+          mime_type: 'text/html',
+          constraint_name: 'test constraint'
+        });
       });
-    });
   });
 
   describe('GeoPackage feature CRUD tests', function(done) {
@@ -238,13 +238,13 @@ describe('GeoPackage Feature table create tests', function() {
       columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
       return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
-      .then(function(result) {
-        var verified = Verification.verifyGeometryColumns(geopackage)
+        .then(function(result) {
+          var verified = Verification.verifyGeometryColumns(geopackage)
           && Verification.verifyTableExists(geopackage, tableName)
           && Verification.verifyContentsForTable(geopackage, tableName)
           && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
-        verified.should.be.equal(true);
-      });
+          verified.should.be.equal(true);
+        });
     });
 
     it('should create a feature', function() {

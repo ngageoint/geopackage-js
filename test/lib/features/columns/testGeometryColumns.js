@@ -1,5 +1,5 @@
 var GeoPackageAPI = require('../../../..')
-  , GeometryColumnsDao = require('../../../../lib/features/columns').GeometryColumnsDao
+  , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao')
   , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
   , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
@@ -32,21 +32,21 @@ describe('GeometryColumns tests', function() {
     tables.length.should.be.equal(16);
     tables.should.have.members([
       'point2d',
-       'linestring2d',
-       'polygon2d',
-       'multipoint2d',
-       'multilinestring2d',
-       'multipolygon2d',
-       'geomcollection2d',
-       'geometry2d',
-       'point3d',
-       'linestring3d',
-       'polygon3d',
-       'multipoint3d',
-       'multilinestring3d',
-       'multipolygon3d',
-       'geomcollection3d',
-       'geometry3d'
+      'linestring2d',
+      'polygon2d',
+      'multipoint2d',
+      'multilinestring2d',
+      'multipolygon2d',
+      'geomcollection2d',
+      'geometry2d',
+      'point3d',
+      'linestring3d',
+      'polygon3d',
+      'multipoint3d',
+      'multilinestring3d',
+      'multipolygon3d',
+      'geomcollection3d',
+      'geometry3d'
     ]);
   });
 
@@ -58,6 +58,7 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       table_name: 'point2d',
       geometry_type_name: 'POINT',
+      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -85,6 +86,7 @@ describe('GeometryColumns tests', function() {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
+      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -100,6 +102,7 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       geometry_type_name: 'POINT',
       srs_id: 0,
+      srs: undefined,
       z: 0,
       m: 0
     });
@@ -107,6 +110,7 @@ describe('GeometryColumns tests', function() {
     TestUtils.compareProperties(srs, {
       srs_name: 'Undefined geographic SRS',
       srs_id: 0,
+      definition_12_063: undefined,
       organization: 'NONE',
       organization_coordsys_id: 0,
       definition: 'undefined',
@@ -122,6 +126,7 @@ describe('GeometryColumns tests', function() {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
+      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -150,6 +155,7 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       geometry_type_name: 'POINT',
       srs_id: 0,
+      srs: undefined,
       z: 0,
       m: 0
     });

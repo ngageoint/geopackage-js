@@ -1,5 +1,7 @@
 var BoundingBox = require('../../lib/boundingBox.js');
 
+var should = require('chai').should();
+
 describe('BoundingBox tests', function() {
 
   it('should create a BoundingBox', function() {
@@ -71,8 +73,8 @@ describe('BoundingBox tests', function() {
   });
 
   it('should convert', function() {
-   var bb = new BoundingBox(-1252344.2714243277,2504688.5428486555,0,3757032.814272983);
-   var projected = bb.projectBoundingBox('EPSG:3857', 'EPSG:4326')
+    var bb = new BoundingBox(-1252344.2714243277,2504688.5428486555,0,3757032.814272983);
+    var projected = bb.projectBoundingBox('EPSG:3857', 'EPSG:4326');
   });
 
 });

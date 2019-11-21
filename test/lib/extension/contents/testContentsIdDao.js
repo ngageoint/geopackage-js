@@ -1,5 +1,5 @@
 var Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents').ContentsDao
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
   , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');

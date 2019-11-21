@@ -1,12 +1,11 @@
-var DataColumnsDao = require('../../../lib/dataColumns').DataColumnsDao
-  , DataColumns = require('../../../lib/dataColumns').DataColumns
-  , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints').DataColumnConstraintsDao
-  , DataColumnConstraints = require('../../../lib/dataColumnConstraints').DataColumnConstraints
+var DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao')
+  , DataColumns = require('../../../lib/dataColumns/dataColumns')
+  , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints/dataColumnConstraintsDao')
+  , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints')
   , GeoPackageAPI = require('../../../.')
   , TableCreator = require('../../../lib/db/tableCreator')
   , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
-  , fs = require('fs')
   , should = require('chai').should();
 
 describe('Data Columns tests', function() {
@@ -135,20 +134,51 @@ describe('Data Columns tests', function() {
   it('should create a data column constraint', function() {
     var tc = new TableCreator(geoPackage);
     return tc.createDataColumnConstraints()
-    .then(function() {
-      var dao = new DataColumnConstraintsDao(geoPackage);
-      var dc = new DataColumnConstraints();
-      dc.constraint_name = 'test constraint';
-      dc.constraint_type = 'range';
-      dc.value = 'NULL';
-      dc.min = 5;
-      dc.min_is_inclusive = true;
-      dc.max = 6;
-      dc.max_is_inclusive = true;
-      dc.description = 'constraint description';
+      .then(function() {
+        var dao = new DataColumnConstraintsDao(geoPackage);
+        var dc = new DataColumnConstraints();
+        dc.constraint_name = 'test constraint';
+        dc.constraint_type = 'range';
+        dc.value = 'NULL';
+        dc.min = 5;
+        dc.min_is_inclusive = true;
+        dc.max = 6;
+        dc.max_is_inclusive = true;
+        dc.description = 'constraint description';
 
-      var resutl = dao.create(dc);
-      for (var dataColumnConstraint of dao.queryByConstraintName('test constraint')) {
+        var resutl = dao.create(dc);
+        for (var dataColumnConstraint of dao.queryByConstraintName('test constraint')) {
+          dataColumnConstraint.should.be.deep.equal({
+            constraint_name: 'test constraint',
+            constraint_type: 'range',
+            value: 'NULL',
+            min: 5,
+            min_is_inclusive: 1,
+            max: 6,
+            max_is_inclusive: 1,
+            description: 'constraint description'
+          });
+        }
+      });
+  });
+
+  it('should create a data column constraint and query unique', function() {
+    var tc = new TableCreator(geoPackage);
+    return tc.createDataColumnConstraints()
+      .then(function() {
+        var dao = new DataColumnConstraintsDao(geoPackage);
+        var dc = new DataColumnConstraints();
+        dc.constraint_name = 'test constraint';
+        dc.constraint_type = 'range';
+        dc.value = 'NULL';
+        dc.min = 5;
+        dc.min_is_inclusive = true;
+        dc.max = 6;
+        dc.max_is_inclusive = true;
+        dc.description = 'constraint description';
+
+        var result = dao.create(dc);
+        var dataColumnConstraint = dao.queryUnique('test constraint', 'range', 'NULL');
         dataColumnConstraint.should.be.deep.equal({
           constraint_name: 'test constraint',
           constraint_type: 'range',
@@ -159,38 +189,7 @@ describe('Data Columns tests', function() {
           max_is_inclusive: 1,
           description: 'constraint description'
         });
-      }
-    });
-  });
-
-  it('should create a data column constraint and query unique', function() {
-    var tc = new TableCreator(geoPackage);
-    return tc.createDataColumnConstraints()
-    .then(function() {
-      var dao = new DataColumnConstraintsDao(geoPackage);
-      var dc = new DataColumnConstraints();
-      dc.constraint_name = 'test constraint';
-      dc.constraint_type = 'range';
-      dc.value = 'NULL';
-      dc.min = 5;
-      dc.min_is_inclusive = true;
-      dc.max = 6;
-      dc.max_is_inclusive = true;
-      dc.description = 'constraint description';
-
-      var result = dao.create(dc);
-      var dataColumnConstraint = dao.queryUnique('test constraint', 'range', 'NULL');
-      dataColumnConstraint.should.be.deep.equal({
-        constraint_name: 'test constraint',
-        constraint_type: 'range',
-        value: 'NULL',
-        min: 5,
-        min_is_inclusive: 1,
-        max: 6,
-        max_is_inclusive: 1,
-        description: 'constraint description'
       });
-    });
   });
 
 });

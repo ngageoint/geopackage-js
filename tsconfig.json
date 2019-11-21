@@ -1,0 +1,37 @@
+// {
+//   "compilerOptions": {
+//     "target": "es5",
+//     "module": "commonjs",
+//     "sourceMap": true,
+//     "checkJs": true,
+//     "allowJs": true,
+//     "outDir": "./built"
+//   },
+//   "include": ["lib/core/srs/**/*"]
+// }
+
+
+{
+  "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "lib": ["dom", "es2015", "es2017", "es2015.iterable"],
+      "jsx": "react", // uses typescript to transpile jsx to js
+      "target": "es5", // specify ECMAScript target version
+      "allowJs": true, // allows a partial TypeScript and JavaScript codebase
+      "declaration": true,
+      "checkJs": true, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "outDir": "./built",
+      "downlevelIteration": true
+  },
+  "include": [
+      "./lib" // type-checks all js files as well not just .ts extension
+  ],
+  "exclude": [
+      "./lib/wkb"
+  ]
+}
