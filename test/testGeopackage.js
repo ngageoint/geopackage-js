@@ -1,5 +1,5 @@
 var GeoPackage = require('../index.js')
-  , BoundingBox = require('../lib/boundingBox.js')
+  , BoundingBox = require('../lib/boundingBox')
   , testSetup = require('./fixtures/testSetup');
 
 var path = require('path')
