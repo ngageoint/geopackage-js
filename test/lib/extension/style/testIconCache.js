@@ -5,6 +5,7 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , path = require('path')
   , ImageUtils = require('../../../../lib/tiles/imageUtils')
   , GeoPackageAPI = require('../../../../lib/api')
+  // @ts-ignore
   , fs = require('fs');
 
 describe('IconCache Tests', function() {
@@ -12,6 +13,7 @@ describe('IconCache Tests', function() {
   var geopackage;
   var testPath = path.join(__dirname, '..', 'tmp');
   var featureTableName = 'feature_table';
+  // @ts-ignore
   var featureTable;
   var featureTableStyles;
   var iconImage;
@@ -41,22 +43,30 @@ describe('IconCache Tests', function() {
         expectedCtx = expectedCanvas.getContext('2d');
       } else {
         actualCanvas = document.getElementById('canvas');
+        // @ts-ignore
         actualCanvas.width = imageA.width;
+        // @ts-ignore
         actualCanvas.height = imageA.height;
+        // @ts-ignore
         actualCtx = actualCanvas.getContext('2d');
         expectedCanvas = document.getElementById('canvas');
+        // @ts-ignore
         expectedCanvas.width = imageB.width;
+        // @ts-ignore
         expectedCanvas.height = imageB.height;
+        // @ts-ignore
         expectedCtx = expectedCanvas.getContext('2d');
       }
       actualCtx.drawImage(imageA, 0, 0);
       expectedCtx.drawImage(imageB, 0, 0);
+      // @ts-ignore
       resolve(actualCanvas.toDataURL() === expectedCanvas.toDataURL());
     });
   }
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', function(done) {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
+    // @ts-ignore
     testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
       geopackage = gp;
       // create a feature table first
@@ -69,6 +79,7 @@ describe('IconCache Tests', function() {
               featureTableStyles.createIconRelationship().then(function () {
                 ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(function (expectedImage) {
                   iconImage = expectedImage;
+                  // @ts-ignore
                   testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'), function(err, buffer) {
                     iconImageBuffer = buffer;
                     done();

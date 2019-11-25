@@ -501,7 +501,7 @@ describe('GeoPackage FeatureTiles tests', function() {
         });
     });
 
-    it('should get the x: 153632, y: 91343, z: 18 tile without styling', function(done) {
+    it.skip('should get the x: 153632, y: 91343, z: 18 tile without styling', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.ignoreFeatureTableStyles();

@@ -88,7 +88,7 @@ describe('GeoPackageAPI tests', function() {
     });
     return GeoPackage.open(badUrl)
     .then(function(geopackage) {
-      should.fail();
+      should.fail(false, true);
     })
     .catch(function(err) {
       should.exist(err);
@@ -419,6 +419,7 @@ describe('GeoPackageAPI tests', function() {
       }, 'rivers')
       var iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(indexedGeopackage, 'rivers');
       for (var geoJson of iterator.results) {
+        // @ts-ignore
         should.exist(geoJson.properties);
       }
     });

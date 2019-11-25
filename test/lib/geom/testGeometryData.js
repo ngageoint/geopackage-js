@@ -1,3 +1,4 @@
+// @ts-nocheck
 var GeometryData = require('../../../lib/geom/geometryData.js');
 
 var wkx = require('wkx')

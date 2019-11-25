@@ -56,14 +56,14 @@ describe('GeoPackage Attribute table create tests', function() {
     properties.push({
       name: 'Name',
       dataType: DataTypes.GPKG_DT_TEXT_NAME,
-      dataColumn: {
+      dataColumn: new DataColumns({
         table_name: 'NewTable',
         column_name: 'Name',
         name: 'The Name',
         title: 'The Title',
         description: 'Description',
         mime_type: 'text'
-      }
+      })
     });
     properties.push({
       name: 'Number',

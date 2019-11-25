@@ -16,7 +16,7 @@ describe('Related Simple Attributes tests', function() {
 
   var testGeoPackage;
   var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
-  var geopackage;
+  var geoPackage;
 
   var tileBuffer;
 
@@ -66,7 +66,7 @@ describe('Related Simple Attributes tests', function() {
 
     // Validate nullable non simple columns
     try {
-      SimpleAttributesTable.create('simple_table', RelatedTablesUtils.createAdditionalUserColumns(SimpleAttributesTable.numRequiredColumns()), false);
+      SimpleAttributesTable.create('simple_table', RelatedTablesUtils.createAdditionalUserColumns(SimpleAttributesTable.numRequiredColumns(), false));
       should.fail('Simple Attributes Table', undefined, 'Simple Attributes Table created with nullable non simple columns');
     } catch (error) {
       // pass

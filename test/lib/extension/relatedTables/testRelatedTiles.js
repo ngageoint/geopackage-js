@@ -17,7 +17,7 @@ describe('Related Tile tests', function() {
 
   var testGeoPackage;
   var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
-  var geopackage;
+  var geoPackage;
 
   var tileBuffer;
 

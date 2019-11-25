@@ -11,7 +11,7 @@ describe('Tests for issue 68', function() {
     this.timeout(5000);
     return GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
     .then(function(geoPackageConnection) {
-      connection = geoPackageConnection;
+      var connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();

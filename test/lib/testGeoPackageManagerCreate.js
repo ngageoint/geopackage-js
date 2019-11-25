@@ -36,6 +36,7 @@ describe('GeoPackageAPI Create tests', function() {
       should.exist(geopackage);
       var applicationId = geopackage.getApplicationId();
       var buff = Buffer.alloc(4);
+      // @ts-ignore
       buff.writeUInt32BE(applicationId);
       var idString = buff.toString('ascii', 0, 4);
       idString.should.be.equal('GPKG');

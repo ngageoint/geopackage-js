@@ -15,6 +15,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , FeatureTableReader = require('../../lib/features/user/featureTableReader')
   , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
+  , wkb = require('../../lib/wkb/index')
   , wkx = require('wkx')
   , path = require('path');
 
@@ -38,7 +39,7 @@ describe('GeoPackage Feature table create tests', function() {
   });
 
   it('should create a feature table', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
     var columns = [];
@@ -46,7 +47,7 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
     columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
     columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkx.Types.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
     columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
@@ -64,14 +65,14 @@ describe('GeoPackage Feature table create tests', function() {
   });
 
   it('should not create a feature table with two geometry columns', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkx.Types.wkt.Point, false, null));
-    columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', wkx.Types.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', wkb.typeMap.wkt.Point, false, null));
     (function() {
       new FeatureTable(tableName, columns);
     }).should.throw();
@@ -122,7 +123,7 @@ describe('GeoPackage Feature table create tests', function() {
   });
 
   it('should create a feature table and read the information about it', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkx.Types.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
     var columns = [];
@@ -130,7 +131,7 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
     columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
     columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkx.Types.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, "default"));
     columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
     columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
@@ -220,7 +221,7 @@ describe('GeoPackage Feature table create tests', function() {
   describe('GeoPackage feature CRUD tests', function(done) {
 
     beforeEach(function() {
-      var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', wkx.Types.wkt.Point);
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', wkb.typeMap.wkt.Point);
       var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
       var columns = [];
@@ -228,7 +229,7 @@ describe('GeoPackage Feature table create tests', function() {
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
       columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkb.typeMap.wkt.Point, false, null));
       columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
       columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
       columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));

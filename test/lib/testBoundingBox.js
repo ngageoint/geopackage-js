@@ -65,6 +65,7 @@ describe('BoundingBox tests', function() {
 
   it('should return the BoundingBox due to no projection', function() {
     var bb = new BoundingBox(0, 1, 2, 3);
+    // @ts-ignore
     var projected = bb.projectBoundingBox('EPSG:4326');
     projected.minLongitude.should.be.equal(0);
     projected.maxLongitude.should.be.equal(1);

@@ -126,7 +126,7 @@ describe('Dublin Core tests', function() {
         if (name === 'identifier') {
           value.should.be.equal('identifier');
         } else {
-          should.fail();
+          should.fail(name, 'identifier');
         }
       },
       getColumnWithColumnName: function(name) {
@@ -153,7 +153,7 @@ describe('Dublin Core tests', function() {
           value.should.be.equal('format');
         }
         else {
-          should.fail();
+          should.fail(name, 'content_type');
         }
       },
       getColumnWithColumnName: function(name) {
@@ -191,7 +191,7 @@ describe('Dublin Core tests', function() {
         if (name === 'identifier') {
           return 'identifier';
         } else {
-          should.fail();
+          should.fail(name, 'identifier');
         }
       },
       getColumnWithColumnName: function(name) {
@@ -218,7 +218,7 @@ describe('Dublin Core tests', function() {
           return 'format';
         }
         else {
-          should.fail();
+          should.fail(name, 'content_type');
         }
       },
       getColumnWithColumnName: function(name) {

@@ -18,7 +18,8 @@ var GeoPackageAPI = require('../index')
   , TableCreator = GeoPackageAPI.TableCreator
   , MediaTable = GeoPackageAPI.MediaTable
   , UserMappingTable = GeoPackageAPI.UserMappingTable
-  , DublinCoreType = GeoPackageAPI.DublinCoreType;
+  , DublinCoreType = GeoPackageAPI.DublinCoreType
+  , wkb = require('../lib/wkb/index');
 
 var wkx = require('wkx')
   , path = require('path')
@@ -150,21 +151,21 @@ GeoPackageUtils.createFeatures = function(geopackage) {
     name: 'NGA Visitor Center'
   };
 
-  return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point1', [point1], wkx.Types.wkt.Point)
+  return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point1', [point1], wkb.typeMap.wkt.Point)
   .then(function() {
-    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point2', [point2], wkx.Types.wkt.Point);
+    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point2', [point2], wkb.typeMap.wkt.Point);
   })
   .then(function() {
-    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line1', [line1], wkx.Types.wkt.LineString);
+    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line1', [line1], wkb.typeMap.wkt.LineString);
   })
   .then(function() {
-    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line2', [line2], wkx.Types.wkt.LineString);
+    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line2', [line2],wkb.typeMap.wkt.LineString);
   })
   .then(function() {
-    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon1', [poly1], wkx.Types.wkt.Polygon);
+    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon1', [poly1], wkb.typeMap.wkt.Polygon);
   })
   .then(function() {
-    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon2', [poly2], wkx.Types.wkt.Polygon);
+    return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon2', [poly2], wkb.typeMap.wkt.Polygon);
   })
   .then(function() {
     return GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'geometry1', [point1, line1, poly1], 'GEOMETRY');
@@ -517,7 +518,7 @@ GeoPackageUtils.createTiles = function(geopackage) {
 }
 
 GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, tileBaseDir, minZoom, maxZoom) {
-  var tableName = tableName || 'OSM';
+  tableName = tableName || 'OSM';
   var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
   var contentsBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
   var contentsSrsId = 3857;

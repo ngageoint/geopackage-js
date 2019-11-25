@@ -86,18 +86,18 @@ describe('Related Tables tests', function() {
         }
 
         for (var baseId in baseIdMappings) {
-          var relatedIds = baseIdMappings[baseId.toString()];
+          relatedIds = baseIdMappings[baseId.toString()];
           for (var r = 0; r < relatedIds.length; r++) {
             var relatedId = relatedIds[r];
             relatedIdMappings[relatedId.toString()].indexOf(Number(baseId)).should.not.equal(-1);
           }
         }
 
-        for (var relatedId in relatedIdMappings) {
-          var baseIds = relatedIdMappings[relatedId.toString()];
+        for (var relatedIdMapping in relatedIdMappings) {
+          baseIds = relatedIdMappings[relatedIdMapping.toString()];
           for (var b = 0; b < baseIds.length; b++) {
-            var baseId = baseIds[b];
-            baseIdMappings[baseId.toString()].indexOf(Number(relatedId)).should.not.equal(-1);
+            var baseIdMapping = baseIds[b];
+            baseIdMappings[baseIdMapping.toString()].indexOf(Number(relatedIdMapping)).should.not.equal(-1);
           }
         }
       }

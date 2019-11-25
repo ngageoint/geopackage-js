@@ -1,3 +1,4 @@
+// @ts-ignore
 var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , FeatureColumn = require('../../../../lib/features/user/featureColumn')
   , DataTypes = require('../../../../lib/db/dataTypes')
@@ -10,7 +11,9 @@ var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
   , wkx = require('wkx')
+  // @ts-ignore
   , fs = require('fs')
+  , helpers = require('@turf/helpers')
   , path = require('path')
   , should = require('chai').should();
 
@@ -21,6 +24,7 @@ describe('FeatureDao tests', function() {
 
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(orignal, copy, callback);
       } else {
@@ -33,6 +37,7 @@ describe('FeatureDao tests', function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function() {
+        // @ts-ignore
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
           done();
@@ -48,6 +53,7 @@ describe('FeatureDao tests', function() {
     it('should read the geometry', function() {
       var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
       var each = featureDao.queryForEach();
+      // @ts-ignore
       var srs = featureDao.srs;
       for (var row of each) {
         var currentRow = featureDao.getRow(row);
@@ -72,8 +78,10 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename;
 
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
       } else {
@@ -84,6 +92,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      // @ts-ignore
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -120,14 +129,18 @@ describe('FeatureDao tests', function() {
   });
 
   describe('Query For Shapes', function() {
+    // @ts-ignore
     var geoPackage;
+    // @ts-ignore
     var featureDao;
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'test_shapes_two_points.gpkg');
     var filename;
 
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
       } else {
@@ -174,8 +187,10 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers2.gpkg');
     var filename;
 
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
       } else {
@@ -186,6 +201,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      // @ts-ignore
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -208,14 +224,11 @@ describe('FeatureDao tests', function() {
       var pointToLineDistance = require('@turf/point-to-line-distance').default;
       var polygonToLine = require('@turf/polygon-to-line').default;
       var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      // @ts-ignore
       var pointDistance = require('@turf/distance').default;
 
       var bb = new BoundingBox(-179, 0, 0, 80);
-      var centerPoint = { type: 'Feature',
-       properties: {},
-       geometry:
-        { type: 'Point',
-          coordinates: [ -105.92193603515625, 34.406906587428736 ] } };
+      var centerPoint = helpers.point([ -105.92193603515625, 34.406906587428736 ]);
 
 
       var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
@@ -237,7 +250,7 @@ describe('FeatureDao tests', function() {
             closestDistance = distance;
           }
         } else if (geometry.type == 'LineString') {
-          var distance = pointToLineDistance(centerPoint, geometry);
+          distance = pointToLineDistance(centerPoint, geometry);
           if (distance < closestDistance) {
             closest = row;
             closestDistance = distance;
@@ -253,6 +266,7 @@ describe('FeatureDao tests', function() {
             }
           } else {
             var line = polygonToLine(geometry);
+            // @ts-ignore
             var distance = pointToLineDistance(centerPoint, line);
             if (distance < closestDistance) {
               closest = row;
@@ -277,6 +291,7 @@ describe('FeatureDao tests', function() {
     });
 
     beforeEach('get the tile buffer', function(done) {
+      // @ts-ignore
       testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'), function(err, buffer) {
         tileBuffer = buffer;
         done();
@@ -285,15 +300,18 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should create the GeoPackage', function(done) {
       testGeoPackage = path.join(testPath, testSetup.createTempName());
+      // @ts-ignore
       testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
         geopackage = gp;
 
+        // @ts-ignore
         var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
         var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
         var columns = [];
 
         columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+        // @ts-ignore
         columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
         columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
         columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
@@ -369,6 +387,7 @@ describe('FeatureDao tests', function() {
           ]
         };
 
+        // @ts-ignore
         var line2 = {
           "type": "Feature",
           "properties": {},
@@ -426,6 +445,7 @@ describe('FeatureDao tests', function() {
         //      /_________|
         //     /
         geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+        // @ts-ignore
         .then(function(result) {
           var featureDao = geopackage.getFeatureDao('QueryTest');
           queryTestFeatureDao = featureDao;
@@ -462,11 +482,13 @@ describe('FeatureDao tests', function() {
     });
 
     it('should query for _feature_id', function() {
+      // @ts-ignore
       var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line');
       row.properties.name.should.be.equal('line');
     });
 
     it('should query for _properties_id', function() {
+      // @ts-ignore
       var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline');
       row.properties.name.should.be.equal('line');
     });
@@ -480,6 +502,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should get features in the bounding box', function() {
+      // @ts-ignore
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       return GeoPackageAPI.getFeaturesInBoundingBox(geopackage, 'QueryTest', -.4, -.6, 2.4, 2.6)
       .then(function(iterator) {
@@ -531,6 +554,7 @@ describe('FeatureDao tests', function() {
       var pointToLineDistance = require('@turf/point-to-line-distance').default;
       var polygonToLine = require('@turf/polygon-to-line').default;
       var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      // @ts-ignore
       var pointDistance = require('@turf/distance').default;
 
       // var bb = new BoundingBox(-107.44354248046876, -104.69696044921876, 33.098444531367186, 35.36889537510477);
@@ -572,6 +596,7 @@ describe('FeatureDao tests', function() {
             closestDistance = distance;
           }
         } else if (geometry.type == 'LineString') {
+          // @ts-ignore
           var distance = pointToLineDistance(centerPoint, geometry);
           if (distance < closestDistance) {
             closest = row;
@@ -581,6 +606,7 @@ describe('FeatureDao tests', function() {
             closestDistance = distance;
           }
         } else if (geometry.type == 'Polygon') {
+          // @ts-ignore
           if (booleanPointInPolygon(centerPoint, geometry)) {
             if (closestDistance != 0) {
               closest = row;
@@ -588,6 +614,7 @@ describe('FeatureDao tests', function() {
             }
           } else {
             var line = polygonToLine(geometry);
+            // @ts-ignore
             var distance = pointToLineDistance(centerPoint, line);
             if (distance < closestDistance) {
               closest = row;
@@ -658,8 +685,11 @@ describe('FeatureDao tests', function() {
       mediaRow.setData(tileBuffer);
       mediaRow.setContentType(contentType);
       RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
+      // @ts-ignore
       mediaRowId = mediaDao.create(mediaRow);
+      // @ts-ignore
       mediaRowId.should.be.greaterThan(0);
+      // @ts-ignore
       mediaRow = mediaDao.queryForId(mediaRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
@@ -667,6 +697,7 @@ describe('FeatureDao tests', function() {
       .then(function() {
         var linkedMedia = queryTestFeatureDao.getLinkedMedia(featureRow);
         linkedMedia.length.should.be.equal(1);
+        // @ts-ignore
         linkedMedia[0].id.should.be.equal(mediaRowId);
       });
     });
@@ -685,8 +716,11 @@ describe('FeatureDao tests', function() {
       // Create simple attributes row
       var simpleRow = simpleDao.newRow();
       RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
+      // @ts-ignore
       simpleRowId = simpleDao.create(simpleRow);
+      // @ts-ignore
       simpleRowId.should.be.greaterThan(0);
+      // @ts-ignore
       simpleRow = simpleDao.queryForId(simpleRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
@@ -694,6 +728,7 @@ describe('FeatureDao tests', function() {
       .then(function() {
         var linkedAttributes = queryTestFeatureDao.getLinkedSimpleAttributes(featureRow);
         linkedAttributes.length.should.be.equal(1);
+        // @ts-ignore
         linkedAttributes[0].id.should.be.equal(simpleRowId);
       });
     });

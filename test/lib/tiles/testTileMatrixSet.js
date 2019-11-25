@@ -8,7 +8,7 @@ var GeoPackageAPI = require('../../..')
 describe('Tile Matrix Set tests', function() {
 
   var geoPackage;
-  var tileMatrixDao;
+  var tileMatrixSetDao;
 
   beforeEach('should open the geopackage', function(done) {
     var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
