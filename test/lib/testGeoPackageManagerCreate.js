@@ -1,6 +1,7 @@
-var GeoPackageAPI = require('../..')
-  , testSetup = require('../fixtures/testSetup')
-  , should = require('chai').should()
+import { default as GeoPackageAPI } from '../..'
+import { default as testSetup } from '../fixtures/testSetup'
+
+var should = require('chai').should()
   , path = require('path');
 
 describe('GeoPackageAPI Create tests', function() {

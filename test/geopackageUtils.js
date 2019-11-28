@@ -1,24 +1,25 @@
-var GeoPackageAPI = require('../index')
-  , DataTypes = GeoPackageAPI.DataTypes
-  , GeometryColumns = GeoPackageAPI.GeometryColumns
-  , GeometryData = GeoPackageAPI.GeometryData
-  , BoundingBox = GeoPackageAPI.BoundingBox
-  , FeatureColumn = GeoPackageAPI.FeatureColumn
-  , DataColumns = GeoPackageAPI.DataColumns
-  , UserColumn = GeoPackageAPI.UserColumn
-  , Metadata = GeoPackageAPI.Metadata
-  , MetadataReference = GeoPackageAPI.MetadataReference
-  , RTreeIndex = GeoPackageAPI.RTreeIndex
-  , CrsWktExtension = GeoPackageAPI.CrsWktExtension
-  , SchemaExtension = GeoPackageAPI.SchemaExtension
-  , MetadataExtension = GeoPackageAPI.MetadataExtension
-  , WebPExtension = GeoPackageAPI.WebPExtension
-  , DataColumnsDao = GeoPackageAPI.DataColumnsDao
-  , DataColumnConstraintsDao = GeoPackageAPI.DataColumnConstraintsDao
-  , TableCreator = GeoPackageAPI.TableCreator
-  , MediaTable = GeoPackageAPI.MediaTable
-  , UserMappingTable = GeoPackageAPI.UserMappingTable
-  , DublinCoreType = GeoPackageAPI.DublinCoreType
+import {default as GeoPackageAPI} from '../index';
+import * as GP  from '../index';
+var DataTypes = GP.DataTypes
+  , GeometryColumns = GP.GeometryColumns
+  , GeometryData = GP.GeometryData
+  , BoundingBox = GP.BoundingBox
+  , FeatureColumn = GP.FeatureColumn
+  , DataColumns = GP.DataColumns
+  , UserColumn = GP.UserColumn
+  , Metadata = GP.Metadata
+  , MetadataReference = GP.MetadataReference
+  , RTreeIndex = GP.RTreeIndex
+  , CrsWktExtension = GP.CrsWktExtension
+  , SchemaExtension = GP.SchemaExtension
+  , MetadataExtension = GP.MetadataExtension
+  , WebPExtension = GP.WebPExtension
+  , DataColumnsDao = GP.DataColumnsDao
+  , DataColumnConstraintsDao = GP.DataColumnConstraintsDao
+  , TableCreator = GP.TableCreator
+  , MediaTable = GP.MediaTable
+  , UserMappingTable = GP.UserMappingTable
+  , DublinCoreType = GP.DublinCoreType
   , wkb = require('../lib/wkb/index');
 
 var wkx = require('wkx')
@@ -28,6 +29,7 @@ var wkx = require('wkx')
 var GeoPackageUtils = {};
 
 module.exports = GeoPackageUtils;
+export default GeoPackageUtils;
 
 GeoPackageUtils.createCRSWKTExtension = function(geopackage) {
   console.log('Creating CRS WKT Extension');

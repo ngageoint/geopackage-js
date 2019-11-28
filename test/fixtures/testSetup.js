@@ -1,14 +1,30 @@
+import {default as GeoPackageAPI} from '../..';
+import GeoPackage from '../../lib/geoPackage';
+import GeoPackageConnection from '../../lib/db/geoPackageConnection';
+
 var fs = require('fs')
   , path = require('path')
   , crypto = require('crypto')
-  , ImageUtils = require('../../lib/tiles/imageUtils')
-  , GeoPackage = require('../../lib/geoPackage')
-  , GeoPackageAPI = require('../..')
-  , GeoPackageConnection = require('../../lib/db/geoPackageConnection');
+  , ImageUtils = require('../../lib/tiles/imageUtils');
 
 module.exports.createTempName = function() {
   return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
 };
+
+module.exports.copyGeopackage = function(orignal) {
+  var copy = path.join(__dirname, 'tmp', module.exports.createTempName());
+
+  return new Promise(function(resolve, reject) {
+    if (typeof(process) !== 'undefined' && process.version) {
+      var fsExtra = require('fs-extra');
+      fsExtra.copy(orignal, copy, function(err) {
+        resolve(copy);
+      });
+    } else {
+      resolve(copy);
+    }
+  })
+}
 
 module.exports.createGeoPackage = function(gppath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
@@ -42,11 +58,15 @@ module.exports.createBareGeoPackage = function(gppath, callback) {
 };
 
 module.exports.deleteGeoPackage = function(gppath, callback) {
-  if (typeof(process) !== 'undefined' && process.version) {
-    fs.unlink(gppath, callback);
-  } else {
-    callback();
-  }
+  callback = callback || function() {}
+  return new Promise(function(resolve, reject) {
+    if (typeof(process) !== 'undefined' && process.version) {
+      fs.unlink(gppath, callback);
+    } else {
+      callback();
+    }
+    resolve();
+  })
 };
 
 module.exports.loadTile = function(tilePath, callback) {
@@ -223,3 +243,5 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
   }
 
 };
+
+export default module.exports;

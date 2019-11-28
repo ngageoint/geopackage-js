@@ -1,6 +1,7 @@
-var GeoPackage = require('../../lib/geoPackage')
-  , GeoPackageConnection = require('../../lib/db/geoPackageConnection')
-  , GeoPackageTileRetriever = require('../../lib/tiles/retriever')
+import GeoPackage from '../../lib/geoPackage'
+import GeoPackageConnection from '../../lib/db/geoPackageConnection';
+
+var GeoPackageTileRetriever = require('../../lib/tiles/retriever')
   , proj4 = require('proj4')
   , should = require('chai').should()
   , path = require('path')

@@ -1,7 +1,10 @@
+import { default as GeoPackageAPI } from '../../..'
+import { default as testSetup } from '../../fixtures/testSetup'
+
 var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
-  , GeoPackageAPI = require('../../..')
+  // , GeoPackageAPI = require('../../..')
   , BoundingBox = require('../../../lib/boundingBox')
-  , testSetup = require('../../fixtures/testSetup')
+  // , testSetup = require('../../fixtures/testSetup')
   , proj4 = require('proj4')
   , fs = require('fs')
   , should = require('chai').should()

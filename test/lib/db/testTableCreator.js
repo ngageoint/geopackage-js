@@ -1,3 +1,5 @@
+import { default as testSetup } from '../../fixtures/testSetup'
+
 var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../lib/geoPackage')
   , TableCreator = require('../../../lib/db/tableCreator')
@@ -5,7 +7,6 @@ var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , TileDao = require('../../../lib/tiles/user/tileDao')
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
-  , testSetup = require('../../fixtures/testSetup')
   , wkb = require('../../../lib/wkb/index')
   , should = require('chai').should()
   , path = require('path');

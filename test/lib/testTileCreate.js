@@ -1,9 +1,10 @@
+import { default as testSetup } from '../fixtures/testSetup'
+
 const
   Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable')
   , BoundingBox = require('../../lib/boundingBox')
   , path = require('path')
-  , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should();
 
 describe('GeoPackage Tile table create tests', function() {

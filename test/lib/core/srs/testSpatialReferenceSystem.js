@@ -1,5 +1,5 @@
-var GeoPackageAPI = require('../../../..')
-  , SpatialReferenceSystemDao = require('../../../../lib/core/srs/spatialReferenceSystemDao')
+import { default as GeoPackageAPI } from '../../../..'
+var SpatialReferenceSystemDao = require('../../../../lib/core/srs/spatialReferenceSystemDao')
   , SpatialReferenceSystem = require('../../../../lib/core/srs/spatialReferenceSystem')
   , should = require('chai').should()
   , path = require('path');

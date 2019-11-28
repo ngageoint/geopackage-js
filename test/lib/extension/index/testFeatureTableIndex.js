@@ -1,9 +1,11 @@
-var GeoPackageAPI = require('../../../..')
-  , GeoPackage = require('../../../../lib/geoPackage')
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+var GeoPackage = require('../../../../lib/geoPackage')
   , FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
   , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder')
   , Verification = require('../../../fixtures/verification')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , fs = require('fs')
   , path = require('path');

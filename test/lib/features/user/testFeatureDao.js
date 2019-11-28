@@ -1,16 +1,21 @@
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+// @ts-ignore
 // @ts-ignore
 var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   , FeatureColumn = require('../../../../lib/features/user/featureColumn')
   , DataTypes = require('../../../../lib/db/dataTypes')
-  , GeoPackageAPI = require('../../../../index.js')
+  // , GeoPackageAPI = require('../../../../index.js')
   , BoundingBox = require('../../../../lib/boundingBox')
   , GeometryData = require('../../../../lib/geom/geometryData')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
   , wkx = require('wkx')
+  // @ts-ignore
   // @ts-ignore
   , fs = require('fs')
   , helpers = require('@turf/helpers')
@@ -25,6 +30,7 @@ describe('FeatureDao tests', function() {
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
         // @ts-ignore
+        // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(orignal, copy, callback);
       } else {
@@ -37,6 +43,7 @@ describe('FeatureDao tests', function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       copyGeopackage(originalFilename, filename, function() {
+        // @ts-ignore
         // @ts-ignore
         GeoPackageAPI.open(filename, function(err, gp) {
           geoPackage = gp;
@@ -53,6 +60,7 @@ describe('FeatureDao tests', function() {
     it('should read the geometry', function() {
       var featureDao = geoPackage.getFeatureDao('FEATURESriversds');
       var each = featureDao.queryForEach();
+      // @ts-ignore
       // @ts-ignore
       var srs = featureDao.srs;
       for (var row of each) {
@@ -79,8 +87,10 @@ describe('FeatureDao tests', function() {
     var filename;
 
     // @ts-ignore
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
@@ -92,6 +102,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      // @ts-ignore
       // @ts-ignore
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
@@ -130,7 +141,9 @@ describe('FeatureDao tests', function() {
 
   describe('Query For Shapes', function() {
     // @ts-ignore
+    // @ts-ignore
     var geoPackage;
+    // @ts-ignore
     // @ts-ignore
     var featureDao;
 
@@ -138,8 +151,10 @@ describe('FeatureDao tests', function() {
     var filename;
 
     // @ts-ignore
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
@@ -188,8 +203,10 @@ describe('FeatureDao tests', function() {
     var filename;
 
     // @ts-ignore
+    // @ts-ignore
     function copyGeopackage(orignal, copy, callback) {
       if (typeof(process) !== 'undefined' && process.version) {
+        // @ts-ignore
         // @ts-ignore
         var fsExtra = require('fs-extra');
         fsExtra.copy(originalFilename, filename, callback);
@@ -201,6 +218,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should open the geopackage', function(done) {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
+      // @ts-ignore
       // @ts-ignore
       copyGeopackage(originalFilename, filename, function(err) {
         GeoPackageAPI.open(filename, function(err, gp) {
@@ -224,6 +242,7 @@ describe('FeatureDao tests', function() {
       var pointToLineDistance = require('@turf/point-to-line-distance').default;
       var polygonToLine = require('@turf/polygon-to-line').default;
       var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      // @ts-ignore
       // @ts-ignore
       var pointDistance = require('@turf/distance').default;
 
@@ -292,6 +311,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('get the tile buffer', function(done) {
       // @ts-ignore
+      // @ts-ignore
       testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'), function(err, buffer) {
         tileBuffer = buffer;
         done();
@@ -300,6 +320,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should create the GeoPackage', function(done) {
       testGeoPackage = path.join(testPath, testSetup.createTempName());
+      // @ts-ignore
       // @ts-ignore
       testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
         geopackage = gp;
@@ -388,6 +409,7 @@ describe('FeatureDao tests', function() {
         };
 
         // @ts-ignore
+        // @ts-ignore
         var line2 = {
           "type": "Feature",
           "properties": {},
@@ -446,6 +468,7 @@ describe('FeatureDao tests', function() {
         //     /
         geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
         // @ts-ignore
+        // @ts-ignore
         .then(function(result) {
           var featureDao = geopackage.getFeatureDao('QueryTest');
           queryTestFeatureDao = featureDao;
@@ -484,12 +507,14 @@ describe('FeatureDao tests', function() {
     it('should query for _feature_id', function() {
       // @ts-ignore
       var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line');
+      // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
 
     it('should query for _properties_id', function() {
       // @ts-ignore
       var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline');
+      // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
 
@@ -502,6 +527,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should get features in the bounding box', function() {
+      // @ts-ignore
       // @ts-ignore
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
       return GeoPackageAPI.getFeaturesInBoundingBox(geopackage, 'QueryTest', -.4, -.6, 2.4, 2.6)
@@ -554,6 +580,7 @@ describe('FeatureDao tests', function() {
       var pointToLineDistance = require('@turf/point-to-line-distance').default;
       var polygonToLine = require('@turf/polygon-to-line').default;
       var booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default;
+      // @ts-ignore
       // @ts-ignore
       var pointDistance = require('@turf/distance').default;
 
@@ -685,11 +712,8 @@ describe('FeatureDao tests', function() {
       mediaRow.setData(tileBuffer);
       mediaRow.setContentType(contentType);
       RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
-      // @ts-ignore
-      mediaRowId = mediaDao.create(mediaRow);
-      // @ts-ignore
+      var mediaRowId = mediaDao.create(mediaRow);
       mediaRowId.should.be.greaterThan(0);
-      // @ts-ignore
       mediaRow = mediaDao.queryForId(mediaRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
@@ -716,11 +740,8 @@ describe('FeatureDao tests', function() {
       // Create simple attributes row
       var simpleRow = simpleDao.newRow();
       RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
-      // @ts-ignore
-      simpleRowId = simpleDao.create(simpleRow);
-      // @ts-ignore
+      var simpleRowId = simpleDao.create(simpleRow);
       simpleRowId.should.be.greaterThan(0);
-      // @ts-ignore
       simpleRow = simpleDao.queryForId(simpleRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);

@@ -1,10 +1,11 @@
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
 
-var GeoPackageAPI = require('../../../..')
-  , FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
+var FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
   , RTreeIndexDao = require('../../../../lib/extension/rtree/rtreeIndexDao')
   , RTreeIndex = require('../../../../lib/extension/rtree/rtreeIndex')
   , BoundingBox = require('../../../../lib/boundingBox')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 

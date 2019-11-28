@@ -1,9 +1,12 @@
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
 var FeatureTiles = require('../../../../lib/tiles/features')
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon')
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile')
   , ImageUtils = require('../../../../lib/tiles/imageUtils')
-  , GeoPackageAPI = require('../../../..')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , GeoPackageAPI = require('../../../..')
+  // , testSetup = require('../../../fixtures/testSetup')
   , fs = require('fs')
   , should = require('chai').should()
   , path = require('path');

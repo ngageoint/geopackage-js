@@ -1,9 +1,11 @@
-var GeoPackageAPI = require('../../../../.')
-  , Verification = require('../../../fixtures/verification')
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+var Verification = require('../../../fixtures/verification')
   , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , wkx = require('wkx')

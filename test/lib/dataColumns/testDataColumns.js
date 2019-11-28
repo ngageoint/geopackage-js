@@ -1,10 +1,13 @@
+import { default as GeoPackageAPI } from '../../../.'
+import { default as testSetup } from '../../fixtures/testSetup'
+
 var DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao')
   , DataColumns = require('../../../lib/dataColumns/dataColumns')
   , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints/dataColumnConstraintsDao')
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints')
-  , GeoPackageAPI = require('../../../.')
+  // , GeoPackageAPI = require('../../../.')
   , TableCreator = require('../../../lib/db/tableCreator')
-  , testSetup = require('../../fixtures/testSetup')
+  // , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
   , should = require('chai').should();
 

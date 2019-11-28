@@ -1,12 +1,14 @@
-var GeoPackageAPI = require('../../../../.')
-  , DataType = require('../../../../lib/db/dataTypes')
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+var DataType = require('../../../../lib/db/dataTypes')
   , Verification = require('../../../fixtures/verification')
   , ContentsDao = require('../../../../lib/core/contents/contentsDao')
   , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
   , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , BoundingBox = require('../../../../lib/boundingBox')
   , should = require('chai').should()

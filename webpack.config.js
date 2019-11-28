@@ -1,5 +1,5 @@
 var path = require('path');
-// var webpack = require('webpack');
+var webpack = require('webpack');
 
 
 // module.exports = {  
@@ -26,24 +26,55 @@ var path = require('path');
 //   },
 // };
 
+// module.exports = {
+//   entry: "./index.js",
+//   output: {
+//     libraryTarget: 'commonjs',
+//     path: path.join(__dirname, 'jslib'),
+//     filename: 'geopackage.js'
+//   },
+//   resolve: {
+//     extensions: [".tsx", ".ts", ".js", ".json"]
+//   },
+//   module: {
+//     rules: [
+//       // all files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'
+//       {
+//         test: /\.tsx?$/,
+//         use: ["ts-loader"],
+//         exclude: /node_modules/
+//       }
+//     ]
+//   }
+// };
+
 module.exports = {
-  entry: "./index.js",
+  entry: {
+    'my-lib': './built/index.js',
+    'my-lib.min': './built/index.js'
+  },
   output: {
-    libraryTarget: 'commonjs',
-    path: path.join(__dirname, 'jslib'),
-    filename: 'geopackage.js'
+    path: path.resolve(__dirname, '_bundles'),
+    filename: '[name].js',
+    libraryTarget: 'umd',
+    library: 'GeoPackage',
+    umdNamedDefine: true
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js", ".json"]
+    extensions: ['.ts', '.tsx', '.js']
+  },
+  devtool: 'source-map',
+  optimization: {
+    minimize: true
   },
   module: {
-    rules: [
-      // all files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'
-      {
-        test: /\.tsx?$/,
-        use: ["ts-loader"],
-        exclude: /node_modules/
+    rules: [{
+      test: /\.tsx?$/,
+      loader: 'awesome-typescript-loader',
+      exclude: /node_modules/,
+      query: {
+        declaration: false,
       }
-    ]
+    }]
   }
 };

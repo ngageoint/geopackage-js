@@ -1,7 +1,8 @@
+import { default as testSetup } from '../../fixtures/testSetup'
+
 var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../../lib/geoPackage')
   , Verification = require('../../fixtures/verification')
-  , testSetup = require('../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 

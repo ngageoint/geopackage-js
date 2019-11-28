@@ -2,6 +2,9 @@
 /**
  * @module geoPackage
  */
+import GeoPackageConnection from './db/geoPackageConnection';
+import CrsWktExtension from './extension/crsWkt';
+
 
 var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
   , GeometryColumnsDao = require('./features/columns/geometryColumnsDao')
@@ -25,7 +28,6 @@ var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
   , MetadataDao = require('./metadata/metadataDao')
   , MetadataReferenceDao = require('./metadata/reference/metadataReferenceDao')
   , ExtensionDao = require('./extension/extensionDao')
-  , CrsWktExtension = require('./extension/crsWkt').CrsWktExtension
   , SchemaExtension = require('./extension/schema')
   , RelatedTablesExtension = require('./extension/relatedTables')
   , TableIndexDao = require('./extension/index/tableIndexDao')
@@ -46,25 +48,48 @@ var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
 
 var proj4 = require('proj4');
 
-proj4 = 'default' in proj4 ? proj4['default'] : proj4; // Module loading hack
+// proj4 = 'default' in proj4 ? proj4['default'] : proj4; // Module loading hack
 
 var defs = require('./proj4Defs');
-for (var name in defs) {
-  if (defs[name]) {
-    proj4.defs(name, defs[name]);
+for (var def in defs) {
+  if (defs[def]) {
+    proj4.defs(def, defs[def]);
   }
 }
 
 /**
  * A `GeoPackage` instance is the interface to a physical GeoPackage SQLite
  * database.
- * @param {string} name
- * @param {string} path
- * @param {module:db/geoPackageConnection~GeoPackageConnection} connection
- * @class
  */
-class GeoPackage {
-  constructor(name, path, connection) {
+export default class GeoPackage {
+  name: any;
+  path: any;
+  connection: any;
+  tableCreator: any;
+  spatialReferenceSystemDao: any;
+  contentsDao: any;
+  tileMatrixSetDao: any;
+  tileMatrixDao: any;
+  dataColumnsDao: any;
+  extensionDao: any;
+  tableIndexDao: any;
+  geometryColumnsDao: any;
+  dataColumnConstraintsDao: any;
+  metadataReferenceDao: any;
+  metadataDao: any;
+  extendedRelationDao: any;
+  contentsIdDao: any;
+  contentsIdExtension: any;
+  featureStyleExtension: any;
+  relatedTablesExtension: any;
+
+  /**
+   * Construct a new GeoPackage object
+   * @param name name to give to this GeoPackage
+   * @param path path to the GeoPackage
+   * @param connection database connection to the GeoPackage
+   */
+  constructor(name: String, path: String, connection: GeoPackageConnection) {
     this.name = name;
     this.path = path;
     this.connection = connection;
@@ -210,13 +235,11 @@ class GeoPackage {
    * @return {{features: string[], tiles: string[], attributes: string[]}}
    */
   getTables() {
-    var tables = {};
-    var featureTables = this.getFeatureTables();
-    tables.features = featureTables;
-    var tileTables = this.getTileTables();
-    tables.tiles = tileTables;
-    var attributesTables = this.getAttributesTables();
-    tables.attributes = attributesTables;
+    var tables = {
+      features: this.getFeatureTables(),
+      tiles: this.getTileTables(),
+      attributes: this.getAttributesTables()
+    };
     return tables;
   }
   getAttributesTables() {
@@ -660,8 +683,8 @@ class GeoPackage {
     }
     return this.tableCreator.createTableIndex();
   }
-  createGeometryIndexTable() {
-    var dao = this.getGeometryIndexDao();
+  createGeometryIndexTable(featureDao) {
+    var dao = this.getGeometryIndexDao(featureDao);
     if (dao.isTableExists()) {
       return Promise.resolve().then(function () { return true; });
     }
@@ -703,10 +726,22 @@ class GeoPackage {
     return connection.getApplicationId();
   }
   getInfoForTable(tableDao) {
-    var info = {};
-    info.tableName = tableDao.table_name;
-    info.tableType = tableDao.table.getTableType();
-    info.count = tableDao.getCount();
+    var info = {
+      tableName: tableDao.table_name,
+      tableType: tableDao.table.getTableType(),
+      count: tableDao.getCount(),
+      geometryColumns: undefined,
+      minZoom: Number,
+      maxZoom: Number,
+      minWebMapZoom: Number,
+      maxWebMapZoom: Number,
+      zoomLevels: Number,
+      tileMatrixSet: undefined,
+      contents: undefined,
+      srs: undefined,
+      columns: undefined,
+      columnMap: undefined,
+    };
     if (info.tableType === UserTable.FEATURE_TABLE) {
       info.geometryColumns = {};
       info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
@@ -806,80 +841,3 @@ class GeoPackage {
     return proj4.defs('' + name);
   }
 }
-
-module.exports = GeoPackage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,3 +1,5 @@
+import { default as testSetup } from '../../../fixtures/testSetup'
+
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
@@ -5,8 +7,7 @@ var fs = require('fs')
   , Metadata = require('../../../../lib/metadata/metadata')
   , GeoPackage = require('../../../../lib/geoPackage')
   , TableCreator = require('../../../../lib/db/tableCreator')
-  , Verification = require('../../../fixtures/verification')
-  , testSetup = require('../../../fixtures/testSetup');
+  , Verification = require('../../../fixtures/verification');
 
 describe('Metadata Reference tests', function() {
   var testGeoPackage;

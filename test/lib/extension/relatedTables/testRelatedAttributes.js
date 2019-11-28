@@ -1,8 +1,10 @@
-var GeoPackageAPI = require('../../../../.')
-  , DataType = require('../../../../lib/db/dataTypes')
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+var DataType = require('../../../../lib/db/dataTypes')
   , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , path = require('path');

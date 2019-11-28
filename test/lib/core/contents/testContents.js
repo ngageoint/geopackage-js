@@ -1,8 +1,11 @@
-var GeoPackageAPI = require('../../../..')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
+// var GeoPackageAPI = require('../../../..')
+var ContentsDao = require('../../../../lib/core/contents/contentsDao')
   , Contents = require('../../../../lib/core/contents/contents')
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 

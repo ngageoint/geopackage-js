@@ -1,6 +1,7 @@
+import GeoPackage from '../../../lib/geoPackage'
+import GeoPackageConnection from '../../../lib/db/geoPackageConnection'
+
 var GeoPackageValidate = require('../../../lib/validate/geoPackageValidate')
-  , GeoPackage = require('../../../lib/geoPackage')
-  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
   , should = require('chai').should()
   , path = require('path');
 

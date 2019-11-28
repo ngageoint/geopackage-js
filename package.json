@@ -46,7 +46,7 @@
     "geojson-vt": "^3.2.0",
     "image-size": "^0.8.2",
     "pbf": "^3.1.0",
-    "proj4": "2.4.3",
+    "proj4": "2.6.0",
     "rbush": "2.0.2",
     "reproject": "1.2.2",
     "rtree-sql.js": "1.0.0",
@@ -73,6 +73,7 @@
     "nyc": "^13.1.0",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.5.2",
+    "typedoc": "^0.15.3",
     "typescript": "^3.7.2",
     "uglify-es": "^3.0.27",
     "watchify": "^3.7.0",
@@ -115,9 +116,10 @@
     "report": "nyc report",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "tsc": "tsc",
+    "typedoc": "typedoc",
     "ts-test": "mocha -r ts-node/register",
     "webpack": "node_modules/.bin/webpack --config webpack.config.js",
-    "build-browserify": "browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o static/geopackage.js",
+    "build-browserify": "browserify -t browserify-css ./built/index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o static/geopackage.js",
     "watch": "watchify -t browserify-css index.js -v --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o static/geopackage.js",
     "prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js"
   }

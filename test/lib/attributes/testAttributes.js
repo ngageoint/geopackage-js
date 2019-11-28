@@ -1,6 +1,8 @@
-var GeoPackageAPI = require('../../../.')
-  , testSetup = require('../../fixtures/testSetup')
-  , Verification = require('../../fixtures/verification')
+import { default as GeoPackageAPI } from '../../../.'
+import { default as testSetup } from '../../fixtures/testSetup'
+// var GeoPackageAPI = require('../../../.')
+// var testSetup = require('../../fixtures/testSetup')
+var Verification = require('../../fixtures/verification')
   , DataColumns = require('../../../lib/dataColumns/dataColumns')
   , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao')
   , AttributeDao = require('../../../lib/attributes/attributeDao')

@@ -5,23 +5,29 @@
       "lib": ["dom", "es2015", "es2017", "es2015.iterable"],
       "jsx": "react", // uses typescript to transpile jsx to js
       "target": "es5", // specify ECMAScript target version
-      "allowJs": false, // allows a partial TypeScript and JavaScript codebase
+      "allowJs": true, // allows a partial TypeScript and JavaScript codebase
       "declaration": true,
       "checkJs": true, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
-      "esModuleInterop": true,
       "skipLibCheck": true,
       "outDir": "./built",
       "downlevelIteration": true,
-      "noEmit": true,
+      "noEmit": false,
+      "noImplicitAny": false,
       "esModuleInterop": true
   },
   "include": [
-      "./lib", // type-checks all js files as well not just .ts extension
-      "./test"
+      "index.ts",
+      "./lib" // type-checks all js files as well not just .ts extension
+      , "./test"
   ],
   "exclude": [
+      "./test",
       "./lib/wkb"
-  ]
+  ],
+  "typedocOptions": {
+      "mode": "file",
+      "out": "docs-ts"
+  }
 }

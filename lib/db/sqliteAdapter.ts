@@ -1,3 +1,5 @@
+import DBAdapter from './dbAdapter';
+
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
@@ -7,117 +9,111 @@ var fs = require('fs')
   , path = require('path')
   , http = require('http')
   , os = require('os');
-
 /**
- * Returns a Promise which, when resolved, returns a {module:db/sqliteAdapter~Adapter} which has connected to the GeoPackage database file
- * @param  {string|Buffer} [filePath] string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
- * @return {Promise<Adapter>}
+ * Class which adapts generic GeoPackage queries to better-sqlite3 queries
  */
-module.exports.createAdapter = function(filePath) {
-  var promise = new Promise(function(resolve, reject) {
-    var Database = require('better-sqlite3');
+export class SqliteAdapter implements DBAdapter{
+  filePath: String | Buffer | Uint8Array;
+  db: any;
+  /**
+   * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
+   */
+  async initialize(): Promise<this> {
+    var bettersqlite = await import('better-sqlite3');
+    var Database = bettersqlite.default;
     try {
-      var db;
-      if (filePath && typeof filePath === 'string') {
-        if (filePath.indexOf('http') === 0) {
-          http.get(filePath, function(response) {
-            if (response.statusCode !== 200) {
-              return reject(new Error('Unable to reach url: ' + filePath));
-            }
-            var tmpPath = path.join(os.tmpdir(), Date.now() + '.gpkg');
-            var writeStream = fs.createWriteStream(tmpPath);
-            response.pipe(writeStream);
-            writeStream.on('close', function() {
-              try {
-                db = new Database(tmpPath);
-                // verify that this is an actual database
-                db.pragma('journal_mode = WAL');
-                var adapter = new Adapter(db);
-                adapter.filePath = tmpPath;
-                resolve(adapter);
-              } catch (err) {
-                console.log('error', err);
-                return reject(err);
+      if (this.filePath && typeof this.filePath === 'string') {
+        if (this.filePath.indexOf('http') === 0) {
+          return new Promise((resolve, reject) => {
+            http.get(this.filePath, (response) => {
+              if (response.statusCode !== 200) {
+                reject(new Error('Unable to reach url: ' + this.filePath));
               }
+              var tmpPath = path.join(os.tmpdir(), Date.now() + Math.floor(Math.random()*100) + '.gpkg');
+              var writeStream = fs.createWriteStream(tmpPath);
+              response.pipe(writeStream);
+              writeStream.on('close', () => {
+                try {
+                  this.db = new Database(tmpPath);
+                  // verify that this is an actual database
+                  this.db.pragma('journal_mode = WAL');
+                  this.filePath = tmpPath;
+                  resolve(this);
+                } catch (err) {
+                  console.log('error', err);
+                  reject(err);
+                }
+              });
+            })
+            .on('error', (e) => {
+              reject(e);
             });
-          });
+          })
         } else {
-          db = new Database(filePath);
-          var adapter = new Adapter(db);
-          adapter.filePath = filePath;
-          resolve(adapter);
+          this.db = new Database(this.filePath);
+          return this;
         }
-      } else if (filePath) {
+      } else if (this.filePath) {
         // write this byte array to a file then open it
-        var byteArray = filePath;
+        var byteArray = this.filePath;
         var tmpPath = path.join(os.tmpdir(), Date.now() + '.gpkg');
-        return fs.writeFile(tmpPath, byteArray, function() {
-          db = new Database(tmpPath);
-          // verify that this is an actual database
-          try {
-            db.pragma('journal_mode = WAL');
-          } catch (err) {
-            console.log('error', err);
-            return reject(err);
-          }
-          var adapter = new Adapter(db);
-          adapter.filePath = tmpPath;
-          resolve(adapter);
+        return new Promise((resolve, reject) => {
+          fs.writeFile(tmpPath, byteArray, () => {
+            this.db = new Database(tmpPath);
+            // verify that this is an actual database
+            try {
+              this.db.pragma('journal_mode = WAL');
+            } catch (err) {
+              console.log('error', err);
+              reject(err);
+            }
+            this.filePath = tmpPath;
+            resolve(this);
+          });
         });
       } else {
         console.log('create in memory');
-        db = new Database("memory", {
-          memory: !filePath
+        this.db = new Database("memory", {
+          memory: !this.filePath
         });
-        adapter = new Adapter(db);
-        adapter.filePath = filePath;
-        resolve(adapter);
+        return this;
       }
 
     } catch (err) {
       console.log('Error opening database', err);
-      return reject(err);
+      throw err;
     }
-  });
-  return promise;
-};
-/**
- * Creates an adapter from an already established better-sqlite3 database connection
- * @param  {*} db better-sqlite3 database connection
- * @return {module:db/sqliteAdapter~Adapter}
- */
-module.exports.createAdapterFromDb = function(db) {
-  return new Adapter(db);
-};
+  };
+  // /**
+  //  * Creates an adapter from an already established better-sqlite3 database connection
+  //  * @param  {*} db better-sqlite3 database connection
+  //  * @return {module:db/sqliteAdapter~Adapter}
+  //  */
+  // static createAdapterFromDb(db) {
+  //   return new SqliteAdapter(db);
+  // };
 
-/**
- * Class which adapts generic GeoPackage queries to better-sqlite3 queries
- * @class Adapter
- * @param {*} db better-sqlite3 database connection
- */
-class Adapter {
-  constructor(db) {
-    this.db = db;
-    this.filePath = undefined;
+  constructor(filePath?: String | Buffer | Uint8Array) {
+    this.filePath = filePath;
   }
   /**
    * Closes the connection to the GeoPackage
    */
-  close() {
+  close(): void {
     this.db.close();
   }
   /**
    * Get the connection to the database file
    * @return {*}
    */
-  getDBConnection() {
+  getDBConnection(): any {
     return this.db;
   }
   /**
    * Returns a Buffer containing the contents of the database as a file
-   * @param  {*} callback called when export is complete
+   * @param  {Function} callback called when export is complete
    */
-  export(callback) {
+  export(callback: Function): void {
     fs.readFile(this.filePath, callback);
   }
   /**
@@ -127,7 +123,7 @@ class Adapter {
    * @param  {Function} functionDefinition function to register
    * @return {module:db/sqliteAdapter~Adapter} this
    */
-  registerFunction(name, functionDefinition) {
+  registerFunction(name: String, functionDefinition: Function): this {
     this.db.function(name, functionDefinition);
     return this;
   }
@@ -138,7 +134,7 @@ class Adapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object}
    */
-  get(sql, params) {
+  get(sql: String, params?: [] | Object): any {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.get(params);
@@ -152,7 +148,7 @@ class Adapter {
    * @param {String} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName) {
+  isTableExists(tableName: String): Boolean {
     var statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
     var result;
     result = statement.get({ name: tableName });
@@ -161,11 +157,11 @@ class Adapter {
   /**
    * Gets all results from the statement in an array
    * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#allbindparameters---array-of-rows|better-sqlite3 all}
-   * @param  {string} sql    statement to run
+   * @param  {String} sql    statement to run
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql, params) {
+  all(sql: String, params?: [] | Object): any[] {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.all(params);
@@ -177,11 +173,11 @@ class Adapter {
   /**
    * Returns an `Iterable` with results from the query
    * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#iteratebindparameters---iterator|better-sqlite3 iterate}
-   * @param  {string} sql    statement to run
+   * @param  {String} sql    statement to run
    * @param  {Object|Array} [params] bind parameters
    * @return {Iterable.<Object>}
    */
-  each(sql, params) {
+  each(sql: String, params?: [] | Object): IterableIterator<any> {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.iterate(params);
@@ -194,13 +190,13 @@ class Adapter {
    * Run the given statement, returning information about what changed.
    *
    * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#runbindparameters---object|better-sqlite3}
-   * @param  {string} sql    statement to run
+   * @param  {String} sql    statement to run
    * @param  {Object|Array} [params] bind parameters
    * @return {{changes: number, lastInsertROWID: number}} object: `{ "changes": number, "lastInsertROWID": number }`
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql, params) {
+  run(sql: String, params?: [] | Object): {changes: number, lastInsertROWID: number} {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.run(params);
@@ -211,30 +207,30 @@ class Adapter {
   }
   /**
    * Runs the specified insert statement and returns the last inserted id or undefined if no insert happened
-   * @param  {string} sql    statement to run
+   * @param  {String} sql    statement to run
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql, params) {
+  insert(sql: String, params?: [] | Object): Number {
     var statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
   /**
    * Runs the specified delete statement and returns the number of deleted rows
-   * @param  {string} sql    statement to run
+   * @param  {String} sql    statement to run
    * @param  {Object|Array} params bind parameters
-   * @return {number} deleted rows
+   * @return {Number} deleted rows
    */
-  delete(sql, params) {
+  delete(sql: String, params?: [] | Object): Number {
     var statement = this.db.prepare(sql);
     return statement.run(params).changes;
   }
   /**
    * Drops the table
-   * @param  {string} table table name
+   * @param  {String} table table name
    * @return {Boolean} indicates if the table was dropped
    */
-  dropTable(table) {
+  dropTable(table: String): Boolean {
     try {
       var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
       var result = statement.run();
@@ -254,7 +250,7 @@ class Adapter {
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName, where, whereArgs) {
+  count(tableName: String, where?: String, whereArgs?: [] | Object): Number {
     var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;

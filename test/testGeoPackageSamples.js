@@ -1,5 +1,6 @@
-var GeoPackageAPI = require('../index')
-  , GeoPackageUtils = require('./geopackageUtils');
+import { default as GeoPackageAPI } from '../.'
+import { default as GeoPackageUtils } from './geopackageUtils'
+// var GeoPackageUtils = require('./geopackageUtils');
 
 var path = require('path')
   , fs = require('fs');

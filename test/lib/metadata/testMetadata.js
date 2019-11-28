@@ -1,14 +1,16 @@
+import GeoPackage from '../../../lib/geoPackage';
+
 var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
-  , GeoPackage = require('../../../lib/geoPackage')
+  // , GeoPackage = require('../../../lib/geoPackage')
   , Metadata = require('../../../lib/metadata/metadata')
   , MetadataDao = require('../../../lib/metadata/metadataDao');
 
 describe('Metadata tests', function() {
 
   it('should create a Metadata object', function() {
-    var md = new MetadataDao(new GeoPackage());
+    var md = new MetadataDao(new GeoPackage(null, null, null));
     var metadata = md.createObject();
     should.exist(metadata.getScopeInformation);
   });

@@ -1,8 +1,6 @@
+import { default as testSetup } from '../../fixtures/testSetup'
 var fs = require('fs');
 var path = require('path');
-var Database = require('better-sqlite3');
-var sqliteAdapter = require('../../../lib/db/sqliteAdapter')
-var testSetup = require('../../fixtures/testSetup');
 var testPath = path.join(__dirname, '..', '..', 'tmp');
 var testDb;
 

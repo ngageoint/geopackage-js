@@ -1,10 +1,13 @@
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
   , IconCache = require('../../../../lib/extension/style/iconCache')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path')
   , ImageUtils = require('../../../../lib/tiles/imageUtils')
-  , GeoPackageAPI = require('../../../../lib/api')
+  // , GeoPackageAPI = require('../../../../lib/api')
   // @ts-ignore
   , fs = require('fs');
 

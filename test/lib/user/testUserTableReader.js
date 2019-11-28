@@ -1,6 +1,7 @@
+import { default as GeoPackageAPI } from '../../../.'
+
 var UserTableReader = require('../../../lib/user/userTableReader.js')
   , UserDao = require('../../../lib/user/userDao')
-  , GeoPackageAPI = require('../../../.')
   , path = require('path')
   , should = require('chai').should();
 

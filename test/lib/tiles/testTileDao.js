@@ -1,6 +1,8 @@
-var GeoPackageAPI = require('../../..')
-  , TileDao = require('../../../lib/tiles/user/tileDao')
-  , testSetup = require('../../fixtures/testSetup')
+import { default as GeoPackageAPI } from '../../..'
+import { default as testSetup } from '../../fixtures/testSetup'
+
+var TileDao = require('../../../lib/tiles/user/tileDao')
+  // , testSetup = require('../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 

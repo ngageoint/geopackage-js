@@ -1,3 +1,6 @@
+import { default as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+
 var FeatureStyleExtension = require('../../../../lib/extension/style')
   , FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable')
@@ -8,12 +11,12 @@ var FeatureStyleExtension = require('../../../../lib/extension/style')
   , FeatureStyle = require('../../../../lib/extension/style/featureStyle')
   , IconTable = require('../../../../lib/extension/style/iconTable')
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao')
-  , testSetup = require('../../../fixtures/testSetup')
+  // , testSetup = require('../../../fixtures/testSetup')
   , ImageUtils = require('../../../../lib/tiles/imageUtils')
   , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
-  , GeoPackageAPI = require('../../../../lib/api')
+  // , GeoPackageAPI = require('../../../../lib/api')
   , wkx = require('wkx')
   , fs = require('fs')
   , GeometryData = require('../../../../lib/geom/geometryData');

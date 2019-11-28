@@ -1,6 +1,9 @@
+import { default as GeoPackageAPI } from '../../.'
+import { default as testSetup } from '../fixtures/testSetup'
+
 var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../lib/geoPackage')
-  , GeoPackageAPI = require('../../.')
+  // , GeoPackageAPI = require('../../.')
   , FeatureColumn = require('../../lib/features/user/featureColumn')
   , DataColumns = require('../../lib/dataColumns/dataColumns')
   , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao')
@@ -13,7 +16,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , DataTypes = require('../../lib/db/dataTypes')
   , GeometryData = require('../../lib/geom/geometryData')
   , FeatureTableReader = require('../../lib/features/user/featureTableReader')
-  , testSetup = require('../fixtures/testSetup')
+  // , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkb = require('../../lib/wkb/index')
   , wkx = require('wkx')

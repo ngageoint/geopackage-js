@@ -1,3 +1,5 @@
+import GeoPackage from "../../geoPackage";
+
 /**
  * WebPExtension module.
  * @module WebPExtension
@@ -7,12 +9,12 @@
 var BaseExtension = require('../baseExtension')
   , Extension = require('../extension');
 
-class WebPExtension extends BaseExtension {
-  constructor(geoPackage, tableName) {
+export default class WebPExtension extends BaseExtension {
+  constructor(geoPackage: GeoPackage, tableName: String) {
     super(geoPackage);
     this.tableName = tableName;
   }
-  getOrCreateExtension() {
+  getOrCreateExtension(): any {
     return this.getOrCreate(WebPExtension.EXTENSION_NAME, this.tableName, 'tile_data', WebPExtension.EXTENSION_WEBP_DEFINITION, Extension.READ_WRITE);
   }
 }
@@ -21,5 +23,3 @@ WebPExtension.EXTENSION_NAME = 'gpkg_webp';
 WebPExtension.EXTENSION_WEBP_AUTHOR = 'gpkg';
 WebPExtension.EXTENSION_WEBP_NAME_NO_AUTHOR = 'webp';
 WebPExtension.EXTENSION_WEBP_DEFINITION = 'http://www.geopackage.org/spec/#extension_webp';
-
-module.exports.WebPExtension = WebPExtension;

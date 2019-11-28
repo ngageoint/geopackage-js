@@ -1,3 +1,7 @@
+import { SqliteAdapter } from './sqliteAdapter';
+import { SqljsAdapter } from './sqljsAdapter';
+import DBAdapter from './dbAdapter';
+
 /**
  * Connection to the SQLite file
  * @module db/geoPackageConnection
@@ -13,76 +17,78 @@ if (typeof(process) !== 'undefined' && process.version && !process.env.FORCE_SQL
 
 /**
  * Represents a connection to the GeoPackage database
- * @class
- * @param  {string} filePath path to the sqlite file
- * @return {Promise<GeoPackageConnection>}
  */
-class GeoPackageConnection {
-  constructor(filePath) {
+export default class GeoPackageConnection {
+  filePath: String | Buffer | Uint8Array;
+  adapter: DBAdapter;
+  adapterCreator: typeof SqliteAdapter | typeof SqljsAdapter;
+  /**
+   * Construct a new connection to the GeoPackage SQLite file
+   * @param filePath path to the sqlite file
+   */
+  constructor(filePath: String | Buffer | Uint8Array) {
     this.filePath = filePath;
-    if (typeof (process) !== 'undefined' && process.version && !process.env.FORCE_SQLJS) {
-      this.adapterCreator = require('./sqliteAdapter');
-    }
-    else {
-      this.adapterCreator = require('./sqljsAdapter');
-    }
   }
   /**
    * Creates a connection to the SQLite file and when connected, returns a promise that resolves the connection.
    * This will create a {module:db/sqliteAdapter~Adapter} if running in node and the FORCE_SQLJS environment variable is not set.
    * This will create a {module:db/sqljsAdapter~Adapter} if running in the browser or the FORCE_SQLJS environment variable is set
-   * @see {module:db/sqliteAdapter~Adapter}
-   * @see {module:db/sqljsAdapter~Adapter}
    * @return {Promise<GeoPackageConnection>}
    */
-  init() {
-    var promise = new Promise(function (resolve, reject) {
-      this.adapterCreator.createAdapter(this.filePath)
-        .then(function (adapter) {
-          this.adapter = adapter;
-          resolve(this);
-        }.bind(this))
-        .catch(function (error) {
-          reject(error);
-        });
-    }.bind(this));
-    return promise;
+  async init(): Promise<GeoPackageConnection> {
+    try {
+      if (typeof (process) !== 'undefined' && process.version && !process.env.FORCE_SQLJS) {
+        const { SqliteAdapter } = await import('./sqliteAdapter');
+        this.adapterCreator = SqliteAdapter;
+        this.adapter = new SqliteAdapter(this.filePath);
+      }
+      else {
+        const { SqljsAdapter } = await import('./sqljsAdapter');
+        this.adapterCreator = SqljsAdapter;
+        this.adapter = new SqljsAdapter(this.filePath);
+      }
+      await this.adapter.initialize();
+    } catch (e) {
+      console.log('Failed to create adapter', e);
+      throw e;
+    }
+    return this;
   }
   /**
    * Close the database.
    */
-  close() {
+  close(): void {
     this.adapter.close();
   }
   /**
    * exports the GeoPackage as a file
    * @param  {Function} callback called with an err and the buffer containing the contents of the file
    */
-  export(callback) {
+  export(callback: Function): void {
     this.adapter.export(callback);
   }
   /**
    * Gets the raw connection to the database
-   * @return {Object}
+   * @return {any}
    */
-  getDBConnection() {
+  getDBConnection(): any {
     return this.adapter.db;
   }
   /**
    * Connects to a GeoPackage database
-   * @param  {Object} db database to connect to
-   * @return {any}
+   * @param  {any} db database to connect to
    */
-  setDBConnection(db) {
-    return this.adapter = this.adapterCreator.createAdapterFromDb(db);
+  setDBConnection(db: any): void {
+    this.adapter = new this.adapterCreator();
+    this.adapter.db = db;
   }
   /**
   * Registers the given function so that it can be used by SQL statements
   * @param  {string} name               name of function to register
   * @param  {Function} functionDefinition function to register
-  * @return {any} the adapter in use
+  * @return {DBAdapter} the adapter in use
   */
-  registerFunction(name, functionDefinition) {
+  registerFunction(name: String, functionDefinition: Function): DBAdapter {
     this.adapter.registerFunction(name, functionDefinition);
     return this.adapter;
   }
@@ -90,9 +96,9 @@ class GeoPackageConnection {
    * Gets the first result from the query
    * @param  {string} sql    sql query to run
    * @param  {Array|Object} [params] array of substitution parameters
-   * @return {object}
+   * @return {any}
    */
-  get(sql, params) {
+  get(sql: String, params?: [] | Object): any {
     return this.adapter.get(sql, params);
   }
   /**
@@ -100,7 +106,7 @@ class GeoPackageConnection {
    * @param {String} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName) {
+  isTableExists(tableName: String): Boolean {
     return this.adapter.isTableExists(tableName);
   }
   /**
@@ -111,16 +117,16 @@ class GeoPackageConnection {
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql, params) {
+  run(sql: String, params?: Object | []): { changes: number; lastInsertROWID: number;} {
     return this.adapter.run(sql, params);
   }
   /**
    * Executes the query and returns all results in an array
-   * @param  {string} sql sql to run
+   * @param  {String} sql sql to run
    * @param  {Array|Object} [params] substitution parameters
-   * @return {Object[]}
+   * @return {any[]}
    */
-  all(sql, params) {
+  all(sql: String, params?: [] | Object): any[] {
     return this.adapter.all(sql, params);
   }
   /**
@@ -129,7 +135,7 @@ class GeoPackageConnection {
    * @param  {Array|Object} [params] substitution parameters
    * @return {IterableIterator<Object>}
    */
-  each(sql, params) {
+  each(sql: String, params?: [] | Object): IterableIterator<any> {
     return this.adapter.each(sql, params);
   }
   /**
@@ -138,9 +144,9 @@ class GeoPackageConnection {
    * @param  {string} column    column to get the min value from
    * @param  {string} [where]     where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Object}
+   * @return {Number}
    */
-  minOfColumn(table, column, where, whereArgs) {
+  minOfColumn(table: String, column: String, where?: String, whereArgs?: [] | Object): Number {
     var minStatement = 'select min(' + column + ') as min from ' + table;
     if (where) {
       minStatement += ' ';
@@ -157,9 +163,9 @@ class GeoPackageConnection {
    * @param  {string} column    column to get the max value from
    * @param  {string} [where]     where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Object}
+   * @return {Number}
    */
-  maxOfColumn(table, column, where, whereArgs) {
+  maxOfColumn(table: String, column: String, where?: String, whereArgs?: [] | Object): Number {
     var maxStatement = 'select max(' + column + ') as max from ' + table;
     if (where) {
       maxStatement += ' ';
@@ -172,21 +178,21 @@ class GeoPackageConnection {
   }
   /**
    * Return the count of objects in the table
-   * @param  {string} table table name
-   * @param  {string} [where] where clause
+   * @param  {String} table table name
+   * @param  {String} [where] where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
    * @return {Number}
    */
-  count(table, where, whereArgs) {
+  count(table: String, where?: String, whereArgs?: [] | Object): Number {
     return this.adapter.count(table, where, whereArgs);
   }
   /**
    * Executes an insert statement and returns the last id inserted
-   * @param  {string} sql    sql to insert
+   * @param  {String} sql    sql to insert
    * @param  {Array|Object} params substitution parameters
    * @return {Object} last row id inserted
    */
-  insert(sql, params) {
+  insert(sql: String, params: [] | Object): Number {
     return this.adapter.insert(sql, params);
   }
   /**
@@ -196,7 +202,7 @@ class GeoPackageConnection {
    * @param  {Array|Object} [whereArgs] substitution parameters
    * @return {Number} number of rows deleted
    */
-  delete(tableName, where, whereArgs) {
+  delete(tableName: String, where?: String, whereArgs?: [] | Object): Number {
     var deleteStatement = 'DELETE FROM ' + tableName + '';
     if (where) {
       deleteStatement += ' WHERE ' + where;
@@ -205,18 +211,18 @@ class GeoPackageConnection {
   }
   /**
    * Drops the table specified
-   * @param  {string} tableName table to drop
+   * @param  {String} tableName table to drop
    * @return {Boolean} results of table drop
    */
-  dropTable(tableName) {
+  dropTable(tableName: String): Boolean {
     return this.adapter.dropTable(tableName);
   }
   /**
    * Gets information about the table specified.  If data is returned, the table exists
-   * @param  {string} tableName table to check
+   * @param  {String} tableName table to check
    * @return {Object}
    */
-  tableExists(tableName) {
+  tableExists(tableName: String): any {
     return this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName]);
   }
   /**
@@ -225,7 +231,7 @@ class GeoPackageConnection {
    * @param  {string} columnName column to check
    * @return {Boolean}
    */
-  columnAndTableExists(tableName, columnName) {
+  columnAndTableExists(tableName: String, columnName: String): Boolean {
     var columns = this.adapter.all('PRAGMA table_info(\'' + tableName + '\')');
     for (var i = 0; i < columns.length; i++) {
       if (columns[i].name === columnName) {
@@ -237,7 +243,7 @@ class GeoPackageConnection {
   /**
    * Sets the APPLICATION_ID and user_version for GeoPackage
    */
-  setApplicationId() {
+  setApplicationId(): void {
     var buff = Buffer.from(GeoPackageConstants.APPLICATION_ID);
     var applicationId = buff.readUInt32BE(0);
     this.adapter.run('PRAGMA application_id = ' + applicationId);
@@ -245,9 +251,9 @@ class GeoPackageConnection {
   }
   /**
    * gets the application_id from the sqlite file
-   * @return {Object}
+   * @return {Number}
    */
-  getApplicationId() {
+  getApplicationId(): Number {
     return this.adapter.get('PRAGMA application_id').application_id;
   }
   /**
@@ -258,7 +264,7 @@ class GeoPackageConnection {
    * @param  {string|Buffer|Uint8Array} filePath string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
    * @return {Promise} that resolves
    */
-  static connect(filePath) {
+  static connect(filePath: String | Buffer | Uint8Array) : Promise<GeoPackageConnection> {
     return new GeoPackageConnection(filePath).init();
   }
   /**
@@ -266,12 +272,10 @@ class GeoPackageConnection {
    * @param  {Object}   db       open database to connect to
    * @return {Promise}
    */
-  static connectWithDatabase(db) {
+  static connectWithDatabase(db: any) {
     return new GeoPackageConnection(undefined).init()
-      .then(function (connection) {
+      .then(function (connection: GeoPackageConnection) {
         connection.setDBConnection(db);
       });
   }
 }
-
-module.exports = GeoPackageConnection;
