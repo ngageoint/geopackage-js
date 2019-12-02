@@ -4,7 +4,9 @@
  */
 import GeoPackageConnection from './db/geoPackageConnection';
 import CrsWktExtension from './extension/crsWkt';
-
+import RelatedTablesExtension from './extension/relatedTables';
+import FeatureStyleExtension from './extension/style/.';
+import ContentsIdExtension from './extension/contents/.';
 
 var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
   , GeometryColumnsDao = require('./features/columns/geometryColumnsDao')
@@ -29,13 +31,10 @@ var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
   , MetadataReferenceDao = require('./metadata/reference/metadataReferenceDao')
   , ExtensionDao = require('./extension/extensionDao')
   , SchemaExtension = require('./extension/schema')
-  , RelatedTablesExtension = require('./extension/relatedTables')
   , TableIndexDao = require('./extension/index/tableIndexDao')
   , GeometryIndexDao = require('./extension/index/geometryIndexDao')
   , ExtendedRelationDao = require('./extension/relatedTables/extendedRelationDao')
   , ContentsIdDao = require('./extension/contents/contentsIdDao')
-  , ContentsIdExtension = require('./extension/contents/.')
-  , FeatureStyleExtension = require('./extension/style/.')
   , AttributeTable = require('./attributes/attributeTable')
   , AttributeTableReader = require('./attributes/attributeTableReader')
   , AttributeDao = require('./attributes/attributeDao')

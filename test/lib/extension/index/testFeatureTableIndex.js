@@ -1,8 +1,9 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import FeatureTableIndex from '../../../../lib/extension/index/featureTableIndex';
+
 
 var GeoPackage = require('../../../../lib/geoPackage')
-  , FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
   , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder')
   , Verification = require('../../../fixtures/verification')
   // , testSetup = require('../../../fixtures/testSetup')

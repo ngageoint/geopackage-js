@@ -1,8 +1,8 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/dataTypes')
-  , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')

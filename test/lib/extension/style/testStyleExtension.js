@@ -1,8 +1,8 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import FeatureStyleExtension from '../../../../lib/extension/style'
 
-var FeatureStyleExtension = require('../../../../lib/extension/style')
-  , FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
+var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable')
   , StyleTable = require('../../../../lib/extension/style/styleTable')
   , Styles = require('../../../../lib/extension/style/styles')

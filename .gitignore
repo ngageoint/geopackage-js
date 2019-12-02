@@ -52,3 +52,7 @@ dist
 docs/coverage
 docs/jsdoc
 docs/gp.js
+
+built
+docs-ts
+tmp

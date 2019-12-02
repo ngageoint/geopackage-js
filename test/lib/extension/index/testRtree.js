@@ -1,9 +1,9 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import RTreeIndex from '../../../../lib/extension/rtree/rtreeIndex'
+import FeatureTableIndex from '../../../../lib/extension/index/featureTableIndex'
 
-var FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex')
-  , RTreeIndexDao = require('../../../../lib/extension/rtree/rtreeIndexDao')
-  , RTreeIndex = require('../../../../lib/extension/rtree/rtreeIndex')
+var RTreeIndexDao = require('../../../../lib/extension/rtree/rtreeIndexDao')
   , BoundingBox = require('../../../../lib/boundingBox')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()

@@ -1,9 +1,10 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
+
 var DataType = require('../../../../lib/db/dataTypes')
   , Verification = require('../../../fixtures/verification')
   , ContentsDao = require('../../../../lib/core/contents/contentsDao')
-  , RelatedTablesExtension = require('../../../../lib/extension/relatedTables')
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
   , SimpleAttributesRow = require('../../../../lib/extension/relatedTables/simpleAttributesRow')

@@ -1,6 +1,8 @@
 import CrsWktExtension from './lib/extension/crsWkt';
 import GeoPackageConnection from './lib/db/geoPackageConnection';
 import WebPExtension from './lib/extension/webp';
+import RTreeIndex from './lib/extension/rtree/rtreeIndex';
+import MetadataExtension from './lib/extension/metadata';
 
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
@@ -20,9 +22,7 @@ var DataColumns = require('./lib/dataColumns/dataColumns');
 var DataTypes = require('./lib/db/dataTypes');
 var Metadata = require('./lib/metadata/metadata');
 var MetadataReference = require('./lib/metadata/reference/metadataReference');
-var RTreeIndex = require('./lib/extension/rtree/rtreeIndex');
 var SchemaExtension = require('./lib/extension/schema');
-var MetadataExtension = require('./lib/extension/metadata').MetadataExtension;
 var DataColumnsDao = require('./lib/dataColumns/dataColumnsDao');
 var DataColumnConstraintsDao = require('./lib/dataColumnConstraints/dataColumnConstraintsDao');
 var FeatureTiles = require('./lib/tiles/features');
