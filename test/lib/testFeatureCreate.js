@@ -1,21 +1,16 @@
 import { default as GeoPackageAPI } from '../../.'
 import { default as testSetup } from '../fixtures/testSetup'
 
-var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../lib/geoPackage')
-  // , GeoPackageAPI = require('../../.')
-  , FeatureColumn = require('../../lib/features/user/featureColumn')
+var FeatureColumn = require('../../lib/features/user/featureColumn').default
   , DataColumns = require('../../lib/dataColumns/dataColumns')
-  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao')
+  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').default
   , Verification = require('../fixtures/verification')
-  , FeatureTable = require('../../lib/features/user/featureTable')
-  , TileTable = require('../../lib/tiles/user/tileTable')
+  , FeatureTable = require('../../lib/features/user/featureTable').default
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
-  , TableCreator = require('../../lib/db/tableCreator')
   , BoundingBox = require('../../lib/boundingBox')
   , DataTypes = require('../../lib/db/dataTypes')
   , GeometryData = require('../../lib/geom/geometryData')
-  , FeatureTableReader = require('../../lib/features/user/featureTableReader')
+  , FeatureTableReader = require('../../lib/features/user/featureTableReader').default
   // , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkb = require('../../lib/wkb/index')
@@ -94,7 +89,7 @@ describe('GeoPackage Feature table create tests', function() {
     });
 
     GeoPackageAPI.createFeatureTableWithProperties(geopackage, 'NewTable', properties)
-      .then(function(result) {
+      .then(function() {
         var reader = new FeatureTableReader('NewTable');
         var result = reader.readFeatureTable(geopackage);
         var columns = result.columns;

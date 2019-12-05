@@ -3,14 +3,14 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 import FeatureStyleExtension from '../../../../lib/extension/style'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
-  , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable')
-  , StyleTable = require('../../../../lib/extension/style/styleTable')
+  , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').default
+  , StyleTable = require('../../../../lib/extension/style/styleTable').default
   , Styles = require('../../../../lib/extension/style/styles')
   , Icons = require('../../../../lib/extension/style/icons')
   , FeatureStyles = require('../../../../lib/extension/style/featureStyles')
   , FeatureStyle = require('../../../../lib/extension/style/featureStyle')
-  , IconTable = require('../../../../lib/extension/style/iconTable')
-  , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao')
+  , IconTable = require('../../../../lib/extension/style/iconTable').default
+  , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').default
   // , testSetup = require('../../../fixtures/testSetup')
   , ImageUtils = require('../../../../lib/tiles/imageUtils')
   , should = require('chai').should()

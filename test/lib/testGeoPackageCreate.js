@@ -3,7 +3,7 @@ import { default as testSetup } from '../fixtures/testSetup'
 var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , GeoPackage = require('../../lib/geoPackage')
   , Verification = require('../fixtures/verification')
-  , TileTable = require('../../lib/tiles/user/tileTable')
+  , TileTable = require('../../lib/tiles/user/tileTable').default
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , should = require('chai').should()
   , wkx = require('wkx')

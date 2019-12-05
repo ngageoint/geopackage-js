@@ -7,39 +7,39 @@ import CrsWktExtension from './extension/crsWkt';
 import RelatedTablesExtension from './extension/relatedTables';
 import FeatureStyleExtension from './extension/style/.';
 import ContentsIdExtension from './extension/contents/.';
+import SpatialReferenceSystemDao from './core/srs/spatialReferenceSystemDao'
+import GeometryColumnsDao from './features/columns/geometryColumnsDao'
+import FeatureDao from './features/user/featureDao'
+import FeatureTableReader from './features/user/featureTableReader'
+import ContentsDao from './core/contents/contentsDao'
+import TileMatrixSetDao from './tiles/matrixset/tileMatrixSetDao'
+import TileMatrixDao from './tiles/matrix/tileMatrixDao'
+import DataColumnsDao from './dataColumns/dataColumnsDao'
+import DataColumnConstraintsDao from './dataColumnConstraints/dataColumnConstraintsDao'
+import MetadataDao from './metadata/metadataDao'
+import MetadataReferenceDao from './metadata/reference/metadataReferenceDao'
+import ExtensionDao from './extension/extensionDao'
+import TableIndexDao from './extension/index/tableIndexDao'
+import GeometryIndexDao from './extension/index/geometryIndexDao'
+import ExtendedRelationDao from './extension/relatedTables/extendedRelationDao'
+import AttributeDao from './attributes/attributeDao'
+import TileDao from './tiles/user/tileDao'
+import ContentsIdDao from './extension/contents/contentsIdDao'
+import AttributeTable from './attributes/attributeTable'
+import TileTableReader from './tiles/user/tileTableReader'
+import AttributeTableReader from './attributes/attributeTableReader'
+import UserTable from './user/userTable'
+import FeatureTable from './features/user/featureTable'
+import StyleMappingTable from './extension/style/styleMappingTable'
+import TileTable from './tiles/user/tileTable'
 
-var SpatialReferenceSystemDao = require('./core/srs/spatialReferenceSystemDao')
-  , GeometryColumnsDao = require('./features/columns/geometryColumnsDao')
-  , FeatureDao = require('./features/user/featureDao')
-  , FeatureTableReader = require('./features/user/featureTableReader')
-  , ContentsDao = require('./core/contents/contentsDao')
-  , Contents = require('./core/contents/contents')
-  , TileMatrixSetDao = require('./tiles/matrixset/tileMatrixSetDao')
+var Contents = require('./core/contents/contents')
   , TileMatrixSet = require('./tiles/matrixset/tileMatrixSet')
-  , TileMatrixDao = require('./tiles/matrix/tileMatrixDao')
   , TileMatrix = require('./tiles/matrix/tileMatrix')
-  , TileTableReader = require('./tiles/user/tileTableReader')
-  , TileDao = require('./tiles/user/tileDao')
-  , TileTable = require('./tiles/user/tileTable')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , TableCreator = require('./db/tableCreator')
-  , UserTable = require('./user/userTable')
-  , FeatureTable = require('./features/user/featureTable')
-  , DataColumnsDao = require('./dataColumns/dataColumnsDao')
-  , DataColumnConstraintsDao = require('./dataColumnConstraints/dataColumnConstraintsDao')
-  , MetadataDao = require('./metadata/metadataDao')
-  , MetadataReferenceDao = require('./metadata/reference/metadataReferenceDao')
-  , ExtensionDao = require('./extension/extensionDao')
   , SchemaExtension = require('./extension/schema')
-  , TableIndexDao = require('./extension/index/tableIndexDao')
-  , GeometryIndexDao = require('./extension/index/geometryIndexDao')
-  , ExtendedRelationDao = require('./extension/relatedTables/extendedRelationDao')
-  , ContentsIdDao = require('./extension/contents/contentsIdDao')
-  , AttributeTable = require('./attributes/attributeTable')
-  , AttributeTableReader = require('./attributes/attributeTableReader')
-  , AttributeDao = require('./attributes/attributeDao')
   , DataTypes = require('./db/dataTypes')
-  , StyleMappingTable = require('./extension/style/styleMappingTable')
   // eslint-disable-next-line no-unused-vars
   , BoundingBox = require('./boundingBox')
   // eslint-disable-next-line no-unused-vars

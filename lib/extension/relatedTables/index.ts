@@ -6,22 +6,22 @@
 
 import BaseExtension from '../baseExtension';
 import Extension from '../extension';
+import MediaDao from './mediaDao'
+import MediaTable from './mediaTable'
+import SimpleAttributesDao from './simpleAttributesDao'
+import SimpleAttributesTable from './simpleAttributesTable'
+import UserMappingTable from './userMappingTable'
+import UserMappingDao from './userMappingDao'
+import UserCustomDao from '../../user/custom/userCustomDao'
+import UserDao from '../../user/userDao'
+import UserTableReader from '../../user/userTableReader'
+import ExtendedRelationDao from './extendedRelationDao'
+import RelationType from './relationType'
 
 var ColumnValues = require('../../dao/columnValues')
   , OptionBuilder = require('../../optionBuilder')
-  , ExtendedRelationDao = require('./extendedRelationDao')
   // eslint-disable-next-line no-unused-vars
   , ExtendedRelation = require('./extendedRelation')
-  , MediaDao = require('./mediaDao')
-  , MediaTable = require('./mediaTable')
-  , SimpleAttributesDao = require('./simpleAttributesDao')
-  , SimpleAttributesTable = require('./simpleAttributesTable')
-  , UserMappingTable = require('./userMappingTable')
-  , UserMappingDao = require('./userMappingDao')
-  , UserCustomDao = require('../../user/custom/userCustomDao')
-  , UserDao = require('../../user/userDao')
-  , UserTableReader = require('../../user/userTableReader')
-  , RelationType = require('./relationType')
   , Contents = require('../../core/contents/contents');
 
 /**
@@ -209,7 +209,7 @@ export default class RelatedTablesExtension extends BaseExtension {
    * @param  {string} tableName table name
    * @return {string}
    */
-  getPrimaryKeyColumnName(tableName) {
+  getPrimaryKeyColumnName(tableName: string) {
     var reader = new UserTableReader(tableName);
     var table = reader.readTable(this.geoPackage.getDatabase());
     return table.getPkColumn().name;

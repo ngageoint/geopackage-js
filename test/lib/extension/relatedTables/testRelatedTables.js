@@ -3,7 +3,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var Verification = require('../../../fixtures/verification')
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')

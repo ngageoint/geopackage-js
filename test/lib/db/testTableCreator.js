@@ -1,10 +1,7 @@
 import { default as testSetup } from '../../fixtures/testSetup'
+import { TableCreator } from '../../../.'
 
-var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../../lib/geoPackage')
-  , TableCreator = require('../../../lib/db/tableCreator')
-  , TileTable = require('../../../lib/tiles/user/tileTable')
-  , TileDao = require('../../../lib/tiles/user/tileDao')
+var TileTable = require('../../../lib/tiles/user/tileTable').default
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
   , wkb = require('../../../lib/wkb/index')

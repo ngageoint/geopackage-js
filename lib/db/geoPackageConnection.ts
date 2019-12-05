@@ -19,14 +19,14 @@ if (typeof(process) !== 'undefined' && process.version && !process.env.FORCE_SQL
  * Represents a connection to the GeoPackage database
  */
 export default class GeoPackageConnection {
-  filePath: String | Buffer | Uint8Array;
+  filePath: string | Buffer | Uint8Array;
   adapter: DBAdapter;
   adapterCreator: typeof SqliteAdapter | typeof SqljsAdapter;
   /**
    * Construct a new connection to the GeoPackage SQLite file
    * @param filePath path to the sqlite file
    */
-  constructor(filePath: String | Buffer | Uint8Array) {
+  constructor(filePath: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
   /**
@@ -88,7 +88,7 @@ export default class GeoPackageConnection {
   * @param  {Function} functionDefinition function to register
   * @return {DBAdapter} the adapter in use
   */
-  registerFunction(name: String, functionDefinition: Function): DBAdapter {
+  registerFunction(name: string, functionDefinition: Function): DBAdapter {
     this.adapter.registerFunction(name, functionDefinition);
     return this.adapter;
   }
@@ -98,15 +98,15 @@ export default class GeoPackageConnection {
    * @param  {Array|Object} [params] array of substitution parameters
    * @return {any}
    */
-  get(sql: String, params?: [] | Object): any {
+  get(sql: string, params?: [] | Object): any {
     return this.adapter.get(sql, params);
   }
   /**
    * Checks if table exists in database
-   * @param {String} tableName
+   * @param {string} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName: String): Boolean {
+  isTableExists(tableName: string): Boolean {
     return this.adapter.isTableExists(tableName);
   }
   /**
@@ -117,16 +117,16 @@ export default class GeoPackageConnection {
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: String, params?: Object | []): { changes: number; lastInsertROWID: number;} {
+  run(sql: string, params?: Object | []): { changes: number; lastInsertROWID: number;} {
     return this.adapter.run(sql, params);
   }
   /**
    * Executes the query and returns all results in an array
-   * @param  {String} sql sql to run
+   * @param  {string} sql sql to run
    * @param  {Array|Object} [params] substitution parameters
    * @return {any[]}
    */
-  all(sql: String, params?: [] | Object): any[] {
+  all(sql: string, params?: [] | Object): any[] {
     return this.adapter.all(sql, params);
   }
   /**
@@ -135,7 +135,7 @@ export default class GeoPackageConnection {
    * @param  {Array|Object} [params] substitution parameters
    * @return {IterableIterator<Object>}
    */
-  each(sql: String, params?: [] | Object): IterableIterator<any> {
+  each(sql: string, params?: [] | Object): IterableIterator<any> {
     return this.adapter.each(sql, params);
   }
   /**
@@ -144,9 +144,9 @@ export default class GeoPackageConnection {
    * @param  {string} column    column to get the min value from
    * @param  {string} [where]     where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Number}
+   * @return {number}
    */
-  minOfColumn(table: String, column: String, where?: String, whereArgs?: [] | Object): Number {
+  minOfColumn(table: string, column: string, where?: string, whereArgs?: [] | Object): number {
     var minStatement = 'select min(' + column + ') as min from ' + table;
     if (where) {
       minStatement += ' ';
@@ -163,9 +163,9 @@ export default class GeoPackageConnection {
    * @param  {string} column    column to get the max value from
    * @param  {string} [where]     where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Number}
+   * @return {number}
    */
-  maxOfColumn(table: String, column: String, where?: String, whereArgs?: [] | Object): Number {
+  maxOfColumn(table: string, column: string, where?: string, whereArgs?: [] | Object): number {
     var maxStatement = 'select max(' + column + ') as max from ' + table;
     if (where) {
       maxStatement += ' ';
@@ -178,21 +178,21 @@ export default class GeoPackageConnection {
   }
   /**
    * Return the count of objects in the table
-   * @param  {String} table table name
-   * @param  {String} [where] where clause
+   * @param  {string} table table name
+   * @param  {string} [where] where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Number}
+   * @return {number}
    */
-  count(table: String, where?: String, whereArgs?: [] | Object): Number {
+  count(table: string, where?: string, whereArgs?: [] | Object): number {
     return this.adapter.count(table, where, whereArgs);
   }
   /**
    * Executes an insert statement and returns the last id inserted
-   * @param  {String} sql    sql to insert
+   * @param  {string} sql    sql to insert
    * @param  {Array|Object} params substitution parameters
    * @return {Object} last row id inserted
    */
-  insert(sql: String, params: [] | Object): Number {
+  insert(sql: string, params: [] | Object): number {
     return this.adapter.insert(sql, params);
   }
   /**
@@ -200,9 +200,9 @@ export default class GeoPackageConnection {
    * @param  {string} tableName table name to delete from
    * @param  {string} [where]     where clause
    * @param  {Array|Object} [whereArgs] substitution parameters
-   * @return {Number} number of rows deleted
+   * @return {number} number of rows deleted
    */
-  delete(tableName: String, where?: String, whereArgs?: [] | Object): Number {
+  delete(tableName: string, where?: string, whereArgs?: [] | Object): number {
     var deleteStatement = 'DELETE FROM ' + tableName + '';
     if (where) {
       deleteStatement += ' WHERE ' + where;
@@ -211,18 +211,18 @@ export default class GeoPackageConnection {
   }
   /**
    * Drops the table specified
-   * @param  {String} tableName table to drop
+   * @param  {string} tableName table to drop
    * @return {Boolean} results of table drop
    */
-  dropTable(tableName: String): Boolean {
+  dropTable(tableName: string): Boolean {
     return this.adapter.dropTable(tableName);
   }
   /**
    * Gets information about the table specified.  If data is returned, the table exists
-   * @param  {String} tableName table to check
+   * @param  {string} tableName table to check
    * @return {Object}
    */
-  tableExists(tableName: String): any {
+  tableExists(tableName: string): any {
     return this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName]);
   }
   /**
@@ -231,7 +231,7 @@ export default class GeoPackageConnection {
    * @param  {string} columnName column to check
    * @return {Boolean}
    */
-  columnAndTableExists(tableName: String, columnName: String): Boolean {
+  columnAndTableExists(tableName: string, columnName: string): Boolean {
     var columns = this.adapter.all('PRAGMA table_info(\'' + tableName + '\')');
     for (var i = 0; i < columns.length; i++) {
       if (columns[i].name === columnName) {
@@ -251,9 +251,9 @@ export default class GeoPackageConnection {
   }
   /**
    * gets the application_id from the sqlite file
-   * @return {Number}
+   * @return {number}
    */
-  getApplicationId(): Number {
+  getApplicationId(): number {
     return this.adapter.get('PRAGMA application_id').application_id;
   }
   /**
@@ -264,7 +264,7 @@ export default class GeoPackageConnection {
    * @param  {string|Buffer|Uint8Array} filePath string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
    * @return {Promise} that resolves
    */
-  static connect(filePath: String | Buffer | Uint8Array) : Promise<GeoPackageConnection> {
+  static connect(filePath: string | Buffer | Uint8Array) : Promise<GeoPackageConnection> {
     return new GeoPackageConnection(filePath).init();
   }
   /**

@@ -23,7 +23,7 @@
       , "./test"
   ],
   "exclude": [
-      "./test",
+    //   "./test",
       "./lib/wkb"
   ],
   "typedocOptions": {

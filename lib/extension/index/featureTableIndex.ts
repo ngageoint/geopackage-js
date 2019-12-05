@@ -7,11 +7,11 @@ import BaseExtension from '../baseExtension';
 import GeoPackage from '../../geoPackage';
 import Extension from '../extension';
 import TableIndex from './tableIndex'
+import FeatureDao from'../../features/user/featureDao'
+import GeometryIndexDao from'./geometryIndexDao'
+import RTreeIndexDao from'../rtree/rtreeIndexDao'
 
-var GeometryIndexDao = require('./geometryIndexDao')
-  , RTreeIndexDao = require('../rtree/rtreeIndexDao')
-  , EnvelopeBuilder = require('../../geom/envelopeBuilder')
-  , FeatureDao = require('../../features/user/featureDao');
+var EnvelopeBuilder = require('../../geom/envelopeBuilder');
 
 /**
  * This class will either use the RTree index if it exists, or the
@@ -34,7 +34,7 @@ export default class FeatureTableIndex extends BaseExtension {
   rtreeIndexDao: any;
   rtreeIndex: RTreeIndex;
   rtreeIndexed: Boolean;
-  constructor(geoPackage: GeoPackage, featureDao: typeof FeatureDao) {
+  constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
     super(geoPackage);
     this.progress;
     /**

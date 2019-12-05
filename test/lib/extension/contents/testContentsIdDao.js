@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
+import ContentsDao from '../../../../lib/core/contents/contentsDao'
 
-var Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
+var Verification = require('../../../fixtures/verification')  
   , should = require('chai').should()
   , path = require('path');
 

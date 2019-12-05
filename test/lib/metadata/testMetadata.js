@@ -5,7 +5,7 @@ var fs = require('fs')
   , path = require('path')
   // , GeoPackage = require('../../../lib/geoPackage')
   , Metadata = require('../../../lib/metadata/metadata')
-  , MetadataDao = require('../../../lib/metadata/metadataDao');
+  , MetadataDao = require('../../../lib/metadata/metadataDao').default;
 
 describe('Metadata tests', function() {
 

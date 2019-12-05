@@ -14,7 +14,7 @@ var sqljs = require('rtree-sql.js/dist/sql-asm-memory-growth.js');
  */
 export class SqljsAdapter implements DBAdapter {
   db: any;
-  filePath: String | Buffer | Uint8Array;
+  filePath: string | Buffer | Uint8Array;
   /**
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
@@ -101,7 +101,7 @@ export class SqljsAdapter implements DBAdapter {
   /**
   * @param  {string|Buffer|Uint8Array} [filePath] string path to an existing file or a path to where a new file will be created or a url from which to download a GeoPackage or a Uint8Array containing the contents of the file, if undefined, an in memory database is created
   */
-  constructor(filePath?: String | Buffer | Uint8Array) {
+  constructor(filePath?: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
   /**
@@ -121,7 +121,7 @@ export class SqljsAdapter implements DBAdapter {
    * Returns a Uint8Array containing the contents of the database as a file
    * @param  {Function} callback called when export is complete
    */
-  export(callback): void {
+  export(callback: Function): void {
     callback(null, this.db.export());
   }
   /**
@@ -131,7 +131,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Function} functionDefinition function to register
    * @return {module:db/sqljsAdapter~Adapter} this
    */
-  registerFunction(name: String, functionDefinition: Function): this {
+  registerFunction(name: string, functionDefinition: Function): this {
     this.db.create_function(name, functionDefinition);
     return this;
   }
@@ -143,7 +143,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Array|Object} [params] substitution parameters
    * @return {Object}
    */
-  get(sql: String, params?: [] | Object): any {
+  get(sql: string, params?: [] | Object): any {
     params = params || [];
     var statement = this.db.prepare(sql);
     statement.bind(params);
@@ -160,7 +160,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param {String} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName: String): Boolean {
+  isTableExists(tableName: string): Boolean {
     var statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
     statement.bind([tableName]);
     var hasResult = statement.step();
@@ -177,7 +177,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql: String, params?: [] | Object): any[] {
+  all(sql: string, params?: [] | Object): any[] {
     var rows = [];
     var iterator = this.each(sql, params);
     for (var row of iterator) {
@@ -191,7 +191,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} params bind parameters
    * @return {IterableIterator<Object>}
    */
-  each(sql: String, params?: [] | Object): IterableIterator<any> {
+  each(sql: string, params?: [] | Object): IterableIterator<any> {
     var statement = this.db.prepare(sql);
     statement.bind(params);
     return {
@@ -222,7 +222,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Object} object containing a changes property indicating the number of rows changed and a lastInsertROWID indicating the last inserted row
    */
-  run(sql: String, params?: [] | Object): {changes: number, lastInsertROWID: number} {
+  run(sql: string, params?: [] | Object): {changes: number, lastInsertROWID: number} {
     if (params) {
       for (var key in params) {
         params['$' + key] = params[key];
@@ -245,7 +245,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql: String, params?: [] | Object): Number {
+  insert(sql: string, params?: [] | Object): number {
     if (params) {
       for (var key in params) {
         params['$' + key] = params[key];
@@ -268,7 +268,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} deleted rows
    */
-  delete(sql: String, params?: [] | Object): Number {
+  delete(sql: string, params?: [] | Object): number {
     var rowsModified = 0;
     var statement = this.db.prepare(sql, params);
     statement.step();
@@ -281,7 +281,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {String} table table name
    * @return {Boolean} indicates if the table was dropped
    */
-  dropTable(table: String): Boolean {
+  dropTable(table: string): Boolean {
     var response = this.db.exec('DROP TABLE IF EXISTS "' + table + '"');
     this.db.exec('VACUUM');
     return !!response;
@@ -293,7 +293,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName:String, where?: String, whereArgs?: [] | Object): Number {
+  count(tableName:string, where?: string, whereArgs?: [] | Object): number {
     var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;

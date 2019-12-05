@@ -5,10 +5,9 @@
 import BaseExtension from '../baseExtension';
 import GeoPackage from '../../geoPackage';
 import Extension from '../extension';
-
-var ContentsDao = require('../../core/contents/contentsDao')
-  , ContentsIdDao = require('./contentsIdDao')
-  , Contents = require('../../core/contents/contents')
+import ContentsIdDao from './contentsIdDao';
+import ContentsDao from '../../core/contents/contentsDao';
+var Contents = require('../../core/contents/contents')
   , ContentsId = require('./contentsId');
 
 type ContentsTableName = { table_name: String }
@@ -22,7 +21,7 @@ export default class ContentsIdExtension extends BaseExtension {
   public static readonly EXTENSION_NAME_NO_AUTHOR = 'contents_id';
   public static readonly EXTENSION_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/contents-id.html';
 
-  contentsIdDao: any;
+  contentsIdDao: ContentsIdDao;
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
     this.contentsIdDao = geoPackage.getContentsIdDao();
@@ -41,7 +40,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * Get the ContentsIdDao
 	 * @returns {module:extension/contents.ContentsIdDao}
 	 */
-  getDao(): typeof ContentsIdDao {
+  getDao(): ContentsIdDao {
     return this.contentsIdDao;
   }
   has(): Boolean {

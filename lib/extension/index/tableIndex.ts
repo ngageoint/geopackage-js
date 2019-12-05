@@ -1,7 +1,6 @@
 
 /**
  * Table Index object, for indexing data within user tables
- * @class TableIndex
  */
 export default class TableIndex {
   /**

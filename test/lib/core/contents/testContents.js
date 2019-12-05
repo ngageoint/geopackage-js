@@ -1,9 +1,9 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import ContentsDao from '../../../../lib/core/contents/contentsDao';
 
 // var GeoPackageAPI = require('../../../..')
-var ContentsDao = require('../../../../lib/core/contents/contentsDao')
-  , Contents = require('../../../../lib/core/contents/contents')
+var Contents = require('../../../../lib/core/contents/contents')
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()

@@ -1,11 +1,11 @@
 import GeoPackage from "../geoPackage";
 import GeoPackageConnection from "../db/geoPackageConnection";
 import Extension from './extension';
+import ExtensionDao from './extensionDao';
 /**
  * Base Extension
  */
 
-var ExtensionDao = require('./extensionDao');
 /**
  * Abstract base GeoPackage extension
  */
@@ -21,7 +21,7 @@ export default abstract class BaseExtension {
   /**
    * ExtensionDao
    */
-  readonly extensionsDao: typeof ExtensionDao;
+  readonly extensionsDao: ExtensionDao;
   /**
    * Name of the extension
    */
@@ -93,7 +93,7 @@ export default abstract class BaseExtension {
    * @param {string} definition
    * @param {string} scopeType
    */
-  createExtension(extensionName: String, tableName: String, columnName: String, definition: String, scopeType: String): Extension {
+  createExtension(extensionName: String, tableName: String, columnName: String, definition: String, scopeType: String): number {
     var extension = new Extension();
     extension.table_name = tableName;
     extension.column_name = columnName;

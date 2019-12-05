@@ -13,7 +13,7 @@ var fs = require('fs')
  * Class which adapts generic GeoPackage queries to better-sqlite3 queries
  */
 export class SqliteAdapter implements DBAdapter{
-  filePath: String | Buffer | Uint8Array;
+  filePath: string | Buffer | Uint8Array;
   db: any;
   /**
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
@@ -93,7 +93,7 @@ export class SqliteAdapter implements DBAdapter{
   //   return new SqliteAdapter(db);
   // };
 
-  constructor(filePath?: String | Buffer | Uint8Array) {
+  constructor(filePath?: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
   /**
@@ -123,7 +123,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Function} functionDefinition function to register
    * @return {module:db/sqliteAdapter~Adapter} this
    */
-  registerFunction(name: String, functionDefinition: Function): this {
+  registerFunction(name: string, functionDefinition: Function): this {
     this.db.function(name, functionDefinition);
     return this;
   }
@@ -134,7 +134,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Array|Object} [params] bind parameters
    * @return {Object}
    */
-  get(sql: String, params?: [] | Object): any {
+  get(sql: string, params?: [] | Object): any {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.get(params);
@@ -148,7 +148,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param {String} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName: String): Boolean {
+  isTableExists(tableName: string): Boolean {
     var statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
     var result;
     result = statement.get({ name: tableName });
@@ -161,7 +161,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql: String, params?: [] | Object): any[] {
+  all(sql: string, params?: [] | Object): any[] {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.all(params);
@@ -177,7 +177,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Object|Array} [params] bind parameters
    * @return {Iterable.<Object>}
    */
-  each(sql: String, params?: [] | Object): IterableIterator<any> {
+  each(sql: string, params?: [] | Object): IterableIterator<any> {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.iterate(params);
@@ -196,7 +196,7 @@ export class SqliteAdapter implements DBAdapter{
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: String, params?: [] | Object): {changes: number, lastInsertROWID: number} {
+  run(sql: string, params?: [] | Object): {changes: number, lastInsertROWID: number} {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.run(params);
@@ -211,7 +211,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql: String, params?: [] | Object): Number {
+  insert(sql: string, params?: [] | Object): number {
     var statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
@@ -221,7 +221,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Object|Array} params bind parameters
    * @return {Number} deleted rows
    */
-  delete(sql: String, params?: [] | Object): Number {
+  delete(sql: string, params?: [] | Object): number {
     var statement = this.db.prepare(sql);
     return statement.run(params).changes;
   }
@@ -230,7 +230,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {String} table table name
    * @return {Boolean} indicates if the table was dropped
    */
-  dropTable(table: String): Boolean {
+  dropTable(table: string): Boolean {
     try {
       var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
       var result = statement.run();
@@ -250,7 +250,7 @@ export class SqliteAdapter implements DBAdapter{
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName: String, where?: String, whereArgs?: [] | Object): Number {
+  count(tableName: string, where?: string, whereArgs?: [] | Object): number {
     var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;

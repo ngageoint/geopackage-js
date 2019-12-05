@@ -1,15 +1,17 @@
 import { default as GeoPackageAPI } from '../../../.'
 import { default as testSetup } from '../../fixtures/testSetup'
+import DataColumnsDao from '../../../lib/dataColumns/dataColumnsDao'
+import AttributeDao from '../../../lib/attributes/attributeDao'
+import AttributeTableReader from '../../../lib/attributes/attributeTableReader'
+import UserTableReader from '../../../lib/user/userTableReader'
+import AttributeTable from '../../../lib/attributes/attributeTable'
+
 // var GeoPackageAPI = require('../../../.')
 // var testSetup = require('../../fixtures/testSetup')
 var Verification = require('../../fixtures/verification')
   , DataColumns = require('../../../lib/dataColumns/dataColumns')
-  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao')
-  , AttributeDao = require('../../../lib/attributes/attributeDao')
-  , AttributeTableReader = require('../../../lib/attributes/attributeTableReader')
-  , UserTableReader = require('../../../lib/user/userTableReader')
-  , AttributeTable = require('../../../lib/attributes/attributeTable')
-  , UserColumn = require('../../../lib/user/userColumn')
+
+  , UserColumn = require('../../../lib/user/userColumn').default
   , DataTypes = require('../../../lib/db/dataTypes')
   , should = require('chai').should()
   , path = require('path');
@@ -73,7 +75,7 @@ describe('GeoPackage Attribute table create tests', function() {
     });
 
     GeoPackageAPI.createAttributeTableWithProperties(geopackage, 'NewTable', properties)
-      .then(function(result) {
+      .then(function() {
         var reader = new AttributeTableReader('NewTable');
         var result = reader.readTable(geopackage.connection);
         var columns = result.columns;
@@ -274,7 +276,7 @@ describe('GeoPackage Attribute table create tests', function() {
     dc.constraint_name = 'test constraint';
 
     return geopackage.createAttributeTable(tableName, columns, [dc])
-      .then(function(result) {
+      .then(function() {
         var reader = new AttributeTableReader(tableName);
         var result = reader.readTable(geopackage.connection);
         var columns = result.columns;

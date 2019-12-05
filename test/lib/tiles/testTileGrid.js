@@ -1,4 +1,4 @@
-var TileGrid = require('../../../lib/tiles/tileGrid.js')
+var TileGrid = require('../../../lib/tiles/tileGrid').default
   , should = require('chai').should();
 
 describe('TileGrid tests', function() {
@@ -18,11 +18,6 @@ describe('TileGrid tests', function() {
     var tg = new TileGrid(0, 1, 0, 1);
     var tg2 = new TileGrid(0, 2, 0, 1);
     tg.equals(tg2).should.be.equal(false);
-  });
-
-  it('should not be equal to undefined', function() {
-    var tg = new TileGrid(0, 1, 0, 1);
-    tg.equals().should.be.equal(false);
   });
 
 });

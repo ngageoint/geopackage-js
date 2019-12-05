@@ -1,7 +1,7 @@
 import { default as GeoPackageAPI } from '../../../..'
 
-var FeatureTableReader = require('../../../../lib/features/user/featureTableReader.js')
-  , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao')
+var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').default
+  , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').default
   // , GeoPackageAPI = require('../../../../.')
   , path = require('path')
   , should = require('chai').should();

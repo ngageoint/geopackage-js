@@ -3,8 +3,8 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 
 // @ts-ignore
 // @ts-ignore
-var FeatureDao = require('../../../../lib/features/user/featureDao.js')
-  , FeatureColumn = require('../../../../lib/features/user/featureColumn')
+var FeatureDao = require('../../../../lib/features/user/featureDao').default
+  , FeatureColumn = require('../../../../lib/features/user/featureColumn').default
   , DataTypes = require('../../../../lib/db/dataTypes')
   // , GeoPackageAPI = require('../../../../index.js')
   , BoundingBox = require('../../../../lib/boundingBox')
@@ -12,8 +12,8 @@ var FeatureDao = require('../../../../lib/features/user/featureDao.js')
   // , testSetup = require('../../../fixtures/testSetup')
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
+  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').default
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').default
   , wkx = require('wkx')
   // @ts-ignore
   // @ts-ignore

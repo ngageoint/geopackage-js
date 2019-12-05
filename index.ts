@@ -3,19 +3,21 @@ import GeoPackageConnection from './lib/db/geoPackageConnection';
 import WebPExtension from './lib/extension/webp';
 import RTreeIndex from './lib/extension/rtree/rtreeIndex';
 import MetadataExtension from './lib/extension/metadata';
+import DataColumnsDao from './lib/dataColumns/dataColumnsDao';
+import MediaTable from './lib/extension/relatedTables/mediaTable';
+import UserMappingTable from './lib/extension/relatedTables/userMappingTable';
+import DataColumnConstraintsDao from './lib/dataColumnConstraints/dataColumnConstraintsDao';
+import FeatureColumn from './lib/features/user/featureColumn';
+import UserColumn from './lib/user/userColumn';
+import TileColumn from './lib/tiles/user/tileColumn';
+
 
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
 var TableCreator = require('./lib/db/tableCreator');
-var MediaTable = require('./lib/extension/relatedTables/mediaTable');
-var UserMappingTable = require('./lib/extension/relatedTables/userMappingTable');
 var DublinCoreType = require('./lib/extension/relatedTables/dublinCoreType');
-
-var TileColumn = require('./lib/tiles/user/tileColumn');
 var BoundingBox = require('./lib/boundingBox');
 var TileUtilities = require('./lib/tiles/creator/tileUtilities');
-var FeatureColumn = require('./lib/features/user/featureColumn');
-var UserColumn = require('./lib/user/userColumn');
 var GeometryColumns = require('./lib/features/columns/geometryColumns');
 var GeometryData = require('./lib/geom/geometryData');
 var DataColumns = require('./lib/dataColumns/dataColumns');
@@ -23,8 +25,6 @@ var DataTypes = require('./lib/db/dataTypes');
 var Metadata = require('./lib/metadata/metadata');
 var MetadataReference = require('./lib/metadata/reference/metadataReference');
 var SchemaExtension = require('./lib/extension/schema');
-var DataColumnsDao = require('./lib/dataColumns/dataColumnsDao');
-var DataColumnConstraintsDao = require('./lib/dataColumnConstraints/dataColumnConstraintsDao');
 var FeatureTiles = require('./lib/tiles/features');
 var NumberFeaturesTile = require('./lib/tiles/features/custom/numberFeaturesTile');
 var ShadedFeaturesTile = require('./lib/tiles/features/custom/shadedFeaturesTile');

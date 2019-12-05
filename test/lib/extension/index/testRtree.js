@@ -2,9 +2,9 @@ import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import RTreeIndex from '../../../../lib/extension/rtree/rtreeIndex'
 import FeatureTableIndex from '../../../../lib/extension/index/featureTableIndex'
+import RTreeIndexDao from '../../../../lib/extension/rtree/rtreeIndexDao'
 
-var RTreeIndexDao = require('../../../../lib/extension/rtree/rtreeIndexDao')
-  , BoundingBox = require('../../../../lib/boundingBox')
+var BoundingBox = require('../../../../lib/boundingBox')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');

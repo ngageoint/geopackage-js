@@ -1,6 +1,14 @@
 
 import GeoPackage from './geoPackage'
 import GeoPackageConnection from './db/geoPackageConnection'
+import DataColumnsDao from './dataColumns/dataColumnsDao'
+import MediaTable from './extension/relatedTables/mediaTable'
+import SimpleAttributesTable from './extension/relatedTables/simpleAttributesTable'
+import FeatureDao from './features/user/featureDao'
+import FeatureRow from './features/user/featureRow'
+import RelationType from './extension/relatedTables/relationType'
+import UserColumn from './user/userColumn'
+import FeatureColumn from './features/user/featureColumn'
 
 /* eslint-disable camelcase */
 var wkx = require('wkx')
@@ -23,19 +31,9 @@ var GeoPackageValidate = require('./validate/geoPackageValidate')
   , GeometryData = require('./geom/geometryData')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , FeatureTile = require('./tiles/features')
-  , DataColumnsDao = require('./dataColumns/dataColumnsDao')
   , DataColumns = require('./dataColumns/dataColumns')
   , DataTypes = require('./db/dataTypes')
   , GeometryColumns = require('./features/columns/geometryColumns')
-  , FeatureColumn = require('./features/user/featureColumn')
-  , RelationType = require('./extension/relatedTables/relationType')
-  , MediaTable = require('./extension/relatedTables/mediaTable')
-  , SimpleAttributesTable = require('./extension/relatedTables/simpleAttributesTable')
-  , UserColumn = require('./user/userColumn')
-  // eslint-disable-next-line no-unused-vars
-  , FeatureRow = require('./features/user/featureRow')
-  // eslint-disable-next-line no-unused-vars
-  , FeatureDao = require('./features/user/featureDao')
   // eslint-disable-next-line no-unused-vars
   , SpatialReferenceSystem = require('./core/srs/spatialReferenceSystem');
 
@@ -56,7 +54,7 @@ export default class GeoPackageAPI {
  * @param  {GeoPackageCallback=} [callback] called with an `Error` if one occurred and the open `GeoPackage` object
  * @return {Promise<GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an `Error`
  */
-static open(gppathOrByteArray: String|Uint8Array|Buffer, callback?:GeoPackageCallback): Promise<GeoPackage> {
+static open(gppathOrByteArray: string|Uint8Array|Buffer, callback?:GeoPackageCallback): Promise<GeoPackage> {
   return new Promise(function(resolve, reject) {
     var valid = (typeof gppathOrByteArray !== 'string') || (typeof gppathOrByteArray === 'string' &&
     (gppathOrByteArray.indexOf('http') === 0 || !GeoPackageValidate.validateGeoPackageExtension(gppathOrByteArray)));
@@ -583,7 +581,7 @@ static getFeature(geopackage, table, featureId) {
 };
 
 // eslint-disable-next-line complexity
-static parseFeatureRowIntoGeoJSON(featureRow: typeof FeatureRow, srs: typeof SpatialReferenceSystem, columnMap?: any) {
+static parseFeatureRowIntoGeoJSON(featureRow: FeatureRow, srs: typeof SpatialReferenceSystem, columnMap?: any) {
   var geoJson = {
     type: 'Feature',
     properties: {},

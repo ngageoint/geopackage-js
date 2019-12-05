@@ -4,21 +4,22 @@
 
 import BaseExtension from '../baseExtension';
 import Extension from '../extension';
-var ContentsIdDao = require('../contents/contentsIdDao')
-  , IconTable = require('./iconTable')
-  , IconDao = require('./iconDao')
-  , StyleTable = require('./styleTable')
-  , StyleDao = require('./styleDao')
-  , StyleMappingTable = require('./styleMappingTable')
-  , StyleMappingDao = require('./styleMappingDao')
-  , UserMappingTable = require('../relatedTables/userMappingTable')
-  , FeatureStyles = require('./featureStyles')
+import ContentsIdDao from '../contents/contentsIdDao'
+import IconTable from './iconTable'
+import IconDao from './iconDao'
+import StyleTable from './styleTable'
+import StyleDao from './styleDao'
+import StyleMappingTable from './styleMappingTable'
+import StyleMappingDao from './styleMappingDao'
+import UserMappingTable from '../relatedTables/userMappingTable'
+import StyleTableReader from './styleTableReader'
+import UserTableReader from '../../user/userTableReader'
+import FeatureTable from '../../features/user/featureTable'
+
+var FeatureStyles = require('./featureStyles')
   , FeatureStyle = require('./featureStyle')
   , Styles = require('./styles')
-  , Icons = require('./icons')
-  , StyleTableReader = require('./styleTableReader')
-  , UserTableReader = require('../../user/userTableReader')
-  , FeatureTable = require('../../features/user/featureTable');
+  , Icons = require('./icons');
 
 /**
  * Style extension
@@ -308,7 +309,7 @@ export default class FeatureStyleExtension extends BaseExtension {
     }
     if (!this.hasRelationship(featureTable)) {
       if (this.extensionsDao.isTableExists()) {
-        this.extensionsDao.deleteByExtension(FeatureStyleExtension.EXTENSION_NAME, this.getFeatureTableName(featureTable));
+        this.extensionsDao.deleteByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, this.getFeatureTableName(featureTable));
       }
     }
   }

@@ -59,7 +59,7 @@ describe('SpatialReferenceSystem tests', function() {
 
     var projection = srs.getProjection();
     should.exist(projection);
-    projection.oProj.PROJECTION.should.be.equal('Mercator_1SP');
+    projection.oProj.projName.should.be.equal('merc');
   });
 
   it('should get the 4326 SRS', function() {

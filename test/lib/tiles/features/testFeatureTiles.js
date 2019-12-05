@@ -176,6 +176,8 @@ describe('GeoPackage FeatureTiles tests', function() {
         should.exist(data);
         console.timeEnd('generating indexed tile');
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '5_8_12_indexed.png'), function(err, equal) {
+          fs.writeFileSync('/tmp/5_8_12_indexed.png', data);
+
           equal.should.be.equal(true);
           done();
         });

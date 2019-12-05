@@ -4,9 +4,9 @@ import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/dataTypes')
   , Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable')
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').default
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').default
   , SimpleAttributesRow = require('../../../../lib/extension/relatedTables/simpleAttributesRow')
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
@@ -215,8 +215,8 @@ describe('Related Simple Attributes tests', function() {
         var manualCount = 0;
 
         for (var i = 0; i < count; i++) {
-          var userMappingRow = userMappingRows[i];
-          var row = userMappingDao.getUserMappingRow(userMappingRow);
+          var umr = userMappingRows[i];
+          var row = userMappingDao.getUserMappingRow(umr);
           row.hasId().should.be.equal(false);
           attributeIds.indexOf(row.getBaseId()).should.be.not.equal(-1);
           simpleIds.indexOf(row.getRelatedId()).should.be.not.equal(-1);
@@ -252,11 +252,11 @@ describe('Related Simple Attributes tests', function() {
           var totalMappedCount = userMappingDao.count();
           var mappings = userMappingDao.queryForAll();
           for (var m = 0; m < mappings.length; m++) {
-            var userMappingRow = userMappingDao.getUserMappingRow(mappings[i]);
-            attributeIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
-            simpleIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
-            RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
-            RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
+            umr = userMappingDao.getUserMappingRow(mappings[i]);
+            attributeIds.indexOf(umr.getBaseId()).should.not.be.equal(-1);
+            simpleIds.indexOf(umr.getRelatedId()).should.not.be.equal(-1);
+            RelatedTablesUtils.validateUserRow(mappingColumns, umr);
+            RelatedTablesUtils.validateDublinCoreColumns(umr);
           }
 
           // get and test the attributes DAO
@@ -316,12 +316,13 @@ describe('Related Simple Attributes tests', function() {
           var userMappingDao = rte.getMappingDao(simpleRelation);
           var totalMappedCount = userMappingDao.count();
           var mappings = userMappingDao.queryForAll();
+          var umr;
           mappings.forEach(function(row) {
-            var userMappingRow = userMappingDao.getUserMappingRow(row);
-            attributeIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
-            simpleIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
-            RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
-            RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
+            umr = userMappingDao.getUserMappingRow(row);
+            attributeIds.indexOf(umr.getBaseId()).should.not.be.equal(-1);
+            simpleIds.indexOf(umr.getRelatedId()).should.not.be.equal(-1);
+            RelatedTablesUtils.validateUserRow(mappingColumns, umr);
+            RelatedTablesUtils.validateDublinCoreColumns(umr);
           });
 
           // Get and test the attributes DAO
@@ -362,14 +363,14 @@ describe('Related Simple Attributes tests', function() {
         relatedTables[0].should.be.equal(simpleTable.table_name);
 
         // Delete a single mapping
-        var countOfIds = userMappingDao.countByIds(userMappingRow);
-        var queryOfIds = userMappingDao.queryByIds(userMappingRow);
+        var countOfIds = userMappingDao.countByIds(umr);
+        var queryOfIds = userMappingDao.queryByIds(umr);
         var queryCount = 0;
         for (var row of queryOfIds) {
           queryCount++;
         }
         queryCount.should.be.equal(countOfIds);
-        countOfIds.should.be.equal(userMappingDao.deleteByIds(userMappingRow));
+        countOfIds.should.be.equal(userMappingDao.deleteByIds(umr));
         userMappingDao.count().should.be.equal(10-countOfIds);
 
         // Delete by base id

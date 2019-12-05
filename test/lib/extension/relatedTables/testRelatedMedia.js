@@ -3,9 +3,9 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/dataTypes')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao')
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable')
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable')
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').default
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
+  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').default
   , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow')
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
