@@ -59,7 +59,6 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       table_name: 'point2d',
       geometry_type_name: 'POINT',
-      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -87,7 +86,6 @@ describe('GeometryColumns tests', function() {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
-      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -103,7 +101,6 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       geometry_type_name: 'POINT',
       srs_id: 0,
-      srs: undefined,
       z: 0,
       m: 0
     });
@@ -126,7 +123,6 @@ describe('GeometryColumns tests', function() {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
-      srs: undefined,
       srs_id: 0,
       z: 0,
       m: 0
@@ -155,7 +151,6 @@ describe('GeometryColumns tests', function() {
       column_name: 'geom',
       geometry_type_name: 'POINT',
       srs_id: 0,
-      srs: undefined,
       z: 0,
       m: 0
     });

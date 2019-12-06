@@ -12,18 +12,18 @@ import UserColumn from './lib/user/userColumn';
 import TileColumn from './lib/tiles/user/tileColumn';
 import DataColumns from './lib/dataColumns/dataColumns';
 import DataTypes from './lib/db/dataTypes'
+import SchemaExtension from './lib/extension/schema';
+import GeometryColumns from './lib/features/columns/geometryColumns';
+import MetadataReference from './lib/metadata/reference/metadataReference';
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
 var TableCreator = require('./lib/db/tableCreator');
 var DublinCoreType = require('./lib/extension/relatedTables/dublinCoreType');
 var BoundingBox = require('./lib/boundingBox');
 var TileUtilities = require('./lib/tiles/creator/tileUtilities');
-var GeometryColumns = require('./lib/features/columns/geometryColumns');
 var GeometryData = require('./lib/geom/geometryData');
 
 var Metadata = require('./lib/metadata/metadata');
-var MetadataReference = require('./lib/metadata/reference/metadataReference');
-var SchemaExtension = require('./lib/extension/schema');
 var FeatureTiles = require('./lib/tiles/features');
 var NumberFeaturesTile = require('./lib/tiles/features/custom/numberFeaturesTile');
 var ShadedFeaturesTile = require('./lib/tiles/features/custom/shadedFeaturesTile');

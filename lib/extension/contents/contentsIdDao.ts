@@ -5,14 +5,14 @@ import Dao from '../../dao/dao';
  * @class ContentsIdDao
  */
 
-var ContentsId = require('./contentsId');
+import ContentsId from './contentsId';
 
 /**
  * Contents Id Data Access Object
  * @constructor
  * @extends Dao
  */
-export default class ContentsIdDao extends Dao<typeof ContentsId> {
+export default class ContentsIdDao extends Dao<ContentsId> {
   public static readonly TABLE_NAME = 'nga_contents_id';
   public static readonly COLUMN_ID = 'id';
   public static readonly COLUMN_TABLE_NAME = 'table_name';

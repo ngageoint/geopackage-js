@@ -1,13 +1,13 @@
 import Dao from '../../dao/dao';
 import ColumnValues from '../../dao/columnValues'
-var ExtendedRelation = require('./extendedRelation');
+import ExtendedRelation from './extendedRelation';
 
 /**
  * Extended Relations Data Access Object
  * @class ExtendedRelationDao
  * @extends Dao
  */
-export default class ExtendedRelationDao extends Dao<typeof ExtendedRelation> {
+export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
   public static readonly TABLE_NAME = 'gpkgext_relations';
   public static readonly COLUMN_ID = ExtendedRelationDao.TABLE_NAME + '.id';
   public static readonly COLUMN_BASE_TABLE_NAME = ExtendedRelationDao.TABLE_NAME + '.base_table_name';

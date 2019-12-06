@@ -11,9 +11,9 @@ import MetadataDao from '../../metadata/metadataDao';
 import FeatureTable from './featureTable';
 import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
-var BoundingBox = require('../../boundingBox')  
+import GeometryColumns from '../columns/geometryColumns';
+var BoundingBox = require('../../boundingBox')  ;
   // eslint-disable-next-line no-unused-vars
-  , GeometryColumns = require('../columns/geometryColumns')
   // eslint-disable-next-line no-unused-vars;
 
 var reproject = require('reproject')

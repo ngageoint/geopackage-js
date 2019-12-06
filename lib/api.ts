@@ -12,6 +12,7 @@ import FeatureColumn from './features/user/featureColumn'
 import SpatialReferenceSystem from './core/srs/spatialReferenceSystem'
 import DataColumns from './dataColumns/dataColumns'
 import DataTypes from './db/dataTypes'
+import GeometryColumns from './features/columns/geometryColumns';
 
 /* eslint-disable camelcase */
 var wkx = require('wkx')
@@ -33,8 +34,7 @@ var GeoPackageValidate = require('./validate/geoPackageValidate')
   , BoundingBox = require('./boundingBox')
   , GeometryData = require('./geom/geometryData')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
-  , FeatureTile = require('./tiles/features')
-  , GeometryColumns = require('./features/columns/geometryColumns');
+  , FeatureTile = require('./tiles/features');
 
   type GeoPackageCallback = (err: Error, geopackage?: GeoPackage) => any;
 /**

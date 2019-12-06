@@ -5,9 +5,7 @@
  */
 import Dao from '../../dao/dao';
 
-var GeometryColumns = require('./geometryColumns')
-  // eslint-disable-next-line no-unused-vars
-  , ContentsDao = require('../../core/contents/contentsDao');
+import GeometryColumns from './geometryColumns';
 
 // /**
 //  * Contents
@@ -31,7 +29,7 @@ var GeometryColumns = require('./geometryColumns')
  * @class GeometryColumnsDao
  * @extends Dao
  */
-export default class GeometryColumnsDao extends Dao<typeof GeometryColumns> {
+export default class GeometryColumnsDao extends Dao<GeometryColumns> {
   /**
    * tableName field name
    * @type {String}

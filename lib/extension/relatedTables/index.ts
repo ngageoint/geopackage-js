@@ -19,10 +19,8 @@ import ExtendedRelationDao from './extendedRelationDao'
 import RelationType from './relationType'
 import Contents from '../../core/contents/contents'
 import ColumnValues from '../../dao/columnValues';
-var OptionBuilder = require('../../optionBuilder')
-  // eslint-disable-next-line no-unused-vars
-  , ExtendedRelation = require('./extendedRelation');
-
+import ExtendedRelation from './extendedRelation';
+var OptionBuilder = require('../../optionBuilder');
 /**
  * Related Tables Extension
  * @param  {module:geoPackage~GeoPackage} geoPackage the GeoPackage object
@@ -98,7 +96,7 @@ export default class RelatedTablesExtension extends BaseExtension {
    * @param {String} [baseTableName] base table name
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getRelationships(baseTableName?: String): typeof ExtendedRelation[] {
+  getRelationships(baseTableName?: string): ExtendedRelation[] {
     if (this.extendedRelationDao.isTableExists()) {
       if (baseTableName) {
         return this.geoPackage.getExtendedRelationDao().getBaseTableRelations(baseTableName);
@@ -121,7 +119,7 @@ export default class RelatedTablesExtension extends BaseExtension {
     }
     return !!relations.length;
   }
-  getRelatedRows(baseTableName: String, baseId: Number) {
+  getRelatedRows(baseTableName: string, baseId: number) {
     var relationships = this.getRelationships(baseTableName);
     for (var i = 0; i < relationships.length; i++) {
       var relation = relationships[i];

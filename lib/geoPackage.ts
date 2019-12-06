@@ -34,15 +34,14 @@ import StyleMappingTable from './extension/style/styleMappingTable'
 import TileTable from './tiles/user/tileTable'
 import Contents from './core/contents/contents';
 import DataTypes from './db/dataTypes';
+import SchemaExtension from './extension/schema';
+import GeometryColumns from './features/columns/geometryColumns';
 var TileMatrixSet = require('./tiles/matrixset/tileMatrixSet')
   , TileMatrix = require('./tiles/matrix/tileMatrix')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , TableCreator = require('./db/tableCreator')
-  , SchemaExtension = require('./extension/schema')
   // eslint-disable-next-line no-unused-vars
   , BoundingBox = require('./boundingBox')
-  // eslint-disable-next-line no-unused-vars
-  , GeometryColumns = require('./features/columns/geometryColumns');
 
 var proj4 = require('proj4');
 

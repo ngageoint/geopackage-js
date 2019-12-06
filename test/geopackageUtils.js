@@ -678,6 +678,7 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
     var ref1 = metadataReferenceDao.createObject();
     ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
     ref1.setMetadata(md1);
+    console.log('ref1', ref1);
     metadataReferenceDao.create(ref1);
 
     var tileTables = geopackage.getTileTables();

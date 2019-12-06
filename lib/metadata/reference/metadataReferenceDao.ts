@@ -1,13 +1,13 @@
 import Dao from '../../dao/dao';
 
 import ColumnValues from '../../dao/columnValues';
-var MetadataReference = require('./metadataReference');
+import MetadataReference from './metadataReference';
 /**
  * Metadata Reference Data Access Object
  * @class
  * @extends Dao
  */
-export default class MetadataReferenceDao extends Dao<typeof MetadataReference> {
+export default class MetadataReferenceDao extends Dao<MetadataReference> {
   public static readonly TABLE_NAME = "gpkg_metadata_reference";
   public static readonly COLUMN_REFERENCE_SCOPE = "reference_scope";
   public static readonly COLUMN_TABLE_NAME = "table_name";

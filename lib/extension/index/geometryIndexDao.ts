@@ -1,14 +1,13 @@
 import Dao from '../../dao/dao';
+import GeometryIndex from './geometryIndex';
 
-var TableCreator = require('../../db/tableCreator')
-  , GeometryIndex = require('./geometryIndex');
-
+var TableCreator = require('../../db/tableCreator');
 /**
  * Geometry Index Data Access Object
  * @class
  * @extends Dao
  */
-export default class GeometryIndexDao extends Dao<typeof GeometryIndex> {
+export default class GeometryIndexDao extends Dao<GeometryIndex> {
   public static readonly TABLE_NAME = "nga_geometry_index";
   public static readonly COLUMN_TABLE_NAME = GeometryIndexDao.TABLE_NAME + ".table_name";
   public static readonly COLUMN_GEOM_ID = GeometryIndexDao.TABLE_NAME + ".geom_id";

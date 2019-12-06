@@ -2,62 +2,59 @@
  * Geometry Index object, for indexing data within user tables
  * @class
  */
-class GeometryIndex {
-  constructor() {
+export default class GeometryIndex {
     /**
      * Name of the table
      * @member {String}
      */
-    this.table_name = undefined;
+    table_name: string;
     /**
      * Geometry Id column
      * @member {Number}
      */
-    this.geom_id = undefined;
+    geom_id: number;
     /**
      * Min X
      * @member {Number}
      */
-    this.min_x = undefined;
+    min_x: number;
     /**
      * Max X
      * @member {Number}
      */
-    this.max_x = undefined;
+    max_x: number;
     /**
      * Min Y
      * @member {Number}
      */
-    this.min_y = undefined;
+    min_y: number;
     /**
      * Max Y
      * @member {Number}
      */
-    this.max_y = undefined;
+    max_y: number;
     /**
      * Min Z
      * @member {Number}
      */
-    this.min_z = undefined;
+    min_z: number;
     /**
      * Max Z
      * @member {Number}
      */
-    this.max_z = undefined;
+    max_z: number;
     /**
      * Min M
      * @member {Number}
      */
-    this.min_m = undefined;
+    min_m: number;
     /**
      * Max M
      * @member {Number}
      */
-    this.max_m = undefined;
-  }
+    max_m: number;
   setTableIndex(tableIndex) {
     this.table_name = tableIndex.table_name;
   }
 }
 
-module.exports = GeometryIndex;
