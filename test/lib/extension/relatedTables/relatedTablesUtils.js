@@ -1,4 +1,4 @@
-var DataTypes = require('../../../../lib/db/dataTypes')
+var DataTypes = require('../../../../lib/db/dataTypes').default
   , UserColumn = require('../../../../lib/user/userColumn').default
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType')
   , DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata')

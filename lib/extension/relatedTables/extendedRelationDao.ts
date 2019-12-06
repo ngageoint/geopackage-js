@@ -1,7 +1,6 @@
 import Dao from '../../dao/dao';
-
-var ColumnValues = require('../../dao/columnValues')
-  , ExtendedRelation = require('./extendedRelation');
+import ColumnValues from '../../dao/columnValues'
+var ExtendedRelation = require('./extendedRelation');
 
 /**
  * Extended Relations Data Access Object

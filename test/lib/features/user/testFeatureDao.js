@@ -5,7 +5,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 // @ts-ignore
 var FeatureDao = require('../../../../lib/features/user/featureDao').default
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').default
-  , DataTypes = require('../../../../lib/db/dataTypes')
+  , DataTypes = require('../../../../lib/db/dataTypes').default
   // , GeoPackageAPI = require('../../../../index.js')
   , BoundingBox = require('../../../../lib/boundingBox')
   , GeometryData = require('../../../../lib/geom/geometryData')

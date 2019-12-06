@@ -1,7 +1,7 @@
 import Dao from '../../dao/dao';
 
-var ColumnValues = require('../../dao/columnValues')
-  , MetadataReference = require('./metadataReference');
+import ColumnValues from '../../dao/columnValues';
+var MetadataReference = require('./metadataReference');
 /**
  * Metadata Reference Data Access Object
  * @class

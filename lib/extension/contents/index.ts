@@ -7,8 +7,8 @@ import GeoPackage from '../../geoPackage';
 import Extension from '../extension';
 import ContentsIdDao from './contentsIdDao';
 import ContentsDao from '../../core/contents/contentsDao';
-var Contents = require('../../core/contents/contents')
-  , ContentsId = require('./contentsId');
+import Contents from '../../core/contents/contents';
+var ContentsId = require('./contentsId');
 
 type ContentsTableName = { table_name: String }
 /**
@@ -51,7 +51,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param contents {module:core/contents.Contents}
 	 * @returns {module:extension/contents.ContentsId}
 	 */
-  get(contents: typeof Contents): typeof ContentsId {
+  get(contents: Contents): typeof ContentsId {
     var contentsId = null;
     if (contents && contents.table_name) {
       contentsId = this.getByTableName(contents.table_name);
@@ -75,7 +75,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param contents {module:core/contents.Contents}
 	 * @returns {Number}
 	 */
-  getId(contents: typeof Contents): number {
+  getId(contents: Contents): number {
     let contentsId = null;
     if (contents && contents.table_name) {
       contentsId = this.getIdByTableName(contents.table_name);
@@ -102,7 +102,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param contents {module:core/contents.Contents}
 	 * @returns {module:extension/contents.ContentsId}
 	 */
-  create(contents: typeof Contents): typeof ContentsId {
+  create(contents: Contents): typeof ContentsId {
     var contentsId = null;
     if (contents && contents.table_name) {
       contentsId = this.createWithTableName(contents.table_name);
@@ -125,7 +125,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param contents {module:core/contents.Contents}
 	 * @returns {module:extension/contents.ContentsId}
 	 */
-  createId(contents: typeof Contents): typeof ContentsId {
+  createId(contents: Contents): typeof ContentsId {
     var contentsId = null;
     if (contents && contents.table_name) {
       contentsId = this.createIdWithTableName(contents.table_name);
@@ -145,7 +145,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param contents {module:core/contents.Contents}
 	 * @returns {module:extension/contents.ContentsId}
 	 */
-  getOrCreateId(contents: typeof Contents): typeof ContentsId {
+  getOrCreateId(contents: Contents): typeof ContentsId {
     var contentsId = null;
     if (contents && contents.table_name) {
       contentsId = this.getOrCreateIdByTableName(contents.table_name);
@@ -168,7 +168,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * Deletes contentsId for contents
 	 * @param contents {module:core/contents.Contents}
 	 */
-  deleteId(contents: typeof Contents): number {
+  deleteId(contents: Contents): number {
     var deleted = 0;
     if (contents && contents.table_name) {
       deleted = this.deleteIdByTableName(contents.table_name);

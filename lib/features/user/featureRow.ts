@@ -1,13 +1,13 @@
 import FeatureTable from "./featureTable";
 import UserRow from '../../user/userRow';
 import FeatureColumn from './featureColumn';
+import DataTypes from '../../db/dataTypes';
 /**
  * featureRow module.
  * @module features/user/featureRow
  */
 
 var GeometryData = require('../../geom/geometryData')
-  , DataTypes = require('../../db/dataTypes');
 
 /**
  * Feature Row containing the values from a single result set row
@@ -75,7 +75,7 @@ export default class FeatureRow extends UserRow {
     if (column instanceof FeatureColumn && column.isGeometry() && value.toData) {
       return value.toData();
     }
-    else if (column.dataType === DataTypes.GPKGDataType.BOOLEAN) {
+    else if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
       return value === true ? 1 : 0;
     }
     return value;

@@ -10,8 +10,8 @@ import DataColumnsDao from '../../dataColumns/dataColumnsDao';
 import MetadataDao from '../../metadata/metadataDao';
 import FeatureTable from './featureTable';
 import FeatureRow from './featureRow';
-var DataTypes = require('../../db/dataTypes')
-  , BoundingBox = require('../../boundingBox')  
+import DataTypes from '../../db/dataTypes'
+var BoundingBox = require('../../boundingBox')  
   // eslint-disable-next-line no-unused-vars
   , GeometryColumns = require('../columns/geometryColumns')
   // eslint-disable-next-line no-unused-vars;
@@ -202,7 +202,7 @@ export default class FeatureDao extends UserDao<FeatureRow> {
         min: column.min,
         notNull: column.notNull,
         primaryKey: column.primaryKey,
-        dataType: column.dataType ? DataTypes.name(column.dataType) : '',
+        dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
         displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
         dataColumn: dataColumn
       });

@@ -6,6 +6,7 @@ import TileMatrixSetDao from '../matrixset/tileMatrixSetDao';
 import TileRow from './tileRow';
 import TileColumn from './tileColumn';
 import TileGrid from '../tileGrid';
+import ColumnValues from '../../dao/columnValues'
 /**
  * tileDao module.
  */
@@ -16,8 +17,7 @@ var TileMatrixSet = require('../matrixset/tileMatrixSet')
   // eslint-disable-next-line no-unused-vars
   , GeoPackageConnection = require('../../db/geoPackageConnection')
   , BoundingBox = require('../../boundingBox')
-  , BoundingBoxUtils = require('../tileBoundingBoxUtils')
-  , ColumnValues = require('../../dao/columnValues');
+  , BoundingBoxUtils = require('../tileBoundingBoxUtils');
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading

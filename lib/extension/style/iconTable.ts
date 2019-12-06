@@ -6,7 +6,7 @@
 import MediaTable from '../relatedTables/mediaTable';
 import UserCustomColumn from '../../user/custom/userCustomColumn';
 
-var DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
  * Icon Requirements Class Media Table

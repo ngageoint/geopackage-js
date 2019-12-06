@@ -2,7 +2,7 @@ import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
-var DataType = require('../../../../lib/db/dataTypes')
+var DataType = require('../../../../lib/db/dataTypes').default
   , Verification = require('../../../fixtures/verification')
   , ContentsDao = require('../../../../lib/core/contents/contentsDao').default
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default

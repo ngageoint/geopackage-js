@@ -10,8 +10,8 @@ import DataColumnConstraintsDao from './lib/dataColumnConstraints/dataColumnCons
 import FeatureColumn from './lib/features/user/featureColumn';
 import UserColumn from './lib/user/userColumn';
 import TileColumn from './lib/tiles/user/tileColumn';
-
-
+import DataColumns from './lib/dataColumns/dataColumns';
+import DataTypes from './lib/db/dataTypes'
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
 var TableCreator = require('./lib/db/tableCreator');
@@ -20,8 +20,7 @@ var BoundingBox = require('./lib/boundingBox');
 var TileUtilities = require('./lib/tiles/creator/tileUtilities');
 var GeometryColumns = require('./lib/features/columns/geometryColumns');
 var GeometryData = require('./lib/geom/geometryData');
-var DataColumns = require('./lib/dataColumns/dataColumns');
-var DataTypes = require('./lib/db/dataTypes');
+
 var Metadata = require('./lib/metadata/metadata');
 var MetadataReference = require('./lib/metadata/reference/metadataReference');
 var SchemaExtension = require('./lib/extension/schema');

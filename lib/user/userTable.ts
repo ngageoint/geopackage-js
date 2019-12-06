@@ -1,6 +1,6 @@
 import UserColumn from './userColumn'
 
-var DataTypes = require('../db/dataTypes');
+import DataTypes from '../db/dataTypes';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -88,7 +88,7 @@ export default class UserTable {
   typeCheck(expected, column) {
     var actual = column.dataType;
     if (!actual || actual !== expected) {
-      throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.table_name + '\', expected: ' + DataTypes.name(expected) + ', actual: ' + column.dataType);
+      throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.table_name + '\', expected: ' + DataTypes.nameFromType(expected) + ', actual: ' + column.dataType);
     }
   }
   /**

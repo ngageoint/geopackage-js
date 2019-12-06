@@ -6,8 +6,7 @@
 import UserRelatedTable from './userRelatedTable';
 import RelationType from './relationType';
 import UserColumn from '../../user/userColumn'
-var DataTypes = require('../../db/dataTypes');
-
+import DataTypes from '../../db/dataTypes'
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table
  * @class

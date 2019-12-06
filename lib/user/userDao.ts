@@ -5,12 +5,8 @@ import UserTableReader from './userTableReader'
 import MediaTable from '../extension/relatedTables/mediaTable'
 import SimpleAttributesTable from '../extension/relatedTables/simpleAttributesTable'
 import UserRow from './userRow'
-import RelationType from '../extension/relatedTables/relationType';
-/**
- * UserDao module.
- */
-
-var ColumnValues = require('../dao/columnValues');
+import RelationType from '../extension/relatedTables/relationType'
+import ColumnValues from '../dao/columnValues'
 
 /**
  * Abstract User DAO for reading user tables

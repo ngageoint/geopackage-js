@@ -2,9 +2,8 @@ import Dao from '../../dao/dao';
 import TileMatrixDao from '../../tiles/matrix/tileMatrixDao'
 import TileMatrixSetDao from '../../tiles/matrixset/tileMatrixSetDao'
 import GeometryColumnsDao from '../../features/columns/geometryColumnsDao'
-
-var ColumnValues = require('../../dao/columnValues')
-  , Contents = require('./contents');
+import Contents from './contents'
+import ColumnValues from '../../dao/columnValues'
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -13,7 +12,7 @@ var ColumnValues = require('../../dao/columnValues')
  * @class ContentsDao
  * @extends Dao
  */
-export default class ContentsDao extends Dao<typeof Contents> {
+export default class ContentsDao extends Dao<Contents> {
   public static readonly TABLE_NAME = "gpkg_contents";
   public static readonly COLUMN_PK = "table_name";
   public static readonly COLUMN_TABLE_NAME = "table_name";
@@ -66,7 +65,7 @@ export default class ContentsDao extends Dao<typeof Contents> {
    * @param  {module:core/contents~Contents} contents Contents to get the projection from
    * @return {*}          proj4 projection
    */
-  getProjection(contents: typeof Contents): any {
+  getProjection(contents: Contents): any {
     var srs = this.getSrs(contents);
     var srsDao = this.geoPackage.getSpatialReferenceSystemDao();
     return srsDao.getProjection(srs);
@@ -76,7 +75,7 @@ export default class ContentsDao extends Dao<typeof Contents> {
    * @param  {module:core/contents~Contents} contents Contents to get the SpatialReferenceSystemDao from
    * @return {module:core/srs~SpatialReferenceSystemDao}
    */
-  getSrs(contents: typeof Contents): any {
+  getSrs(contents: Contents): any {
     var dao = this.geoPackage.getSpatialReferenceSystemDao();
     return dao.queryForId(contents.srs_id);
   }
@@ -85,7 +84,7 @@ export default class ContentsDao extends Dao<typeof Contents> {
    * @param  {module:core/contents~Contents} contents Contents
    * @return {module:features/columns~GeometryColumns}
    */
-  getGeometryColumns(contents: typeof Contents): any {
+  getGeometryColumns(contents: Contents): any {
     var dao = this.geoPackage.getGeometryColumnsDao();
     var results = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
     if (!results || !results.length)
@@ -99,7 +98,7 @@ export default class ContentsDao extends Dao<typeof Contents> {
    * @param  {module:core/contents~Contents} contents Contents
    * @return {module:tiles/matrixset~TileMatrixSet}
    */
-  getTileMatrixSet(contents: typeof Contents) {
+  getTileMatrixSet(contents: Contents) {
     var dao = this.geoPackage.getTileMatrixSetDao();
     var results = dao.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name);
     if (!results || !results.length)

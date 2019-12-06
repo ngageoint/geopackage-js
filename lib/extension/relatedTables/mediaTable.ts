@@ -5,7 +5,7 @@
 import UserRelatedTable from './userRelatedTable';
 import RelationType from './relationType';
 import UserColumn from '../../user/userColumn';
-var DataType = require('../../db/dataTypes');
+import DataType from '../../db/dataTypes';
 
 /**
  * Media Requirements Class User-Defined Related Data Table

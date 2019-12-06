@@ -111,7 +111,6 @@ describe('GeometryColumns tests', function() {
     TestUtils.compareProperties(srs, {
       srs_name: 'Undefined geographic SRS',
       srs_id: 0,
-      definition_12_063: undefined,
       organization: 'NONE',
       organization_coordsys_id: 0,
       definition: 'undefined',

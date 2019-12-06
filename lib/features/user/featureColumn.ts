@@ -3,7 +3,7 @@
  */
 
 import UserColumn from '../../user/userColumn';
-const DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
  * Represents a user feature column
@@ -22,9 +22,9 @@ export default class FeatureColumn extends UserColumn {
   }
   getTypeName() {
     if (this.isGeometry()) {
-      return DataTypes.name(DataTypes.GPKGDataType.GPKG_DT_GEOMETRY);
+      return DataTypes.nameFromType(DataTypes.GPKGDataType.GPKG_DT_GEOMETRY);
     }
-    return this.dataType !== undefined && DataTypes.name(this.dataType);
+    return this.dataType !== undefined && DataTypes.nameFromType(this.dataType);
   }
   /**
    * Determine if this column is a geometry

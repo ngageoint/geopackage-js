@@ -6,7 +6,7 @@ import UserTableReader from '../../user/userTableReader';
 import TileTable from './tileTable';
 import TileColumn from './tileColumn';
 
-var DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
 * Reads the metadata from an existing tile table

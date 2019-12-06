@@ -2,13 +2,13 @@ import { default as GeoPackageAPI } from '../../.'
 import { default as testSetup } from '../fixtures/testSetup'
 
 var FeatureColumn = require('../../lib/features/user/featureColumn').default
-  , DataColumns = require('../../lib/dataColumns/dataColumns')
+  , DataColumns = require('../../lib/dataColumns/dataColumns').default
   , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').default
   , Verification = require('../fixtures/verification')
   , FeatureTable = require('../../lib/features/user/featureTable').default
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , BoundingBox = require('../../lib/boundingBox')
-  , DataTypes = require('../../lib/db/dataTypes')
+  , DataTypes = require('../../lib/db/dataTypes').default
   , GeometryData = require('../../lib/geom/geometryData')
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').default
   // , testSetup = require('../fixtures/testSetup')

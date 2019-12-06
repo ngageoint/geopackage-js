@@ -1,13 +1,13 @@
 import Dao from '../../dao/dao';
 
-var SpatialReferenceSystem = require ('./spatialReferenceSystem');
+import SpatialReferenceSystem from './spatialReferenceSystem';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao
  * @class SpatialReferenceSystemDao
  * @param {module:geoPackage~GeoPackage} geoPackage The GeoPackage object
  */
-export default class SpatialReferenceSystemDao extends Dao<typeof SpatialReferenceSystem> {
+export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
   /**
    * Spatial Reference System Table Name
    * @type {String}
@@ -69,7 +69,7 @@ export default class SpatialReferenceSystemDao extends Dao<typeof SpatialReferen
    * Create a new SpatialReferenceSystem object
    * @return {module:core/srs~SpatialReferenceSystem}
    */
-  createObject(): typeof SpatialReferenceSystem {
+  createObject(): SpatialReferenceSystem {
     return new SpatialReferenceSystem();
   }
   /**
@@ -77,14 +77,14 @@ export default class SpatialReferenceSystemDao extends Dao<typeof SpatialReferen
    * @param  {Number}   srsId srs id
    * @return {module:core/srs~SpatialReferenceSystem}
    */
-  getBySrsId(srsId: number): typeof SpatialReferenceSystem {
+  getBySrsId(srsId: number): SpatialReferenceSystem {
     return this.queryForId(srsId);
   }
   /**
    * Return the proj4 projection specified by this SpatialReferenceSystem
    * @return {typeof proj4}
    */
-  getProjection(srs: typeof SpatialReferenceSystem): any {
+  getProjection(srs: SpatialReferenceSystem): any {
     return srs.getProjection();
   }
   /**

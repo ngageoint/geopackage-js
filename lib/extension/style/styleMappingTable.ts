@@ -5,7 +5,7 @@
 
 import UserMappingTable from '../relatedTables/userMappingTable';
 import UserCustomColumn from '../../user/custom/userCustomColumn'
-var DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes'
 
 /**
  * Contains style mapping table factory and utility methods

@@ -3,8 +3,7 @@
  */
 import ContentsDao from '../core/contents/contentsDao';
 import UserTable from '../user/userTable';
-
-var Contents = require('../core/contents/contents');
+import Contents from '../core/contents/contents';
 
 /**
  * Represents a user attribute table
@@ -15,7 +14,7 @@ var Contents = require('../core/contents/contents');
  * @param  {module:user/userColumn~UserColumn[]} columns   attribute columns
  */
 export default class AttributeTable extends UserTable {
-  contents: typeof Contents;
+  contents: Contents;
   constructor(tableName, columns) {
     super(tableName, columns);
     /**

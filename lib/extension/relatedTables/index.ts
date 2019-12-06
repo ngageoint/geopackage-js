@@ -17,12 +17,11 @@ import UserDao from '../../user/userDao'
 import UserTableReader from '../../user/userTableReader'
 import ExtendedRelationDao from './extendedRelationDao'
 import RelationType from './relationType'
-
-var ColumnValues = require('../../dao/columnValues')
-  , OptionBuilder = require('../../optionBuilder')
+import Contents from '../../core/contents/contents'
+import ColumnValues from '../../dao/columnValues';
+var OptionBuilder = require('../../optionBuilder')
   // eslint-disable-next-line no-unused-vars
-  , ExtendedRelation = require('./extendedRelation')
-  , Contents = require('../../core/contents/contents');
+  , ExtendedRelation = require('./extendedRelation');
 
 /**
  * Related Tables Extension

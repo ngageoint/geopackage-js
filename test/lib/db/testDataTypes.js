@@ -1,37 +1,37 @@
-var DataTypes = require('../../../lib/db/dataTypes.js');
+var DataTypes = require('../../../lib/db/dataTypes').default;
 
 var should = require('chai').should();
 
 describe('DataTypes tests', function() {
 
   it('get the enum name', function() {
-    var name = DataTypes.name(0);
+    var name = DataTypes.nameFromType(0);
     name.should.be.equal('BOOLEAN');
-    name = DataTypes.name(1);
+    name = DataTypes.nameFromType(1);
     name.should.be.equal('TINYINT');
-    name = DataTypes.name(2);
+    name = DataTypes.nameFromType(2);
     name.should.be.equal('SMALLINT');
-    name = DataTypes.name(3);
+    name = DataTypes.nameFromType(3);
     name.should.be.equal('MEDIUMINT');
-    name = DataTypes.name(4);
+    name = DataTypes.nameFromType(4);
     name.should.be.equal('INT');
-    name = DataTypes.name(5);
+    name = DataTypes.nameFromType(5);
     name.should.be.equal('INTEGER');
-    name = DataTypes.name(6);
+    name = DataTypes.nameFromType(6);
     name.should.be.equal('FLOAT');
-    name = DataTypes.name(7);
+    name = DataTypes.nameFromType(7);
     name.should.be.equal('DOUBLE');
-    name = DataTypes.name(8);
+    name = DataTypes.nameFromType(8);
     name.should.be.equal('REAL');
-    name = DataTypes.name(9);
+    name = DataTypes.nameFromType(9);
     name.should.be.equal('TEXT');
-    name = DataTypes.name(10);
+    name = DataTypes.nameFromType(10);
     name.should.be.equal('BLOB');
-    name = DataTypes.name(11);
+    name = DataTypes.nameFromType(11);
     name.should.be.equal('DATE');
-    name = DataTypes.name(12);
+    name = DataTypes.nameFromType(12);
     name.should.be.equal('DATETIME');
-    name = DataTypes.name(13);
+    name = DataTypes.nameFromType(13);
     name.should.be.equal('GEOMETRY');
   });
 

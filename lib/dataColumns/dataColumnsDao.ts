@@ -1,11 +1,10 @@
-import Dao from '../dao/dao';
-import ContentsDao from '../core/contents/contentsDao';
+import Dao from '../dao/dao'
+import ContentsDao from '../core/contents/contentsDao'
+import DataColumns from './dataColumns'
 /**
  * DataColumns module.
  * @module dataColumns
  */
-
-var DataColumns = require('./dataColumns');
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -15,7 +14,7 @@ var DataColumns = require('./dataColumns');
  * @extends Dao
  * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
-export default class DataColumnsDao extends Dao<typeof DataColumns> {
+export default class DataColumnsDao extends Dao<DataColumns> {
   public static readonly TABLE_NAME = "gpkg_data_columns";
   public static readonly COLUMN_PK1 = "table_name";
   public static readonly COLUMN_PK2 = "column_name";

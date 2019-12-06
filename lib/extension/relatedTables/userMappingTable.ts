@@ -7,7 +7,7 @@ import UserTable from '../../user/userTable';
 import UserColumn from '../../user/userColumn';
 import UserCustomColumn from '../../user/custom/userCustomColumn';
 
-var DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
  * Contains user mapping table factory and utility methods

@@ -5,8 +5,7 @@ import UserDao from '../user/userDao';
 import GeoPackage from '../geoPackage';
 import AttributeTable from './attributeTable'
 import AttributeRow from './attributeRow';
-
-var Contents = require('../core/contents/contents');
+import Contents from '../core/contents/contents';
 /**
  * Attribute DAO for reading attribute user data tables
  * @class AttributeDao
@@ -19,7 +18,7 @@ export default class AttributeDao<T extends AttributeRow> extends UserDao<Attrib
    * Contents of this AttributeDao
    * @member {module:core/contents~Contents}
    */
-  contents: typeof Contents;
+  contents: Contents;
   constructor(geoPackage: GeoPackage, table: AttributeTable) {
     super(geoPackage, table);
     if (!table.contents) {

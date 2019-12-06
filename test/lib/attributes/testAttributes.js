@@ -5,14 +5,14 @@ import AttributeDao from '../../../lib/attributes/attributeDao'
 import AttributeTableReader from '../../../lib/attributes/attributeTableReader'
 import UserTableReader from '../../../lib/user/userTableReader'
 import AttributeTable from '../../../lib/attributes/attributeTable'
+import DataTypes from '../../../lib/db/dataTypes'
 
 // var GeoPackageAPI = require('../../../.')
 // var testSetup = require('../../fixtures/testSetup')
 var Verification = require('../../fixtures/verification')
-  , DataColumns = require('../../../lib/dataColumns/dataColumns')
+  , DataColumns = require('../../../lib/dataColumns/dataColumns').default
 
   , UserColumn = require('../../../lib/user/userColumn').default
-  , DataTypes = require('../../../lib/db/dataTypes')
   , should = require('chai').should()
   , path = require('path');
 

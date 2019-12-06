@@ -1,12 +1,11 @@
 import GeoPackage from "../geoPackage";
 import GeoPackageConnection from "../db/geoPackageConnection";
-
+import ColumnValues from './columnValues';
 /**
  * Dao module.
  */
 
-var sqliteQueryBuilder = require('../db/sqliteQueryBuilder')
-  , ColumnValues = require('./columnValues');
+var sqliteQueryBuilder = require('../db/sqliteQueryBuilder');
 
 /**
  * Base DAO
@@ -85,7 +84,7 @@ export default abstract class Dao<T> {
     var idArray = this.getMultiId(object);
     return this.queryForMultiId(idArray);
   }
-  getMultiId(object: T | any) {
+  getMultiId(object: T | any): any[] {
     var idValues = [];
     for (var i = 0; i < this.idColumns.length; i++) {
       var idValue = object.values ? object.values[this.idColumns[i]] : object[this.idColumns[i]];
@@ -100,7 +99,7 @@ export default abstract class Dao<T> {
    * @param  idValues ColumnValues with the multi id
    * @return object created from the raw database object
    */
-  queryForMultiId(idValues: typeof ColumnValues): T {
+  queryForMultiId(idValues: any[]): T {
     var whereString = this.buildPkWhere(idValues);
     var whereArgs = this.buildPkWhereArgs(idValues);
     var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
@@ -141,7 +140,7 @@ export default abstract class Dao<T> {
    * @param {module:dao/columnValues~ColumnValues} [fieldValues] optional values to filter on
    * @return {Object[]} raw object array from the database
    */
-  queryForColumns(columnName: string, fieldValues?: typeof ColumnValues): any[] {
+  queryForColumns(columnName: string, fieldValues?: ColumnValues): any[] {
     var where: string;
     var whereArgs: any[];
     if (fieldValues) {
@@ -187,7 +186,7 @@ export default abstract class Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} fieldValues ColumnValues to query for
    * @return {IterableIterator<any>}
    */
-  queryForFieldValues(fieldValues: typeof ColumnValues): IterableIterator<any> {
+  queryForFieldValues(fieldValues: ColumnValues): IterableIterator<any> {
     var whereString: string = this.buildWhere(fieldValues);
     var whereArgs: any[] = this.buildWhereArgs(fieldValues);
     var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
@@ -281,7 +280,7 @@ export default abstract class Dao<T> {
    * @param  {string} [operation] AND or OR
    * @return {string} where clause
    */
-  buildWhereLike(fields: typeof ColumnValues, operation?: string): string {
+  buildWhereLike(fields: ColumnValues, operation?: string): string {
     var whereString = '';
     for (var i = 0; i < fields.columns.length; i++) {
       var column = fields.columns[i];
@@ -298,7 +297,7 @@ export default abstract class Dao<T> {
    * @param  [operation=AND] AND or OR
    * @return where clause
    */
-  buildWhere(fields: typeof ColumnValues, operation = 'and'): string {
+  buildWhere(fields: ColumnValues, operation = 'and'): string {
     var whereString = '';
     for (var i = 0; i < fields.columns.length; i++) {
       var column = fields.columns[i];
@@ -314,7 +313,7 @@ export default abstract class Dao<T> {
    * @param {any[]|ColumnValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgs(values: any[] | typeof ColumnValues | any): any[] {
+  buildWhereArgs(values: any[] | ColumnValues | any): any[] {
     var args = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
@@ -349,7 +348,7 @@ export default abstract class Dao<T> {
    * @param {ColumnValues} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithColumnValues(values: typeof ColumnValues): any[] {
+  _buildWhereArgsWithColumnValues(values: ColumnValues): any[] {
     var args = [];
     for (var i = 0; i < values.columns.length; i++) {
       var column = values.columns[i];
@@ -398,14 +397,14 @@ export default abstract class Dao<T> {
    * @param  {Object} [value]  value to filter on if fields is a string
    * @return {number} count of objects
    */
-  count(fields?: typeof ColumnValues | string, value?: any): number {
+  count(fields?: ColumnValues | string, value?: any): number {
     if (!fields) {
       return this.connection.count(this.gpkgTableName);
     }
   var where;
     var whereArgs;
     var query;
-    if (fields.columns) {
+    if (fields instanceof ColumnValues) {
       where = this.buildWhere(fields, 'and');
       whereArgs = this.buildWhereArgs(fields);
       query = sqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
@@ -479,7 +478,7 @@ export default abstract class Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} idValues id values
    * @return {number} number of objects deleted
    */
-  deleteByMultiId(idValues: typeof ColumnValues): number {
+  deleteByMultiId(idValues: any[]): number {
     var where = this.buildPkWhere(idValues);
     var whereArgs = this.buildPkWhereArgs(idValues);
     return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
@@ -518,7 +517,7 @@ export default abstract class Dao<T> {
    * @return {number} number of objects updated
    */
   //TODO this return value
-  updateWithValues(values: typeof ColumnValues, where: string, whereArgs: any[]): any {
+  updateWithValues(values: {}, where: string, whereArgs: any[]): any {
     var update = sqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
     return this.connection.run(update.sql, update.args);
   }

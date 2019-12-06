@@ -9,6 +9,9 @@ import FeatureRow from './features/user/featureRow'
 import RelationType from './extension/relatedTables/relationType'
 import UserColumn from './user/userColumn'
 import FeatureColumn from './features/user/featureColumn'
+import SpatialReferenceSystem from './core/srs/spatialReferenceSystem'
+import DataColumns from './dataColumns/dataColumns'
+import DataTypes from './db/dataTypes'
 
 /* eslint-disable camelcase */
 var wkx = require('wkx')
@@ -31,11 +34,7 @@ var GeoPackageValidate = require('./validate/geoPackageValidate')
   , GeometryData = require('./geom/geometryData')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , FeatureTile = require('./tiles/features')
-  , DataColumns = require('./dataColumns/dataColumns')
-  , DataTypes = require('./db/dataTypes')
-  , GeometryColumns = require('./features/columns/geometryColumns')
-  // eslint-disable-next-line no-unused-vars
-  , SpatialReferenceSystem = require('./core/srs/spatialReferenceSystem');
+  , GeometryColumns = require('./features/columns/geometryColumns');
 
   type GeoPackageCallback = (err: Error, geopackage?: GeoPackage) => any;
 /**
@@ -490,7 +489,7 @@ static createDataColumnMap(featureDao) {
       min: column.min,
       notNull: column.notNull,
       primaryKey: column.primaryKey,
-      dataType: column.dataType ? DataTypes.name(column.dataType) : '',
+      dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
       displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
       dataColumn: dataColumn
     };
@@ -581,7 +580,7 @@ static getFeature(geopackage, table, featureId) {
 };
 
 // eslint-disable-next-line complexity
-static parseFeatureRowIntoGeoJSON(featureRow: FeatureRow, srs: typeof SpatialReferenceSystem, columnMap?: any) {
+static parseFeatureRowIntoGeoJSON(featureRow: FeatureRow, srs: SpatialReferenceSystem, columnMap?: any) {
   var geoJson = {
     type: 'Feature',
     properties: {},

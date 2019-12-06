@@ -5,7 +5,7 @@ import UserCustomTable from './userCustomTable';
 import UserTableReader from '../userTableReader';
 import UserCustomColumn from './userCustomColumn';
 
-var DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
  * User custom table reader

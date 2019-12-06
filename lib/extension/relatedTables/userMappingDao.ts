@@ -5,8 +5,7 @@ import UserCustomDao from '../../user/custom/userCustomDao';
 import GeoPackage from '../../geoPackage';
 import UserMappingTable from './userMappingTable';
 import UserMappingRow from './userMappingRow';
-
-var ColumnValues = require('../../dao/columnValues');
+import ColumnValues from '../../dao/columnValues';
 
 /**
  * User Mapping DAO for reading user mapping data tables

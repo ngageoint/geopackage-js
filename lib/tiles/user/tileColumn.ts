@@ -3,7 +3,7 @@
  */
 
 import UserColumn from '../../user/userColumn';
-const DataTypes = require('../../db/dataTypes');
+import DataTypes from '../../db/dataTypes';
 
 /**
  * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.

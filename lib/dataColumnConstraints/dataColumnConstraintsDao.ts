@@ -1,11 +1,11 @@
 import Dao from '../dao/dao';
+import DataColumnConstraints from './dataColumnConstraints';
 
 /**
  * DataColumnConstraints module.
  * @module dataColumnConstraints
  */
 
-var DataColumnConstraints = require('./dataColumnConstraints');
 
 /**
  * Data Column Constraints Data Access Object
@@ -13,7 +13,7 @@ var DataColumnConstraints = require('./dataColumnConstraints');
  * @extends Dao
  * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
-export default class DataColumnConstraintsDao extends Dao<typeof DataColumnConstraints> {
+export default class DataColumnConstraintsDao extends Dao<DataColumnConstraints> {
   public static readonly TABLE_NAME = "gpkg_data_column_constraints";
   public static readonly COLUMN_CONSTRAINT_NAME = "constraint_name";
   public static readonly COLUMN_CONSTRAINT_TYPE = "constraint_type";

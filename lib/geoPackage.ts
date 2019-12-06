@@ -32,14 +32,13 @@ import UserTable from './user/userTable'
 import FeatureTable from './features/user/featureTable'
 import StyleMappingTable from './extension/style/styleMappingTable'
 import TileTable from './tiles/user/tileTable'
-
-var Contents = require('./core/contents/contents')
-  , TileMatrixSet = require('./tiles/matrixset/tileMatrixSet')
+import Contents from './core/contents/contents';
+import DataTypes from './db/dataTypes';
+var TileMatrixSet = require('./tiles/matrixset/tileMatrixSet')
   , TileMatrix = require('./tiles/matrix/tileMatrix')
   , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
   , TableCreator = require('./db/tableCreator')
   , SchemaExtension = require('./extension/schema')
-  , DataTypes = require('./db/dataTypes')
   // eslint-disable-next-line no-unused-vars
   , BoundingBox = require('./boundingBox')
   // eslint-disable-next-line no-unused-vars
@@ -814,7 +813,7 @@ export default class GeoPackage {
         min: column.min,
         notNull: column.notNull,
         primaryKey: column.primaryKey,
-        dataType: column.dataType ? DataTypes.name(column.dataType) : '',
+        dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
         displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
         dataColumn: dataColumn
       });

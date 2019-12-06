@@ -7,8 +7,8 @@ import FeatureTable from './featureTable';
 import UserTableReader from '../../user/userTableReader';
 import FeatureColumn from './featureColumn';
 
-var DataTypes = require('../../db/dataTypes')
-  , wkb = require('../../wkb');
+import DataTypes from '../../db/dataTypes'
+var wkb = require('../../wkb');
 
 /**
 * Reads the metadata from an existing feature table

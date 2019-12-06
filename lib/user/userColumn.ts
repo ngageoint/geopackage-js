@@ -2,7 +2,7 @@
  * @module user/userColumn
  */
 
-var DataTypes = require('../db/dataTypes');
+import DataTypes from '../db/dataTypes';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -41,7 +41,7 @@ export default class UserColumn {
   getTypeName() {
     var type = undefined;
     if (this.dataType !== DataTypes.GPKGDataType.GPKG_DT_GEOMETRY) {
-      type = DataTypes.name(this.dataType);
+      type = DataTypes.nameFromType(this.dataType);
     }
     return type;
   }

@@ -1,8 +1,8 @@
 import Extension from './extension';
 import Dao from '../dao/dao';
+import ColumnValues from '../dao/columnValues';
 
-var ColumnValues = require('../dao/columnValues')
-  , TableCreator = require('../db/tableCreator');
+var TableCreator = require('../db/tableCreator');
 
 /**
  * Extension Data Access Object

@@ -6,7 +6,7 @@ import UserTable from './userTable';
 import { GeoPackageConnection } from '../..';
 import UserColumn from './userColumn';
 
-var DataTypes = require('../db/dataTypes');
+import DataTypes from '../db/dataTypes';
 
 /**
  * @class

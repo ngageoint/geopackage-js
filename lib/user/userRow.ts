@@ -6,7 +6,7 @@
 import UserTable from './userTable'
 import UserColumn from './userColumn'
 
-var DataTypes = require('../db/dataTypes');
+import DataTypes from '../db/dataTypes';
 
 /**
  * User Row containing the values from a single result row
