@@ -2,8 +2,8 @@
  * featureDao module.
  * @module features/user/featureDao
  */
+import reproject from 'reproject'
 
-//  import BoundingBox from '../../boundingBox';
 import FeatureTableIndex from '../../extension/index/featureTableIndex';
 import UserDao from '../../user/userDao';
 import DataColumnsDao from '../../dataColumns/dataColumnsDao';
@@ -13,8 +13,6 @@ import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
 import GeometryColumns from '../columns/geometryColumns';
 import { BoundingBox } from '../../boundingBox'
-  // eslint-disable-next-line no-unused-vars
-  // eslint-disable-next-line no-unused-vars;
 
 var reproject = require('reproject')
   , LineIntersect = require('@turf/line-intersect').default

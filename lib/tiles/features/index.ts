@@ -1,39 +1,60 @@
+import concat from 'concat-stream'
+import * as d3geo  from 'd3-geo'
+import FeatureDao from "../../features/user/featureDao"
+import {TileBoundingBoxUtils} from '../tileBoundingBoxUtils'
+import { BoundingBox } from '../../boundingBox'
+import { ImageUtils } from '../imageUtils'
+
 /**
  * FeatureTiles module.
  * @module tiles/features
  */
-var TileBoundingBoxUtils = require('../tileBoundingBoxUtils').TileBoundingBoxUtils
-  , BoundingBox = require('../../boundingBox').BoundingBox
-  , FeatureTableStyles = require('../../extension/style/featureTableStyles')
+var FeatureTableStyles = require('../../extension/style/featureTableStyles')
   , Paint = require('./paint')
   , FeaturePaintCache = require('./featurePaintCache')
   , FeatureDrawType = require('./featureDrawType')
-  , IconCache = require('../../extension/style/iconCache')
-  , ImageUtils = require('../imageUtils').ImageUtils;
+  , IconCache = require('../../extension/style/iconCache');
 
 // @ts-ignore
-var d3geo = require('d3-geo')
-  // @ts-ignore
-  , concat = require('concat-stream')
-  // @ts-ignore
-  , reproject = require('reproject')
+var reproject = require('reproject')
   , PolyToLine = require('@turf/polygon-to-line').default;
-
-var isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-// @ts-ignore
-var isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-var isNode = typeof (process) !== 'undefined' && process.version;
 
 /**
  *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
  *  from those features.
  */
-class FeatureTiles {
-  constructor(featureDao, tileWidth = null, tileHeight = null) {
-    this.useNodeCanvas = isNode && !isPhantom && !isElectron;
+export class FeatureTiles {
+  private static readonly isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
+  // @ts-ignore
+  private static readonly isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
+  private static readonly isNode = typeof (process) !== 'undefined' && process.version;
+  private static readonly useNodeCanvas = FeatureTiles.isNode && !FeatureTiles.isPhantom && !FeatureTiles.isElectron;
+  featureDao: FeatureDao;
+  tileWidth: number;
+  tileHeight: number;
+  compressFormat: string;
+  pointRadius: number;
+  pointPaint: any;
+  pointIcon: any;
+  linePaint: any;
+  lineStrokeWidth: number;
+  polygonPaint: any;
+  polygonStrokeWidth: number;
+  fillPolygon: boolean;
+  polygonFillPaint: any;
+  featurePaintCache: any;
+  iconCache: any;
+  scale: number;
+  geoPackage: any;
+  featureTableStyles: any;
+  maxFeaturesPerTile: any;
+  maxFeaturesTileDraw: any;
+  widthOverlap: any;
+  heightOverlap: any;
+  constructor(featureDao: FeatureDao, tileWidth: number = 256, tileHeight: number = 256) {
     this.featureDao = featureDao;
-    this.tileWidth = tileWidth !== null ? tileWidth : 256;
-    this.tileHeight = tileHeight !== null ? tileHeight : 256;
+    this.tileWidth = tileWidth;
+    this.tileHeight = tileHeight;
     this.compressFormat = 'png';
     this.pointRadius = 4.0;
     this.pointPaint = new Paint();
@@ -603,7 +624,7 @@ class FeatureTiles {
     }
     var context;
     if (canvas === undefined || canvas === null) {
-      if (this.useNodeCanvas) {
+      if (FeatureTiles.useNodeCanvas) {
         var Canvas = require('canvas');
         canvas = Canvas.createCanvas(width, height);
       }
@@ -672,7 +693,7 @@ class FeatureTiles {
     }
     var context;
     if (canvas === undefined || canvas === null) {
-      if (this.useNodeCanvas) {
+      if (FeatureTiles.useNodeCanvas) {
         var Canvas = require('canvas');
         canvas = Canvas.createCanvas(width, height);
       }
@@ -838,7 +859,7 @@ class FeatureTiles {
    * @param featureStyle
    */
   async addFeatureToBatch(geoJson, context, drawProjection, boundingBox, featureStyle) {
-    var path = new d3geo.geoPath()
+    var path = d3geo.geoPath()
       .context(context)
       .projection(drawProjection);
     var i, c;
@@ -915,69 +936,3 @@ class FeatureTiles {
     return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module.exports = FeatureTiles;

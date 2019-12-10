@@ -5,7 +5,7 @@ import DBAdapter from './dbAdapter';
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
  */
 
-var fs = require('fs')
+var fs = require('fs-extra')
   , path = require('path')
   , http = require('http')
   , os = require('os');

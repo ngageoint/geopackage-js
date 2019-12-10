@@ -25,7 +25,7 @@ var DataTypes = GP.DataTypes
 
 var wkx = require('wkx')
   , path = require('path')
-  , fs = require('fs');
+  , fs = require('fs-extra');
 
 var GeoPackageUtils = {};
 

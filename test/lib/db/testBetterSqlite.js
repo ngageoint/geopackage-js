@@ -1,5 +1,5 @@
 import { default as testSetup } from '../../fixtures/testSetup'
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var testPath = path.join(__dirname, '..', '..', 'tmp');
 var testDb;

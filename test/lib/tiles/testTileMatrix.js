@@ -10,17 +10,13 @@ describe('Tile Matrix tests', function() {
   var geoPackage;
   var tileMatrixDao;
 
-  beforeEach('should open the geopackage', function(done) {
+  beforeEach('should open the geopackage', async function() {
     var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-    GeoPackageAPI.open(filename, function(err, gp) {
-      geoPackage = gp;
-      should.not.exist(err);
-      should.exist(gp);
-      should.exist(gp.getDatabase().getDBConnection());
-      gp.getPath().should.be.equal(filename);
-      tileMatrixDao = new TileMatrixDao(gp);
-      done();
-    });
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(filename);
+    filename = result.path;
+    geoPackage = result.geopackage;
+    tileMatrixDao = new TileMatrixDao(geoPackage);
   });
 
   afterEach('should close the geopackage', function() {

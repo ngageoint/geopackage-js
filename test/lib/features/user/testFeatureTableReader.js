@@ -8,16 +8,13 @@ var FeatureTableReader = require('../../../../lib/features/user/featureTableRead
 
 describe('FeatureTableReader tests', function() {
   var geoPackage;
-  beforeEach('create the GeoPackage connection', function(done) {
+  beforeEach('create the GeoPackage connection', async function() {
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-    GeoPackageAPI.open(filename, function(err, gp) {
-      geoPackage = gp;
-      should.not.exist(err);
-      should.exist(gp);
-      should.exist(gp.getDatabase().getDBConnection());
-      gp.getPath().should.be.equal(filename);
-      done();
-    });
+
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(filename);
+    filename = result.path;
+    geoPackage = result.geopackage;
   });
 
   afterEach('close the geopackage connection', function() {

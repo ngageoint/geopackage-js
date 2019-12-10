@@ -22,29 +22,16 @@ describe('Related Simple Attributes tests', function() {
 
   var tileBuffer;
 
-  function copyGeopackage(orignal, copy, callback) {
-    if (typeof(process) !== 'undefined' && process.version) {
-      var fsExtra = require('fs-extra');
-      fsExtra.copy(orignal, copy, callback);
-    } else {
-      filename = orignal;
-      callback();
-    }
-  }
   var filename;
-  beforeEach('create the GeoPackage connection', function(done) {
+  beforeEach('create the GeoPackage connection', async function() {
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'attributes.gpkg');
-    filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-    copyGeopackage(originalFilename, filename, function() {
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'), function(err, buffer) {
-          tileBuffer = buffer;
-          done();
-        });
-      });
-    });
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(originalFilename);
+    filename = result.path;
+    geoPackage = result.geopackage;
+    // @ts-ignore
+    tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
   function validateContents(simpleAttributesTable, contents) {

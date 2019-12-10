@@ -18,13 +18,13 @@ import { GeoPackageTileRetriever } from './tiles/retriever'
 import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils'
 import { BoundingBox } from './boundingBox'
 import { GeoPackageValidate } from './validate/geoPackageValidate'
-
+import { FeatureTiles } from './tiles/features'
 
 /* eslint-disable camelcase */
 var wkx = require('wkx')
   , reproject = require('reproject')
   , path = require('path')
-  , fs = require('fs')
+  , fs = require('fs-extra')
   , geojsonvt = require('geojson-vt')
   , vtpbf = require('vt-pbf')
   , Pbf = require('pbf')
@@ -33,10 +33,7 @@ var wkx = require('wkx')
   , polygonToLine = require('@turf/polygon-to-line').default
   , booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default
   , pointDistance = require('@turf/distance').default
-  , helpers = require('@turf/helpers')
-
-  
-  , FeatureTile = require('./tiles/features');
+  , helpers = require('@turf/helpers');
 
   type GeoPackageCallback = (err: Error, geopackage?: GeoPackage) => any;
 /**
@@ -52,44 +49,26 @@ export default class GeoPackageAPI {
  * In Node, open a GeoPackage file at the given path, or in a browser, load an
  * in-memory GeoPackage from the given byte array.
  * @param  {String|Uint8Array|Buffer} gppathOrByteArray path to the GeoPackage file or `Uint8Array` of GeoPackage bytes
- * @param  {GeoPackageCallback=} [callback] called with an `Error` if one occurred and the open `GeoPackage` object
  * @return {Promise<GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an `Error`
  */
-static open(gppathOrByteArray: string|Uint8Array|Buffer, callback?:GeoPackageCallback): Promise<GeoPackage> {
-  return new Promise(function(resolve, reject) {
-    var valid = (typeof gppathOrByteArray !== 'string') || (typeof gppathOrByteArray === 'string' &&
-    (gppathOrByteArray.indexOf('http') === 0 || !GeoPackageValidate.validateGeoPackageExtension(gppathOrByteArray)));
-    if (!valid) {
-      reject(new Error('Invalid GeoPackage - Invalid GeoPackage Extension'));
-    } else {
-      resolve(gppathOrByteArray);
-    }
-  }).then(function() {
-    return GeoPackageConnection.connect(gppathOrByteArray);
-  }).then(function(connection) {
-    if (gppathOrByteArray && typeof gppathOrByteArray === 'string') {
-      return new GeoPackage(path.basename(gppathOrByteArray), gppathOrByteArray, connection);
-    } else {
-      return new GeoPackage('geopackage', undefined, connection);
-    }
-  }).then(function(geoPackage) {
-    if (GeoPackageValidate.hasMinimumTables(geoPackage)) {
-      return geoPackage;
-    } else {
-      throw new Error('Invalid GeoPackage - GeoPackage does not have the minimum required tables');
-    }
-  }).then(function(geoPackage) {
-    if(callback) callback(null, geoPackage);
+static async open(gppathOrByteArray: string|Uint8Array|Buffer): Promise<GeoPackage> {
+  var valid = (typeof gppathOrByteArray !== 'string') || (typeof gppathOrByteArray === 'string' &&
+  (gppathOrByteArray.indexOf('http') === 0 || !GeoPackageValidate.validateGeoPackageExtension(gppathOrByteArray)));
+  if (!valid) {
+    throw new Error('Invalid GeoPackage - Invalid GeoPackage Extension');
+  }
+  let connection = await GeoPackageConnection.connect(gppathOrByteArray);
+  let geoPackage
+  if (gppathOrByteArray && typeof gppathOrByteArray === 'string') {
+    geoPackage = new GeoPackage(path.basename(gppathOrByteArray), gppathOrByteArray, connection);
+  } else {
+    geoPackage = new GeoPackage('geopackage', undefined, connection);
+  }
+  if (GeoPackageValidate.hasMinimumTables(geoPackage)) {
     return geoPackage;
-  });
-  // .catch(function(error){
-  //   console.log('error', error);
-  //   if(callback) {
-  //     callback(error);
-  //   } else {
-  //     throw error;
-  //   }
-  // });
+  } else {
+    throw new Error('Invalid GeoPackage - GeoPackage does not have the minimum required tables');
+  }
 }
 
 /**
@@ -828,7 +807,7 @@ static getFeatureTileFromXYZ(geopackage, table, x, y, z, width, height) {
   height = Number(height);
   var featureDao = geopackage.getFeatureDao(table);
   if (!featureDao) return;
-  var ft = new FeatureTile(featureDao, width, height);
+  var ft = new FeatureTiles(featureDao, width, height);
   return ft.drawTile(x, y, z);
 };
 
@@ -840,7 +819,7 @@ static getClosestFeatureInXYZTile(geopackage, table, x, y, z, latitude, longitud
 
   var featureDao = geopackage.getFeatureDao(table);
   if (!featureDao) return;
-  var ft = new FeatureTile(featureDao, 256, 256);
+  var ft = new FeatureTiles(featureDao, 256, 256);
   var tileCount = ft.getFeatureCountXYZ(x, y, z);
   var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
   boundingBox = boundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');

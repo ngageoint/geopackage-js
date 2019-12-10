@@ -9,7 +9,7 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../../lib/api')
   // @ts-ignore
-  , fs = require('fs');
+  , fs = require('fs-extra');
 
 describe('IconCache Tests', function() {
   var testGeoPackage;
@@ -80,13 +80,11 @@ describe('IconCache Tests', function() {
             geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension().then(function () {
               featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
               featureTableStyles.createIconRelationship().then(function () {
-                ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(function (expectedImage) {
+                ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(async function (expectedImage) {
                   iconImage = expectedImage;
                   // @ts-ignore
-                  testSetup.loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'), function(err, buffer) {
-                    iconImageBuffer = buffer;
-                    done();
-                  });
+                  iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
+                  done();
                 });
               });
             });

@@ -1,9 +1,28 @@
-var TileBoundingBoxUtils = require('../tileBoundingBoxUtils').TileBoundingBoxUtils;
-var proj4 = require('proj4');
-proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils'
+import proj4 from 'proj4'
+import { TileMatrix } from '../matrix/tileMatrix';
+import { BoundingBox } from '../../..';
+import { TileMatrixSet } from '../matrixset/tileMatrixSet';
+import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
 
-class TileCreator {
-  constructor(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo) {
+export abstract class TileCreator {
+  width: number;
+  height: number;
+  tileMatrix: TileMatrix;
+  projectionFrom: string;
+  projectionFromDefinition: string;
+  projectionTo: string;
+  tileBoundingBox: BoundingBox;
+  tileMatrixSet: TileMatrixSet;
+  chunks: any[];
+  tileHeightUnitsPerPixel: number;
+  tileWidthUnitsPerPixel: number;
+  sameProjection: boolean;
+
+  abstract async initialize(): Promise<TileCreator>;
+  abstract getCompleteTile(format?: string): Promise<any>;
+
+  constructor(width: number, height: number, tileMatrix: TileMatrix, tileMatrixSet: TileMatrixSet, tileBoundingBox: BoundingBox, srs: SpatialReferenceSystem, projectionTo: string) {
     this.width = width;
     this.height = height;
     this.tileMatrix = tileMatrix;
@@ -19,7 +38,7 @@ class TileCreator {
     // special cases 'EPSG:900913' =='EPSG:3857' == 'EPSG:102113'
     this.sameProjection = (this.projectionFrom === this.projectionTo) || (this.projectionTo === 'EPSG:3857' && (this.projectionFrom === 'EPSG:900913' || this.projectionFrom === 'EPSG:102113'));
   }
-  projectTile(tileData, gridColumn, gridRow) {
+  projectTile(tileData: any, gridColumn: number, gridRow: number) {
     var bb = TileBoundingBoxUtils.getTileBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
     if (!this.sameProjection) {
       return this.reproject(tileData, bb);
@@ -28,7 +47,7 @@ class TileCreator {
       return Promise.resolve(this.cutAndScale(tileData, bb));
     }
   }
-  cutAndScale(tileData, tilePieceBoundingBox) {
+  cutAndScale(tileData: any, tilePieceBoundingBox: BoundingBox) {
     var position = TileBoundingBoxUtils.determinePositionAndScale(tilePieceBoundingBox, this.tileMatrix.tile_height, this.tileMatrix.tile_width, this.tileBoundingBox, this.height, this.width);
     if (position.xPositionInFinalTileStart >= this.width || position.xPositionInFinalTileEnd <= 0 || position.yPositionInFinalTileStart >= this.height || position.yPositionInFinalTileEnd <= 0) {
       // this tile doesn't belong just skip it
@@ -37,13 +56,13 @@ class TileCreator {
       this.addChunk(tileData, position);
     }
   }
-  addChunk(chunk, position) {
+  addChunk(chunk: any, position: any) {
     this.chunks.push({
       chunk: chunk,
       position: position
     });
   }
-  reproject(tileData, tilePieceBoundingBox) {
+  reproject(tileData: any, tilePieceBoundingBox: BoundingBox) {
     var y = 0;
     var x = 0;
     var height = this.height;
@@ -102,5 +121,3 @@ class TileCreator {
     }.bind(this), Promise.resolve());
   }
 }
-
-module.exports = TileCreator;

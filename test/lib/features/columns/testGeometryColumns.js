@@ -1,8 +1,8 @@
 import { default as GeoPackageAPI } from '../../../..'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').default
+  // @ts-ignore
   , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
-  , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
   , path = require('path');
 
@@ -10,16 +10,11 @@ describe('GeometryColumns tests', function() {
 
   var geoPackage;
 
-  beforeEach('should open the geopackage', function(done) {
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-    GeoPackageAPI.open(filename, function(err, gp) {
-      geoPackage = gp;
-      should.not.exist(err);
-      should.exist(gp);
-      should.exist(gp.getDatabase().getDBConnection());
-      gp.getPath().should.be.equal(filename);
-      done();
-    });
+  beforeEach('should open the geopackage', async function() {
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(originalFilename);
+    geoPackage = result.geopackage;
   });
 
   afterEach('should close the geopackage', function() {
@@ -55,7 +50,8 @@ describe('GeometryColumns tests', function() {
     var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
-    TestUtils.compareProperties(table, {
+    // @ts-ignore
+    compareProperties(table, {
       column_name: 'geom',
       table_name: 'point2d',
       geometry_type_name: 'POINT',
@@ -82,7 +78,8 @@ describe('GeometryColumns tests', function() {
     var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
-    TestUtils.compareProperties(table, {
+    // @ts-ignore
+    compareProperties(table, {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
@@ -96,7 +93,8 @@ describe('GeometryColumns tests', function() {
     var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
-    TestUtils.compareProperties(table, {
+    // @ts-ignore
+    compareProperties(table, {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
@@ -105,7 +103,8 @@ describe('GeometryColumns tests', function() {
       m: 0
     });
     var srs = gcd.getSrs(table);
-    TestUtils.compareProperties(srs, {
+    // @ts-ignore
+    compareProperties(srs, {
       srs_name: 'Undefined geographic SRS',
       srs_id: 0,
       organization: 'NONE',
@@ -119,7 +118,8 @@ describe('GeometryColumns tests', function() {
     var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
-    TestUtils.compareProperties(table, {
+    // @ts-ignore
+    compareProperties(table, {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',
@@ -146,7 +146,8 @@ describe('GeometryColumns tests', function() {
     var gcd = new GeometryColumnsDao(geoPackage);
     var table = gcd.queryForTableName('point2d');
     should.exist(table);
-    TestUtils.compareProperties(table, {
+    // @ts-ignore
+    compareProperties(table, {
       table_name: 'point2d',
       column_name: 'geom',
       geometry_type_name: 'POINT',

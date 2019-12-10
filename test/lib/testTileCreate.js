@@ -126,11 +126,11 @@ describe('GeoPackage Tile table create tests', function() {
               }
               return ytiles.reduce(function(ySequence, y) {
                 return ySequence.then(function() {
-                  return new Promise(function(resolve, reject) {
-                    testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, image) {
-                      console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                      resolve(geopackage.addTile(image, tableName, zoom, y, x));
-                    });
+                  return new Promise(async function(resolve, reject) {
+                    // @ts-ignore
+                    let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
+                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
+                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
               }, Promise.resolve());
@@ -178,11 +178,11 @@ describe('GeoPackage Tile table create tests', function() {
                   }
                   return ytiles.reduce(function(ySequence, y) {
                     return ySequence.then(function() {
-                      return new Promise(function(resolve, reject) {
-                        testSetup.loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, image) {
-                          console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                          resolve(geopackage.addTile(image, tableName, zoom, y, x));
-                        });
+                      return new Promise(async function(resolve, reject) {
+                        // @ts-ignore
+                        let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
+                        console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
+                        resolve(geopackage.addTile(image, tableName, zoom, y, x));
                       });
                     });
                   }, Promise.resolve());

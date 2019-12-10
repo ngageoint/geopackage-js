@@ -3,7 +3,7 @@ import { default as GeoPackageUtils } from './geopackageUtils'
 // var GeoPackageUtils = require('./geopackageUtils');
 
 var path = require('path')
-  , fs = require('fs');
+  , fs = require('fs-extra');
 
 describe('Create GeoPackage samples', function() {
 

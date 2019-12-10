@@ -13,30 +13,14 @@ describe('TileDao tests', function() {
     var geoPackage;
     var tileDao;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
     var filename;
-    beforeEach('create the GeoPackage connection', function(done) {
+    beforeEach('create the GeoPackage connection', async function() {
       var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          should.not.exist(err);
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          tileDao = geoPackage.getTileDao('TILESosmds');
-          done();
-        });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      tileDao = geoPackage.getTileDao('TILESosmds');
     });
 
     afterEach('close the geopackage connection', function(done) {
@@ -171,17 +155,13 @@ describe('TileDao tests', function() {
     var geoPackage;
     var tileDao;
 
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'private', 'alaska.gpkg');
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        should.not.exist(err);
-        should.exist(gp);
-        should.exist(gp.getDatabase().getDBConnection());
-        gp.getPath().should.be.equal(filename);
-        tileDao = geoPackage.getTileDao('alaska');
-        done();
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(filename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      tileDao = geoPackage.getTileDao('alaska');
     });
 
     it('should get the zoom levels', function() {

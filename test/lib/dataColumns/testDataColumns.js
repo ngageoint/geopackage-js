@@ -17,28 +17,12 @@ describe('Data Columns tests', function() {
   var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
   var filename;
 
-  function copyGeopackage(orignal, copy, callback) {
-    if (typeof(process) !== 'undefined' && process.version) {
-      var fsExtra = require('fs-extra');
-      fsExtra.copy(originalFilename, filename, callback);
-    } else {
-      filename = originalFilename;
-      callback();
-    }
-  }
-
-  beforeEach('create the GeoPackage connection', function(done) {
+  beforeEach('create the GeoPackage connection', async function() {
     filename = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-    copyGeopackage(originalFilename, filename, function(err) {
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        should.not.exist(err);
-        should.exist(gp);
-        should.exist(gp.getDatabase().getDBConnection());
-        gp.getPath().should.be.equal(filename);
-        done();
-      });
-    });
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(originalFilename);
+    filename = result.path;
+    geoPackage = result.geopackage;
   });
 
   afterEach('should close the geopackage', function(done) {

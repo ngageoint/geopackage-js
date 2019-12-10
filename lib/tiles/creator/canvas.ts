@@ -1,11 +1,16 @@
+import { TileMatrix } from "../matrix/tileMatrix";
+import { TileMatrixSet } from "../matrixset/tileMatrixSet";
+import { BoundingBox } from "../../..";
+import SpatialReferenceSystem from "../../core/srs/spatialReferenceSystem";
+
 var fileType = require('file-type');
 
-var TileCreator = require('./tileCreator')
+var TileCreator = require('./tileCreator').TileCreator
   , TileUtilities = require('./tileUtilities')
   , ProjectTile = require('./projectTile.js');
 
-class CanvasTileCreator extends TileCreator {
-  constructor(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo, canvas) {
+export class CanvasTileCreator extends TileCreator {
+  constructor(width: number, height: number, tileMatrix: TileMatrix, tileMatrixSet: TileMatrixSet, tileBoundingBox: BoundingBox, srs: SpatialReferenceSystem, projectionTo: string, canvas?: any) {
     super(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo);
     // eslint-disable-next-line no-undef
     this.canvas = canvas || document.createElement('canvas');
@@ -21,11 +26,14 @@ class CanvasTileCreator extends TileCreator {
     this.tileCanvas.height = tileMatrix.tile_height;
     this.imageData = new Uint8ClampedArray(width * height * 4);
   }
-  addPixel(targetX, targetY, sourceX, sourceY) {
+  async initialize(): Promise<CanvasTileCreator> {
+    return Promise.resolve(this);
+  }
+  addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number) {
     var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
     this.imageData.set(color.data, (targetY * this.width * 4) + (targetX * 4));
   }
-  addTile(tileData, gridColumn, gridRow) {
+  addTile(tileData: any, gridColumn: number, gridRow: number) {
     var type = fileType(tileData);
     var binary = '';
     var bytes = tileData;
@@ -73,7 +81,7 @@ class CanvasTileCreator extends TileCreator {
         }
       }.bind(this));
   }
-  getCompleteTile() {
+  async getCompleteTile(format?: string): Promise<any> {
     return this.canvas.toDataURL();
   }
   reproject(tileData, tilePieceBoundingBox) {
@@ -131,5 +139,3 @@ function workerDone(data, piecePosition, ctx) {
     ctx.drawImage(tmpCanvas, offsetX, offsetY);
   }
 }
-
-module.exports = CanvasTileCreator;

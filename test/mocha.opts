@@ -1,2 +1,3 @@
 --recursive
 --require chai
+--require test/fixtures/testUtils

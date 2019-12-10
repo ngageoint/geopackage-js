@@ -8,7 +8,7 @@ var GeoPackage = require('../../../../lib/geoPackage')
   , Verification = require('../../../fixtures/verification')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
-  , fs = require('fs')
+  , fs = require('fs-extra')
   , path = require('path');
 
 describe('GeoPackage Feature Table Index Extension tests', function() {
@@ -20,29 +20,12 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
-      } else {
-        filename = originalFilename;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageAPI.open(filename)
-        .then(function(gp) {
-          geoPackage = gp;
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
-          done();
-        });
-      });
+    beforeEach('create the GeoPackage connection', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
     afterEach('should close the geopackage', function(done) {
@@ -149,29 +132,12 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
-      } else {
-        filename = originalFilename;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          should.not.exist(err);
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDao('rivers');
-          done();
-        });
-      });
+    beforeEach('should open the geopackage', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('rivers');
     });
 
     afterEach('should close the geopackage', function(done) {

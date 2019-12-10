@@ -5,7 +5,7 @@ import ContentsDao from '../../../../lib/core/contents/contentsDao';
 // var GeoPackageAPI = require('../../../..')
 var Contents = require('../../../../lib/core/contents/contents').default
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
-  // , testSetup = require('../../../fixtures/testSetup')
+  , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
   , path = require('path');
 
@@ -15,30 +15,13 @@ describe('Contents tests', function() {
   var contentsDao;
   var filename;
 
-  function copyGeopackage(orignal, copy, callback) {
-    if (typeof(process) !== 'undefined' && process.version) {
-      var fsExtra = require('fs-extra');
-      fsExtra.copy(orignal, copy, callback);
-    } else {
-      filename = orignal;
-      callback();
-    }
-  }
-
-  beforeEach('should open the geopackage', function(done) {
+  beforeEach('should open the geopackage', async function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-    filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-    copyGeopackage(originalFilename, filename, function() {
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        should.not.exist(err);
-        should.exist(gp);
-        should.exist(gp.getDatabase().getDBConnection());
-        gp.getPath().should.be.equal(filename);
-        contentsDao = new ContentsDao(gp);
-        done();
-      });
-    });
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(originalFilename);
+    filename = result.path;
+    geoPackage = result.geopackage;
+    contentsDao = new ContentsDao(geoPackage);
   });
 
   afterEach('should close the geopackage', function(done) {

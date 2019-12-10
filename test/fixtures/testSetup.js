@@ -1,8 +1,9 @@
+// @ts-nocheck
 import {default as GeoPackageAPI} from '../..';
 import GeoPackage from '../../lib/geoPackage';
 import GeoPackageConnection from '../../lib/db/geoPackageConnection';
 
-var fs = require('fs')
+var fs = require('fs-extra')
   , path = require('path')
   , crypto = require('crypto')
   , ImageUtils = require('../../lib/tiles/imageUtils').ImageUtils;
@@ -69,24 +70,26 @@ module.exports.deleteGeoPackage = function(gppath, callback) {
   })
 };
 
-module.exports.loadTile = function(tilePath, callback) {
+global.loadTile = module.exports.loadTile = async function(tilePath) {
   if (typeof(process) !== 'undefined' && process.version) {
-    fs.readFile(tilePath, callback);
+    return fs.readFile(tilePath);
   } else {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', tilePath, true);
-    xhr.responseType = 'arraybuffer';
+    return new Promise((resolve, reject) => {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', tilePath, true);
+      xhr.responseType = 'arraybuffer';
 
-    xhr.onload = function(e) {
-      if (xhr.status !== 200) {
-        return callback();
-      }
-      return callback(null, Buffer.from(this.response));
-    };
-    xhr.onerror = function(e) {
-      return callback();
-    };
-    xhr.send();
+      xhr.onload = function(e) {
+        if (xhr.status !== 200) {
+          return resolve();
+        }
+        return resolve(Buffer.from(this.response));
+      };
+      xhr.onerror = function(e) {
+        reject(e);
+      };
+      xhr.send();
+    });
   }
 };
 

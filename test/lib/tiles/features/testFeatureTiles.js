@@ -1,13 +1,13 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var FeatureTiles = require('../../../../lib/tiles/features')
+var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon')
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile')
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../..')
   // , testSetup = require('../../../fixtures/testSetup')
-  , fs = require('fs')
+  , fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path');
 
@@ -22,30 +22,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename)
-        .then(function(gp) {
-          geoPackage = gp;
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
-          done();
-        });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
     afterEach('should close the geopackage', function(done) {
@@ -111,17 +94,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     var geoPackage;
     var featureDao;
 
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
-      GeoPackageAPI.open(filename, function(err, gp) {
-        geoPackage = gp;
-        should.not.exist(err);
-        should.exist(gp);
-        should.exist(gp.getDatabase().getDBConnection());
-        gp.getPath().should.be.equal(filename);
-        featureDao = geoPackage.getFeatureDao('rivers');
-        done();
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(filename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('rivers');
     });
 
     afterEach('should close the geopackage', function() {
@@ -191,30 +170,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename)
-          .then(function(gp) {
-            geoPackage = gp;
-            should.exist(gp);
-            should.exist(gp.getDatabase().getDBConnection());
-            gp.getPath().should.be.equal(filename);
-            featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
-            done();
-          });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
     afterEach('should close the geopackage', function(done) {
@@ -380,30 +342,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled_with_icon.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename)
-          .then(function(gp) {
-            geoPackage = gp;
-            should.exist(gp);
-            should.exist(gp.getDatabase().getDBConnection());
-            gp.getPath().should.be.equal(filename);
-            featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
-            done();
-          });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
     afterEach('should close the geopackage', function(done) {
@@ -443,30 +388,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
+    beforeEach('should open the geopackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled_scaled.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename)
-          .then(function(gp) {
-            geoPackage = gp;
-            should.exist(gp);
-            should.exist(gp.getDatabase().getDBConnection());
-            gp.getPath().should.be.equal(filename);
-            featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
-            done();
-          });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
     afterEach('should close the geopackage', function(done) {

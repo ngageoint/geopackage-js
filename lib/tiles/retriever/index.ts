@@ -83,14 +83,14 @@ export class GeoPackageTileRetriever {
     }
     return gpZoom;
   }
-  getTileWithBounds(targetBoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
+  async getTileWithBounds(targetBoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
     var tiles = [];
     var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     if (!tileMatrix)
       return Promise.resolve();
     var tileWidth = tileMatrix.tile_width;
     var tileHeight = tileMatrix.tile_height;
-    var creator = TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
+    var creator = await TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
     var iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
     for (var tile of iterator) {
       tiles.push({

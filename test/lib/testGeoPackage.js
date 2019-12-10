@@ -5,7 +5,7 @@ var GeoPackageTileRetriever = require('../../lib/tiles/retriever').GeoPackageTil
   , proj4 = require('proj4')
   , should = require('chai').should()
   , path = require('path')
-  , fs = require('fs');
+  , fs = require('fs-extra');
 
 describe('GeoPackage tests', function() {
   it('should get the feature table names', function(done) {

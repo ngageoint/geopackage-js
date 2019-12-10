@@ -1,6 +1,11 @@
+// @ts-nocheck
 var should = require('chai').should();
+var GeoPackageAPI = require('../..').default
+var path = require('path')
+import { default as testSetup } from './testSetup'
+import {default as fsExtra} from 'fs-extra'
 
-module.exports.compareProperties = function(o1, o2) {
+global.compareProperties = module.exports.compareProperties = function(o1, o2) {
   o2.should.have.all.keys(Object.keys(o1));
   o1.should.have.all.keys(Object.keys(o2));
   for (var key in o1) {
@@ -9,3 +14,35 @@ module.exports.compareProperties = function(o1, o2) {
     }
   }
 };
+
+global.mochaAsync = module.exports.mochaAsync = (fn) => {
+  return async () => {
+    try {
+      return fn();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
+
+global.openGeoPackage = async (path) => {
+  let geopackage = await GeoPackageAPI.open(path);
+  should.exist(geopackage);
+  should.exist(geopackage.getDatabase().getDBConnection());
+  geopackage.getPath().should.be.equal(path);
+  return {
+    geopackage,
+    path
+  };
+}
+
+global.copyAndOpenGeopackage = async function(original, copy) {
+  let filename;
+  if (typeof(process) !== 'undefined' && process.version) {
+    filename = copy || path.join(__dirname, 'tmp', testSetup.createTempName());
+    let result = await fsExtra.copy(original, filename);
+  } else {
+    filename = original;
+  }
+  return openGeoPackage(filename);
+}

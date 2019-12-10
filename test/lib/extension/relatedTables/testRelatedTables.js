@@ -20,26 +20,14 @@ describe('Related Tables tests', function() {
 
     var geoPackage;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
     var filename;
-    beforeEach('create the GeoPackage connection', function(done) {
+    beforeEach('create the GeoPackage connection', async function() {
 
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rte.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          done();
-        });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
     });
 
     afterEach('close the geopackage connection', function(done) {
@@ -133,26 +121,14 @@ describe('Related Tables tests', function() {
 
     var geoPackage;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(orignal, copy, callback);
-      } else {
-        filename = orignal;
-        callback();
-      }
-    }
     var filename;
-    beforeEach('create the GeoPackage connection', function(done) {
+    beforeEach('create the GeoPackage connection', async function() {
 
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function() {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          done();
-        });
-      });
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
     });
 
     afterEach('close the geopackage connection', function(done) {

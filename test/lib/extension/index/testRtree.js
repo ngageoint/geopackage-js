@@ -18,30 +18,12 @@ describe('RTree tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'super.gpkg');
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
-      } else {
-        filename = originalFilename;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
-      this.timeout(0);
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          should.not.exist(err);
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDao('line1');
-          done();
-        });
-      });
+    beforeEach('should open the geopackage', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('line1');
     });
 
     afterEach('should close the geopackage', function(done) {
@@ -121,30 +103,12 @@ describe('RTree tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
     var filename;
 
-    function copyGeopackage(orignal, copy, callback) {
-      if (typeof(process) !== 'undefined' && process.version) {
-        var fsExtra = require('fs-extra');
-        fsExtra.copy(originalFilename, filename, callback);
-      } else {
-        filename = originalFilename;
-        callback();
-      }
-    }
-
-    beforeEach('should open the geopackage', function(done) {
-      this.timeout(0);
-      filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
-      copyGeopackage(originalFilename, filename, function(err) {
-        GeoPackageAPI.open(filename, function(err, gp) {
-          geoPackage = gp;
-          should.not.exist(err);
-          should.exist(gp);
-          should.exist(gp.getDatabase().getDBConnection());
-          gp.getPath().should.be.equal(filename);
-          featureDao = geoPackage.getFeatureDao('FEATURESriversds');
-          done();
-        });
-      });
+    beforeEach('should open the geopackage', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
     afterEach('should close the geopackage', function(done) {

@@ -1,6 +1,6 @@
 // var GeoPackage = require('../../geopackage')
 //   , should = require('chai').should()
-//   , fs = require('fs')
+//   , fs = require('fs-extra')
 //   , path = require('path');
 //
 // describe.skip('JAVA GeoPackage tests', function() {

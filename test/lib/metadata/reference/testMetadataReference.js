@@ -1,6 +1,6 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var fs = require('fs')
+var fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path')
   , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').default
