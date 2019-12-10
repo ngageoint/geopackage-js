@@ -1,5 +1,5 @@
 // @ts-nocheck
-var GeometryData = require('../../../lib/geom/geometryData.js');
+var GeometryData = require('../../../lib/geom/geometryData').GeometryData;
 
 var wkx = require('wkx')
   , should = require('chai').should();

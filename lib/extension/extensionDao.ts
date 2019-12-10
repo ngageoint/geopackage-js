@@ -2,7 +2,7 @@ import Extension from './extension';
 import Dao from '../dao/dao';
 import ColumnValues from '../dao/columnValues';
 
-var TableCreator = require('../db/tableCreator');
+import { TableCreator } from '../db/tableCreator';
 
 /**
  * Extension Data Access Object

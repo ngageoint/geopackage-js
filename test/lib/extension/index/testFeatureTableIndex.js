@@ -4,7 +4,7 @@ import FeatureTableIndex from '../../../../lib/extension/index/featureTableIndex
 
 
 var GeoPackage = require('../../../../lib/geoPackage')
-  , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder')
+  , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
   , Verification = require('../../../fixtures/verification')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()

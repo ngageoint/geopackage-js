@@ -36,14 +36,15 @@ import Contents from './core/contents/contents';
 import DataTypes from './db/dataTypes';
 import SchemaExtension from './extension/schema';
 import GeometryColumns from './features/columns/geometryColumns';
-var TileMatrixSet = require('./tiles/matrixset/tileMatrixSet')
-  , TileMatrix = require('./tiles/matrix/tileMatrix')
-  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
-  , TableCreator = require('./db/tableCreator')
+import { TableCreator } from './db/tableCreator';
+import { TileMatrix } from './tiles/matrix/tileMatrix';
+import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
+import { BoundingBox } from './boundingBox';
+import {TileMatrixSet} from './tiles/matrixset/tileMatrixSet'
+  
   // eslint-disable-next-line no-unused-vars
-  , BoundingBox = require('./boundingBox')
 
-var proj4 = require('proj4');
+import proj4 from 'proj4';
 
 // proj4 = 'default' in proj4 ? proj4['default'] : proj4; // Module loading hack
 

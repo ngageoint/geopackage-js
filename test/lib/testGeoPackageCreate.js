@@ -7,7 +7,7 @@ var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , should = require('chai').should()
   , wkx = require('wkx')
-  , wkb = require('../../lib/wkb')
+  , wkb = require('../../lib/wkb').WKB
   , path = require('path');
 
 describe('GeoPackage create tests', function() {

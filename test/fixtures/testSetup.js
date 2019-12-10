@@ -5,7 +5,7 @@ import GeoPackageConnection from '../../lib/db/geoPackageConnection';
 var fs = require('fs')
   , path = require('path')
   , crypto = require('crypto')
-  , ImageUtils = require('../../lib/tiles/imageUtils');
+  , ImageUtils = require('../../lib/tiles/imageUtils').ImageUtils;
 
 module.exports.createTempName = function() {
   return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';

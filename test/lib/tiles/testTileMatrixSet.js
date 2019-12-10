@@ -1,8 +1,8 @@
 import { default as GeoPackageAPI } from '../../..'
 
 var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').default
-  , TileMatrixSet = require('../../../lib/tiles/matrixset/tileMatrixSet')
-  , BoundingBox = require('../../../lib/boundingBox')
+  , TileMatrixSet = require('../../../lib/tiles/matrixset/tileMatrixSet').TileMatrixSet
+  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
   , should = require('chai').should()
   , path = require('path');
 

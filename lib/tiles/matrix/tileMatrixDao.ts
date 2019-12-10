@@ -4,14 +4,14 @@
  */
 import Dao from '../../dao/dao';
 
-var TileMatrix = require('./tileMatrix');
+import { TileMatrix } from './tileMatrix';
 
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixDao
  * @extends Dao
  */
-export default class TileMatrixDao extends Dao<typeof TileMatrix> {
+export default class TileMatrixDao extends Dao<TileMatrix> {
   public static readonly TABLE_NAME = "gpkg_tile_matrix";
   public static readonly COLUMN_PK1 = "table_name";
   public static readonly COLUMN_PK2 = "zoom_level";

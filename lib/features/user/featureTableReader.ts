@@ -8,7 +8,7 @@ import UserTableReader from '../../user/userTableReader';
 import FeatureColumn from './featureColumn';
 
 import DataTypes from '../../db/dataTypes'
-var wkb = require('../../wkb');
+import { WKB } from '../../wkb'
 
 /**
 * Reads the metadata from an existing feature table
@@ -38,7 +38,7 @@ export default class FeatureTableReader extends UserTableReader {
     var geometryType = undefined;
     var dataType = undefined;
     if (geometry) {
-      geometryType = wkb.fromName(type);
+      geometryType = WKB.fromName(type);
     }
     else {
       dataType = DataTypes.fromName(type);

@@ -3,9 +3,7 @@
  * @module metadata/reference
  * @see module:dao/dao
  */
-
-// eslint-disable-next-line no-unused-vars
-var  Metadata = require('../metadata');
+import { Metadata } from '../metadata';
 
 /**
  * Links metadata in the gpkg_metadata table to data in the feature, and tiles tables
@@ -74,7 +72,7 @@ export default class MetadataReference {
    * Set the metadata
    * @param  {Metadata} [metadata] metadata
    */
-  setMetadata(metadata?: typeof Metadata) {
+  setMetadata(metadata?: Metadata) {
     if (metadata) {
       this.md_file_id = metadata.id;
     }
@@ -86,7 +84,7 @@ export default class MetadataReference {
    * Set the parent metadata
    * @param  {Metadata} [metadata] parent metadata
    */
-  setParentMetadata(metadata?: typeof Metadata) {
+  setParentMetadata(metadata?: Metadata) {
     if (metadata) {
       this.md_parent_id = metadata.id;
     }

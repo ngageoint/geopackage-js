@@ -4,9 +4,9 @@ var fs = require('fs')
   , should = require('chai').should()
   , path = require('path')
   , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').default
-  , Metadata = require('../../../../lib/metadata/metadata')
+  , Metadata = require('../../../../lib/metadata/metadata').Metadata
   , GeoPackage = require('../../../../lib/geoPackage')
-  , TableCreator = require('../../../../lib/db/tableCreator')
+  , TableCreator = require('../../../../lib/db/tableCreator').TableCreator
   , Verification = require('../../../fixtures/verification');
 
 describe('Metadata Reference tests', function() {

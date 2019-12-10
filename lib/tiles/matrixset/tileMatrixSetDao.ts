@@ -1,14 +1,16 @@
 import Dao from '../../dao/dao';
 import GeoPackage from '../../geoPackage';
 
-var TileMatrixSet = require('./tileMatrixSet');
+import { TileMatrixSet } from './tileMatrixSet';
+import Contents from '../../core/contents/contents';
+import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
 
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixSetDao
  * @extends Dao
  */
-export default class TileMatrixSetDao extends Dao<typeof TileMatrixSet> {
+export default class TileMatrixSetDao extends Dao<TileMatrixSet> {
   public static readonly TABLE_NAME = "gpkg_tile_matrix_set";
   public static readonly COLUMN_PK = "table_name";
   public static readonly COLUMN_TABLE_NAME = "table_name";
@@ -34,21 +36,21 @@ export default class TileMatrixSetDao extends Dao<typeof TileMatrixSet> {
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
   }
 
-  createObject() {
+  createObject(): TileMatrixSet {
     return new TileMatrixSet();
   }
   /**
    * Get the tile table names
    * @returns {string[]} tile table names
    */
-  getTileTables() {
+  getTileTables(): string[] {
     var tableNames = [];
     for (var result of this.connection.each('select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME)) {
       tableNames.push(result[TileMatrixSetDao.COLUMN_TABLE_NAME]);
     }
     return tableNames;
   }
-  getProjection(tileMatrixSet) {
+  getProjection(tileMatrixSet: TileMatrixSet): any {
     var srs = this.getSrs(tileMatrixSet);
     if (!srs)
       return;
@@ -59,14 +61,14 @@ export default class TileMatrixSetDao extends Dao<typeof TileMatrixSet> {
    * Get the Spatial Reference System of the Tile Matrix set
    * @param  {TileMatrixSet}   tileMatrixSet tile matrix set
    */
-  getSrs(tileMatrixSet) {
+  getSrs(tileMatrixSet: TileMatrixSet): SpatialReferenceSystem {
     var dao = this.geoPackage.getSpatialReferenceSystemDao();
     return dao.queryForId(tileMatrixSet.srs_id);
   }
   /**
    * @param {TileMatrixSet} tileMatrixSet
    */
-  getContents(tileMatrixSet) {
+  getContents(tileMatrixSet: TileMatrixSet): Contents {
     var dao = this.geoPackage.getContentsDao();
     return dao.queryForId(tileMatrixSet.table_name);
   }

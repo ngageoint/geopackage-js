@@ -12,14 +12,14 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , IconTable = require('../../../../lib/extension/style/iconTable').default
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').default
   // , testSetup = require('../../../fixtures/testSetup')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
   // , GeoPackageAPI = require('../../../../lib/api')
   , wkx = require('wkx')
   , fs = require('fs')
-  , GeometryData = require('../../../../lib/geom/geometryData');
+  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData;
 
 describe('StyleExtension Tests', function() {
   var testGeoPackage;

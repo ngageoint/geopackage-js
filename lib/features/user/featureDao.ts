@@ -12,7 +12,7 @@ import FeatureTable from './featureTable';
 import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
 import GeometryColumns from '../columns/geometryColumns';
-var BoundingBox = require('../../boundingBox')  ;
+import { BoundingBox } from '../../boundingBox'
   // eslint-disable-next-line no-unused-vars
   // eslint-disable-next-line no-unused-vars;
 

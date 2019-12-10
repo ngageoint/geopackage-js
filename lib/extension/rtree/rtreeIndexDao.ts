@@ -2,12 +2,11 @@ import Dao from '../../dao/dao';
 import RTreeIndex from './rtreeIndex';
 import FeatureDao from '../../features/user/featureDao';
 import GeoPackage from '../../geoPackage';
-
+import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
 /**
  * RTree module.
  */
 
-var sqliteQueryBuilder = require('../../db/sqliteQueryBuilder');
 
 /**
  * RTree Index Data Access Object
@@ -97,6 +96,6 @@ export default class RTreeIndexDao extends Dao<RTreeIndex> {
   }
   countWithGeometryEnvelope(envelope) {
     var result = this._generateGeometryEnvelopeQuery(envelope);
-    return this.connection.get(sqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", result.where), result.whereArgs).count;
+    return this.connection.get(SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", result.where), result.whereArgs).count;
   }
 }

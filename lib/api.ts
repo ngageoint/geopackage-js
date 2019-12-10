@@ -12,7 +12,13 @@ import FeatureColumn from './features/user/featureColumn'
 import SpatialReferenceSystem from './core/srs/spatialReferenceSystem'
 import DataColumns from './dataColumns/dataColumns'
 import DataTypes from './db/dataTypes'
-import GeometryColumns from './features/columns/geometryColumns';
+import GeometryColumns from './features/columns/geometryColumns'
+import { GeometryData } from './geom/geometryData'
+import { GeoPackageTileRetriever } from './tiles/retriever'
+import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils'
+import { BoundingBox } from './boundingBox'
+import { GeoPackageValidate } from './validate/geoPackageValidate'
+
 
 /* eslint-disable camelcase */
 var wkx = require('wkx')
@@ -27,13 +33,9 @@ var wkx = require('wkx')
   , polygonToLine = require('@turf/polygon-to-line').default
   , booleanPointInPolygon = require('@turf/boolean-point-in-polygon').default
   , pointDistance = require('@turf/distance').default
-  , helpers = require('@turf/helpers');
+  , helpers = require('@turf/helpers')
 
-var GeoPackageValidate = require('./validate/geoPackageValidate')
-  , GeoPackageTileRetriever = require('./tiles/retriever')
-  , BoundingBox = require('./boundingBox')
-  , GeometryData = require('./geom/geometryData')
-  , TileBoundingBoxUtils = require('./tiles/tileBoundingBoxUtils')
+  
   , FeatureTile = require('./tiles/features');
 
   type GeoPackageCallback = (err: Error, geopackage?: GeoPackage) => any;

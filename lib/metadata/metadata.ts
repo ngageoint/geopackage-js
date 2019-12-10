@@ -4,34 +4,54 @@
  * authoritative metadata specification
  * @class Metadata
  */
-class Metadata {
-  constructor() {
-    /**
-     * Metadata primary key
-     * @member {Number}
-     */
-    this.id = undefined;
-    /**
-     * Case sensitive name of the data scope to which this metadata applies; see Metadata Scopes below
-     * @member {string}
-     */
-    this.md_scope= undefined;
-    /**
-     * URI reference to the metadata structure definition authority
-     * @member {string}
-     */
-    this.md_standard_uri= undefined;
-    /**
-     * MIME encoding of metadata
-     * @member {string}
-     */
-    this.mime_type= undefined;
-    /**
-     * metadata
-     * @member {string}
-     */
-    this.metadata= undefined;
-  }
+export class Metadata {
+
+  public static readonly UNDEFINED = "undefined";
+  public static readonly FIELD_SESSION = "fieldSession";
+  public static readonly COLLECTION_SESSION = "collectionSession";
+  public static readonly SERIES = "series";
+  public static readonly DATASET = "dataset";
+  public static readonly FEATURE_TYPE = "featureType";
+  public static readonly FEATURE = "feature";
+  public static readonly ATTRIBUTE_TYPE = "attributeType";
+  public static readonly ATTRIBUTE = "attribute";
+  public static readonly TILE = "tile";
+  public static readonly MODEL = "model";
+  public static readonly CATALOG = "catalog";
+  public static readonly SCHEMA = "schema";
+  public static readonly TAXONOMY = "taxonomy";
+  public static readonly SOFTWARE = "software";
+  public static readonly SERVICE = "service";
+  public static readonly COLLECTION_HARDWARE = "collectionHardware";
+  public static readonly NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
+  public static readonly DIMENSION_GROUP = "dimensionGroup";
+
+  /**
+   * Metadata primary key
+   * @member {Number}
+   */
+  id: number;
+  /**
+   * Case sensitive name of the data scope to which this metadata applies; see Metadata Scopes below
+   * @member {string}
+   */
+  md_scope: string;
+  /**
+   * URI reference to the metadata structure definition authority
+   * @member {string}
+   */
+  md_standard_uri: string;
+  /**
+   * MIME encoding of metadata
+   * @member {string}
+   */
+  mime_type: string;
+  /**
+   * metadata
+   * @member {string}
+   */
+  metadata: string;
+
   // eslint-disable-next-line complexity
   getScopeInformation(type) {
     switch (type) {
@@ -152,25 +172,3 @@ class Metadata {
     }
   }
 }
-
-Metadata.UNDEFINED = "undefined";
-Metadata.FIELD_SESSION = "fieldSession";
-Metadata.COLLECTION_SESSION = "collectionSession";
-Metadata.SERIES = "series";
-Metadata.DATASET = "dataset";
-Metadata.FEATURE_TYPE = "featureType";
-Metadata.FEATURE = "feature";
-Metadata.ATTRIBUTE_TYPE = "attributeType";
-Metadata.ATTRIBUTE = "attribute";
-Metadata.TILE = "tile";
-Metadata.MODEL = "model";
-Metadata.CATALOG = "catalog";
-Metadata.SCHEMA = "schema";
-Metadata.TAXONOMY = "taxonomy";
-Metadata.SOFTWARE = "software";
-Metadata.SERVICE = "service";
-Metadata.COLLECTION_HARDWARE = "collectionHardware";
-Metadata.NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
-Metadata.DIMENSION_GROUP = "dimensionGroup";
-
-module.exports = Metadata;

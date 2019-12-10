@@ -2,8 +2,8 @@
  * @module tiles/matrixset
  * @see module:dao/dao
  */
-// import * as BoundingBox from '../../boundingBox';
-var BoundingBox = require('../../boundingBox');
+import { BoundingBox } from '../../boundingBox';
+import Contents from '../../core/contents/contents';
 
 /**
  * `TileMatrixSet` models the [`gpkg_tile_matrix_set`](https://www.geopackage.org/spec121/index.html#_tile_matrix_set)
@@ -22,62 +22,58 @@ var BoundingBox = require('../../boundingBox');
  *
  * @class TileMatrixSet
  */
-class TileMatrixSet {
-  constructor() {
-    /**
-     * Name of the [tile pyramid user data table](https://www.geopackage.org/spec121/index.html#tiles_user_tables)
-     * that stores the tiles
-     * @member {string}
-     */
-    this.table_name = undefined;
-    /**
-     * Unique identifier for each Spatial Reference System within a GeoPackage
-     * @member {SRSRef}
-     */
-    this.srs_id = undefined;
-    /**
-     * Bounding box minimum easting or longitude for all content in table_name
-     * @member {Number}
-     */
-    this.min_x = undefined;
-    /**
-     * Bounding box minimum northing or latitude for all content in table_name
-     * @member {Number}
-     */
-    this.min_y = undefined;
-    /**
-     * Bounding box maximum easting or longitude for all content in table_name
-     * @member {Number}
-     */
-    this.max_x = undefined;
-    /**
-     * Bounding box maximum northing or latitude for all content in table_name
-     * @member {Number}
-     */
-    this.max_y = undefined;
-  }
-  setBoundingBox(boundingBox) {
+export class TileMatrixSet {
+  public static readonly TABLE_NAME = "tableName";
+  public static readonly MIN_X = "minX";
+  public static readonly MIN_Y = "minY";
+  public static readonly MAX_X = "maxX";
+  public static readonly MAX_Y = "maxY";
+  public static readonly SRS_ID = "srsId";
+
+  /**
+   * Name of the [tile pyramid user data table](https://www.geopackage.org/spec121/index.html#tiles_user_tables)
+   * that stores the tiles
+   * @member {string}
+   */
+  table_name: string;
+  /**
+   * Unique identifier for each Spatial Reference System within a GeoPackage
+   * @member {SRSRef}
+   */
+  srs_id: number;
+  /**
+   * Bounding box minimum easting or longitude for all content in table_name
+   * @member {Number}
+   */
+  min_x: number;
+  /**
+   * Bounding box minimum northing or latitude for all content in table_name
+   * @member {Number}
+   */
+  min_y: number;
+  /**
+   * Bounding box maximum easting or longitude for all content in table_name
+   * @member {Number}
+   */
+  max_x: number;
+  /**
+   * Bounding box maximum northing or latitude for all content in table_name
+   * @member {Number}
+   */
+  max_y: number;
+
+  setBoundingBox(boundingBox: BoundingBox) {
     this.min_x = boundingBox.minLongitude;
     this.max_x = boundingBox.maxLongitude;
     this.min_y = boundingBox.minLatitude;
     this.max_y = boundingBox.maxLatitude;
   }
-  getBoundingBox() {
-    // return undefined;
+  getBoundingBox(): BoundingBox {
     return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
   }
-  setContents(contents) {
+  setContents(contents: Contents) {
     if (contents && contents.data_type === 'tiles') {
       this.table_name = contents.table_name;
     }
   }
 }
-
-TileMatrixSet.TABLE_NAME = "tableName";
-TileMatrixSet.MIN_X = "minX";
-TileMatrixSet.MIN_Y = "minY";
-TileMatrixSet.MAX_X = "maxX";
-TileMatrixSet.MAX_Y = "maxY";
-TileMatrixSet.SRS_ID = "srsId";
-
-module.exports = TileMatrixSet;

@@ -7,17 +7,9 @@ import TileRow from './tileRow';
 import TileColumn from './tileColumn';
 import TileGrid from '../tileGrid';
 import ColumnValues from '../../dao/columnValues'
-/**
- * tileDao module.
- */
-// import BoundingBox from '../../boundingBox'
-var TileMatrixSet = require('../matrixset/tileMatrixSet')
-  // eslint-disable-next-line no-unused-vars
-  , TileMatrix = require('../matrix/tileMatrix')  
-  // eslint-disable-next-line no-unused-vars
-  , GeoPackageConnection = require('../../db/geoPackageConnection')
-  , BoundingBox = require('../../boundingBox')
-  , BoundingBoxUtils = require('../tileBoundingBoxUtils');
+import { TileMatrix } from '../matrix/tileMatrix'
+import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
+import { BoundingBox } from '../../boundingBox';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -88,7 +80,7 @@ export default class TileDao extends UserDao<TileRow> {
     this.setWebMapZoomLevels();
   }
   webZoomToGeoPackageZoom(webZoom) {
-    var webMercatorBoundingBox = BoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(0, 0, webZoom);
+    var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(0, 0, webZoom);
     return this.determineGeoPackageZoomLevel(webMercatorBoundingBox, webZoom);
   }
   setWebMapZoomLevels() {
@@ -132,7 +124,7 @@ export default class TileDao extends UserDao<TileRow> {
       var tileGrid = this.queryForTileGridWithZoomLevel(zoomLevel);
       if (tileGrid) {
         var matrixSetBoundingBox = this.getBoundingBox();
-        boundingBox = BoundingBoxUtils.getTileGridBoundingBox(matrixSetBoundingBox, tileMatrix.matrix_width, tileMatrix.matrix_height, tileGrid);
+        boundingBox = TileBoundingBoxUtils.getTileGridBoundingBox(matrixSetBoundingBox, tileMatrix.matrix_width, tileMatrix.matrix_height, tileGrid);
       }
       return boundingBox;
     }

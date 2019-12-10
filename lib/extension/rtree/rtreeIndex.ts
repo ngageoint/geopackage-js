@@ -3,9 +3,8 @@ import BaseExtension from '../baseExtension';
 import Extension from '../extension';
 import RTreeIndexDao from './rtreeIndexDao'
 import FeatureDao from '../../features/user/featureDao'
-
-var EnvelopeBuilder = require('../../geom/envelopeBuilder')
-  , GeometryData = require('../../geom/geometryData');
+import EnvelopeBuilder from '../../geom/envelopeBuilder'
+import { GeometryData } from '../../geom/geometryData'
 /**
  * RTreeIndex extension
  * @class RTreeIndex

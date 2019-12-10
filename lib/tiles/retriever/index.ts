@@ -1,12 +1,17 @@
-var TileBoundingBoxUtils = require('../tileBoundingBoxUtils')
-  , TileCreator = require('../creator');
+import proj4 from 'proj4';
+import TileDao from '../user/tileDao';
+import { TileMatrix } from '../matrix/tileMatrix';
+import { TileBoundingBoxUtils }  from '../tileBoundingBoxUtils'
+import { BoundingBox } from '../../boundingBox'
+var TileCreator = require('../creator');
 
-var proj4 = require('proj4');
-
-proj4 = 'default' in proj4 ? proj4['default'] : proj4;
-
-class GeoPackageTileRetriever {
-  constructor(tileDao, width, height) {
+export class GeoPackageTileRetriever {
+  tileDao: TileDao;
+  width: number;
+  height: number;
+  setWebMercatorBoundingBox: any;
+  setProjectionBoundingBox: any;
+  constructor(tileDao: TileDao, width: number, height: number) {
     this.tileDao = tileDao;
     this.tileDao.adjustTileMatrixLengths();
     this.width = width;
@@ -29,38 +34,38 @@ class GeoPackageTileRetriever {
       return this.setWebMercatorBoundingBox;
     }
   }
-  hasTile(x, y, zoom) {
+  hasTile(x: number, y: number, zoom: number) {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, webMercatorBoundingBox);
     return !!this.tileDao.countByTileGrid(tileGrid, zoom);
   }
-  getTile(x, y, zoom) {
+  getTile(x: number, y: number, zoom: number) {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857');
   }
-  drawTileIn(x, y, zoom, canvas) {
+  drawTileIn(x: number, y: number, zoom: number, canvas?: any) {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857', canvas);
   }
-  getTileWithWgs84Bounds(wgs84BoundingBox, canvas) {
+  getTileWithWgs84Bounds(wgs84BoundingBox: BoundingBox, canvas?: any) {
     var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857', canvas);
   }
-  getTileWithWgs84BoundsInProjection(wgs84BoundingBox, zoom, targetProjection, canvas) {
+  getTileWithWgs84BoundsInProjection(wgs84BoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
     var targetBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', targetProjection);
     return this.getTileWithBounds(targetBoundingBox, zoom, targetProjection, canvas);
   }
-  getWebMercatorTile(x, y, zoom) {
+  getWebMercatorTile(x: number, y: number, zoom: number) {
     // need to determine the geoPackage zoom level from the web mercator zoom level
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857');
   }
-  determineGeoPackageZoomLevel(webMercatorBoundingBox) {
+  determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox) {
     // find width and height of this tile in geopackage projection
     var proj4Projection = proj4(this.tileDao.projection, 'EPSG:3857');
     var ne = proj4Projection.inverse([webMercatorBoundingBox.maxLongitude, webMercatorBoundingBox.maxLatitude]);
@@ -78,7 +83,7 @@ class GeoPackageTileRetriever {
     }
     return gpZoom;
   }
-  getTileWithBounds(targetBoundingBox, zoom, targetProjection, canvas) {
+  getTileWithBounds(targetBoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
     var tiles = [];
     var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     if (!tileMatrix)
@@ -105,7 +110,7 @@ class GeoPackageTileRetriever {
         }
       });
   }
-  retrieveTileResults(tileMatrixProjectionBoundingBox, tileMatrix) {
+  retrieveTileResults(tileMatrixProjectionBoundingBox: BoundingBox, tileMatrix?: TileMatrix) {
     if (tileMatrix) {
       var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, tileMatrixProjectionBoundingBox);
       return this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoom_level);
@@ -115,6 +120,3 @@ class GeoPackageTileRetriever {
     }
   }
 }
-
-module.exports = GeoPackageTileRetriever;
-

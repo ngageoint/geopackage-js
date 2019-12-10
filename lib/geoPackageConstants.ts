@@ -3,21 +3,23 @@
  * @module dao/geoPackageConstants
  */
 
+export class GeoPackageConstants {
 /** @constant {string} GEOPACKAGE_EXTENSION Extension to GeoPackage files */
-exports.GEOPACKAGE_EXTENSION = 'gpkg';
+public static readonly GEOPACKAGE_EXTENSION = 'gpkg';
 /** @constant {string} GEOPACKAGE_EXTENDED_EXTENSION Extension to GeoPackage extension files */
-exports.GEOPACKAGE_EXTENDED_EXTENSION = 'gpkx';
+public static readonly GEOPACKAGE_EXTENDED_EXTENSION = 'gpkx';
 /** @constant {string} APPLICATION_ID GeoPackage application id */
-exports.APPLICATION_ID = 'GPKG';
+public static readonly APPLICATION_ID = 'GPKG';
 /** @constant {string} USER_VERSION GeoPackage user version */
-exports.USER_VERSION = '10200';
+public static readonly USER_VERSION = '10200';
 /** @constant {string} GEOPACKAGE_EXTENSION_AUTHOR GeoPackage author */
-exports.GEOPACKAGE_EXTENSION_AUTHOR = exports.GEOPACKAGE_EXTENSION;
+public static readonly GEOPACKAGE_EXTENSION_AUTHOR = exports.GEOPACKAGE_EXTENSION;
 /** @constant {string} GEOMETRY_EXTENSION_PREFIX Geometry extension prefix */
-exports.GEOMETRY_EXTENSION_PREFIX = 'geom';
+public static readonly GEOMETRY_EXTENSION_PREFIX = 'geom';
 /** @constant {string} GEOPACKAGE_GEOMETRY_MAGIX_NUMBER Expected magic number */
-exports.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER = 'GP';
+public static readonly GEOPACKAGE_GEOMETRY_MAGIC_NUMBER = 'GP';
 /** @constant {string} GEOPACKAGE_GEOMETRY_VERSION_1 Expected version 1 value */
-exports.GEOPACKAGE_GEOMETRY_VERSION_1 = 0;
+public static readonly GEOPACKAGE_GEOMETRY_VERSION_1 = 0;
 /** @constant {string} SQLITE_HEADER_PREFIX SQLite header string prefix */
-exports.SQLITE_HEADER_PREFIX = 'SQLite format 3';
+public static readonly SQLITE_HEADER_PREFIX = 'SQLite format 3';
+}

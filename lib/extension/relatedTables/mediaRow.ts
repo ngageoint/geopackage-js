@@ -1,12 +1,12 @@
 import MediaTable from "./mediaTable";
 import UserRow from '../../user/userRow';
+import {ImageUtils} from '../../tiles/imageUtils';
 
 /**
  * MediaRow module.
  * @module extension/relatedTables
  */
 
-var ImageUtils = require('../../tiles/imageUtils');
 
 /**
  * User Media Row containing the values from a single result set row

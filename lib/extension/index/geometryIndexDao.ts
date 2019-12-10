@@ -1,7 +1,6 @@
 import Dao from '../../dao/dao';
 import GeometryIndex from './geometryIndex';
-
-var TableCreator = require('../../db/tableCreator');
+import { TableCreator } from '../../db/tableCreator';
 /**
  * Geometry Index Data Access Object
  * @class

@@ -5,7 +5,7 @@ import ColumnValues from './columnValues';
  * Dao module.
  */
 
-var sqliteQueryBuilder = require('../db/sqliteQueryBuilder');
+import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder'
 
 /**
  * Base DAO
@@ -71,7 +71,7 @@ export default abstract class Dao<T> {
   queryForId(id: any): T {
     var whereString = this.buildPkWhere(id);
     var whereArgs = this.buildPkWhereArgs(id);
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     var result = this.connection.get(query, whereArgs);
     if (!result)
       return;
@@ -102,7 +102,7 @@ export default abstract class Dao<T> {
   queryForMultiId(idValues: any[]): T {
     var whereString = this.buildPkWhere(idValues);
     var whereArgs = this.buildPkWhereArgs(idValues);
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     var result = this.connection.get(query, whereArgs);
     if (!result)
       return;
@@ -117,7 +117,7 @@ export default abstract class Dao<T> {
    * @return {Object[]} raw object array from the database
    */
   queryForAll(where?: string, whereArgs?: any[]): any[] {
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
     return this.connection.all(query, whereArgs);
   }
   /**
@@ -131,7 +131,7 @@ export default abstract class Dao<T> {
     values.addColumn(fieldName, value);
     var where = this.buildWhereLike(values);
     var whereArgs = this.buildWhereArgs(value);
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
     return this.connection.all(query, whereArgs);
   }
   /**
@@ -147,7 +147,7 @@ export default abstract class Dao<T> {
       where = this.buildWhere(fieldValues);
       whereArgs = this.buildWhereArgs(fieldValues);
     }
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", [columnName], where);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", [columnName], where);
     return this.connection.all(query, whereArgs);
   }
   /**
@@ -157,7 +157,7 @@ export default abstract class Dao<T> {
    * @return {Object[]} raw object array from the database
    */
   queryForChunk(pageSize: number, page: number): any[] {
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, undefined, undefined, undefined, undefined, this.idColumns[0], pageSize, page * pageSize);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, undefined, undefined, undefined, undefined, this.idColumns[0], pageSize, page * pageSize);
     return this.connection.all(query);
   }
   /**
@@ -171,13 +171,13 @@ export default abstract class Dao<T> {
    */
   queryForEach(field?: string, value?: Object, groupBy?: string, having?: string, orderBy?: string): IterableIterator<any> {
     if (!field) {
-      var query: string = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, undefined, undefined, groupBy, having, orderBy);
+      var query: string = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, undefined, undefined, groupBy, having, orderBy);
       return this.connection.each(query);
     }
     else {
       var whereString: string = this.buildWhereWithFieldAndValue(field, value);
       var whereArgs: any[] = this.buildWhereArgs(value);
-      query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString, undefined, groupBy, having, orderBy);
+      query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString, undefined, groupBy, having, orderBy);
       return this.connection.each(query, whereArgs);
     }
   }
@@ -189,7 +189,7 @@ export default abstract class Dao<T> {
   queryForFieldValues(fieldValues: ColumnValues): IterableIterator<any> {
     var whereString: string = this.buildWhere(fieldValues);
     var whereArgs: any[] = this.buildWhereArgs(fieldValues);
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     return this.connection.each(query, whereArgs);
   }
   /**
@@ -201,7 +201,7 @@ export default abstract class Dao<T> {
    * @return {IterableIterator<any>}
    */
   queryJoinWhereWithArgs(join: string, where?: string, whereArgs?: any[], columns?: string[]): IterableIterator<any> {
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", columns, where, join);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", columns, where, join);
     return this.connection.each(query, whereArgs);
   }
   /**
@@ -225,7 +225,7 @@ export default abstract class Dao<T> {
    * @return {IterableIterator<any>}
    */
   queryWhereWithArgsDistinct(where: string, whereArgs?: any[]): IterableIterator<any> {
-    var query = sqliteQueryBuilder.buildQuery(true, "'" + this.gpkgTableName + "'", undefined, where);
+    var query = SqliteQueryBuilder.buildQuery(true, "'" + this.gpkgTableName + "'", undefined, where);
     return this.connection.each(query, whereArgs);
   }
   /**
@@ -239,7 +239,7 @@ export default abstract class Dao<T> {
    * @return {IterableIterator<any>}
    */
   queryWhere(where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number): IterableIterator<any> {
-    var query: string = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where, undefined, groupBy, having, orderBy, limit);
+    var query: string = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where, undefined, groupBy, having, orderBy, limit);
     return this.connection.each(query, whereArgs);
   }
   /**
@@ -388,7 +388,7 @@ export default abstract class Dao<T> {
   queryForAllEq(field: string, value: any, groupBy?: string, having?: string, orderBy?: string): any[] {
     var whereString = this.buildWhereWithFieldAndValue(field, value);
     var whereArgs = this.buildWhereArgs(value);
-    var query = sqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString, undefined, groupBy, having, orderBy);
+    var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString, undefined, groupBy, having, orderBy);
     return this.connection.all(query, whereArgs);
   }
   /**
@@ -407,12 +407,12 @@ export default abstract class Dao<T> {
     if (fields instanceof ColumnValues) {
       where = this.buildWhere(fields, 'and');
       whereArgs = this.buildWhereArgs(fields);
-      query = sqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
+      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
     }
     else {
       var whereString = this.buildWhereWithFieldAndValue(fields, value);
       whereArgs = this.buildWhereArgs(value);
-      query = sqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", whereString);
+      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", whereString);
     }
     var result = this.connection.get(query, whereArgs);
     if (!result)
@@ -426,7 +426,7 @@ export default abstract class Dao<T> {
    * @return {number} count of objects
    */
   countWhere(where: string, whereArgs: any[]): number {
-    var query = sqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
+    var query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
     var result = this.connection.get(query, whereArgs);
     if (!result)
       return 0;
@@ -505,8 +505,8 @@ export default abstract class Dao<T> {
    * @return {number} id of the inserted object
    */
   create(object: T): number {
-    var sql = sqliteQueryBuilder.buildInsert("'" + this.gpkgTableName + "'", object);
-    var insertObject = sqliteQueryBuilder.buildUpdateOrInsertObject(object);
+    var sql = SqliteQueryBuilder.buildInsert("'" + this.gpkgTableName + "'", object);
+    var insertObject = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
     return this.connection.insert(sql, insertObject);
   }
   /**
@@ -518,7 +518,7 @@ export default abstract class Dao<T> {
    */
   //TODO this return value
   updateWithValues(values: {}, where: string, whereArgs: any[]): any {
-    var update = sqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
+    var update = SqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
     return this.connection.run(update.sql, update.args);
   }
   /**
@@ -528,14 +528,14 @@ export default abstract class Dao<T> {
    */
   //TODO this return value
   update(object: T): any {
-    var updateValues = sqliteQueryBuilder.buildUpdateOrInsertObject(object);
-    var update = sqliteQueryBuilder.buildObjectUpdate("'" + this.gpkgTableName + "'", object);
+    var updateValues = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
+    var update = SqliteQueryBuilder.buildObjectUpdate("'" + this.gpkgTableName + "'", object);
     var multiId = this.getMultiId(object);
     if (multiId.length) {
       var where = ' where ';
       for (var i = 0; i < multiId.length; i++) {
-        where += '"' + this.idColumns[i] + '" = $' + sqliteQueryBuilder.fixColumnName(this.idColumns[i]);
-        updateValues[sqliteQueryBuilder.fixColumnName(this.idColumns[i])] = multiId[i];
+        where += '"' + this.idColumns[i] + '" = $' + SqliteQueryBuilder.fixColumnName(this.idColumns[i]);
+        updateValues[SqliteQueryBuilder.fixColumnName(this.idColumns[i])] = multiId[i];
       }
       update += where;
     }

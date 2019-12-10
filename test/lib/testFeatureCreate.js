@@ -7,13 +7,13 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').default
   , Verification = require('../fixtures/verification')
   , FeatureTable = require('../../lib/features/user/featureTable').default
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
-  , BoundingBox = require('../../lib/boundingBox')
+  , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , DataTypes = require('../../lib/db/dataTypes').default
-  , GeometryData = require('../../lib/geom/geometryData')
+  , GeometryData = require('../../lib/geom/geometryData').GeometryData
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').default
   // , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
-  , wkb = require('../../lib/wkb/index')
+  , wkb = require('../../lib/wkb/index').WKB
   , wkx = require('wkx')
   , path = require('path');
 

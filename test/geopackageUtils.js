@@ -1,5 +1,6 @@
 import {default as GeoPackageAPI} from '../index';
 import * as GP  from '../index';
+import { WKB } from '../lib/wkb'
 var DataTypes = GP.DataTypes
   , GeometryColumns = GP.GeometryColumns
   , GeometryData = GP.GeometryData
@@ -20,7 +21,7 @@ var DataTypes = GP.DataTypes
   , MediaTable = GP.MediaTable
   , UserMappingTable = GP.UserMappingTable
   , DublinCoreType = GP.DublinCoreType
-  , wkb = require('../lib/wkb/index');
+  , wkb = WKB;
 
 var wkx = require('wkx')
   , path = require('path')

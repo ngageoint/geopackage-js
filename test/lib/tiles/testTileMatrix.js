@@ -1,7 +1,7 @@
 import { default as GeoPackageAPI } from '../../..'
 
 var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').default
-  , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix')
+  , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix
   , should = require('chai').should()
   , path = require('path');
 

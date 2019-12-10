@@ -4,7 +4,7 @@ import ContentsDao from '../../../../lib/core/contents/contentsDao';
 
 // var GeoPackageAPI = require('../../../..')
 var Contents = require('../../../../lib/core/contents/contents').default
-  , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix')
+  , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');

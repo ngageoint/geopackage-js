@@ -1,4 +1,4 @@
-var BoundingBox = require('../../lib/boundingBox');
+var BoundingBox = require('../../lib/boundingBox').BoundingBox;
 
 var should = require('chai').should();
 

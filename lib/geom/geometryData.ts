@@ -3,30 +3,34 @@
  * @module geom/geometryData
  */
 
-var GeoPackageConstants = require('../geoPackageConstants');
-
-var wkx = require('wkx');
-
-var BIG_ENDIAN = 0;
-// @ts-ignore
-// eslint-disable-next-line no-unused-vars
-var LITTLE_ENDIAN = 1;
+import wkx from 'wkx';
+import {GeoPackageConstants} from '../geoPackageConstants';
 
 /**
  * GeoPackage Geometry Data
  */
-class GeometryData {
-  constructor(buffer) {
+export class GeometryData {
+  static readonly BIG_ENDIAN = 0;
+  static readonly LITTLE_ENDIAN = 1;
+  empty: boolean;
+  byteOrder: number;
+  srsId: number;
+  geometry: any;
+  envelope: any;
+  buffer: any;
+  geometryError: any;
+  extended: any;
+  constructor(buffer?: Buffer | Uint8Array) {
     this.empty = true;
-    this.byteOrder = BIG_ENDIAN;
+    this.byteOrder = GeometryData.BIG_ENDIAN;
     if (buffer) {
       this.fromData(buffer);
     }
   }
-  setSrsId(srsId) {
+  setSrsId(srsId: number) {
     this.srsId = srsId;
   }
-  setGeometry(wkbGeometry) {
+  setGeometry(wkbGeometry: wkx.Geometry) {
     this.empty = false;
     this.geometry = wkbGeometry;
   }
@@ -128,7 +132,7 @@ class GeometryData {
     var envelopeIndicator = !this.envelope ? 0 : this.getIndicatorWithEnvelope(this.envelope);
     flag += (envelopeIndicator << 1);
     // Add the byte order to bit 0, 0 for Big Endian and 1 for Little Endian
-    var byteOrderValue = (this.byteOrder === BIG_ENDIAN) ? 0 : 1;
+    var byteOrderValue = (this.byteOrder === GeometryData.BIG_ENDIAN) ? 0 : 1;
     flag += byteOrderValue;
     return flag;
   }
@@ -178,7 +182,18 @@ class GeometryData {
     if (envelopeIndicator <= 0) {
       return envelopeAndOffset;
     }
-    var envelope = {};
+    var envelope = {
+      minX: null as number,
+      maxX: null as number,
+      minY: null as number,
+      maxY: null as number,
+      hasZ: false as boolean,
+      hasM: false as boolean,
+      minZ: null as number,
+      maxZ: null as number,
+      minM: null as number,
+      maxM: null as number
+    };
     // Read x and y values and create envelope
     envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
     envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
@@ -203,5 +218,3 @@ class GeometryData {
     return envelopeAndOffset;
   }
 }
-
-module.exports = GeometryData;

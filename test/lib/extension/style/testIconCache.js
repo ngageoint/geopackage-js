@@ -6,7 +6,7 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../../lib/api')
   // @ts-ignore
   , fs = require('fs');

@@ -1,7 +1,6 @@
 import Dao from '../../dao/dao';
-
-var TableCreator = require('../../db/tableCreator')
-  , TableIndex = require('./tableIndex').default;
+import { TableCreator } from '../../db/tableCreator'
+import TableIndex from './tableIndex';
 
 /**
  * Table Index Data Access Object
@@ -9,7 +8,7 @@ var TableCreator = require('../../db/tableCreator')
  * @extends Dao
  * @param {module:geoPackage~GeoPackage}  geoPackage The GeoPackage object
  */
-export default class TableIndexDao extends Dao<typeof TableIndex> {
+export default class TableIndexDao extends Dao<TableIndex> {
 
   public static readonly TABLE_NAME = "nga_table_index";
   public static readonly COLUMN_TABLE_NAME = "table_name";

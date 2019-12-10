@@ -1,10 +1,10 @@
 import { default as testSetup } from '../../fixtures/testSetup'
-import { TableCreator } from '../../../.'
+import { TableCreator } from '../../../lib/db/tableCreator'
 
 var TileTable = require('../../../lib/tiles/user/tileTable').default
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
-  , wkb = require('../../../lib/wkb/index')
+  , wkb = require('../../../lib/wkb/index').WKB
   , should = require('chai').should()
   , path = require('path');
 

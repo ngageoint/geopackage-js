@@ -4,7 +4,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 var FeatureTiles = require('../../../../lib/tiles/features')
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon')
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../..')
   // , testSetup = require('../../../fixtures/testSetup')
   , fs = require('fs')

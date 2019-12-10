@@ -1,9 +1,9 @@
 import { default as GeoPackageAPI } from '../../..'
 import { default as testSetup } from '../../fixtures/testSetup'
 
-var GeoPackageTileRetriever = require('../../../lib/tiles/retriever')
+var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
   // , GeoPackageAPI = require('../../..')
-  , BoundingBox = require('../../../lib/boundingBox')
+  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
   // , testSetup = require('../../fixtures/testSetup')
   , proj4 = require('proj4')
   , fs = require('fs')

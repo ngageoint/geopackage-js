@@ -1,13 +1,12 @@
 import { SqliteAdapter } from './sqliteAdapter';
 import { SqljsAdapter } from './sqljsAdapter';
 import DBAdapter from './dbAdapter';
-
+import { GeoPackageConstants } from '../geoPackageConstants';
 /**
  * Connection to the SQLite file
  * @module db/geoPackageConnection
  */
 
-var GeoPackageConstants = require('../geoPackageConstants');
 
 if (typeof(process) !== 'undefined' && process.version && !process.env.FORCE_SQLJS) {
   console.log('Better SQLite');

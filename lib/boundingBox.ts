@@ -1,18 +1,21 @@
-var proj4 = require('proj4');
-proj4 = 'default' in proj4 ? proj4['default'] : proj4;
+import proj4 from 'proj4'
 
 /**
  * Create a new bounding box
  * @class BoundingBox
  */
-class BoundingBox {
+export class BoundingBox {
+  minLongitude: any;
+  maxLongitude: any;
+  minLatitude: any;
+  maxLatitude: any;
   /**
    * @param  {BoundingBox | Number} minLongitudeOrBoundingBox minimum longitude or bounding box to copy (west)
    * @param  {Number} [maxLongitude]              maximum longitude (east)
    * @param  {Number} [minLatitude]               Minimum latitude (south)
    * @param  {Number} [maxLatitude]               Maximum latitude (north)
    */
-  constructor(minLongitudeOrBoundingBox, maxLongitude, minLatitude, maxLatitude) {
+  constructor(minLongitudeOrBoundingBox: BoundingBox | number, maxLongitude?: number, minLatitude?: number, maxLatitude?: number) {
     // if there is a second argument the first argument is the minLongitude
     if (minLongitudeOrBoundingBox instanceof BoundingBox) {
       var boundingBox = minLongitudeOrBoundingBox;
@@ -32,7 +35,7 @@ class BoundingBox {
    *
    * @return geometry envelope
    */
-  buildEnvelope() {
+  buildEnvelope(): { minY: number, minX: number, maxY: number, maxX: number} {
     return {
       minY: this.minLatitude,
       minX: this.minLongitude,
@@ -40,7 +43,7 @@ class BoundingBox {
       maxX: this.maxLongitude
     };
   }
-  toGeoJSON() {
+  toGeoJSON(): any {
     return {
       "type": "Feature",
       "properties": {},
@@ -63,7 +66,7 @@ class BoundingBox {
    * @param  {BoundingBox} boundingBox bounding boundingBox
    * @return {Boolean}             true if equal, false if not
    */
-  equals(boundingBox) {
+  equals(boundingBox: BoundingBox): boolean {
     if (!boundingBox) {
       return false;
     }
@@ -83,7 +86,7 @@ class BoundingBox {
    * @param {string} to
    * @return {BoundingBox}
    */
-  projectBoundingBox(from, to) {
+  projectBoundingBox(from?: string, to?: string): BoundingBox {
     if (from && from !== 'undefined' && to && to !== 'undefined') {
       if (to.toUpperCase && to.toUpperCase() === 'EPSG:3857' && from.toUpperCase && from.toUpperCase() === 'EPSG:4326') {
         this.maxLatitude = Math.min(this.maxLatitude, 85.0511);
@@ -99,5 +102,3 @@ class BoundingBox {
     return this;
   }
 }
-
-module.exports = BoundingBox;

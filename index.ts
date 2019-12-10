@@ -15,13 +15,15 @@ import DataTypes from './lib/db/dataTypes'
 import SchemaExtension from './lib/extension/schema';
 import GeometryColumns from './lib/features/columns/geometryColumns';
 import MetadataReference from './lib/metadata/reference/metadataReference';
+import { GeometryData } from './lib/geom/geometryData';
+import { TableCreator } from './lib/db/tableCreator';
+import { DublinCoreType } from './lib/extension/relatedTables/dublinCoreType';
+import { BoundingBox } from './lib/boundingBox';
+
+
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
-var TableCreator = require('./lib/db/tableCreator');
-var DublinCoreType = require('./lib/extension/relatedTables/dublinCoreType');
-var BoundingBox = require('./lib/boundingBox');
 var TileUtilities = require('./lib/tiles/creator/tileUtilities');
-var GeometryData = require('./lib/geom/geometryData');
 
 var Metadata = require('./lib/metadata/metadata');
 var FeatureTiles = require('./lib/tiles/features');

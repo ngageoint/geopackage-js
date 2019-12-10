@@ -1,12 +1,12 @@
 import IconTable from "./iconTable";
 import MediaRow from '../relatedTables/mediaRow';
+import { ImageUtils } from '../../tiles/imageUtils';
 
 /**
  * @memberOf module:extension/style
  * @class IconRow
  */
 
-var ImageUtils = require('../../tiles/imageUtils');
 
 /**
  * Icon Row

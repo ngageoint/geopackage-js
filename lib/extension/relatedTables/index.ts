@@ -20,7 +20,7 @@ import RelationType from './relationType'
 import Contents from '../../core/contents/contents'
 import ColumnValues from '../../dao/columnValues';
 import ExtendedRelation from './extendedRelation';
-var OptionBuilder = require('../../optionBuilder');
+import { OptionBuilder } from '../../optionBuilder';
 /**
  * Related Tables Extension
  * @param  {module:geoPackage~GeoPackage} geoPackage the GeoPackage object
@@ -532,8 +532,8 @@ export default class RelatedTablesExtension extends BaseExtension {
     }
     return this.hasExtension(RelatedTablesExtension.EXTENSION_NAME, ExtendedRelationDao.TABLE_NAME, null);
   }
-  static RelationshipBuilder() {
-    return OptionBuilder([
+  static RelationshipBuilder(): any {
+    return OptionBuilder.build([
       'baseTableName',
       'relatedTableName',
       'userMappingTable',

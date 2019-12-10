@@ -2,12 +2,13 @@ import FeatureTable from "./featureTable";
 import UserRow from '../../user/userRow';
 import FeatureColumn from './featureColumn';
 import DataTypes from '../../db/dataTypes';
+import { GeometryData } from '../../geom/geometryData'
+
 /**
  * featureRow module.
  * @module features/user/featureRow
  */
 
-var GeometryData = require('../../geom/geometryData')
 
 /**
  * Feature Row containing the values from a single result set row

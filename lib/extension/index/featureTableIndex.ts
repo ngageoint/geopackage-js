@@ -10,8 +10,7 @@ import TableIndex from './tableIndex'
 import FeatureDao from'../../features/user/featureDao'
 import GeometryIndexDao from'./geometryIndexDao'
 import RTreeIndexDao from'../rtree/rtreeIndexDao'
-
-var EnvelopeBuilder = require('../../geom/envelopeBuilder');
+import EnvelopeBuilder from '../../geom/envelopeBuilder'
 
 /**
  * This class will either use the RTree index if it exists, or the

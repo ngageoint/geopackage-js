@@ -1,4 +1,4 @@
-var WKB = require('../../../lib/wkb');
+var WKB = require('../../../lib/wkb').WKB;
 var wkx = require('wkx');
 var should = require('chai').should();
 

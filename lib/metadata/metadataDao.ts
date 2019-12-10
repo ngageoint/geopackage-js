@@ -5,14 +5,14 @@
  */
 import Dao from '../dao/dao';
 
-var Metadata = require('./metadata');
+import { Metadata } from './metadata';
 
 /**
  * Metadata Data Access Object
  * @class
  * @extends Dao
  */
-export default class MetadataDao extends Dao<typeof Metadata> {
+export default class MetadataDao extends Dao<Metadata> {
   public static readonly TABLE_NAME = "gpkg_metadata";
   public static readonly COLUMN_ID = "id";
   public static readonly COLUMN_MD_SCOPE = "md_scope";
