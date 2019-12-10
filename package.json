@@ -124,7 +124,7 @@
     "webpack": "node_modules/.bin/webpack --config webpack.config.js",
     "build-browserify": "browserify -t browserify-css ./built/index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o static/geopackage.js",
     "watch": "watchify -t browserify-css index.js -v --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o static/geopackage.js",
-    "prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js",
+    "no-prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js",
     "prepare": "tsc"
   }
 }
