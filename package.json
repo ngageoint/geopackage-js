@@ -53,6 +53,7 @@
     "wkx": "0.4.8"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "0.1.3",
     "@types/chai": "4.2.5",
     "@types/concat-stream": "^1.6.0",
     "@types/d3-geo": "^1.11.1",
@@ -101,6 +102,7 @@
     "sqlite3": false
   },
   "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
     "temp-dir": "./.test_run",
     "report-dir": "./docs/coverage",
     "reporter": [
