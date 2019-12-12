@@ -27,47 +27,29 @@ module.exports.copyGeopackage = function(orignal) {
   })
 }
 
-module.exports.createGeoPackage = function(gppath, callback) {
+module.exports.createGeoPackage = async function(gppath) {
   if (typeof(process) !== 'undefined' && process.version) {
-    fs.mkdir(path.dirname(gppath), function() {
-      fs.open(gppath, 'w', function() {
-        GeoPackageAPI.create(gppath)
-          .then(function(geopackage) {
-            callback(null, geopackage);
-          });
-      });
-    });
-  } else {
-    callback();
+    await fs.mkdirp(path.dirname(gppath));
+    await fs.open(gppath, 'w');
+    return await GeoPackageAPI.create(gppath)
   }
 };
 
-module.exports.createBareGeoPackage = function(gppath, callback) {
+module.exports.createBareGeoPackage = async function(gppath) {
   if (typeof(process) !== 'undefined' && process.version) {
-    fs.mkdir(path.dirname(gppath), function() {
-      fs.open(gppath, 'w', function() {
-        GeoPackageConnection.connect(gppath)
-          .then(function(connection) {
-            var geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-            callback(null, geopackage);
-          });
-      });
-    });
-  } else {
-    callback();
+    await fs.mkdirp(path.dirname(gppath))
+    await fs.open(gppath, 'w');
+    let connection = await GeoPackageConnection.connect(gppath)
+    return new GeoPackage(path.basename(gppath), gppath, connection);
   }
 };
 
-module.exports.deleteGeoPackage = function(gppath, callback) {
-  callback = callback || function() {}
-  return new Promise(function(resolve, reject) {
-    if (typeof(process) !== 'undefined' && process.version) {
-      fs.unlink(gppath, callback);
-    } else {
-      callback();
-    }
-    resolve();
-  })
+module.exports.deleteGeoPackage = async function(gppath) {
+  if (typeof(process) !== 'undefined' && process.version) {
+    try {
+    await fs.unlink(gppath);
+    } catch (e) {}
+  }
 };
 
 global.loadTile = module.exports.loadTile = async function(tilePath) {

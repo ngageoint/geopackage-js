@@ -61,7 +61,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {Function} progress function which is called with progress while indexing
    * @return {Promise<Boolean>} promise resolved when the indexing is complete
    */
-  index(progress) {
+  async index(progress?: Function): Promise<boolean> {
     return this.indexWithForce(false, progress);
   }
   /**
@@ -70,36 +70,26 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {Function} progress function which is called with progress while indexing
    * @return {Promise<Boolean>} promise resolved when the indexing is complete
    */
-  indexWithForce(force, progress) {
+  async indexWithForce(force?: false, progress?: Function): Promise<boolean> {
     progress = progress || function () { };
     this.progress = function (message) {
       setTimeout(progress, 0, message);
     };
     var indexed = this.isIndexed();
     if (force || !indexed) {
-      return this.getOrCreateExtension()
-        .then(function () {
-          return this.getOrCreateTableIndex();
-        }.bind(this))
-        .then(function (tableIndex) {
-          return this.createOrClearGeometryIndicies()
-            .then(function () {
-              return this.indexTable(tableIndex);
-            }.bind(this))
-            .then(function () {
-              return true;
-            });
-        }.bind(this));
-    }
-    else {
-      return Promise.resolve(indexed);
+      await this.getOrCreateExtension();      
+      let tableIndex = await this.getOrCreateTableIndex();
+      await this.createOrClearGeometryIndicies()
+      return this.indexTable(tableIndex);
+    } else {
+      return indexed;
     }
   }
   /**
    * Check if the table is indexed either with an RTree or the NGA Feature Table Index
    * @return {Boolean}
    */
-  isIndexed() {
+  isIndexed(): boolean {
     if (this.rtreeIndexed)
       return true;
     try {
@@ -200,14 +190,14 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {module:extension/index~TableIndex} tableIndex TableIndex
    * @return {Promise} resolved when complete
    */
-  indexTable(tableIndex) {
+  async indexTable(tableIndex: TableIndex): Promise<boolean> {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         this.indexChunk(0, tableIndex, resolve, reject);
       }.bind(this));
     }.bind(this))
       .then(function () {
-        return this.updateLastIndexed(tableIndex);
+        return this.updateLastIndexed(tableIndex).changes === 1;
       }.bind(this));
   }
   /**

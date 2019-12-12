@@ -5,8 +5,6 @@ import UserRow from '../../user/userRow';
  * @module tiles/user/tileRow
  */
 
-var TileColumn = require('./tileColumn');
-
 /**
  * Tile Row containing the values from a single result set row
  * @class

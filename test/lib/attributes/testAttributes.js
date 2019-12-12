@@ -22,22 +22,20 @@ describe('GeoPackage Attribute table create tests', function() {
   var tableName = 'test_attributes.test';
   var geopackage;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      done();
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should create an attribute table', function() {
-    var columns = [];
+  it('should create an attribute table', async function() {
+    geopackage.hasAttributeTable(tableName).should.be.equal(false);
 
+    var columns = [];
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
     columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
     columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
@@ -46,13 +44,13 @@ describe('GeoPackage Attribute table create tests', function() {
     columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
     columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
     columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
-    return geopackage.createAttributeTable(tableName, columns)
-      .then(function(result) {
-        var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
-        contentsVerified.should.be.equal(true);
-        var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
-        attributesTableExists.should.be.equal(true);
-      });
+    await geopackage.createAttributeTable(tableName, columns)
+    var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
+    contentsVerified.should.be.equal(true);
+    var attributesTableExists = Verification.verifyTableExists(geopackage, tableName);
+    attributesTableExists.should.be.equal(true);
+
+    geopackage.hasAttributeTable(tableName).should.be.equal(true);
   });
 
   it('should create an attribute table from properties', function() {

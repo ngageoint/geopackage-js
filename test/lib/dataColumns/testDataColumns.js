@@ -25,9 +25,9 @@ describe('Data Columns tests', function() {
     geoPackage = result.geopackage;
   });
 
-  afterEach('should close the geopackage', function(done) {
+  afterEach('should close the geopackage', async function() {
     geoPackage.close();
-    testSetup.deleteGeoPackage(filename, done);
+    await testSetup.deleteGeoPackage(filename);
   });
 
   it('should get the data column for property_0', function() {

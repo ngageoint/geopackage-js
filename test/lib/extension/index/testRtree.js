@@ -26,9 +26,9 @@ describe('RTree tests', function() {
       featureDao = geoPackage.getFeatureDao('line1');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should return the index status of true', function() {
@@ -111,9 +111,9 @@ describe('RTree tests', function() {
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should add the RTree extension to the GeoPackage', function() {

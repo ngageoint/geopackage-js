@@ -171,7 +171,7 @@ export class SqliteQueryBuilder {
    * @return {Object} object with a sql property containing the update statement and an args property with bind arguments
    */
   static buildUpdate(table: string, values: any, where: string, whereArgs: any[] | any): { sql: string, args: any[] } {
-    var args = [];
+    var args: any[] = [];
     var update = 'update ' + table + ' set ';
     var first = true;
     for (var columnName in values) {
@@ -257,7 +257,7 @@ export class SqliteQueryBuilder {
     return column.indexOf('*') !== -1 ? column : '"' + column + '"';
   }
   
-  private static isEmpty(string: string): boolean {
+  private static isEmpty(string: string | undefined): boolean {
     return !string || string.length === 0;
   }
 }

@@ -13,18 +13,13 @@ describe('TableCreator tests', function() {
   var testGeoPackage = path.join(__dirname, '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
   var geopackage;
 
-  beforeEach(function(done) {
-    testSetup.deleteGeoPackage(testGeoPackage, function() {
-      testSetup.createBareGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
-        done();
-      });
-    });
+  beforeEach(async function() {
+    geopackage = await testSetup.createBareGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create the spatial reference system table', function() {

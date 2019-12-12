@@ -3,13 +3,18 @@ import { TileMatrixSet } from "../matrixset/tileMatrixSet";
 import { BoundingBox } from "../../..";
 import SpatialReferenceSystem from "../../core/srs/spatialReferenceSystem";
 
-var fileType = require('file-type');
-
-var TileCreator = require('./tileCreator').TileCreator
-  , TileUtilities = require('./tileUtilities')
-  , ProjectTile = require('./projectTile.js');
+import fileType from 'file-type';
+import { TileCreator } from './tileCreator'
+import TileUtilities from './tileUtilities'
+import ProjectTile from './projectTile'
 
 export class CanvasTileCreator extends TileCreator {
+  canvas: any;
+  ctx: any;
+  image: HTMLImageElement;
+  tileCanvas: HTMLCanvasElement;
+  tileContext: any;
+  imageData: Uint8ClampedArray;
   constructor(width: number, height: number, tileMatrix: TileMatrix, tileMatrixSet: TileMatrixSet, tileBoundingBox: BoundingBox, srs: SpatialReferenceSystem, projectionTo: string, canvas?: any) {
     super(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo);
     // eslint-disable-next-line no-undef
@@ -108,34 +113,33 @@ export class CanvasTileCreator extends TileCreator {
         var work = require('webworkify');
         var worker = work(require('./tileWorker.js'));
         worker.onmessage = function (e) {
-          resolve(workerDone(e.data, piecePosition, ctx));
+          resolve(this.workerDone(e.data, piecePosition, ctx));
         };
         worker.postMessage(job, [this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer]);
       }
       catch (e) {
         worker = ProjectTile;
         worker(job, function (err, data) {
-          resolve(workerDone(data, piecePosition, ctx));
+          resolve(this.workerDone(data, piecePosition, ctx));
         });
       }
     }.bind(this));
   }
-}
-
-function workerDone(data, piecePosition, ctx) {
-  if (data.message === 'done') {
-    var imageData = new Uint8ClampedArray(data.imageData);
-    var offsetX = piecePosition.startX;
-    var offsetY = piecePosition.startY;
-    var finalWidth = data.finalWidth;
-    var finalHeight = data.finalHeight;
-
-    // eslint-disable-next-line no-undef
-    var tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = finalWidth;
-    tmpCanvas.height = finalHeight;
-    tmpCanvas.getContext('2d').putImageData(new ImageData(imageData, finalWidth, finalHeight), 0, 0);
-
-    ctx.drawImage(tmpCanvas, offsetX, offsetY);
+  workerDone(data, piecePosition, ctx) {
+    if (data.message === 'done') {
+      var imageData = new Uint8ClampedArray(data.imageData);
+      var offsetX = piecePosition.startX;
+      var offsetY = piecePosition.startY;
+      var finalWidth = data.finalWidth;
+      var finalHeight = data.finalHeight;
+  
+      // eslint-disable-next-line no-undef
+      var tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = finalWidth;
+      tmpCanvas.height = finalHeight;
+      tmpCanvas.getContext('2d').putImageData(new ImageData(imageData, finalWidth, finalHeight), 0, 0);
+  
+      ctx.drawImage(tmpCanvas, offsetX, offsetY);
+    }
   }
 }

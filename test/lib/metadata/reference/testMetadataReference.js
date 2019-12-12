@@ -14,20 +14,16 @@ describe('Metadata Reference tests', function() {
   var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      done();
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     try {
       geopackage.close();
-      testSetup.deleteGeoPackage(testGeoPackage, done);
+      await testSetup.deleteGeoPackage(testGeoPackage);
     } catch (e) {
-      done();
     }
   });
 

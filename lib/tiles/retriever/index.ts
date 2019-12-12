@@ -3,7 +3,7 @@ import TileDao from '../user/tileDao';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils }  from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
-var TileCreator = require('../creator');
+import { TileCreator } from '../creator/tileCreator';
 
 export class GeoPackageTileRetriever {
   tileDao: TileDao;
@@ -90,7 +90,7 @@ export class GeoPackageTileRetriever {
       return Promise.resolve();
     var tileWidth = tileMatrix.tile_width;
     var tileHeight = tileMatrix.tile_height;
-    var creator = await TileCreator.initialize(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
+    var creator = await TileCreator.create(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
     var iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
     for (var tile of iterator) {
       tiles.push({

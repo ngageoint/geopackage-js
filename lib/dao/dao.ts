@@ -52,7 +52,7 @@ export default abstract class Dao<T> {
   /**
    * Checks if the table exists
    */
-  isTableExists(): Boolean {
+  isTableExists(): boolean {
     var results = this.connection.isTableExists(this.gpkgTableName);
     return !!results;
   }
@@ -60,7 +60,7 @@ export default abstract class Dao<T> {
    * Refreshes the object by id
    * @param object object to refresh
    */
-  refresh(object: T): T {
+  refresh(object: T): T | undefined {
     return this.queryForSameId(object);
   }
   /**
@@ -68,7 +68,7 @@ export default abstract class Dao<T> {
    * @param  id ID of the object to query for
    * @return object created from the raw database object
    */
-  queryForId(id: any): T {
+  queryForId(id: any): T | undefined {
     var whereString = this.buildPkWhere(id);
     var whereArgs = this.buildPkWhereArgs(id);
     var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
@@ -85,7 +85,7 @@ export default abstract class Dao<T> {
     return this.queryForMultiId(idArray);
   }
   getMultiId(object: T | any): any[] {
-    var idValues = [];
+    var idValues: any[] = [];
     for (var i = 0; i < this.idColumns.length; i++) {
       var idValue = object.values ? object.values[this.idColumns[i]] : object[this.idColumns[i]];
       if (idValue !== undefined) {
@@ -99,7 +99,7 @@ export default abstract class Dao<T> {
    * @param  idValues ColumnValues with the multi id
    * @return object created from the raw database object
    */
-  queryForMultiId(idValues: any[]): T {
+  queryForMultiId(idValues: any[]): T | undefined {
     var whereString = this.buildPkWhere(idValues);
     var whereArgs = this.buildPkWhereArgs(idValues);
     var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
@@ -141,8 +141,8 @@ export default abstract class Dao<T> {
    * @return {Object[]} raw object array from the database
    */
   queryForColumns(columnName: string, fieldValues?: ColumnValues): any[] {
-    var where: string;
-    var whereArgs: any[];
+    var where: string | undefined = undefined;
+    var whereArgs: any[] | null = null;
     if (fieldValues) {
       where = this.buildWhere(fieldValues);
       whereArgs = this.buildWhereArgs(fieldValues);
@@ -176,7 +176,7 @@ export default abstract class Dao<T> {
     }
     else {
       var whereString: string = this.buildWhereWithFieldAndValue(field, value);
-      var whereArgs: any[] = this.buildWhereArgs(value);
+      var whereArgs: any[] | null = this.buildWhereArgs(value);
       query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString, undefined, groupBy, having, orderBy);
       return this.connection.each(query, whereArgs);
     }
@@ -313,8 +313,8 @@ export default abstract class Dao<T> {
    * @param {any[]|ColumnValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgs(values: any[] | ColumnValues | any): any[] {
-    var args = [];
+  buildWhereArgs(values: any[] | ColumnValues | any): any[] | null {
+    var args: any[] = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
     }

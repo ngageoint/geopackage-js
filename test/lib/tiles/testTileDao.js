@@ -23,9 +23,9 @@ describe('TileDao tests', function() {
       tileDao = geoPackage.getTileDao('TILESosmds');
     });
 
-    afterEach('close the geopackage connection', function(done) {
+    afterEach('close the geopackage connection', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the zoom levels', function(done) {

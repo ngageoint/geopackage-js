@@ -15,11 +15,10 @@ import UserMappingTable from '../relatedTables/userMappingTable'
 import StyleTableReader from './styleTableReader'
 import UserTableReader from '../../user/userTableReader'
 import FeatureTable from '../../features/user/featureTable'
-
-var FeatureStyles = require('./featureStyles')
-  , FeatureStyle = require('./featureStyle')
-  , Styles = require('./styles')
-  , Icons = require('./icons');
+import FeatureStyles from './featureStyles'
+import FeatureStyle from './featureStyle'
+import Styles from './styles'
+import Icons from './icons'
 
 /**
  * Style extension

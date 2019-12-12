@@ -16,17 +16,14 @@ describe('GeoPackage create tests', function() {
   var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      done();
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should get return an empty array if asking for tile tables when they do not exist', function() {

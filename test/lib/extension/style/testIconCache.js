@@ -1,7 +1,7 @@
 import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
+var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , IconCache = require('../../../../lib/extension/style/iconCache')
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
@@ -67,36 +67,24 @@ describe('IconCache Tests', function() {
     });
   }
 
-  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', function(done) {
+  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    // create a feature table first
+    featureTable = await GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, [])
+    await geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName)
+    await geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension()
+    await geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension()
+    featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
+    await featureTableStyles.createIconRelationship()
+    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))
     // @ts-ignore
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      // create a feature table first
-      GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, []).then(function(table) {
-        featureTable = table;
-        geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName).then(function() {
-          geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension().then(function () {
-            geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension().then(function () {
-              featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
-              featureTableStyles.createIconRelationship().then(function () {
-                ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(async function (expectedImage) {
-                  iconImage = expectedImage;
-                  // @ts-ignore
-                  iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
-    });
+    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create icon cache', function() {

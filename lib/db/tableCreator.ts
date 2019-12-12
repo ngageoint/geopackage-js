@@ -29,18 +29,16 @@ export class TableCreator {
    * Creates all required tables and Spatial Reference Systems, in addition to EPSG:3857
    * @return {Promise<Boolean>}
    */
-  createRequired(): Promise<boolean> {
+  async createRequired(): Promise<boolean> {
     var dao = new SpatialReferenceSystemDao(this.geopackage);
-    return Promise.all([this.createSpatialReferenceSystem(), this.createContents()])
-      .then(function () {
-        // Create the required Spatial Reference Systems (spec Requirement 11)
-        dao.createUndefinedGeographic();
-        dao.createWgs84();
-        dao.createUndefinedCartesian();
-        // not required but very common
-        dao.createWebMercator();
-        return true;
-      });
+    await Promise.all([this.createSpatialReferenceSystem(), this.createContents()]);
+    // Create the required Spatial Reference Systems (spec Requirement 11)
+    dao.createUndefinedGeographic();
+    dao.createWgs84();
+    dao.createUndefinedCartesian();
+    // not required but very common
+    dao.createWebMercator();
+    return true;
   }
   /**
    * Creates the spatial reference system tables
@@ -152,20 +150,21 @@ export class TableCreator {
    * @param  {string} creationScriptName creation scripts to run
    * @return {Promise<Boolean>}
    */
-  createTable(creationScriptName: string): Promise<boolean> {
-    var connection = this.connection;
-    return TableCreator.tableCreationScripts[creationScriptName].reduce(function (sequence, sql) {
-      return sequence.then(function () {
-        try {
-          return !!connection.run(sql);
+  async createTable(creationScriptName: string): Promise<boolean> {
+    let success = true;
+    let scripts = TableCreator.tableCreationScripts[creationScriptName];
+    for (let i = 0; i < scripts.length; i++) {
+      let sql = scripts[i];
+      try {
+        success = success && !!this.connection.run(sql);
+      }
+      catch (error) {
+        if (error.message.indexOf('already exists') === -1) {
+          throw error;
         }
-        catch (error) {
-          if (error.message.indexOf('already exists') === -1) {
-            throw error;
-          }
-        }
-      });
-    }, Promise.resolve());
+      }
+    }
+    return success;
   }
   /**
    * Create the given user table.
@@ -174,7 +173,7 @@ export class TableCreator {
    * @return {object} the result of {@link module:db/geoPackageConnection~GeoPackageConnection#run}
    * @throws {Error} if the table already exists
    */
-  createUserTable(userTable: UserTable): any {
+  createUserTable(userTable: UserTable): { lastInsertRowid: number, changes: number} {
     var connection = this.connection;
     var result = connection.tableExists(userTable.table_name);
     if (result) {

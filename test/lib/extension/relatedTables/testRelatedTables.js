@@ -30,9 +30,9 @@ describe('Related Tables tests', function() {
       geoPackage = result.geopackage;
     });
 
-    afterEach('close the geopackage connection', function(done) {
+    afterEach('close the geopackage connection', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should read a relationship', function() {
@@ -131,9 +131,9 @@ describe('Related Tables tests', function() {
       geoPackage = result.geopackage;
     });
 
-    afterEach('close the geopackage connection', function(done) {
+    afterEach('close the geopackage connection', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should write a relationship', function() {

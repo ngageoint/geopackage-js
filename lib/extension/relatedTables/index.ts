@@ -119,7 +119,7 @@ export default class RelatedTablesExtension extends BaseExtension {
     }
     return !!relations.length;
   }
-  getRelatedRows(baseTableName: string, baseId: number) {
+  getRelatedRows(baseTableName: string, baseId: number): ExtendedRelation[] {
     var relationships = this.getRelationships(baseTableName);
     for (var i = 0; i < relationships.length; i++) {
       var relation = relationships[i];
@@ -404,7 +404,7 @@ export default class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~RelationType} relationType     relation type
    * @return {Promise}
    */
-  linkRelatedIds(baseTableName, baseId, relatedTableName, relatedId, relationType) {
+  async linkRelatedIds(baseTableName, baseId, relatedTableName, relatedId, relationType): Promise<number> {
     var baseDao = UserDao.readTable(this.geoPackage, baseTableName);
     var relatedDao = UserDao.readTable(this.geoPackage, relatedTableName);
     var baseRow = baseDao.queryForId(baseId);

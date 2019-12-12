@@ -1,18 +1,17 @@
 import DBAdapter from './dbAdapter';
-
+import fs from 'fs-extra'
+import path from 'path'
+import http from 'http'
+import os from 'os'
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
  */
 
-var fs = require('fs-extra')
-  , path = require('path')
-  , http = require('http')
-  , os = require('os');
 /**
  * Class which adapts generic GeoPackage queries to better-sqlite3 queries
  */
-export class SqliteAdapter implements DBAdapter{
+export class SqliteAdapter implements DBAdapter {
   filePath: string | Buffer | Uint8Array;
   db: any;
   /**
@@ -24,8 +23,9 @@ export class SqliteAdapter implements DBAdapter{
     try {
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
+          let url: string = this.filePath as string;
           return new Promise((resolve, reject) => {
-            http.get(this.filePath, (response) => {
+            http.get(url, (response) => {
               if (response.statusCode !== 200) {
                 reject(new Error('Unable to reach url: ' + this.filePath));
               }
@@ -111,10 +111,9 @@ export class SqliteAdapter implements DBAdapter{
   }
   /**
    * Returns a Buffer containing the contents of the database as a file
-   * @param  {Function} callback called when export is complete
    */
-  export(callback: Function): void {
-    fs.readFile(this.filePath, callback);
+  async export(): Promise<any> {
+    return fs.readFile(this.filePath as string);
   }
   /**
    * Registers the given function so that it can be used by SQL statements
@@ -196,7 +195,7 @@ export class SqliteAdapter implements DBAdapter{
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: string, params?: [] | Object): {changes: number, lastInsertROWID: number} {
+  run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number} {
     var statement = this.db.prepare(sql);
     if (params) {
       return statement.run(params);

@@ -48,7 +48,7 @@ export default class RTreeIndexDao extends Dao<RTreeIndex> {
    * @returns {{whereArgs: Array, where: string, join: string, tableNameArr: string[]}}
    * @private
    */
-  _generateGeometryEnvelopeQuery(envelope) {
+  _generateGeometryEnvelopeQuery(envelope: { minX: number, maxX: number, minY: number, maxY: number}): {whereArgs: any[], where: string, join: string, tableNameArr: string[]} {
     var tableName = this.featureDao.gpkgTableName;
     var where = '';
     var minXLessThanMaxX = envelope.minX < envelope.maxX;
@@ -72,7 +72,7 @@ export default class RTreeIndexDao extends Dao<RTreeIndex> {
     where += this.buildWhereWithFieldAndValue('miny', envelope.maxY, '<=');
     where += ' and ';
     where += this.buildWhereWithFieldAndValue('maxy', envelope.minY, '>=');
-    var whereArgs = [];
+    const whereArgs: number[] = [];
     whereArgs.push(envelope.maxX, envelope.minX);
     if (!minXLessThanMaxX) {
       whereArgs.push(envelope.minX, envelope.maxX);

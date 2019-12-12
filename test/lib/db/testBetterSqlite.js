@@ -32,16 +32,14 @@ describe('Database opening tests', function(done) {
 
   var db;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testDb = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testDb, function(err, gp) {
-      db = gp.getDatabase().getDBConnection();
-      done();
-    });
+    let gp = await testSetup.createGeoPackage(testDb);
+    db = gp.getDatabase().getDBConnection();
   });
 
-  afterEach(function(done) {
-    testSetup.deleteGeoPackage(testDb, done);
+  afterEach(async function() {
+    await testSetup.deleteGeoPackage(testDb);
   });
 
   it('should load a file synchronusly then write to the db', function(done) {

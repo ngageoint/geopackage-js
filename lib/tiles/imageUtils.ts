@@ -1,11 +1,11 @@
-var sizeOf = require('image-size');
-var isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-// @ts-ignore
-var isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-var isNode = typeof(process) !== 'undefined' && process.version;
+import sizeOf from 'image-size';
 
 export class ImageUtils {
-  public static readonly useNodeCanvas =  isNode && !isPhantom && !isElectron;
+  public static readonly isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
+  // @ts-ignore
+  public static readonly isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
+  public static readonly isNode = typeof(process) !== 'undefined' && process.version;
+  public static readonly useNodeCanvas =  ImageUtils.isNode && !ImageUtils.isPhantom && !ImageUtils.isElectron;
 
   /**
    * Get image for data

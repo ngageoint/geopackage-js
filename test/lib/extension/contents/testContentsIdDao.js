@@ -12,27 +12,23 @@ describe('ContentsIdExtension Tests', function() {
   var tableName = 'test';
   var contents;
 
-  beforeEach('create the GeoPackage connection', function(done) {
+  beforeEach('create the GeoPackage connection', async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      var contentsDao = geopackage.getContentsDao();
-      var contentsIdExtension = geopackage.getContentsIdExtension();
-      contentsIdExtension.getOrCreateExtension();
-      var contentsIdDao = contentsIdExtension.getDao();
-      contents = contentsDao.createObject();
-      contents.table_name = tableName;
-      contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
-      contentsDao.create(contents);
-      contentsIdDao.createTable().then(function() {
-        done();
-      });
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    var contentsDao = geopackage.getContentsDao();
+    var contentsIdExtension = geopackage.getContentsIdExtension();
+    contentsIdExtension.getOrCreateExtension();
+    var contentsIdDao = contentsIdExtension.getDao();
+    contents = contentsDao.createObject();
+    contents.table_name = tableName;
+    contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
+    contentsDao.create(contents);
+    await contentsIdDao.createTable();
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create a nga_contents_id table', function() {

@@ -41,7 +41,7 @@ export default class RTreeIndex extends BaseExtension {
    * @returns {Promise}
    */
   create(progress?: Function): Promise<any> {
-    progress = progress || function () { };
+    let safeProgress = progress || function () { };
     if (this.extensionExists) {
       return Promise.resolve(this.getRTreeIndexExtension());
     }
@@ -49,7 +49,7 @@ export default class RTreeIndex extends BaseExtension {
       .then(function () {
         this.createAllFunctions();
         this.createRTreeIndex();
-        progress({
+        safeProgress({
           description: 'Creating Feature Index',
           count: 0,
           totalCount: this.featureCount,

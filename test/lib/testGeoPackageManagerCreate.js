@@ -10,39 +10,36 @@ describe('GeoPackageAPI Create tests', function() {
   var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      done();
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
-  it('should not allow a file without a gpkg extension', function(done) {
-    GeoPackageAPI.create('/tmp/test.g', function(err, geopackage) {
-      should.exist(err);
-      should.not.exist(geopackage);
-      done();
-    });
+  it('should not allow a file without a gpkg extension', async function() {
+    try {
+      let gp = await GeoPackageAPI.create('/tmp/test.g');
+      should.fail(gp, null, 'Error should have been thrown')
+    } catch (e) {
+      should.exist(e);
+      return;
+    }
+    should.fail(false, true, 'Error should have been thrown');
   });
 
-  it('should create the geopackage file', function(done) {
-    GeoPackageAPI.create(testGeoPackage, function(err, geopackage) {
-      should.not.exist(err);
-      should.exist(geopackage);
-      var applicationId = geopackage.getApplicationId();
-      var buff = Buffer.alloc(4);
-      // @ts-ignore
-      buff.writeUInt32BE(applicationId);
-      var idString = buff.toString('ascii', 0, 4);
-      idString.should.be.equal('GPKG');
-      done();
-    });
+  it('should create the geopackage file', async function() {
+    let geopackage = await GeoPackageAPI.create(testGeoPackage);
+    should.exist(geopackage);
+    var applicationId = geopackage.getApplicationId();
+    var buff = Buffer.alloc(4);
+    // @ts-ignore
+    buff.writeUInt32BE(applicationId);
+    var idString = buff.toString('ascii', 0, 4);
+    idString.should.be.equal('GPKG');
   });
 
 });

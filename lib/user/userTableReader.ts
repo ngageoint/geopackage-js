@@ -12,6 +12,13 @@ import DataTypes from '../db/dataTypes';
  * @class
  */
 export default class UserTableReader {
+  private static readonly GPKG_UTR_CID = "cid";
+  private static readonly GPKG_UTR_NAME = "name";
+  private static readonly GPKG_UTR_TYPE = "type";
+  private static readonly GPKG_UTR_NOT_NULL = "notnull";
+  private static readonly GPKG_UTR_PK = "pk";
+  private static readonly GPKG_UTR_DFLT_VALUE = "dflt_value";
+
   table_name: string;
   requiredColumns: any;
   /**
@@ -34,11 +41,11 @@ export default class UserTableReader {
     var results = db.all('PRAGMA table_info(\'' + this.table_name + '\')');
     for (var i = 0; i < results.length; i++) {
       var result = results[i];
-      var index = result[GPKG_UTR_CID];
-      var name = result[GPKG_UTR_NAME];
-      var type = result[GPKG_UTR_TYPE];
-      var notNull = result[GPKG_UTR_NOT_NULL] === 1;
-      var primarykey = result[GPKG_UTR_PK] === 1;
+      var index = result[UserTableReader.GPKG_UTR_CID];
+      var name = result[UserTableReader.GPKG_UTR_NAME];
+      var type = result[UserTableReader.GPKG_UTR_TYPE];
+      var notNull = result[UserTableReader.GPKG_UTR_NOT_NULL] === 1;
+      var primarykey = result[UserTableReader.GPKG_UTR_PK] === 1;
       var max = undefined;
       if (type && type.lastIndexOf(')') === type.length - 1) {
         var maxStart = type.indexOf('(');
@@ -51,8 +58,8 @@ export default class UserTableReader {
         }
       }
       var defaultValue = undefined;
-      if (result[GPKG_UTR_DFLT_VALUE]) {
-        defaultValue = result[GPKG_UTR_DFLT_VALUE].replace(/\\'/g, '');
+      if (result[UserTableReader.GPKG_UTR_DFLT_VALUE]) {
+        defaultValue = result[UserTableReader.GPKG_UTR_DFLT_VALUE].replace(/\\'/g, '');
       }
       var column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValue, primarykey);
       columnList.push(column);
@@ -90,10 +97,3 @@ export default class UserTableReader {
     return new UserTable(tableName, columns, requiredColumns);
   }
 }
-
-var GPKG_UTR_CID = "cid";
-var GPKG_UTR_NAME = "name";
-var GPKG_UTR_TYPE = "type";
-var GPKG_UTR_NOT_NULL = "notnull";
-var GPKG_UTR_PK = "pk";
-var GPKG_UTR_DFLT_VALUE = "dflt_value";

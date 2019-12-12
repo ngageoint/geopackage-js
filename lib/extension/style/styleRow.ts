@@ -7,11 +7,6 @@ import AttributesRow from '../../attributes/attributeRow';
 import StyleTable from './styleTable';
 
 /**
- * Color hex pattern
- */
-var colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
-
-/**
  * Style Row
  * @extends AttributesRow
  * @param  {module:extension/style.StyleTable} styleTable  style table
@@ -20,6 +15,10 @@ var colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
  * @constructor
  */
 export default class StyleRow extends AttributesRow {
+  /**
+   * Color hex pattern
+   */
+  private static readonly colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
   styleTable: StyleTable;
   constructor(styleTable: StyleTable, columnTypes?: any[], values?: any[]) {
     super(styleTable, columnTypes, values);
@@ -268,7 +267,7 @@ export default class StyleRow extends AttributesRow {
       if (!color.startsWith("#")) {
         validated = "#" + color;
       }
-      if (!colorPattern.test(validated)) {
+      if (!StyleRow.colorPattern.test(validated)) {
         throw new Error("Color must be in hex format #RRGGBB or #RGB, invalid value: " + color);
       }
       validated = validated.toUpperCase();

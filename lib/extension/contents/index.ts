@@ -10,7 +10,6 @@ import ContentsDao from '../../core/contents/contentsDao';
 import Contents from '../../core/contents/contents';
 import ContentsId from './contentsId';
 
-type ContentsTableName = { table_name: string }
 /**
  * Style extension
  */
@@ -264,7 +263,7 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * @param type
 	 * @returns {ContentsTableName[]} contentsTableNames
 	 */
-  getMissing(type = ""): ContentsTableName[] {
+  getMissing(type = ""): { table_name: string }[] {
     var query = "SELECT " + ContentsDao.COLUMN_TABLE_NAME + " FROM " + ContentsDao.TABLE_NAME;
     var where = "";
     var params = [];

@@ -28,9 +28,9 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should return the index status of false', function() {
@@ -140,9 +140,9 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should query for the index row rivers, 315', function(done) {

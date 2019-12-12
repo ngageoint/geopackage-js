@@ -3,7 +3,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon')
-  , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile')
+  , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../..')
   // , testSetup = require('../../../fixtures/testSetup')
@@ -31,9 +31,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the x: 1, y: 0, z: 1 tile', function(done) {
@@ -179,9 +179,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the x: 153631, y: 91343, z: 18 tile', function(done) {
@@ -351,9 +351,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the x: 153632, y: 91343, z: 18 tile', function(done) {
@@ -397,9 +397,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the x: 153632, y: 91343, z: 18 tile and scale the styles', function(done) {

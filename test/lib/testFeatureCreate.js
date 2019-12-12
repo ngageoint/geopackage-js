@@ -23,17 +23,14 @@ describe('GeoPackage Feature table create tests', function() {
   var tableName = 'test_features.test';
   var geopackage;
 
-  beforeEach(function(done) {
+  beforeEach(async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      done();
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create a feature table', function() {

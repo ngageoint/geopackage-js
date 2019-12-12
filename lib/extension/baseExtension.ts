@@ -51,7 +51,7 @@ export default abstract class BaseExtension {
    * @param  {String}   scopeType     extension scope type
    * @return {Promise<Extension>}
    */
-  getOrCreate(extensionName: String, tableName: String, columnName: String, definition: String, scopeType: String): Promise<Extension> {
+  getOrCreate(extensionName: String, tableName: String | null, columnName: String | null, definition: String, scopeType: String): Promise<Extension> {
     var extension = this.getExtension(extensionName, tableName, columnName);
     if (extension.length) {
       return Promise.resolve(extension[0]);
@@ -68,7 +68,7 @@ export default abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @return {Extension[]}
    */
-  getExtension(extensionName: String, tableName: String, columnName: String): Extension[] {
+  getExtension(extensionName: String, tableName: String | null, columnName: String | null): Extension[] {
     if (!this.extensionsDao.isTableExists()) {
       return [];
     }

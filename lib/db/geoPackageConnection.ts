@@ -18,14 +18,14 @@ if (typeof(process) !== 'undefined' && process.version && !process.env.FORCE_SQL
  * Represents a connection to the GeoPackage database
  */
 export default class GeoPackageConnection {
-  filePath: string | Buffer | Uint8Array;
+  filePath: string | Buffer | Uint8Array | undefined;
   adapter: DBAdapter;
   adapterCreator: typeof SqliteAdapter | typeof SqljsAdapter;
   /**
    * Construct a new connection to the GeoPackage SQLite file
    * @param filePath path to the sqlite file
    */
-  constructor(filePath: string | Buffer | Uint8Array) {
+  constructor(filePath: string | Buffer | Uint8Array | undefined) {
     this.filePath = filePath;
   }
   /**
@@ -63,8 +63,8 @@ export default class GeoPackageConnection {
    * exports the GeoPackage as a file
    * @param  {Function} callback called with an err and the buffer containing the contents of the file
    */
-  export(callback: Function): void {
-    this.adapter.export(callback);
+  async export(): Promise<any> {
+    return this.adapter.export();
   }
   /**
    * Gets the raw connection to the database
@@ -112,11 +112,11 @@ export default class GeoPackageConnection {
    * Run the given SQL and return the results.
    * @param  {string} sql    sql to run
    * @param  {Array|Object} [params] array of substitution parameters
-   * @return {{changes: number, lastInsertROWID: number}} object: `{ "changes": number, "lastInsertROWID": number }`
+   * @return {{changes: number, lastInsertRowid: number}} object: `{ "changes": number, "lastInsertROWID": number }`
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: string, params?: Object | []): { changes: number; lastInsertROWID: number;} {
+  run(sql: string, params?: Object | []): { changes: number; lastInsertRowid: number;} {
     return this.adapter.run(sql, params);
   }
   /**
@@ -125,7 +125,7 @@ export default class GeoPackageConnection {
    * @param  {Array|Object} [params] substitution parameters
    * @return {any[]}
    */
-  all(sql: string, params?: [] | Object): any[] {
+  all(sql: string, params?: [] | Object | null): any[] {
     return this.adapter.all(sql, params);
   }
   /**
@@ -252,7 +252,7 @@ export default class GeoPackageConnection {
    * gets the application_id from the sqlite file
    * @return {number}
    */
-  getApplicationId(): number {
+  getApplicationId(): string {
     return this.adapter.get('PRAGMA application_id').application_id;
   }
   /**

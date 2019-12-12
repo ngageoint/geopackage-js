@@ -24,9 +24,9 @@ describe('Contents tests', function() {
     contentsDao = new ContentsDao(geoPackage);
   });
 
-  afterEach('should close the geopackage', function(done) {
+  afterEach('should close the geopackage', async function() {
     geoPackage.close();
-    testSetup.deleteGeoPackage(filename, done);
+    await testSetup.deleteGeoPackage(filename);
   });
 
   it('should create a new contents entry', function() {

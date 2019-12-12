@@ -9,25 +9,23 @@
  * paint objects for each draw type can be modified to or set to null (except
  * for the text paint object).
  */
-
-var CustomFeatureTile = require('./customFeaturesTile')
+import { CustomFeaturesTile } from './customFeaturesTile';
   // @ts-ignore
-  , concat = require('concat-stream');
-
-var isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-// @ts-ignore
-var isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-var isNode = typeof (process) !== 'undefined' && process.version;
+import concat from 'concat-stream';
 
 /**
  *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
  *  from those features.
  */
-class ShadedFeaturesTile extends CustomFeatureTile {
+export class ShadedFeaturesTile extends CustomFeaturesTile {
+  tileBorderStrokeWidth: number;
+  tileBorderColor: string;
+  tileFillColor: string;
+  drawUnindexedTiles: boolean;
+  compressFormat: string;
   constructor() {
     super();
 
-    this.useNodeCanvas = isNode && !isPhantom && !isElectron;
     this.tileBorderStrokeWidth = 2;
     this.tileBorderColor = "rgba(0, 0, 0, 1.0)";
     this.tileFillColor = "rgba(0, 0, 0, 0.0625)";
@@ -140,7 +138,7 @@ class ShadedFeaturesTile extends CustomFeatureTile {
         canvas = tileCanvas;
       }
       else {
-        if (this.useNodeCanvas) {
+        if (CustomFeaturesTile.useNodeCanvas) {
           var Canvas = require('canvas');
           canvas = Canvas.createCanvas(tileWidth, tileHeight);
         }
@@ -163,7 +161,7 @@ class ShadedFeaturesTile extends CustomFeatureTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      if (this.useNodeCanvas) {
+      if (CustomFeaturesTile.useNodeCanvas) {
         var writeStream = concat(function (buffer) {
           resolve(buffer);
         });

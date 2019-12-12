@@ -7,13 +7,13 @@ export default interface DBAdapter {
   initialize(): Promise<this>;
   close(): void;
   getDBConnection(): any;
-  export(callback: Function): void;
+  export(): Promise<any>;
   registerFunction(name: string, functionDefinition: Function): this;
   get(sql: string, params?: [] | Object): any;
   isTableExists(tableName: string): Boolean;
-  all(sql: string, params?: [] | Object): any[];
+  all(sql: string, params?: [] | Object | null): any[];
   each(sql: string, params?: [] | Object): IterableIterator<any>;
-  run(sql: string, params?: [] | Object): {changes: number, lastInsertROWID: number};
+  run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number};
   insert(sql: string, params?: [] | Object): number;
   delete(sql: string, params?: [] | Object): number;
   dropTable(table: string): Boolean;

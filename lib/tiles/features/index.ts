@@ -1,23 +1,21 @@
 import concat from 'concat-stream'
 import * as d3geo  from 'd3-geo'
+import reproject from 'reproject'
+import PolyToLine from '@turf/polygon-to-line'
+
 import FeatureDao from "../../features/user/featureDao"
 import {TileBoundingBoxUtils} from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
 import { ImageUtils } from '../imageUtils'
-
+import IconCache from '../../extension/style/iconCache'
+import { FeatureDrawType } from './featureDrawType'
+import FeaturePaintCache from './featurePaintCache'
+import Paint from './paint'
+import { FeatureTableStyles } from '../../extension/style/featureTableStyles'
 /**
  * FeatureTiles module.
  * @module tiles/features
  */
-var FeatureTableStyles = require('../../extension/style/featureTableStyles')
-  , Paint = require('./paint')
-  , FeaturePaintCache = require('./featurePaintCache')
-  , FeatureDrawType = require('./featureDrawType')
-  , IconCache = require('../../extension/style/iconCache');
-
-// @ts-ignore
-var reproject = require('reproject')
-  , PolyToLine = require('@turf/polygon-to-line').default;
 
 /**
  *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles

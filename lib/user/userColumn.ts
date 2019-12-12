@@ -21,6 +21,7 @@ export default class UserColumn {
   name: string;
   dataType: any;
   max: number;
+  min: number;
   notNull: boolean;
   defaultValue: any;
   primaryKey: boolean;

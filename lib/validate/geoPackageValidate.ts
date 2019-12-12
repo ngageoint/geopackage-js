@@ -1,13 +1,12 @@
+import path from 'path'
 import GeoPackage from "../geoPackage";
+import {GeoPackageConstants} from '../geoPackageConstants'
 
 /**
  * GeoPackageValidate module.
  * @module validate/geoPackageValidate
  *
  */
-
-var path = require('path')
-  , GeoPackageConstants = require('../geoPackageConstants').GeoPackageConstants;
 
 export class GeoPackageValidate {
   /**

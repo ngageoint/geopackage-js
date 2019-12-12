@@ -119,10 +119,9 @@ export class SqljsAdapter implements DBAdapter {
   }
   /**
    * Returns a Uint8Array containing the contents of the database as a file
-   * @param  {Function} callback called when export is complete
    */
-  export(callback: Function): void {
-    callback(null, this.db.export());
+  async export(): Promise<any> {
+    return this.db.export();
   }
   /**
    * Registers the given function so that it can be used by SQL statements
@@ -222,7 +221,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Object} object containing a changes property indicating the number of rows changed and a lastInsertROWID indicating the last inserted row
    */
-  run(sql: string, params?: [] | Object): {changes: number, lastInsertROWID: number} {
+  run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number} {
     if (params) {
       for (var key in params) {
         params['$' + key] = params[key];
@@ -235,7 +234,7 @@ export class SqljsAdapter implements DBAdapter {
       lastInsertedId = lastId[0].values[0][0];
     }
     return {
-      lastInsertROWID: lastInsertedId,
+      lastInsertRowid: lastInsertedId,
       changes: this.db.getRowsModified()
     };
   }

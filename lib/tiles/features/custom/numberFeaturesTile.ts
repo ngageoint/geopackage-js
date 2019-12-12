@@ -1,7 +1,6 @@
-/**
- * NumberFeaturesTile module.
- * @module tiles/features/custom
- */
+import { CustomFeaturesTile } from './customFeaturesTile'
+import concat from 'concat-stream'
+import path from 'path'
 
 /**
  * Draws a tile indicating the number of features that exist within the tile,
@@ -11,25 +10,22 @@
  * paint objects for each draw type can be modified to or set to null (except
  * for the text paint object).
  */
-
-var CustomFeatureTile = require('./customFeaturesTile')
-  // @ts-ignore
-  , concat = require('concat-stream')
-  , path = require('path');
-
-var isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-// @ts-ignore
-var isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-var isNode = typeof (process) !== 'undefined' && process.version;
-
-/**
- *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
- *  from those features.
- */
-class NumberFeaturesTile extends CustomFeatureTile {
+export class NumberFeaturesTile extends CustomFeaturesTile {
+  textSize: number;
+  textFont: string;
+  textColor: string;
+  circleStrokeWidth: number;
+  circleBorderColor: string;
+  circleFillColor: string;
+  tileBorderStrokeWidth: number;
+  tileBorderColor: string;
+  tileFillColor: string;
+  circlePaddingPercentage: number;
+  drawUnindexedTiles: boolean;
+  compressFormat: string;
+  defaultFontRegistered: boolean;
   constructor() {
     super();
-    this.useNodeCanvas = isNode && !isPhantom && !isElectron;
     this.textSize = 18;
     this.textFont = 'PT Mono';
     this.textColor = "rgba(255, 255, 255, 1.0)";
@@ -50,7 +46,7 @@ class NumberFeaturesTile extends CustomFeatureTile {
    */
   _registerDefaultFont() {
     if (!this.defaultFontRegistered) {
-      if (this.useNodeCanvas) {
+      if (CustomFeaturesTile.useNodeCanvas) {
         var Canvas = require('canvas');
         Canvas.registerFont(path.join(__dirname, '..', '..', '..', 'fonts', 'PTMono-Regular.ttf'), { family: 'PT Mono' });
       }
@@ -252,7 +248,7 @@ class NumberFeaturesTile extends CustomFeatureTile {
         canvas = tileCanvas;
       }
       else {
-        if (this.useNodeCanvas) {
+        if (CustomFeaturesTile.useNodeCanvas) {
           var Canvas = require('canvas');
           canvas = Canvas.createCanvas(tileWidth, tileHeight);
         }
@@ -311,7 +307,7 @@ class NumberFeaturesTile extends CustomFeatureTile {
       context.fillStyle = this.textColor;
       context.textBaseline = "middle";
       context.fillText(text, textX, textY);
-      if (this.useNodeCanvas) {
+      if (CustomFeaturesTile.useNodeCanvas) {
         var writeStream = concat(function (buffer) {
           resolve(buffer);
         });
@@ -330,5 +326,3 @@ class NumberFeaturesTile extends CustomFeatureTile {
     }.bind(this));
   }
 }
-
-module.exports = NumberFeaturesTile;

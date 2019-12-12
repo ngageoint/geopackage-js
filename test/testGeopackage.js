@@ -128,18 +128,17 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  it('should not open a file without the minimum tables', function(done) {
+  it('should not open a file without the minimum tables', async function() {
     // @ts-ignore
-    testSetup.createBareGeoPackage(geopackageToCreate, async function() {
-      try {
-        let geopackage = await GeoPackage.open(geopackageToCreate);
-        should.not.exist(geopackage);
-      } catch (e) {
-        should.exist(e);
-      }
-      // @ts-ignore
-      testSetup.deleteGeoPackage(geopackageToCreate, done);
-    });
+    await testSetup.createBareGeoPackage(geopackageToCreate)
+    try {
+      let geopackage = await GeoPackage.open(geopackageToCreate);
+      should.not.exist(geopackage);
+    } catch (e) {
+      should.exist(e);
+    }
+    // @ts-ignore
+    await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
   it('should not open a file without the correct extension', async function() {
@@ -176,12 +175,15 @@ describe('GeoPackageAPI tests', function() {
     }
   });
 
-  it('should not create a geopackage without the correct extension', function(done) {
-    GeoPackage.create(tilePath, function(err, geopackage) {
-      should.exist(err);
-      should.not.exist(geopackage);
-      done();
-    });
+  it('should not create a geopackage without the correct extension', async function() {
+    try {
+      let gp = await GeoPackage.create(tilePath);
+      should.fail(gp, null, 'Error should have been thrown')
+    } catch (e) {
+      should.exist(e);
+      return;
+    }
+    should.fail(false, true, 'Error should have been thrown');
   });
 
   it('should not create a geopackage without the correct extension return promise', function(done) {
@@ -197,13 +199,10 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  it('should create a geopackage', function(done) {
-    GeoPackage.create(geopackageToCreate, function(err, gp) {
-      should.not.exist(err);
-      should.exist(gp);
-      should.exist(gp.getTables);
-      done();
-    });
+  it('should create a geopackage', async function() {
+    let gp = await GeoPackage.create(geopackageToCreate);
+    should.exist(gp);
+    should.exist(gp.getTables);
   });
 
   it('should create a geopackage with a promise', function() {
@@ -214,24 +213,16 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  it('should create a geopackage and export it', function(done) {
-    GeoPackage.create(geopackageToCreate, function(err, gp) {
-      should.not.exist(err);
-      should.exist(gp);
-      gp.export(function(err, buffer) {
-        should.not.exist(err);
-        should.exist(buffer);
-        done();
-      });
-    });
+  it('should create a geopackage and export it', async function() {
+    let gp = await GeoPackage.create(geopackageToCreate);
+    should.exist(gp);
+    let buffer = await gp.export();
+    should.exist(buffer);
   });
 
-  it('should create a geopackage in memory', function(done) {
-    GeoPackage.create(function(err, gp) {
-      should.not.exist(err);
-      should.exist(gp);
-      done();
-    });
+  it('should create a geopackage in memory', async function() {
+    let gp = await GeoPackage.create();
+    should.exist(gp);
   });
 
   describe('should operate on a GeoPacakge with lots of features', function() {
@@ -247,10 +238,10 @@ describe('GeoPackageAPI tests', function() {
       indexedGeopackage = result.geopackage;
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       indexedGeopackage.close();
       // @ts-ignore
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get a vector tile countries_0 pbf tile', function() {
@@ -270,6 +261,13 @@ describe('GeoPackageAPI tests', function() {
         json.layers['country-name'].length.should.be.equal(1);
       });
     });
+
+    it('should get the closest feature in an XYZ tile', function() {
+      var closest = GeoPackage.getClosestFeatureInXYZTile(indexedGeopackage, 'country', 0, 0, 0, 40, -119);
+      closest.id.should.be.equal(481);
+      closest.gp_table.should.be.equal('country');
+      closest.distance.should.be.equal(0);
+    })
   })
 
   describe('should operate on an indexed geopackage', function() {
@@ -285,10 +283,10 @@ describe('GeoPackageAPI tests', function() {
       indexedGeopackage = result.geopackage;
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       indexedGeopackage.close();
       // @ts-ignore
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the tables', function() {
@@ -441,12 +439,9 @@ describe('GeoPackageAPI tests', function() {
     var geopackage;
 
     beforeEach(function(done) {
-      fs.unlink(geopackageToCreate, function() {
-        // @ts-ignore
-        GeoPackage.create(geopackageToCreate, function(err, gp) {
-          geopackage = gp;
-          done();
-        });
+      fs.unlink(geopackageToCreate, async function() {
+        geopackage = await GeoPackage.create(geopackageToCreate);
+        done();
       });
     });
 

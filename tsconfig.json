@@ -28,6 +28,7 @@
   ],
   "typedocOptions": {
       "mode": "file",
-      "out": "docs-ts"
+      "out": "docs-ts",
+      "exclude": "./test/**/*"
   }
 }

@@ -1,7 +1,7 @@
 // @ts-nocheck
 var should = require('chai').should();
 var GeoPackageAPI = require('../..').default
-var path = require('path')
+var Path = require('path')
 import { default as testSetup } from './testSetup'
 import {default as fsExtra} from 'fs-extra'
 
@@ -30,6 +30,7 @@ global.openGeoPackage = async (path) => {
   should.exist(geopackage);
   should.exist(geopackage.getDatabase().getDBConnection());
   geopackage.getPath().should.be.equal(path);
+  geopackage.getName().should.be.equal(Path.basename(path));
   return {
     geopackage,
     path
@@ -39,7 +40,7 @@ global.openGeoPackage = async (path) => {
 global.copyAndOpenGeopackage = async function(original, copy) {
   let filename;
   if (typeof(process) !== 'undefined' && process.version) {
-    filename = copy || path.join(__dirname, 'tmp', testSetup.createTempName());
+    filename = copy || Path.join(__dirname, 'tmp', testSetup.createTempName());
     let result = await fsExtra.copy(original, filename);
   } else {
     filename = original;

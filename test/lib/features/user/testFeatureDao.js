@@ -36,9 +36,9 @@ describe('FeatureDao tests', function() {
       geoPackage = result.geopackage;
     });
 
-    afterEach('close the geopackage connection', function(done) {
+    afterEach('close the geopackage connection', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should read the geometry', function() {
@@ -78,9 +78,9 @@ describe('FeatureDao tests', function() {
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should query for indexed geometries', function() {
@@ -112,8 +112,8 @@ describe('FeatureDao tests', function() {
       filename = result.path;
     });
 
-    afterEach('should close the geopackage', function(done) {
-      testSetup.deleteGeoPackage(filename, done);
+    afterEach('should close the geopackage', async function() {
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should query for GeoJSON features', function() {
@@ -153,9 +153,9 @@ describe('FeatureDao tests', function() {
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', function(done) {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
-      testSetup.deleteGeoPackage(filename, done);
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should query for rivers and calculate distance from a center point', function() {
@@ -225,8 +225,8 @@ describe('FeatureDao tests', function() {
     var testGeoPackage;
     var tileBuffer;
 
-    afterEach('should delete the geopackage', function(done) {
-      testSetup.deleteGeoPackage(testGeoPackage, done);
+    afterEach('should delete the geopackage', async function() {
+      await testSetup.deleteGeoPackage(testGeoPackage);
     });
 
     beforeEach('get the tile buffer', async function() {
@@ -234,171 +234,160 @@ describe('FeatureDao tests', function() {
       tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
     });
 
-    beforeEach('should create the GeoPackage', function(done) {
+    beforeEach('should create the GeoPackage', async function() {
       testGeoPackage = path.join(testPath, testSetup.createTempName());
+      geopackage = await testSetup.createGeoPackage(testGeoPackage)
+
       // @ts-ignore
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
+      var boundingBox = new BoundingBox(-180, 180, -80, 80);
+
+      var columns = [];
+
+      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       // @ts-ignore
-      testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-        geopackage = gp;
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
 
-        // @ts-ignore
-        var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
-        var boundingBox = new BoundingBox(-180, 180, -80, 80);
-
-        var columns = [];
-
-        columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-        // @ts-ignore
-        columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-        columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-        columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-        columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-
-        var box1 = {
-          "type": "Polygon",
-          "coordinates": [
+      var box1 = {
+        "type": "Polygon",
+        "coordinates": [
+          [
             [
-              [
-                -1,
-                1
-              ],
-              [
-                1,
-                1
-              ],
-              [
-                1,
-                3
-              ],
-              [
-                -1,
-                3
-              ],
-              [
-                -1,
-                1
-              ]
-            ]
-          ]
-        };
-
-        var box2 = {
-          "type": "Polygon",
-          "coordinates": [
+              -1,
+              1
+            ],
             [
-              [
-                0,
-                0
-              ],
-              [
-                2,
-                0
-              ],
-              [
-                2,
-                2
-              ],
-              [
-                0,
-                2
-              ],
-              [
-                0,
-                0
-              ]
-            ]
-          ]
-        };
-
-        var line = {
-          "type": "LineString",
-          "coordinates": [
+              1,
+              1
+            ],
             [
-              2,
+              1,
               3
             ],
             [
               -1,
+              3
+            ],
+            [
+              -1,
+              1
+            ]
+          ]
+        ]
+      };
+
+      var box2 = {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              0,
               0
             ]
           ]
-        };
+        ]
+      };
 
-        // @ts-ignore
-        // @ts-ignore
-        var line2 = {
-          "type": "Feature",
-          "properties": {},
-          "geometry": {
-            "type": "LineString",
-            "coordinates": [
-              [
-                2.0,
-                2.5
-              ],
-              [
-                -0.5,
-                0
-              ]
+      var line = {
+        "type": "LineString",
+        "coordinates": [
+          [
+            2,
+            3
+          ],
+          [
+            -1,
+            0
+          ]
+        ]
+      };
+
+      // @ts-ignore
+      // @ts-ignore
+      var line2 = {
+        "type": "Feature",
+        "properties": {},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              2.0,
+              2.5
+            ],
+            [
+              -0.5,
+              0
             ]
-          }
-        };
-
-        var point = {
-          "type": "Point",
-          "coordinates": [
-            0.5,
-            1.5
           ]
-        };
-
-        var point2 = {
-          "type": "Point",
-          "coordinates": [
-            1.5,
-            .5
-          ]
-        };
-
-        var createRow = function(geoJson, name, featureDao) {
-          var srs = featureDao.getSrs();
-          var featureRow = featureDao.newRow();
-          var geometryData = new GeometryData();
-          geometryData.setSrsId(srs.srs_id);
-          var geometry = wkx.Geometry.parseGeoJSON(geoJson);
-          geometryData.setGeometry(geometry);
-          featureRow.setGeometry(geometryData);
-          featureRow.setValueWithColumnName('name', name);
-          featureRow.setValueWithColumnName('_feature_id', name);
-          featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
-          return featureDao.create(featureRow);
         }
-        // create the features
-        // Two intersecting boxes with a line going through the intersection and a point on the line
-        // ---------- / 3
-        // | 1  ____|/_____
-        // |    |  /|  2  |
-        // |____|_/_|     |
-        //      |/        |
-        //      /_________|
-        //     /
-        geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
-        // @ts-ignore
-        // @ts-ignore
-        .then(function(result) {
-          var featureDao = geopackage.getFeatureDao('QueryTest');
-          queryTestFeatureDao = featureDao;
-          createRow(box1, 'box1', featureDao);
-          createRow(box2, 'box2', featureDao);
-          createRow(line, 'line', featureDao);
-          createRow(point, 'point', featureDao);
-          createRow(point2, 'point2', featureDao);
-          featureDao.featureTableIndex.index()
-          .then(function() {
-            done();
-          });
-        });
-      });
+      };
+
+      var point = {
+        "type": "Point",
+        "coordinates": [
+          0.5,
+          1.5
+        ]
+      };
+
+      var point2 = {
+        "type": "Point",
+        "coordinates": [
+          1.5,
+          .5
+        ]
+      };
+
+      var createRow = function(geoJson, name, featureDao) {
+        var srs = featureDao.getSrs();
+        var featureRow = featureDao.newRow();
+        var geometryData = new GeometryData();
+        geometryData.setSrsId(srs.srs_id);
+        var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+        geometryData.setGeometry(geometry);
+        featureRow.setGeometry(geometryData);
+        featureRow.setValueWithColumnName('name', name);
+        featureRow.setValueWithColumnName('_feature_id', name);
+        featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+        return featureDao.create(featureRow);
+      }
+      // create the features
+      // Two intersecting boxes with a line going through the intersection and a point on the line
+      // ---------- / 3
+      // | 1  ____|/_____
+      // |    |  /|  2  |
+      // |____|_/_|     |
+      //      |/        |
+      //      /_________|
+      //     /
+      await geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+      var featureDao = geopackage.getFeatureDao('QueryTest');
+      queryTestFeatureDao = featureDao;
+      createRow(box1, 'box1', featureDao);
+      createRow(box2, 'box2', featureDao);
+      createRow(line, 'line', featureDao);
+      createRow(point, 'point', featureDao);
+      createRow(point2, 'point2', featureDao);
+      await featureDao.featureTableIndex.index()
     });
 
     it('should update a shape', function() {

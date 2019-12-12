@@ -10,6 +10,7 @@ import ColumnValues from '../../dao/columnValues'
 import { TileMatrix } from '../matrix/tileMatrix'
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { BoundingBox } from '../../boundingBox';
+import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -218,7 +219,7 @@ export default class TileDao extends UserDao<TileRow> {
    * @param  {Number} row       row
    * @param  {Number} zoomLevel zoom level
    */
-  queryForTile(column, row, zoomLevel) {
+  queryForTile(column: number, row: number, zoomLevel: number): TileRow {
     var fieldValues = new ColumnValues();
     fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
     fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
@@ -420,7 +421,7 @@ export default class TileDao extends UserDao<TileRow> {
     var whereArgs = this.buildWhereArgs([zoomLevel, column, row]);
     return this.deleteWhere(where, whereArgs);
   }
-  getSrs() {
+  getSrs(): SpatialReferenceSystem {
     return this.geoPackage.getContentsDao().getSrs(this.tileMatrixSet);
   }
   dropTable() {

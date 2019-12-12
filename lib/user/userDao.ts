@@ -100,7 +100,7 @@ export default class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
    * @return {Promise}
    */
-  linkRelatedRow(userRow, relatedRow, relationType, mappingTable?: string | UserMappingTable, mappingColumnValues?: typeof ColumnValues) {
+  async linkRelatedRow(userRow, relatedRow, relationType, mappingTable?: string | UserMappingTable, mappingColumnValues?: typeof ColumnValues): Promise<number> {
     var rte = this.geoPackage.getRelatedTablesExtension();
     var baseTableName = userRow.table.table_name;
     var relatedTableName = relatedRow.table.table_name;
@@ -127,7 +127,7 @@ export default class UserDao<T extends UserRow> extends Dao<T> {
         for (var column in mappingColumnValues) {
           userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
         }
-        userMappingDao.create(userMappingRow);
+        return userMappingDao.create(userMappingRow);
       });
   }
   /**

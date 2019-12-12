@@ -2,12 +2,10 @@
  * @memberOf module:extension/style
  * @class FeatureStyleExtension
  */
-
-var FeatureStyles = require('./featureStyles')
-  , FeatureStyle = require('./featureStyle')
-  , Styles = require('./styles')
-  , Icons = require('./icons');
-
+import FeatureStyles from './featureStyles';
+import FeatureStyle from './featureStyle';
+import Styles from './styles';
+import Icons from './icons';
 
 /**
  * Feature Table Styles, styles and icons for an individual feature table
@@ -15,7 +13,10 @@ var FeatureStyles = require('./featureStyles')
  * @param {String} tableName
  * @constructor
  */
-class FeatureTableStyles {
+export class FeatureTableStyles {
+  featureStyleExtension: any;
+  cachedTableFeatureStyles: FeatureStyles;
+  tableName: any;
   constructor(geoPackage, tableName) {
     this.featureStyleExtension = geoPackage.getFeatureStyleExtension();
     this.cachedTableFeatureStyles = new FeatureStyles();
@@ -1082,5 +1083,3 @@ class FeatureTableStyles {
     return this.featureStyleExtension.getAllIconIds(this.tableName);
   }
 }
-
-module.exports = FeatureTableStyles;

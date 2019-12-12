@@ -3,21 +3,17 @@
  * @module features/user/featureDao
  */
 import reproject from 'reproject'
+import LineIntersect from '@turf/line-intersect'
+import Intersect from '@turf/intersect'
+import BooleanWithin from '@turf/boolean-within'
 
 import FeatureTableIndex from '../../extension/index/featureTableIndex';
 import UserDao from '../../user/userDao';
 import DataColumnsDao from '../../dataColumns/dataColumnsDao';
-import MetadataDao from '../../metadata/metadataDao';
-import FeatureTable from './featureTable';
 import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
-import GeometryColumns from '../columns/geometryColumns';
 import { BoundingBox } from '../../boundingBox'
-
-var reproject = require('reproject')
-  , LineIntersect = require('@turf/line-intersect').default
-  , Intersect = require('@turf/intersect').default
-  , BooleanWithin = require('@turf/boolean-within').default;
+import { Feature } from 'geojson';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -160,8 +156,8 @@ export default class FeatureDao extends UserDao<FeatureRow> {
           var geometry;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
-            geometry = reprojectFeature(featureRow, srs, projection);
-            geometry = verifyFeature(geometry, projectedBoundingBox);
+            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+            geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
             if (geometry) {
               geometry.properties = featureRow.values;
               return {
@@ -186,7 +182,7 @@ export default class FeatureDao extends UserDao<FeatureRow> {
    * @param {Boolean} [skipVerification] do not verify if the feature actually exists in the box
    * @returns {any}
    */
-  queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox: typeof BoundingBox, skipVerification = false) {
+  queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox: BoundingBox, skipVerification = false): IterableIterator<Feature> {
     var columns = [];
     var columnMap = {};
     var srs = this.getSrs();
@@ -220,9 +216,9 @@ export default class FeatureDao extends UserDao<FeatureRow> {
           var geometry;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
-            geometry = reprojectFeature(featureRow, srs, projection);
+            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
             if (!skipVerification) {
-              geometry = verifyFeature(geometry, boundingBox);
+              geometry = FeatureDao.verifyFeature(geometry, boundingBox);
             }
             if (geometry) {
               var geoJson = {
@@ -276,8 +272,8 @@ export default class FeatureDao extends UserDao<FeatureRow> {
           var geometry;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
-            geometry = reprojectFeature(featureRow, srs, projection);
-            geometry = verifyFeature(geometry, boundingBox);
+            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+            geometry = FeatureDao.verifyFeature(geometry, boundingBox);
             if (geometry) {
               geometry.properties = featureRow.values;
               return {
@@ -300,48 +296,48 @@ export default class FeatureDao extends UserDao<FeatureRow> {
     var contents = this.getContents();
     return new BoundingBox(contents.min_x, contents.max_x, contents.min_y, contents.max_y);
   }
-}
 
-function reprojectFeature(featureRow, srs, projection) {
-  var geometry = featureRow.getGeometry().toGeoJSON();
-  if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
-    geometry = reproject.reproject(geometry, projection, 'EPSG:4326');
-  }
-  return geometry;
-}
-
-function verifyFeature(geometry, boundingBox) {
-  try {
-    if (geometry.type === 'Point') {
-      return geometry;
-    } else if (geometry.type === 'LineString') {
-      return verifyLineString(geometry, boundingBox);
-    } else if (geometry.type === 'Polygon') {
-      return verifyPolygon(geometry, boundingBox);
-    } else if (geometry.type === 'MultiLineString') {
-      return verifyLineString(geometry, boundingBox);
-    } else if (geometry.type === 'MultiPolygon') {
-      return verifyPolygon(geometry, boundingBox);
+  static reprojectFeature(featureRow, srs, projection) {
+    var geometry = featureRow.getGeometry().toGeoJSON();
+    if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
+      geometry = reproject.reproject(geometry, projection, 'EPSG:4326');
     }
-  } catch (e) {
-    return false;
-  }
-}
-
-function verifyLineString(geometry, boundingBox) {
-  var intersect = LineIntersect(geometry, boundingBox.toGeoJSON().geometry);
-  if (intersect.features.length) {
-    return geometry;
-  } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
     return geometry;
   }
-}
-
-function verifyPolygon(geometry, boundingBox) {
-  var polyIntersect = Intersect(geometry, boundingBox.toGeoJSON().geometry);
-  if (polyIntersect) {
-    return geometry;
-  } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
-    return geometry;
+  
+  static verifyFeature(geometry, boundingBox) {
+    try {
+      if (geometry.type === 'Point') {
+        return geometry;
+      } else if (geometry.type === 'LineString') {
+        return FeatureDao.verifyLineString(geometry, boundingBox);
+      } else if (geometry.type === 'Polygon') {
+        return FeatureDao.verifyPolygon(geometry, boundingBox);
+      } else if (geometry.type === 'MultiLineString') {
+        return FeatureDao.verifyLineString(geometry, boundingBox);
+      } else if (geometry.type === 'MultiPolygon') {
+        return FeatureDao.verifyPolygon(geometry, boundingBox);
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  static verifyLineString(geometry, boundingBox) {
+    var intersect = LineIntersect(geometry, boundingBox.toGeoJSON().geometry);
+    if (intersect.features.length) {
+      return geometry;
+    } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
+      return geometry;
+    }
+  }
+  
+  static verifyPolygon(geometry, boundingBox) {
+    var polyIntersect = Intersect(geometry, boundingBox.toGeoJSON().geometry);
+    if (polyIntersect) {
+      return geometry;
+    } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
+      return geometry;
+    }
   }
 }

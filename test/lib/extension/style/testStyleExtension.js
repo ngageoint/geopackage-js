@@ -2,7 +2,7 @@ import { default as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import FeatureStyleExtension from '../../../../lib/extension/style'
 
-var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles')
+var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').default
   , StyleTable = require('../../../../lib/extension/style/styleTable').default
   , Styles = require('../../../../lib/extension/style/styles')
@@ -87,38 +87,28 @@ describe('StyleExtension Tests', function() {
     return hex;
   };
 
-  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', function(done) {
+  beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     testGeoPackage = path.join(testPath, testSetup.createTempName());
-    testSetup.createGeoPackage(testGeoPackage, function(err, gp) {
-      geopackage = gp;
-      // create a feature table first
-      GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, []).then(function(table) {
-        featureTable = table;
-        var box = {
-          "type": "Polygon",
-          "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
-        };
-        featureRowId = createRow(box, 'box', geopackage.getFeatureDao(featureTableName));
-        geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName).then(function() {
-          geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension().then(function () {
-            geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension().then(function () {
-              featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
-              ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png')).then(async function (expectedImage) {
-                iconImage = expectedImage;
-                // @ts-ignore
-                iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
-                done();
-              });
-            });
-          });
-        });
-      });
-    });
+    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    // create a feature table first
+    featureTable = await GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, [])
+    var box = {
+      "type": "Polygon",
+      "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+    };
+    featureRowId = createRow(box, 'box', geopackage.getFeatureDao(featureTableName));
+    await geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName)
+    await geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension()
+    await geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension()
+    featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
+    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))
+    // @ts-ignore
+    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
   });
 
-  afterEach(function(done) {
+  afterEach(async function() {
     geopackage.close();
-    testSetup.deleteGeoPackage(testGeoPackage, done);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create extension for feature table', function() {
