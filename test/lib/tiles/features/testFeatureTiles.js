@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../..'
+import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles

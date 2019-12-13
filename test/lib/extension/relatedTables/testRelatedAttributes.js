@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../..'
+import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 import UserMappingTable from '../../../../lib/extension/relatedTables/userMappingTable';

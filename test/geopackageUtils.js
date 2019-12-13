@@ -1,4 +1,4 @@
-import {default as GeoPackageAPI} from '../index';
+import {GeoPackage as GeoPackageAPI} from '../index';
 import * as GP  from '../index';
 import { WKB } from '../lib/wkb'
 var DataTypes = GP.DataTypes

@@ -22,7 +22,7 @@ import { FeatureTiles } from './tiles/features'
 import wkx from 'wkx'
 import reproject from 'reproject'
 import path from 'path'
-import fs from 'fs-extra'
+import fs from 'fs'
 import geojsonvt from 'geojson-vt'
 import vtpbf from 'vt-pbf'
 import Pbf from 'pbf'
@@ -34,13 +34,12 @@ import pointDistance from '@turf/distance'
 import * as helpers from '@turf/helpers'
 import { TileMatrixSet } from './tiles/matrixset/tileMatrixSet'
 import FeatureDao from './features/user/featureDao'
-import AttributeRow from './attributes/attributeRow'
 import SimpleAttributesDao from './extension/relatedTables/simpleAttributesDao'
 import SimpleAttributesRow from './extension/relatedTables/simpleAttributesRow'
 import MediaDao from './extension/relatedTables/mediaDao'
 import MediaRow from './extension/relatedTables/mediaRow'
 import ExtendedRelation from './extension/relatedTables/extendedRelation'
-import { GeoJSON, Feature } from 'geojson'
+import { Feature } from 'geojson'
 import TileRow from './tiles/user/tileRow'
 
 interface ClosestFeature extends Feature {
@@ -54,7 +53,7 @@ interface ClosestFeature extends Feature {
  * methods for opening and building GeoPackage files.
  */
 
-export default class GeoPackageAPI {
+export class GeoPackageAPI {
 /**
  * In Node, open a GeoPackage file at the given path, or in a browser, load an
  * in-memory GeoPackage from the given byte array.
@@ -95,7 +94,7 @@ static async create(gppath?: string): Promise<GeoPackage> {
 
   if (typeof(process) !== 'undefined' && process.version && gppath) {
     try {
-      await fs.mkdir(path.dirname(gppath));
+      fs.mkdirSync(path.dirname(gppath));
     } catch (e) {
       // it's fine if we can't create the directory
     }

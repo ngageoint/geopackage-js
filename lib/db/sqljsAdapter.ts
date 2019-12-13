@@ -23,7 +23,7 @@ export class SqljsAdapter implements DBAdapter {
       sqljs().then(SQL => {
         if (this.filePath && typeof this.filePath === 'string') {
           if (typeof (process) !== 'undefined' && process.version) {
-            var fs = require('fs-extra');
+            var fs = require('fs');
             if (this.filePath.indexOf('http') === 0) {
               var http = require('http');
               http.get(this.filePath, (response) => {

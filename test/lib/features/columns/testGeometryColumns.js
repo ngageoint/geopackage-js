@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../..'
+import { GeoPackage as GeoPackageAPI } from '../../../..'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').default
   // @ts-ignore

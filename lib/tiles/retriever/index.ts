@@ -91,6 +91,7 @@ export class GeoPackageTileRetriever {
     var tileWidth = tileMatrix.tile_width;
     var tileHeight = tileMatrix.tile_height;
     var creator = await TileCreator.create(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
+    console.time('Getting results')
     var iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
     for (var tile of iterator) {
       tiles.push({

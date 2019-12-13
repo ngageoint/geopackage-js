@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../.'
+import { GeoPackage as GeoPackageAPI } from '../../../.'
 
 var UserTableReader = require('../../../lib/user/userTableReader').default
   , UserDao = require('../../../lib/user/userDao').default

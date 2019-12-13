@@ -25,7 +25,10 @@ window.FileSaver = FileSaver;
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
 
-window.GeoPackageAPI = require('@ngageoint/geopackage');
+var gp = require('@ngageoint/geopackage');
+console.log('gp is', gp);
+window.GeoPackage = gp;
+window.GeoPackageAPI = gp.GeoPackage;
 // window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage');
 // window.ShapefileToGeoPackage = require('@ngageoint/shapefile-to-geopackage');
 // window.MBTilesToGeoPackage = require('mbtiles-to-geopackage');

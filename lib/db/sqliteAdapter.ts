@@ -1,5 +1,5 @@
 import DBAdapter from './dbAdapter';
-import fs from 'fs-extra'
+import fs from 'fs'
 import path from 'path'
 import http from 'http'
 import os from 'os'
@@ -113,7 +113,11 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Buffer containing the contents of the database as a file
    */
   async export(): Promise<any> {
-    return fs.readFile(this.filePath as string);
+    return new Promise((resolve) => {
+      return fs.readFile(this.filePath as string, (err, data) => {
+        resolve(data);
+      });
+    });
   }
   /**
    * Registers the given function so that it can be used by SQL statements

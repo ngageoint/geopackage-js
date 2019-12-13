@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../.'
+import { GeoPackage as GeoPackageAPI } from '../../../.'
 import { default as testSetup } from '../../fixtures/testSetup'
 import DataColumnsDao from '../../../lib/dataColumns/dataColumnsDao'
 import AttributeDao from '../../../lib/attributes/attributeDao'

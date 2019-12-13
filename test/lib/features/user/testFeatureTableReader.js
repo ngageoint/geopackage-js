@@ -1,4 +1,4 @@
-import { default as GeoPackageAPI } from '../../../..'
+import { GeoPackage as GeoPackageAPI } from '../../../..'
 
 var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').default
   , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').default

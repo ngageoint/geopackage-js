@@ -50,7 +50,7 @@ var map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
-var defs = window.GeoPackageAPI.proj4Defs;
+var defs = window.GeoPackage.proj4Defs;
 for (var name in defs) {
   if (defs[name]) {
     window.proj4.defs(name, defs[name]);
@@ -494,9 +494,9 @@ window.toggleLayer = function(layerType, table) {
             var height = size.y;
             var featureDao = geoPackage.getFeatureDao(table);
             if (!featureDao) return;
-            var ft = new GeoPackageAPI.FeatureTiles(featureDao, width, height);
+            var ft = new window.GeoPackage.FeatureTiles.FeatureTiles(featureDao, width, height);
             ft.setMaxFeaturesPerTile(10000);
-            var numberFeaturesTile = new GeoPackageAPI.NumberFeaturesTile();
+            var numberFeaturesTile = new window.GeoPackage.NumberFeaturesTile.NumberFeaturesTile();
             ft.setMaxFeaturesTileDraw(numberFeaturesTile);
             ft.drawTile(tilePoint.x, tilePoint.y, tilePoint.z, canvas)
               .then(() => {

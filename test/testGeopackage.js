@@ -1,4 +1,4 @@
-import GeoPackage from '../index';
+import {GeoPackage} from '../index';
 import { GeometryColumns, FeatureColumn, DataTypes, BoundingBox } from '../index'
 var testSetup = require('./fixtures/testSetup');
 

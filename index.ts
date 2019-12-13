@@ -19,7 +19,7 @@ import { GeometryData } from './lib/geom/geometryData';
 import { TableCreator } from './lib/db/tableCreator';
 import { DublinCoreType } from './lib/extension/relatedTables/dublinCoreType';
 import { BoundingBox } from './lib/boundingBox';
-
+import { GeoPackageAPI } from './lib/api';
 
 var proj4Defs = require('./lib/proj4Defs');
 var GeoPackageTileRetriever = require('./lib/tiles/retriever');
@@ -30,9 +30,9 @@ var FeatureTiles = require('./lib/tiles/features');
 var NumberFeaturesTile = require('./lib/tiles/features/custom/numberFeaturesTile');
 var ShadedFeaturesTile = require('./lib/tiles/features/custom/shadedFeaturesTile');
 
-export { default } from './lib/api';
 export {
   proj4Defs,
+  GeoPackageAPI as GeoPackage,
   GeoPackageTileRetriever,
   GeoPackageConnection,
   TableCreator,
