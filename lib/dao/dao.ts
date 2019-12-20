@@ -9,14 +9,8 @@ import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder'
 
 /**
  * Base DAO
- * @class Dao
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
-export default abstract class Dao<T> {
-  /**
-   * GeoPackage object this dao belongs to
-   */
-  readonly geoPackage: GeoPackage;
+export abstract class Dao<T> {
   /**
    * Database connection to the sqlite file
    */
@@ -29,8 +23,12 @@ export default abstract class Dao<T> {
    * Name of the table within the GeoPackage
    */
   gpkgTableName: string;
-  constructor(geoPackage: GeoPackage) {
-    this.geoPackage = geoPackage;
+
+  /**
+   * 
+   * @param geoPackage GeoPackage object this dao belongs to
+   */
+  constructor(readonly geoPackage: GeoPackage) {
     this.connection = geoPackage.getDatabase();
   }
   /**
@@ -80,7 +78,7 @@ export default abstract class Dao<T> {
     this.populateObjectFromResult(object, result);
     return object;
   }
-  queryForSameId(object: T) {
+  queryForSameId(object: T): T {
     var idArray = this.getMultiId(object);
     return this.queryForMultiId(idArray);
   }
@@ -99,7 +97,7 @@ export default abstract class Dao<T> {
    * @param  idValues ColumnValues with the multi id
    * @return object created from the raw database object
    */
-  queryForMultiId(idValues: any[]): T | undefined {
+  queryForMultiId(idValues: any[]): T {
     var whereString = this.buildPkWhere(idValues);
     var whereArgs = this.buildPkWhereArgs(idValues);
     var query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);

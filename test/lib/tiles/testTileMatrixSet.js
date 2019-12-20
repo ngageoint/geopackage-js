@@ -1,6 +1,6 @@
 import { GeoPackage as GeoPackageAPI } from '../../..'
 
-var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').default
+var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
   , TileMatrixSet = require('../../../lib/tiles/matrixset/tileMatrixSet').TileMatrixSet
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
   , should = require('chai').should()

@@ -3,7 +3,7 @@
  * GeometryColumns module.
  * @module features/columns
  */
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 
 import GeometryColumns from './geometryColumns';
 
@@ -29,7 +29,7 @@ import GeometryColumns from './geometryColumns';
  * @class GeometryColumnsDao
  * @extends Dao
  */
-export default class GeometryColumnsDao extends Dao<GeometryColumns> {
+export class GeometryColumnsDao extends Dao<GeometryColumns> {
   /**
    * tableName field name
    * @type {String}

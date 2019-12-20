@@ -14,16 +14,6 @@ export default class UserTable {
   public static readonly FEATURE_TABLE = 'FEATURE';
   public static readonly TILE_TABLE = 'TILE';
   /**
-   * The name of the table
-   * @type {string}
-   */
-  table_name: string;
-  /**
-   * Array of columns
-   * @type {module:user/userColumn~UserColumn[]}
-   */
-  columns: UserColumn[];
-  /**
    * Array of column names
    * @type {string[]}
    */
@@ -35,12 +25,14 @@ export default class UserTable {
   nameToIndex: {};
   uniqueConstraints: any[];
   pkIndex: number;
-  requiredColumns: any;
 
-  constructor(tableName: string, columns: UserColumn[], requiredColumns?: string[]) {
-    this.requiredColumns = requiredColumns;
-    this.table_name = tableName;
-    this.columns = columns;
+  /**
+   * 
+   * @param table_name the name of the table
+   * @param columns array of columns
+   * @param requiredColumns required columns
+   */
+  constructor(public table_name: string, public columns: UserColumn[], public requiredColumns?: string[]) {
     this.uniqueConstraints = [];
     // Sort the columns by index
     this.columns.sort(function (a, b) {

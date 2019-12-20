@@ -1,4 +1,4 @@
-import Dao from '../dao/dao';
+import {Dao} from '../dao/dao';
 import DataColumnConstraints from './dataColumnConstraints';
 
 /**
@@ -13,28 +13,28 @@ import DataColumnConstraints from './dataColumnConstraints';
  * @extends Dao
  * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
-export default class DataColumnConstraintsDao extends Dao<DataColumnConstraints> {
-  public static readonly TABLE_NAME = "gpkg_data_column_constraints";
-  public static readonly COLUMN_CONSTRAINT_NAME = "constraint_name";
-  public static readonly COLUMN_CONSTRAINT_TYPE = "constraint_type";
-  public static readonly COLUMN_VALUE = "value";
-  public static readonly COLUMN_MIN = "min";
-  public static readonly COLUMN_MIN_IS_INCLUSIVE = "min_is_inclusive";
-  public static readonly COLUMN_MAX = "max";
-  public static readonly COLUMN_MAX_IS_INCLUSIVE = "max_is_inclusive";
-  public static readonly COLUMN_DESCRIPTION = "description";
+export class DataColumnConstraintsDao extends Dao<DataColumnConstraints> {
+  public static readonly TABLE_NAME: string  = "gpkg_data_column_constraints";
+  public static readonly COLUMN_CONSTRAINT_NAME: string  = "constraint_name";
+  public static readonly COLUMN_CONSTRAINT_TYPE: string  = "constraint_type";
+  public static readonly COLUMN_VALUE: string  = "value";
+  public static readonly COLUMN_MIN: string  = "min";
+  public static readonly COLUMN_MIN_IS_INCLUSIVE: string  = "min_is_inclusive";
+  public static readonly COLUMN_MAX: string  = "max";
+  public static readonly COLUMN_MAX_IS_INCLUSIVE: string  = "max_is_inclusive";
+  public static readonly COLUMN_DESCRIPTION: string  = "description";
   
-  public static readonly ENUM_TYPE = 'enum';
-  public static readonly GLOB_TYPE = 'glob';
-  public static readonly RANGE_TYPE = 'range';
+  public static readonly ENUM_TYPE: string  = 'enum';
+  public static readonly GLOB_TYPE: string  = 'glob';
+  public static readonly RANGE_TYPE: string  = 'range';
   
-  readonly gpkgTableName = DataColumnConstraintsDao.TABLE_NAME;
-  readonly idColumns = [DataColumnConstraintsDao.COLUMN_CONSTRAINT_NAME, DataColumnConstraintsDao.COLUMN_CONSTRAINT_TYPE, DataColumnConstraintsDao.COLUMN_VALUE];
+  readonly gpkgTableName: string  = DataColumnConstraintsDao.TABLE_NAME;
+  readonly idColumns: string[] = [DataColumnConstraintsDao.COLUMN_CONSTRAINT_NAME, DataColumnConstraintsDao.COLUMN_CONSTRAINT_TYPE, DataColumnConstraintsDao.COLUMN_VALUE];
   /**
    * Creates a new DataColumnConstraints object
    * @return {module:dataColumnConstraints~DataColumnConstraints}
    */
-  createObject() {
+  createObject(): DataColumnConstraints {
     return new DataColumnConstraints();
   }
   /**
@@ -42,7 +42,7 @@ export default class DataColumnConstraintsDao extends Dao<DataColumnConstraints>
    * @param  {String} constraintName     constraint name
    * @return {Iterable}
    */
-  queryByConstraintName(constraintName) {
+  queryByConstraintName(constraintName: string): IterableIterator<any> {
     return this.queryForEach(DataColumnConstraintsDao.COLUMN_CONSTRAINT_NAME, constraintName);
   }
   /**
@@ -52,7 +52,7 @@ export default class DataColumnConstraintsDao extends Dao<DataColumnConstraints>
    * @param  {String} value              value
    * @return {module:dataColumnConstraints~DataColumnConstraints}
    */
-  queryUnique(constraintName, constraintType, value) {
+  queryUnique(constraintName: string, constraintType: string, value: any): DataColumnConstraints {
     var dataColumnConstraints = new DataColumnConstraints();
     dataColumnConstraints.constraint_name = constraintName;
     dataColumnConstraints.constraint_type = constraintType;

@@ -3,7 +3,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 
 // @ts-ignore
 // @ts-ignore
-var FeatureDao = require('../../../../lib/features/user/featureDao').default
+var FeatureDao = require('../../../../lib/features/user/featureDao').FeatureDao
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').default
   , DataTypes = require('../../../../lib/db/dataTypes').default
   // , GeoPackageAPI = require('../../../../index.js')

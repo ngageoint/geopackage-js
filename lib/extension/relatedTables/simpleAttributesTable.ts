@@ -17,12 +17,12 @@ import DataTypes from '../../db/dataTypes'
  */
 export default class SimpleAttributesTable extends UserRelatedTable {
 
-  public static readonly RELATION_TYPE = RelationType.SIMPLE_ATTRIBUTES;
-  public static readonly COLUMN_ID = 'id';
+  public static readonly RELATION_TYPE: RelationType = RelationType.SIMPLE_ATTRIBUTES;
+  public static readonly COLUMN_ID: string = 'id';
 
-  readonly TABLE_TYPE = 'simple_attributes';
+  readonly TABLE_TYPE: string = 'simple_attributes';
 
-  constructor(tableName, columns, requiredColumns) {
+  constructor(tableName: string, columns?: UserColumn[], requiredColumns?: string[]) {
     super(tableName, SimpleAttributesTable.RELATION_TYPE.name, SimpleAttributesTable.RELATION_TYPE.dataType, columns, requiredColumns);
     this.validateColumns();
   }
@@ -46,14 +46,14 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * Get the column index of the id column
    * @return {Number}
    */
-  getIdColumnIndex() {
+  getIdColumnIndex(): number {
     return this.pkIndex;
   }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getIdColumn() {
+  getIdColumn(): UserColumn {
     return this.getPkColumn();
   }
   /**
@@ -62,7 +62,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param  {module:user/userColumn~UserColumn[]} additionalColumns additional columns
    * @return {module:extension/relatedTables~SimpleAttributesTable}
    */
-  static create(tableName, additionalColumns) {
+  static create(tableName: string, additionalColumns?: UserColumn[]): SimpleAttributesTable {
     var tableColumns = SimpleAttributesTable.createRequiredColumns(0);
     if (additionalColumns) {
       tableColumns = tableColumns.concat(additionalColumns);
@@ -74,7 +74,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param  {string} [idColumnName=id] id column name
    * @return {string[]}
    */
-  static requiredColumns(idColumnName=SimpleAttributesTable.COLUMN_ID) {
+  static requiredColumns(idColumnName=SimpleAttributesTable.COLUMN_ID): string[] {
     var requiredColumns = [];
     requiredColumns.push(idColumnName);
     return requiredColumns;
@@ -83,7 +83,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * Get the number of required columns
    * @return {Number}
    */
-  static numRequiredColumns() {
+  static numRequiredColumns(): number {
     return SimpleAttributesTable.requiredColumns().length;
   }
   /**
@@ -92,7 +92,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param  {string} [idColumnName=id]  id column name
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createRequiredColumns(startingIndex = 0, idColumnName = 'id') {
+  static createRequiredColumns(startingIndex = 0, idColumnName = 'id'): UserColumn[] {
     return [SimpleAttributesTable.createIdColumn(startingIndex++, idColumnName || SimpleAttributesTable.COLUMN_ID)];
   }
   /**
@@ -101,7 +101,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param  {string} idColumnName name of the id column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createIdColumn(index, idColumnName) {
+  static createIdColumn(index: number, idColumnName: string): UserColumn {
     return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
   }
   /**
@@ -109,7 +109,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param  {module:user/userColumn~UserColumn} column column to check
    * @return {Boolean}
    */
-  static isSimple(column) {
+  static isSimple(column: UserColumn): boolean {
     return column.notNull && SimpleAttributesTable.isSimpleDataType(column.dataType);
   }
   /**
@@ -117,7 +117,7 @@ export default class SimpleAttributesTable extends UserRelatedTable {
    * @param {module:db/dataTypes~GPKGDataType} dataType
    * @return {Boolean}
    */
-  static isSimpleDataType(dataType) {
+  static isSimpleDataType(dataType: DataTypes): boolean {
     return dataType !== DataTypes.GPKGDataType.GPKG_DT_BLOB && dataType !== DataTypes.GPKGDataType.GPKG_DT_GEOMETRY;
   }
 }

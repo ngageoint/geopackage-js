@@ -1,6 +1,6 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import ContentsDao from '../../../../lib/core/contents/contentsDao';
+import {ContentsDao} from '../../../../lib/core/contents/contentsDao';
 
 // var GeoPackageAPI = require('../../../..')
 var Contents = require('../../../../lib/core/contents/contents').default

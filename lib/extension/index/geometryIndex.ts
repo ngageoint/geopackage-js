@@ -1,3 +1,5 @@
+import TableIndex from "./tableIndex";
+
 /**
  * Geometry Index object, for indexing data within user tables
  * @class
@@ -53,7 +55,7 @@ export default class GeometryIndex {
      * @member {Number}
      */
     max_m: number;
-  setTableIndex(tableIndex) {
+  setTableIndex(tableIndex: TableIndex) {
     this.table_name = tableIndex.table_name;
   }
 }

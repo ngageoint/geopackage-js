@@ -1,11 +1,13 @@
 /**
  * @module extension/relatedTables
  */
-import UserCustomDao from '../../user/custom/userCustomDao';
+import {UserCustomDao} from '../../user/custom/userCustomDao';
 import GeoPackage from '../../geoPackage';
 import UserMappingTable from './userMappingTable';
 import UserMappingRow from './userMappingRow';
 import ColumnValues from '../../dao/columnValues';
+import UserRow from '../../user/userRow';
+import { DataTypes } from '../../..';
 
 /**
  * User Mapping DAO for reading user mapping data tables
@@ -14,7 +16,7 @@ import ColumnValues from '../../dao/columnValues';
  * @param  {module:geoPackage~GeoPackage} geoPackage      geopackage object
  * @param {UserMappingTable} [userMappingTable]
  */
-export default class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<UserMappingRow> {
+export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<UserMappingRow> {
   
   constructor(userCustomDao: UserCustomDao<UserMappingRow>, geoPackage: GeoPackage, userMappingTable?: UserMappingTable) {
     super(geoPackage, userMappingTable || new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));
@@ -24,21 +26,21 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {module:user/custom~UserCustomDao} userCustomDao
    * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
    */
-  createMappingTable(userCustomDao) {
+  createMappingTable(userCustomDao: UserCustomDao<UserRow>) {
     return new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
   }
   /**
    * Create a new {module:extension/relatedTables~UserMappingRow}
    * @return {module:extension/relatedTables~UserMappingRow}
    */
-  newRow() {
+  newRow(): UserMappingRow {
     return new UserMappingRow(this.table);
   }
   /**
    * Gets the {module:extension/relatedTables~UserMappingTable}
    * @return {module:extension/relatedTables~UserMappingTable}
    */
-  getTable() {
+  getTable(): UserMappingTable {
     return this.table;
   }
   /**
@@ -47,7 +49,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: DataTypes[], values: ColumnValues[]): UserMappingRow {
     return new UserMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -55,7 +57,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {Object} result db result
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  getUserMappingRow(result) {
+  getUserMappingRow(result: any): UserMappingRow {
     return this.getRow(result);
   }
   /**
@@ -63,7 +65,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} baseId base id
    * @return {Object[]}
    */
-  queryByBaseId(baseId) {
+  queryByBaseId(baseId: UserMappingRow | number): any[] {
     return this.queryForAllEq(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
   }
   /**
@@ -71,8 +73,8 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(Number & UserMappingRow)} relatedId related id
    * @return {Object[]}
    */
-  queryByRelatedId(relatedId) {
-    return this.queryForAllEq(UserMappingTable.COLUMN_RELATED_ID, relatedId.getRelatedId ? relatedId.getRelatedId() : relatedId);
+  queryByRelatedId(relatedId: UserMappingRow | number): any[] {
+    return this.queryForAllEq(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
   }
   /**
    * Query by base id and related id
@@ -80,7 +82,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} [relatedId] related id
    * @return {Iterable<any>}
    */
-  queryByIds(baseId: typeof UserMappingRow | number, relatedId?: typeof UserMappingRow | number) {
+  queryByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): IterableIterator<any> {
     var values = new ColumnValues();
     values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     if (relatedId !== undefined) {
@@ -92,7 +94,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * The unique related ids
    * @return {Number[]}
    */
-  uniqueRelatedIds() {
+  uniqueRelatedIds(): number[] {
     var query = 'SELECT DISTINCT ';
     query += UserMappingTable.COLUMN_RELATED_ID;
     query += ' FROM ';
@@ -105,7 +107,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} [relatedId] related id
    * @return {Number}
    */
-  countByIds(baseId: typeof UserMappingRow | number, relatedId?: typeof UserMappingRow | number): number {
+  countByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
     var values = new ColumnValues();
     values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     if (relatedId !== undefined) {
@@ -118,7 +120,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} baseId base id
    * @return {Number} number of deleted rows
    */
-  deleteByBaseId(baseId: typeof UserMappingRow | number): number {
+  deleteByBaseId(baseId: UserMappingRow | number): number {
     var where = '';
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     var whereArgs = this.buildWhereArgs([baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId]);
@@ -129,7 +131,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} relatedId related id
    * @return {Number} number of deleted rows
    */
-  deleteByRelatedId(relatedId: typeof UserMappingRow | number): number {
+  deleteByRelatedId(relatedId: UserMappingRow | number): number {
     var where = '';
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
     var whereArgs = this.buildWhereArgs([relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId]);
@@ -141,7 +143,7 @@ export default class UserMappingDao<T extends UserMappingRow> extends UserCustom
    * @param  {(UserMappingRow | Number)} [relatedId] related id
    * @return {Number} number of deleted rows
    */
-  deleteByIds(baseId: typeof UserMappingRow | number, relatedId?: typeof UserMappingRow | number): number {
+  deleteByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
     var where = '';
     var whereParams = [baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId];
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);

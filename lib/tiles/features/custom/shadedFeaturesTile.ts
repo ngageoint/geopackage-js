@@ -1,7 +1,5 @@
-/**
- * ShadedFeaturesTile module.
- * @module tiles/features/custom
- */
+import { CustomFeaturesTile } from './customFeaturesTile';
+import concat from 'concat-stream';
 
 /**
  * Draws a tile which is shaded to indicate too many features. By default a
@@ -9,28 +7,10 @@
  * paint objects for each draw type can be modified to or set to null (except
  * for the text paint object).
  */
-import { CustomFeaturesTile } from './customFeaturesTile';
-  // @ts-ignore
-import concat from 'concat-stream';
-
-/**
- *  Tiles drawn from or linked to features. Used to query features and optionally draw tiles
- *  from those features.
- */
 export class ShadedFeaturesTile extends CustomFeaturesTile {
-  tileBorderStrokeWidth: number;
-  tileBorderColor: string;
-  tileFillColor: string;
-  drawUnindexedTiles: boolean;
-  compressFormat: string;
+
   constructor() {
     super();
-
-    this.tileBorderStrokeWidth = 2;
-    this.tileBorderColor = "rgba(0, 0, 0, 1.0)";
-    this.tileFillColor = "rgba(0, 0, 0, 0.0625)";
-    this.drawUnindexedTiles = true;
-    this.compressFormat = 'png';
   }
   /**
    * Get the tile border stroke width
@@ -110,7 +90,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @param canvas
    * @returns {Promise<String|Buffer>}
    */
-  drawUnindexedTile(tileWidth, tileHeight, canvas = null) {
+  drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
     var image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
@@ -130,7 +110,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @return {Promise<String|Buffer>}
    */
   // @ts-ignore
-  drawTile(tileWidth, tileHeight, text, tileCanvas) {
+  drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
     // @ts-ignore
     return new Promise(function (resolve) {
       var canvas;
@@ -180,5 +160,3 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
     }.bind(this));
   }
 }
-
-module.exports = ShadedFeaturesTile;

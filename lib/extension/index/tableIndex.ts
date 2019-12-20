@@ -7,10 +7,10 @@ export default class TableIndex {
    * Name of the table
    * @member {String}
    */
-  table_name: String;
+  table_name: string;
   /**
    * Last indexed date
    * @member {String}
    */
-  last_indexed: String | Date;
+  last_indexed: string | Date;
 }

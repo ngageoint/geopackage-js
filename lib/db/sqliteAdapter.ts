@@ -100,6 +100,8 @@ export class SqliteAdapter implements DBAdapter {
    * Closes the connection to the GeoPackage
    */
   close(): void {
+    this.db.pragma('wal_autocheckpoint=0');
+    this.db.checkpoint();
     this.db.close();
   }
   /**

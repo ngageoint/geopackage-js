@@ -4,13 +4,13 @@
 
 import BaseExtension from '../baseExtension';
 import Extension from '../extension';
-import ContentsIdDao from '../contents/contentsIdDao'
+import {ContentsIdDao} from '../contents/contentsIdDao'
 import IconTable from './iconTable'
-import IconDao from './iconDao'
+import {IconDao} from './iconDao'
 import StyleTable from './styleTable'
-import StyleDao from './styleDao'
+import {StyleDao} from './styleDao'
 import StyleMappingTable from './styleMappingTable'
-import StyleMappingDao from './styleMappingDao'
+import {StyleMappingDao} from './styleMappingDao'
 import UserMappingTable from '../relatedTables/userMappingTable'
 import StyleTableReader from './styleTableReader'
 import UserTableReader from '../../user/userTableReader'

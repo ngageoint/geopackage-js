@@ -1,4 +1,4 @@
-import Dao from '../dao/dao';
+import {Dao} from '../dao/dao';
 import GeoPackage from '../geoPackage';
 import UserMappingTable from '../extension/relatedTables/userMappingTable'
 import UserTableReader from './userTableReader'
@@ -15,7 +15,7 @@ import ColumnValues from '../dao/columnValues'
  * @param  {module:db/geoPackageConnection~GeoPackageConnection} geoPackage        connection
  * @param  {string} table table name
  */
-export default class UserDao<T extends UserRow> extends Dao<T> {
+export class UserDao<T extends UserRow> extends Dao<T> {
   table: any;
   table_name: any;
   columns: any;
@@ -118,17 +118,15 @@ export default class UserDao<T extends UserRow> extends Dao<T> {
       relationship.setUserMappingTable(mappingTable);
       mappingTableName = mappingTable.table_name;
     }
-    return rte.addRelationship(relationship)
-      .then(function () {
-        var userMappingDao = rte.getMappingDao(mappingTableName);
-        var userMappingRow = userMappingDao.newRow();
-        userMappingRow.setBaseId(userRow.getId());
-        userMappingRow.setRelatedId(relatedRow.getId());
-        for (var column in mappingColumnValues) {
-          userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
-        }
-        return userMappingDao.create(userMappingRow);
-      });
+    await rte.addRelationship(relationship)
+    var userMappingDao = rte.getMappingDao(mappingTableName);
+    var userMappingRow = userMappingDao.newRow();
+    userMappingRow.setBaseId(userRow.getId());
+    userMappingRow.setRelatedId(relatedRow.getId());
+    for (var column in mappingColumnValues) {
+      userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
+    }
+    return userMappingDao.create(userMappingRow);
   }
   /**
    * Links a user row to a feature row

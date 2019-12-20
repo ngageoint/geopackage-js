@@ -1,7 +1,10 @@
-import UserDao from '../../user/userDao'
+import {UserDao} from '../../user/userDao'
 import UserTableReader from '../../user/userTableReader'
 import MediaTable from './mediaTable'
 import MediaRow from './mediaRow';
+import GeoPackage from '../../geoPackage';
+import { DataTypes } from '../../..';
+import ColumnValues from '../../dao/columnValues';
 
 /**
  * MediaDao module.
@@ -15,18 +18,17 @@ import MediaRow from './mediaRow';
  * @param  {module:db/geoPackageConnection~GeoPackageConnection} connection        connection
  * @param  {string} table table name
  */
-export default class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
-  mediaTable: MediaTable;
+export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
 
-  constructor(geoPackage, table) {
-    super(geoPackage, table);
-    this.mediaTable = table;
+  constructor(geoPackage: GeoPackage, public mediaTable: MediaTable) {
+    super(geoPackage, mediaTable);
+    this.mediaTable = mediaTable;
   }
   /**
    * Create a new media row
    * @return {module:extension/relatedTables~MediaRow}
    */
-  newRow() {
+  newRow(): MediaRow {
     return new MediaRow(this.mediaTable);
   }
   /**
@@ -35,14 +37,14 @@ export default class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~MediaRow}             media row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: DataTypes[], values: ColumnValues[]): MediaRow {
     return new MediaRow(this.mediaTable, columnTypes, values);
   }
   /**
    * Gets the media table
    * @return {module:extension/relatedTables~MediaTable}
    */
-  getTable() {
+  getTable(): MediaTable {
     return this.mediaTable;
   }
   /**
@@ -51,7 +53,7 @@ export default class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    * @param  {string} tableName       table name
    * @return {module:user/userDao~UserDao}
    */
-  static readTable(geoPackage, tableName) {
+  static readTable(geoPackage: GeoPackage, tableName: string): MediaDao<MediaRow> {
     var reader = new UserTableReader(tableName);
     var userTable = reader.readTable(geoPackage.getDatabase());
     return new MediaDao(geoPackage, userTable);

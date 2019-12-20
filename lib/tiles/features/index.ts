@@ -3,7 +3,7 @@ import * as d3geo  from 'd3-geo'
 import reproject from 'reproject'
 import PolyToLine from '@turf/polygon-to-line'
 
-import FeatureDao from "../../features/user/featureDao"
+import {FeatureDao} from "../../features/user/featureDao"
 import {TileBoundingBoxUtils} from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
 import { ImageUtils } from '../imageUtils'
@@ -651,7 +651,7 @@ export class FeatureTiles {
       }
       // @ts-ignore
       return new Promise(function (resolve, reject) {
-        if (this.useNodeCanvas) {
+        if (FeatureTiles.useNodeCanvas) {
           var writeStream = concat(function (buffer) {
             resolve(buffer);
           });
@@ -720,7 +720,7 @@ export class FeatureTiles {
     }
     // @ts-ignore
     return new Promise(function (resolve, reject) {
-      if (this.useNodeCanvas) {
+      if (FeatureTiles.useNodeCanvas) {
         var writeStream = concat(function (buffer) {
           resolve(buffer);
         });

@@ -2,7 +2,7 @@
  * featureTableReader module.
  * @module features/user/featureTableReader
  */
-import GeometryColumnsDao from '../columns/geometryColumnsDao';
+import {GeometryColumnsDao} from '../columns/geometryColumnsDao';
 import FeatureTable from './featureTable';
 import UserTableReader from '../../user/userTableReader';
 import FeatureColumn from './featureColumn';

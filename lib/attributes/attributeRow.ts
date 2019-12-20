@@ -2,11 +2,6 @@ import AttributeTable from "./attributeTable";
 import UserRow from '../user/userRow';
 
 /**
- * AttributeRow module.
- * @module attributes/attributeRow
- */
-
-/**
  * Attribute Row containing the values from a single result set row
  * @class AttributeRow
  * @param  {module:attributes/attributeTable~AttributeTable} attributeTable attribute table
@@ -14,7 +9,7 @@ import UserRow from '../user/userRow';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export default class AttributeRow extends UserRow {
-  constructor(attributeTable: AttributeTable, columnTypes?: any[], values?: any[]) {
+  constructor(attributeTable: AttributeTable, columnTypes?: string[], values?: any[]) {
     super(attributeTable, columnTypes, values);
   }
 }

@@ -1,7 +1,7 @@
 
 import GeoPackage from './geoPackage'
 import GeoPackageConnection from './db/geoPackageConnection'
-import DataColumnsDao from './dataColumns/dataColumnsDao'
+import {DataColumnsDao} from './dataColumns/dataColumnsDao'
 import MediaTable from './extension/relatedTables/mediaTable'
 import SimpleAttributesTable from './extension/relatedTables/simpleAttributesTable'
 import FeatureRow from './features/user/featureRow'
@@ -33,10 +33,10 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon'
 import pointDistance from '@turf/distance'
 import * as helpers from '@turf/helpers'
 import { TileMatrixSet } from './tiles/matrixset/tileMatrixSet'
-import FeatureDao from './features/user/featureDao'
-import SimpleAttributesDao from './extension/relatedTables/simpleAttributesDao'
+import {FeatureDao} from './features/user/featureDao'
+import {SimpleAttributesDao} from './extension/relatedTables/simpleAttributesDao'
 import SimpleAttributesRow from './extension/relatedTables/simpleAttributesRow'
-import MediaDao from './extension/relatedTables/mediaDao'
+import {MediaDao} from './extension/relatedTables/mediaDao'
 import MediaRow from './extension/relatedTables/mediaRow'
 import ExtendedRelation from './extension/relatedTables/extendedRelation'
 import { Feature } from 'geojson'
@@ -57,7 +57,7 @@ export class GeoPackageAPI {
 /**
  * In Node, open a GeoPackage file at the given path, or in a browser, load an
  * in-memory GeoPackage from the given byte array.
- * @param  {String|Uint8Array|Buffer} gppathOrByteArray path to the GeoPackage file or `Uint8Array` of GeoPackage bytes
+ * @param  {string|Uint8Array|Buffer} gppathOrByteArray path to the GeoPackage file or `Uint8Array` of GeoPackage bytes
  * @return {Promise<GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an `Error`
  */
 static async open(gppathOrByteArray: string|Uint8Array|Buffer): Promise<GeoPackage> {
@@ -83,7 +83,7 @@ static async open(gppathOrByteArray: string|Uint8Array|Buffer): Promise<GeoPacka
 /**
  * In Node, create a GeoPackage file at the given file path, or in a browser,
  * create an in-memory GeoPackage.
- * @param  {String} gppath path of the created GeoPackage file; ignored in the browser
+ * @param  {string} gppath path of the created GeoPackage file; ignored in the browser
  * @return {Promise<typeof GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an  `Error`
  */
 static async create(gppath?: string): Promise<GeoPackage> {
@@ -280,7 +280,7 @@ static createMediaTableWithProperties(geopackage: GeoPackage, tableName: string,
   return relatedTables.getMediaDao(mediaTable);
 };
 
-static addMedia(geopackage: GeoPackage, tableName: String, dataBuffer: Buffer, contentType: String, additionalProperties?: {}): number {
+static addMedia(geopackage: GeoPackage, tableName: string, dataBuffer: Buffer, contentType: string, additionalProperties?: {}): number {
   var relatedTables = geopackage.getRelatedTablesExtension();
   var mediaDao = relatedTables.getMediaDao(tableName);
   var row = mediaDao.newRow();
@@ -321,7 +321,7 @@ static getRelatedRows(geopackage: GeoPackage, baseTableName: string, baseId: num
  * Adds a GeoJSON feature to the GeoPackage
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
  * @param  {object}   feature    GeoJSON feature to add
- * @param  {String}   tableName  name of the table that will store the feature
+ * @param  {string}   tableName  name of the table that will store the feature
  */
 static addGeoJSONFeatureToGeoPackage(geopackage: GeoPackage, feature: Feature, tableName: string): number {
   var featureDao = geopackage.getFeatureDao(tableName);
@@ -350,7 +350,7 @@ static addGeoJSONFeatureToGeoPackage(geopackage: GeoPackage, feature: Feature, t
  * Adds a GeoJSON feature to the GeoPackage and updates the FeatureTableIndex extension if it exists
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
  * @param  {object}   feature    GeoJSON feature to add
- * @param  {String}   tableName  name of the table that will store the feature
+ * @param  {string}   tableName  name of the table that will store the feature
  */
 static addGeoJSONFeatureToGeoPackageAndIndex(geopackage: GeoPackage, feature: helpers.Feature, tableName: string): number {
   var featureDao = geopackage.getFeatureDao(tableName);
@@ -383,8 +383,8 @@ static addGeoJSONFeatureToGeoPackageAndIndex(geopackage: GeoPackage, feature: he
 
 /**
  * Queries for GeoJSON features in a feature tables
- * @param  {String}   geoPackagePath  path to the GeoPackage file
- * @param  {String}   tableName   Table name to query
+ * @param  {string}   geoPackagePath  path to the GeoPackage file
+ * @param  {string}   tableName   Table name to query
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  */
 static async queryForGeoJSONFeaturesInTableFromPath(geoPackagePath: string, tableName: string, boundingBox: BoundingBox): Promise<Feature[]> {
@@ -397,7 +397,7 @@ static async queryForGeoJSONFeaturesInTableFromPath(geoPackagePath: string, tabl
 /**
  * Queries for GeoJSON features in a feature tables
  * @param  {module:geoPackage~GeoPackage}   geoPackage  open GeoPackage object
- * @param  {String}   tableName   Table name to query
+ * @param  {string}   tableName   Table name to query
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  */
 static queryForGeoJSONFeaturesInTable(geoPackage: GeoPackage, tableName: string, boundingBox: BoundingBox): Feature[] {
@@ -407,7 +407,7 @@ static queryForGeoJSONFeaturesInTable(geoPackage: GeoPackage, tableName: string,
 /**
  * Iterates GeoJSON features in a feature table that matches the bounding box
  * @param  {module:geoPackage~GeoPackage}   geoPackage  open GeoPackage object
- * @param  {String}   tableName   Table name to query
+ * @param  {string}   tableName   Table name to query
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  */
 static iterateGeoJSONFeaturesInTableWithinBoundingBox(geoPackage: GeoPackage, tableName: string, boundingBox: BoundingBox): IterableIterator<Feature> {
@@ -417,8 +417,8 @@ static iterateGeoJSONFeaturesInTableWithinBoundingBox(geoPackage: GeoPackage, ta
 
 /**
  * Iterates GeoJSON features in a feature table that matches the bounding box
- * @param  {String}   geoPackagePath  path to the GeoPackage file
- * @param  {String}   tableName   Table name to query
+ * @param  {string}   geoPackagePath  path to the GeoPackage file
+ * @param  {string}   tableName   Table name to query
  * @param  {BoundingBox}   boundingBox BoundingBox to query
  */
 static async iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(geoPackagePath: string, tableName: string, boundingBox: BoundingBox): Promise<IterableIterator<Feature>> {
@@ -456,7 +456,7 @@ static createDataColumnMap(featureDao: FeatureDao): any {
 /**
  * Iterate GeoJSON features from table
  * @param  {module:geoPackage~GeoPackage} geopackage      open GeoPackage object
- * @param  {String} table           Table name to Iterate
+ * @param  {string} table           Table name to Iterate
  * @return {GeoJSONFeatureIterator}
  */
 static iterateGeoJSONFeaturesFromTable(geopackage: GeoPackage, table: string): {srs: SpatialReferenceSystem, featureDao: FeatureDao, results: IterableIterator<Feature>} {
@@ -504,7 +504,7 @@ static iterateGeoJSONFeaturesFromTable(geopackage: GeoPackage, table: string): {
 /**
  * Gets a GeoJSON feature from the table by id
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the table to get the feature from
+ * @param  {string}   table      name of the table to get the feature from
  * @param  {Number}   featureId  ID of the feature
  */
 static getFeature(geopackage: GeoPackage, table: string, featureId: any): Feature {
@@ -568,7 +568,7 @@ static parseFeatureRowIntoGeoJSON(featureRow: FeatureRow, srs: SpatialReferenceS
 /**
  * Gets a tile from the specified table
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the table to get the tile from
+ * @param  {string}   table      name of the table to get the tile from
  * @param  {Number}   zoom       zoom level of the tile
  * @param  {Number}   tileRow    row of the tile
  * @param  {Number}   tileColumn column of the tile
@@ -583,7 +583,7 @@ static getTileFromTable(geopackage: GeoPackage, table: string, zoom: number, til
 /**
  * Gets the tiles in the EPSG:4326 bounding box
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the tile table
+ * @param  {string}   table      name of the tile table
  * @param  {Number}   zoom       Zoom of the tiles to query for
  * @param  {Number}   west       EPSG:4326 western boundary
  * @param  {Number}   east       EPSG:4326 eastern boundary
@@ -670,7 +670,7 @@ static getTilesInBoundingBox(geopackage: GeoPackage, table: string, zoom: number
 /**
  * Gets the tiles in the EPSG:4326 bounding box
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the tile table
+ * @param  {string}   table      name of the tile table
  * @param  {Number}   webZoom       Zoom of the tiles to query for
  * @param  {Number}   west       EPSG:4326 western boundary
  * @param  {Number}   east       EPSG:4326 eastern boundary
@@ -936,7 +936,7 @@ static getClosestFeatureInXYZTile(geopackage: GeoPackage, table: string, x: numb
 /**
  * Gets the features in the EPSG:3857 tile
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the feature table
+ * @param  {string}   table      name of the feature table
  * @param  {Number}   x       x tile number
  * @param  {Number}   y       y tile number
  * @param  {Number}   z      z tile number
@@ -963,7 +963,7 @@ static convertPBFToVectorTile(pbf: Uint8Array | ArrayBuffer): VectorTile {
 /**
  * Gets a mapbox VectorTile for the x y z web mercator tile specified
  * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
- * @param  {String} table      table name
+ * @param  {string} table      table name
  * @param  {Number} x          x tile
  * @param  {Number} y          y tile
  * @param  {Number} z          web zoom
@@ -977,7 +977,7 @@ static async getVectorTile(geopackage: GeoPackage, table: string, x: number, y: 
 /**
  * Gets a protobuf for the x y z web mercator tile specified
  * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
- * @param  {String} table      table name
+ * @param  {string} table      table name
  * @param  {Number} x          x tile
  * @param  {Number} y          y tile
  * @param  {Number} z          web zoom
@@ -1007,7 +1007,7 @@ static async getVectorTileProtobuf(geopackage: GeoPackage, table: string, x: num
 /**
  * Gets the features in the EPSG:4326 bounding box
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the feature table
+ * @param  {string}   table      name of the feature table
  * @param  {Number}   west       EPSG:4326 western boundary
  * @param  {Number}   east       EPSG:4326 eastern boundary
  * @param  {Number}   south      EPSG:4326 southern boundary
@@ -1025,7 +1025,7 @@ static async getFeaturesInBoundingBox(geopackage: GeoPackage, table: string, wes
 /**
  * Gets a tile image for an XYZ tile pyramid location
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the table containing the tiles
+ * @param  {string}   table      name of the table containing the tiles
  * @param  {Number}   x          x index of the tile
  * @param  {Number}   y          y index of the tile
  * @param  {Number}   z          zoom level of the tile
@@ -1047,7 +1047,7 @@ static async getTileFromXYZ(geopackage: GeoPackage, table: string, x: number, y:
 /**
  * Draws an XYZ tile pyramid location into the provided canvas
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the table containing the tiles
+ * @param  {string}   table      name of the table containing the tiles
  * @param  {Number}   x          x index of the tile
  * @param  {Number}   y          y index of the tile
  * @param  {Number}   z          zoom level of the tile
@@ -1069,7 +1069,7 @@ static async drawXYZTileInCanvas(geopackage: GeoPackage, table: string, x: numbe
 /**
  * Draws a tile specified by the bounds in EPSG:4326 into the canvas
  * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
- * @param  {String}   table      name of the table containing the tiles
+ * @param  {string}   table      name of the table containing the tiles
  * @param  {Number}   minLat     minimum latitude bounds of tile
  * @param  {Number}   minLon     minimum longitude bounds of tile
  * @param  {Number}   maxLat     maximum latitude bounds of tile

@@ -4,38 +4,19 @@
  */
 
 import UserTable from './userTable'
-import UserColumn from './userColumn'
 
 import DataTypes from '../db/dataTypes';
+import { UserColumn } from '../..';
 
-/**
- * User Row containing the values from a single result row
- * @class UserRow
- * @param  {UserTable} table       user table
- * @param  {module:db/dataTypes[]} columnTypes  column types
- * @param  {Array} values      values
- */
 export default class UserRow {
-  table: UserTable;
-  columnTypes: any;
-  values: any;
-  
-  constructor(table: UserTable, columnTypes?: any, values?: any) {
-    /**
-     * User table
-     * @type {UserTable}
-     */
-    this.table = table;
-    /**
-     * Column types of this row, based upon the data values
-     * @type {Object}
-     */
-    this.columnTypes = columnTypes;
-    /**
-     * Array of row values
-     * @type {Object}
-     */
-    this.values = values;
+
+  /**
+   * User Row containing the values from a single result row
+   * @param table User Table
+   * @param columnTypes Column types of this row, based upon the data values
+   * @param values Array of the row values
+   */
+  constructor(public table: UserTable, public columnTypes?: any, public values?: any) {
     if (!this.columnTypes) {
       var columnCount = this.table.columnCount();
       this.columnTypes = {};
@@ -50,14 +31,14 @@ export default class UserRow {
    * Get the column count
    * @return {number} column count
    */
-  columnCount() {
+  columnCount(): number {
     return this.table.columnCount();
   }
   /**
    * Get the column names
    * @return {Array} column names
    */
-  getColumnNames() {
+  getColumnNames(): string[] {
     return this.table.columnNames;
   }
   /**
@@ -65,7 +46,7 @@ export default class UserRow {
    * @param  {Number} index index
    * @return {string}       column name
    */
-  getColumnNameWithIndex(index) {
+  getColumnNameWithIndex(index: number): string {
     return this.table.getColumnNameWithIndex(index);
   }
   /**
@@ -73,7 +54,7 @@ export default class UserRow {
    * @param  {string} columnName column name
    * @return {Number}            column index
    */
-  getColumnIndexWithColumnName(columnName) {
+  getColumnIndexWithColumnName(columnName: string): number {
     return this.table.getColumnIndex(columnName);
   }
   /**
@@ -81,7 +62,7 @@ export default class UserRow {
    * @param  {Number} index index
    * @return {object}       value
    */
-  getValueWithIndex(index) {
+  getValueWithIndex(index: number): any {
     var value = this.values[this.getColumnNameWithIndex(index)];
     if (value !== undefined) {
       value = this.toObjectValue(index, value);
@@ -93,7 +74,7 @@ export default class UserRow {
    * @param  {string} columnName column name
    * @return {Object}            value
    */
-  getValueWithColumnName(columnName) {
+  getValueWithColumnName(columnName: string): any {
     var value = this.values[columnName];
     var dataType = this.getRowColumnTypeWithColumnName(columnName);
     if (value === undefined || value === null)
@@ -106,7 +87,12 @@ export default class UserRow {
     }
     return value;
   }
-  toObjectValue(index, value) {
+  /**
+   * Get the value from the database as an object based on the column
+   * @param index column index
+   * @param value value from the database
+   */
+  toObjectValue(index: number, value: any): any {
     var objectValue = value;
     var column = this.getColumnWithIndex(index);
     if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN && value) {
@@ -114,7 +100,11 @@ export default class UserRow {
     }
     return objectValue;
   }
-  toDatabaseValue(columnName) {
+  /**
+   * Get the value which will be persisted to the database based on the column
+   * @param columnName name of the column
+   */
+  toDatabaseValue(columnName: string): any {
     var column = this.getColumnWithColumnName(columnName);
     var value = this.getValueWithColumnName(columnName);
     if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
@@ -127,7 +117,7 @@ export default class UserRow {
    * @param  {Number} index index
    * @return {Number}       row column type
    */
-  getRowColumnTypeWithIndex(index) {
+  getRowColumnTypeWithIndex(index: number): number {
     return this.columnTypes[this.getColumnNameWithIndex(index)];
   }
   /**
@@ -135,7 +125,7 @@ export default class UserRow {
    * @param  {string} columnName column name
    * @return {Number}            row column type
    */
-  getRowColumnTypeWithColumnName(columnName) {
+  getRowColumnTypeWithColumnName(columnName: string): number {
     return this.columnTypes[columnName];
   }
   /**
@@ -143,7 +133,7 @@ export default class UserRow {
    * @param  {Number} index index
    * @return {UserColumn}       column
    */
-  getColumnWithIndex(index) {
+  getColumnWithIndex(index: number): UserColumn {
     return this.table.getColumnWithIndex(index);
   }
   /**
@@ -151,14 +141,14 @@ export default class UserRow {
    * @param  {string} columnName column name
    * @return {UserColumn}            column
    */
-  getColumnWithColumnName(columnName) {
+  getColumnWithColumnName(columnName: string): UserColumn {
     return this.table.getColumnWithColumnName(columnName);
   }
   /**
    * Get the id value, which is the value of the primary key
    * @return {Number} id value
    */
-  getId() {
+  getId(): number {
     if (this.getPkColumn()) {
       return this.getValueWithColumnName(this.getPkColumn().name);
     }
@@ -167,14 +157,14 @@ export default class UserRow {
    * Get the primary key column Index
    * @return {Number} pk index
    */
-  getPkColumnIndex() {
+  getPkColumnIndex(): number {
     return this.table.pkIndex;
   }
   /**
    * Get the primary key column
    * @return {UserColumn} pk column
    */
-  getPkColumn() {
+  getPkColumn(): UserColumn {
     return this.table.getPkColumn();
   }
   /**
@@ -182,7 +172,7 @@ export default class UserRow {
    * @param {Number} index index
    * @param {object} value value
    */
-  setValueWithIndex(index, value) {
+  setValueWithIndex(index: number, value: any) {
     if (index === this.table.pkIndex) {
       throw new Error('Cannot update the primary key of the row.  Table Name: ' + this.table.table_name + ', Index: ' + index + ', Name: ' + this.table.getPkColumn().name);
     }
@@ -193,7 +183,7 @@ export default class UserRow {
    * @param {Number} index index
    * @param {Object} value value
    */
-  setValueNoValidationWithIndex(index, value) {
+  setValueNoValidationWithIndex(index: number, value: any) {
     this.values[this.getColumnNameWithIndex(index)] = value;
   }
   /**
@@ -201,7 +191,7 @@ export default class UserRow {
    * @param {string} columnName column name
    * @param {Object} value      value
    */
-  setValueWithColumnName(columnName, value) {
+  setValueWithColumnName(columnName: string, value: any) {
     var dataType = this.getRowColumnTypeWithColumnName(columnName);
     if (dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
       value === true ? this.values[columnName] = 1 : this.values[columnName] = 0;
@@ -216,10 +206,10 @@ export default class UserRow {
       this.values[columnName] = value;
     }
   }
-  hasIdColumn() {
+  hasIdColumn(): boolean {
     return this.table.pkIndex !== undefined;
   }
-  hasId() {
+  hasId(): boolean {
     var hasId = false;
     if (this.hasIdColumn()) {
       var objectValue = this.getValueWithIndex(this.table.pkIndex);
@@ -231,7 +221,7 @@ export default class UserRow {
    * Set the primary key id value
    * @param {Number} id id
    */
-  setId(id) {
+  setId(id: number) {
     this.values[this.table.getPkColumn().name] = id;
   }
   /**

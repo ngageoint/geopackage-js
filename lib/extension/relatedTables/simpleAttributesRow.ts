@@ -5,6 +5,8 @@
 
 import UserRow from '../../user/userRow';
 import SimpleAttributesTable from './simpleAttributesTable';
+import { DataTypes, UserColumn } from '../../..';
+import ColumnValues from '../../dao/columnValues';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
@@ -15,23 +17,21 @@ import SimpleAttributesTable from './simpleAttributesTable';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export default class SimpleAttributesRow extends UserRow {
-  simpleAttributesTable: SimpleAttributesTable;
-  constructor(simpleAttributesTable: SimpleAttributesTable, columnTypes?: any[], values?: any[]) {
+  constructor(public simpleAttributesTable: SimpleAttributesTable, columnTypes?: DataTypes[], values?: ColumnValues[]) {
     super(simpleAttributesTable, columnTypes, values);
-    this.simpleAttributesTable = simpleAttributesTable;
   }
   /**
    * Gets the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getIdColumn() {
+  getIdColumn(): UserColumn {
     return this.simpleAttributesTable.getIdColumn();
   }
   /**
    * Gets the id
    * @return {Number}
    */
-  getId() {
+  getId(): number {
     return this.getValueWithColumnName(this.getIdColumn().name);
   }
 }

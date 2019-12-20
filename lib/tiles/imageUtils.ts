@@ -12,7 +12,7 @@ export class ImageUtils {
    * @param {Buffer|String} data file data or file path
    * @returns {Object}
    */
-  public static getImageSize(data) {
+  public static getImageSize(data: Buffer | string) {
     // @ts-ignore
     return sizeOf(data);
   }
@@ -23,8 +23,8 @@ export class ImageUtils {
    * @param {String} contentType
    * @returns {Promise<typeof Image>}
    */
-  public static getImage(data, contentType = 'image/png') {
-    return new Promise(function (resolve, reject) {
+  public static async getImage(data: Buffer | string, contentType = 'image/png'): Promise<any> {
+    return new Promise((resolve, reject) => {
       var image;
       if (ImageUtils.useNodeCanvas) {
         var Canvas = require('canvas');
@@ -44,7 +44,7 @@ export class ImageUtils {
         src = 'data:' + contentType + ';base64,' + data.toString('base64');
       }
       image.src = src;
-    }.bind(this));
+    });
   }
 
   /**
@@ -53,10 +53,10 @@ export class ImageUtils {
    * @param {Number} scale
    * @returns {Promise<typeof Image>}
    */
-  public static getScaledImage(data, scale) {
-    return ImageUtils.getImage(data).then(function (image) {
+  public static getScaledImage(data: Buffer | string, scale: number) {
+    return ImageUtils.getImage(data).then((image) => {
       return ImageUtils.scaleBitmap(image, scale);
-    }.bind(this));
+    });
   }
 
   /**
@@ -65,9 +65,9 @@ export class ImageUtils {
    * @param {Number} scale
    * @returns {Promise<typeof Image>}
    */
-  public static scaleBitmap(image, scale) {
+  public static async scaleBitmap(image: any, scale: number): Promise<any> {
     if (scale === 1.0) {
-      return Promise.resolve(image);
+      return image;
     } else {
       // @ts-ignore
       var iconWidth = image.width;
@@ -91,10 +91,10 @@ export class ImageUtils {
       ctx = canvas.getContext('2d');
       // @ts-ignore
       ctx.drawImage(image, 0, 0, iconWidth, iconHeight, 0, 0, scaledWidth, scaledHeight);
-      return new Promise(function (resolve) {
+      return new Promise(resolve => {
         img.onload = () => { resolve(img); };
         img.src = canvas.toDataURL();
-      }.bind(this));
+      });
     }
   }
 }

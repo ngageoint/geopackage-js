@@ -1,5 +1,5 @@
 import proj4 from 'proj4';
-import TileDao from '../user/tileDao';
+import {TileDao} from '../user/tileDao';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils }  from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'

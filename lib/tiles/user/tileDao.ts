@@ -1,8 +1,7 @@
 import proj4 from 'proj4'
-import UserDao from '../../user/userDao'
-import TileTable from './tileTable'
-import TileMatrixDao from '../matrix/tileMatrixDao';
-import TileMatrixSetDao from '../matrixset/tileMatrixSetDao';
+import {UserDao} from '../../user/userDao'
+import {TileMatrixDao} from '../matrix/tileMatrixDao';
+import {TileMatrixSetDao} from '../matrixset/tileMatrixSetDao';
 import TileRow from './tileRow';
 import TileColumn from './tileColumn';
 import TileGrid from '../tileGrid';
@@ -23,7 +22,7 @@ import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
  * @param  {TileMatrixSet} tileMatrixSet
  * @param  {TileMatrix[]} tileMatrices
  */
-export default class TileDao extends UserDao<TileRow> {
+export class TileDao extends UserDao<TileRow> {
   tileMatrixSet: any;
   tileMatrices: any;
   zoomLevelToTileMatrix: any[];

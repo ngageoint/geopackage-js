@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { GeoPackageAPI} from '../..';
+import { GeoPackage as GeoPackageAPI } from '../..';
 import GeoPackage from '../../lib/geoPackage';
 import GeoPackageConnection from '../../lib/db/geoPackageConnection';
 

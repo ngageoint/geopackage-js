@@ -1,5 +1,6 @@
 import UserMappingTable from "./userMappingTable";
 import UserRow from '../../user/userRow';
+import { UserColumn } from "../../..";
 
 /**
  * UserMappingRow module.
@@ -16,52 +17,49 @@ import UserRow from '../../user/userRow';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export default class UserMappingRow extends UserRow {
-  table: UserMappingTable;
-
-  constructor(table: UserMappingTable, columnTypes?: any[], values?: any[]) {
+  constructor(public table: UserMappingTable, columnTypes?: any[], values?: any[]) {
     super(table, columnTypes, values);
-    this.table = table;
   }
   /**
    * Get the base id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getBaseIdColumn() {
+  getBaseIdColumn(): UserColumn {
     return this.table.getBaseIdColumn();
   }
   /**
    * Gets the base id
    * @return {Number}
    */
-  getBaseId() {
+  getBaseId(): number {
     return this.getValueWithColumnName(this.getBaseIdColumn().name);
   }
   /**
    * Sets the base id
    * @param  {Number} baseId base id
    */
-  setBaseId(baseId) {
+  setBaseId(baseId: number): void {
     this.setValueWithColumnName(this.getBaseIdColumn().name, baseId);
   }
   /**
    * Get the related id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getRelatedIdColumn() {
+  getRelatedIdColumn(): UserColumn {
     return this.table.getRelatedIdColumn();
   }
   /**
    * Gets the related id
    * @return {Number}
    */
-  getRelatedId() {
+  getRelatedId(): number {
     return this.getValueWithColumnName(this.getRelatedIdColumn().name);
   }
   /**
    * Sets the related id
    * @param  {Number} relatedId related id
    */
-  setRelatedId(relatedId) {
+  setRelatedId(relatedId: number): void {
     this.setValueWithColumnName(this.getRelatedIdColumn().name, relatedId);
   }
 }

@@ -1,12 +1,14 @@
+import proj4Defs from './lib/proj4Defs'
+
 import CrsWktExtension from './lib/extension/crsWkt';
 import GeoPackageConnection from './lib/db/geoPackageConnection';
 import WebPExtension from './lib/extension/webp';
 import RTreeIndex from './lib/extension/rtree/rtreeIndex';
 import MetadataExtension from './lib/extension/metadata';
-import DataColumnsDao from './lib/dataColumns/dataColumnsDao';
+import {DataColumnsDao} from './lib/dataColumns/dataColumnsDao';
 import MediaTable from './lib/extension/relatedTables/mediaTable';
 import UserMappingTable from './lib/extension/relatedTables/userMappingTable';
-import DataColumnConstraintsDao from './lib/dataColumnConstraints/dataColumnConstraintsDao';
+import {DataColumnConstraintsDao} from './lib/dataColumnConstraints/dataColumnConstraintsDao';
 import FeatureColumn from './lib/features/user/featureColumn';
 import UserColumn from './lib/user/userColumn';
 import TileColumn from './lib/tiles/user/tileColumn';
@@ -20,15 +22,12 @@ import { TableCreator } from './lib/db/tableCreator';
 import { DublinCoreType } from './lib/extension/relatedTables/dublinCoreType';
 import { BoundingBox } from './lib/boundingBox';
 import { GeoPackageAPI } from './lib/api';
-
-var proj4Defs = require('./lib/proj4Defs');
-var GeoPackageTileRetriever = require('./lib/tiles/retriever');
-var TileUtilities = require('./lib/tiles/creator/tileUtilities');
-
-var Metadata = require('./lib/metadata/metadata');
-var FeatureTiles = require('./lib/tiles/features');
-var NumberFeaturesTile = require('./lib/tiles/features/custom/numberFeaturesTile');
-var ShadedFeaturesTile = require('./lib/tiles/features/custom/shadedFeaturesTile');
+import { Metadata } from './lib/metadata/metadata'
+import { FeatureTiles } from './lib/tiles/features'
+import { NumberFeaturesTile } from './lib/tiles/features/custom/numberFeaturesTile'
+import { ShadedFeaturesTile } from './lib/tiles/features/custom/shadedFeaturesTile'
+import { GeoPackageTileRetriever } from './lib/tiles/retriever'
+import TileUtilities from './lib/tiles/creator/tileUtilities'
 
 export {
   proj4Defs,

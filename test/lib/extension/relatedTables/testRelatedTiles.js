@@ -4,7 +4,7 @@ import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/dataTypes').default
   , Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao').default
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').default
   , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow')

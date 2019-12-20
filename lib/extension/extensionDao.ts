@@ -1,5 +1,5 @@
 import Extension from './extension';
-import Dao from '../dao/dao';
+import {Dao} from '../dao/dao';
 import ColumnValues from '../dao/columnValues';
 
 import { TableCreator } from '../db/tableCreator';
@@ -9,7 +9,7 @@ import { TableCreator } from '../db/tableCreator';
  * @class
  * @extends Dao
  */
-export default class ExtensionDao extends Dao<Extension> {
+export class ExtensionDao extends Dao<Extension> {
   public static readonly TABLE_NAME = "gpkg_extensions";
   public static readonly COLUMN_TABLE_NAME = "table_name";
   public static readonly COLUMN_COLUMN_NAME = "column_name";

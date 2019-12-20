@@ -3,7 +3,7 @@ import { default as testSetup } from '../fixtures/testSetup'
 
 var FeatureColumn = require('../../lib/features/user/featureColumn').default
   , DataColumns = require('../../lib/dataColumns/dataColumns').default
-  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').default
+  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
   , Verification = require('../fixtures/verification')
   , FeatureTable = require('../../lib/features/user/featureTable').default
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')

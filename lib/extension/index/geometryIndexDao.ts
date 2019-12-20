@@ -1,33 +1,36 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 import GeometryIndex from './geometryIndex';
 import { TableCreator } from '../../db/tableCreator';
+import { FeatureDao } from '../../features/user/featureDao';
+import GeoPackage from '../../geoPackage';
+import TableIndex from './tableIndex';
 /**
  * Geometry Index Data Access Object
  * @class
  * @extends Dao
  */
-export default class GeometryIndexDao extends Dao<GeometryIndex> {
-  public static readonly TABLE_NAME = "nga_geometry_index";
-  public static readonly COLUMN_TABLE_NAME = GeometryIndexDao.TABLE_NAME + ".table_name";
-  public static readonly COLUMN_GEOM_ID = GeometryIndexDao.TABLE_NAME + ".geom_id";
-  public static readonly COLUMN_MIN_X = GeometryIndexDao.TABLE_NAME + ".min_x";
-  public static readonly COLUMN_MAX_X = GeometryIndexDao.TABLE_NAME + ".max_x";
-  public static readonly COLUMN_MIN_Y = GeometryIndexDao.TABLE_NAME + ".min_y";
-  public static readonly COLUMN_MAX_Y = GeometryIndexDao.TABLE_NAME + ".max_y";
-  public static readonly COLUMN_MIN_Z = GeometryIndexDao.TABLE_NAME + ".min_z";
-  public static readonly COLUMN_MAX_Z = GeometryIndexDao.TABLE_NAME + ".max_z";
-  public static readonly COLUMN_MIN_M = GeometryIndexDao.TABLE_NAME + ".min_m";
-  public static readonly COLUMN_MAX_M = GeometryIndexDao.TABLE_NAME + ".max_m";
+export class GeometryIndexDao extends Dao<GeometryIndex> {
+  public static readonly TABLE_NAME: string = "nga_geometry_index";
+  public static readonly COLUMN_TABLE_NAME: string = GeometryIndexDao.TABLE_NAME + ".table_name";
+  public static readonly COLUMN_GEOM_ID: string = GeometryIndexDao.TABLE_NAME + ".geom_id";
+  public static readonly COLUMN_MIN_X: string = GeometryIndexDao.TABLE_NAME + ".min_x";
+  public static readonly COLUMN_MAX_X: string = GeometryIndexDao.TABLE_NAME + ".max_x";
+  public static readonly COLUMN_MIN_Y: string = GeometryIndexDao.TABLE_NAME + ".min_y";
+  public static readonly COLUMN_MAX_Y: string = GeometryIndexDao.TABLE_NAME + ".max_y";
+  public static readonly COLUMN_MIN_Z: string = GeometryIndexDao.TABLE_NAME + ".min_z";
+  public static readonly COLUMN_MAX_Z: string = GeometryIndexDao.TABLE_NAME + ".max_z";
+  public static readonly COLUMN_MIN_M: string = GeometryIndexDao.TABLE_NAME + ".min_m";
+  public static readonly COLUMN_MAX_M: string = GeometryIndexDao.TABLE_NAME + ".max_m";
 
-  readonly gpkgTableName = GeometryIndexDao.TABLE_NAME;
-  readonly idColumns = ['table_name', 'geom_id'];
+  readonly gpkgTableName: string = GeometryIndexDao.TABLE_NAME;
+  readonly idColumns: string[] = ['table_name', 'geom_id'];
 
-  featureDao: any;
-  constructor(geoPackage, featureDao) {
+  featureDao: FeatureDao;
+  constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
     super(geoPackage);
     this.featureDao = featureDao;
   }
-  createObject() {
+  createObject(): GeometryIndex {
     return new GeometryIndex();
   }
   /**
@@ -36,31 +39,25 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param {module:extension/index~GeometryIndex} geometryIndex geometry index
    * @return {module:extension/index~TableIndex}
    */
-  getTableIndex(geometryIndex) {
+  getTableIndex(geometryIndex: GeometryIndex): TableIndex {
     var dao = this.geoPackage.getTableIndexDao();
-    return dao.queryForId(geometryIndex.tableName);
+    return dao.queryForId(geometryIndex.table_name);
   }
   /**
    * Query by table name
    * @param  {string} tableName table name
    * @return {Iterable}
    */
-  queryForTableName(tableName) {
+  queryForTableName(tableName: string): IterableIterator<any> {
     return this.queryForEach(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
   }
-  /**
-   *  Count by table name
-   *
-   *  @param tableName table name
-   *
-   *  @return count
-   */
+
   /**
    * Count by table name
    * @param  {string}   tableName table name
    * @return {Number}
    */
-  countByTableName(tableName) {
+  countByTableName(tableName: string): number {
     return this.count(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
   }
 
@@ -71,7 +68,7 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Object} envelope   envelope to store
    * @return {module:extension/index~GeometryIndex}
    */
-  populate(tableIndex, geometryId, envelope) {
+  populate(tableIndex: TableIndex, geometryId: number, envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): GeometryIndex {
     var geometryIndex = new GeometryIndex();
     geometryIndex.setTableIndex(tableIndex);
     geometryIndex.geom_id = geometryId;
@@ -93,10 +90,10 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * Create the GeometryIndex table
    * @return {Promise}
    */
-  createTable() {
+  async createTable(): Promise<boolean> {
     var exists = this.isTableExists();
     if (exists)
-      return Promise.resolve(true);
+      return true;
     var tc = new TableCreator(this.geoPackage);
     return tc.createGeometryIndex();
   }
@@ -115,7 +112,7 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasZ has z
    * @return {Object}
    */
-  _generateGeometryEnvelopeQuery(envelope) {
+  _generateGeometryEnvelopeQuery(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): {join: string, where: string, whereArgs: any[], tableNameArr: string[]} {
     var tableName = this.featureDao.gpkgTableName;
     var where = '';
     where += this.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
@@ -181,7 +178,7 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasM has m
    * @param  {Boolean} envelope.hasZ has z
    */
-  queryWithGeometryEnvelope(envelope) {
+  queryWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): IterableIterator<any> {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
   }
@@ -198,7 +195,7 @@ export default class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasM has m
    * @param  {Boolean} envelope.hasZ has z
    */
-  countWithGeometryEnvelope(envelope) {
+  countWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): number {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.countJoinWhereWithArgs(result.join, result.where, result.whereArgs);
   }

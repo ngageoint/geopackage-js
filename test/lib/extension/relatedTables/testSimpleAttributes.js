@@ -4,7 +4,7 @@ import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/dataTypes').default
   , Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao').default
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').default
   , SimpleAttributesRow = require('../../../../lib/extension/relatedTables/simpleAttributesRow')
@@ -203,12 +203,12 @@ describe('Related Simple Attributes tests', function() {
 
         for (var i = 0; i < count; i++) {
           var umr = userMappingRows[i];
-          var row = userMappingDao.getUserMappingRow(umr);
-          row.hasId().should.be.equal(false);
-          attributeIds.indexOf(row.getBaseId()).should.be.not.equal(-1);
-          simpleIds.indexOf(row.getRelatedId()).should.be.not.equal(-1);
-          RelatedTablesUtils.validateUserRow(mappingColumns, row);
-          RelatedTablesUtils.validateDublinCoreColumns(row);
+          var row2 = userMappingDao.getUserMappingRow(umr);
+          row2.hasId().should.be.equal(false);
+          attributeIds.indexOf(row2.getBaseId()).should.be.not.equal(-1);
+          simpleIds.indexOf(row2.getRelatedId()).should.be.not.equal(-1);
+          RelatedTablesUtils.validateUserRow(mappingColumns, row2);
+          RelatedTablesUtils.validateDublinCoreColumns(row2);
           manualCount++;
         }
 

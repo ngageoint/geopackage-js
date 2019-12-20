@@ -17,12 +17,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
   circleStrokeWidth: number;
   circleBorderColor: string;
   circleFillColor: string;
-  tileBorderStrokeWidth: number;
-  tileBorderColor: string;
-  tileFillColor: string;
   circlePaddingPercentage: number;
-  drawUnindexedTiles: boolean;
-  compressFormat: string;
   defaultFontRegistered: boolean;
   constructor() {
     super();
@@ -32,12 +27,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
     this.circleStrokeWidth = 3;
     this.circleBorderColor = "rgba(0, 0, 0, 0.25)";
     this.circleFillColor = "rgba(0, 0, 0, 1.0)";
-    this.tileBorderStrokeWidth = 2;
-    this.tileBorderColor = "rgba(0, 0, 0, 1.0)";
-    this.tileFillColor = "rgba(0, 0, 0, 0.0625)";
     this.circlePaddingPercentage = 0.25;
-    this.drawUnindexedTiles = true;
-    this.compressFormat = 'png';
     this.defaultFontRegistered = false;
   }
   /**
@@ -219,7 +209,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * @param canvas
    * @returns {Promise<String|Buffer>}
    */
-  drawUnindexedTile(tileWidth, tileHeight, canvas = null) {
+  drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer>  {
     var image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
@@ -238,7 +228,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * @param tileCanvas
    * @return {Promise<String|Buffer>}
    */
-  drawTile(tileWidth, tileHeight, text, tileCanvas) {
+  drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
     // @ts-ignore
     // eslint-disable-next-line complexity
     return new Promise(function (resolve) {

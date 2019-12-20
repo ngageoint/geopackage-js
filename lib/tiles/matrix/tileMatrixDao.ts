@@ -2,7 +2,7 @@
  * @module tiles/matrix
  * @see module:dao/dao
  */
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 
 import { TileMatrix } from './tileMatrix';
 
@@ -11,7 +11,7 @@ import { TileMatrix } from './tileMatrix';
  * @class TileMatrixDao
  * @extends Dao
  */
-export default class TileMatrixDao extends Dao<TileMatrix> {
+export class TileMatrixDao extends Dao<TileMatrix> {
   public static readonly TABLE_NAME = "gpkg_tile_matrix";
   public static readonly COLUMN_PK1 = "table_name";
   public static readonly COLUMN_PK2 = "zoom_level";

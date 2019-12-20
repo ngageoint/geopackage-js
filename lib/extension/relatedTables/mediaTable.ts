@@ -16,35 +16,35 @@ import DataType from '../../db/dataTypes';
  * @param {string[]} requiredColumns required column names
  */
 export default class MediaTable extends UserRelatedTable {
-  public static readonly RELATION_TYPE = RelationType.MEDIA;
-  public static readonly COLUMN_ID = 'id';
-  public static readonly COLUMN_DATA = 'data';
-  public static readonly COLUMN_CONTENT_TYPE = 'content_type';
+  public static readonly RELATION_TYPE: RelationType = RelationType.MEDIA;
+  public static readonly COLUMN_ID: string = 'id';
+  public static readonly COLUMN_DATA: string = 'data';
+  public static readonly COLUMN_CONTENT_TYPE: string = 'content_type';
 
-  readonly TABLE_TYPE = 'media';
+  readonly TABLE_TYPE: string = 'media';
 
-  constructor(tableName, columns, requiredColumns) {
+  constructor(tableName: string, columns?: UserColumn[], requiredColumns?: string[]) {
     super(tableName, MediaTable.RELATION_TYPE.name, MediaTable.RELATION_TYPE.dataType, columns, requiredColumns);
   }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getIdColumn() {
+  getIdColumn(): UserColumn {
     return this.getPkColumn();
   }
   /**
    * Get the data column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDataColumn() {
+  getDataColumn(): UserColumn {
     return this.getColumnWithColumnName(MediaTable.COLUMN_DATA);
   }
   /**
    * Get the content type column
    * @return {module:user/userColumn~UserColumn}
    */
-  getContentTypeColumn() {
+  getContentTypeColumn(): UserColumn {
     return this.getColumnWithColumnName(MediaTable.COLUMN_CONTENT_TYPE);
   }
   /**
@@ -53,7 +53,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {module:user/userColumn~UserColumn[]} [additionalColumns] additional columns
    * @return {module:extension/relatedTables~MediaTable}
    */
-  static create(tableName: string, additionalColumns?: UserColumn[]) {
+  static create(tableName: string, additionalColumns?: UserColumn[]): MediaTable {
     var columns = MediaTable.createRequiredColumns();
     if (additionalColumns) {
       columns = columns.concat(additionalColumns);
@@ -65,7 +65,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {string} [idColumnName=id] id column name
    * @return {string[]}
    */
-  static requiredColumns(idColumnName = MediaTable.COLUMN_ID) {
+  static requiredColumns(idColumnName = MediaTable.COLUMN_ID): string[] {
     var requiredColumns = [];
     requiredColumns.push(idColumnName);
     requiredColumns.push(MediaTable.COLUMN_DATA);
@@ -76,7 +76,7 @@ export default class MediaTable extends UserRelatedTable {
    * Get the number of required columns
    * @return {Number}
    */
-  static numRequiredColumns() {
+  static numRequiredColumns(): number {
     return MediaTable.requiredColumns().length;
   }
   /**
@@ -85,7 +85,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {string} [idColumnName=id]  id column name
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createRequiredColumns(startingIndex = 0, idColumnName = MediaTable.COLUMN_ID) {
+  static createRequiredColumns(startingIndex = 0, idColumnName = MediaTable.COLUMN_ID): UserColumn[] {
     return [
       MediaTable.createIdColumn(startingIndex++, idColumnName),
       MediaTable.createDataColumn(startingIndex++),
@@ -98,7 +98,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {string} idColumnName name of the id column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createIdColumn(index, idColumnName) {
+  static createIdColumn(index: number, idColumnName: string): UserColumn {
     return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
   }
   /**
@@ -106,7 +106,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {Number} index        index of the column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createDataColumn(index) {
+  static createDataColumn(index: number): UserColumn {
     return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, DataType.GPKGDataType.GPKG_DT_BLOB, true);
   }
   /**
@@ -114,7 +114,7 @@ export default class MediaTable extends UserRelatedTable {
    * @param  {Number} index        index of the column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createContentTypeColumn(index) {
+  static createContentTypeColumn(index: number): UserColumn {
     return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, DataType.GPKGDataType.GPKG_DT_TEXT, true);
   }
 }

@@ -1,7 +1,7 @@
 /**
  * @module user/custom
  */
-import UserDao from '../userDao';
+import {UserDao} from '../userDao';
 import GeoPackage from '../../geoPackage';
 import UserCustomTableReader from './userCustomTableReader';
 import UserRow from '../userRow';
@@ -13,7 +13,7 @@ import UserRow from '../userRow';
  * @param  {module:geoPackage~GeoPackage} geoPackage      geopackage object
  * @param  {module:user/custom~UserCustomTable} userCustomTable user custom table
  */
-export default class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
+export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
 
   createObject(results) {
     return this.getRow(results);

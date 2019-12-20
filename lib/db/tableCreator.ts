@@ -1,4 +1,4 @@
-import SpatialReferenceSystemDao from '../core/srs/spatialReferenceSystemDao';
+import {SpatialReferenceSystemDao} from '../core/srs/spatialReferenceSystemDao';
 
 // eslint-disable-next-line no-unused-vars
 import UserTable from '../user/userTable';

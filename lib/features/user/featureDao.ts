@@ -8,8 +8,8 @@ import Intersect from '@turf/intersect'
 import BooleanWithin from '@turf/boolean-within'
 
 import FeatureTableIndex from '../../extension/index/featureTableIndex';
-import UserDao from '../../user/userDao';
-import DataColumnsDao from '../../dataColumns/dataColumnsDao';
+import {UserDao} from '../../user/userDao';
+import {DataColumnsDao} from '../../dataColumns/dataColumnsDao';
 import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
 import { BoundingBox } from '../../boundingBox'
@@ -24,7 +24,7 @@ import { Feature } from 'geojson';
  * @param  {GeometryColumns} geometryColumns geometry columns
  * @param  {MetadataDao} metadataDao      metadata dao
  */
-export default class FeatureDao extends UserDao<FeatureRow> {
+export class FeatureDao extends UserDao<FeatureRow> {
   geometryColumns: any;
   metadataDao: any;
   dataColumnsDao: any;

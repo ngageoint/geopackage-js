@@ -1,7 +1,7 @@
 import GeoPackage from "../geoPackage";
 import GeoPackageConnection from "../db/geoPackageConnection";
 import Extension from './extension';
-import ExtensionDao from './extensionDao';
+import {ExtensionDao} from './extensionDao';
 /**
  * Base Extension
  */
@@ -25,15 +25,15 @@ export default abstract class BaseExtension {
   /**
    * Name of the extension
    */
-  extensionName: String;
+  extensionName: string;
   /**
    * Definition for the extension
    */
-  extensionDefinition: String;
+  extensionDefinition: string;
   /**
    * extension table name
    */
-  tableName: String;
+  tableName: string;
   /**
    * @param {module:geoPackage~GeoPackage} geoPackage
    */
@@ -51,7 +51,7 @@ export default abstract class BaseExtension {
    * @param  {String}   scopeType     extension scope type
    * @return {Promise<Extension>}
    */
-  getOrCreate(extensionName: String, tableName: String | null, columnName: String | null, definition: String, scopeType: String): Promise<Extension> {
+  getOrCreate(extensionName: string, tableName: string | null, columnName: string | null, definition: string, scopeType: string): Promise<Extension> {
     var extension = this.getExtension(extensionName, tableName, columnName);
     if (extension.length) {
       return Promise.resolve(extension[0]);
@@ -68,7 +68,7 @@ export default abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @return {Extension[]}
    */
-  getExtension(extensionName: String, tableName: String | null, columnName: String | null): Extension[] {
+  getExtension(extensionName: string, tableName: string | null, columnName: string | null): Extension[] {
     if (!this.extensionsDao.isTableExists()) {
       return [];
     }
@@ -81,7 +81,7 @@ export default abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @returns {Boolean} if the extension exists
    */
-  hasExtension(extensionName: String, tableName: String, columnName: String): Boolean {
+  hasExtension(extensionName: string, tableName: string, columnName: string): boolean {
     return !!this.getExtension(extensionName, tableName, columnName).length;
   }
   
@@ -93,7 +93,7 @@ export default abstract class BaseExtension {
    * @param {string} definition
    * @param {string} scopeType
    */
-  createExtension(extensionName: String, tableName: String, columnName: String, definition: String, scopeType: String): number {
+  createExtension(extensionName: string, tableName: string, columnName: string, definition: string, scopeType: string): number {
     var extension = new Extension();
     extension.table_name = tableName;
     extension.column_name = columnName;

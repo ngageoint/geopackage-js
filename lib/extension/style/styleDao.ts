@@ -4,7 +4,7 @@
  */
 
 import StyleTable from './styleTable';
-import AttributesDao from '../../attributes/attributeDao';
+import {AttributeDao} from '../../attributes/attributeDao';
 import StyleRow from './styleRow';
 
 /**
@@ -14,7 +14,7 @@ import StyleRow from './styleRow';
  * @param  {string} table table name
  * @constructor
  */
-export default class StyleDao extends AttributesDao<StyleRow> {
+export class StyleDao extends AttributeDao<StyleRow> {
   constructor(geoPackage, table) {
     super(geoPackage, table);
     this.table = table;

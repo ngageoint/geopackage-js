@@ -1,14 +1,8 @@
 /**
- * Contents module.
- * @module core/contents
- */
-
-/**
  * The Contents class models rows in the [`gpkg_contents`](https://www.geopackage.org/spec121/index.html#_contents)
  * table.  The contents table stores identifying and descriptive information
  * that an application can display to a user in a menu of geospatial data
  * available in a GeoPackage.
- * @class Contents
  * @see https://www.geopackage.org/spec121/index.html#_contents
  */
 export default class Contents {

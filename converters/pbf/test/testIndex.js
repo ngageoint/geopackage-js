@@ -1,5 +1,4 @@
 var PBFToGeoPackage = require('../index.js');
-var GeoPackageAPI = require('@ngageoint/geopackage')
 
 var path = require('path')
   , fs = require('fs')

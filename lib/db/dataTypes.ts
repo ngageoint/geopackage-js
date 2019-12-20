@@ -6,68 +6,68 @@ export default class DataTypes {
    * A boolean value representing true or false.
    * @type {String}
    */
-  public static readonly GPKG_DT_BOOLEAN_NAME = "BOOLEAN";
+  public static readonly GPKG_DT_BOOLEAN_NAME: string  = "BOOLEAN";
   /**
    * 8-bit signed two’s complement integer.
    * @type {String}
    */
-  public static readonly GPKG_DT_TINYINT_NAME = "TINYINT";
+  public static readonly GPKG_DT_TINYINT_NAME: string  = "TINYINT";
   /**
    * 16-bit signed two’s complement integer.
    * @type {String}
    */
-  public static readonly GPKG_DT_SMALLINT_NAME = "SMALLINT";
+  public static readonly GPKG_DT_SMALLINT_NAME: string  = "SMALLINT";
   /**
    * 32-bit signed two’s complement integer.
    * @type {String}
    */
-  public static readonly GPKG_DT_MEDIUMINT_NAME = "MEDIUMINT";
+  public static readonly GPKG_DT_MEDIUMINT_NAME: string  = "MEDIUMINT";
   /**
    * 64-bit signed two’s complement integer.
    * @type {String}
    */
-  public static readonly GPKG_DT_INT_NAME = "INT";
+  public static readonly GPKG_DT_INT_NAME: string  = "INT";
   /**
    * 64-bit signed two’s complement integer.
    * @type {String}
    */
-  public static readonly GPKG_DT_INTEGER_NAME = "INTEGER";
+  public static readonly GPKG_DT_INTEGER_NAME: string = "INTEGER";
   /**
    * 32-bit IEEE floating point number.
    * @type {String}
    */
-  public static readonly GPKG_DT_FLOAT_NAME = "FLOAT";
+  public static readonly GPKG_DT_FLOAT_NAME: string = "FLOAT";
   /**
    * 64-bit IEEE floating point number.
    * @type {String}
    */
-  public static readonly GPKG_DT_DOUBLE_NAME = "DOUBLE";
+  public static readonly GPKG_DT_DOUBLE_NAME: string = "DOUBLE";
   /**
    * 64-bit IEEE floating point number.
    * @type {String}
    */
-  public static readonly GPKG_DT_REAL_NAME = "REAL";
+  public static readonly GPKG_DT_REAL_NAME: string = "REAL";
   /**
    * TEXT{(maxchar_count)}: Variable length string encoded in either UTF-8 or UTF-16, determined by PRAGMA encoding; see http://www.sqlite.org/pragma.html#pragma_encoding.
    * @type {String}
    */
-  public static readonly GPKG_DT_TEXT_NAME = "TEXT";
+  public static readonly GPKG_DT_TEXT_NAME: string = "TEXT";
   /**
    * BLOB{(max_size)}: Variable length binary data.
    * @type {String}
    */
-  public static readonly GPKG_DT_BLOB_NAME = "BLOB";
+  public static readonly GPKG_DT_BLOB_NAME: string = "BLOB";
   /**
    * ISO-8601 date string in the form YYYY-MM-DD encoded in either UTF-8 or UTF-16.
    * @type {String}
    */
-  public static readonly GPKG_DT_DATE_NAME = "DATE";
+  public static readonly GPKG_DT_DATE_NAME: string = "DATE";
   /**
    * ISO-8601 date/time string in the form YYYY-MM-DDTHH:MM:SS.SSSZ with T separator character and Z suffix for coordinated universal time (UTC) encoded in either UTF-8 or UTF-16.
    * @type {String}
    */
-  public static readonly GPKG_DT_DATETIME_NAME = "DATETIME";
-  public static readonly GPKG_DT_GEOMETRY_NAME = "GEOMETRY";
+  public static readonly GPKG_DT_DATETIME_NAME: string = "DATETIME";
+  public static readonly GPKG_DT_GEOMETRY_NAME: string  = "GEOMETRY";
 
 /**
  * DataType enumeration
@@ -103,36 +103,6 @@ public static GPKGDataType = {
   [DataTypes.GPKG_DT_GEOMETRY_NAME]: 13,
   GPKG_DT_GEOMETRY: 13,
 };
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_BOOLEAN_NAME] = 0;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_TINYINT_NAME] = 1;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_SMALLINT_NAME] = 2;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_MEDIUMINT_NAME] = 3;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_INT_NAME] = 4;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_INTEGER_NAME] = 5;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_FLOAT_NAME] = 6;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_DOUBLE_NAME] = 7;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_REAL_NAME] = 8;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_TEXT_NAME] = 9;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_BLOB_NAME] = 10;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_DATE_NAME] = 11;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_DATETIME_NAME] = 12;
-// public static readonly GPKGDataType[DataTypes.GPKG_DT_GEOMETRY_NAME] = 13;
-
-// public static readonly GPKGDataType.GPKG_DT_BOOLEAN = 0;
-// public static readonly GPKGDataType.GPKG_DT_TINYINT = 1;
-// public static readonly GPKGDataType.GPKG_DT_SMALLINT = 2;
-// public static readonly GPKGDataType.GPKG_DT_MEDIUMINT = 3;
-// public static readonly GPKGDataType.GPKG_DT_INT = 4;
-// public static readonly GPKGDataType.GPKG_DT_INTEGER = 5;
-// public static readonly GPKGDataType.GPKG_DT_FLOAT = 6;
-// public static readonly GPKGDataType.GPKG_DT_DOUBLE = 7;
-// public static readonly GPKGDataType.GPKG_DT_REAL = 8;
-// public static readonly GPKGDataType.GPKG_DT_TEXT = 9;
-// public static readonly GPKGDataType.GPKG_DT_BLOB = 10;
-// public static readonly GPKGDataType.GPKG_DT_DATE = 11;
-// public static readonly GPKGDataType.GPKG_DT_DATETIME = 12;
-// public static readonly GPKGDataType.GPKG_DT_GEOMETRY = 13;
-
 
 /**
  * Return the name of the given data type.
@@ -140,7 +110,7 @@ public static GPKGDataType = {
  * @param  {module:db/dataTypes~GPKGDataType} dataType the enum to retrieve the name for
  * @return {String} the string name of the given data type enum
  */
-static nameFromType(dataType) {
+static nameFromType(dataType: number): string {
   var name = undefined;
   switch(dataType){
   case DataTypes.GPKGDataType.GPKG_DT_BOOLEAN:
@@ -196,8 +166,7 @@ static nameFromType(dataType) {
    * @param  {String} name the name of the data type enum
    * @return {module:db/dataTypes~GPKGDataType} the enum value
    */
-  static fromName = function(name: string): number {
-    DataTypes.GPKGDataType['test'] = 5;
+  static fromName(name: string): number {
     var value = 9;
     if (name) {
       name = name.toUpperCase();

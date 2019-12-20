@@ -14,10 +14,10 @@ import Extension from '../extension';
  * @extends BaseExtension
  */
 export default class MetadataExtension extends BaseExtension {
-  public static readonly EXTENSION_NAME = 'gpkg_metadata';
-  public static readonly EXTENSION_Metadata_AUTHOR = 'gpkg';
-  public static readonly EXTENSION_Metadata_NAME_NO_AUTHOR = 'metadata';
-  public static readonly EXTENSION_Metadata_DEFINITION = 'http://www.geopackage.org/spec/#extension_metadata';
+  public static readonly EXTENSION_NAME: string = 'gpkg_metadata';
+  public static readonly EXTENSION_Metadata_AUTHOR: string = 'gpkg';
+  public static readonly EXTENSION_Metadata_NAME_NO_AUTHOR: string = 'metadata';
+  public static readonly EXTENSION_Metadata_DEFINITION: string = 'http://www.geopackage.org/spec/#extension_metadata';
 
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);

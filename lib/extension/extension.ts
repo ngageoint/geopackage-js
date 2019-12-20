@@ -17,44 +17,44 @@ export default class Extension {
    * is required for the entire GeoPackage. SHALL NOT be NULL when the
    * column_name is not NULL.
    */
-  table_name: String;
+  table_name: string;
     /**
    * Name of the column that requires the extension. When NULL, the extension
    * is required for the entire table.
    */
-  column_name: String;
+  column_name: string;
   /**
   * The case sensitive name of the extension that is required, in the form
   * <author>_<extension_name>.
   */
-  extension_name: String;
+  extension_name: string;
   /**
    * Definition of the extension in the form specfied by the template in
    * GeoPackage Extension Template (Normative) or reference thereto.
    */
-  definition: String;
+  definition: string;
   /**
    * Indicates scope of extension effects on readers / writers: read-write or
    * write-only in lowercase.
    */
-  scope: String;
+  scope: string;
 
-  setExtensionName(author: String, extensionName: String) {
+  setExtensionName(author: string, extensionName: string) {
     this.extension_name = Extension.buildExtensionName(author, extensionName);
   }
-  getAuthor(): String {
+  getAuthor(): string {
     return Extension.getAuthorWithExtensionName(this.extension_name);
   }
-  getExtensionNameNoAuthor(): String {
+  getExtensionNameNoAuthor(): string {
     return Extension.getExtensionNameNoAuthor(this.extension_name);
   }
-  static buildExtensionName(author: String, extensionName: String): String {
+  static buildExtensionName(author: string, extensionName: string): string {
     return author + Extension.EXTENSION_NAME_DIVIDER + extensionName;
   }
-  static getAuthorWithExtensionName(extensionName: String): String {
+  static getAuthorWithExtensionName(extensionName: string): string {
     return extensionName.split(Extension.EXTENSION_NAME_DIVIDER)[0];
   }
-  static getExtensionNameNoAuthor(extensionName: String): String {
+  static getExtensionNameNoAuthor(extensionName: string): string {
     return extensionName.slice(extensionName.indexOf(Extension.EXTENSION_NAME_DIVIDER) + 1);
   }
 }

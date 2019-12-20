@@ -2,7 +2,7 @@
  * @memberOf module:extension/style
  * @class IconDao
  */
-import MediaDao from '../relatedTables/mediaDao';
+import {MediaDao} from '../relatedTables/mediaDao';
 import IconRow from './iconRow';
 
 /**
@@ -12,7 +12,7 @@ import IconRow from './iconRow';
  * @param  {string} table table name
  * @constructor
  */
-export default class IconDao extends MediaDao<IconRow> {
+export class IconDao extends MediaDao<IconRow> {
   constructor(geoPackage, table) {
     super(geoPackage, table);
     this.mediaTable = table;

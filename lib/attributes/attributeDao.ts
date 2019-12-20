@@ -1,11 +1,12 @@
 /**
  * @module attributes/attributeDao
  */
-import UserDao from '../user/userDao';
+import {UserDao} from '../user/userDao';
 import GeoPackage from '../geoPackage';
 import AttributeTable from './attributeTable'
 import AttributeRow from './attributeRow';
 import Contents from '../core/contents/contents';
+import ColumnValues from '../dao/columnValues';
 /**
  * Attribute DAO for reading attribute user data tables
  * @class AttributeDao
@@ -13,7 +14,7 @@ import Contents from '../core/contents/contents';
  * @param  {module:geoPackage~GeoPackage} geoPackage              geopackage object
  * @param  {module:attributes/attributeTable~AttributeTable} table           attribute table
  */
-export default class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> {
+export class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> {
   /**
    * Contents of this AttributeDao
    * @member {module:core/contents~Contents}
@@ -33,14 +34,14 @@ export default class AttributeDao<T extends AttributeRow> extends UserDao<Attrib
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:attributes/attributeRow~AttributeRow}             attribute row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: string[], values: any[]): AttributeRow {
     return new AttributeRow(this.table, columnTypes, values);
   }
   /**
    * Create a new attribute row
    * @return {module:attributes/attributeRow~AttributeRow} attribute row
    */
-  newRow() {
+  newRow(): AttributeRow {
     return new AttributeRow(this.table);
   }
 }

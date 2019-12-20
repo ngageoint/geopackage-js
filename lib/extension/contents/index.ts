@@ -5,8 +5,8 @@
 import BaseExtension from '../baseExtension';
 import GeoPackage from '../../geoPackage';
 import Extension from '../extension';
-import ContentsIdDao from './contentsIdDao';
-import ContentsDao from '../../core/contents/contentsDao';
+import {ContentsIdDao} from './contentsIdDao';
+import {ContentsDao} from '../../core/contents/contentsDao';
 import Contents from '../../core/contents/contents';
 import ContentsId from './contentsId';
 
@@ -15,10 +15,10 @@ import ContentsId from './contentsId';
  */
 export default class ContentsIdExtension extends BaseExtension {
 
-  public static readonly EXTENSION_NAME = 'nga_contents_id';
-  public static readonly EXTENSION_AUTHOR = 'nga';
-  public static readonly EXTENSION_NAME_NO_AUTHOR = 'contents_id';
-  public static readonly EXTENSION_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/contents-id.html';
+  public static readonly EXTENSION_NAME: string  = 'nga_contents_id';
+  public static readonly EXTENSION_AUTHOR: string  = 'nga';
+  public static readonly EXTENSION_NAME_NO_AUTHOR: string  = 'contents_id';
+  public static readonly EXTENSION_DEFINITION: string  = 'http://ngageoint.github.io/GeoPackage/docs/extensions/contents-id.html';
 
   contentsIdDao: ContentsIdDao;
   constructor(geoPackage: GeoPackage) {
@@ -29,11 +29,10 @@ export default class ContentsIdExtension extends BaseExtension {
 	 * Get or create the contents id extension
 	 * @return {Promise}
 	 */
-  getOrCreateExtension(): Promise<Extension> {
-    return this.getOrCreate(ContentsIdExtension.EXTENSION_NAME, null, null, ContentsIdExtension.EXTENSION_DEFINITION, Extension.READ_WRITE)
-      .then(function () {
-        return this.contentsIdDao.createTable();
-      }.bind(this));
+  async getOrCreateExtension(): Promise<Extension> {
+    let extension = await this.getOrCreate(ContentsIdExtension.EXTENSION_NAME, null, null, ContentsIdExtension.EXTENSION_DEFINITION, Extension.READ_WRITE)
+    await this.contentsIdDao.createTable();
+    return extension;
   }
   /**
 	 * Get the ContentsIdDao

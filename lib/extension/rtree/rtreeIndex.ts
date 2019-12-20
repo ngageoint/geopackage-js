@@ -1,8 +1,8 @@
 import GeoPackage from "../../geoPackage";
 import BaseExtension from '../baseExtension';
 import Extension from '../extension';
-import RTreeIndexDao from './rtreeIndexDao'
-import FeatureDao from '../../features/user/featureDao'
+import {RTreeIndexDao} from './rtreeIndexDao'
+import {FeatureDao} from '../../features/user/featureDao'
 import EnvelopeBuilder from '../../geom/envelopeBuilder'
 import { GeometryData } from '../../geom/geometryData'
 /**
@@ -17,7 +17,7 @@ export default class RTreeIndex extends BaseExtension {
   columnName: any;
   featureCount: any;
   rtreeIndexDao: any;
-  extensionExists: Boolean;
+  extensionExists: boolean;
   constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
     super(geoPackage);
     this.extensionName = Extension.buildExtensionName(RTreeIndexDao.EXTENSION_RTREE_INDEX_AUTHOR, RTreeIndexDao.EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR);

@@ -22,9 +22,8 @@ export default class UserTableReader {
   table_name: string;
   requiredColumns: any;
   /**
-   * 
-   * @param {string} tableName name of the table
-   * @param {string[]} [requiredColumns] array of the required column nammes
+   * @param tableName name of the table
+   * @param requiredColumns array of the required column nammes
    */
   constructor(tableName: string, requiredColumns?: string[]) {
     // eslint-disable-next-line camelcase

@@ -1,4 +1,4 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 
 import ColumnValues from '../../dao/columnValues';
 import MetadataReference from './metadataReference';
@@ -7,7 +7,7 @@ import MetadataReference from './metadataReference';
  * @class
  * @extends Dao
  */
-export default class MetadataReferenceDao extends Dao<MetadataReference> {
+export class MetadataReferenceDao extends Dao<MetadataReference> {
   public static readonly TABLE_NAME = "gpkg_metadata_reference";
   public static readonly COLUMN_REFERENCE_SCOPE = "reference_scope";
   public static readonly COLUMN_TABLE_NAME = "table_name";

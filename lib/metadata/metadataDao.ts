@@ -3,7 +3,7 @@
  * @module metadata
  * @see module:dao/dao
  */
-import Dao from '../dao/dao';
+import {Dao} from '../dao/dao';
 
 import { Metadata } from './metadata';
 
@@ -12,7 +12,7 @@ import { Metadata } from './metadata';
  * @class
  * @extends Dao
  */
-export default class MetadataDao extends Dao<Metadata> {
+export class MetadataDao extends Dao<Metadata> {
   public static readonly TABLE_NAME = "gpkg_metadata";
   public static readonly COLUMN_ID = "id";
   public static readonly COLUMN_MD_SCOPE = "md_scope";

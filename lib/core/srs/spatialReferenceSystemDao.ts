@@ -1,4 +1,4 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 
 import SpatialReferenceSystem from './spatialReferenceSystem';
 /**
@@ -7,64 +7,61 @@ import SpatialReferenceSystem from './spatialReferenceSystem';
  * @class SpatialReferenceSystemDao
  * @param {module:geoPackage~GeoPackage} geoPackage The GeoPackage object
  */
-export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
+export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
   /**
    * Spatial Reference System Table Name
    * @type {String}
    */
-  public static readonly TABLE_NAME = 'gpkg_spatial_ref_sys';
+  public static readonly TABLE_NAME: string = 'gpkg_spatial_ref_sys';
 
   /**
    * srsName field name
    * @type {String}
    */
-  public static readonly COLUMN_SRS_NAME = "srs_name";
+  public static readonly COLUMN_SRS_NAME: string = "srs_name";
 
   /**
    * srsId field name
    * @type {String}
    */
-  public static readonly COLUMN_SRS_ID = "srs_id";
+  public static readonly COLUMN_SRS_ID: string = "srs_id";
 
   /**
    * id field name, srsId
    * @type {String}
    */
-  public static readonly COLUMN_ID = SpatialReferenceSystemDao.COLUMN_SRS_ID;
+  public static readonly COLUMN_ID: string = SpatialReferenceSystemDao.COLUMN_SRS_ID;
 
   /**
    * organization field name
    * @type {String}
    */
-  public static readonly COLUMN_ORGANIZATION = "organization";
+  public static readonly COLUMN_ORGANIZATION: string = "organization";
 
   /**
    * organizationCoordsysId field name
    * @type {String}
    */
-  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID = "organization_coordsys_id";
+  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID: string = "organization_coordsys_id";
 
   /**
    * definition field name
    * @type {String}
    */
-  public static readonly COLUMN_DEFINITION = "definition";
+  public static readonly COLUMN_DEFINITION: string = "definition";
 
   /**
    * description field name
    * @type {String}
    */
-  public static readonly COLUMN_DESCRIPTION = "description";
+  public static readonly COLUMN_DESCRIPTION: string = "description";
 
-  readonly idColumns = [SpatialReferenceSystemDao.COLUMN_SRS_ID];
+  readonly idColumns: string[] = [SpatialReferenceSystemDao.COLUMN_SRS_ID];
   /**
    * Table Name
    * @type {String}
    */
-  readonly gpkgTableName = SpatialReferenceSystemDao.TABLE_NAME;
-  constructor(geoPackage) {
-    super(geoPackage);
-  }
+  readonly gpkgTableName: string = SpatialReferenceSystemDao.TABLE_NAME;
   /**
    * Create a new SpatialReferenceSystem object
    * @return {module:core/srs~SpatialReferenceSystem}
@@ -92,10 +89,10 @@ export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSyste
    * Requirement 11)
    * @return {Number} id of the created row
    */
-  createWgs84(): any {
+  createWgs84(): number {
     var srs = this.getBySrsId(4326);
     if (srs) {
-      return srs;
+      return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'WGS 84 geodetic';
@@ -114,10 +111,10 @@ export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSyste
    * Requirement 11)
    * @return {Number} id of the created row
    */
-  createUndefinedCartesian(): any  {
+  createUndefinedCartesian(): number  {
     var srs = this.getBySrsId(-1);
     if (srs) {
-      return srs;
+      return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'Undefined cartesian SRS';
@@ -136,10 +133,10 @@ export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSyste
    * Requirement 11)
    * @return {Number} id of the created row
    */
-  createUndefinedGeographic(): any  {
+  createUndefinedGeographic(): number  {
     var srs = this.getBySrsId(0);
     if (srs) {
-      return srs;
+      return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'Undefined geographic SRS';
@@ -158,10 +155,10 @@ export default class SpatialReferenceSystemDao extends Dao<SpatialReferenceSyste
    * exist
    * @return {Number} id of the created row
    */
-  createWebMercator(): any  {
+  createWebMercator(): number  {
     var srs = this.getBySrsId(3857);
     if (srs) {
-      return srs;
+      return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'WGS 84 / Pseudo-Mercator';

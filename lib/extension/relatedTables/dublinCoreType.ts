@@ -13,44 +13,39 @@ export class DublinCoreType {
    * the resource.
    * @type {Object}
    */
-  public static readonly DATE = new DublinCoreType('date');
+  public static readonly DATE: DublinCoreType = new DublinCoreType('date');
 
   /**
    * An account of the resource.
    * @type {Object}
    */
-  public static readonly DESCRIPTION = new DublinCoreType('description');
+  public static readonly DESCRIPTION: DublinCoreType = new DublinCoreType('description');
 
   /**
    * The file format, physical medium, or dimensions of the resource.
    * @type {Object}
    */
-  public static readonly FORMAT = new DublinCoreType('format', ['content_type']);
+  public static readonly FORMAT: DublinCoreType = new DublinCoreType('format', ['content_type']);
 
   /**
    * An unambiguous reference to the resource within a given context.
    * @type {Object}
    */
-  public static readonly IDENTIFIER = new DublinCoreType('identifier', ['id']);
+  public static readonly IDENTIFIER: DublinCoreType = new DublinCoreType('identifier', ['id']);
 
   /**
    * A related resource from which the described resource is derived.
    * @type {Object}
    */
-  public static readonly SOURCE = new DublinCoreType('source');
+  public static readonly SOURCE: DublinCoreType = new DublinCoreType('source');
 
   /**
    * A name given to the resource.
    * @type {Object}
    */
-  public static readonly TITLE = new DublinCoreType('title');
+  public static readonly TITLE: DublinCoreType = new DublinCoreType('title');
 
-  name: string;
-  synonyms: string[];
-
-  constructor(name: string, synonyms?: string[]) {
-    this.name = name;
-    this.synonyms = synonyms;
+  constructor(public name: string, public synonyms?: string[]) {
   }
 
   /**

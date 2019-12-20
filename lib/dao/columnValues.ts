@@ -8,18 +8,14 @@ import UserColumn from "../user/userColumn";
  * @class ColumnValues
  */
 export default class ColumnValues {
-  values: { [key: string]: UserColumn | any};
-  columns: string[];
-  constructor() {
-    this.values = {};
-    this.columns = [];
-  }
+  values: { [key: string]: UserColumn | any} = {};
+  columns: string[] = [];
   /**
    * adds a column to the structure
    * @param  {string} columnName  name of column to add
    * @param  {module:user/userColumn~UserColumn} column column to add
    */
-  addColumn(columnName: string, column: UserColumn | any) {
+  addColumn(columnName: string, column: UserColumn | any): void {
     this.columns.push(columnName);
     this.values[columnName] = column;
   }

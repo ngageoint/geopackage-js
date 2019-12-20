@@ -2,8 +2,8 @@
  * @memberOf module:extension/style
  * @class StyleMappingDao
  */
-import UserMappingDao from '../relatedTables/userMappingDao';
-import UserCustomDao from '../../user/custom/userCustomDao';
+import {UserMappingDao} from '../relatedTables/userMappingDao';
+import {UserCustomDao} from '../../user/custom/userCustomDao';
 import GeoPackage from '../../geoPackage';
 import StyleMappingTable from './styleMappingTable';
 import UserMappingTable from '../relatedTables/userMappingTable';
@@ -17,7 +17,7 @@ import StyleMappingRow from './styleMappingRow';
  * @param {StyleMappingTable} [styleMappingTable]
  * @constructor
  */
-export default class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
+export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
   constructor(userCustomDao: UserCustomDao<StyleMappingRow>, geoPackage: GeoPackage, styleMappingTable?: StyleMappingTable) {
     super(userCustomDao, geoPackage, styleMappingTable || new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));
   }

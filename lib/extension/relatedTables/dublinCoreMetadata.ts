@@ -19,7 +19,7 @@ export class DublinCoreMetadata {
    * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
    * @return {Boolean}
    */
-  public static hasColumn(table: UserTable | UserRow, type: DublinCoreType) {
+  public static hasColumn(table: UserTable | UserRow, type: DublinCoreType): boolean {
     var userTable: UserTable;
     if (table instanceof UserRow) {
       userTable = table.table;
@@ -54,7 +54,7 @@ export class DublinCoreMetadata {
     } else {
       userTable = table;
     }
-    var column;
+    var column: UserColumn;
     var hasColumn = userTable.hasColumn(type.name);
     if (hasColumn) {
       column = userTable.getColumnWithColumnName(type.name);

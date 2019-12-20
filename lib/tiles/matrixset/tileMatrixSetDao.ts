@@ -1,4 +1,4 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 import GeoPackage from '../../geoPackage';
 
 import { TileMatrixSet } from './tileMatrixSet';
@@ -10,7 +10,7 @@ import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
  * @class TileMatrixSetDao
  * @extends Dao
  */
-export default class TileMatrixSetDao extends Dao<TileMatrixSet> {
+export class TileMatrixSetDao extends Dao<TileMatrixSet> {
   public static readonly TABLE_NAME = "gpkg_tile_matrix_set";
   public static readonly COLUMN_PK = "table_name";
   public static readonly COLUMN_TABLE_NAME = "table_name";

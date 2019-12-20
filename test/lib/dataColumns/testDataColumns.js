@@ -1,7 +1,7 @@
 import { GeoPackage as GeoPackageAPI, TableCreator } from '../../../.'
 import { default as testSetup } from '../../fixtures/testSetup'
-import DataColumnsDao from '../../../lib/dataColumns/dataColumnsDao';
-import DataColumnConstraintsDao from '../../../lib/dataColumnConstraints/dataColumnConstraintsDao';
+import {DataColumnsDao} from '../../../lib/dataColumns/dataColumnsDao';
+import {DataColumnConstraintsDao} from '../../../lib/dataColumnConstraints/dataColumnConstraintsDao';
 
 var DataColumns = require('../../../lib/dataColumns/dataColumns').default
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').default

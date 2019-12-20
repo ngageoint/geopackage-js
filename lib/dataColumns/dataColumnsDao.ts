@@ -1,6 +1,7 @@
-import Dao from '../dao/dao'
-import ContentsDao from '../core/contents/contentsDao'
+import {Dao} from '../dao/dao'
+import {ContentsDao} from '../core/contents/contentsDao'
 import DataColumns from './dataColumns'
+import Contents from '../core/contents/contents';
 /**
  * DataColumns module.
  * @module dataColumns
@@ -14,26 +15,26 @@ import DataColumns from './dataColumns'
  * @extends Dao
  * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
-export default class DataColumnsDao extends Dao<DataColumns> {
-  public static readonly TABLE_NAME = "gpkg_data_columns";
-  public static readonly COLUMN_PK1 = "table_name";
-  public static readonly COLUMN_PK2 = "column_name";
-  public static readonly COLUMN_TABLE_NAME = "table_name";
-  public static readonly COLUMN_COLUMN_NAME = "column_name";
-  public static readonly COLUMN_NAME = "name";
-  public static readonly COLUMN_TITLE = "title";
-  public static readonly COLUMN_DESCRIPTION = "description";
-  public static readonly COLUMN_MIME_TYPE = "mime_type";
-  public static readonly COLUMN_CONSTRAINT_NAME = "constraint_name";
+export class DataColumnsDao extends Dao<DataColumns> {
+  public static readonly TABLE_NAME: string  = "gpkg_data_columns";
+  public static readonly COLUMN_PK1: string  = "table_name";
+  public static readonly COLUMN_PK2: string  = "column_name";
+  public static readonly COLUMN_TABLE_NAME: string  = "table_name";
+  public static readonly COLUMN_COLUMN_NAME: string  = "column_name";
+  public static readonly COLUMN_NAME: string  = "name";
+  public static readonly COLUMN_TITLE: string  = "title";
+  public static readonly COLUMN_DESCRIPTION: string  = "description";
+  public static readonly COLUMN_MIME_TYPE: string  = "mime_type";
+  public static readonly COLUMN_CONSTRAINT_NAME: string  = "constraint_name";
 
-  readonly gpkgTableName = DataColumnsDao.TABLE_NAME;
-  readonly idColumns = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
+  readonly gpkgTableName: string  = DataColumnsDao.TABLE_NAME;
+  readonly idColumns: string[]  = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
 
   /**
    * Creates a new {module:dataColumns~DataColumns} object
    * @return {module:dataColumns~DataColumns}
    */
-  createObject() {
+  createObject(): DataColumns {
     return new DataColumns();
   }
   /**
@@ -41,7 +42,7 @@ export default class DataColumnsDao extends Dao<DataColumns> {
    * @param  {module:dataColumns~DataColumns} dataColumns data columns
    * @return {module:core/contents~Contents}             contents
    */
-  getContents(dataColumns) {
+  getContents(dataColumns: DataColumns): Contents {
     var cd = new ContentsDao(this.geoPackage);
     return cd.queryForId(dataColumns.table_name);
   }
@@ -50,7 +51,7 @@ export default class DataColumnsDao extends Dao<DataColumns> {
    * @param  {String} constraintName     constraint name
    * @return {Iterable.<Object>} iterator of database objects
    */
-  queryByConstraintName(constraintName) {
+  queryByConstraintName(constraintName: string): IterableIterator<any> {
     return this.queryForEach(DataColumnsDao.COLUMN_CONSTRAINT_NAME, constraintName);
   }
   /**
@@ -59,7 +60,7 @@ export default class DataColumnsDao extends Dao<DataColumns> {
    * @param  {String} columnName column name
    * @return {module:dataColumns~DataColumns} 
    */
-  getDataColumns(tableName, columnName) {
+  getDataColumns(tableName: string, columnName: string): DataColumns {
     var exists = this.isTableExists();
     if (!exists) {
       return;

@@ -1,6 +1,6 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 import RTreeIndex from './rtreeIndex';
-import FeatureDao from '../../features/user/featureDao';
+import {FeatureDao} from '../../features/user/featureDao';
 import GeoPackage from '../../geoPackage';
 import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
 /**
@@ -13,7 +13,7 @@ import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
  * @class
  * @extends Dao
  */
-export default class RTreeIndexDao extends Dao<RTreeIndex> {
+export class RTreeIndexDao extends Dao<RTreeIndex> {
 
   public static readonly TABLE_NAME = "rtree";
   public static readonly COLUMN_TABLE_NAME = RTreeIndexDao.TABLE_NAME + ".table_name";
@@ -32,7 +32,7 @@ export default class RTreeIndexDao extends Dao<RTreeIndex> {
   public static readonly EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR = 'rtree_index';
   public static readonly EXTENSION_RTREE_INDEX_DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
 
-  readonly gpkgTableName = RTreeIndexDao.TABLE_NAME;
+  gpkgTableName = RTreeIndexDao.TABLE_NAME;
   featureDao: FeatureDao;
 
   constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {

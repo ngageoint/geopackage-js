@@ -14,7 +14,7 @@ export default class WebPExtension extends BaseExtension {
   public static readonly EXTENSION_WEBP_AUTHOR = 'gpkg';
   public static readonly EXTENSION_WEBP_NAME_NO_AUTHOR = 'webp';
   public static readonly EXTENSION_WEBP_DEFINITION = 'http://www.geopackage.org/spec/#extension_webp';
-  constructor(geoPackage: GeoPackage, tableName: String) {
+  constructor(geoPackage: GeoPackage, tableName: string) {
     super(geoPackage);
     this.tableName = tableName;
   }

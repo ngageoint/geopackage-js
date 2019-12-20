@@ -2,10 +2,12 @@
  * SimpleAttributesDao module.
  * @module extension/relatedTables
  */
-import UserDao from '../../user/userDao';
+import {UserDao} from '../../user/userDao';
 import SimpleAttributesTable from './simpleAttributesTable'
 import SimpleAttributesRow from './simpleAttributesRow'
 import GeoPackage from '../../geoPackage';
+import { DataTypes } from '../../..';
+import ColumnValues from '../../dao/columnValues';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables
@@ -14,18 +16,16 @@ import GeoPackage from '../../geoPackage';
  * @param  {module:db/geoPackageConnection~GeoPackageConnection} connection        connection
  * @param  {string} table table name
  */
-export default class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<SimpleAttributesRow> {
-  simpleAttributesTable: SimpleAttributesTable;
-  
-  constructor(geoPackage: GeoPackage, table: SimpleAttributesTable) {
-    super(geoPackage, table);
-    this.simpleAttributesTable = table;
+export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<SimpleAttributesRow> {
+ 
+  constructor(geoPackage: GeoPackage, public simpleAttributesTable: SimpleAttributesTable) {
+    super(geoPackage, simpleAttributesTable);
   }
   /**
    * Create a new {module:extension/relatedTables~SimpleAttributesRow}
    * @return {module:extension/relatedTables~SimpleAttributesRow}
    */
-  newRow() {
+  newRow(): SimpleAttributesRow {
     return new SimpleAttributesRow(this.simpleAttributesTable);
   }
   /**
@@ -34,14 +34,14 @@ export default class SimpleAttributesDao<T extends SimpleAttributesRow> extends 
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~SimpleAttributesRow}             simple attributes row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: DataTypes[], values: ColumnValues[]): SimpleAttributesRow {
     return new SimpleAttributesRow(this.simpleAttributesTable, columnTypes, values);
   }
   /**
    * Gets the {module:extension/relatedTables~SimpleAttributesTable}
    * @return {module:extension/relatedTables~SimpleAttributesTable}
    */
-  getTable() {
+  getTable(): SimpleAttributesTable {
     return this.simpleAttributesTable;
   }
   /**
@@ -49,7 +49,7 @@ export default class SimpleAttributesDao<T extends SimpleAttributesRow> extends 
    * @param  {Number[]} ids array of ids
    * @return {module:extension/relatedTables~SimpleAttributesRow[]}
    */
-  getRows(ids) {
+  getRows(ids: number[]): SimpleAttributesRow[] {
     var simpleAttributesRows = [];
     for (var i = 0; i < ids.length; i++) {
       var row = this.queryForId(ids[i]);

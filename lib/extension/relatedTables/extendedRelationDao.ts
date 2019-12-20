@@ -1,4 +1,4 @@
-import Dao from '../../dao/dao';
+import {Dao} from '../../dao/dao';
 import ColumnValues from '../../dao/columnValues'
 import ExtendedRelation from './extendedRelation';
 
@@ -7,23 +7,23 @@ import ExtendedRelation from './extendedRelation';
  * @class ExtendedRelationDao
  * @extends Dao
  */
-export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
-  public static readonly TABLE_NAME = 'gpkgext_relations';
-  public static readonly COLUMN_ID = ExtendedRelationDao.TABLE_NAME + '.id';
-  public static readonly COLUMN_BASE_TABLE_NAME = ExtendedRelationDao.TABLE_NAME + '.base_table_name';
-  public static readonly COLUMN_BASE_PRIMARY_COLUMN = ExtendedRelationDao.TABLE_NAME + '.base_primary_column';
-  public static readonly COLUMN_RELATED_TABLE_NAME = ExtendedRelationDao.TABLE_NAME + '.related_table_name';
-  public static readonly COLUMN_RELATED_PRIMARY_COLUMN = ExtendedRelationDao.TABLE_NAME + '.related_primary_column';
-  public static readonly COLUMN_RELATION_NAME = ExtendedRelationDao.TABLE_NAME + '.relation_name';
-  public static readonly COLUMN_MAPPING_TABLE_NAME = ExtendedRelationDao.TABLE_NAME + '.mapping_table_name';
+export class ExtendedRelationDao extends Dao<ExtendedRelation> {
+  public static readonly TABLE_NAME: string = 'gpkgext_relations';
+  public static readonly COLUMN_ID: string = ExtendedRelationDao.TABLE_NAME + '.id';
+  public static readonly COLUMN_BASE_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.base_table_name';
+  public static readonly COLUMN_BASE_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.base_primary_column';
+  public static readonly COLUMN_RELATED_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.related_table_name';
+  public static readonly COLUMN_RELATED_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.related_primary_column';
+  public static readonly COLUMN_RELATION_NAME: string = ExtendedRelationDao.TABLE_NAME + '.relation_name';
+  public static readonly COLUMN_MAPPING_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.mapping_table_name';
 
-  readonly gpkgTableName = ExtendedRelationDao.TABLE_NAME;
-  readonly idColumns = ['id'];
+  readonly gpkgTableName: string = ExtendedRelationDao.TABLE_NAME;
+  readonly idColumns: string[] = ['id'];
   /**
    * Create a {module:extension/relatedTables~ExtendedRelation} object
    * @return {module:extension/relatedTables~ExtendedRelation}
    */
-  createObject(result) {
+  createObject(result?: any): ExtendedRelation {
     var er = new ExtendedRelation();
     if (result) {
       er.base_table_name = result.base_table_name;
@@ -41,7 +41,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * Create the necessary tables for this dao
    * @return {Promise}
    */
-  createTable() {
+  createTable(): Promise<boolean> {
     var tc = this.geoPackage.getTableCreator();
     return tc.createExtendedRelations();
   }
@@ -49,8 +49,8 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * Get all the base table names
    * @return {string[]}
    */
-  getBaseTables() {
-    var baseTables = [];
+  getBaseTables(): string[] {
+    var baseTables: string[] = [];
     var baseTableColumns = this.queryForColumns('base_table_name');
     for (var i = 0; i < baseTableColumns.length; i++) {
       baseTables.push(baseTableColumns[i].base_table_name);
@@ -61,7 +61,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * Get all the related table names
    * @return {string[]}
    */
-  getRelatedTables() {
+  getRelatedTables(): string[] {
     var relatedTables = [];
     var relatedTableColumns = this.queryForColumns('related_table_name');
     for (var i = 0; i < relatedTableColumns.length; i++) {
@@ -74,7 +74,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param  {string} baseTable base table name
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getBaseTableRelations(baseTable) {
+  getBaseTableRelations(baseTable: string): ExtendedRelation[] {
     var results = [];
     for (var relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTable)) {
       results.push(this.createObject(relation));
@@ -86,7 +86,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param  {string} relatedTable related table name
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getRelatedTableRelations(relatedTable) {
+  getRelatedTableRelations(relatedTable: string): ExtendedRelation[] {
     var results = [];
     for (var relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTable)) {
       results.push(this.createObject(relation));
@@ -99,7 +99,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param  {string} name      relation name
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getBaseTableRelationsWithName(baseTable, name) {
+  getBaseTableRelationsWithName(baseTable: string, name: string): ExtendedRelation[] {
     var fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTable);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATION_NAME, name);
@@ -116,7 +116,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param  {string} table table name to query for
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getTableRelations(table) {
+  getTableRelations(table: string): ExtendedRelation[] {
     var fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, table);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, table);
@@ -135,7 +135,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param {String} [mappingTableName] mapping table name
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  getRelations(baseTableName, relatedTableName, mappingTableName) {
+  getRelations(baseTableName?: string, relatedTableName?: string, mappingTableName?: string): ExtendedRelation[] {
     var fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTableName);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTableName);
@@ -153,7 +153,7 @@ export default class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @param  {string} mappingTableName name of the mapping table
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
-  queryByMappingTableName(mappingTableName) {
+  queryByMappingTableName(mappingTableName: string): ExtendedRelation[] {
     var fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_MAPPING_TABLE_NAME, mappingTableName);
     var where = this.buildWhere(fields, 'and');

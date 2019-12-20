@@ -62,7 +62,6 @@
     "@types/pbf": "^3.0.2",
     "@types/proj4": "^2.5.0",
     "@types/source-map-support": "^0.5.0",
-    "@types/webpack-bundle-analyzer": "^2.13.3",
     "babel-polyfill": "^6.23.0",
     "browserify": "16.5.0",
     "browserify-css": "0.15.0",

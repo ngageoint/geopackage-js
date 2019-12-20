@@ -7,10 +7,12 @@ import BaseExtension from '../baseExtension';
 import GeoPackage from '../../geoPackage';
 import Extension from '../extension';
 import TableIndex from './tableIndex'
-import FeatureDao from'../../features/user/featureDao'
-import GeometryIndexDao from'./geometryIndexDao'
-import RTreeIndexDao from'../rtree/rtreeIndexDao'
+import {FeatureDao} from'../../features/user/featureDao'
+import {GeometryIndexDao} from'./geometryIndexDao'
+import {RTreeIndexDao} from'../rtree/rtreeIndexDao'
 import EnvelopeBuilder from '../../geom/envelopeBuilder'
+import { TableIndexDao } from './tableIndexDao';
+import { GeometryData, BoundingBox } from '../../..';
 
 /**
  * This class will either use the RTree index if it exists, or the
@@ -21,16 +23,16 @@ import EnvelopeBuilder from '../../geom/envelopeBuilder'
  * @extends BaseExtension
  */
 export default class FeatureTableIndex extends BaseExtension {
-  public static readonly EXTENSION_GEOMETRY_INDEX_AUTHOR = 'nga';
-  public static readonly EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR = 'geometry_index';
-  public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
+  public static readonly EXTENSION_GEOMETRY_INDEX_AUTHOR: string = 'nga';
+  public static readonly EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR: string = 'geometry_index';
+  public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
   progress: any;
-  featureDao: any;
-  tableName: any;
-  columnName: any;
-  tableIndexDao: any;
-  geometryIndexDao: any;
-  rtreeIndexDao: any;
+  featureDao: FeatureDao;
+  tableName: string;
+  columnName: string;
+  tableIndexDao: TableIndexDao;
+  geometryIndexDao: GeometryIndexDao;
+  rtreeIndexDao: RTreeIndexDao;
   rtreeIndex: RTreeIndex;
   rtreeIndexed: Boolean;
   constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
@@ -100,7 +102,7 @@ export default class FeatureTableIndex extends BaseExtension {
         if (!contents)
           return false;
         var lastChange = new Date(contents.last_change);
-        var tableIndex = this.tableIndexDao.queryForId(this.tableName);
+        var tableIndex: TableIndex = this.tableIndexDao.queryForId(this.tableName);
         if (!tableIndex || !tableIndex.last_indexed) {
           return false;
         }
@@ -120,35 +122,33 @@ export default class FeatureTableIndex extends BaseExtension {
    * Returns the feature table index extension for this table and column name if exists
    * @return {module:extension~Extension}
    */
-  getFeatureTableIndexExtension() {
-    return this.getExtension(this.extensionName, this.tableName, this.columnName);
+  getFeatureTableIndexExtension(): Extension {
+    return this.getExtension(this.extensionName, this.tableName, this.columnName)[0];
   }
   /**
    * Get or create the extension for this table name and column name
    * @return {module:extension~Extension}
    */
-  getOrCreateExtension() {
+  async getOrCreateExtension(): Promise<Extension> {
     return this.getOrCreate(this.extensionName, this.tableName, this.columnName, this.extensionDefinition, Extension.READ_WRITE);
   }
   /**
    * Get or create if needed the table index
    * @return {Promise<TableIndex>}
    */
-  getOrCreateTableIndex() {
+  async getOrCreateTableIndex(): Promise<TableIndex> {
     var tableIndex = this.getTableIndex();
     if (tableIndex)
-      return Promise.resolve(tableIndex);
-    return this.tableIndexDao.createTable()
-      .then(function () {
-        this.createTableIndex();
-        return this.getTableIndex();
-      }.bind(this));
+      return tableIndex;
+    await this.tableIndexDao.createTable();
+    this.createTableIndex();
+    return this.getTableIndex();
   }
   /**
    * Create the table index
    * @return {module:extension/index~TableIndex}
    */
-  createTableIndex() {
+  createTableIndex(): number {
     var ti = new TableIndex();
     ti.table_name = this.tableName;
     ti.last_indexed = new Date();
@@ -158,7 +158,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * Get the table index
    * @return {module:extension/index~TableIndex}
    */
-  getTableIndex() {
+  getTableIndex(): TableIndex {
     if (this.tableIndexDao.isTableExists()) {
       return this.tableIndexDao.queryForId(this.tableName);
     }
@@ -170,17 +170,15 @@ export default class FeatureTableIndex extends BaseExtension {
    * Clear the geometry indices or create the table if needed
    * @return {Promise} resolved when complete
    */
-  createOrClearGeometryIndicies() {
-    return this.geometryIndexDao.createTable()
-      .then(function () {
-        return this.clearGeometryIndicies();
-      }.bind(this));
+  async createOrClearGeometryIndicies(): Promise<number> {
+    await this.geometryIndexDao.createTable();
+    return this.clearGeometryIndicies();
   }
   /**
    * Clears the geometry indices
    * @return {Number} number of rows deleted
    */
-  clearGeometryIndicies() {
+  clearGeometryIndicies(): number {
     var where = this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
     var whereArgs = this.geometryIndexDao.buildWhereArgs(this.tableName);
     return this.geometryIndexDao.deleteWhere(where, whereArgs);
@@ -191,14 +189,14 @@ export default class FeatureTableIndex extends BaseExtension {
    * @return {Promise} resolved when complete
    */
   async indexTable(tableIndex: TableIndex): Promise<boolean> {
-    return new Promise(function (resolve, reject) {
-      setTimeout(function () {
+    return new Promise((resolve: Function, reject: Function) => {
+      setTimeout(() => {
         this.indexChunk(0, tableIndex, resolve, reject);
-      }.bind(this));
-    }.bind(this))
-      .then(function () {
-        return this.updateLastIndexed(tableIndex).changes === 1;
-      }.bind(this));
+      });
+    })
+    .then(() => {
+      return this.updateLastIndexed(tableIndex).changes === 1;
+    });
   }
   /**
    * Indexes a chunk of 100 rows
@@ -207,31 +205,30 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {Function} resolve    function to call when all chunks are indexed
    * @param  {Function} reject     called if there is an error
    */
-  indexChunk(page, tableIndex, resolve, reject) {
+  indexChunk(page: number, tableIndex: TableIndex, resolve: Function, reject: Function): void {
     var rows = this.featureDao.queryForChunk(100, page);
     if (rows.length) {
       this.progress('Indexing ' + (page * 100) + ' to ' + ((page + 1) * 100));
       console.log('Indexing ' + (page * 100) + ' to ' + ((page + 1) * 100));
-      rows.forEach(function (row) {
+      rows.forEach(row => {
         var fr = this.featureDao.getRow(row);
         this.indexRow(tableIndex, fr.getId(), fr.getGeometry());
-      }.bind(this));
-      setTimeout(function () {
+      });
+      setTimeout(() => {
         this.indexChunk(++page, tableIndex, resolve, reject);
-      }.bind(this));
-    }
-    else {
+      });
+    } else {
       resolve();
     }
   }
   /**
    * Indexes a row
-   * @param  {module:extension/index~TableIndex} tableIndex TableIndex`
+   * @param  {ableIndex} tableIndex TableIndex`
    * @param  {Number} geomId     id of the row
-   * @param  {module:geom/geometryData~GeometryData} geomData   GeometryData to index
+   * @param  {GeometryData} geomData   GeometryData to index
    * @return {Boolean} success
    */
-  indexRow(tableIndex, geomId, geomData) {
+  indexRow(tableIndex: TableIndex, geomId: number, geomData: GeometryData): boolean {
     if (!geomData)
       return false;
     var envelope = geomData.envelope;
@@ -254,7 +251,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {module:extension/index~TableIndex} tableIndex TableIndex
    * @return {Object} update status
    */
-  updateLastIndexed(tableIndex) {
+  updateLastIndexed(tableIndex: TableIndex): any {
     if (!tableIndex) {
       tableIndex = new TableIndex();
       tableIndex.table_name = this.tableName;
@@ -269,7 +266,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {string} projection  projection the boundingBox is in
    * @return {IterableIterator}
    */
-  queryWithBoundingBox(boundingBox, projection) {
+  queryWithBoundingBox(boundingBox: BoundingBox, projection: string): IterableIterator<any> {
     var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
     var envelope = projectedBoundingBox.buildEnvelope();
     return this.queryWithGeometryEnvelope(envelope);
@@ -279,7 +276,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {any} envelope envelope
    * @return {IterableIterator<any>}
    */
-  queryWithGeometryEnvelope(envelope) {
+  queryWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): IterableIterator<any> {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.queryWithGeometryEnvelope(envelope);
     }
@@ -293,7 +290,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {string} projection  projection the boundingBox is in
    * @return {Number}
    */
-  countWithBoundingBox(boundingBox, projection) {
+  countWithBoundingBox(boundingBox: BoundingBox, projection: string): number {
     var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
     var envelope = projectedBoundingBox.buildEnvelope();
     return this.countWithGeometryEnvelope(envelope);
@@ -303,7 +300,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {any} envelope envelope
    * @return {Number}
    */
-  countWithGeometryEnvelope(envelope) {
+  countWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): number {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.countWithGeometryEnvelope(envelope);
     }

@@ -1,6 +1,6 @@
 import { GeoPackage as GeoPackageAPI } from '../../..'
 
-var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').default
+var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
   , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix
   , should = require('chai').should()
   , path = require('path');
