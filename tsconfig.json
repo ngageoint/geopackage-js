@@ -11,7 +11,7 @@
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
-      "outDir": "./built",
+      "outDir": "built",
       "downlevelIteration": true,
       "noEmit": false,
       "noImplicitAny": false,
@@ -24,7 +24,6 @@
       , "./test"
   ],
   "exclude": [
-    //   "./test",
       "./lib/wkb"
   ],
   "typedocOptions": {
