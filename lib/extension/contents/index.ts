@@ -41,7 +41,7 @@ export default class ContentsIdExtension extends BaseExtension {
   getDao(): ContentsIdDao {
     return this.contentsIdDao;
   }
-  has(): Boolean {
+  has(): boolean {
     return this.hasExtension(ContentsIdExtension.EXTENSION_NAME, null, null) && this.contentsIdDao.isTableExists();
   }
   /**

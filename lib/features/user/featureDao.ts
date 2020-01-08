@@ -13,7 +13,13 @@ import {DataColumnsDao} from '../../dataColumns/dataColumnsDao';
 import FeatureRow from './featureRow';
 import DataTypes from '../../db/dataTypes'
 import { BoundingBox } from '../../boundingBox'
-import { Feature } from 'geojson';
+import { Feature, GeoJsonObject } from 'geojson';
+import GeometryColumns from '../columns/geometryColumns';
+import { MetadataDao } from '../../metadata/metadataDao';
+import GeoPackage from '../../geoPackage';
+import FeatureTable from './featureTable';
+import Contents from '../../core/contents/contents';
+import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -25,33 +31,29 @@ import { Feature } from 'geojson';
  * @param  {MetadataDao} metadataDao      metadata dao
  */
 export class FeatureDao extends UserDao<FeatureRow> {
-  geometryColumns: any;
-  metadataDao: any;
-  dataColumnsDao: any;
+  dataColumnsDao: DataColumnsDao;
   featureTableIndex: FeatureTableIndex;
   projection: any;
-  constructor(geoPackage, table, geometryColumns, metadataDao) {
+  constructor(geoPackage: GeoPackage, table: FeatureTable, public geometryColumns: GeometryColumns, public metadataDao: MetadataDao) {
     super(geoPackage, table);
-    this.geometryColumns = geometryColumns;
-    this.metadataDao = metadataDao;
     this.dataColumnsDao = new DataColumnsDao(geoPackage);
     this.featureTableIndex = new FeatureTableIndex(geoPackage, this);
     var dao = geoPackage.getGeometryColumnsDao();
     if (!dao.getContents(geometryColumns)) {
-      throw new Error('Geometry Columns ' + dao.getId(geometryColumns) + ' has null Contents');
+      throw new Error('Geometry Columns ' + geometryColumns.getId() + ' has null Contents');
     }
     if (!dao.getSrs(geometryColumns)) {
-      throw new Error('Geometry Columns ' + dao.getId(geometryColumns) + ' has null Spatial Reference System');
+      throw new Error('Geometry Columns ' + geometryColumns.getId() + ' has null Spatial Reference System');
     }
     this.projection = dao.getProjection(geometryColumns);
   }
-  createObject(results) {
+  createObject(results: any): FeatureRow {
     if (results) {
       return this.getRow(results);
     }
     return this.newRow();
   }
-  getContents() {
+  getContents(): Contents {
     var dao = this.geoPackage.getGeometryColumnsDao();
     return dao.getContents(this.geometryColumns);
   }
@@ -59,7 +61,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
    * Get the feature table
    * @return {FeatureTable} the feature table
    */
-  getFeatureTable() {
+  getFeatureTable(): FeatureTable {
     return this.table;
   }
   /**
@@ -68,61 +70,71 @@ export class FeatureDao extends UserDao<FeatureRow> {
    * @param  {Array} values      values
    * @return {FeatureRow}             feature row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: any[], values: any[]): FeatureRow {
     return new FeatureRow(this.getFeatureTable(), columnTypes, values);
   }
   /**
    * Create a new feature row
    * @return {FeatureRow} feature row
    */
-  newRow() {
+  newRow(): FeatureRow {
     return new FeatureRow(this.getFeatureTable());
   }
   /**
    * Get the geometry column name
    * @return {string} the geometry column name
    */
-  getGeometryColumnName() {
+  getGeometryColumnName(): string {
     return this.geometryColumns.column_name;
   }
   /**
    * Get the geometry types
    * @return {Number} well known binary geometry type
    */
-  getGeometryType() {
+  //TODO is this a string?
+  getGeometryType(): string {
     return this.geometryColumns.getGeometryType();
   }
-  getSrs() {
+  getSrs(): SpatialReferenceSystem {
     return this.geoPackage.getGeometryColumnsDao().getSrs(this.geometryColumns);
   }
   /**
    * Determine if the feature table is indexed
    * @returns {Boolean} indexed status of the table
    */
-  isIndexed() {
+  isIndexed(): boolean {
     return this.featureTableIndex.isIndexed();
   }
   /**
    * Query for count in bounding box
    * @param boundingBox
+   * @returns {Number}
+   */
+  countWebMercatorBoundingBox(boundingBox: BoundingBox): number {
+    return this.featureTableIndex.countWithBoundingBox(boundingBox, 'EPSG:3857');
+  }
+  /**
+   * Query for count in bounding box
+   * @param boundingBox
+   * @param projection
    * @returns {Number}}
    */
-  countWebMercatorBoundingBox(boundingBox) {
-    return this.featureTableIndex.countWithBoundingBox(boundingBox, 'EPSG:3857');
+  countInBoundingBox(boundingBox: BoundingBox, projection?: string) {
+    return this.featureTableIndex.countWithBoundingBox(boundingBox, projection);
   }
   /**
    * Fast query web mercator bounding box
    * @param {BoundingBox} boundingBox bounding box to query for
    * @returns {any}
    */
-  fastQueryWebMercatorBoundingBox(boundingBox) {
+  fastQueryWebMercatorBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
     var iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
     var thisgetRow = this.getRow.bind(this);
     return {
       [Symbol.iterator]() {
         return this;
       },
-      next: function () {
+      next: function (): IteratorResult<FeatureRow, any> {
         var nextRow = iterator.next();
         if (!nextRow.done) {
           var featureRow = thisgetRow(nextRow.value);
@@ -133,13 +145,14 @@ export class FeatureDao extends UserDao<FeatureRow> {
         }
         else {
           return {
+            value: undefined,
             done: true
           };
         }
       }
     };
   }
-  queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox) {
+  queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox: BoundingBox) {
     var srs = this.getSrs();
     var projection = this.projection;
     var iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
@@ -152,7 +165,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
       next: function () {
         var nextRow = iterator.next();
         if (!nextRow.done) {
-          var featureRow;
+          var featureRow: FeatureRow;
           var geometry;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
@@ -176,13 +189,79 @@ export class FeatureDao extends UserDao<FeatureRow> {
       }
     };
   }
+  fastQueryBoundingBox(boundingBox: BoundingBox, projection?: string) {
+    var iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, projection);
+    var thisgetRow = this.getRow.bind(this);
+  
+    return {
+      [Symbol.iterator]() {
+        return this;
+      },
+      next: function() {
+        var nextRow = iterator.next();
+        if (!nextRow.done) {
+          var featureRow = thisgetRow(nextRow.value);
+  
+          return {
+            value: featureRow,
+            done: false
+          };
+        } else {
+          return {
+            done: true
+          }
+        }
+      }
+    }
+  }
+  
+  queryIndexedFeaturesWithBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
+    var srs = this.getSrs();
+    var projection = this.projection;
+  
+    var iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, projection);
+    var thisgetRow = this.getRow.bind(this);
+    var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.projection);
+    return {
+      [Symbol.iterator]() {
+        return this;
+      },
+      next: function() {
+        var nextRow = iterator.next();
+        if (!nextRow.done) {
+          var featureRow;
+          var geometry;
+  
+          while(!nextRow.done && !geometry) {
+            featureRow = thisgetRow(nextRow.value);
+            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+            geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+            if (geometry) {
+              geometry.properties = featureRow.values;
+              return {
+                value: featureRow,
+                done: false
+              };
+            } else {
+              nextRow = iterator.next();
+            }
+          }
+        }
+        return {
+          done: true,
+          value: undefined
+        }
+      }
+    }
+  }
+
   /**
    * Calls geoJSONFeatureCallback with the geoJSON of each matched feature (always in 4326 projection)
    * @param  {BoundingBox} boundingBox        4326 bounding box to query
    * @param {Boolean} [skipVerification] do not verify if the feature actually exists in the box
    * @returns {any}
    */
-  queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox: BoundingBox, skipVerification = false): IterableIterator<Feature> {
+  queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox: BoundingBox, skipVerification: boolean = false): IterableIterator<Feature> {
     var columns = [];
     var columnMap = {};
     var srs = this.getSrs();
@@ -256,48 +335,12 @@ export class FeatureDao extends UserDao<FeatureRow> {
       }.bind(this)
     };
   }
-  queryIndexedFeaturesWithBoundingBox(boundingBox) {
-    var srs = this.getSrs();
-    var projection = this.projection;
-    var iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:4326');
-    var thisgetRow = this.getRow.bind(this);
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next: function () {
-        var nextRow = iterator.next();
-        if (!nextRow.done) {
-          var featureRow;
-          var geometry;
-          while (!nextRow.done && !geometry) {
-            featureRow = thisgetRow(nextRow.value);
-            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-            geometry = FeatureDao.verifyFeature(geometry, boundingBox);
-            if (geometry) {
-              geometry.properties = featureRow.values;
-              return {
-                value: featureRow,
-                done: false
-              };
-            }
-            else {
-              nextRow = iterator.next();
-            }
-          }
-        }
-        return {
-          done: true
-        };
-      }.bind(this)
-    };
-  }
-  getBoundingBox() {
+  getBoundingBox(): BoundingBox {
     var contents = this.getContents();
     return new BoundingBox(contents.min_x, contents.max_x, contents.min_y, contents.max_y);
   }
 
-  static reprojectFeature(featureRow, srs, projection) {
+  static reprojectFeature(featureRow: FeatureRow, srs: SpatialReferenceSystem, projection: string): GeoJsonObject {
     var geometry = featureRow.getGeometry().toGeoJSON();
     if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
       geometry = reproject.reproject(geometry, projection, 'EPSG:4326');
@@ -305,7 +348,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
     return geometry;
   }
   
-  static verifyFeature(geometry, boundingBox) {
+  static verifyFeature(geometry: any, boundingBox: BoundingBox) {
     try {
       if (geometry.type === 'Point') {
         return geometry;
@@ -323,7 +366,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
     }
   }
   
-  static verifyLineString(geometry, boundingBox) {
+  static verifyLineString(geometry: any, boundingBox: BoundingBox) {
     var intersect = LineIntersect(geometry, boundingBox.toGeoJSON().geometry);
     if (intersect.features.length) {
       return geometry;
@@ -332,7 +375,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
     }
   }
   
-  static verifyPolygon(geometry, boundingBox) {
+  static verifyPolygon(geometry: any, boundingBox: BoundingBox) {
     var polyIntersect = Intersect(geometry, boundingBox.toGeoJSON().geometry);
     if (polyIntersect) {
       return geometry;

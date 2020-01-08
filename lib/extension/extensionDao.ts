@@ -10,22 +10,22 @@ import { TableCreator } from '../db/tableCreator';
  * @extends Dao
  */
 export class ExtensionDao extends Dao<Extension> {
-  public static readonly TABLE_NAME = "gpkg_extensions";
-  public static readonly COLUMN_TABLE_NAME = "table_name";
-  public static readonly COLUMN_COLUMN_NAME = "column_name";
-  public static readonly COLUMN_EXTENSION_NAME = "extension_name";
-  public static readonly COLUMN_DEFINITION = "definition";
-  public static readonly COLUMN_SCOPE = "scope";
+  public static readonly TABLE_NAME: string = "gpkg_extensions";
+  public static readonly COLUMN_TABLE_NAME: string = "table_name";
+  public static readonly COLUMN_COLUMN_NAME: string = "column_name";
+  public static readonly COLUMN_EXTENSION_NAME: string = "extension_name";
+  public static readonly COLUMN_DEFINITION: string = "definition";
+  public static readonly COLUMN_SCOPE: string = "scope";
 
-  readonly gpkgTableName = ExtensionDao.TABLE_NAME;
-  readonly idColumns = [ExtensionDao.COLUMN_TABLE_NAME, ExtensionDao.COLUMN_COLUMN_NAME, ExtensionDao.COLUMN_EXTENSION_NAME];
+  readonly gpkgTableName: string = ExtensionDao.TABLE_NAME;
+  readonly idColumns: string[] = [ExtensionDao.COLUMN_TABLE_NAME, ExtensionDao.COLUMN_COLUMN_NAME, ExtensionDao.COLUMN_EXTENSION_NAME];
 
   /**
    * Creates an Extension object from the raw database row
    * @param {object} row raw database row
    * @returns {Extension}
    */
-  createObject(row) {
+  createObject(row: any): Extension {
     var e = new Extension();
     for (var key in row) {
       e[key] = row[key];
@@ -37,7 +37,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} extensionName extension name
    * @returns {Extension}
    */
-  queryByExtension(extensionName) {
+  queryByExtension(extensionName: string): Extension {
     var results = this.queryForAllEq(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     if (!results[0]) return;
     var e = this.createObject(results[0]);
@@ -48,7 +48,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} extensionName extension name
    * @returns {Extension[]}
    */
-  queryAllByExtension(extensionName) {
+  queryAllByExtension(extensionName: string): Extension[] {
     var extensions = [];
     for (var row of this.queryForAllEq(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName)) {
       var e = this.createObject(row);
@@ -62,7 +62,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} tableName table name
    * @returns {Extension[]}
    */
-  queryByExtensionAndTableName(extensionName, tableName) {
+  queryByExtensionAndTableName(extensionName: string, tableName: string): Extension[] {
     var values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
@@ -85,7 +85,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} columnName column name
    * @returns {Extension[]}
    */
-  queryByExtensionAndTableNameAndColumnName(extensionName, tableName, columnName) {
+  queryByExtensionAndTableNameAndColumnName(extensionName: string, tableName: string, columnName: string): Extension[] {
     var values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
@@ -100,7 +100,7 @@ export class ExtensionDao extends Dao<Extension> {
   /**
    * Creates the extensions table
    */
-  createTable() {
+  async createTable(): Promise<boolean> {
     var tc = new TableCreator(this.geoPackage);
     return tc.createExtensions();
   }
@@ -109,7 +109,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} extensionName extension name to delete
    * @returns {Number} Number of extensions deleted
    */
-  deleteByExtension(extensionName) {
+  deleteByExtension(extensionName: string): number {
     var values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     return this.deleteWhere(this.buildWhere(values, '='), this.buildWhereArgs(values));
@@ -120,7 +120,7 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {String} tableName table name to delete
    * @returns {Number} Number of extensions deleted
    */
-  deleteByExtensionAndTableName(extensionName, tableName) {
+  deleteByExtensionAndTableName(extensionName: string, tableName: string): number {
     var values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);

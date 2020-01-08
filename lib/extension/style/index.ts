@@ -1294,6 +1294,25 @@ export default class FeatureStyleExtension extends BaseExtension {
     this.deleteMapping(this.getStyleMappingDao(featureTable), featureId, geometryType);
   }
   /**
+   * Delete the style row and associated mappings by style row
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {module:extension/style.StyleRow} styleRow style row
+   */
+  deleteStyleAndMappingsByStyleRow (featureTable, styleRow) {
+    this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.getId())
+  }
+
+  /**
+   * Delete the style row and associated mappings by style row id
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} styleRowId style row id
+   */
+  deleteStyleAndMappingsByStyleRowId(featureTable, styleRowId) {
+    this.getStyleDao().deleteById(styleRowId)
+    this.getStyleMappingDao(featureTable).deleteByRelatedId(styleRowId)
+    this.getTableStyleMappingDao(featureTable).deleteByRelatedId(styleRowId)
+  }
+  /**
 	 * Delete all icons
 	 * @param {module:features/user/featureTable|String} featureTable feature table
 	 */
@@ -1353,6 +1372,25 @@ export default class FeatureStyleExtension extends BaseExtension {
 	 */
   deleteIcon(featureTable, featureId, geometryType) {
     this.deleteMapping(this.getIconMappingDao(featureTable), featureId, geometryType);
+  }
+  /**
+   * Delete the icon row and associated mappings by icon row
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {module:extension/style.IconRow} iconRow icon row
+   */
+  deleteIconAndMappingsByIconRow(featureTable, iconRow) {
+    this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.getId())
+  }
+
+  /**
+   * Delete the icon row and associated mappings by icon row id
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} iconRowId icon row id
+   */
+  deleteIconAndMappingsByIconRowId(featureTable, iconRowId) {
+    this.getIconDao().deleteById(iconRowId)
+    this.getIconMappingDao(featureTable).deleteByRelatedId(iconRowId)
+    this.getTableIconMappingDao(featureTable).deleteByRelatedId(iconRowId)
   }
   /**
 	 * Delete all style mappings

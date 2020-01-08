@@ -63,7 +63,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Object} results result to create the row from
    * @return {module:user/userRow~UserRow}         the user row
    */
-  getRow(results) {
+  getRow(results): any {
     var row = undefined;
     if (!this.table)
       return row;
@@ -88,7 +88,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:user/userRow~UserRow}             user row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes<T>(columnTypes, values): any {
     return new UserRow(this.table, columnTypes, values);
   }
   /**

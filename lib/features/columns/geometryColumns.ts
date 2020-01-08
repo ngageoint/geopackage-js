@@ -6,12 +6,12 @@ import SpatialReferenceSystem from "../../core/srs/spatialReferenceSystem";
  * @class GeometryColumns
  */
 export default class GeometryColumns {
-  public static readonly TABLE_NAME = "tableName";
-  public static readonly COLUMN_NAME = "columnName";
-  public static readonly GEOMETRY_TYPE_NAME = "geometryTypeName";
-  public static readonly SRS_ID = "srsId";
-  public static readonly Z = "z";
-  public static readonly M = "m";
+  public static readonly TABLE_NAME: string = "tableName";
+  public static readonly COLUMN_NAME: string = "columnName";
+  public static readonly GEOMETRY_TYPE_NAME: string = "geometryTypeName";
+  public static readonly SRS_ID: string = "srsId";
+  public static readonly Z: string = "z";
+  public static readonly M: string = "m";
   /**
      * Name of the table containing the geometry column
      * @member {string}
@@ -48,7 +48,10 @@ export default class GeometryColumns {
      * @member {byte}
      */
     m: any;
-  getGeometryType() {
+  getGeometryType(): string {
     return this.geometry_type_name;
+  }
+  getId(): string {
+    return `${this.table_name} ${this.column_name}`;
   }
 }

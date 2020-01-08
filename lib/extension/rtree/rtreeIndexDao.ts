@@ -15,22 +15,22 @@ import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
  */
 export class RTreeIndexDao extends Dao<RTreeIndex> {
 
-  public static readonly TABLE_NAME = "rtree";
-  public static readonly COLUMN_TABLE_NAME = RTreeIndexDao.TABLE_NAME + ".table_name";
-  public static readonly COLUMN_GEOM_ID = RTreeIndexDao.TABLE_NAME + ".geom_id";
-  public static readonly COLUMN_MIN_X = RTreeIndexDao.TABLE_NAME + ".minx";
-  public static readonly COLUMN_MAX_X = RTreeIndexDao.TABLE_NAME + ".maxx";
-  public static readonly COLUMN_MIN_Y = RTreeIndexDao.TABLE_NAME + ".miny";
-  public static readonly COLUMN_MAX_Y = RTreeIndexDao.TABLE_NAME + ".maxy";
-  public static readonly COLUMN_MIN_Z = RTreeIndexDao.TABLE_NAME + ".minz";
-  public static readonly COLUMN_MAX_Z = RTreeIndexDao.TABLE_NAME + ".maxz";
-  public static readonly COLUMN_MIN_M = RTreeIndexDao.TABLE_NAME + ".minm";
-  public static readonly COLUMN_MAX_M = RTreeIndexDao.TABLE_NAME + ".maxm";
+  public static readonly TABLE_NAME: string = "rtree";
+  public static readonly COLUMN_TABLE_NAME: string = RTreeIndexDao.TABLE_NAME + ".table_name";
+  public static readonly COLUMN_GEOM_ID: string = RTreeIndexDao.TABLE_NAME + ".geom_id";
+  public static readonly COLUMN_MIN_X: string = RTreeIndexDao.TABLE_NAME + ".minx";
+  public static readonly COLUMN_MAX_X: string = RTreeIndexDao.TABLE_NAME + ".maxx";
+  public static readonly COLUMN_MIN_Y: string = RTreeIndexDao.TABLE_NAME + ".miny";
+  public static readonly COLUMN_MAX_Y: string = RTreeIndexDao.TABLE_NAME + ".maxy";
+  public static readonly COLUMN_MIN_Z: string = RTreeIndexDao.TABLE_NAME + ".minz";
+  public static readonly COLUMN_MAX_Z: string = RTreeIndexDao.TABLE_NAME + ".maxz";
+  public static readonly COLUMN_MIN_M: string = RTreeIndexDao.TABLE_NAME + ".minm";
+  public static readonly COLUMN_MAX_M: string = RTreeIndexDao.TABLE_NAME + ".maxm";
 
-  public static readonly EXTENSION_NAME = 'gpkg_rtree_index';
-  public static readonly EXTENSION_RTREE_INDEX_AUTHOR = 'gpkg';
-  public static readonly EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR = 'rtree_index';
-  public static readonly EXTENSION_RTREE_INDEX_DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
+  public static readonly EXTENSION_NAME: string = 'gpkg_rtree_index';
+  public static readonly EXTENSION_RTREE_INDEX_AUTHOR: string = 'gpkg';
+  public static readonly EXTENSION_RTREE_INDEX_NAME_NO_AUTHOR: string = 'rtree_index';
+  public static readonly EXTENSION_RTREE_INDEX_DEFINITION: string = 'http://www.geopackage.org/spec/#extension_rtree';
 
   gpkgTableName = RTreeIndexDao.TABLE_NAME;
   featureDao: FeatureDao;
@@ -90,11 +90,11 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
    * @param  {any} envelope envelope
    * @return {IterableIterator<any>}
    */
-  queryWithGeometryEnvelope(envelope) {
+  queryWithGeometryEnvelope(envelope: { minX: number, maxX: number, minY: number, maxY: number}): IterableIterator<any> {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
   }
-  countWithGeometryEnvelope(envelope) {
+  countWithGeometryEnvelope(envelope: { minX: number, maxX: number, minY: number, maxY: number}): number {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.connection.get(SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", result.where), result.whereArgs).count;
   }

@@ -10,11 +10,11 @@ import { Metadata } from '../metadata';
  * @class MetadataReference
  */
 export default class MetadataReference {
-  public static readonly GEOPACKAGE = "geopackage";
-  public static readonly TABLE = "table";
-  public static readonly COLUMN = "column";
-  public static readonly ROW = "row";
-  public static readonly ROW_COL = "row/col";
+  public static readonly GEOPACKAGE: string = "geopackage";
+  public static readonly TABLE: string = "table";
+  public static readonly COLUMN: string = "column";
+  public static readonly ROW: string = "row";
+  public static readonly ROW_COL: string = "row/col";
 
   /**
    * Lowercase metadata reference scope; one of ‘geopackage’, ‘table’, ‘column’, ’row’, ’row/col’
@@ -62,7 +62,7 @@ export default class MetadataReference {
   /**
    * @param {string} columnName
    */
-  toDatabaseValue(columnName: string) {
+  toDatabaseValue(columnName: string): any {
     if (columnName === 'timestamp') {
       return this.timestamp.toISOString();
     }

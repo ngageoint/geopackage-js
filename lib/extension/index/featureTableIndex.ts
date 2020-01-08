@@ -13,6 +13,7 @@ import {RTreeIndexDao} from'../rtree/rtreeIndexDao'
 import EnvelopeBuilder from '../../geom/envelopeBuilder'
 import { TableIndexDao } from './tableIndexDao';
 import { GeometryData, BoundingBox } from '../../..';
+import { Envelope } from '../../geom/envelope';
 
 /**
  * This class will either use the RTree index if it exists, or the
@@ -276,7 +277,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {any} envelope envelope
    * @return {IterableIterator<any>}
    */
-  queryWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): IterableIterator<any> {
+  queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<any> {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.queryWithGeometryEnvelope(envelope);
     }
@@ -300,7 +301,7 @@ export default class FeatureTableIndex extends BaseExtension {
    * @param  {any} envelope envelope
    * @return {Number}
    */
-  countWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): number {
+  countWithGeometryEnvelope(envelope: Envelope): number {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.countWithGeometryEnvelope(envelope);
     }

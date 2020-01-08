@@ -152,7 +152,7 @@ export default class StyleTable extends AttributesTable {
     columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
     columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
     columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
+    columns.push(UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
     return columns;
   }
 }

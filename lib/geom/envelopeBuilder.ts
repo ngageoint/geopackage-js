@@ -1,7 +1,8 @@
 import turfBbox from '@turf/bbox';
+import wkx from 'wkx';
 
 export default class DataTypes {
-  static buildEnvelopeWithGeometry(wkbGeometry) {
+  static buildEnvelopeWithGeometry(wkbGeometry: wkx.Geometry) {
     var geoJson = wkbGeometry.toGeoJSON();
     var bbox = turfBbox(geoJson);
     return {

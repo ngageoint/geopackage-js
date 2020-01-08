@@ -20,7 +20,7 @@ export default class FeatureColumn extends UserColumn {
       throw new Error('Data or Geometry Type is required to create column: ' + name);
     }
   }
-  getTypeName() {
+  getTypeName(): string {
     if (this.isGeometry()) {
       return DataTypes.nameFromType(DataTypes.GPKGDataType.GPKG_DT_GEOMETRY);
     }
@@ -30,7 +30,7 @@ export default class FeatureColumn extends UserColumn {
    * Determine if this column is a geometry
    * @return {Boolean} true if a geometry column
    */
-  isGeometry() {
+  isGeometry(): boolean {
     return this.geometryType !== undefined;
   }
   /**
@@ -41,7 +41,7 @@ export default class FeatureColumn extends UserColumn {
    *
    *  @return feature column
    */
-  static createPrimaryKeyColumnWithIndexAndName(index, name) {
+  static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): FeatureColumn {
     return new FeatureColumn(index, name, DataTypes.GPKGDataType.GPKG_DT_INTEGER, undefined, true, undefined, true);
   }
   /**
@@ -55,7 +55,7 @@ export default class FeatureColumn extends UserColumn {
    *
    *  @return feature column
    */
-  static createGeometryColumn(index, name, type, notNull, defaultValue) {
+  static createGeometryColumn(index: number, name: string, type: string, notNull: boolean, defaultValue?: any): FeatureColumn {
     return new FeatureColumn(index, name, type, undefined, notNull, defaultValue, false, type);
   }
   /**

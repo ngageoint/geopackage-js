@@ -32,7 +32,7 @@ export class CanvasTileCreator extends TileCreator {
     this.imageData = new Uint8ClampedArray(width * height * 4);
   }
   async initialize(): Promise<CanvasTileCreator> {
-    return Promise.resolve(this);
+    return this;
   }
   addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number) {
     var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);

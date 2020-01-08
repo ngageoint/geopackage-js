@@ -987,6 +987,24 @@ export class FeatureTableStyles {
     this.featureStyleExtension.deleteStyle(this.tableName, featureId, geometryType);
   }
   /**
+   * Delete the style and associated mappings using StyleRow
+   *
+   * @param {module:extension/style.StyleRow} styleRow style row
+   */
+  deleteStyleAndMappingsByStyleRow(styleRow) {
+    this.featureStyleExtension.deleteStyleAndMappingsByStyleRow(this.tableName, styleRow);
+  };
+
+  /**
+   * Delete the style and associated mappings using StyleRow's Id
+   *
+   * @param {Number} styleRowId style row id
+   */
+  deleteStyleAndMappingsByStyleRowId(styleRowId) {
+    this.featureStyleExtension.deleteStyleAndMappingsByStyleRowId(this.tableName, styleRowId);
+  };  
+
+  /**
 	 * Delete all icons
 	 */
   deleteIcons() {
@@ -1050,6 +1068,23 @@ export class FeatureTableStyles {
   deleteIcon(featureId, geometryType) {
     this.featureStyleExtension.deleteIcon(this.tableName, featureId, geometryType);
   }
+  /**
+   * Delete the icon and associated mappings using IconRow
+   *
+   * @param {module:extension/style.IconRow} iconRow icon row
+   */
+  deleteIconAndMappingsByIconRow(iconRow) {
+    this.featureStyleExtension.deleteIconAndMappingsByIconRow(this.tableName, iconRow);
+  };
+
+  /**
+   * Delete the icon and associated mappings using IconRow
+   *
+   * @param {Number} iconRowId icon row id
+   */
+  deleteIconAndMappingsByIconRowId(iconRowId) {
+    this.featureStyleExtension.deleteIconAndMappingsByIconRowId(this.tableName, iconRowId);
+  };
   /**
 	 * Get all the unique style row ids the table maps to
 	 *

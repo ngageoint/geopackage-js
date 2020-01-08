@@ -6,25 +6,25 @@
  */
 export class Metadata {
 
-  public static readonly UNDEFINED = "undefined";
-  public static readonly FIELD_SESSION = "fieldSession";
-  public static readonly COLLECTION_SESSION = "collectionSession";
-  public static readonly SERIES = "series";
-  public static readonly DATASET = "dataset";
-  public static readonly FEATURE_TYPE = "featureType";
-  public static readonly FEATURE = "feature";
-  public static readonly ATTRIBUTE_TYPE = "attributeType";
-  public static readonly ATTRIBUTE = "attribute";
-  public static readonly TILE = "tile";
-  public static readonly MODEL = "model";
-  public static readonly CATALOG = "catalog";
-  public static readonly SCHEMA = "schema";
-  public static readonly TAXONOMY = "taxonomy";
-  public static readonly SOFTWARE = "software";
-  public static readonly SERVICE = "service";
-  public static readonly COLLECTION_HARDWARE = "collectionHardware";
-  public static readonly NON_GEOGRAPHIC_DATASET = "nonGeographicDataset";
-  public static readonly DIMENSION_GROUP = "dimensionGroup";
+  public static readonly UNDEFINED: string = "undefined";
+  public static readonly FIELD_SESSION: string = "fieldSession";
+  public static readonly COLLECTION_SESSION: string = "collectionSession";
+  public static readonly SERIES: string = "series";
+  public static readonly DATASET: string = "dataset";
+  public static readonly FEATURE_TYPE: string = "featureType";
+  public static readonly FEATURE: string = "feature";
+  public static readonly ATTRIBUTE_TYPE: string = "attributeType";
+  public static readonly ATTRIBUTE: string = "attribute";
+  public static readonly TILE: string = "tile";
+  public static readonly MODEL: string = "model";
+  public static readonly CATALOG: string = "catalog";
+  public static readonly SCHEMA: string = "schema";
+  public static readonly TAXONOMY: string = "taxonomy";
+  public static readonly SOFTWARE: string = "software";
+  public static readonly SERVICE: string = "service";
+  public static readonly COLLECTION_HARDWARE: string = "collectionHardware";
+  public static readonly NON_GEOGRAPHIC_DATASET: string = "nonGeographicDataset";
+  public static readonly DIMENSION_GROUP: string = "dimensionGroup";
 
   /**
    * Metadata primary key
@@ -53,7 +53,7 @@ export class Metadata {
   metadata: string;
 
   // eslint-disable-next-line complexity
-  getScopeInformation(type) {
+  getScopeInformation(type: string): { name: string, code: string, definition: string} {
     switch (type) {
     case Metadata.UNDEFINED:
       return {

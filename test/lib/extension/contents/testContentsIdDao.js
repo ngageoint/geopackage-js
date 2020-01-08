@@ -17,7 +17,7 @@ describe('ContentsIdExtension Tests', function() {
     geopackage = await testSetup.createGeoPackage(testGeoPackage);
     var contentsDao = geopackage.getContentsDao();
     var contentsIdExtension = geopackage.getContentsIdExtension();
-    contentsIdExtension.getOrCreateExtension();
+    await contentsIdExtension.getOrCreateExtension();
     var contentsIdDao = contentsIdExtension.getDao();
     contents = contentsDao.createObject();
     contents.table_name = tableName;

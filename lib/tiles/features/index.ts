@@ -8,6 +8,7 @@ import {TileBoundingBoxUtils} from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
 import { ImageUtils } from '../imageUtils'
 import IconCache from '../../extension/style/iconCache'
+import { GeometryCache } from './geometryCache'
 import { FeatureDrawType } from './featureDrawType'
 import FeaturePaintCache from './featurePaintCache'
 import Paint from './paint'
@@ -41,6 +42,8 @@ export class FeatureTiles {
   fillPolygon: boolean;
   polygonFillPaint: any;
   featurePaintCache: any;
+  geometryCache: any;
+  cacheGeometries: boolean;
   iconCache: any;
   scale: number;
   geoPackage: any;
@@ -67,6 +70,7 @@ export class FeatureTiles {
     this.polygonFillPaint = new Paint();
     this.polygonFillPaint.setColor('#00000011');
     this.featurePaintCache = new FeaturePaintCache();
+    this.geometryCache = new GeometryCache();
     this.iconCache = new IconCache();
     this.scale = 1.0;
     this.geoPackage = this.featureDao.geoPackage;
@@ -78,6 +82,7 @@ export class FeatureTiles {
     }
     this.maxFeaturesPerTile = null;
     this.maxFeaturesTileDraw = null;
+    this.cacheGeometries = true;
     this.calculateDrawOverlap();
   }
   /**
@@ -231,6 +236,22 @@ export class FeatureTiles {
     this.linePaint.setStrokeWidth(scale * this.lineStrokeWidth);
     this.polygonPaint.setStrokeWidth(scale * this.polygonStrokeWidth);
     this.featurePaintCache.clear();
+  }
+
+  /**
+   * Set CacheGeometries flag. When set to true, geometries will be cached.
+   * @param {Boolean} cacheGeometries
+   */
+  setCacheGeometries(cacheGeometries) {
+    this.cacheGeometries = cacheGeometries;
+  }
+
+  /**
+   * Set geometry cache's max size
+   * @param {Number} maxSize
+   */
+  setGeometryCacheMaxSize(maxSize) {
+    this.geometryCache.resize(maxSize)
   }
   /**
    * Get the scale
@@ -640,7 +661,15 @@ export class FeatureTiles {
       var iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
       var geojsonFeatures = [];
       for (var featureRow of iterator) {
-        geojsonFeatures.push(featureRow.getGeometry().geometry.toGeoJSON());
+        var geojson = null;
+        if (this.cacheGeometries) {
+          geojson = this.geometryCache.getGeometryForFeatureRow(featureRow)
+        }
+        if (geojson === undefined || geojson === null) {
+          geojson = featureRow.getGeometry().geometry.toGeoJSON();
+          this.geometryCache.setGeometry(featureRow.getId(), geojson);
+        }
+        geojsonFeatures.push(geojson);
       }
       for (var gj of geojsonFeatures) {
         var style = this.getFeatureStyle(featureRow);
@@ -711,7 +740,14 @@ export class FeatureTiles {
       featureRows.push(featureDao.getRow(row));
     }
     for (var fr of featureRows) {
-      var gj = fr.getGeometry().geometry.toGeoJSON();
+      var gj = null;
+      if (this.cacheGeometries) {
+        gj = this.geometryCache.getGeometryForFeatureRow(fr)
+      }
+      if (gj === undefined || gj === null) {
+        gj = fr.getGeometry().geometry.toGeoJSON();
+        this.geometryCache.setGeometry(fr.getId(), gj);
+      }
       var style = this.getFeatureStyle(fr);
       if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
         gj = reproject.toWgs84(gj, featureDao.projection);
@@ -758,7 +794,7 @@ export class FeatureTiles {
     var y = transformedCoords[1];
     if (featureStyle !== undefined && featureStyle !== null && featureStyle.hasIcon()) {
       var iconRow = featureStyle.getIcon();
-      var image = await iconRow.getDataImage(iconRow);
+      var image = await this.iconCache.createIcon(iconRow);
       width = Math.round(this.scale * iconRow.getWidth());
       height = Math.round(this.scale * iconRow.getHeight());
       if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height && y <= this.tileHeight + height) {

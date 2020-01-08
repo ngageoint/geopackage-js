@@ -51,15 +51,14 @@ export default abstract class BaseExtension {
    * @param  {String}   scopeType     extension scope type
    * @return {Promise<Extension>}
    */
-  getOrCreate(extensionName: string, tableName: string | null, columnName: string | null, definition: string, scopeType: string): Promise<Extension> {
+  async getOrCreate(extensionName: string, tableName: string | null, columnName: string | null, definition: string, scopeType: string): Promise<Extension> {
     var extension = this.getExtension(extensionName, tableName, columnName);
     if (extension.length) {
-      return Promise.resolve(extension[0]);
+      return extension[0];
     }
-    return this.extensionsDao.createTable()
-      .then(function () {
-        return this.createExtension(extensionName, tableName, columnName, definition, scopeType);
-      }.bind(this));
+    await this.extensionsDao.createTable()
+    this.createExtension(extensionName, tableName, columnName, definition, scopeType);
+    return this.getExtension(extensionName, tableName, columnName)[0];
   }
   /**
    * Get the extension for the name, table name and column name

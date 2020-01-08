@@ -12,11 +12,11 @@ import { GeometryData } from '../../geom/geometryData'
  * @param {module:geoPackage~GeoPackage} geoPackage The GeoPackage object
  */
 export default class RTreeIndex extends BaseExtension {
-  tableName: any;
-  primaryKeyColumn: any;
-  columnName: any;
-  featureCount: any;
-  rtreeIndexDao: any;
+  tableName: string;
+  primaryKeyColumn: string;
+  columnName: string;
+  featureCount: number;
+  rtreeIndexDao: RTreeIndexDao;
   extensionExists: boolean;
   constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
     super(geoPackage);
@@ -29,10 +29,10 @@ export default class RTreeIndex extends BaseExtension {
     this.rtreeIndexDao = new RTreeIndexDao(geoPackage, featureDao);
     this.extensionExists = this.hasExtension(this.extensionName, this.tableName, this.columnName);
   }
-  getRTreeIndexExtension() {
+  getRTreeIndexExtension(): Extension[] {
     return this.getExtension(this.extensionName, this.tableName, this.columnName);
   }
-  getOrCreateExtension() {
+  async getOrCreateExtension(): Promise<Extension> {
     return this.getOrCreate(this.extensionName, this.tableName, this.columnName, this.extensionDefinition, Extension.WRITE_ONLY);
   }
   /**
@@ -40,25 +40,23 @@ export default class RTreeIndex extends BaseExtension {
    * @param {Function} [progress] progress function
    * @returns {Promise}
    */
-  create(progress?: Function): Promise<any> {
+  async create(progress?: Function): Promise<Extension[]> {
     let safeProgress = progress || function () { };
     if (this.extensionExists) {
-      return Promise.resolve(this.getRTreeIndexExtension());
+      return this.getRTreeIndexExtension();
     }
-    return this.getOrCreate(this.extensionName, this.tableName, this.columnName, RTreeIndexDao.EXTENSION_RTREE_INDEX_DEFINITION, Extension.WRITE_ONLY)
-      .then(function () {
-        this.createAllFunctions();
-        this.createRTreeIndex();
-        safeProgress({
-          description: 'Creating Feature Index',
-          count: 0,
-          totalCount: this.featureCount,
-          layer: this.tableName
-        });
-        this.loadRTreeIndex();
-        this.createAllTriggers();
-        return this.getRTreeIndexExtension();
-      }.bind(this));
+    await this.getOrCreate(this.extensionName, this.tableName, this.columnName, RTreeIndexDao.EXTENSION_RTREE_INDEX_DEFINITION, Extension.WRITE_ONLY)
+    this.createAllFunctions();
+    this.createRTreeIndex();
+    safeProgress({
+      description: 'Creating Feature Index',
+      count: 0,
+      totalCount: this.featureCount,
+      layer: this.tableName
+    });
+    this.loadRTreeIndex();
+    this.createAllTriggers();
+    return this.getRTreeIndexExtension();
   }
   createAllTriggers() {
     var insertTrigger = 'CREATE TRIGGER rtree_' + this.tableName + '_' + this.columnName + '_insert AFTER INSERT ON ' + this.tableName +
@@ -116,10 +114,10 @@ export default class RTreeIndex extends BaseExtension {
     this.connection.run(deleteTrigger);
   }
   loadRTreeIndex() {
-    this.connection.run('INSERT OR REPLACE INTO rtree_' + this.tableName + '_' + this.columnName + ' SELECT ' + this.primaryKeyColumn + ', st_minx(' + this.columnName + '), st_maxx(' + this.columnName + '), st_miny(' + this.columnName + '), st_maxy(' + this.columnName + ') FROM ' + this.tableName);
+    return this.connection.run('INSERT OR REPLACE INTO rtree_' + this.tableName + '_' + this.columnName + ' SELECT ' + this.primaryKeyColumn + ', st_minx(' + this.columnName + '), st_maxx(' + this.columnName + '), st_miny(' + this.columnName + '), st_maxy(' + this.columnName + ') FROM ' + this.tableName);
   }
   createRTreeIndex() {
-    this.connection.run('CREATE VIRTUAL TABLE rtree_' + this.tableName + '_' + this.columnName + ' USING rtree(id, minx, maxx, miny, maxy)');
+    return this.connection.run('CREATE VIRTUAL TABLE rtree_' + this.tableName + '_' + this.columnName + ' USING rtree(id, minx, maxx, miny, maxy)');
   }
   createAllFunctions() {
     this.createMinXFunction();

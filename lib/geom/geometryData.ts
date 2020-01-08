@@ -5,6 +5,7 @@
 
 import wkx from 'wkx';
 import {GeoPackageConstants} from '../geoPackageConstants';
+import { Envelope } from './envelope';
 
 /**
  * GeoPackage Geometry Data
@@ -15,9 +16,9 @@ export class GeometryData {
   empty: boolean;
   byteOrder: number;
   srsId: number;
-  geometry: any;
+  geometry: wkx.Geometry;
   envelope: any;
-  buffer: any;
+  buffer: Buffer;
   geometryError: any;
   extended: any;
   constructor(buffer?: Buffer | Uint8Array) {
@@ -34,32 +35,33 @@ export class GeometryData {
     this.empty = false;
     this.geometry = wkbGeometry;
   }
-  setEnvelope(envelope) {
+  setEnvelope(envelope: Envelope) {
     this.envelope = envelope;
   }
   toGeoJSON() {
     return this.geometry.toGeoJSON();
   }
-  fromData(buffer) {
-    this.buffer = buffer;
-    if (buffer instanceof Uint8Array) {
-      this.buffer = buffer = Buffer.from(buffer);
+  fromData(bufferOrArray: Buffer | Uint8Array) {
+    if (bufferOrArray instanceof Uint8Array) {
+      this.buffer = bufferOrArray = Buffer.from(bufferOrArray);
+    } else {
+      this.buffer = bufferOrArray
     }
-    var magicString = buffer.toString('ascii', 0, 2);
+    var magicString = this.buffer.toString('ascii', 0, 2);
     if (magicString !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER) {
       throw new Error('Unexpected GeoPackage Geometry magic number: ' + magicString + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
     }
-    var version = buffer.readUInt8(2);
+    var version = this.buffer.readUInt8(2);
     if (version !== GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1) {
       throw new Error('Unexpected GeoPackage Geometry version ' + version + ', Expected: ' + GeoPackageConstants.GEOPACKAGE_GEOMETRY_VERSION_1);
     }
-    var flags = buffer.readUInt8(3);
+    var flags = this.buffer.readUInt8(3);
     var envelopeIndicator = this.readFlags(flags);
-    this.srsId = buffer[this.byteOrder ? 'readUInt32LE' : 'readUInt32BE'](4);
-    var envelopeAndOffset = this.readEnvelope(envelopeIndicator, buffer);
+    this.srsId = this.buffer[this.byteOrder ? 'readUInt32LE' : 'readUInt32BE'](4);
+    var envelopeAndOffset = this.readEnvelope(envelopeIndicator, this.buffer);
     this.envelope = envelopeAndOffset.envelope;
     var offset = envelopeAndOffset.offset;
-    var wkbBuffer = buffer.slice(offset);
+    var wkbBuffer = this.buffer.slice(offset);
     try {
       this.geometry = wkx.Geometry.parse(wkbBuffer);
       this.geometryError = undefined;
@@ -69,7 +71,7 @@ export class GeometryData {
       console.log('Error parsing geometry');
     }
   }
-  toData() {
+  toData(): Buffer {
     var header = Buffer.alloc(8);
     // Write GP as the 2 byte magic number
     header.write(GeoPackageConstants.GEOPACKAGE_GEOMETRY_MAGIC_NUMBER);
@@ -92,7 +94,7 @@ export class GeometryData {
     this.buffer = Buffer.concat(concatArray);
     return this.buffer;
   }
-  writeEnvelope() {
+  writeEnvelope(): Buffer {
     if (!this.envelope)
       return Buffer.alloc(0);
     var writeDoubleMethod = 'writeDouble' + (this.byteOrder ? 'LE' : 'BE');
@@ -120,7 +122,7 @@ export class GeometryData {
     }
     return envelopeBuffer;
   }
-  buildFlagsByte() {
+  buildFlagsByte(): number {
     var flag = 0;
     // Add the binary type to bit 5, 0 for standard and 1 for extended
     var binaryType = this.extended ? 1 : 0;
@@ -136,7 +138,7 @@ export class GeometryData {
     flag += byteOrderValue;
     return flag;
   }
-  getIndicatorWithEnvelope(envelope) {
+  getIndicatorWithEnvelope(envelope: Envelope) {
     var indicator = 1;
     if (envelope.hasZ) {
       indicator++;
@@ -146,7 +148,7 @@ export class GeometryData {
     }
     return indicator;
   }
-  readFlags(flagsInt) {
+  readFlags(flagsInt: number): number {
     // Verify the reserved bits at 7 and 6 are 0
     var reserved7 = (flagsInt >> 7) & 1;
     var reserved6 = (flagsInt >> 6) & 1;
@@ -171,7 +173,7 @@ export class GeometryData {
     this.byteOrder = byteOrderValue;
     return envelopeIndicator;
   }
-  readEnvelope(envelopeIndicator, buffer) {
+  readEnvelope(envelopeIndicator: number, buffer: Buffer) {
     var readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
     var envelopeByteOffset = 8;
     var reads = 0;
@@ -182,18 +184,7 @@ export class GeometryData {
     if (envelopeIndicator <= 0) {
       return envelopeAndOffset;
     }
-    var envelope = {
-      minX: null as number,
-      maxX: null as number,
-      minY: null as number,
-      maxY: null as number,
-      hasZ: false as boolean,
-      hasM: false as boolean,
-      minZ: null as number,
-      maxZ: null as number,
-      minM: null as number,
-      maxM: null as number
-    };
+    var envelope = new Envelope();
     // Read x and y values and create envelope
     envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));
     envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + (8 * reads++));

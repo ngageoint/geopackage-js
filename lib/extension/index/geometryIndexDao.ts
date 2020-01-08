@@ -4,6 +4,7 @@ import { TableCreator } from '../../db/tableCreator';
 import { FeatureDao } from '../../features/user/featureDao';
 import GeoPackage from '../../geoPackage';
 import TableIndex from './tableIndex';
+import { Envelope } from '../../geom/envelope';
 /**
  * Geometry Index Data Access Object
  * @class
@@ -68,7 +69,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Object} envelope   envelope to store
    * @return {module:extension/index~GeometryIndex}
    */
-  populate(tableIndex: TableIndex, geometryId: number, envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): GeometryIndex {
+  populate(tableIndex: TableIndex, geometryId: number, envelope: Envelope): GeometryIndex {
     var geometryIndex = new GeometryIndex();
     geometryIndex.setTableIndex(tableIndex);
     geometryIndex.geom_id = geometryId;
@@ -112,7 +113,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasZ has z
    * @return {Object}
    */
-  _generateGeometryEnvelopeQuery(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): {join: string, where: string, whereArgs: any[], tableNameArr: string[]} {
+  _generateGeometryEnvelopeQuery(envelope: Envelope): {join: string, where: string, whereArgs: any[], tableNameArr: string[]} {
     var tableName = this.featureDao.gpkgTableName;
     var where = '';
     where += this.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
@@ -178,7 +179,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasM has m
    * @param  {Boolean} envelope.hasZ has z
    */
-  queryWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): IterableIterator<any> {
+  queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<any> {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
   }
@@ -195,7 +196,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasM has m
    * @param  {Boolean} envelope.hasZ has z
    */
-  countWithGeometryEnvelope(envelope: {minX: number, maxX: number, minY: number, maxY: number, minM?: number, maxM?: number, minZ?: number, maxZ?: number, hasM?: boolean, hasZ?: boolean}): number {
+  countWithGeometryEnvelope(envelope: Envelope): number {
     var result = this._generateGeometryEnvelopeQuery(envelope);
     return this.countJoinWhereWithArgs(result.join, result.where, result.whereArgs);
   }

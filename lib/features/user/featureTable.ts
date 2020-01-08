@@ -4,6 +4,7 @@
  */
 import UserTable from '../../user/userTable';
 import FeatureColumn from './featureColumn';
+import UserColumn from '../../user/userColumn';
 
 /**
  * Represents a user feature table
@@ -12,12 +13,12 @@ import FeatureColumn from './featureColumn';
  */
 export default class FeatureTable extends UserTable {
   geometryIndex: number;
-  constructor(tableName, columns) {
+  constructor(tableName: string, columns?: UserColumn[]) {
     super(tableName, columns);
     var geometry = undefined;
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
-      if (column.isGeometry()) {
+      if (column instanceof FeatureColumn && column.isGeometry()) {
         this.duplicateCheck(column.index, geometry, /* WKB_GEOMETRY_NAME */ 'GEOMETRY');
         geometry = column.index;
       }
@@ -29,10 +30,10 @@ export default class FeatureTable extends UserTable {
    * Get the geometry feature column
    * @return {FeatureColumn} geometry feature column
    */
-  getGeometryColumn() {
-    return this.getColumnWithIndex(this.geometryIndex);
+  getGeometryColumn(): FeatureColumn {
+    return this.getColumnWithIndex(this.geometryIndex) as FeatureColumn;
   }
-  getTableType() {
+  getTableType(): string {
     return UserTable.FEATURE_TABLE;
   }
 }
