@@ -21,7 +21,7 @@ export default class UserCustomTableReader extends UserTableReader {
    * @param  {string[]} [requiredColumns] required columns
    * @return {module:user/userCustom~UserCustomTable}
    */
-  createTable(tableName, columnList, requiredColumns) {
+  createTable(tableName: string, columnList: UserCustomColumn[], requiredColumns: string[]): UserCustomTable {
     return new UserCustomTable(tableName, columnList, requiredColumns);
   }
   /**
@@ -36,7 +36,7 @@ export default class UserCustomTableReader extends UserTableReader {
    * @param {Boolean} primaryKey primary key
    * @return {module:user/custom~UserCustomColumn}
    */
-  createColumnWithResults(result, index, name, type, max, notNull, defaultValue, primaryKey) {
+  createColumnWithResults(result: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean): UserCustomColumn {
     var dataType = DataTypes.fromName(type);
     return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, primaryKey);
   }

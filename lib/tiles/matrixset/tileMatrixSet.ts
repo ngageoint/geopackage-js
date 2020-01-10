@@ -23,12 +23,12 @@ import Contents from '../../core/contents/contents';
  * @class TileMatrixSet
  */
 export class TileMatrixSet {
-  public static readonly TABLE_NAME = "tableName";
-  public static readonly MIN_X = "minX";
-  public static readonly MIN_Y = "minY";
-  public static readonly MAX_X = "maxX";
-  public static readonly MAX_Y = "maxY";
-  public static readonly SRS_ID = "srsId";
+  public static readonly TABLE_NAME: string = "tableName";
+  public static readonly MIN_X: string = "minX";
+  public static readonly MIN_Y: string = "minY";
+  public static readonly MAX_X: string = "maxX";
+  public static readonly MAX_Y: string = "maxY";
+  public static readonly SRS_ID: string = "srsId";
 
   /**
    * Name of the [tile pyramid user data table](https://www.geopackage.org/spec121/index.html#tiles_user_tables)

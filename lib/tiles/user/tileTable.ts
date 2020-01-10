@@ -17,12 +17,8 @@ export default class TileTable extends UserTable {
   tileColumnIndex: number;
   tileRowIndex: number;
   tileDataIndex: number;
-  constructor(tableName, columns) {
+  constructor(tableName: string, columns: TileColumn[]) {
     super(tableName, columns);
-    var zoomLevel;
-    var tileColumn;
-    var tileRow;
-    var tileData;
     var uniqueColumns = [];
     for (var i = 0; i < columns.length; i++) {
       var column = columns[i];
@@ -30,55 +26,55 @@ export default class TileTable extends UserTable {
       var columnIndex = column.index;
       switch (columnName) {
       case TileColumn.COLUMN_ZOOM_LEVEL:
-        this.duplicateCheck(columnIndex, zoomLevel, TileColumn.COLUMN_ZOOM_LEVEL);
-        zoomLevel = columnIndex;
+        this.duplicateCheck(columnIndex, this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
+        this.zoomLevelIndex = columnIndex;
         uniqueColumns.push(column);
         break;
       case TileColumn.COLUMN_TILE_COLUMN:
-        this.duplicateCheck(columnIndex, tileColumn, TileColumn.COLUMN_TILE_COLUMN);
-        tileColumn = columnIndex;
+        this.duplicateCheck(columnIndex, this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
+        this.tileColumnIndex = columnIndex;
         uniqueColumns.push(column);
         break;
       case TileColumn.COLUMN_TILE_ROW:
-        this.duplicateCheck(columnIndex, tileRow, TileColumn.COLUMN_TILE_ROW);
-        tileRow = columnIndex;
+        this.duplicateCheck(columnIndex, this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
+        this.tileRowIndex = columnIndex;
         uniqueColumns.push(column);
         break;
       case TileColumn.COLUMN_TILE_DATA:
-        this.duplicateCheck(columnIndex, tileData, TileColumn.COLUMN_TILE_DATA);
-        tileData = columnIndex;
+        this.duplicateCheck(columnIndex, this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
+        this.tileDataIndex = columnIndex;
         break;
       }
     }
     this.uniqueConstraints = [{ columns: uniqueColumns }];
-    this.missingCheck(zoomLevel, TileColumn.COLUMN_ZOOM_LEVEL);
-    this.zoomLevelIndex = zoomLevel;
-    this.missingCheck(tileColumn, TileColumn.COLUMN_TILE_COLUMN);
-    this.tileColumnIndex = tileColumn;
-    this.missingCheck(tileRow, TileColumn.COLUMN_TILE_ROW);
-    this.tileRowIndex = tileRow;
-    this.missingCheck(tileData, TileColumn.COLUMN_TILE_DATA);
-    this.tileDataIndex = tileData;
+    this.missingCheck(this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
+    this.zoomLevelIndex = this.zoomLevelIndex;
+    this.missingCheck(this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
+    this.tileColumnIndex = this.tileColumnIndex;
+    this.missingCheck(this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
+    this.tileRowIndex = this.tileRowIndex;
+    this.missingCheck(this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
+    this.tileDataIndex = this.tileDataIndex;
   }
-  getZoomLevelColumn() {
+  getZoomLevelColumn(): TileColumn {
     return this.getColumnWithIndex(this.zoomLevelIndex);
   }
-  getTileColumnColumn() {
+  getTileColumnColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileColumnIndex);
   }
-  getRowColumn() {
+  getRowColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileRowIndex);
   }
-  getTileDataColumn() {
+  getTileDataColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileDataIndex);
   }
-  getTableType() {
+  getTableType(): string {
     return UserTable.TILE_TABLE;
   }
-  static createRequiredColumns() {
+  static createRequiredColumns(): TileColumn[] {
     return TileTable.createRequiredColumnsWithStartingIndex(0);
   }
-  static createRequiredColumnsWithStartingIndex(startingIndex) {
+  static createRequiredColumnsWithStartingIndex(startingIndex: number): TileColumn[] {
     var columns = [];
     columns.push(TileColumn.createIdColumn(startingIndex++));
     columns.push(TileColumn.createZoomLevelColumn(startingIndex++));

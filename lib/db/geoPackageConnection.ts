@@ -213,7 +213,7 @@ export default class GeoPackageConnection {
    * @param  {string} tableName table to drop
    * @return {Boolean} results of table drop
    */
-  dropTable(tableName: string): Boolean {
+  dropTable(tableName: string): boolean {
     return this.adapter.dropTable(tableName);
   }
   /**

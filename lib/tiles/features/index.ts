@@ -11,8 +11,14 @@ import IconCache from '../../extension/style/iconCache'
 import { GeometryCache } from './geometryCache'
 import { FeatureDrawType } from './featureDrawType'
 import FeaturePaintCache from './featurePaintCache'
-import Paint from './paint'
+import { Paint } from './paint'
 import { FeatureTableStyles } from '../../extension/style/featureTableStyles'
+import GeoPackage from '../../geoPackage'
+import FeatureTable from '../../features/user/featureTable'
+import FeatureRow from '../../features/user/featureRow'
+import StyleRow from '../../extension/style/styleRow'
+import { FeatureTilePointIcon } from './featureTilePointIcon'
+import { CustomFeaturesTile } from './custom/customFeaturesTile'
 /**
  * FeatureTiles module.
  * @module tiles/features
@@ -23,56 +29,36 @@ import { FeatureTableStyles } from '../../extension/style/featureTableStyles'
  *  from those features.
  */
 export class FeatureTiles {
-  private static readonly isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
+  private static readonly isElectron: boolean = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
   // @ts-ignore
-  private static readonly isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-  private static readonly isNode = typeof (process) !== 'undefined' && process.version;
-  private static readonly useNodeCanvas = FeatureTiles.isNode && !FeatureTiles.isPhantom && !FeatureTiles.isElectron;
-  featureDao: FeatureDao;
-  tileWidth: number;
-  tileHeight: number;
-  compressFormat: string;
-  pointRadius: number;
-  pointPaint: any;
-  pointIcon: any;
-  linePaint: any;
-  lineStrokeWidth: number;
-  polygonPaint: any;
-  polygonStrokeWidth: number;
-  fillPolygon: boolean;
-  polygonFillPaint: any;
-  featurePaintCache: any;
-  geometryCache: any;
-  cacheGeometries: boolean;
-  iconCache: any;
-  scale: number;
-  geoPackage: any;
+  private static readonly isPhantom: boolean = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
+  private static readonly isNode: boolean = typeof (process) !== 'undefined' && !!process.version;
+  private static readonly useNodeCanvas: boolean = FeatureTiles.isNode && !FeatureTiles.isPhantom && !FeatureTiles.isElectron;
+  compressFormat: string = 'png';
+  pointRadius: number = 4.0;
+  pointPaint: Paint = new Paint();
+  pointIcon: any = null;
+  linePaint: Paint = new Paint();
+  lineStrokeWidth: number = 2.0;
+  polygonPaint: Paint = new Paint();
+  polygonStrokeWidth: number = 2.0;
+  fillPolygon: boolean = true;
+  polygonFillPaint: Paint = new Paint();
+  featurePaintCache: FeaturePaintCache = new FeaturePaintCache();
+  geometryCache: GeometryCache = new GeometryCache();
+  cacheGeometries: boolean = true;
+  iconCache: IconCache = new IconCache();
+  scale: number = 1.0;
+  geoPackage: GeoPackage;
   featureTableStyles: any;
-  maxFeaturesPerTile: any;
-  maxFeaturesTileDraw: any;
-  widthOverlap: any;
-  heightOverlap: any;
-  constructor(featureDao: FeatureDao, tileWidth: number = 256, tileHeight: number = 256) {
-    this.featureDao = featureDao;
-    this.tileWidth = tileWidth;
-    this.tileHeight = tileHeight;
-    this.compressFormat = 'png';
-    this.pointRadius = 4.0;
-    this.pointPaint = new Paint();
-    this.pointIcon = null;
-    this.linePaint = new Paint();
+  maxFeaturesPerTile: number = null;
+  maxFeaturesTileDraw: any = null;
+  widthOverlap: number;
+  heightOverlap: number;
+  constructor(public featureDao: FeatureDao, public tileWidth: number = 256, public tileHeight: number = 256) {
     this.linePaint.setStrokeWidth(2.0);
-    this.lineStrokeWidth = 2.0;
-    this.polygonPaint = new Paint();
     this.polygonPaint.setStrokeWidth(2.0);
-    this.polygonStrokeWidth = 2.0;
-    this.fillPolygon = true;
-    this.polygonFillPaint = new Paint();
     this.polygonFillPaint.setColor('#00000011');
-    this.featurePaintCache = new FeaturePaintCache();
-    this.geometryCache = new GeometryCache();
-    this.iconCache = new IconCache();
-    this.scale = 1.0;
     this.geoPackage = this.featureDao.geoPackage;
     if (this.geoPackage != null) {
       this.featureTableStyles = new FeatureTableStyles(this.geoPackage, this.featureDao.getTable());
@@ -80,16 +66,13 @@ export class FeatureTiles {
         this.featureTableStyles = null;
       }
     }
-    this.maxFeaturesPerTile = null;
-    this.maxFeaturesTileDraw = null;
-    this.cacheGeometries = true;
     this.calculateDrawOverlap();
   }
   /**
    * Manually set the width and height draw overlap
    * @param {Number} pixels pixels
    */
-  setDrawOverlap(pixels) {
+  setDrawOverlap(pixels: number) {
     this.setWidthDrawOverlap(pixels);
     this.setHeightDrawOverlap(pixels);
   }
@@ -97,49 +80,49 @@ export class FeatureTiles {
    * Get the width draw overlap
    * @return {Number} width draw overlap
    */
-  getWidthDrawOverlap() {
+  getWidthDrawOverlap(): number {
     return this.widthOverlap;
   }
   /**
    * Manually set the width draw overlap
    * @param {Number} pixels pixels
    */
-  setWidthDrawOverlap(pixels) {
+  setWidthDrawOverlap(pixels: number) {
     this.widthOverlap = pixels;
   }
   /**
    * Get the height draw overlap
    * @return {Number} height draw overlap
    */
-  getHeightDrawOverlap() {
+  getHeightDrawOverlap(): number {
     return this.heightOverlap;
   }
   /**
    * Manually set the height draw overlap
    * @param {Number} pixels pixels
    */
-  setHeightDrawOverlap(pixels) {
+  setHeightDrawOverlap(pixels: number) {
     this.heightOverlap = pixels;
   }
   /**
    * Get the feature DAO
    * @return {module:features/user/featureDao} feature dao
    */
-  getFeatureDao() {
+  getFeatureDao(): FeatureDao {
     return this.featureDao;
   }
   /**
    * Get the feature table styles
    * @return {module:extension/style~FeatureTableStyles} feature table styles
    */
-  getFeatureTableStyles() {
+  getFeatureTableStyles(): FeatureTableStyles {
     return this.featureTableStyles;
   }
   /**
    * Set the feature table styles
    * @param {module:extension/style~FeatureTableStyles} featureTableStyles feature table styles
    */
-  setFeatureTableStyles(featureTableStyles) {
+  setFeatureTableStyles(featureTableStyles: FeatureTableStyles) {
     this.featureTableStyles = featureTableStyles;
   }
   /**
@@ -168,7 +151,7 @@ export class FeatureTiles {
    * @param {Number} size
    * @since 3.3.0
    */
-  setStylePaintCacheSize(size) {
+  setStylePaintCacheSize(size: number) {
     this.featurePaintCache.resize(size);
   }
   /**
@@ -181,49 +164,49 @@ export class FeatureTiles {
    * Set / resize the icon cache size
    * @param {Number} size new size
    */
-  setIconCacheSize(size) {
+  setIconCacheSize(size: number) {
     this.iconCache.resize(size);
   }
   /**
    * Get the tile width
    * @return {Number} tile width
    */
-  getTileWidth() {
+  getTileWidth(): number {
     return this.tileWidth;
   }
   /**
    * Set the tile width
    * @param {Number} tileWidth tile width
    */
-  setTileWidth(tileWidth) {
+  setTileWidth(tileWidth:number) {
     this.tileWidth = tileWidth;
   }
   /**
    * Get the tile height
    * @return {Number} tile height
    */
-  getTileHeight() {
+  getTileHeight(): number {
     return this.tileHeight;
   }
   /**
    * Set the tile height
    * @param {Number} tileHeight tile height
    */
-  setTileHeight(tileHeight) {
+  setTileHeight(tileHeight: number) {
     this.tileHeight = tileHeight;
   }
   /**
    * Get the compress format
    * @return {String} compress format
    */
-  getCompressFormat() {
+  getCompressFormat(): string {
     return this.compressFormat;
   }
   /**
    * Set the compress format
    * @param {String} compressFormat compress format
    */
-  setCompressFormat(compressFormat) {
+  setCompressFormat(compressFormat: string) {
     this.compressFormat = compressFormat;
   }
   /**
@@ -231,7 +214,7 @@ export class FeatureTiles {
    *
    * @param {Number} scale scale factor
    */
-  setScale(scale) {
+  setScale(scale: number) {
     this.scale = scale;
     this.linePaint.setStrokeWidth(scale * this.lineStrokeWidth);
     this.polygonPaint.setStrokeWidth(scale * this.polygonStrokeWidth);
@@ -242,7 +225,7 @@ export class FeatureTiles {
    * Set CacheGeometries flag. When set to true, geometries will be cached.
    * @param {Boolean} cacheGeometries
    */
-  setCacheGeometries(cacheGeometries) {
+  setCacheGeometries(cacheGeometries: boolean) {
     this.cacheGeometries = cacheGeometries;
   }
 
@@ -250,14 +233,14 @@ export class FeatureTiles {
    * Set geometry cache's max size
    * @param {Number} maxSize
    */
-  setGeometryCacheMaxSize(maxSize) {
+  setGeometryCacheMaxSize(maxSize: number) {
     this.geometryCache.resize(maxSize)
   }
   /**
    * Get the scale
    * @return {Number} scale factor
    */
-  getScale() {
+  getScale(): number {
     return this.scale;
   }
   calculateDrawOverlap() {
@@ -314,11 +297,11 @@ export class FeatureTiles {
       }
     }
   }
-  setDrawOverlapsWithPixels(pixels) {
+  setDrawOverlapsWithPixels(pixels: number) {
     this.widthOverlap = pixels;
     this.heightOverlap = pixels;
   }
-  getFeatureStyle(featureRow) {
+  getFeatureStyle(featureRow: FeatureRow) {
     var featureStyle = null;
     if (this.featureTableStyles !== null) {
       featureStyle = this.featureTableStyles.getFeatureStyleForFeatureRow(featureRow);
@@ -330,7 +313,7 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPointPaint(featureStyle) {
+  getPointPaint(featureStyle: any) {
     var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.CIRCLE);
     if (paint == null) {
       paint = this.pointPaint;
@@ -342,7 +325,7 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getLinePaint(featureStyle) {
+  getLinePaint(featureStyle: any) {
     var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint === null) {
       paint = this.linePaint;
@@ -354,7 +337,7 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPolygonPaint(featureStyle) {
+  getPolygonPaint(featureStyle: any) {
     var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint == null) {
       paint = this.polygonPaint;
@@ -367,7 +350,7 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPolygonFillPaint(featureStyle) {
+  getPolygonFillPaint(featureStyle: any) {
     var paint = null;
     var hasStyleColor = false;
     if (featureStyle != null) {
@@ -392,7 +375,7 @@ export class FeatureTiles {
    * @param drawType draw type
    * @return feature style paint
    */
-  getFeatureStylePaint(featureStyle, drawType) {
+  getFeatureStylePaint(featureStyle: any, drawType: any) {
     var paint = null;
     if (featureStyle != null) {
       var style = featureStyle.getStyle();
@@ -408,7 +391,7 @@ export class FeatureTiles {
    * @param drawType draw type
    * @return {Paint} paint
    */
-  getStylePaint(style, drawType) {
+  getStylePaint(style: StyleRow, drawType: string) {
     var paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
     if (paint === undefined || paint === null) {
       var color = null;
@@ -444,56 +427,56 @@ export class FeatureTiles {
    * Get the point radius
    * @return {Number} radius
    */
-  getPointRadius() {
+  getPointRadius(): number {
     return this.pointRadius;
   }
   /**
    * Set the point radius
    * @param {Number} pointRadius point radius
    */
-  setPointRadius(pointRadius) {
+  setPointRadius(pointRadius: number) {
     this.pointRadius = pointRadius;
   }
   /**
    * Get point color
    * @return {String} color
    */
-  getPointColor() {
+  getPointColor(): string {
     return this.pointPaint.getColor();
   }
   /**
    * Set point color
    * @param {String} pointColor point color
    */
-  setPointColor(pointColor) {
+  setPointColor(pointColor: string) {
     this.pointPaint.setColor(pointColor);
   }
   /**
    * Get the point icon
    * @return {module:tiles/features.FeatureTilePointIcon} icon
    */
-  getPointIcon() {
+  getPointIcon(): FeatureTilePointIcon {
     return this.pointIcon;
   }
   /**
    * Set the point icon
    * @param {module:tiles/features.FeatureTilePointIcon} pointIcon point icon
    */
-  setPointIcon(pointIcon) {
+  setPointIcon(pointIcon: FeatureTilePointIcon) {
     this.pointIcon = pointIcon;
   }
   /**
    * Get line stroke width
    * @return {Number} width
    */
-  getLineStrokeWidth() {
+  getLineStrokeWidth(): number {
     return this.lineStrokeWidth;
   }
   /**
    * Set line stroke width
    * @param {Number} lineStrokeWidth line stroke width
    */
-  setLineStrokeWidth(lineStrokeWidth) {
+  setLineStrokeWidth(lineStrokeWidth: number) {
     this.lineStrokeWidth = lineStrokeWidth;
     this.linePaint.setStrokeWidth(this.scale * this.lineStrokeWidth);
   }
@@ -501,28 +484,28 @@ export class FeatureTiles {
    * Get line color
    * @return {String} color
    */
-  getLineColor() {
+  getLineColor(): string {
     return this.linePaint.getColor();
   }
   /**
    * Set line color
    * @param {String} lineColor line color
    */
-  setLineColor(lineColor) {
+  setLineColor(lineColor: string) {
     this.linePaint.setColor(lineColor);
   }
   /**
    * Get polygon stroke width
    * @return {Number} width
    */
-  getPolygonStrokeWidth() {
+  getPolygonStrokeWidth(): number {
     return this.polygonStrokeWidth;
   }
   /**
    * Set polygon stroke width
    * @param {Number} polygonStrokeWidth polygon stroke width
    */
-  setPolygonStrokeWidth(polygonStrokeWidth) {
+  setPolygonStrokeWidth(polygonStrokeWidth: number) {
     this.polygonStrokeWidth = polygonStrokeWidth;
     this.polygonPaint.setStrokeWidth(this.scale * this.polygonStrokeWidth);
   }
@@ -530,49 +513,49 @@ export class FeatureTiles {
    * Get polygon color
    * @return {String} color
    */
-  getPolygonColor() {
+  getPolygonColor(): string {
     return this.polygonPaint.getColor();
   }
   /**
    * Set polygon color
    * @param {String} polygonColor polygon color
    */
-  setPolygonColor(polygonColor) {
+  setPolygonColor(polygonColor: string) {
     this.polygonPaint.setColor(polygonColor);
   }
   /**
    * Is fill polygon
    * @return {Boolean} true if fill polygon
    */
-  isFillPolygon() {
+  isFillPolygon(): boolean {
     return this.fillPolygon;
   }
   /**
    * Set the fill polygon
    * @param {Boolean} fillPolygon fill polygon
    */
-  setFillPolygon(fillPolygon) {
+  setFillPolygon(fillPolygon: boolean) {
     this.fillPolygon = fillPolygon;
   }
   /**
    * Get polygon fill color
    * @return {String} color
    */
-  getPolygonFillColor() {
+  getPolygonFillColor(): string {
     return this.polygonFillPaint.getColor();
   }
   /**
    * Set polygon fill color
    * @param {String} polygonFillColor polygon fill color
    */
-  setPolygonFillColor(polygonFillColor) {
+  setPolygonFillColor(polygonFillColor: string) {
     this.polygonFillPaint.setColor(polygonFillColor);
   }
   /**
    * Get the max features per tile
    * @return {Number} max features per tile or null
    */
-  getMaxFeaturesPerTile() {
+  getMaxFeaturesPerTile(): number {
     return this.maxFeaturesPerTile;
   }
   /**
@@ -580,7 +563,7 @@ export class FeatureTiles {
    * to create a single tile, the tile is not created.
    * @param {Number} maxFeaturesPerTile  max features per tile
    */
-  setMaxFeaturesPerTile(maxFeaturesPerTile) {
+  setMaxFeaturesPerTile(maxFeaturesPerTile: number) {
     this.maxFeaturesPerTile = maxFeaturesPerTile;
   }
   /**
@@ -588,7 +571,7 @@ export class FeatureTiles {
    * for tiles with more features than the max at #getMaxFeaturesPerTile
    * @return {module:tiles/features/custom~CustomFeatureTile} max features tile draw or null
    */
-  getMaxFeaturesTileDraw() {
+  getMaxFeaturesTileDraw(): CustomFeaturesTile {
     return this.maxFeaturesTileDraw;
   }
   /**
@@ -596,15 +579,15 @@ export class FeatureTiles {
    * a single tile than the max at #getMaxFeaturesPerTile exist
    * @param {module:tiles/features/custom~CustomFeatureTile} maxFeaturesTileDraw max features tile draw
    */
-  setMaxFeaturesTileDraw(maxFeaturesTileDraw) {
+  setMaxFeaturesTileDraw(maxFeaturesTileDraw: CustomFeaturesTile) {
     this.maxFeaturesTileDraw = maxFeaturesTileDraw;
   }
-  getFeatureCountXYZ(x, y, z) {
+  getFeatureCountXYZ(x: number, y: number, z: number): number {
     var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
     boundingBox = this.expandBoundingBox(boundingBox);
     return this.featureDao.countWebMercatorBoundingBox(boundingBox);
   }
-  drawTile(x, y, z, canvas = null) {
+  async drawTile(x: number, y: number, z: number, canvas = null): Promise<any> {
     var indexed = this.featureDao.isIndexed();
     if (indexed) {
       return this.drawTileQueryIndex(x, y, z, canvas);
@@ -613,7 +596,7 @@ export class FeatureTiles {
       return this.drawTileQueryAll(x, y, z, canvas);
     }
   }
-  drawTileQueryAll(x, y, zoom, canvas) {
+  async drawTileQueryAll(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
     var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     boundingBox = this.expandBoundingBox(boundingBox);
     var count = this.featureDao.getCount();
@@ -624,7 +607,7 @@ export class FeatureTiles {
       return this.maxFeaturesTileDraw.drawUnindexedTile(256, 256, canvas);
     }
   }
-  async drawTileQueryIndex(x, y, z, tileCanvas) {
+  async drawTileQueryIndex(x: number, y: number, z: number, tileCanvas?: any): Promise<any> {
     var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
     var expandedBoundingBox = this.expandBoundingBox(boundingBox);
     var width = 256;
@@ -659,7 +642,6 @@ export class FeatureTiles {
     var tileCount = this.featureDao.countWebMercatorBoundingBox(expandedBoundingBox);
     if (this.maxFeaturesPerTile === null || tileCount <= this.maxFeaturesPerTile) {
       var iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
-      var geojsonFeatures = [];
       for (var featureRow of iterator) {
         var geojson = null;
         if (this.cacheGeometries) {
@@ -669,14 +651,11 @@ export class FeatureTiles {
           geojson = featureRow.getGeometry().geometry.toGeoJSON();
           this.geometryCache.setGeometry(featureRow.getId(), geojson);
         }
-        geojsonFeatures.push(geojson);
-      }
-      for (var gj of geojsonFeatures) {
         var style = this.getFeatureStyle(featureRow);
         if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
-          gj = reproject.toWgs84(gj, this.featureDao.projection);
+          geojson = reproject.toWgs84(geojson, this.featureDao.projection);
         }
-        await this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
+        await this.addFeatureToBatch(geojson, context, drawProjection, boundingBox, style);
       }
       // @ts-ignore
       return new Promise(function (resolve, reject) {
@@ -703,7 +682,7 @@ export class FeatureTiles {
       return this.maxFeaturesTileDraw.drawTile(width, height, tileCount, canvas);
     }
   }
-  async drawTileWithBoundingBox(boundingBox, zoom, tileCanvas) {
+  async drawTileWithBoundingBox(boundingBox: BoundingBox, zoom: number, tileCanvas?: any): Promise<any> {
     var width = 256;
     var height = 256;
     var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 << zoom), width * (1 << zoom));
@@ -784,7 +763,7 @@ export class FeatureTiles {
    * @param drawProjection
    */
   // @ts-ignore
-  async drawPoint(path, geoJson, context, boundingBox, featureStyle, drawProjection) {
+  async drawPoint(path: any, geoJson: any, context: any, boundingBox: BoundingBox, featureStyle: any, drawProjection: Function) {
     var width;
     var height;
     var iconX;
@@ -942,7 +921,7 @@ export class FeatureTiles {
    * @param webMercatorBoundingBox  web mercator bounding box
    * @return {BoundingBox} bounding box
    */
-  expandBoundingBox(webMercatorBoundingBox) {
+  expandBoundingBox(webMercatorBoundingBox: BoundingBox): BoundingBox {
     return this.expandWebMercatorBoundingBox(webMercatorBoundingBox, webMercatorBoundingBox);
   }
   /**
@@ -951,7 +930,7 @@ export class FeatureTiles {
    * @param tileWebMercatorBoundingBox  tile web mercator bounding box
    * @return {BoundingBox} bounding box
    */
-  expandWebMercatorBoundingBox(webMercatorBoundingBox, tileWebMercatorBoundingBox) {
+  expandWebMercatorBoundingBox(webMercatorBoundingBox: BoundingBox, tileWebMercatorBoundingBox: BoundingBox): BoundingBox {
     // Create an expanded bounding box to handle features outside the tile  that overlap
     var minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(this.tileWidth, webMercatorBoundingBox, tileWebMercatorBoundingBox, 0 - this.widthOverlap);
     var maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(this.tileWidth, webMercatorBoundingBox, tileWebMercatorBoundingBox, this.tileWidth + this.widthOverlap);

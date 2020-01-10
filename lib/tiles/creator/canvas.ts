@@ -38,7 +38,7 @@ export class CanvasTileCreator extends TileCreator {
     var color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
     this.imageData.set(color.data, (targetY * this.width * 4) + (targetX * 4));
   }
-  addTile(tileData: any, gridColumn: number, gridRow: number) {
+  async loadImage(tileData: any) {
     var type = fileType(tileData);
     var binary = '';
     var bytes = tileData;
@@ -48,48 +48,49 @@ export class CanvasTileCreator extends TileCreator {
     }
     // eslint-disable-next-line no-undef
     var base64Data = btoa(binary);
-    return new Promise(function (resolve) {
+    return new Promise((resolve: Function) => {
       this.chunks = [];
-      this.image.onload = function () {
+      this.image.onload = () => {
         resolve(this.tileContext.drawImage(this.image, 0, 0));
-      }.bind(this);
+      };
       this.image.src = 'data:' + type.mime + ';base64,' + base64Data;
-    }.bind(this))
-      .then(function () {
-        return this.projectTile(tileData, gridColumn, gridRow);
-      }.bind(this))
-      .then(function () {
-        if (this.chunks && this.chunks.length) {
-          return this.chunks.reduce(function (sequence, chunk) {
-            var type = fileType(tileData);
-            var binary = '';
-            var bytes = chunk.chunk;
-            var len = bytes.byteLength;
-            for (var i = 0; i < len; i++) {
-              binary += String.fromCharCode(bytes[i]);
-            }
-            // eslint-disable-next-line no-undef
-            var base64DataChunk = btoa(binary);
-            // eslint-disable-next-line no-undef
-            var image = document.createElement('img');
-            return sequence.then(function () {
-              return new Promise(function (resolve) {
-                image.onload = function () {
-                  var p = chunk.position;
-                  this.ctx.drawImage(image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
-                  resolve();
-                }.bind(this);
-                image.src = 'data:' + type.mime + ';base64,' + base64DataChunk;
-              }.bind(this));
-            }.bind(this));
-          }.bind(this), Promise.resolve());
+    })
+  }
+
+  async addTile(tileData: any, gridColumn: number, gridRow: number) {
+    var type = fileType(tileData);
+    await this.loadImage(tileData);
+    this.projectTile(tileData, gridColumn, gridRow);
+    if (this.chunks && this.chunks.length) {
+      return this.chunks.reduce(function (sequence, chunk) {
+        var type = fileType(tileData);
+        var binary = '';
+        var bytes = chunk.chunk;
+        var len = bytes.byteLength;
+        for (var i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
         }
-      }.bind(this));
+        // eslint-disable-next-line no-undef
+        var base64DataChunk = btoa(binary);
+        // eslint-disable-next-line no-undef
+        var image = document.createElement('img');
+        return sequence.then(function () {
+          return new Promise(function (resolve) {
+            image.onload = function () {
+              var p = chunk.position;
+              this.ctx.drawImage(image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
+              resolve();
+            }.bind(this);
+            image.src = 'data:' + type.mime + ';base64,' + base64DataChunk;
+          }.bind(this));
+        }.bind(this));
+      }.bind(this), Promise.resolve());
+    }
   }
   async getCompleteTile(format?: string): Promise<any> {
     return this.canvas.toDataURL();
   }
-  reproject(tileData, tilePieceBoundingBox) {
+  async reproject(tileData: any, tilePieceBoundingBox): Promise<void> {
     var ctx = this.ctx;
     var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, this.tileBoundingBox, this.height, this.width, this.projectionTo, this.projectionFrom, this.projectionFromDefinition, this.tileHeightUnitsPerPixel, this.tileWidthUnitsPerPixel, this.tileMatrix.pixel_x_size, this.tileMatrix.pixel_y_size);
     var job = {

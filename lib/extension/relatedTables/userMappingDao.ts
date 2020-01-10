@@ -17,6 +17,8 @@ import { DataTypes } from '../../..';
  * @param {UserMappingTable} [userMappingTable]
  */
 export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<UserMappingRow> {
+
+  public table: UserMappingTable;
   
   constructor(userCustomDao: UserCustomDao<UserMappingRow>, geoPackage: GeoPackage, userMappingTable?: UserMappingTable) {
     super(geoPackage, userMappingTable || new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));

@@ -235,7 +235,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {String} table table name
    * @return {Boolean} indicates if the table was dropped
    */
-  dropTable(table: string): Boolean {
+  dropTable(table: string): boolean {
     try {
       var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
       var result = statement.run();

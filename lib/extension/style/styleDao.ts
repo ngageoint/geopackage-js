@@ -6,6 +6,7 @@
 import StyleTable from './styleTable';
 import {AttributeDao} from '../../attributes/attributeDao';
 import StyleRow from './styleRow';
+import GeoPackage from '../../geoPackage';
 
 /**
  * Style DAO for reading style tables
@@ -15,16 +16,15 @@ import StyleRow from './styleRow';
  * @constructor
  */
 export class StyleDao extends AttributeDao<StyleRow> {
-  constructor(geoPackage, table) {
+  constructor(geoPackage: GeoPackage, public table: StyleTable) {
     super(geoPackage, table);
-    this.table = table;
   }
   /**
    * Creates a StyleRow object from the results
    * @param results
    * @returns {module:extension/style.StyleRow}
    */
-  createObject(results) {
+  createObject(results: any): StyleRow {
     if (results) {
       return this.getRow(results);
     }
@@ -34,7 +34,7 @@ export class StyleDao extends AttributeDao<StyleRow> {
    * Create a new style row
    * @return {module:extension/style.StyleRow}
    */
-  newRow() {
+  newRow(): StyleRow {
     return new StyleRow(this.table);
   }
   /**
@@ -43,7 +43,7 @@ export class StyleDao extends AttributeDao<StyleRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.StyleRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: any[], values: any[]): StyleRow {
     return new StyleRow(this.table, columnTypes, values);
   }
 }

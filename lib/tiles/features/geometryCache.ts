@@ -1,3 +1,5 @@
+import FeatureRow from "../../features/user/featureRow";
+
 /**
  * Feature Paint Cache.
  * @module tiles/features
@@ -9,14 +11,13 @@
  */
 export class GeometryCache {
   public static readonly DEFAULT_GEOMETRY_CACHE_SIZE = 100;
-  cacheSize: any;
   geometryCache: {};
   accessHistory: any[];
 
-    constructor(size = null) {
-        this.cacheSize = size !== null ? size : GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE;
-        this.geometryCache = {};
-        this.accessHistory = [];
+    constructor(public cacheSize: number = GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE) {
+        // this.cacheSize = size !== null ? size : GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE;
+      this.geometryCache = {};
+      this.accessHistory = [];
     }
   
   /**
@@ -24,7 +25,7 @@ export class GeometryCache {
    * @param featureRow
    * @returns {module:tiles/features~Geometry}
    */
-  getGeometryForFeatureRow(featureRow) {
+  getGeometryForFeatureRow(featureRow: FeatureRow): any {
     return this.getGeometry(featureRow.getId());
   };
   
@@ -33,7 +34,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @return {module:tiles/features~Geometry} geometry or null
    */
-  getGeometry(featureRowId) {
+  getGeometry(featureRowId: number): any {
     var Geometry = this.geometryCache[featureRowId];
     if (!!Geometry) {
       var index = this.accessHistory.indexOf(featureRowId);
@@ -51,7 +52,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @param {Object} geometry geometry
    */
-  setGeometry(featureRowId, geometry) {
+  setGeometry(featureRowId: number, geometry: any) {
     var index = this.accessHistory.indexOf(featureRowId);
     if (index > -1) {
       this.accessHistory.splice(index, 1);
@@ -71,7 +72,7 @@ export class GeometryCache {
    * @param {Number} featureRowId style row id
    * @return {module:tiles/features~Geometry} removed feature paint or null
    */
-  remove(featureRowId) {
+  remove(featureRowId: number): any {
     var removed = this.geometryCache[featureRowId];
     delete this.geometryCache[featureRowId];
     if (!!removed) {
@@ -94,7 +95,7 @@ export class GeometryCache {
    * Resize the cache
    * @param {Number} maxSize max size
    */
-  resize(maxSize) {
+  resize(maxSize: number) {
     this.cacheSize = maxSize;
     var keys = Object.keys(this.geometryCache);
     if (keys.length > maxSize) {

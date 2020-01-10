@@ -4,20 +4,12 @@
  * @class
  */
 export default class TileGrid {
-  min_x: number;
-  max_x: number;
-  min_y: number;
-  max_y: number;
-  constructor(minX: number, maxX: number, minY: number, maxY: number) {
-    this.min_x = minX;
-    this.max_x = maxX;
-    this.min_y = minY;
-    this.max_y = maxY;
+  constructor(public min_x: number, public max_x: number, public min_y: number, public max_y: number) {
   }
-  count() {
+  count(): number {
     return ((this.max_x + 1) - this.min_x) * ((this.max_y + 1) - this.min_y);
   }
-  equals(tileGrid: TileGrid) {
+  equals(tileGrid: TileGrid): boolean {
     if (!tileGrid)
       return false;
     return this.min_x === tileGrid.min_x

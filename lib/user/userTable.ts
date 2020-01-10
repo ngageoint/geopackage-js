@@ -59,6 +59,11 @@ export default class UserTable {
       this.nameToIndex[column.name] = index;
     }
   }
+
+  getTableType(): string {
+    return "userTable";
+  }
+
   /**
    * Check for duplicate column names
    * @param  {Number} index         index

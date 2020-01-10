@@ -7,24 +7,24 @@ import TileTable from './tileTable';
 import TileColumn from './tileColumn';
 
 import DataTypes from '../../db/dataTypes';
+import { TileMatrixSet } from '../matrixset/tileMatrixSet';
+import GeoPackage from '../../geoPackage';
 
 /**
 * Reads the metadata from an existing tile table
 * @class TileTableReader
 */
 export default class TileTableReader extends UserTableReader {
-  tileMatrixSet: any;
-  constructor(tileMatrixSet) {
+  constructor(public tileMatrixSet: TileMatrixSet) {
     super(tileMatrixSet.table_name);
-    this.tileMatrixSet = tileMatrixSet;
   }
-  readTileTable(geoPackage) {
+  readTileTable(geoPackage: GeoPackage) {
     return this.readTable(geoPackage.getDatabase());
   }
-  createTable(tableName, columns) {
+  createTable(tableName: string, columns: TileColumn[]) {
     return new TileTable(tableName, columns);
   }
-  createColumnWithResults(results, index, name, type, max, notNull, defaultValueIndex, primaryKey) {
+  createColumnWithResults(results: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValueIndex?: number, primaryKey?: boolean): TileColumn {
     var dataType = DataTypes.fromName(type);
     var defaultValue = undefined;
     if (defaultValueIndex) {

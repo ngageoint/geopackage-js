@@ -558,7 +558,7 @@ export abstract class Dao<T> {
    * Drops this table
    * @return {boolean} results of the drop
    */
-  dropTable(): Boolean {
+  dropTable(): boolean {
     return this.connection.dropTable(this.gpkgTableName);
   }
   /**

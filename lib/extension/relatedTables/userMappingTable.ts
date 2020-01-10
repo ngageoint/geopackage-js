@@ -19,6 +19,9 @@ export default class UserMappingTable extends UserTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
   public static readonly COLUMN_RELATED_ID: string = 'related_id';
   
+  getTableType(): string {
+    return "userMappingTable";
+  }
   /**
    * Get the base id column
    * @return {module:user/userColumn~UserColumn}

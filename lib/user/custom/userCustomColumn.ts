@@ -34,7 +34,7 @@ export default class UserCustomColumn extends UserColumn {
    *
    *  @return {module:user/custom~UserCustomColumn} created column
    */
-  static createColumn(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any) {
+  static createColumn(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any): UserCustomColumn {
     return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, false);
   }
 }

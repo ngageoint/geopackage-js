@@ -253,10 +253,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(0);
-      box.minY.should.be.equal(0);
-      box.maxX.should.be.equal(Math.pow(2, i)-1);
-      box.maxY.should.be.equal(Math.pow(2, i)-1);
+      box.minLongitude.should.be.equal(0);
+      box.minLatitude.should.be.equal(0);
+      box.maxLongitude.should.be.equal(Math.pow(2, i)-1);
+      box.maxLatitude.should.be.equal(Math.pow(2, i)-1);
     }
   });
 
@@ -265,10 +265,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(0);
-      box.minY.should.be.equal(0);
-      box.maxX.should.be.equal(Math.pow(2, i)-1);
-      box.maxY.should.be.equal(Math.pow(2, i)-1);
+      box.minLongitude.should.be.equal(0);
+      box.minLatitude.should.be.equal(0);
+      box.maxLongitude.should.be.equal(Math.pow(2, i)-1);
+      box.maxLatitude.should.be.equal(Math.pow(2, i)-1);
     }
   });
 
@@ -277,10 +277,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(Math.floor(Math.pow(2, i)/2));
-      box.minY.should.be.equal(0);
-      box.maxX.should.be.equal(Math.pow(2, i)-1);
-      box.maxY.should.be.equal(Math.pow(2, i)-1);
+      box.minLongitude.should.be.equal(Math.floor(Math.pow(2, i)/2));
+      box.minLatitude.should.be.equal(0);
+      box.maxLongitude.should.be.equal(Math.pow(2, i)-1);
+      box.maxLatitude.should.be.equal(Math.pow(2, i)-1);
     }
   });
 
@@ -289,10 +289,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(0);
-      box.minY.should.be.equal(0);
-      box.maxX.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
-      box.maxY.should.be.equal(Math.pow(2, i)-1);
+      box.minLongitude.should.be.equal(0);
+      box.minLatitude.should.be.equal(0);
+      box.maxLongitude.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
+      box.maxLatitude.should.be.equal(Math.pow(2, i)-1);
     }
   });
 
@@ -301,10 +301,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(0);
-      box.minY.should.be.equal(0);
-      box.maxX.should.be.equal(Math.pow(2, i)-1);
-      box.maxY.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
+      box.minLongitude.should.be.equal(0);
+      box.minLatitude.should.be.equal(0);
+      box.maxLongitude.should.be.equal(Math.pow(2, i)-1);
+      box.maxLatitude.should.be.equal(Math.floor((Math.pow(2, i)-1)/2));
     }
   });
 
@@ -313,10 +313,10 @@ describe('TileBoundingBoxUtils tests', function() {
 
     for (var i = 0; i <= 18; i++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, i);
-      box.minX.should.be.equal(0);
-      box.minY.should.be.equal(Math.floor(Math.pow(2, i)/2));
-      box.maxX.should.be.equal(Math.pow(2, i)-1);
-      box.maxY.should.be.equal(Math.pow(2, i)-1);
+      box.minLongitude.should.be.equal(0);
+      box.minLatitude.should.be.equal(Math.floor(Math.pow(2, i)/2));
+      box.maxLongitude.should.be.equal(Math.pow(2, i)-1);
+      box.maxLatitude.should.be.equal(Math.pow(2, i)-1);
     }
   });
 
@@ -324,10 +324,10 @@ describe('TileBoundingBoxUtils tests', function() {
     const webMercatorBox = new BoundingBox(-20037508.3, 20037508.3, -20037508.3, 20037508.3);
     const tileBox = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, 12);
 
-    tileBox.minX.should.equal(0);
-    tileBox.maxX.should.equal(4095);
-    tileBox.minY.should.equal(0);
-    tileBox.maxY.should.equal(4095);
+    tileBox.minLongitude.should.equal(0);
+    tileBox.maxLongitude.should.equal(4095);
+    tileBox.minLatitude.should.equal(0);
+    tileBox.maxLatitude.should.equal(4095);
   });
 
   it('should clamp bounds outside 3857 bounds', function() {
@@ -335,9 +335,9 @@ describe('TileBoundingBoxUtils tests', function() {
     const webMercatorBox = new BoundingBox(-20037509, 20037509, -20037509, 20037509);
     const tileBox = TileBoundingBoxUtils.webMercatorTileBox(webMercatorBox, 12);
 
-    tileBox.minX.should.equal(0);
-    tileBox.maxX.should.equal(4095);
-    tileBox.minY.should.equal(0);
-    tileBox.maxY.should.equal(4095);
+    tileBox.minLongitude.should.equal(0);
+    tileBox.maxLongitude.should.equal(4095);
+    tileBox.minLatitude.should.equal(0);
+    tileBox.maxLatitude.should.equal(4095);
   });
 });

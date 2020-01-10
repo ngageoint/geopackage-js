@@ -10,6 +10,9 @@ import { TileMatrix } from '../matrix/tileMatrix'
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { BoundingBox } from '../../boundingBox';
 import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
+import { TileMatrixSet } from '../matrixset/tileMatrixSet';
+import GeoPackage from '../../geoPackage';
+import TileTable from './tileTable';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -23,11 +26,9 @@ import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
  * @param  {TileMatrix[]} tileMatrices
  */
 export class TileDao extends UserDao<TileRow> {
-  tileMatrixSet: any;
-  tileMatrices: any;
-  zoomLevelToTileMatrix: any[];
-  widths: any[];
-  heights: any[];
+  zoomLevelToTileMatrix: TileMatrix[];
+  widths: number[];
+  heights: number[];
   minZoom: number;
   maxZoom: number;
   srs: any;
@@ -35,10 +36,8 @@ export class TileDao extends UserDao<TileRow> {
   minWebMapZoom: number;
   maxWebMapZoom: number;
   webZoomToGeoPackageZooms: {};
-  constructor(geoPackage, table, tileMatrixSet, tileMatrices) {
+  constructor(geoPackage: GeoPackage, public table: TileTable, public tileMatrixSet: TileMatrixSet, public tileMatrices: TileMatrix[]) {
     super(geoPackage, table);
-    this.tileMatrixSet = tileMatrixSet;
-    this.tileMatrices = tileMatrices;
     this.zoomLevelToTileMatrix = [];
     this.widths = [];
     this.heights = [];
@@ -79,7 +78,7 @@ export class TileDao extends UserDao<TileRow> {
     }
     this.setWebMapZoomLevels();
   }
-  webZoomToGeoPackageZoom(webZoom) {
+  webZoomToGeoPackageZoom(webZoom: number): number {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(0, 0, webZoom);
     return this.determineGeoPackageZoomLevel(webMercatorBoundingBox, webZoom);
   }
@@ -108,8 +107,7 @@ export class TileDao extends UserDao<TileRow> {
       this.webZoomToGeoPackageZooms[zoom] = tileMatrix.zoom_level;
     }
   }
-  // @ts-ignore
-  determineGeoPackageZoomLevel(webMercatorBoundingBox, zoom) {
+  determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox, zoom: number): number {
     return this.webZoomToGeoPackageZooms[zoom];
   }
   /**
@@ -117,7 +115,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel zoom level
    * @return {BoundingBox}           bounding box of the zoom level, or null if no tiles
    */
-  getBoundingBoxWithZoomLevel(zoomLevel) {
+  getBoundingBoxWithZoomLevel(zoomLevel: number): BoundingBox {
     var boundingBox;
     var tileMatrix = this.getTileMatrixWithZoomLevel(zoomLevel);
     if (tileMatrix) {
@@ -132,10 +130,10 @@ export class TileDao extends UserDao<TileRow> {
       return boundingBox;
     }
   }
-  getBoundingBox() {
+  getBoundingBox(): BoundingBox {
     return this.tileMatrixSet.getBoundingBox();
   }
-  queryForTileGridWithZoomLevel(zoomLevel) {
+  queryForTileGridWithZoomLevel(zoomLevel: number): TileGrid {
     var where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
     var whereArgs = this.buildWhereArgs(zoomLevel);
     var minX = this.minOfColumn(TileColumn.COLUMN_TILE_COLUMN, where, whereArgs);
@@ -153,7 +151,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel zoom level
    * @return {TileGrid}           tile grid at zoom level, null if no tile matrix at zoom level
    */
-  getTileGridWithZoomLevel(zoomLevel) {
+  getTileGridWithZoomLevel(zoomLevel: number): TileGrid {
     var tileGrid;
     var tileMatrix = this.getTileMatrixWithZoomLevel(zoomLevel);
     if (tileMatrix) {
@@ -165,7 +163,7 @@ export class TileDao extends UserDao<TileRow> {
    * get the tile table
    * @return {TileTable} tile table
    */
-  getTileTable() {
+  getTileTable(): TileTable {
     return this.table;
   }
   /**
@@ -174,14 +172,14 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Array} values      values
    * @return {TileRow}             tile row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: string[], values: any[]): TileRow {
     return new TileRow(this.getTileTable(), columnTypes, values);
   }
   /**
    * Create a new tile row
    * @return {TileRow} tile row
    */
-  newRow() {
+  newRow(): TileRow {
     return new TileRow(this.getTileTable());
   }
   /**
@@ -190,17 +188,17 @@ export class TileDao extends UserDao<TileRow> {
    * into the tile matrix lengths
    */
   adjustTileMatrixLengths() {
-    var tileMatrixWidth = this.tileMatrixSet.maxX - this.tileMatrixSet.minX;
-    var tileMatrixHeight = this.tileMatrixSet.maxY - this.tileMatrixSet.minY;
+    var tileMatrixWidth = this.tileMatrixSet.max_x - this.tileMatrixSet.min_x;
+    var tileMatrixHeight = this.tileMatrixSet.max_y - this.tileMatrixSet.min_y;
     for (var i = 0; i < this.tileMatrices.length; i++) {
       var tileMatrix = this.tileMatrices[i];
-      var tempMatrixWidth = ~~((tileMatrixWidth / (tileMatrix.pixelXSize * ~~tileMatrix.tileWidth)));
-      var tempMatrixHeight = ~~((tileMatrixHeight / (tileMatrix.pixelYSize * ~~(tileMatrix.tileHeight))));
-      if(tempMatrixWidth > ~~(tileMatrix.matrixWidth)) {
-        tileMatrix.matrixWidth = ~~(tempMatrixWidth);
+      var tempMatrixWidth = ~~((tileMatrixWidth / (tileMatrix.pixel_x_size * ~~tileMatrix.tile_width)));
+      var tempMatrixHeight = ~~((tileMatrixHeight / (tileMatrix.pixel_y_size * ~~(tileMatrix.tile_height))));
+      if(tempMatrixWidth > ~~(tileMatrix.matrix_width)) {
+        tileMatrix.matrix_width = ~~(tempMatrixWidth);
       }
-      if (tempMatrixHeight > ~~(tileMatrix.matrixHeight)) {
-        tileMatrix.matrixHeight = ~~(tempMatrixHeight);
+      if (tempMatrixHeight > ~~(tileMatrix.matrix_height)) {
+        tileMatrix.matrix_height = ~~(tempMatrixHeight);
       }
     }
   }
@@ -209,7 +207,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel zoom level
    * @returns {TileMatrix}           tile matrix
    */
-  getTileMatrixWithZoomLevel(zoomLevel) {
+  getTileMatrixWithZoomLevel(zoomLevel: number): TileMatrix {
     return this.zoomLevelToTileMatrix[zoomLevel];
   }
   /**
@@ -229,44 +227,17 @@ export class TileDao extends UserDao<TileRow> {
     }
     return tileRow;
   }
-  queryForTilesWithZoomLevel(zoomLevel) {
+  queryForTilesWithZoomLevel(zoomLevel: number): IterableIterator<TileRow> {
     var iterator = this.queryForEach(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
-    var thisgetRow = this.getRow.bind(this);
     return {
       [Symbol.iterator]() {
         return this;
       },
-      next: function () {
+      next: () => {
         var nextRow = iterator.next();
         if (!nextRow.done) {
           return {
-            value: thisgetRow(nextRow.value),
-            done: false
-          };
-        }
-        return {
-          done: true
-        };
-      }.bind(this)
-    };
-  }
-  /**
-   * Query for Tiles at a zoom level in descending row and column order
-   * @param  {Number} zoomLevel    zoom level
-   * @returns {IterableIterator<TileRow>}
-   */
-  queryForTilesDescending(zoomLevel) {
-    var iterator = this.queryForEach(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ' DESC');
-    var thisgetRow = this.getRow.bind(this);
-    return {
-      [Symbol.iterator]() {
-        return this;
-      },
-      next: function () {
-        var nextRow = iterator.next();
-        if (!nextRow.done) {
-          return {
-            value: thisgetRow(nextRow.value),
+            value: this.getRow(nextRow.value),
             done: false
           };
         }
@@ -274,7 +245,33 @@ export class TileDao extends UserDao<TileRow> {
           value: undefined,
           done: true
         };
-      }.bind(this)
+      }
+    };
+  }
+  /**
+   * Query for Tiles at a zoom level in descending row and column order
+   * @param  {Number} zoomLevel    zoom level
+   * @returns {IterableIterator<TileRow>}
+   */
+  queryForTilesDescending(zoomLevel: number): IterableIterator<TileRow> {
+    var iterator = this.queryForEach(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel, undefined, undefined, TileColumn.COLUMN_TILE_COLUMN + ' DESC, ' + TileColumn.COLUMN_TILE_ROW + ' DESC');
+    return {
+      [Symbol.iterator]() {
+        return this;
+      },
+      next: () => {
+        var nextRow = iterator.next();
+        if (!nextRow.done) {
+          return {
+            value: this.getRow(nextRow.value),
+            done: false
+          };
+        }
+        return {
+          value: undefined,
+          done: true
+        };
+      }
     };
   }
   /**
@@ -283,20 +280,19 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel    zoom level
    * @returns {IterableIterator<TileRow>}
    */
-  queryForTilesInColumn(column, zoomLevel) {
+  queryForTilesInColumn(column: number, zoomLevel: number): IterableIterator<TileRow> {
     var fieldValues = new ColumnValues();
     fieldValues.addColumn(TileColumn.COLUMN_TILE_COLUMN, column);
     fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
     var iterator = this.queryForFieldValues(fieldValues);
-    var thisgetRow = this.getRow.bind(this);
     return {
       [Symbol.iterator]() {
         return this;
       },
-      next: function () {
+      next: () => {
         var nextRow = iterator.next();
         if (!nextRow.done) {
-          var tileRow = thisgetRow(nextRow.value);
+          var tileRow = this.getRow(nextRow.value);
           return {
             value: tileRow,
             done: false
@@ -316,20 +312,19 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} row       row
    * @param  {Number} zoomLevel    zoom level
    */
-  queryForTilesInRow(row, zoomLevel) {
+  queryForTilesInRow(row: number, zoomLevel: number): IterableIterator<TileRow> {
     var fieldValues = new ColumnValues();
     fieldValues.addColumn(TileColumn.COLUMN_TILE_ROW, row);
     fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
     var iterator = this.queryForFieldValues(fieldValues);
-    var thisgetRow = this.getRow.bind(this);
     return {
       [Symbol.iterator]() {
         return this;
       },
-      next: function () {
+      next: () => {
         var nextRow = iterator.next();
         if (!nextRow.done) {
-          var tileRow = thisgetRow(nextRow.value);
+          var tileRow = this.getRow(nextRow.value);
           return {
             value: tileRow,
             done: false
@@ -350,7 +345,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel zoom level
    * @returns {IterableIterator<any>}
    */
-  queryByTileGrid(tileGrid, zoomLevel) {
+  queryByTileGrid(tileGrid: TileGrid, zoomLevel: number): IterableIterator<TileRow> {
     if (!tileGrid)
       return;
     var where = '';
@@ -365,15 +360,14 @@ export class TileDao extends UserDao<TileRow> {
     where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, tileGrid.max_y, '<=');
     var whereArgs = this.buildWhereArgs([zoomLevel, tileGrid.min_x, tileGrid.max_x, tileGrid.min_y, tileGrid.max_y]);
     var iterator = this.queryWhereWithArgsDistinct(where, whereArgs);
-    var thisgetRow = this.getRow.bind(this);
     return {
       [Symbol.iterator]() {
         return this;
       },
-      next: function () {
+      next: () => {
         var nextRow = iterator.next();
         if (!nextRow.done) {
-          var tileRow = thisgetRow(nextRow.value);
+          var tileRow = this.getRow(nextRow.value);
           return {
             value: tileRow,
             done: false
@@ -394,7 +388,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Number} zoomLevel zoom level
    * @returns {Number} count of tiles
    */
-  countByTileGrid(tileGrid, zoomLevel) {
+  countByTileGrid(tileGrid: TileGrid, zoomLevel: number): number {
     if (!tileGrid)
       return;
     var where = '';
@@ -410,7 +404,8 @@ export class TileDao extends UserDao<TileRow> {
     var whereArgs = this.buildWhereArgs([zoomLevel, tileGrid.min_x, tileGrid.max_x, tileGrid.min_y, tileGrid.max_y]);
     return this.countWhere(where, whereArgs);
   }
-  deleteTile(column, row, zoomLevel) {
+
+  deleteTile(column: number, row: number, zoomLevel: number): number {
     var where = '';
     where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
     where += ' and ';
@@ -421,9 +416,9 @@ export class TileDao extends UserDao<TileRow> {
     return this.deleteWhere(where, whereArgs);
   }
   getSrs(): SpatialReferenceSystem {
-    return this.geoPackage.getContentsDao().getSrs(this.tileMatrixSet);
+    return this.geoPackage.getSpatialReferenceSystemDao().getBySrsId(this.tileMatrixSet.srs_id);
   }
-  dropTable() {
+  dropTable(): boolean {
     var tileMatrixDao = this.geoPackage.getTileMatrixDao();
     var dropResult = UserDao.prototype.dropTable.call(this);
     var tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
@@ -436,7 +431,7 @@ export class TileDao extends UserDao<TileRow> {
     dao.deleteById(this.gpkgTableName);
     return dropResult;
   }
-  rename(newName) {
+  rename(newName: string) {
     UserDao.prototype.rename.call(this, newName);
     var oldName = this.tileMatrixSet.table_name;
     var values = {};

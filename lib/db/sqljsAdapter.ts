@@ -280,7 +280,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {String} table table name
    * @return {Boolean} indicates if the table was dropped
    */
-  dropTable(table: string): Boolean {
+  dropTable(table: string): boolean {
     var response = this.db.exec('DROP TABLE IF EXISTS "' + table + '"');
     this.db.exec('VACUUM');
     return !!response;

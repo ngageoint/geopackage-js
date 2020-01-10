@@ -15,6 +15,7 @@ export class NodeTileCreator extends TileCreator {
   tileCanvas: any;
   tileContext: any;
   imageData: any;
+
   constructor(width: number, height: number, tileMatrix: TileMatrix, tileMatrixSet: TileMatrixSet, tileBoundingBox: BoundingBox, srs: SpatialReferenceSystem, projectionTo: string, canvas?: any) {
     super(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo);
     this.canvas = canvas;
@@ -36,39 +37,24 @@ export class NodeTileCreator extends TileCreator {
     this.imageData.data.set(color.data, (targetY * this.width * 4) + (targetX * 4));
     this.pixelAdded = true;
   }
-  addTile(tileData: any, gridColumn: number, gridRow: number) {
-    return ImageUtils.getImage(tileData)
-      .then(function (img) {
-        this.tile = img;
-        this.tileContext.drawImage(img, 0, 0);
-        this.chunks = [];
-      }.bind(this))
-      .then(function () {
-        return this.projectTile(tileData, gridColumn, gridRow);
-      }.bind(this))
-      .then(function () {
-        if (this.pixelAdded) {
-          this.ctx.putImageData(this.imageData, 0, 0);
-        }
-      }.bind(this))
-      .then(function () {
-        if (this.chunks && this.chunks.length) {
-          return this.chunks.reduce(function (sequence, chunk) {
-            return sequence.then(function () {
-              return ImageUtils.getImage(tileData);
-            }.bind(this))
-              .then(function (image) {
-                var p = chunk.position;
-                this.ctx.drawImage(image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
-              }.bind(this));
-          }.bind(this), Promise.resolve());
-        }
-      }.bind(this))
-      .then(function () {
-        return this.canvas;
-      }.bind(this));
+  async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
+    let tile = await ImageUtils.getImage(tileData);
+    this.tileContext.drawImage(tile, 0, 0);
+    this.chunks = [];
+    await this.projectTile(tileData, gridColumn, gridRow);
+    if (this.pixelAdded) {
+      this.ctx.putImageData(this.imageData, 0, 0);
+    }
+    if (this.chunks && this.chunks.length) {
+      for (let i = 0; i < this.chunks.length; i++) {
+        let image = await ImageUtils.getImage(tileData);
+        var p = this.chunks[i].position;
+        this.ctx.drawImage(image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
+      }
+    }
+    return this.canvas;
   }
-  getCompleteTile(format?: string) {
+  async getCompleteTile(format?: string) {
     return new Promise(function (resolve) {
       var writeStream = concat(function (buffer) {
         resolve(buffer);

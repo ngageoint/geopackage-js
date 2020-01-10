@@ -8,6 +8,7 @@ import GeoPackage from '../../geoPackage';
 import StyleMappingTable from './styleMappingTable';
 import UserMappingTable from '../relatedTables/userMappingTable';
 import StyleMappingRow from './styleMappingRow';
+import UserRow from '../../user/userRow';
 
 /**
  * Style Mapping DAO for reading user mapping data tables
@@ -18,6 +19,7 @@ import StyleMappingRow from './styleMappingRow';
  * @constructor
  */
 export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
+  public table: StyleMappingTable;
   constructor(userCustomDao: UserCustomDao<StyleMappingRow>, geoPackage: GeoPackage, styleMappingTable?: StyleMappingTable) {
     super(userCustomDao, geoPackage, styleMappingTable || new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));
   }
@@ -26,14 +28,14 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @param  {module:user/custom~UserCustomDao} userCustomDao
    * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
    */
-  createMappingTable(userCustomDao) {
+  createMappingTable(userCustomDao: UserCustomDao<UserRow>): StyleMappingTable {
     return new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
   }
   /**
    * Create a new {module:extension/style.StyleMappingRow}
    * @return {module:extension/style.StyleMappingRow}
    */
-  newRow() {
+  newRow(): StyleMappingRow {
     return new StyleMappingRow(this.table);
   }
   /**
@@ -42,7 +44,7 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values values
    * @return {module:extension/style.StyleMappingRow} style mapping row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: any[], values: any[]): StyleMappingRow {
     return new StyleMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -51,7 +53,7 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @param  {String} geometryType geometry type
    * @return {Number} number of deleted rows
    */
-  deleteByBaseIdAndGeometryType(baseId, geometryType) {
+  deleteByBaseIdAndGeometryType(baseId: number, geometryType: string): number {
     var where = '';
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId);
     where += ' AND ';

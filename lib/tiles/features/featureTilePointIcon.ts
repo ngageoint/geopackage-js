@@ -8,8 +8,13 @@
  * @param {Image} icon
  * @constructor
  */
-class FeatureTilePointIcon {
-  constructor(icon) {
+export class FeatureTilePointIcon {
+  icon: any;
+  width: number;
+  height: number;
+  xOffset: number;
+  yOffset: number;
+  constructor(icon: any) {
     this.icon = icon;
     this.width = icon.width;
     this.height = icon.height;
@@ -33,21 +38,21 @@ class FeatureTilePointIcon {
    * Get the icon
    * @returns {Image} icon
    */
-  getIcon() {
+  getIcon(): any {
     return this.icon;
   }
   /**
    * Get the width
    * @return {Number} width
    */
-  getWidth() {
+  getWidth(): number {
     return this.width;
   }
   /**
    * Set the display width and adjust the x offset
    * @param {Number} width icon display width
    */
-  setWidth(width) {
+  setWidth(width: number) {
     this.xOffset = this.xOffset / this.width * width;
     this.width = width;
   }
@@ -55,14 +60,14 @@ class FeatureTilePointIcon {
    * Get the height
    * @return {Number} height
    */
-  getHeight() {
+  getHeight(): number {
     return this.height;
   }
   /**
    * Set the display height and adjust the y offset
    * @param {Number} height  icon display height
    */
-  setHeight(height) {
+  setHeight(height: number) {
     this.yOffset = this.yOffset / this.height * height;
     this.height = height;
   }
@@ -70,30 +75,28 @@ class FeatureTilePointIcon {
    * Get the x offset
    * @return {Number} x offset
    */
-  getXOffset() {
+  getXOffset(): number {
     return this.xOffset;
   }
   /**
    * Set the x offset
    * @param {Number} xOffset x offset
    */
-  setXOffset(xOffset) {
+  setXOffset(xOffset: number) {
     this.xOffset = xOffset;
   }
   /**
    * Get the y offset
    * @return {Number} y offset
    */
-  getYOffset() {
+  getYOffset(): number {
     return this.yOffset;
   }
   /**
    * Set the y offset
    * @param {Number} yOffset y offset
    */
-  setYOffset(yOffset) {
+  setYOffset(yOffset: number) {
     this.yOffset = yOffset;
   }
 }
-
-module.exports = FeatureTilePointIcon;

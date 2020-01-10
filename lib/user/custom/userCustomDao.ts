@@ -15,14 +15,14 @@ import UserRow from '../userRow';
  */
 export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
 
-  createObject(results) {
+  createObject(results: any) {
     return this.getRow(results);
   }
   /**
    * Create a new UserRow
    * @return {module:user/userRow~UserRow}
    */
-  newRow() {
+  newRow(): UserRow {
     return new UserRow(this.table);
   }
   /**
@@ -32,7 +32,7 @@ export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
    * @param  {string[]} [requiredColumns] required columns
    * @return {module:user/custom~UserCustomDao}
    */
-  static readTable(geoPackage: GeoPackage, tableName: string, requiredColumns?: string[]) {
+  static readTable(geoPackage: GeoPackage, tableName: string, requiredColumns?: string[]): UserCustomDao<UserRow> {
     var reader = new UserCustomTableReader(tableName, requiredColumns);
     var userCustomTable = reader.readTable(geoPackage.getDatabase());
     return new UserCustomDao(geoPackage, userCustomTable);

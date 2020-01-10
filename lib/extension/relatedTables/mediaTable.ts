@@ -26,6 +26,10 @@ export default class MediaTable extends UserRelatedTable {
   constructor(tableName: string, columns?: UserColumn[], requiredColumns?: string[]) {
     super(tableName, MediaTable.RELATION_TYPE.name, MediaTable.RELATION_TYPE.dataType, columns, requiredColumns);
   }
+
+  getTableType() {
+    return this.TABLE_TYPE;
+  }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}

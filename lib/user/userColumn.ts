@@ -17,29 +17,15 @@ import DataTypes from '../db/dataTypes';
  * @param {Boolean} primaryKey `true` if this column is part of the table's primary key
  */
 export default class UserColumn {
-  index: number;
-  name: string;
-  dataType: any;
-  max: number;
   min: number;
-  notNull: boolean;
-  defaultValue: any;
-  primaryKey: boolean;
-  constructor(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean) {
-    this.index = index;
-    this.name = name;
-    this.dataType = dataType;
-    this.max = max;
-    this.notNull = notNull;
-    this.defaultValue = defaultValue;
-    this.primaryKey = primaryKey;
+  constructor(public index: number, public name: string, public dataType: any, public max?: number, public notNull?: boolean, public defaultValue?: any, public primaryKey?: boolean) {
     this.validateMax();
   }
   /**
    * Gets the type name
    * @return {module:db/dataTypes~GPKGDataType}
    */
-  getTypeName() {
+  getTypeName(): string {
     var type = undefined;
     if (this.dataType !== DataTypes.GPKGDataType.GPKG_DT_GEOMETRY) {
       type = DataTypes.nameFromType(this.dataType);

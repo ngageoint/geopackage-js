@@ -1,8 +1,10 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import StyleRow from '../../../../lib/extension/style/styleRow';
+import StyleTable from '../../../../lib/extension/style/styleTable';
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
-  , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon')
+  , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../..')
@@ -476,12 +478,18 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.getPolygonFillColor().should.be.equal('#00FF00FF')
       ft.setPolygonStrokeWidth(5);
       ft.getPolygonStrokeWidth().should.be.equal(5);
+      class MockStyleRow extends StyleRow {
+        getId() {
+          return 0;
+        }
+      }
+      class MockStyleTable extends StyleTable {
+
+      }
+      var st = new MockStyleTable('table', []);
+      var sr = new MockStyleRow(st);
       (function() {
-        ft.getStylePaint({
-          getId: function () {
-            return 0;
-          }
-        }, 'INVALID');
+        ft.getStylePaint(sr, 'INVALID');
       }).should.throw("Unsupported Draw Type: " + 'INVALID');
 
       ft.drawTile(153632, 91343, 18)

@@ -4,6 +4,7 @@ import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils }  from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
 import { TileCreator } from '../creator/tileCreator';
+import TileRow from '../user/tileRow';
 
 export class GeoPackageTileRetriever {
   tileDao: TileDao;
@@ -17,7 +18,7 @@ export class GeoPackageTileRetriever {
     this.width = width;
     this.height = height;
   }
-  getWebMercatorBoundingBox() {
+  getWebMercatorBoundingBox(): BoundingBox {
     if (this.setWebMercatorBoundingBox) {
       return this.setWebMercatorBoundingBox;
     }
@@ -34,38 +35,38 @@ export class GeoPackageTileRetriever {
       return this.setWebMercatorBoundingBox;
     }
   }
-  hasTile(x: number, y: number, zoom: number) {
+  hasTile(x: number, y: number, zoom: number): boolean {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, webMercatorBoundingBox);
     return !!this.tileDao.countByTileGrid(tileGrid, zoom);
   }
-  getTile(x: number, y: number, zoom: number) {
+  async getTile(x: number, y: number, zoom: number): Promise<any> {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857');
   }
-  drawTileIn(x: number, y: number, zoom: number, canvas?: any) {
+  async drawTileIn(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857', canvas);
   }
-  getTileWithWgs84Bounds(wgs84BoundingBox: BoundingBox, canvas?: any) {
+  async getTileWithWgs84Bounds(wgs84BoundingBox: BoundingBox, canvas?: any): Promise<any> {
     var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857', canvas);
   }
-  getTileWithWgs84BoundsInProjection(wgs84BoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
+  async getTileWithWgs84BoundsInProjection(wgs84BoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any): Promise<any> {
     var targetBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', targetProjection);
     return this.getTileWithBounds(targetBoundingBox, zoom, targetProjection, canvas);
   }
-  getWebMercatorTile(x: number, y: number, zoom: number) {
+  async getWebMercatorTile(x: number, y: number, zoom: number): Promise<any> {
     // need to determine the geoPackage zoom level from the web mercator zoom level
     var webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     var gpZoom = this.determineGeoPackageZoomLevel(webMercatorBoundingBox);
     return this.getTileWithBounds(webMercatorBoundingBox, gpZoom, 'EPSG:3857');
   }
-  determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox) {
+  determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox): number {
     // find width and height of this tile in geopackage projection
     var proj4Projection = proj4(this.tileDao.projection, 'EPSG:3857');
     var ne = proj4Projection.inverse([webMercatorBoundingBox.maxLongitude, webMercatorBoundingBox.maxLatitude]);
@@ -83,41 +84,27 @@ export class GeoPackageTileRetriever {
     }
     return gpZoom;
   }
-  async getTileWithBounds(targetBoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any) {
+  async getTileWithBounds(targetBoundingBox: BoundingBox, zoom: number, targetProjection: string, canvas?: any): Promise<any> {
     var tiles = [];
     var tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     if (!tileMatrix)
-      return Promise.resolve();
+      return;
     var tileWidth = tileMatrix.tile_width;
     var tileHeight = tileMatrix.tile_height;
     var creator = await TileCreator.create(this.width || tileWidth, this.height || tileHeight, tileMatrix, this.tileDao.tileMatrixSet, targetBoundingBox, this.tileDao.srs, targetProjection, canvas);
     console.time('Getting results')
     var iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
     for (var tile of iterator) {
-      tiles.push({
-        data: tile.getTileData(),
-        gridColumn: tile.getTileColumn(),
-        gridRow: tile.getRow()
-      });
+      await creator.addTile(tile.getTileData(), tile.getTileColumn(), tile.getRow());
     }
-    return tiles.reduce(function (sequence, tile) {
-      return sequence.then(function () {
-        return creator.addTile(tile.data, tile.gridColumn, tile.gridRow);
-      });
-    }, Promise.resolve())
-      .then(function () {
-        if (!canvas) {
-          return creator.getCompleteTile('png');
-        }
-      });
+    if (!canvas) {
+      return creator.getCompleteTile('png');
+    }
   }
-  retrieveTileResults(tileMatrixProjectionBoundingBox: BoundingBox, tileMatrix?: TileMatrix) {
+  retrieveTileResults(tileMatrixProjectionBoundingBox: BoundingBox, tileMatrix?: TileMatrix): IterableIterator<TileRow> {
     if (tileMatrix) {
       var tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(this.tileDao.tileMatrixSet.getBoundingBox(), tileMatrix.matrix_width, tileMatrix.matrix_height, tileMatrixProjectionBoundingBox);
       return this.tileDao.queryByTileGrid(tileGrid, tileMatrix.zoom_level);
-    }
-    else {
-      return Promise.resolve();
     }
   }
 }

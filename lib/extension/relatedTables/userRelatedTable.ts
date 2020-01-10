@@ -26,6 +26,10 @@ export default class UserRelatedTable extends UserTable {
   constructor(tableName: string, public relation_name: string, public data_type: string, columns: UserColumn[], requiredColumns: string[]) {
     super(tableName, columns, requiredColumns);
   }
+
+  getTableType(): string {
+    return "userRelatedTable";
+  }
   /**
    * Sets the contents
    * @param  {module:core/contents~Contents} contents contents

@@ -2,6 +2,7 @@
  * @module user/custom
  */
 import UserTable from '../userTable';
+import UserColumn from '../userColumn';
 
 /**
  * Create a new user custom table
@@ -11,7 +12,7 @@ import UserTable from '../userTable';
  * @param  {string[]} requiredColumns required columns
  */
 export default class UserCustomTable extends UserTable {
-  constructor(tableName, columns, requiredColumns) {
+  constructor(tableName: string, columns: UserColumn[], requiredColumns: string[]) {
     super(tableName, columns);
     if (requiredColumns && requiredColumns.length) {
       var found = {};

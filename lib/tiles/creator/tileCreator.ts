@@ -21,6 +21,7 @@ export abstract class TileCreator {
 
   abstract async initialize(): Promise<TileCreator>;
   abstract getCompleteTile(format?: string): Promise<any>;
+  abstract addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number);
 
   static async create(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo, canvas) {
     var isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
@@ -56,18 +57,18 @@ export abstract class TileCreator {
     // special cases 'EPSG:900913' =='EPSG:3857' == 'EPSG:102113'
     this.sameProjection = (this.projectionFrom === this.projectionTo) || (this.projectionTo === 'EPSG:3857' && (this.projectionFrom === 'EPSG:900913' || this.projectionFrom === 'EPSG:102113'));
   }
-  projectTile(tileData: any, gridColumn: number, gridRow: number) {
+  async projectTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
     var bb = TileBoundingBoxUtils.getTileBoundingBox(this.tileMatrixSet.getBoundingBox(), this.tileMatrix, gridColumn, gridRow);
     if (!this.sameProjection) {
       return this.reproject(tileData, bb);
     }
     else {
-      return Promise.resolve(this.cutAndScale(tileData, bb));
+      return this.cutAndScale(tileData, bb);
     }
   }
   cutAndScale(tileData: any, tilePieceBoundingBox: BoundingBox) {
     var position = TileBoundingBoxUtils.determinePositionAndScale(tilePieceBoundingBox, this.tileMatrix.tile_height, this.tileMatrix.tile_width, this.tileBoundingBox, this.height, this.width);
-    if (position.xPositionInFinalTileStart >= this.width || position.xPositionInFinalTileEnd <= 0 || position.yPositionInFinalTileStart >= this.height || position.yPositionInFinalTileEnd <= 0) {
+    if (position.xPositionInFinalTileStart >= this.width || position.yPositionInFinalTileStart >= this.height) {
       // this tile doesn't belong just skip it
     }
     else {
@@ -80,7 +81,7 @@ export abstract class TileCreator {
       position: position
     });
   }
-  reproject(tileData: any, tilePieceBoundingBox: BoundingBox) {
+  async reproject(tileData: any, tilePieceBoundingBox: BoundingBox) {
     var y = 0;
     var x = 0;
     var height = this.height;
@@ -113,29 +114,24 @@ export abstract class TileCreator {
     for (i = 0; i < width; i++) {
       columns.push(i);
     }
-    return rows.reduce(function (rowSequence, row) {
-      return rowSequence.then(function () {
-        latitude = this.tileBoundingBox.maxLatitude - (row * this.tileHeightUnitsPerPixel);
-        var currentColumns = columns.slice();
-        return currentColumns.reduce(function (columnSequence, column) {
-          return columnSequence.then(function () {
-            // loop over all pixels in the target tile
-            // determine the position of the current pixel in the target tile
-            var longitude = this.tileBoundingBox.minLongitude + (column * this.tileWidthUnitsPerPixel);
-            // project that lat/lng to the source coordinate system
-            var projected = conversion.forward([longitude, latitude]);
-            var projectedLongitude = projected[0];
-            var projectedLatitude = projected[1];
-            // now find the source pixel
-            var xPixel = this.tileMatrix.tile_width - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
-            var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixel_y_size);
-            if (xPixel >= 0 && xPixel < this.tileMatrix.tile_width
-              && yPixel >= 0 && yPixel < this.tileMatrix.tile_height) {
-              this.addPixel(column, row, xPixel, yPixel);
-            }
-          }.bind(this));
-        }.bind(this), Promise.resolve());
-      }.bind(this));
-    }.bind(this), Promise.resolve());
+    for (let row = 0; row < height; row++) {
+      latitude = this.tileBoundingBox.maxLatitude - (row * this.tileHeightUnitsPerPixel);
+      for (let column = 0; column < width; column++) {
+        // loop over all pixels in the target tile
+        // determine the position of the current pixel in the target tile
+        var longitude = this.tileBoundingBox.minLongitude + (column * this.tileWidthUnitsPerPixel);
+        // project that lat/lng to the source coordinate system
+        var projected = conversion.forward([longitude, latitude]);
+        var projectedLongitude = projected[0];
+        var projectedLatitude = projected[1];
+        // now find the source pixel
+        var xPixel = this.tileMatrix.tile_width - Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
+        var yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixel_y_size);
+        if (xPixel >= 0 && xPixel < this.tileMatrix.tile_width
+          && yPixel >= 0 && yPixel < this.tileMatrix.tile_height) {
+          this.addPixel(column, row, xPixel, yPixel);
+        }
+      }
+    }
   }
 }

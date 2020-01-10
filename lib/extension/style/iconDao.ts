@@ -4,6 +4,9 @@
  */
 import {MediaDao} from '../relatedTables/mediaDao';
 import IconRow from './iconRow';
+import IconTable from './iconTable';
+import GeoPackage from '../../geoPackage';
+import { DataTypes } from '../../..';
 
 /**
  * Icon DAO for reading user icon data tables
@@ -13,7 +16,7 @@ import IconRow from './iconRow';
  * @constructor
  */
 export class IconDao extends MediaDao<IconRow> {
-  constructor(geoPackage, table) {
+  constructor(geoPackage: GeoPackage, public table: IconTable) {
     super(geoPackage, table);
     this.mediaTable = table;
   }
@@ -21,7 +24,7 @@ export class IconDao extends MediaDao<IconRow> {
    * Create a new icon row
    * @return {module:extension/style.IconRow}
    */
-  newRow() {
+  newRow(): IconRow {
     return new IconRow(this.table);
   }
   /**
@@ -30,7 +33,7 @@ export class IconDao extends MediaDao<IconRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.IconRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes, values) {
+  newRowWithColumnTypes(columnTypes: any[], values: any[]): IconRow {
     return new IconRow(this.table, columnTypes, values);
   }
 }

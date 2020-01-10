@@ -561,8 +561,8 @@ export default class GeoPackage {
     var tileMatrixDao = this.getTileMatrixDao();
     for (var zoom = minZoom; zoom <= maxZoom; zoom++) {
       var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
-      var matrixWidth = (box.maxX - box.minX) + 1;
-      var matrixHeight = (box.maxY - box.minY) + 1;
+      var matrixWidth = (box.maxLongitude - box.minLongitude) + 1;
+      var matrixHeight = (box.maxLatitude - box.minLatitude) + 1;
       var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / tileSize;
       var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / tileSize;
       var tileMatrix = new TileMatrix();

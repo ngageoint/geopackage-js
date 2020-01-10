@@ -1,4 +1,4 @@
-var Paint = require('../../../../lib/tiles/features/paint')
+var Paint = require('../../../../lib/tiles/features/paint').Paint
   , should = require('chai').should();
 
 describe('Paint Tests', function() {

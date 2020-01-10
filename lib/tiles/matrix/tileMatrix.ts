@@ -7,14 +7,14 @@
  * @class TileMatrix
  */
 export class TileMatrix {
-  public static readonly TABLE_NAME = 'tableName';
-  public static readonly ZOOM_LEVEL = 'zoomLevel';
-  public static readonly MATRIX_WIDTH = 'matrixWidth';
-  public static readonly MATRIX_HEIGHT = 'matrixHeight';
-  public static readonly TILE_WIDTH = 'tileWidth';
-  public static readonly TILE_HEIGHT = 'tileHeight';
-  public static readonly PIXEL_X_SIZE = 'pixelXSize';
-  public static readonly PIXEL_Y_SIZE = 'pixelYSize';
+  public static readonly TABLE_NAME: string = 'tableName';
+  public static readonly ZOOM_LEVEL: string = 'zoomLevel';
+  public static readonly MATRIX_WIDTH: string = 'matrixWidth';
+  public static readonly MATRIX_HEIGHT: string = 'matrixHeight';
+  public static readonly TILE_WIDTH: string = 'tileWidth';
+  public static readonly TILE_HEIGHT: string = 'tileHeight';
+  public static readonly PIXEL_X_SIZE: string = 'pixelXSize';
+  public static readonly PIXEL_Y_SIZE: string = 'pixelYSize';
 
   /**
    * Tile Pyramid User Data Table Name

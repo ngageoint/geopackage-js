@@ -16,6 +16,6 @@ export default interface DBAdapter {
   run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number};
   insert(sql: string, params?: [] | Object): number;
   delete(sql: string, params?: [] | Object): number;
-  dropTable(table: string): Boolean;
+  dropTable(table: string): boolean;
   count(tableName: string, where?: string, whereArgs?: [] | Object): number;
 }

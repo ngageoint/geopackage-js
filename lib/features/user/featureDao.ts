@@ -34,7 +34,7 @@ export class FeatureDao extends UserDao<FeatureRow> {
   dataColumnsDao: DataColumnsDao;
   featureTableIndex: FeatureTableIndex;
   projection: any;
-  constructor(geoPackage: GeoPackage, table: FeatureTable, public geometryColumns: GeometryColumns, public metadataDao: MetadataDao) {
+  constructor(geoPackage: GeoPackage, public table: FeatureTable, public geometryColumns: GeometryColumns, public metadataDao: MetadataDao) {
     super(geoPackage, table);
     this.dataColumnsDao = new DataColumnsDao(geoPackage);
     this.featureTableIndex = new FeatureTableIndex(geoPackage, this);
@@ -291,8 +291,8 @@ export class FeatureDao extends UserDao<FeatureRow> {
       next: function () {
         var nextRow = iterator.next();
         if (!nextRow.done) {
-          var featureRow;
-          var geometry;
+          var featureRow: FeatureRow;
+          var geometry: GeoJsonObject;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
             geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);

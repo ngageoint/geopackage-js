@@ -1,5 +1,5 @@
 var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache')
-  , Paint = require('../../../../lib/tiles/features/paint')
+  , Paint = require('../../../../lib/tiles/features/paint').Paint
   , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
   , should = require('chai').should();
 

@@ -11,18 +11,18 @@ import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
  * @extends Dao
  */
 export class TileMatrixSetDao extends Dao<TileMatrixSet> {
-  public static readonly TABLE_NAME = "gpkg_tile_matrix_set";
-  public static readonly COLUMN_PK = "table_name";
-  public static readonly COLUMN_TABLE_NAME = "table_name";
-  public static readonly COLUMN_SRS_ID = "srs_id";
-  public static readonly COLUMN_MIN_X = "min_x";
-  public static readonly COLUMN_MIN_Y = "min_y";
-  public static readonly COLUMN_MAX_X = "max_x";
-  public static readonly COLUMN_MAX_Y = "max_y";
+  public static readonly TABLE_NAME: string = "gpkg_tile_matrix_set";
+  public static readonly COLUMN_PK: string = "table_name";
+  public static readonly COLUMN_TABLE_NAME: string = "table_name";
+  public static readonly COLUMN_SRS_ID: string = "srs_id";
+  public static readonly COLUMN_MIN_X: string = "min_x";
+  public static readonly COLUMN_MIN_Y: string = "min_y";
+  public static readonly COLUMN_MAX_X: string = "max_x";
+  public static readonly COLUMN_MAX_Y: string = "max_y";
 
-  readonly gpkgTableName = 'gpkg_tile_matrix_set';
-  readonly idColumns = [TileMatrixSetDao.COLUMN_PK];
-  readonly columns = [TileMatrixSetDao.COLUMN_TABLE_NAME, TileMatrixSetDao.COLUMN_SRS_ID, TileMatrixSetDao.COLUMN_MIN_X, TileMatrixSetDao.COLUMN_MIN_Y, TileMatrixSetDao.COLUMN_MAX_X, TileMatrixSetDao.COLUMN_MAX_Y];
+  readonly gpkgTableName: string = 'gpkg_tile_matrix_set';
+  readonly idColumns: string[] = [TileMatrixSetDao.COLUMN_PK];
+  readonly columns: string[] = [TileMatrixSetDao.COLUMN_TABLE_NAME, TileMatrixSetDao.COLUMN_SRS_ID, TileMatrixSetDao.COLUMN_MIN_X, TileMatrixSetDao.COLUMN_MIN_Y, TileMatrixSetDao.COLUMN_MAX_X, TileMatrixSetDao.COLUMN_MAX_Y];
 
   columnToPropertyMap = {};
 

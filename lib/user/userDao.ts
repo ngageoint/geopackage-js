@@ -7,6 +7,7 @@ import SimpleAttributesTable from '../extension/relatedTables/simpleAttributesTa
 import UserRow from './userRow'
 import RelationType from '../extension/relatedTables/relationType'
 import ColumnValues from '../dao/columnValues'
+import UserTable from './userTable';
 
 /**
  * Abstract User DAO for reading user tables
@@ -16,12 +17,10 @@ import ColumnValues from '../dao/columnValues'
  * @param  {string} table table name
  */
 export class UserDao<T extends UserRow> extends Dao<T> {
-  table: any;
-  table_name: any;
-  columns: any;
-  constructor(geoPackage, table) {
+  table_name: string;
+  columns: string[];
+  constructor(geoPackage: GeoPackage, public table: UserTable) {
     super(geoPackage);
-    this.table = table;
     this.table_name = table.table_name;
     this.gpkgTableName = table.table_name;
     if (table.getPkColumn()) {
@@ -37,7 +36,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Object} [results] results to create the row from if not specified, an empty row is created
    * @return {module:user/userRow~UserRow}
    */
-  createObject(results): any {
+  createObject(results: any): any {
     if (results) {
       return this.getRow(results);
     }

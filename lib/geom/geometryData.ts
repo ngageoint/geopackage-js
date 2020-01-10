@@ -173,7 +173,7 @@ export class GeometryData {
     this.byteOrder = byteOrderValue;
     return envelopeIndicator;
   }
-  readEnvelope(envelopeIndicator: number, buffer: Buffer) {
+  readEnvelope(envelopeIndicator: number, buffer: Buffer): { envelope: Envelope, offset: number } {
     var readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
     var envelopeByteOffset = 8;
     var reads = 0;

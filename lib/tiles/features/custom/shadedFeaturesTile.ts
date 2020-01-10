@@ -16,7 +16,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Get the tile border stroke width
    * @return {Number} tile border stroke width
    */
-  getTileBorderStrokeWidth() {
+  getTileBorderStrokeWidth(): number {
     return this.tileBorderStrokeWidth;
   }
   /**
@@ -24,63 +24,63 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    *
    * @param {Number} tileBorderStrokeWidth tile border stroke width
    */
-  setTileBorderStrokeWidth(tileBorderStrokeWidth) {
+  setTileBorderStrokeWidth(tileBorderStrokeWidth: number) {
     this.tileBorderStrokeWidth = tileBorderStrokeWidth;
   }
   /**
    * Get the tile border color
    * @return {String} tile border color
    */
-  getTileBorderColor() {
+  getTileBorderColor(): string {
     return this.tileBorderColor;
   }
   /**
    * Set the tile border color
    * @param {String} tileBorderColor tile border color
    */
-  setTileBorderColor(tileBorderColor) {
+  setTileBorderColor(tileBorderColor: string) {
     this.tileBorderColor = tileBorderColor;
   }
   /**
    * Get the tile fill color
    * @return {String} tile fill color
    */
-  getTileFillColor() {
+  getTileFillColor(): string {
     return this.tileFillColor;
   }
   /**
    * Set the tile fill color
    * @param {String} tileFillColor tile fill color
    */
-  setTileFillColor(tileFillColor) {
+  setTileFillColor(tileFillColor: string) {
     this.tileFillColor = tileFillColor;
   }
   /**
    * Is the draw unindexed tiles option enabled
    * @return {Boolean} true if drawing unindexed tiles
    */
-  isDrawUnindexedTiles() {
+  isDrawUnindexedTiles(): boolean {
     return this.drawUnindexedTiles;
   }
   /**
    * Set the draw unindexed tiles option
    * @param {Boolean} drawUnindexedTiles draw unindexed tiles flag
    */
-  setDrawUnindexedTiles(drawUnindexedTiles) {
+  setDrawUnindexedTiles(drawUnindexedTiles: boolean) {
     this.drawUnindexedTiles = drawUnindexedTiles;
   }
   /**
    * Get the compression format
    * @return {String} the compression format (either png or jpeg)
    */
-  getCompressFormat() {
+  getCompressFormat(): string {
     return this.compressFormat;
   }
   /**
    * Set the compression format
    * @param {String} compressFormat either 'png' or 'jpeg'
    */
-  setCompressFormat(compressFormat) {
+  setCompressFormat(compressFormat: string) {
     this.compressFormat = compressFormat;
   }
   /**
@@ -90,7 +90,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @param canvas
    * @returns {Promise<String|Buffer>}
    */
-  drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
+  async drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
     var image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
@@ -110,7 +110,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @return {Promise<String|Buffer>}
    */
   // @ts-ignore
-  drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
+  async drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
     // @ts-ignore
     return new Promise(function (resolve) {
       var canvas;

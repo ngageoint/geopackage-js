@@ -20,7 +20,7 @@ export class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> 
    * @member {module:core/contents~Contents}
    */
   contents: Contents;
-  constructor(geoPackage: GeoPackage, table: AttributeTable) {
+  constructor(geoPackage: GeoPackage, public table: AttributeTable) {
     super(geoPackage, table);
     if (!table.contents) {
       throw new Error('Attributes table has null Contents');

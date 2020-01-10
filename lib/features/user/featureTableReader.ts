@@ -33,10 +33,10 @@ export default class FeatureTableReader extends UserTableReader {
       return this.readTable(geoPackage.getDatabase());
     }
   }
-  createTable(tableName: string, columns: UserColumn[]) {
+  createTable(tableName: string, columns: UserColumn[]): FeatureTable {
     return new FeatureTable(tableName, columns);
   }
-  createColumnWithResults(results: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean) {
+  createColumnWithResults(results: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean): FeatureColumn{
     var geometry = name === this.geometryColumns.column_name;
     var geometryType = undefined;
     var dataType = undefined;
