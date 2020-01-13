@@ -19,13 +19,13 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
 
 describe('GeoPackage Feature table create tests', function() {
   var testGeoPackage;
-  var testPath = path.join(__dirname, '..', 'tmp');
   var tableName = 'test_features.test';
   var geopackage;
 
   beforeEach(async function() {
-    testGeoPackage = path.join(testPath, testSetup.createTempName());
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    let created = await testSetup.createTmpGeoPackage();
+    testGeoPackage = created.path;
+    geopackage = created.geopackage;
   });
 
   afterEach(async function() {

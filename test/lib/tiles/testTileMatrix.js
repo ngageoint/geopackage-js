@@ -2,6 +2,7 @@ import { GeoPackage as GeoPackageAPI } from '../../..'
 
 var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
   , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix
+  , testSetup = require('../../fixtures/testSetup').default
   , should = require('chai').should()
   , path = require('path');
 
@@ -9,18 +10,20 @@ describe('Tile Matrix tests', function() {
 
   var geoPackage;
   var tileMatrixDao;
+  var filename;
 
   beforeEach('should open the geopackage', async function() {
-    var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
+    var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
     // @ts-ignore
-    let result = await copyAndOpenGeopackage(filename);
+    let result = await copyAndOpenGeopackage(riversfilename);
     filename = result.path;
     geoPackage = result.geopackage;
     tileMatrixDao = new TileMatrixDao(geoPackage);
   });
 
-  afterEach('should close the geopackage', function() {
+  afterEach('should close the geopackage', async function() {
     geoPackage.close();
+    await testSetup.deleteGeoPackage(filename);
   });
 
   it('should get the tile matrixes', function() {

@@ -24,6 +24,11 @@ describe('Related Attributes tests', function() {
     geoPackage = result.geopackage;
   });
 
+  afterEach('delete the geopackage', async function() {
+    geoPackage.close();
+    await testSetup.deleteGeoPackage(filename);
+  })
+
   function validateContents(attributesTable, contents) {
     should.exist(contents);
     should.exist(contents.data_type);

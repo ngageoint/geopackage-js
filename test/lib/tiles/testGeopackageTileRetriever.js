@@ -18,18 +18,20 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     var geoPackage;
     var tileDao;
+    var filename;
 
     beforeEach('should open the geopackage', async function() {
-      var filename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
+      var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
       // @ts-ignore
-      let result = await copyAndOpenGeopackage(filename);
+      let result = await copyAndOpenGeopackage(riversfilename);
       filename = result.path;
       geoPackage = result.geopackage;
       tileDao = geoPackage.getTileDao('TILESosmds');
     });
 
-    afterEach('should close the geopackage', function() {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the web mercator bounding box', function() {
@@ -202,15 +204,20 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     var geoPackage;
     var tileDao;
-
+    var filename;
     beforeEach('should open the geopackage', async function() {
-      var filename = path.join(__dirname, '..', '..', 'fixtures', '3857.gpkg');
+      var filename3857 = path.join(__dirname, '..', '..', 'fixtures', '3857.gpkg');
       // @ts-ignore
-      let result = await copyAndOpenGeopackage(filename);
+      let result = await copyAndOpenGeopackage(filename3857);
       filename = result.path;
       geoPackage = result.geopackage;
       tileDao = geoPackage.getTileDao('imagery');
     });
+
+    afterEach('delete the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    })
 
     it('should get the x: 0, y: 4, z: 4 tile', function(done) {
       this.timeout(0);
@@ -252,6 +259,7 @@ describe('GeoPackage Tile Retriever tests', function() {
   describe('4326 tile tests', function() {
     var tileDao;
     var geoPackage;
+    var filename;
     var defs = require('../../../lib/proj4Defs');
     for (var name in defs) {
       if (defs[name]) {
@@ -260,13 +268,17 @@ describe('GeoPackage Tile Retriever tests', function() {
     }
 
     beforeEach('should open the geopackage', async function() {
-      var filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
+      var wgs84filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
       // @ts-ignore
-      let result = await copyAndOpenGeopackage(filename);
+      let result = await copyAndOpenGeopackage(wgs84filename);
       filename = result.path;
       geoPackage = result.geopackage;
       tileDao = geoPackage.getTileDao('imagery');
     });
+
+    afterEach('should delete the geopackage', async function() {
+      await testSetup.deleteGeoPackage(filename);
+    })
 
     it('should get the web mercator bounding box', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);

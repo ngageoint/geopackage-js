@@ -1,4 +1,5 @@
 import { GeoPackage as GeoPackageAPI } from '../../../.'
+import { default as testSetup } from '../../fixtures/testSetup'
 
 var UserTableReader = require('../../../lib/user/userTableReader').UserTableReader
   , UserDao = require('../../../lib/user/userDao').UserDao
@@ -7,16 +8,18 @@ var UserTableReader = require('../../../lib/user/userTableReader').UserTableRead
 
 describe('UserTableReader tests', function() {
   var geoPackage;
+  var filename;
   beforeEach('create the GeoPackage connection', async function() {
-    var filename = path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg');
+    var sampleFilename = path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg');
     // @ts-ignore
-    let result = await copyAndOpenGeopackage(filename);
+    let result = await copyAndOpenGeopackage(sampleFilename);
     filename = result.path;
     geoPackage = result.geopackage;
   });
 
-  afterEach('close the geopackage connection', function() {
+  afterEach('close the geopackage connection', async function() {
     geoPackage.close();
+    await testSetup.deleteGeoPackage(filename);
   });
 
   it('should read the table', function() {

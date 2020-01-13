@@ -1,7 +1,6 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 var fs = require('fs-extra');
 var path = require('path');
-var testPath = path.join(__dirname, '..', '..', 'tmp');
 var testDb;
 
 describe('Database opening tests', function(done) {
@@ -33,9 +32,9 @@ describe('Database opening tests', function(done) {
   var db;
 
   beforeEach(async function() {
-    testDb = path.join(testPath, testSetup.createTempName());
-    let gp = await testSetup.createGeoPackage(testDb);
-    db = gp.getDatabase().getDBConnection();
+    let created = await testSetup.createTmpGeoPackage();
+    testDb = created.path;
+    db = created.geopackage.getDatabase().getDBConnection();
   });
 
   afterEach(async function() {

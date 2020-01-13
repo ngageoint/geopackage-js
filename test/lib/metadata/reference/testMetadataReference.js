@@ -11,12 +11,12 @@ var fs = require('fs-extra')
 
 describe('Metadata Reference tests', function() {
   var testGeoPackage;
-  var testPath = path.join(__dirname, '..', 'tmp');
   var geopackage;
 
   beforeEach(async function() {
-    testGeoPackage = path.join(testPath, testSetup.createTempName());
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    let created = await testSetup.createTmpGeoPackage();
+    testGeoPackage = created.path;
+    geopackage = created.geopackage;
   });
 
   afterEach(async function() {

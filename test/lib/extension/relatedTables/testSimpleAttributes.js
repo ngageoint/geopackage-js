@@ -33,6 +33,11 @@ describe('Related Simple Attributes tests', function() {
     tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
+  afterEach('delete the geopackage', async function() {
+    geoPackage.close();
+    await testSetup.deleteGeoPackage(filename);
+  })
+
   function validateContents(simpleAttributesTable, contents) {
     should.exist(contents);
     should.exist(contents.data_type);

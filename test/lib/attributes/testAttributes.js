@@ -13,19 +13,17 @@ import {Contents} from '../../../lib/core/contents/contents'
 var Verification = require('../../fixtures/verification')
   , DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
 
-  , UserColumn = require('../../../lib/user/userColumn').UserColumn
-  , should = require('chai').should()
-  , path = require('path');
+  , UserColumn = require('../../../lib/user/userColumn').UserColumn;
 
 describe('GeoPackage Attribute table create tests', function() {
   var testGeoPackage;
-  var testPath = path.join(__dirname, '..', 'tmp');
   var tableName = 'test_attributes.test';
   var geopackage;
 
   beforeEach(async function() {
-    testGeoPackage = path.join(testPath, testSetup.createTempName());
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
+    let created = await testSetup.createTmpGeoPackage();
+    testGeoPackage = created.path;
+    geopackage = created.geopackage;
   });
 
   afterEach(async function() {

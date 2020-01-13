@@ -24,7 +24,6 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
 describe('StyleExtension Tests', function() {
   var testGeoPackage;
   var geopackage;
-  var testPath = path.join(__dirname, '..', 'tmp');
   var featureTableName = 'feature_table';
   var featureTable;
   var featureTableStyles;
@@ -87,9 +86,13 @@ describe('StyleExtension Tests', function() {
     return hex;
   };
 
+  beforeEach(async function() {
+    let created = await testSetup.createTmpGeoPackage();
+    testGeoPackage = created.path;
+    geopackage = created.geopackage;
+  });
+
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
-    testGeoPackage = path.join(testPath, testSetup.createTempName());
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
     // create a feature table first
     featureTable = await GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, [])
     var box = {

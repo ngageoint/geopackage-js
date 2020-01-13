@@ -1,6 +1,6 @@
 import {GeoPackage} from '../index';
 import { GeometryColumns, FeatureColumn, DataTypes, BoundingBox } from '../index'
-var testSetup = require('./fixtures/testSetup');
+var testSetup = require('./fixtures/testSetup').default;
 
 var path = require('path')
   , fs = require('fs-extra')
@@ -12,7 +12,7 @@ var path = require('path')
 describe('GeoPackageAPI tests', function() {
 
   var existingPath = path.join(__dirname, 'fixtures', 'rivers.gpkg');
-  var geopackageToCreate = path.join(__dirname, 'tmp', 'tmp.gpkg');
+  var geopackageToCreate = path.join(__dirname, 'fixtures', 'tmp', 'tmp.gpkg');
   var tilePath = path.join(__dirname, 'fixtures', 'tiles', '0', '0', '0.png');
   var indexedPath = path.join(__dirname, 'fixtures', 'rivers_indexed.gpkg');
   var countriesPath = path.join(__dirname, 'fixtures', 'countries_0.gpkg');
@@ -203,13 +203,15 @@ describe('GeoPackageAPI tests', function() {
     let gp = await GeoPackage.create(geopackageToCreate);
     should.exist(gp);
     should.exist(gp.getTables);
+    await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
   it('should create a geopackage with a promise', function() {
     GeoPackage.create(geopackageToCreate)
-    .then(function(geopackage) {
+    .then(async function(geopackage) {
       should.exist(geopackage);
       should.exist(geopackage.getTables);
+      await testSetup.deleteGeoPackage(geopackageToCreate);
     });
   });
 
@@ -218,6 +220,7 @@ describe('GeoPackageAPI tests', function() {
     should.exist(gp);
     let buffer = await gp.export();
     should.exist(buffer);
+    await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
   it('should create a geopackage in memory', async function() {
@@ -444,6 +447,10 @@ describe('GeoPackageAPI tests', function() {
         done();
       });
     });
+
+    afterEach(async function() {
+      await testSetup.deleteGeoPackage(geopackageToCreate);
+    })
 
     it('should create a feature table', function() {
       var columns = [];

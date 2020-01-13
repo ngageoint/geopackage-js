@@ -1,4 +1,5 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
   // @ts-ignore
@@ -9,16 +10,18 @@ var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColum
 describe('GeometryColumns tests', function() {
 
   var geoPackage;
-
+  var filename;
   beforeEach('should open the geopackage', async function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     geoPackage = result.geopackage;
+    filename = result.path;
   });
 
   afterEach('should close the geopackage', function() {
     geoPackage.close();
+    testSetup.deleteGeoPackage(filename);
   });
 
   it('should get the feature tables', function() {

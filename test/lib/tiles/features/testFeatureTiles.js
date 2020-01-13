@@ -96,18 +96,20 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     var geoPackage;
     var featureDao;
+    var filename;
 
     beforeEach('should open the geopackage', async function() {
-      var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
+      var indexedfilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
       // @ts-ignore
-      let result = await copyAndOpenGeopackage(filename);
+      let result = await copyAndOpenGeopackage(indexedfilename);
       filename = result.path;
       geoPackage = result.geopackage;
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', function() {
+    afterEach('should close the geopackage', async function() {
       geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
     });
 
     it('should get the x: 1, y: 0, z: 1 tile', function(done) {

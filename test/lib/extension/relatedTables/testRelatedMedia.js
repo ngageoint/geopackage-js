@@ -33,6 +33,10 @@ describe('Related Media tests', function() {
     tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
+  afterEach('delete the geopackage', async function() {
+    await testSetup.deleteGeoPackage(filename);
+  })
+
   function validateContents(mediaTable, contents) {
     should.exist(contents);
     should.exist(contents.data_type);

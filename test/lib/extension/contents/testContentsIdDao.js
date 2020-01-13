@@ -8,13 +8,16 @@ var Verification = require('../../../fixtures/verification')
 describe('ContentsIdExtension Tests', function() {
   var testGeoPackage;
   var geopackage;
-  var testPath = path.join(__dirname, '..', 'tmp');
   var tableName = 'test';
   var contents;
 
+  beforeEach(async function() {
+    let created = await testSetup.createTmpGeoPackage();
+    testGeoPackage = created.path;
+    geopackage = created.geopackage;
+  });
+
   beforeEach('create the GeoPackage connection', async function() {
-    testGeoPackage = path.join(testPath, testSetup.createTempName());
-    geopackage = await testSetup.createGeoPackage(testGeoPackage);
     var contentsDao = geopackage.getContentsDao();
     var contentsIdExtension = geopackage.getContentsIdExtension();
     await contentsIdExtension.getOrCreateExtension();

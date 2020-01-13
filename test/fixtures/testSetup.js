@@ -27,6 +27,15 @@ module.exports.copyGeopackage = function(orignal) {
   })
 }
 
+module.exports.createTmpGeoPackage = async function() {
+  var tmpGpPath = path.join(__dirname, 'tmp', module.exports.createTempName());
+  var geopackage = await module.exports.createGeoPackage(tmpGpPath)
+  return {
+    geopackage,
+    path: tmpGpPath
+  }
+}
+
 module.exports.createGeoPackage = async function(gppath) {
   if (typeof(process) !== 'undefined' && process.version) {
     await fs.mkdirp(path.dirname(gppath));

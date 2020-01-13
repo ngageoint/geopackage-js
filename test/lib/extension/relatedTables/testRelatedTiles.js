@@ -35,6 +35,10 @@ describe('Related Tile tests', function() {
     tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
+  afterEach('delete the geopackage', async function() {
+    await testSetup.deleteGeoPackage(filename);
+  })
+
   var tileMatrixSet;
   var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
   var tileTableName = 'OSM';
