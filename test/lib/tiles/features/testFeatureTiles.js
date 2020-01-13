@@ -6,6 +6,7 @@ import {StyleTable} from '../../../../lib/extension/style/styleTable';
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
+  , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   // , GeoPackageAPI = require('../../../..')
   // , testSetup = require('../../../fixtures/testSetup')
@@ -501,7 +502,7 @@ describe('GeoPackage FeatureTiles tests', function() {
         });
     });
 
-    it('should get the max feature tile and test various functions', function(done) {
+    it('should get the max feature number tile and test various functions', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.setMaxFeaturesPerTile(1);
@@ -572,6 +573,52 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '',  isLinux ? 'max_feature_tile_unindexed_linux.png' : 'max_feature_tile_unindexed.png'), function(err, equal) {
+            equal.should.be.equal(true);
+            done();
+          });
+        });
+    });
+
+    it('should get the max feature shaded tile and test various functions', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.setMaxFeaturesPerTile(1);
+      ft.getMaxFeaturesPerTile().should.be.equal(1);
+      should.not.exist(ft.getMaxFeaturesTileDraw());
+      var shadedFeaturesTile = new ShadedFeaturesTile();
+
+      shadedFeaturesTile.getTileBorderStrokeWidth().should.be.equal(2);
+      shadedFeaturesTile.setTileBorderStrokeWidth(12);
+      shadedFeaturesTile.getTileBorderStrokeWidth().should.be.equal(12);
+      shadedFeaturesTile.setTileBorderStrokeWidth(2);
+
+      shadedFeaturesTile.getTileBorderColor().should.be.equal("rgba(0, 0, 0, 1.0)");
+      shadedFeaturesTile.setTileBorderColor("rgba(0, 0, 0, 0.50)");
+      shadedFeaturesTile.getTileBorderColor().should.be.equal("rgba(0, 0, 0, 0.50)");
+      shadedFeaturesTile.setTileBorderColor("rgba(0, 0, 0, 1.0)");
+
+      shadedFeaturesTile.getTileFillColor().should.be.equal("rgba(0, 0, 0, 0.0625)");
+      shadedFeaturesTile.setTileFillColor("rgba(0, 0, 0, 0.50)");
+      shadedFeaturesTile.getTileFillColor().should.be.equal("rgba(0, 0, 0, 0.50)");
+      shadedFeaturesTile.setTileFillColor("rgba(0, 0, 0, 0.0625)");
+
+      shadedFeaturesTile.isDrawUnindexedTiles().should.be.equal(true);
+      shadedFeaturesTile.setDrawUnindexedTiles(false);
+      shadedFeaturesTile.isDrawUnindexedTiles().should.be.equal(false);
+      shadedFeaturesTile.setDrawUnindexedTiles(true);
+
+      shadedFeaturesTile.getCompressFormat().should.be.equal('png');
+      shadedFeaturesTile.setCompressFormat('jpeg');
+      shadedFeaturesTile.getCompressFormat().should.be.equal('jpeg');
+      shadedFeaturesTile.setCompressFormat('png');
+
+      ft.setMaxFeaturesTileDraw(shadedFeaturesTile);
+      should.exist(ft.getMaxFeaturesTileDraw());
+
+      ft.drawTile(153632, 91343, 18)
+        .then(function(image) {
+          // fs.writeFileSync('/tmp/max_feature_tile_shaded.png', image);
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', 'max_feature_tile_shaded.png'), function(err, equal) {
             equal.should.be.equal(true);
             done();
           });
