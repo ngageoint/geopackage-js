@@ -4,36 +4,36 @@
  * @see module:extension/BaseExtension
  */
 
-import BaseExtension from '../baseExtension';
-import Extension from '../extension';
+import {BaseExtension} from '../baseExtension';
+import {Extension} from '../extension';
 import {MediaDao} from './mediaDao'
-import MediaTable from './mediaTable'
+import {MediaTable} from './mediaTable'
 import {SimpleAttributesDao} from './simpleAttributesDao'
-import SimpleAttributesTable from './simpleAttributesTable'
-import UserMappingTable from './userMappingTable'
+import {SimpleAttributesTable} from './simpleAttributesTable'
+import {UserMappingTable} from './userMappingTable'
 import {UserMappingDao} from './userMappingDao'
 import {UserCustomDao} from '../../user/custom/userCustomDao'
 import {UserDao} from '../../user/userDao'
-import UserTableReader from '../../user/userTableReader'
+import {UserTableReader} from '../../user/userTableReader'
 import {ExtendedRelationDao} from './extendedRelationDao'
-import RelationType from './relationType'
-import Contents from '../../core/contents/contents'
-import ColumnValues from '../../dao/columnValues';
-import ExtendedRelation from './extendedRelation';
+import {RelationType} from './relationType'
+import {Contents} from '../../core/contents/contents'
+import {ColumnValues} from '../../dao/columnValues';
+import {ExtendedRelation} from './extendedRelation';
 import { OptionBuilder } from '../../optionBuilder';
-import GeoPackage from '../../geoPackage';
-import UserRelatedTable from './userRelatedTable';
-import UserRow from '../../user/userRow';
-import UserMappingRow from './userMappingRow';
-import MediaRow from './mediaRow';
-import SimpleAttributesRow from './simpleAttributesRow';
+import {GeoPackage} from '../../geoPackage';
+import {UserRelatedTable} from './userRelatedTable';
+import {UserRow} from '../../user/userRow';
+import {UserMappingRow} from './userMappingRow';
+import {MediaRow} from './mediaRow';
+import {SimpleAttributesRow} from './simpleAttributesRow';
 /**
  * Related Tables Extension
  * @param  {module:geoPackage~GeoPackage} geoPackage the GeoPackage object
  * @class
  * @extends BaseExtension
  */
-export default class RelatedTablesExtension extends BaseExtension {
+export class RelatedTablesExtension extends BaseExtension {
   extendedRelationDao: ExtendedRelationDao;
 
   public static readonly EXTENSION_NAME: string = 'related_tables';

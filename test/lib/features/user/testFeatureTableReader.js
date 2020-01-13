@@ -1,6 +1,6 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 
-var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').default
+var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader
   , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
   // , GeoPackageAPI = require('../../../../.')
   , path = require('path')

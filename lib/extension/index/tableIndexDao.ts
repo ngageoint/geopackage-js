@@ -1,6 +1,6 @@
 import {Dao} from '../../dao/dao';
 import { TableCreator } from '../../db/tableCreator'
-import TableIndex from './tableIndex';
+import {TableIndex} from './tableIndex';
 
 /**
  * Table Index Data Access Object

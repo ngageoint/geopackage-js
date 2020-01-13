@@ -1,9 +1,9 @@
 import {Dao} from '../../dao/dao';
-import GeometryIndex from './geometryIndex';
+import {GeometryIndex} from './geometryIndex';
 import { TableCreator } from '../../db/tableCreator';
 import { FeatureDao } from '../../features/user/featureDao';
-import GeoPackage from '../../geoPackage';
-import TableIndex from './tableIndex';
+import {GeoPackage} from '../../geoPackage';
+import {TableIndex} from './tableIndex';
 import { Envelope } from '../../geom/envelope';
 /**
  * Geometry Index Data Access Object

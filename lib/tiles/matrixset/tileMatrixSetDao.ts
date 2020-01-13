@@ -1,9 +1,9 @@
 import {Dao} from '../../dao/dao';
-import GeoPackage from '../../geoPackage';
+import {GeoPackage} from '../../geoPackage';
 
 import { TileMatrixSet } from './tileMatrixSet';
-import Contents from '../../core/contents/contents';
-import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
+import {Contents} from '../../core/contents/contents';
+import {SpatialReferenceSystem} from '../../core/srs/spatialReferenceSystem';
 
 /**
  * Tile Matrix Set Data Access Object

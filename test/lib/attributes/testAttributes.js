@@ -2,18 +2,18 @@ import { GeoPackage as GeoPackageAPI } from '../../../.'
 import { default as testSetup } from '../../fixtures/testSetup'
 import {DataColumnsDao} from '../../../lib/dataColumns/dataColumnsDao'
 import {AttributeDao} from '../../../lib/attributes/attributeDao'
-import AttributeTableReader from '../../../lib/attributes/attributeTableReader'
-import UserTableReader from '../../../lib/user/userTableReader'
-import AttributeTable from '../../../lib/attributes/attributeTable'
-import DataTypes from '../../../lib/db/dataTypes'
-import Contents from '../../../lib/core/contents/contents'
+import {AttributeTableReader} from '../../../lib/attributes/attributeTableReader'
+import {UserTableReader} from '../../../lib/user/userTableReader'
+import {AttributeTable} from '../../../lib/attributes/attributeTable'
+import {DataTypes} from '../../../lib/db/dataTypes'
+import {Contents} from '../../../lib/core/contents/contents'
 
 // var GeoPackageAPI = require('../../../.')
 // var testSetup = require('../../fixtures/testSetup')
 var Verification = require('../../fixtures/verification')
-  , DataColumns = require('../../../lib/dataColumns/dataColumns').default
+  , DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
 
-  , UserColumn = require('../../../lib/user/userColumn').default
+  , UserColumn = require('../../../lib/user/userColumn').UserColumn
   , should = require('chai').should()
   , path = require('path');
 

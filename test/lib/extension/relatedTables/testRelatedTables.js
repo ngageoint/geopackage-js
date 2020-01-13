@@ -1,9 +1,9 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
+import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 
 var Verification = require('../../../fixtures/verification')
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')

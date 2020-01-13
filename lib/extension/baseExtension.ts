@@ -1,6 +1,6 @@
-import GeoPackage from "../geoPackage";
-import GeoPackageConnection from "../db/geoPackageConnection";
-import Extension from './extension';
+import {GeoPackage} from "../geoPackage";
+import {GeoPackageConnection} from "../db/geoPackageConnection";
+import {Extension} from './extension';
 import {ExtensionDao} from './extensionDao';
 /**
  * Base Extension
@@ -9,7 +9,7 @@ import {ExtensionDao} from './extensionDao';
 /**
  * Abstract base GeoPackage extension
  */
-export default abstract class BaseExtension {
+export abstract class BaseExtension {
   /**
    * GeoPackage object
    */

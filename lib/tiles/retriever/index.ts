@@ -4,7 +4,7 @@ import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils }  from '../tileBoundingBoxUtils'
 import { BoundingBox } from '../../boundingBox'
 import { TileCreator } from '../creator/tileCreator';
-import TileRow from '../user/tileRow';
+import {TileRow} from '../user/tileRow';
 
 export class GeoPackageTileRetriever {
   tileDao: TileDao;

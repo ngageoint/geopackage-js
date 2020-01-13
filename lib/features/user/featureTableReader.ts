@@ -3,21 +3,21 @@
  * @module features/user/featureTableReader
  */
 import {GeometryColumnsDao} from '../columns/geometryColumnsDao';
-import FeatureTable from './featureTable';
-import UserTableReader from '../../user/userTableReader';
-import FeatureColumn from './featureColumn';
+import {FeatureTable} from './featureTable';
+import {UserTableReader} from '../../user/userTableReader';
+import {FeatureColumn} from './featureColumn';
 
-import DataTypes from '../../db/dataTypes'
+import {DataTypes} from '../../db/dataTypes'
 import { WKB } from '../../wkb'
-import GeometryColumns from '../columns/geometryColumns';
-import GeoPackage from '../../geoPackage';
-import UserColumn from '../../user/userColumn';
+import {GeometryColumns} from '../columns/geometryColumns';
+import {GeoPackage} from '../../geoPackage';
+import {UserColumn} from '../../user/userColumn';
 
 /**
 * Reads the metadata from an existing feature table
 * @class FeatureTableReader
 */
-export default class FeatureTableReader extends UserTableReader {
+export class FeatureTableReader extends UserTableReader {
   geometryColumns: any;
   constructor(tableNameOrGeometryColumns: string | GeometryColumns) {
     super(tableNameOrGeometryColumns instanceof GeometryColumns ? tableNameOrGeometryColumns.table_name : tableNameOrGeometryColumns);
@@ -27,10 +27,10 @@ export default class FeatureTableReader extends UserTableReader {
     if (!this.geometryColumns) {
       var gcd = new GeometryColumnsDao(geoPackage);
       this.geometryColumns = gcd.queryForTableName(this.table_name);
-      return this.readTable(geoPackage.getDatabase());
+      return this.readTable(geoPackage.getDatabase()) as FeatureTable;
     }
     else {
-      return this.readTable(geoPackage.getDatabase());
+      return this.readTable(geoPackage.getDatabase()) as FeatureTable;
     }
   }
   createTable(tableName: string, columns: UserColumn[]): FeatureTable {

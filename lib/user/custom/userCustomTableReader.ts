@@ -1,11 +1,11 @@
 /**
  * @module user/custom
  */
-import UserCustomTable from './userCustomTable';
-import UserTableReader from '../userTableReader';
-import UserCustomColumn from './userCustomColumn';
+import {UserCustomTable} from './userCustomTable';
+import {UserTableReader} from '../userTableReader';
+import {UserCustomColumn} from './userCustomColumn';
 
-import DataTypes from '../../db/dataTypes';
+import {DataTypes} from '../../db/dataTypes';
 
 /**
  * User custom table reader
@@ -13,7 +13,7 @@ import DataTypes from '../../db/dataTypes';
  * @param  {string} tableName       table name
  * @param  {string[]} requiredColumns required columns
  */
-export default class UserCustomTableReader extends UserTableReader {
+export class UserCustomTableReader extends UserTableReader {
   /**
    * Creates user custom column
    * @param  {string} tableName       table name

@@ -2,16 +2,16 @@
  * featureTable module.
  * @module features/user/featureTable
  */
-import UserTable from '../../user/userTable';
-import FeatureColumn from './featureColumn';
-import UserColumn from '../../user/userColumn';
+import {UserTable} from '../../user/userTable';
+import {FeatureColumn} from './featureColumn';
+import {UserColumn} from '../../user/userColumn';
 
 /**
  * Represents a user feature table
  * @param  {string} tableName table name
  * @param  {array} columns   feature columns
  */
-export default class FeatureTable extends UserTable {
+export class FeatureTable extends UserTable {
   geometryIndex: number;
   constructor(tableName: string, columns?: UserColumn[]) {
     super(tableName, columns);

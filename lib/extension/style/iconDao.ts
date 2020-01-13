@@ -3,9 +3,9 @@
  * @class IconDao
  */
 import {MediaDao} from '../relatedTables/mediaDao';
-import IconRow from './iconRow';
-import IconTable from './iconTable';
-import GeoPackage from '../../geoPackage';
+import {IconRow} from './iconRow';
+import {IconTable} from './iconTable';
+import {GeoPackage} from '../../geoPackage';
 import { DataTypes } from '../../..';
 
 /**

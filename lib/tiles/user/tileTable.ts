@@ -2,8 +2,8 @@
  * @module tiles/user/tileTable
  */
 
-import UserTable from '../../user/userTable';
-import TileColumn from './tileColumn';
+import {UserTable} from '../../user/userTable';
+import {TileColumn} from './tileColumn';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
@@ -12,7 +12,7 @@ import TileColumn from './tileColumn';
  * @param {string} tableName
  * @param {module:tiles/user/tileColumn~TileColumn[]} columns
  */
-export default class TileTable extends UserTable {
+export class TileTable extends UserTable {
   zoomLevelIndex: number;
   tileColumnIndex: number;
   tileRowIndex: number;

@@ -1,8 +1,8 @@
 /**
  * @module user/custom
  */
-import UserTable from '../userTable';
-import UserColumn from '../userColumn';
+import {UserTable} from '../userTable';
+import {UserColumn} from '../userColumn';
 
 /**
  * Create a new user custom table
@@ -11,7 +11,7 @@ import UserColumn from '../userColumn';
  * @param  {module:user/userColumn~UserColumn[]} columns         user columns
  * @param  {string[]} requiredColumns required columns
  */
-export default class UserCustomTable extends UserTable {
+export class UserCustomTable extends UserTable {
   constructor(tableName: string, columns: UserColumn[], requiredColumns: string[]) {
     super(tableName, columns);
     if (requiredColumns && requiredColumns.length) {
@@ -25,7 +25,7 @@ export default class UserCustomTable extends UserTable {
         }
       }
       for (i = 0; i < requiredColumns.length; i++) {
-        this.missingCheck(found[requiredColumns[i]], requiredColumns);
+        this.missingCheck(found[requiredColumns[i]], requiredColumns[i]);
       }
     }
   }

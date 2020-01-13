@@ -2,15 +2,15 @@
  * Feature Table Index
  * @module extension/index
  */
-import RTreeIndex from '../rtree/rtreeIndex';
-import BaseExtension from '../baseExtension';
-import GeoPackage from '../../geoPackage';
-import Extension from '../extension';
-import TableIndex from './tableIndex'
+import {RTreeIndex} from '../rtree/rtreeIndex';
+import {BaseExtension} from '../baseExtension';
+import {GeoPackage} from '../../geoPackage';
+import {Extension} from '../extension';
+import {TableIndex} from './tableIndex'
 import {FeatureDao} from'../../features/user/featureDao'
 import {GeometryIndexDao} from'./geometryIndexDao'
 import {RTreeIndexDao} from'../rtree/rtreeIndexDao'
-import EnvelopeBuilder from '../../geom/envelopeBuilder'
+import {EnvelopeBuilder} from '../../geom/envelopeBuilder'
 import { TableIndexDao } from './tableIndexDao';
 import { GeometryData, BoundingBox } from '../../..';
 import { Envelope } from '../../geom/envelope';
@@ -23,7 +23,7 @@ import { Envelope } from '../../geom/envelope';
  * @class
  * @extends BaseExtension
  */
-export default class FeatureTableIndex extends BaseExtension {
+export class FeatureTableIndex extends BaseExtension {
   public static readonly EXTENSION_GEOMETRY_INDEX_AUTHOR: string = 'nga';
   public static readonly EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR: string = 'geometry_index';
   public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';

@@ -1,4 +1,4 @@
-import TileGrid from './tileGrid';
+import {TileGrid} from './tileGrid';
 import { BoundingBox } from '../boundingBox'
 import proj4 from 'proj4'
 import { TileMatrix } from './matrix/tileMatrix';

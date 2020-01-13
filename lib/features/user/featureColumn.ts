@@ -2,15 +2,15 @@
  * @module features/user/featureColumn
  */
 
-import UserColumn from '../../user/userColumn';
-import DataTypes from '../../db/dataTypes';
+import {UserColumn} from '../../user/userColumn';
+import {DataTypes} from '../../db/dataTypes';
 
 /**
  * Represents a user feature column
  * @class
  * @extends UserColumn
  */
-export default class FeatureColumn extends UserColumn {
+export class FeatureColumn extends UserColumn {
   geometryType: any;
   
   constructor(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean, geometryType?: any) {

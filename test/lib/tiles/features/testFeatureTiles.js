@@ -1,7 +1,7 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import StyleRow from '../../../../lib/extension/style/styleRow';
-import StyleTable from '../../../../lib/extension/style/styleTable';
+import {StyleRow} from '../../../../lib/extension/style/styleRow';
+import {StyleTable} from '../../../../lib/extension/style/styleTable';
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon

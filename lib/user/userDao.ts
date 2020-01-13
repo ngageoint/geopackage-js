@@ -1,13 +1,13 @@
 import {Dao} from '../dao/dao';
-import GeoPackage from '../geoPackage';
-import UserMappingTable from '../extension/relatedTables/userMappingTable'
-import UserTableReader from './userTableReader'
-import MediaTable from '../extension/relatedTables/mediaTable'
-import SimpleAttributesTable from '../extension/relatedTables/simpleAttributesTable'
-import UserRow from './userRow'
-import RelationType from '../extension/relatedTables/relationType'
-import ColumnValues from '../dao/columnValues'
-import UserTable from './userTable';
+import {GeoPackage} from '../geoPackage';
+import {UserMappingTable} from '../extension/relatedTables/userMappingTable'
+import {UserTableReader} from './userTableReader'
+import {MediaTable} from '../extension/relatedTables/mediaTable'
+import {SimpleAttributesTable} from '../extension/relatedTables/simpleAttributesTable'
+import {UserRow} from './userRow'
+import {RelationType} from '../extension/relatedTables/relationType'
+import {ColumnValues} from '../dao/columnValues'
+import {UserTable} from './userTable';
 
 /**
  * Abstract User DAO for reading user tables

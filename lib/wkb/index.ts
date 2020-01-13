@@ -3,6 +3,8 @@
  * @module wkb
  */
 
+interface WKTMap { [key: string]: number; }
+
 export class WKB {
   public static readonly typeMap = {
     wkt: {
@@ -25,7 +27,7 @@ export class WKB {
     }
   };
 
-  public static readonly wktToEnum = {
+  public static readonly wktToEnum: WKTMap = {
     [WKB.typeMap.wkt.Point]: WKB.typeMap.wkb.Point,
     [WKB.typeMap.wkt.LineString]: WKB.typeMap.wkb.LineString,
     [WKB.typeMap.wkt.Polygon]: WKB.typeMap.wkb.Polygon,
@@ -40,7 +42,7 @@ export class WKB {
    * @param  {string} name name
    * @return {Number}      number corresponding to the wkb name
    */
-  static fromName(name) {
+  static fromName(name: string): number {
     name = name.toUpperCase();
     if (name === 'GEOMETRY') {
       return WKB.typeMap.wkb.GeometryCollection;

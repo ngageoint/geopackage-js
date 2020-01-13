@@ -3,7 +3,7 @@ import proj4 from 'proj4'
 import { TileMatrix } from '../matrix/tileMatrix';
 import { BoundingBox } from '../../..';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
+import {SpatialReferenceSystem} from '../../core/srs/spatialReferenceSystem';
 
 export abstract class TileCreator {
   width: number;

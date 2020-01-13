@@ -1,4 +1,4 @@
-import GeoPackage from '../../../lib/geoPackage';
+import {GeoPackage} from '../../../lib/geoPackage';
 
 var fs = require('fs-extra')
   , should = require('chai').should()

@@ -2,11 +2,11 @@
  * @memberOf module:extension/style
  * @class StyleTable
  */
-import AttributesTable from '../../attributes/attributeTable'
-import RelationType from '../relatedTables/relationType';
-import UserColumn from '../../user/userColumn'
-import UserCustomColumn from '../../user/custom/userCustomColumn';
-import DataTypes from '../../db/dataTypes'
+import {AttributeTable} from '../../attributes/attributeTable'
+import {RelationType} from '../relatedTables/relationType';
+import {UserColumn} from '../../user/userColumn'
+import {UserCustomColumn} from '../../user/custom/userCustomColumn';
+import {DataTypes} from '../../db/dataTypes'
 
 /**
  * Icon Requirements Class Media Table
@@ -14,7 +14,7 @@ import DataTypes from '../../db/dataTypes'
  * @param  {module:user/userColumn~UserColumn[]} columns   media columns
  * @constructor
  */
-export default class StyleTable extends AttributesTable {
+export class StyleTable extends AttributeTable {
   public static readonly TABLE_NAME = 'nga_style';
   public static readonly COLUMN_ID = 'id';
   public static readonly COLUMN_NAME = 'name';

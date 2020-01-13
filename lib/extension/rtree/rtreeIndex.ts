@@ -1,9 +1,9 @@
-import GeoPackage from "../../geoPackage";
-import BaseExtension from '../baseExtension';
-import Extension from '../extension';
+import {GeoPackage} from "../../geoPackage";
+import {BaseExtension} from '../baseExtension';
+import {Extension} from '../extension';
 import {RTreeIndexDao} from './rtreeIndexDao'
 import {FeatureDao} from '../../features/user/featureDao'
-import EnvelopeBuilder from '../../geom/envelopeBuilder'
+import {EnvelopeBuilder} from '../../geom/envelopeBuilder'
 import { GeometryData } from '../../geom/geometryData'
 /**
  * RTreeIndex extension
@@ -11,7 +11,7 @@ import { GeometryData } from '../../geom/geometryData'
  * @extends BaseExtension
  * @param {module:geoPackage~GeoPackage} geoPackage The GeoPackage object
  */
-export default class RTreeIndex extends BaseExtension {
+export class RTreeIndex extends BaseExtension {
   tableName: string;
   primaryKeyColumn: string;
   columnName: string;

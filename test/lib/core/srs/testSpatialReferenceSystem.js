@@ -1,4 +1,4 @@
-var SpatialReferenceSystem = require('../../../../lib/core/srs/spatialReferenceSystem').default
+var SpatialReferenceSystem = require('../../../../lib/core/srs/spatialReferenceSystem').SpatialReferenceSystem
   , should = require('chai').should()
   , path = require('path');
 

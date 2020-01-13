@@ -1,7 +1,7 @@
 import {Dao} from '../../dao/dao';
 
-import ColumnValues from '../../dao/columnValues';
-import MetadataReference from './metadataReference';
+import {ColumnValues} from '../../dao/columnValues';
+import {MetadataReference} from './metadataReference';
 /**
  * Metadata Reference Data Access Object
  * @class

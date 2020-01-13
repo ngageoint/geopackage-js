@@ -3,11 +3,11 @@
  * @module extension/relatedTables
  */
 import {UserDao} from '../../user/userDao';
-import SimpleAttributesTable from './simpleAttributesTable'
-import SimpleAttributesRow from './simpleAttributesRow'
-import GeoPackage from '../../geoPackage';
+import {SimpleAttributesTable} from './simpleAttributesTable'
+import {SimpleAttributesRow} from './simpleAttributesRow'
+import {GeoPackage} from '../../geoPackage';
 import { DataTypes } from '../../..';
-import ColumnValues from '../../dao/columnValues';
+import {ColumnValues} from '../../dao/columnValues';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables

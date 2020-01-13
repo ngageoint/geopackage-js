@@ -1,10 +1,10 @@
 import {SpatialReferenceSystemDao} from '../core/srs/spatialReferenceSystemDao';
 
 // eslint-disable-next-line no-unused-vars
-import UserTable from '../user/userTable';
-import DataTypes from './dataTypes';
-import GeoPackage from '../geoPackage';
-import GeoPackageConnection from './geoPackageConnection';
+import {UserTable} from '../user/userTable';
+import {DataTypes} from './dataTypes';
+import {GeoPackage} from '../geoPackage';
+import {GeoPackageConnection} from './geoPackageConnection';
 /**
  * Creates tables necessary for GeoPackages
  * @module db/tableCreator

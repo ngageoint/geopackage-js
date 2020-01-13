@@ -1,4 +1,4 @@
-var TileGrid = require('../../../lib/tiles/tileGrid').default
+var TileGrid = require('../../../lib/tiles/tileGrid').TileGrid
   , should = require('chai').should();
 
 describe('TileGrid tests', function() {

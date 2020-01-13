@@ -1,6 +1,6 @@
 import { SqliteAdapter } from './sqliteAdapter';
 import { SqljsAdapter } from './sqljsAdapter';
-import DBAdapter from './dbAdapter';
+import {DBAdapter} from './dbAdapter';
 import { GeoPackageConstants } from '../geoPackageConstants';
 /**
  * Connection to the SQLite file
@@ -17,7 +17,7 @@ if (typeof(process) !== 'undefined' && process.version && !process.env.FORCE_SQL
 /**
  * Represents a connection to the GeoPackage database
  */
-export default class GeoPackageConnection {
+export class GeoPackageConnection {
   filePath: string | Buffer | Uint8Array | undefined;
   adapter: DBAdapter;
   adapterCreator: typeof SqliteAdapter | typeof SqljsAdapter;

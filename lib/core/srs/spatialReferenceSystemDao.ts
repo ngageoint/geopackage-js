@@ -1,6 +1,6 @@
 import {Dao} from '../../dao/dao';
 
-import SpatialReferenceSystem from './spatialReferenceSystem';
+import {SpatialReferenceSystem} from './spatialReferenceSystem';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao

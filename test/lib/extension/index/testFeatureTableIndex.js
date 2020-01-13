@@ -1,6 +1,6 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import FeatureTableIndex from '../../../../lib/extension/index/featureTableIndex';
+import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex';
 
 
 var GeoPackage = require('../../../../lib/geoPackage')

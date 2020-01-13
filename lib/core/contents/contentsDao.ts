@@ -2,12 +2,12 @@ import {Dao} from '../../dao/dao';
 import {TileMatrixDao} from '../../tiles/matrix/tileMatrixDao'
 import {TileMatrixSetDao} from '../../tiles/matrixset/tileMatrixSetDao'
 import {GeometryColumnsDao} from '../../features/columns/geometryColumnsDao'
-import Contents from './contents'
-import ColumnValues from '../../dao/columnValues'
-import GeometryColumns from '../../features/columns/geometryColumns';
+import {Contents} from './contents'
+import {ColumnValues} from '../../dao/columnValues'
+import {GeometryColumns} from '../../features/columns/geometryColumns';
 import { TileMatrixSet } from '../../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../../tiles/matrix/tileMatrix';
-import SpatialReferenceSystem from '../srs/spatialReferenceSystem';
+import {SpatialReferenceSystem} from '../srs/spatialReferenceSystem';
 
 /**
  * Contents object. Provides identifying and descriptive information that an

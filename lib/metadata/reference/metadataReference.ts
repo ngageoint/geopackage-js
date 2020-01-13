@@ -9,7 +9,7 @@ import { Metadata } from '../metadata';
  * Links metadata in the gpkg_metadata table to data in the feature, and tiles tables
  * @class MetadataReference
  */
-export default class MetadataReference {
+export class MetadataReference {
   public static readonly GEOPACKAGE: string = "geopackage";
   public static readonly TABLE: string = "table";
   public static readonly COLUMN: string = "column";

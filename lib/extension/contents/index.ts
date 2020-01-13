@@ -2,18 +2,18 @@
  * @module extension/contents
  */
 
-import BaseExtension from '../baseExtension';
-import GeoPackage from '../../geoPackage';
-import Extension from '../extension';
+import {BaseExtension} from '../baseExtension';
+import {GeoPackage} from '../../geoPackage';
+import {Extension} from '../extension';
 import {ContentsIdDao} from './contentsIdDao';
 import {ContentsDao} from '../../core/contents/contentsDao';
-import Contents from '../../core/contents/contents';
-import ContentsId from './contentsId';
+import {Contents} from '../../core/contents/contents';
+import {ContentsId} from './contentsId';
 
 /**
  * Style extension
  */
-export default class ContentsIdExtension extends BaseExtension {
+export class ContentsIdExtension extends BaseExtension {
 
   public static readonly EXTENSION_NAME: string  = 'nga_contents_id';
   public static readonly EXTENSION_AUTHOR: string  = 'nga';

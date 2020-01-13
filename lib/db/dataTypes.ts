@@ -1,7 +1,7 @@
 /**
  * @module db/dataTypes
  */
-export default class DataTypes {
+export class DataTypes {
   /**
    * A boolean value representing true or false.
    * @type {String}

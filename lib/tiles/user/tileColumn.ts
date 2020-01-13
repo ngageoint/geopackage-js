@@ -2,8 +2,8 @@
  * @module tiles/user/tileColumn
  */
 
-import UserColumn from '../../user/userColumn';
-import DataTypes from '../../db/dataTypes';
+import {UserColumn} from '../../user/userColumn';
+import {DataTypes} from '../../db/dataTypes';
 
 /**
  * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
@@ -11,7 +11,7 @@ import DataTypes from '../../db/dataTypes';
  * @class
  * @extends UserColumn
  */
-export default class TileColumn extends UserColumn {
+export class TileColumn extends UserColumn {
   public static readonly COLUMN_ID: string = "id";
   public static readonly COLUMN_ZOOM_LEVEL: string = "zoom_level";
   public static readonly COLUMN_TILE_COLUMN: string = "tile_column";

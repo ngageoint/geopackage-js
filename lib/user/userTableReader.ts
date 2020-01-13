@@ -2,40 +2,34 @@
  * userTableReader module.
  * @module user/userTableReader
  */
-import UserTable from './userTable';
+import {UserTable} from './userTable';
 import { GeoPackageConnection } from '../..';
-import UserColumn from './userColumn';
+import {UserColumn} from './userColumn';
 
-import DataTypes from '../db/dataTypes';
+import {DataTypes} from '../db/dataTypes';
 
 /**
  * @class
  */
-export default class UserTableReader {
-  private static readonly GPKG_UTR_CID = "cid";
-  private static readonly GPKG_UTR_NAME = "name";
-  private static readonly GPKG_UTR_TYPE = "type";
-  private static readonly GPKG_UTR_NOT_NULL = "notnull";
-  private static readonly GPKG_UTR_PK = "pk";
-  private static readonly GPKG_UTR_DFLT_VALUE = "dflt_value";
-
-  table_name: string;
-  requiredColumns: any;
+export class UserTableReader {
+  private static readonly GPKG_UTR_CID: string = "cid";
+  private static readonly GPKG_UTR_NAME: string = "name";
+  private static readonly GPKG_UTR_TYPE: string = "type";
+  private static readonly GPKG_UTR_NOT_NULL: string = "notnull";
+  private static readonly GPKG_UTR_PK: string = "pk";
+  private static readonly GPKG_UTR_DFLT_VALUE: string = "dflt_value";
   /**
    * @param tableName name of the table
    * @param requiredColumns array of the required column nammes
    */
-  constructor(tableName: string, requiredColumns?: string[]) {
-    // eslint-disable-next-line camelcase
-    this.table_name = tableName;
-    this.requiredColumns = requiredColumns;
+  constructor(public table_name: string, public requiredColumns?: string[]) {
   }
   /**
    * Read the table
    * @param  {object} db db connection
    * @return {module:user/userTable~UserTable}
    */
-  readTable(db: GeoPackageConnection): any {
+  readTable(db: GeoPackageConnection): UserTable {
     var columnList = [];
     var results = db.all('PRAGMA table_info(\'' + this.table_name + '\')');
     for (var i = 0; i < results.length; i++) {
@@ -80,7 +74,7 @@ export default class UserTableReader {
    * @param {Boolean} primaryKey primary key
    * @return {module:user/custom~UserCustomColumn}
    */
-  createColumnWithResults(result: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean) {
+  createColumnWithResults(result: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean): UserColumn {
     var dataType = DataTypes.fromName(type);
     return new UserColumn(index, name, dataType, max, notNull, defaultValue, primaryKey);
   }
@@ -92,7 +86,7 @@ export default class UserTableReader {
    * @return {module:user/userTable~UserTable}           the user table
    * 
    */
-  createTable(tableName: string, columns: UserColumn[], requiredColumns?: string[]): any {
+  createTable(tableName: string, columns: UserColumn[], requiredColumns?: string[]): UserTable {
     return new UserTable(tableName, columns, requiredColumns);
   }
 }

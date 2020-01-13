@@ -1,7 +1,7 @@
 import {Dao} from '../dao/dao'
 import {ContentsDao} from '../core/contents/contentsDao'
-import DataColumns from './dataColumns'
-import Contents from '../core/contents/contents';
+import {DataColumns} from './dataColumns'
+import {Contents} from '../core/contents/contents';
 /**
  * DataColumns module.
  * @module dataColumns

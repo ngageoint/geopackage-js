@@ -1,5 +1,5 @@
-import GeoPackage from '../../../lib/geoPackage'
-import GeoPackageConnection from '../../../lib/db/geoPackageConnection'
+import {GeoPackage} from '../../../lib/geoPackage'
+import {GeoPackageConnection} from '../../../lib/db/geoPackageConnection'
 
 var GeoPackageValidate = require('../../../lib/validate/geoPackageValidate').GeoPackageValidate
   , should = require('chai').should()

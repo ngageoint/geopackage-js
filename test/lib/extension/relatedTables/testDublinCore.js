@@ -1,6 +1,6 @@
-import UserTable from '../../../../lib/user/userTable';
-import UserColumn from '../../../../lib/user/userColumn';
-import UserRow from '../../../../lib/user/userRow';
+import {UserTable} from '../../../../lib/user/userTable';
+import {UserColumn} from '../../../../lib/user/userColumn';
+import {UserRow} from '../../../../lib/user/userRow';
 
 var DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType

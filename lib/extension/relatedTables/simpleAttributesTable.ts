@@ -3,10 +3,10 @@
  * @module extension/relatedTables
  */
 
-import UserRelatedTable from './userRelatedTable';
-import RelationType from './relationType';
-import UserColumn from '../../user/userColumn'
-import DataTypes from '../../db/dataTypes'
+import {UserRelatedTable} from './userRelatedTable';
+import {RelationType} from './relationType';
+import {UserColumn} from '../../user/userColumn'
+import {DataTypes} from '../../db/dataTypes'
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table
  * @class
@@ -15,7 +15,7 @@ import DataTypes from '../../db/dataTypes'
  * @param  {module:user/userColumn~UserColumn[]} columns   attribute columns
  * @param {string[]} requiredColumns required column names
  */
-export default class SimpleAttributesTable extends UserRelatedTable {
+export class SimpleAttributesTable extends UserRelatedTable {
 
   public static readonly RELATION_TYPE: RelationType = RelationType.SIMPLE_ATTRIBUTES;
   public static readonly COLUMN_ID: string = 'id';

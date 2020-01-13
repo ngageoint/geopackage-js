@@ -1,16 +1,16 @@
 import { GeoPackage as GeoPackageAPI } from '../../.'
 import { default as testSetup } from '../fixtures/testSetup'
 
-var FeatureColumn = require('../../lib/features/user/featureColumn').default
-  , DataColumns = require('../../lib/dataColumns/dataColumns').default
+var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
+  , DataColumns = require('../../lib/dataColumns/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
   , Verification = require('../fixtures/verification')
-  , FeatureTable = require('../../lib/features/user/featureTable').default
+  , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
-  , DataTypes = require('../../lib/db/dataTypes').default
+  , DataTypes = require('../../lib/db/dataTypes').DataTypes
   , GeometryData = require('../../lib/geom/geometryData').GeometryData
-  , FeatureTableReader = require('../../lib/features/user/featureTableReader').default
+  , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
   // , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkb = require('../../lib/wkb/index').WKB

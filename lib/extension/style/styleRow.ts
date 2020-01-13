@@ -3,8 +3,8 @@
  * @class StyleRow
  */
 
-import AttributesRow from '../../attributes/attributeRow';
-import StyleTable from './styleTable';
+import {AttributeRow} from '../../attributes/attributeRow';
+import {StyleTable} from './styleTable';
 
 /**
  * Style Row
@@ -14,7 +14,7 @@ import StyleTable from './styleTable';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
-export default class StyleRow extends AttributesRow {
+export class StyleRow extends AttributeRow {
   /**
    * Color hex pattern
    */

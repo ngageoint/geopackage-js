@@ -1,9 +1,9 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
-import UserMappingTable from '../../../../lib/extension/relatedTables/userMappingTable';
+import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import {UserMappingTable} from '../../../../lib/extension/relatedTables/userMappingTable';
 
-var DataType = require('../../../../lib/db/dataTypes').default
+var DataType = require('../../../../lib/db/dataTypes').DataTypes
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()

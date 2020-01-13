@@ -2,7 +2,7 @@
  * @module user/userColumn
  */
 
-import DataTypes from '../db/dataTypes';
+import {DataTypes} from '../db/dataTypes';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -16,7 +16,7 @@ import DataTypes from '../db/dataTypes';
  * @param {?Object} defaultValue default value or null
  * @param {Boolean} primaryKey `true` if this column is part of the table's primary key
  */
-export default class UserColumn {
+export class UserColumn {
   min: number;
   constructor(public index: number, public name: string, public dataType: any, public max?: number, public notNull?: boolean, public defaultValue?: any, public primaryKey?: boolean) {
     this.validateMax();

@@ -3,10 +3,10 @@
  * @class IconTable
  */
 
-import MediaTable from '../relatedTables/mediaTable';
-import UserCustomColumn from '../../user/custom/userCustomColumn';
+import {MediaTable} from '../relatedTables/mediaTable';
+import {UserCustomColumn} from '../../user/custom/userCustomColumn';
 
-import DataTypes from '../../db/dataTypes';
+import {DataTypes} from '../../db/dataTypes';
 
 /**
  * Icon Requirements Class Media Table
@@ -16,7 +16,7 @@ import DataTypes from '../../db/dataTypes';
  * @param  {module:user/userColumn~UserColumn[]} columns   media columns
  * @param {string[]} requiredColumns required column names
  */
-export default class IconTable extends MediaTable {
+export class IconTable extends MediaTable {
   public static readonly TABLE_NAME = 'nga_icon';
   public static readonly COLUMN_NAME = 'name';
   public static readonly COLUMN_DESCRIPTION = 'description';

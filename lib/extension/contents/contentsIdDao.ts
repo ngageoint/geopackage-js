@@ -5,7 +5,7 @@ import {Dao} from '../../dao/dao';
  * @class ContentsIdDao
  */
 
-import ContentsId from './contentsId';
+import {ContentsId} from './contentsId';
 
 /**
  * Contents Id Data Access Object

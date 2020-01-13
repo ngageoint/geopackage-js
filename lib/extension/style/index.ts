@@ -2,19 +2,19 @@
  * @module extension/style
  */
 
-import BaseExtension from '../baseExtension';
-import Extension from '../extension';
+import {BaseExtension} from '../baseExtension';
+import {Extension} from '../extension';
 import {ContentsIdDao} from '../contents/contentsIdDao'
-import IconTable from './iconTable'
+import {IconTable} from './iconTable'
 import {IconDao} from './iconDao'
-import StyleTable from './styleTable'
+import {StyleTable} from './styleTable'
 import {StyleDao} from './styleDao'
-import StyleMappingTable from './styleMappingTable'
+import {StyleMappingTable} from './styleMappingTable'
 import {StyleMappingDao} from './styleMappingDao'
-import UserMappingTable from '../relatedTables/userMappingTable'
-import StyleTableReader from './styleTableReader'
-import UserTableReader from '../../user/userTableReader'
-import FeatureTable from '../../features/user/featureTable'
+import {UserMappingTable} from '../relatedTables/userMappingTable'
+import {StyleTableReader} from './styleTableReader'
+import {UserTableReader} from '../../user/userTableReader'
+import {FeatureTable} from '../../features/user/featureTable'
 import FeatureStyles from './featureStyles'
 import FeatureStyle from './featureStyle'
 import Styles from './styles'
@@ -26,7 +26,7 @@ import Icons from './icons'
  * @extends BaseExtension
  * @constructor
  */
-export default class FeatureStyleExtension extends BaseExtension {
+export class FeatureStyleExtension extends BaseExtension {
   relatedTablesExtension: any;
   contentsIdExtension: any;
   public static readonly EXTENSION_NAME = 'nga_feature_style';
@@ -371,7 +371,7 @@ export default class FeatureStyleExtension extends BaseExtension {
       var contents = dao.queryForId(StyleTable.TABLE_NAME);
       if (contents) {
         var reader = new StyleTableReader(contents.table_name);
-        var table = reader.readTable(this.geoPackage.connection);
+        var table = reader.readTable(this.geoPackage.connection) as StyleTable;
         this.relatedTablesExtension.setContents(table);
         styleDao = new StyleDao(this.geoPackage, table);
       }

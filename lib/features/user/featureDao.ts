@@ -7,19 +7,19 @@ import LineIntersect from '@turf/line-intersect'
 import Intersect from '@turf/intersect'
 import BooleanWithin from '@turf/boolean-within'
 
-import FeatureTableIndex from '../../extension/index/featureTableIndex';
+import {FeatureTableIndex} from '../../extension/index/featureTableIndex';
 import {UserDao} from '../../user/userDao';
 import {DataColumnsDao} from '../../dataColumns/dataColumnsDao';
-import FeatureRow from './featureRow';
-import DataTypes from '../../db/dataTypes'
+import {FeatureRow} from './featureRow';
+import {DataTypes} from '../../db/dataTypes'
 import { BoundingBox } from '../../boundingBox'
 import { Feature, GeoJsonObject } from 'geojson';
-import GeometryColumns from '../columns/geometryColumns';
+import {GeometryColumns} from '../columns/geometryColumns';
 import { MetadataDao } from '../../metadata/metadataDao';
-import GeoPackage from '../../geoPackage';
-import FeatureTable from './featureTable';
-import Contents from '../../core/contents/contents';
-import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
+import {GeoPackage} from '../../geoPackage';
+import {FeatureTable} from './featureTable';
+import {Contents} from '../../core/contents/contents';
+import {SpatialReferenceSystem} from '../../core/srs/spatialReferenceSystem';
 
 /**
  * Feature DAO for reading feature user data tables

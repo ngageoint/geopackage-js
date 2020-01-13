@@ -2,9 +2,9 @@
  * @module attributes/attributeTable
  */
 import {ContentsDao} from '../core/contents/contentsDao';
-import UserTable from '../user/userTable';
-import Contents from '../core/contents/contents';
-import UserColumn from '../user/userColumn';
+import {UserTable} from '../user/userTable';
+import {Contents} from '../core/contents/contents';
+import {UserColumn} from '../user/userColumn';
 
 /**
  * Represents a user attribute table
@@ -14,7 +14,7 @@ import UserColumn from '../user/userColumn';
  * @param  {string} tableName table name
  * @param  {module:user/userColumn~UserColumn[]} columns   attribute columns
  */
-export default class AttributeTable extends UserTable {
+export class AttributeTable extends UserTable {
   contents: Contents;
   constructor(tableName: string, columns: UserColumn[]) {
     super(tableName, columns);

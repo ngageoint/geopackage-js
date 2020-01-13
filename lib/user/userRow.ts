@@ -3,12 +3,12 @@
  * @module user/userRow
  */
 
-import UserTable from './userTable'
+import {UserTable} from './userTable'
 
-import DataTypes from '../db/dataTypes';
+import {DataTypes} from '../db/dataTypes';
 import { UserColumn } from '../..';
 
-export default class UserRow {
+export class UserRow {
 
   /**
    * User Row containing the values from a single result row

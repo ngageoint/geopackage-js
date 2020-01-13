@@ -1,13 +1,12 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import RelatedTablesExtension from '../../../../lib/extension/relatedTables'
+import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 
-var DataType = require('../../../../lib/db/dataTypes').default
+var DataType = require('../../../../lib/db/dataTypes').DataTypes
   , Verification = require('../../../fixtures/verification')
   , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').default
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').default
-  , SimpleAttributesRow = require('../../../../lib/extension/relatedTables/simpleAttributesRow')
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()

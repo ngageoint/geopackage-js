@@ -1,4 +1,4 @@
-import DBAdapter from './dbAdapter';
+import {DBAdapter} from './dbAdapter';
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
  * @module db/sqljsAdapter

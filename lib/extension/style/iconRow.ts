@@ -1,5 +1,5 @@
-import IconTable from "./iconTable";
-import MediaRow from '../relatedTables/mediaRow';
+import {IconTable} from "./iconTable";
+import {MediaRow} from '../relatedTables/mediaRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 
 /**
@@ -16,7 +16,7 @@ import { ImageUtils } from '../../tiles/imageUtils';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
-export default class IconRow extends MediaRow {
+export class IconRow extends MediaRow {
   iconTable: IconTable;
   constructor(iconTable: IconTable, columnTypes?: any[], values?: any[]) {
     super(iconTable, columnTypes, values);

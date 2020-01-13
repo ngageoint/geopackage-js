@@ -5,7 +5,7 @@
 import {Dao} from '../../dao/dao';
 
 import { TileMatrix } from './tileMatrix';
-import Contents from '../../core/contents/contents';
+import {Contents} from '../../core/contents/contents';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 
 /**

@@ -4,11 +4,11 @@
  * @see module:extension/BaseExtension
  */
 
-import BaseExtension from '../baseExtension';
-import Extension from '../extension';
-import GeoPackage from '../../geoPackage';
+import {BaseExtension} from '../baseExtension';
+import {Extension} from '../extension';
+import {GeoPackage} from '../../geoPackage';
 
-export default class SchemaExtension extends BaseExtension {
+export class SchemaExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_schema';
   public static readonly EXTENSION_SCHEMA_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_SCHEMA_NAME_NO_AUTHOR: string = 'schema';

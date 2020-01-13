@@ -1,7 +1,7 @@
-import UserRow from "../../user/userRow";
-import UserTable from "../../user/userTable";
+import {UserRow} from "../../user/userRow";
+import {UserTable} from "../../user/userTable";
 import { DublinCoreType } from "./dublinCoreType";
-import UserColumn from "../../user/userColumn";
+import {UserColumn} from "../../user/userColumn";
 
 /**
  * Dublin Core Metadata Initiative

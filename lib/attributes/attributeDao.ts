@@ -2,11 +2,10 @@
  * @module attributes/attributeDao
  */
 import {UserDao} from '../user/userDao';
-import GeoPackage from '../geoPackage';
-import AttributeTable from './attributeTable'
-import AttributeRow from './attributeRow';
-import Contents from '../core/contents/contents';
-import ColumnValues from '../dao/columnValues';
+import {GeoPackage} from '../geoPackage';
+import {AttributeTable} from './attributeTable'
+import {AttributeRow} from './attributeRow';
+import {Contents} from '../core/contents/contents';
 /**
  * Attribute DAO for reading attribute user data tables
  * @class AttributeDao

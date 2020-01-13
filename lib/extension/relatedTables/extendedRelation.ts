@@ -7,7 +7,7 @@
  * mapping table
  * @class ExtendedRelation
  */
-export default class ExtendedRelation {
+export class ExtendedRelation {
   /**
    * Autoincrement primary key
    * @member {Number}

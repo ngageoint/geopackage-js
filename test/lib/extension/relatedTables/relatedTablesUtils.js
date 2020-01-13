@@ -1,8 +1,8 @@
-var DataTypes = require('../../../../lib/db/dataTypes').default
-  , UserColumn = require('../../../../lib/user/userColumn').default
+var DataTypes = require('../../../../lib/db/dataTypes').DataTypes
+  , UserColumn = require('../../../../lib/user/userColumn').UserColumn
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
   , DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').default
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
   , should = require('chai').should();
 
 

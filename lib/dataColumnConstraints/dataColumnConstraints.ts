@@ -3,7 +3,7 @@
  * Contains data to specify restrictions on basic data type column values
  * @class DataColumnConstraints
  */
-export default class DataColumnConstraints {
+export class DataColumnConstraints {
   /**
    * Case sensitive name of constraint
    * @member {string}

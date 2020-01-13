@@ -7,7 +7,7 @@
   * read or write to tables with extensions, and to “fail fast” and return an
   * error message if it does not.
  */
-export default class Extension {
+export class Extension {
   public static readonly EXTENSION_NAME_DIVIDER = "_";
 
   public static readonly READ_WRITE = "read-write";

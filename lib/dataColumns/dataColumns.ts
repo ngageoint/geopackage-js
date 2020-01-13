@@ -10,7 +10,7 @@
  * suitability of GeoPackage contents for specific purposes.
  * @class DataColumns
  */
-export default class DataColumns {
+export class DataColumns {
   /**
    * the name of the tiles, or feature table
    * @member {string}

@@ -5,9 +5,9 @@
  */
 import {Dao} from '../../dao/dao';
 
-import GeometryColumns from './geometryColumns';
-import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
-import Contents from '../../core/contents/contents';
+import {GeometryColumns} from './geometryColumns';
+import {SpatialReferenceSystem} from '../../core/srs/spatialReferenceSystem';
+import {Contents} from '../../core/contents/contents';
 /**
  * Geometry Columns Data Access Object
  * @class GeometryColumnsDao

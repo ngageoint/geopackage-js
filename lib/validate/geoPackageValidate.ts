@@ -1,5 +1,5 @@
 import path from 'path'
-import GeoPackage from "../geoPackage";
+import {GeoPackage} from "../geoPackage";
 import {GeoPackageConstants} from '../geoPackageConstants'
 
 /**

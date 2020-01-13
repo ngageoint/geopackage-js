@@ -1,15 +1,15 @@
 import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import FeatureStyleExtension from '../../../../lib/extension/style'
+import {FeatureStyleExtension} from '../../../../lib/extension/style'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
-  , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').default
-  , StyleTable = require('../../../../lib/extension/style/styleTable').default
+  , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').StyleMappingTable
+  , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
   , Styles = require('../../../../lib/extension/style/styles')
   , Icons = require('../../../../lib/extension/style/icons')
   , FeatureStyles = require('../../../../lib/extension/style/featureStyles')
   , FeatureStyle = require('../../../../lib/extension/style/featureStyle')
-  , IconTable = require('../../../../lib/extension/style/iconTable').default
+  , IconTable = require('../../../../lib/extension/style/iconTable').IconTable
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').ContentsIdDao
   // , testSetup = require('../../../fixtures/testSetup')
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils

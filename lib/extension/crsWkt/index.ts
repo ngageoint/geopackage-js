@@ -1,11 +1,11 @@
-import GeoPackage from "../../geoPackage";
-import Extension from '../extension';
-import BaseExtension from '../baseExtension';
+import {GeoPackage} from "../../geoPackage";
+import {Extension} from '../extension';
+import {BaseExtension} from '../baseExtension';
 
 /**
  * OGC Well known text representation of Coordinate Reference Systems extensionName
  */
-export default class CrsWktExtension extends BaseExtension {
+export class CrsWktExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_crs_wkt';
   public static readonly EXTENSION_CRS_WKT_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_CRS_WKT_NAME_NO_AUTHOR: string = 'crs_wkt';

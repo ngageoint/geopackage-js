@@ -4,11 +4,11 @@
  */
 import {UserMappingDao} from '../relatedTables/userMappingDao';
 import {UserCustomDao} from '../../user/custom/userCustomDao';
-import GeoPackage from '../../geoPackage';
-import StyleMappingTable from './styleMappingTable';
-import UserMappingTable from '../relatedTables/userMappingTable';
-import StyleMappingRow from './styleMappingRow';
-import UserRow from '../../user/userRow';
+import {GeoPackage} from '../../geoPackage';
+import {StyleMappingTable} from './styleMappingTable';
+import {UserMappingTable} from '../relatedTables/userMappingTable';
+import {StyleMappingRow} from './styleMappingRow';
+import {UserRow} from '../../user/userRow';
 
 /**
  * Style Mapping DAO for reading user mapping data tables

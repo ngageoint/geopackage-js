@@ -1,10 +1,10 @@
-import TableIndex from "./tableIndex";
+import {TableIndex} from "./tableIndex";
 
 /**
  * Geometry Index object, for indexing data within user tables
  * @class
  */
-export default class GeometryIndex {
+export class GeometryIndex {
     /**
      * Name of the table
      * @member {String}

@@ -3,9 +3,9 @@
  * @module extension/relatedTables
  */
 
-import UserTable from '../../user/userTable';
-import UserColumn from '../../user/userColumn';
-import Contents from '../../core/contents/contents';
+import {UserTable} from '../../user/userTable';
+import {UserColumn} from '../../user/userColumn';
+import {Contents} from '../../core/contents/contents';
 
 /**
  * User Defined Related Table
@@ -21,7 +21,7 @@ import Contents from '../../core/contents/contents';
  * @param  {string[]} [requiredColumns] required columns
  * @return {module:extension/relatedTables~UserRelatedTable}
  */
-export default class UserRelatedTable extends UserTable {
+export class UserRelatedTable extends UserTable {
   contents: Contents;
   constructor(tableName: string, public relation_name: string, public data_type: string, columns: UserColumn[], requiredColumns: string[]) {
     super(tableName, columns, requiredColumns);

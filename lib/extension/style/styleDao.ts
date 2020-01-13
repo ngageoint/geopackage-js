@@ -3,10 +3,10 @@
  * @class StyleDao
  */
 
-import StyleTable from './styleTable';
+import {StyleTable} from './styleTable';
 import {AttributeDao} from '../../attributes/attributeDao';
-import StyleRow from './styleRow';
-import GeoPackage from '../../geoPackage';
+import {StyleRow} from './styleRow';
+import {GeoPackage} from '../../geoPackage';
 
 /**
  * Style DAO for reading style tables

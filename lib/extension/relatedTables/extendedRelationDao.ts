@@ -1,6 +1,6 @@
 import {Dao} from '../../dao/dao';
-import ColumnValues from '../../dao/columnValues'
-import ExtendedRelation from './extendedRelation';
+import {ColumnValues} from '../../dao/columnValues'
+import {ExtendedRelation} from './extendedRelation';
 
 /**
  * Extended Relations Data Access Object

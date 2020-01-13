@@ -1,7 +1,7 @@
 import {Dao} from '../../dao/dao';
-import RTreeIndex from './rtreeIndex';
+import {RTreeIndex} from './rtreeIndex';
 import {FeatureDao} from '../../features/user/featureDao';
-import GeoPackage from '../../geoPackage';
+import {GeoPackage} from '../../geoPackage';
 import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
 /**
  * RTree module.

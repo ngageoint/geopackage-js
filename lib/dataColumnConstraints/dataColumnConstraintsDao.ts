@@ -1,5 +1,5 @@
 import {Dao} from '../dao/dao';
-import DataColumnConstraints from './dataColumnConstraints';
+import {DataColumnConstraints} from './dataColumnConstraints';
 
 /**
  * DataColumnConstraints module.

@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 import { TableCreator } from '../../../lib/db/tableCreator'
 
-var TileTable = require('../../../lib/tiles/user/tileTable').default
+var TileTable = require('../../../lib/tiles/user/tileTable').TileTable
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
   , wkb = require('../../../lib/wkb/index').WKB

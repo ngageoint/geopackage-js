@@ -3,8 +3,8 @@
  * @class StyleMappingRow
  */
 
-import UserMappingRow from '../relatedTables/userMappingRow';
-import StyleMappingTable from './styleMappingTable';
+import {UserMappingRow} from '../relatedTables/userMappingRow';
+import {StyleMappingTable} from './styleMappingTable';
 
 /**
  * User Mapping Row containing the values from a single result set row
@@ -14,7 +14,7 @@ import StyleMappingTable from './styleMappingTable';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
-export default class StyleMappingRow extends UserMappingRow {
+export class StyleMappingRow extends UserMappingRow {
   styleMappingTable: StyleMappingTable;
   constructor(styleMappingTable: StyleMappingTable, columnTypes?: any[], values?: any[]) {
     super(styleMappingTable, columnTypes, values);

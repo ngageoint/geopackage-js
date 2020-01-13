@@ -1,4 +1,4 @@
-import FeatureRow from "../../features/user/featureRow";
+import {FeatureRow} from "../../features/user/featureRow";
 
 /**
  * Feature Paint Cache.

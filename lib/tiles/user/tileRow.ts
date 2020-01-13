@@ -1,6 +1,6 @@
-import TileTable from "./tileTable";
-import UserRow from '../../user/userRow';
-import TileColumn from "./tileColumn";
+import {TileTable} from "./tileTable";
+import {UserRow} from '../../user/userRow';
+import {TileColumn} from "./tileColumn";
 /**
  * tileRow module.
  * @module tiles/user/tileRow
@@ -14,7 +14,7 @@ import TileColumn from "./tileColumn";
  * @param  {Array} columnTypes  column types
  * @param  {Array} values       values
  */
-export default class TileRow extends UserRow {
+export class TileRow extends UserRow {
   tileTable: TileTable;
   constructor(tileTable: TileTable, columnTypes?: any[], values?: any[]) {
     super(tileTable, columnTypes, values);

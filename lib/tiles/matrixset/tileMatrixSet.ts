@@ -3,7 +3,7 @@
  * @see module:dao/dao
  */
 import { BoundingBox } from '../../boundingBox';
-import Contents from '../../core/contents/contents';
+import {Contents} from '../../core/contents/contents';
 
 /**
  * `TileMatrixSet` models the [`gpkg_tile_matrix_set`](https://www.geopackage.org/spec121/index.html#_tile_matrix_set)

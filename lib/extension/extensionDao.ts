@@ -1,6 +1,6 @@
-import Extension from './extension';
+import {Extension} from './extension';
 import {Dao} from '../dao/dao';
-import ColumnValues from '../dao/columnValues';
+import {ColumnValues} from '../dao/columnValues';
 
 import { TableCreator } from '../db/tableCreator';
 

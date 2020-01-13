@@ -3,9 +3,9 @@
  * @class StyleMappingTable
  */
 
-import UserMappingTable from '../relatedTables/userMappingTable';
-import UserCustomColumn from '../../user/custom/userCustomColumn'
-import DataTypes from '../../db/dataTypes'
+import {UserMappingTable} from '../relatedTables/userMappingTable';
+import {UserCustomColumn} from '../../user/custom/userCustomColumn'
+import {DataTypes} from '../../db/dataTypes'
 
 /**
  * Contains style mapping table factory and utility methods
@@ -14,7 +14,7 @@ import DataTypes from '../../db/dataTypes'
  * @param  {module:user/userColumn~UserColumn[]} columns   style mapping columns
  * @constructor
  */
-export default class StyleMappingTable extends UserMappingTable {
+export class StyleMappingTable extends UserMappingTable {
   public static readonly COLUMN_GEOMETRY_TYPE_NAME = 'geometry_type_name';
 
   /**

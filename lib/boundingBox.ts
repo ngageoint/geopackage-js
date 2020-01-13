@@ -1,4 +1,5 @@
 import proj4 from 'proj4'
+import { Envelope } from './geom/envelope';
 
 /**
  * Create a new bounding box
@@ -35,7 +36,7 @@ export class BoundingBox {
    *
    * @return geometry envelope
    */
-  buildEnvelope(): { minY: number, minX: number, maxY: number, maxX: number} {
+  buildEnvelope(): Envelope {
     return {
       minY: this.minLatitude,
       minX: this.minLongitude,

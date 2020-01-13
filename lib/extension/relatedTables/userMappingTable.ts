@@ -3,11 +3,10 @@
  * @module extension/relatedTables
  */
 
-import UserTable from '../../user/userTable';
-import UserColumn from '../../user/userColumn';
-import UserCustomColumn from '../../user/custom/userCustomColumn';
-
-import DataTypes from '../../db/dataTypes';
+import {UserTable} from '../../user/userTable';
+import {UserColumn} from '../../user/userColumn';
+import {UserCustomColumn} from '../../user/custom/userCustomColumn';
+import {DataTypes} from '../../db/dataTypes';
 
 /**
  * Contains user mapping table factory and utility methods
@@ -15,7 +14,7 @@ import DataTypes from '../../db/dataTypes';
  * @param  {string} tableName table name
  * @param  {module:user/userColumn~UserColumn[]} columns   user mapping columns
  */
-export default class UserMappingTable extends UserTable {
+export class UserMappingTable extends UserTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
   public static readonly COLUMN_RELATED_ID: string = 'related_id';
   

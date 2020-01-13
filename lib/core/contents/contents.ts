@@ -5,7 +5,7 @@
  * available in a GeoPackage.
  * @see https://www.geopackage.org/spec121/index.html#_contents
  */
-export default class Contents {
+export class Contents {
   /**
    * the name of the tiles, or feature table
    * @member {string}

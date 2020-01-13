@@ -2,9 +2,9 @@
  * @module user/custom
  */
 import {UserDao} from '../userDao';
-import GeoPackage from '../../geoPackage';
-import UserCustomTableReader from './userCustomTableReader';
-import UserRow from '../userRow';
+import {GeoPackage} from '../../geoPackage';
+import {UserCustomTableReader} from './userCustomTableReader';
+import {UserRow} from '../userRow';
 
 /**
  * User Custom Dao

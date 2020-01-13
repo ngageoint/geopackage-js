@@ -1,4 +1,4 @@
-import UserColumn from "../user/userColumn";
+import {UserColumn} from "../user/userColumn";
 
 /**
  * @module dao/columnValues
@@ -7,7 +7,7 @@ import UserColumn from "../user/userColumn";
  * Structure to define columns in a table
  * @class ColumnValues
  */
-export default class ColumnValues {
+export class ColumnValues {
   values: { [key: string]: UserColumn | any} = {};
   columns: string[] = [];
   /**

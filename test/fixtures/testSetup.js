@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { GeoPackage as GeoPackageAPI } from '../..';
-import GeoPackage from '../../lib/geoPackage';
-import GeoPackageConnection from '../../lib/db/geoPackageConnection';
+import {GeoPackage} from '../../lib/geoPackage';
+import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
 
 var fs = require('fs-extra')
   , path = require('path')

@@ -1,10 +1,10 @@
 import {UserDao} from '../../user/userDao'
-import UserTableReader from '../../user/userTableReader'
-import MediaTable from './mediaTable'
-import MediaRow from './mediaRow';
-import GeoPackage from '../../geoPackage';
+import {UserTableReader} from '../../user/userTableReader'
+import {MediaTable} from './mediaTable'
+import {MediaRow} from './mediaRow';
+import {GeoPackage} from '../../geoPackage';
 import { DataTypes } from '../../..';
-import ColumnValues from '../../dao/columnValues';
+import {ColumnValues} from '../../dao/columnValues';
 
 /**
  * MediaDao module.
@@ -55,7 +55,7 @@ export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    */
   static readTable(geoPackage: GeoPackage, tableName: string): MediaDao<MediaRow> {
     var reader = new UserTableReader(tableName);
-    var userTable = reader.readTable(geoPackage.getDatabase());
+    var userTable = reader.readTable(geoPackage.getDatabase()) as MediaTable;
     return new MediaDao(geoPackage, userTable);
   }
 }

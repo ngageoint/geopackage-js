@@ -9,7 +9,7 @@ import proj4 from 'proj4'
  * Spatial Reference System object. The coordinate reference system definitions it contains are referenced by the GeoPackage Contents and GeometryColumns objects to relate the vector and tile data in user tables to locations on the earth.
  * @class SpatialReferenceSystem
  */
-export default class SpatialReferenceSystem {
+export class SpatialReferenceSystem {
   public static readonly TABLE_NAME = 'gpkg_spatial_ref_sys';
   /**
    * Human readable name of this SRS

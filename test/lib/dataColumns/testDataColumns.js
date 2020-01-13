@@ -3,8 +3,8 @@ import { default as testSetup } from '../../fixtures/testSetup'
 import {DataColumnsDao} from '../../../lib/dataColumns/dataColumnsDao';
 import {DataColumnConstraintsDao} from '../../../lib/dataColumnConstraints/dataColumnConstraintsDao';
 
-var DataColumns = require('../../../lib/dataColumns/dataColumns').default
-  , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').default
+var DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
+  , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').DataColumnConstraints
   // , GeoPackageAPI = require('../../../.')
   // , testSetup = require('../../fixtures/testSetup')
   , path = require('path')

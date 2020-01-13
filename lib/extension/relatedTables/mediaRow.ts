@@ -1,8 +1,8 @@
-import MediaTable from "./mediaTable";
-import UserRow from '../../user/userRow';
+import {MediaTable} from "./mediaTable";
+import {UserRow} from '../../user/userRow';
 import {ImageUtils} from '../../tiles/imageUtils';
 import { UserColumn, DataTypes } from "../../..";
-import ColumnValues from "../../dao/columnValues";
+import {ColumnValues} from "../../dao/columnValues";
 
 /**
  * MediaRow module.
@@ -18,7 +18,7 @@ import ColumnValues from "../../dao/columnValues";
  * @param  {module:db/dataTypes[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
-export default class MediaRow extends UserRow {
+export class MediaRow extends UserRow {
   constructor(public mediaTable: MediaTable, columnTypes?: DataTypes[], values?: ColumnValues[]) {
     super(mediaTable, columnTypes, values);
   }

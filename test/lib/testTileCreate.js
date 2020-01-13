@@ -2,7 +2,7 @@ import { default as testSetup } from '../fixtures/testSetup'
 
 const
   Verification = require('../fixtures/verification')
-  , TileTable = require('../../lib/tiles/user/tileTable').default
+  , TileTable = require('../../lib/tiles/user/tileTable').TileTable
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , path = require('path')
   , should = require('chai').should();

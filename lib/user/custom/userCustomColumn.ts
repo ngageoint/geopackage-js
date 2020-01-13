@@ -2,7 +2,7 @@
  * @module user/custom
  */
 
-import UserColumn from '../userColumn';
+import {UserColumn} from '../userColumn';
 
 /**
  * Create a new user custom columnd
@@ -14,7 +14,7 @@ import UserColumn from '../userColumn';
  *  @param {Object} defaultValue default value or nil
  *  @param {Boolean} primaryKey primary key
  */
-export default class UserCustomColumn extends UserColumn {
+export class UserCustomColumn extends UserColumn {
   constructor(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);
     // eslint-disable-next-line eqeqeq

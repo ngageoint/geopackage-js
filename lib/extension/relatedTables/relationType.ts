@@ -8,7 +8,7 @@ import {ContentsDao} from '../../core/contents/contentsDao';
  * Spec supported User-Defined Related Data Tables
  * @class
  */
-export default class RelationType {
+export class RelationType {
   /**
    * Link features with other features
    * @type {Object}

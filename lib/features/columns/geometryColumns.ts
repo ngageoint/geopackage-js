@@ -1,11 +1,10 @@
-import SpatialReferenceSystem from "../../core/srs/spatialReferenceSystem";
-
+import {SpatialReferenceSystem} from "../../core/srs/spatialReferenceSystem";
 
 /**
  * Spatial Reference System object. The coordinate reference system definitions it contains are referenced by the GeoPackage Contents and GeometryColumns objects to relate the vector and tile data in user tables to locations on the earth.
  * @class GeometryColumns
  */
-export default class GeometryColumns {
+export class GeometryColumns {
   public static readonly TABLE_NAME: string = "tableName";
   public static readonly COLUMN_NAME: string = "columnName";
   public static readonly GEOMETRY_TYPE_NAME: string = "geometryTypeName";

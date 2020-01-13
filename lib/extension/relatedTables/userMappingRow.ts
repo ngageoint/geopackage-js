@@ -1,5 +1,5 @@
-import UserMappingTable from "./userMappingTable";
-import UserRow from '../../user/userRow';
+import {UserMappingTable} from "./userMappingTable";
+import {UserRow} from '../../user/userRow';
 import { UserColumn } from "../../..";
 
 /**
@@ -16,7 +16,7 @@ import { UserColumn } from "../../..";
  * @param  {module:db/dataTypes[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
-export default class UserMappingRow extends UserRow {
+export class UserMappingRow extends UserRow {
   constructor(public table: UserMappingTable, columnTypes?: any[], values?: any[]) {
     super(table, columnTypes, values);
   }

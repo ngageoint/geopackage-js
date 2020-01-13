@@ -3,9 +3,9 @@
  * @module attributes/attributeTableReader
  */
 
-import UserTableReader from '../user/userTableReader';
-import AttributeTable from './attributeTable';
-import UserColumn from '../user/userColumn';
+import {UserTableReader} from '../user/userTableReader';
+import {AttributeTable} from './attributeTable';
+import {UserColumn} from '../user/userColumn';
 
 /**
 * Reads the metadata from an existing attribute table
@@ -13,11 +13,11 @@ import UserColumn from '../user/userColumn';
 * @extends UserTableReader
 * @classdesc Reads the metadata from an existing attributes table
 */
-export default class AttributeTableReader extends UserTableReader {
+export class AttributeTableReader extends UserTableReader {
   /**
    * @inheritdoc
    */
-  createTable(tableName: string, columns: UserColumn[]) {
+  createTable(tableName: string, columns: UserColumn[]): AttributeTable {
     return new AttributeTable(tableName, columns);
   }
 }

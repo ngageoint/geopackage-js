@@ -2,7 +2,7 @@
 /**
  * Table Index object, for indexing data within user tables
  */
-export default class TableIndex {
+export class TableIndex {
   /**
    * Name of the table
    * @member {String}

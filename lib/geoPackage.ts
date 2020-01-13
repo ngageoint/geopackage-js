@@ -2,15 +2,15 @@
 /**
  * @module geoPackage
  */
-import GeoPackageConnection from './db/geoPackageConnection';
-import CrsWktExtension from './extension/crsWkt';
-import RelatedTablesExtension from './extension/relatedTables';
-import FeatureStyleExtension from './extension/style/.';
-import ContentsIdExtension from './extension/contents/.';
+import {GeoPackageConnection} from './db/geoPackageConnection';
+import {CrsWktExtension} from './extension/crsWkt';
+import {RelatedTablesExtension} from './extension/relatedTables';
+import {FeatureStyleExtension} from './extension/style/.';
+import {ContentsIdExtension} from './extension/contents/.';
 import {SpatialReferenceSystemDao} from './core/srs/spatialReferenceSystemDao'
 import {GeometryColumnsDao} from './features/columns/geometryColumnsDao'
 import {FeatureDao} from './features/user/featureDao'
-import FeatureTableReader from './features/user/featureTableReader'
+import {FeatureTableReader} from './features/user/featureTableReader'
 import {ContentsDao} from './core/contents/contentsDao'
 import {TileMatrixSetDao} from './tiles/matrixset/tileMatrixSetDao'
 import {TileMatrixDao} from './tiles/matrix/tileMatrixDao'
@@ -25,17 +25,16 @@ import {ExtendedRelationDao} from './extension/relatedTables/extendedRelationDao
 import {AttributeDao} from './attributes/attributeDao'
 import {TileDao} from './tiles/user/tileDao'
 import {ContentsIdDao} from './extension/contents/contentsIdDao'
-import AttributeTable from './attributes/attributeTable'
-import TileTableReader from './tiles/user/tileTableReader'
-import AttributeTableReader from './attributes/attributeTableReader'
-import UserTable from './user/userTable'
-import FeatureTable from './features/user/featureTable'
-import StyleMappingTable from './extension/style/styleMappingTable'
-import TileTable from './tiles/user/tileTable'
-import Contents from './core/contents/contents';
-import DataTypes from './db/dataTypes';
-import SchemaExtension from './extension/schema';
-import GeometryColumns from './features/columns/geometryColumns';
+import {AttributeTable} from './attributes/attributeTable'
+import {TileTableReader} from './tiles/user/tileTableReader'
+import {AttributeTableReader} from './attributes/attributeTableReader'
+import {FeatureTable} from './features/user/featureTable'
+import {StyleMappingTable} from './extension/style/styleMappingTable'
+import {TileTable} from './tiles/user/tileTable'
+import {Contents} from './core/contents/contents';
+import {DataTypes} from './db/dataTypes';
+import {SchemaExtension} from './extension/schema';
+import {GeometryColumns} from './features/columns/geometryColumns';
 import { TableCreator } from './db/tableCreator';
 import { TileMatrix } from './tiles/matrix/tileMatrix';
 import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
@@ -43,10 +42,10 @@ import { BoundingBox } from './boundingBox';
 import {TileMatrixSet} from './tiles/matrixset/tileMatrixSet'
   
 import proj4 from 'proj4';
-import UserColumn from './user/userColumn';
-import DataColumns from './dataColumns/dataColumns';
-import AttributeRow from './attributes/attributeRow';
-import SpatialReferenceSystem from './core/srs/spatialReferenceSystem';
+import {UserColumn} from './user/userColumn';
+import {DataColumns} from './dataColumns/dataColumns';
+import {AttributeRow} from './attributes/attributeRow';
+import {SpatialReferenceSystem} from './core/srs/spatialReferenceSystem';
 import * as defs from './proj4Defs'
 import { Feature } from 'geojson';
 for (var def in defs) {
@@ -59,7 +58,7 @@ for (var def in defs) {
  * A `GeoPackage` instance is the interface to a physical GeoPackage SQLite
  * database.
  */
-export default class GeoPackage {
+export class GeoPackage {
   name: string;
   path: string;
   connection: GeoPackageConnection;
@@ -417,7 +416,7 @@ export default class GeoPackage {
       throw new Error('Non null Contents is required to create an Attributes DAO');
     }
     var reader = new AttributeTableReader(contents.table_name);
-    var table = reader.readTable(this.connection);
+    var table: AttributeTable = reader.readTable(this.connection) as AttributeTable;
     table.setContents(contents);
     return new AttributeDao(this, table);
   }

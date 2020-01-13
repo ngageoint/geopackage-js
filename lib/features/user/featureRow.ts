@@ -1,9 +1,8 @@
-import FeatureTable from "./featureTable";
-import UserRow from '../../user/userRow';
-import FeatureColumn from './featureColumn';
-import DataTypes from '../../db/dataTypes';
+import {FeatureTable} from "./featureTable";
+import {UserRow} from '../../user/userRow';
+import {FeatureColumn} from './featureColumn';
+import {DataTypes} from '../../db/dataTypes';
 import { GeometryData } from '../../geom/geometryData'
-import UserColumn from "../../user/userColumn";
 
 /**
  * featureRow module.
@@ -17,7 +16,7 @@ import UserColumn from "../../user/userColumn";
  * @param  {Array} columnTypes  column types
  * @param  {Array} values       values
  */
-export default class FeatureRow extends UserRow {
+export class FeatureRow extends UserRow {
   constructor(public featureTable: FeatureTable, columnTypes?: any[], values?: any[]) {
     super(featureTable, columnTypes, values);
   }

@@ -3,7 +3,7 @@
  * @module tiles/tileGrid
  * @class
  */
-export default class TileGrid {
+export class TileGrid {
   constructor(public min_x: number, public max_x: number, public min_y: number, public max_y: number) {
   }
   count(): number {

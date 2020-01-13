@@ -2,17 +2,17 @@ import proj4 from 'proj4'
 import {UserDao} from '../../user/userDao'
 import {TileMatrixDao} from '../matrix/tileMatrixDao';
 import {TileMatrixSetDao} from '../matrixset/tileMatrixSetDao';
-import TileRow from './tileRow';
-import TileColumn from './tileColumn';
-import TileGrid from '../tileGrid';
-import ColumnValues from '../../dao/columnValues'
+import {TileRow} from './tileRow';
+import {TileColumn} from './tileColumn';
+import {TileGrid} from '../tileGrid';
+import {ColumnValues} from '../../dao/columnValues'
 import { TileMatrix } from '../matrix/tileMatrix'
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { BoundingBox } from '../../boundingBox';
-import SpatialReferenceSystem from '../../core/srs/spatialReferenceSystem';
+import {SpatialReferenceSystem} from '../../core/srs/spatialReferenceSystem';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import GeoPackage from '../../geoPackage';
-import TileTable from './tileTable';
+import {GeoPackage} from '../../geoPackage';
+import {TileTable} from './tileTable';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading

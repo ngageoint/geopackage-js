@@ -6,7 +6,7 @@
  * Contents Id object, for maintaining a unique identifier for contents tables
  * @constructor
  */
-export default class ContentsId {
+export class ContentsId {
   /**
    * Id column, primary key
    * @member {Number}

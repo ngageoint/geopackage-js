@@ -1,5 +1,5 @@
-import GeoPackage from '../../lib/geoPackage'
-import GeoPackageConnection from '../../lib/db/geoPackageConnection';
+import {GeoPackage} from '../../lib/geoPackage'
+import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
 
 var GeoPackageTileRetriever = require('../../lib/tiles/retriever').GeoPackageTileRetriever
   , proj4 = require('proj4')

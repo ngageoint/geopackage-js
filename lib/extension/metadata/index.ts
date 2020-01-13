@@ -3,9 +3,9 @@
  * @module extension/metadata
  */
 
-import BaseExtension from '../baseExtension';
-import GeoPackage from '../../geoPackage';
-import Extension from '../extension';
+import {BaseExtension} from '../baseExtension';
+import {GeoPackage} from '../../geoPackage';
+import {Extension} from '../extension';
 
 /**
  * Metadata extension
@@ -13,7 +13,7 @@ import Extension from '../extension';
  * @class
  * @extends BaseExtension
  */
-export default class MetadataExtension extends BaseExtension {
+export class MetadataExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_metadata';
   public static readonly EXTENSION_Metadata_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_Metadata_NAME_NO_AUTHOR: string = 'metadata';

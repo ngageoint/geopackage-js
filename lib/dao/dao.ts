@@ -1,6 +1,6 @@
-import GeoPackage from "../geoPackage";
-import GeoPackageConnection from "../db/geoPackageConnection";
-import ColumnValues from './columnValues';
+import {GeoPackage} from "../geoPackage";
+import {GeoPackageConnection} from "../db/geoPackageConnection";
+import {ColumnValues} from './columnValues';
 /**
  * Dao module.
  */

@@ -1,4 +1,4 @@
-import GeoPackage from "../../geoPackage";
+import {GeoPackage} from "../../geoPackage";
 
 /**
  * WebPExtension module.
@@ -6,10 +6,10 @@ import GeoPackage from "../../geoPackage";
  * @see module:extension/BaseExtension
  */
 
-import BaseExtension from '../baseExtension'
-import Extension from '../extension';
+import {BaseExtension} from '../baseExtension'
+import {Extension} from '../extension';
 
-export default class WebPExtension extends BaseExtension {
+export class WebPExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_webp';
   public static readonly EXTENSION_WEBP_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_WEBP_NAME_NO_AUTHOR: string = 'webp';

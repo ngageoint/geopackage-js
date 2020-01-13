@@ -2,11 +2,11 @@
  * @module extension/relatedTables
  */
 import {UserCustomDao} from '../../user/custom/userCustomDao';
-import GeoPackage from '../../geoPackage';
-import UserMappingTable from './userMappingTable';
-import UserMappingRow from './userMappingRow';
-import ColumnValues from '../../dao/columnValues';
-import UserRow from '../../user/userRow';
+import {GeoPackage} from '../../geoPackage';
+import {UserMappingTable} from './userMappingTable';
+import {UserMappingRow} from './userMappingRow';
+import {ColumnValues} from '../../dao/columnValues';
+import {UserRow} from '../../user/userRow';
 import { DataTypes } from '../../..';
 
 /**

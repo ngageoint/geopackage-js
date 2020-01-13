@@ -1,4 +1,4 @@
-export default interface DBAdapter {
+export interface DBAdapter {
   db: any;
   filePath: string | Buffer | Uint8Array;
   /**

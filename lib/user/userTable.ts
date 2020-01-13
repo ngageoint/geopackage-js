@@ -1,6 +1,6 @@
-import UserColumn from './userColumn'
+import {UserColumn} from './userColumn'
 
-import DataTypes from '../db/dataTypes';
+import {DataTypes} from '../db/dataTypes';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -10,7 +10,7 @@ import DataTypes from '../db/dataTypes';
  * @param  {module:user/userColumn~UserColumn[]} columns user columns
  * @param  {string[]} [requiredColumns] required columns
  */
-export default class UserTable {
+export class UserTable {
   public static readonly FEATURE_TABLE = 'FEATURE';
   public static readonly TILE_TABLE = 'TILE';
   /**
@@ -71,7 +71,7 @@ export default class UserTable {
    * @param  {string} column        column
    * @throws Throws an error if previous index is not undefined
    */
-  duplicateCheck(index, previousIndex, column) {
+  duplicateCheck(index: number, previousIndex?: number, column?: string) {
     if (previousIndex !== undefined) {
       throw new Error('More than one ' + column + ' column was found for table \'' + this.table_name + '\'. Index ' + previousIndex + ' and ' + index);
     }
@@ -82,7 +82,7 @@ export default class UserTable {
    * @param  {module:user/userColumn~UserColumn} column   column
    * @throws Will throw an error if the actual column type does not match the expected column type
    */
-  typeCheck(expected, column) {
+  typeCheck(expected: any, column: UserColumn) {
     var actual = column.dataType;
     if (!actual || actual !== expected) {
       throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.table_name + '\', expected: ' + DataTypes.nameFromType(expected) + ', actual: ' + column.dataType);
@@ -94,7 +94,7 @@ export default class UserTable {
    * @param  {string} column column
    * @throws Will throw an error if no column is found
    */
-  missingCheck(index, column) {
+  missingCheck(index: number, column: string) {
     if (index === undefined || index === null) {
       throw new Error('No ' + column + ' column was found for table \'' + this.table_name + '\'');
     }
@@ -105,7 +105,7 @@ export default class UserTable {
    * @return {Number} the column index
    * @throws Will throw an error if the column is not found in the table
    */
-  getColumnIndex(columnName) {
+  getColumnIndex(columnName: string): number {
     var index = this.nameToIndex[columnName];
     if (index === undefined || index === null) {
       throw new Error('Column does not exist in table \'' + this.table_name + '\', column: ' + columnName);
@@ -117,7 +117,7 @@ export default class UserTable {
    * @param  {string} columnName name of the column
    * @return {Boolean}            true if the column exists in the table
    */
-  hasColumn(columnName) {
+  hasColumn(columnName: string): boolean {
     try {
       this.getColumnIndex(columnName);
       return true;
@@ -131,7 +131,7 @@ export default class UserTable {
    * @param  {Number} index index
    * @return {string} the column name
    */
-  getColumnNameWithIndex(index) {
+  getColumnNameWithIndex(index: number): string {
     return this.columnNames[index];
   }
   /**
@@ -139,7 +139,7 @@ export default class UserTable {
    * @param  {Number} index index
    * @return {module:user/userColumn~UserColumn} column at the index
    */
-  getColumnWithIndex(index) {
+  getColumnWithIndex(index: number): UserColumn {
     return this.columns[index];
   }
   /**
@@ -147,31 +147,31 @@ export default class UserTable {
    * @param  {string} columnName column name
    * @return {module:user/userColumn~UserColumn}            column at the index
    */
-  getColumnWithColumnName(columnName) {
+  getColumnWithColumnName(columnName: string): UserColumn {
     return this.getColumnWithIndex(this.getColumnIndex(columnName));
   }
   /**
    * Get the column count
    * @return {Number} the count of the columns
    */
-  columnCount() {
+  columnCount(): number {
     return this.columns.length;
   }
   /**
    * Get the primary key column
    * @return {module:user/userColumn~UserColumn} the primary key column
    */
-  getPkColumn() {
+  getPkColumn(): UserColumn {
     return this.columns[this.pkIndex];
   }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getIdColumn() {
+  getIdColumn(): UserColumn {
     return this.getPkColumn();
   }
-  addUniqueConstraint(uniqueConstraint) {
+  addUniqueConstraint(uniqueConstraint: any) {
     this.uniqueConstraints.push(uniqueConstraint);
   }
 }

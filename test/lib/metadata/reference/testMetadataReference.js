@@ -3,7 +3,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 var fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path')
-  , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').default
+  , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').MetadataReference
   , Metadata = require('../../../../lib/metadata/metadata').Metadata
   , GeoPackage = require('../../../../lib/geoPackage')
   , TableCreator = require('../../../../lib/db/tableCreator').TableCreator
