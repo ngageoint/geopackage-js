@@ -39,7 +39,6 @@
     "better-sqlite3": "5.4.3",
     "canvas": "^2.6.0",
     "concat-stream": "^1.6.0",
-    "d3-geo": "^1.10.0",
     "file-type": "8.1.0",
     "geojson-vt": "^3.2.0",
     "image-size": "^0.8.2",
