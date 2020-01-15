@@ -1,12 +1,12 @@
-import {UserMappingTable} from "./userMappingTable";
-import {UserRow} from '../../user/userRow';
-import { UserColumn } from "../../..";
+import { UserMappingTable } from './userMappingTable';
+import { UserRow } from '../../user/userRow';
+import { UserColumn, DataTypes } from '../../..';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * UserMappingRow module.
  * @module extension/relatedTables
  */
-
 
 /**
  * User Mapping Row containing the values from a single result set row
@@ -17,7 +17,7 @@ import { UserColumn } from "../../..";
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class UserMappingRow extends UserRow {
-  constructor(public table: UserMappingTable, columnTypes?: any[], values?: any[]) {
+  constructor(public table: UserMappingTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(table, columnTypes, values);
   }
   /**

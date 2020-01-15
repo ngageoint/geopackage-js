@@ -1,6 +1,7 @@
 import {UserTable} from '../../../../lib/user/userTable';
 import {UserColumn} from '../../../../lib/user/userColumn';
 import {UserRow} from '../../../../lib/user/userRow';
+import { DataTypes } from '../../../../lib/db/dataTypes';
 
 var DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
@@ -67,7 +68,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
@@ -99,13 +100,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.TEXT);
         }
         return;
       }
@@ -141,7 +142,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
       }
       hasColumn(name) {
@@ -155,13 +156,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.TEXT);
         }
         return;
       }
@@ -179,7 +180,7 @@ describe('Dublin Core tests', function() {
       }
     };
     var fakeTable = new MockUserTable('table', []);
-    var fakeRow = new MockUserRow(fakeTable, [])
+    var fakeRow = new MockUserRow(fakeTable)
 
     DublinCoreMetadata.setValue(fakeRow, DublinCoreType.IDENTIFIER, 'identifier');
   });
@@ -199,13 +200,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', '');
+          return new UserColumn(0, 'content_type', DataTypes.TEXT);
         }
       }
       hasColumn(columnNanameme) {
@@ -225,13 +226,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', '');
+          return new UserColumn(0, 'content_type', DataTypes.TEXT);
         }
         return;
       }
@@ -249,7 +250,7 @@ describe('Dublin Core tests', function() {
       }
     };
     var fakeTable = new MockUserTable('table', []);
-    var fakeRow = new MockUserRow(fakeTable, [])
+    var fakeRow = new MockUserRow(fakeTable)
 
     DublinCoreMetadata.setValue(fakeRow, DublinCoreType.FORMAT, 'format');
   });
@@ -267,7 +268,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
       }
       hasColumn(name) {
@@ -293,7 +294,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
       }
     }
@@ -316,13 +317,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', '');
+          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', '');
+          return new UserColumn(0, 'content_type', DataTypes.TEXT);
         }
       }
       hasColumn(name) {
@@ -355,7 +356,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'format') {
-          return new UserColumn(0, 'format', '');
+          return new UserColumn(0, 'format', DataTypes.TEXT);
         }
       }
     }

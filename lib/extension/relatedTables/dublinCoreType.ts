@@ -7,7 +7,6 @@
  * @class
  */
 export class DublinCoreType {
-
   /**
    * A point or period of time associated with an event in the lifecycle of
    * the resource.
@@ -45,8 +44,7 @@ export class DublinCoreType {
    */
   public static readonly TITLE: DublinCoreType = new DublinCoreType('title');
 
-  constructor(public name: string, public synonyms?: string[]) {
-  }
+  constructor(public name: string, public synonyms?: string[]) {}
 
   /**
    * Get the Dublin Core Type from the name
@@ -54,16 +52,16 @@ export class DublinCoreType {
    * @return {module:extension/relatedTables~DublinCoreType}
    */
   public static fromName(name: string): DublinCoreType {
-    for (var prop in DublinCoreType) {
-      var type = DublinCoreType[prop];
+    for (const prop in DublinCoreType) {
+      const type = DublinCoreType[prop];
       if (type.name === name) {
         return type;
       }
     }
-    for (var prop in DublinCoreType) {
-      var type = DublinCoreType[prop];
+    for (const prop in DublinCoreType) {
+      const type = DublinCoreType[prop];
       if (type.synonyms) {
-        for (var i = 0; i < type.synonyms.length; i++) {
+        for (let i = 0; i < type.synonyms.length; i++) {
           if (type.synonyms[i] === name) {
             return type;
           }

@@ -1,54 +1,54 @@
-
 /**
  * @module geoPackage
  */
-import {GeoPackageConnection} from './db/geoPackageConnection';
-import {CrsWktExtension} from './extension/crsWkt';
-import {RelatedTablesExtension} from './extension/relatedTables';
-import {FeatureStyleExtension} from './extension/style/.';
-import {ContentsIdExtension} from './extension/contents/.';
-import {SpatialReferenceSystemDao} from './core/srs/spatialReferenceSystemDao'
-import {GeometryColumnsDao} from './features/columns/geometryColumnsDao'
-import {FeatureDao} from './features/user/featureDao'
-import {FeatureTableReader} from './features/user/featureTableReader'
-import {ContentsDao} from './core/contents/contentsDao'
-import {TileMatrixSetDao} from './tiles/matrixset/tileMatrixSetDao'
-import {TileMatrixDao} from './tiles/matrix/tileMatrixDao'
-import {DataColumnsDao} from './dataColumns/dataColumnsDao'
-import {DataColumnConstraintsDao} from './dataColumnConstraints/dataColumnConstraintsDao'
-import {MetadataDao} from './metadata/metadataDao'
-import {MetadataReferenceDao} from './metadata/reference/metadataReferenceDao'
-import {ExtensionDao} from './extension/extensionDao'
-import {TableIndexDao} from './extension/index/tableIndexDao'
-import {GeometryIndexDao} from './extension/index/geometryIndexDao'
-import {ExtendedRelationDao} from './extension/relatedTables/extendedRelationDao'
-import {AttributeDao} from './attributes/attributeDao'
-import {TileDao} from './tiles/user/tileDao'
-import {ContentsIdDao} from './extension/contents/contentsIdDao'
-import {AttributeTable} from './attributes/attributeTable'
-import {TileTableReader} from './tiles/user/tileTableReader'
-import {AttributeTableReader} from './attributes/attributeTableReader'
-import {FeatureTable} from './features/user/featureTable'
-import {StyleMappingTable} from './extension/style/styleMappingTable'
-import {TileTable} from './tiles/user/tileTable'
-import {Contents} from './core/contents/contents';
-import {DataTypes} from './db/dataTypes';
-import {SchemaExtension} from './extension/schema';
-import {GeometryColumns} from './features/columns/geometryColumns';
+import { GeoPackageConnection } from './db/geoPackageConnection';
+import { CrsWktExtension } from './extension/crsWkt';
+import { RelatedTablesExtension } from './extension/relatedTables';
+import { FeatureStyleExtension } from './extension/style/.';
+import { ContentsIdExtension } from './extension/contents/.';
+import { SpatialReferenceSystemDao } from './core/srs/spatialReferenceSystemDao';
+import { GeometryColumnsDao } from './features/columns/geometryColumnsDao';
+import { FeatureDao } from './features/user/featureDao';
+import { FeatureTableReader } from './features/user/featureTableReader';
+import { ContentsDao } from './core/contents/contentsDao';
+import { TileMatrixSetDao } from './tiles/matrixset/tileMatrixSetDao';
+import { TileMatrixDao } from './tiles/matrix/tileMatrixDao';
+import { DataColumnsDao } from './dataColumns/dataColumnsDao';
+import { DataColumnConstraintsDao } from './dataColumnConstraints/dataColumnConstraintsDao';
+import { MetadataDao } from './metadata/metadataDao';
+import { MetadataReferenceDao } from './metadata/reference/metadataReferenceDao';
+import { ExtensionDao } from './extension/extensionDao';
+import { TableIndexDao } from './extension/index/tableIndexDao';
+import { GeometryIndexDao } from './extension/index/geometryIndexDao';
+import { ExtendedRelationDao } from './extension/relatedTables/extendedRelationDao';
+import { AttributeDao } from './attributes/attributeDao';
+import { TileDao } from './tiles/user/tileDao';
+import { ContentsIdDao } from './extension/contents/contentsIdDao';
+import { AttributeTable } from './attributes/attributeTable';
+import { TileTableReader } from './tiles/user/tileTableReader';
+import { AttributeTableReader } from './attributes/attributeTableReader';
+import { FeatureTable } from './features/user/featureTable';
+import { StyleMappingTable } from './extension/style/styleMappingTable';
+import { TileTable } from './tiles/user/tileTable';
+import { Contents } from './core/contents/contents';
+import { DataTypes } from './db/dataTypes';
+import { SchemaExtension } from './extension/schema';
+import { GeometryColumns } from './features/columns/geometryColumns';
 import { TableCreator } from './db/tableCreator';
 import { TileMatrix } from './tiles/matrix/tileMatrix';
 import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
 import { BoundingBox } from './boundingBox';
-import {TileMatrixSet} from './tiles/matrixset/tileMatrixSet'
-  
+import { TileMatrixSet } from './tiles/matrixset/tileMatrixSet';
+
 import proj4 from 'proj4';
-import {UserColumn} from './user/userColumn';
-import {DataColumns} from './dataColumns/dataColumns';
-import {AttributeRow} from './attributes/attributeRow';
-import {SpatialReferenceSystem} from './core/srs/spatialReferenceSystem';
-import * as defs from './proj4Defs'
+import { UserColumn } from './user/userColumn';
+import { DataColumns } from './dataColumns/dataColumns';
+import { AttributeRow } from './attributes/attributeRow';
+import { SpatialReferenceSystem } from './core/srs/spatialReferenceSystem';
+import * as defs from './proj4Defs';
 import { Feature } from 'geojson';
-for (var def in defs) {
+import { FeatureRow } from './features/user/featureRow';
+for (const def in defs) {
   if (defs[def]) {
     proj4.defs(def, defs[def]);
   }
@@ -168,24 +168,24 @@ export class GeoPackage {
   getFeatureStyleExtension(): FeatureStyleExtension {
     return this.featureStyleExtension || (this.featureStyleExtension = new FeatureStyleExtension(this));
   }
-  getGeometryIndexDao(featureDao: FeatureDao): GeometryIndexDao {
+  getGeometryIndexDao(featureDao: FeatureDao<FeatureRow>): GeometryIndexDao {
     return new GeometryIndexDao(this, featureDao);
   }
   getRelatedTablesExtension(): RelatedTablesExtension {
     return this.relatedTablesExtension || (this.relatedTablesExtension = new RelatedTablesExtension(this));
   }
   getSrs(srsId: number): SpatialReferenceSystem {
-    var dao = this.getSpatialReferenceSystemDao();
+    const dao = this.getSpatialReferenceSystemDao();
     return dao.queryForId(srsId);
   }
   async createRequiredTables(): Promise<GeoPackage> {
-    await this.tableCreator.createRequired()
+    await this.tableCreator.createRequired();
     return this;
   }
   createSupportedExtensions(): GeoPackage {
-    var crs = new CrsWktExtension(this);
+    const crs = new CrsWktExtension(this);
     crs.getOrCreateExtension();
-    var schema = new SchemaExtension(this);
+    const schema = new SchemaExtension(this);
     schema.getOrCreateExtension();
     return this;
   }
@@ -193,33 +193,48 @@ export class GeoPackage {
    * @returns {module:tiles/user/tileDao~TileDao} the `TileDao` to access [tiles]{@link module:tiles/user/tileTable}
    */
   getTileDaoWithTileMatrixSet(tileMatrixSet: TileMatrixSet): TileDao {
-    var tileMatrices = [];
-    var tileMatrixDao = this.getTileMatrixDao();
-    var results = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tileMatrixSet.table_name, null, null, TileMatrixDao.COLUMN_ZOOM_LEVEL + ' ASC, ' + TileMatrixDao.COLUMN_PIXEL_X_SIZE + ' DESC, ' + TileMatrixDao.COLUMN_PIXEL_Y_SIZE + ' DESC');
-    results.forEach(function (result) {
-      var tm = new TileMatrix();
+    const tileMatrices = [];
+    const tileMatrixDao = this.getTileMatrixDao();
+    const results = tileMatrixDao.queryForAllEq(
+      TileMatrixDao.COLUMN_TABLE_NAME,
+      tileMatrixSet.table_name,
+      null,
+      null,
+      TileMatrixDao.COLUMN_ZOOM_LEVEL +
+        ' ASC, ' +
+        TileMatrixDao.COLUMN_PIXEL_X_SIZE +
+        ' DESC, ' +
+        TileMatrixDao.COLUMN_PIXEL_Y_SIZE +
+        ' DESC',
+    );
+    results.forEach(function(result) {
+      const tm = new TileMatrix();
       tileMatrixDao.populateObjectFromResult(tm, result);
       tileMatrices.push(tm);
     });
-    var tableReader = new TileTableReader(tileMatrixSet);
-    var tileTable = tableReader.readTileTable(this);
+    const tableReader = new TileTableReader(tileMatrixSet);
+    const tileTable = tableReader.readTileTable(this);
     return new TileDao(this, tileTable, tileMatrixSet, tileMatrices);
   }
   getTileDaoWithContents(contents: Contents): TileDao {
-    var dao = this.getContentsDao();
-    var tileMatrixSet = dao.getTileMatrixSet(contents);
+    const dao = this.getContentsDao();
+    const tileMatrixSet = dao.getTileMatrixSet(contents);
     return this.getTileDaoWithTileMatrixSet(tileMatrixSet);
   }
   getTileDao(tableName: string): TileDao {
-    var tms = this.getTileMatrixSetDao();
-    var results = tms.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName);
+    const tms = this.getTileMatrixSetDao();
+    const results = tms.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName);
     if (results.length > 1) {
-      throw new Error('Unexpected state. More than one Tile Matrix Set matched for table name: ' + tableName + ', count: ' + results.length);
-    }
-    else if (results.length === 0) {
+      throw new Error(
+        'Unexpected state. More than one Tile Matrix Set matched for table name: ' +
+          tableName +
+          ', count: ' +
+          results.length,
+      );
+    } else if (results.length === 0) {
       throw new Error('No Tile Matrix found for table name: ' + tableName);
     }
-    var tileMatrixSet = new TileMatrixSet();
+    const tileMatrixSet = new TileMatrixSet();
     tms.populateObjectFromResult(tileMatrixSet, results[0]);
     return this.getTileDaoWithTileMatrixSet(tileMatrixSet);
   }
@@ -228,11 +243,11 @@ export class GeoPackage {
    * `tiles`, and `attributes`.
    * @return {{features: string[], tiles: string[], attributes: string[]}}
    */
-  getTables(): {features: string[], tiles: string[], attributes: string[]} {
-    var tables = {
+  getTables(): { features: string[]; tiles: string[]; attributes: string[] } {
+    const tables = {
       features: this.getFeatureTables(),
       tiles: this.getTileTables(),
-      attributes: this.getAttributesTables()
+      attributes: this.getAttributesTables(),
     };
     return tables;
   }
@@ -240,7 +255,7 @@ export class GeoPackage {
     return this.getContentsDao().getTables(ContentsDao.GPKG_CDT_ATTRIBUTES_NAME);
   }
   hasAttributeTable(attributeTableName: string): boolean {
-    var tables = this.getAttributesTables();
+    const tables = this.getAttributesTables();
     return tables && tables.indexOf(attributeTableName) != -1;
   }
   /**
@@ -248,7 +263,7 @@ export class GeoPackage {
    *  @returns {String[]} tile table names
    */
   getTileTables(): string[] {
-    var cd = this.getContentsDao();
+    const cd = this.getContentsDao();
     if (!cd.isTableExists()) {
       return [];
     }
@@ -260,7 +275,7 @@ export class GeoPackage {
    * @returns {Boolean} indicates the existence of the tile table
    */
   hasTileTable(tileTableName: string): boolean {
-    var tables = this.getTileTables();
+    const tables = this.getTileTables();
     return tables && tables.indexOf(tileTableName) !== -1;
   }
   /**
@@ -269,7 +284,7 @@ export class GeoPackage {
    * @returns {Boolean} indicates the existence of the feature table
    */
   hasFeatureTable(featureTableName: string): boolean {
-    var tables = this.getFeatureTables();
+    const tables = this.getFeatureTables();
     return tables && tables.indexOf(featureTableName) != -1;
   }
   /**
@@ -277,7 +292,7 @@ export class GeoPackage {
    *  @returns {String[]} feature table names
    */
   getFeatureTables(): string[] {
-    var cd = this.getContentsDao();
+    const cd = this.getContentsDao();
     if (!cd.isTableExists()) {
       return [];
     }
@@ -290,7 +305,7 @@ export class GeoPackage {
     return type === this.getTableType(tableName);
   }
   getTableType(tableName: string): string {
-    var contents = this.getTableContents(tableName);
+    const contents = this.getTableContents(tableName);
     if (contents) {
       return contents.data_type;
     }
@@ -298,25 +313,25 @@ export class GeoPackage {
   getTableContents(tableName: string): Contents {
     return this.getContentsDao().queryForId(tableName);
   }
-  deleteTable(tableName: string) {
-    this.connection.dropTable(tableName);
+  deleteTable(tableName: string): boolean {
+    return this.connection.dropTable(tableName);
   }
   getTableCreator(): TableCreator {
     return this.tableCreator;
   }
   async index(): Promise<boolean> {
-    var tables = this.getFeatureTables();
+    const tables = this.getFeatureTables();
     for (let i = 0; i < tables.length; i++) {
-      if(!(await this.indexFeatureTable(tables[i]))) {
+      if (!(await this.indexFeatureTable(tables[i]))) {
         throw new Error('Unable to index table ' + tables[i]);
       }
     }
     return true;
   }
   async indexFeatureTable(table: string, progress?: Function): Promise<boolean> {
-    var featureDao = this.getFeatureDao(table);
-    var fti = featureDao.featureTableIndex;
-    var tableIndex = fti.getTableIndex();
+    const featureDao = this.getFeatureDao(table);
+    const fti = featureDao.featureTableIndex;
+    const tableIndex = fti.getTableIndex();
     if (tableIndex) {
       return true;
     }
@@ -328,13 +343,13 @@ export class GeoPackage {
    *  @param {GeometryColumns} geometryColumns Geometry Columns
    *  @returns {FeatureDao}
    */
-  getFeatureDaoWithGeometryColumns(geometryColumns: GeometryColumns): FeatureDao {
+  getFeatureDaoWithGeometryColumns(geometryColumns: GeometryColumns): FeatureDao<FeatureRow> {
     if (!geometryColumns) {
       throw new Error('Non null Geometry Columns is required to create Feature DAO');
     }
-    var tableReader = new FeatureTableReader(geometryColumns);
-    var featureTable = tableReader.readFeatureTable(this);
-    var dao = new FeatureDao(this, featureTable, geometryColumns, this.metadataDao);
+    const tableReader = new FeatureTableReader(geometryColumns);
+    const featureTable = tableReader.readFeatureTable(this);
+    const dao = new FeatureDao(this, featureTable, geometryColumns, this.metadataDao);
     return dao;
   }
   /**
@@ -342,9 +357,9 @@ export class GeoPackage {
    * @param  {Contents}   contents Contents
    *  @returns {FeatureDao}
    */
-  getFeatureDaoWithContents(contents: Contents): FeatureDao {
-    var dao = this.getContentsDao();
-    var columns = dao.getGeometryColumns(contents);
+  getFeatureDaoWithContents(contents: Contents): FeatureDao<FeatureRow> {
+    const dao = this.getContentsDao();
+    const columns = dao.getGeometryColumns(contents);
     return this.getFeatureDaoWithGeometryColumns(columns);
   }
   /**
@@ -352,9 +367,9 @@ export class GeoPackage {
    * @param  {string}   tableName table name
    *  @returns {FeatureDao}
    */
-  getFeatureDao(tableName: string): FeatureDao {
-    var dao = this.getGeometryColumnsDao();
-    var geometryColumns = dao.queryForTableName(tableName);
+  getFeatureDao(tableName: string): FeatureDao<FeatureRow> {
+    const dao = this.getGeometryColumnsDao();
+    const geometryColumns = dao.queryForTableName(tableName);
     if (!geometryColumns) {
       throw new Error('No Feature Table exists for table name: ' + tableName);
     }
@@ -367,10 +382,10 @@ export class GeoPackage {
    * @returns {Object[]} array of GeoJSON features
    */
   queryForGeoJSONFeaturesInTable(tableName: string, boundingBox: BoundingBox): Feature[] {
-    var featureDao = this.getFeatureDao(tableName);
-    var features = [];
-    var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
-    for (var feature of iterator) {
+    const featureDao = this.getFeatureDao(tableName);
+    const features = [];
+    const iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
+    for (const feature of iterator) {
       features.push(feature);
     }
     return features;
@@ -381,8 +396,11 @@ export class GeoPackage {
    * @param  {BoundingBox}   boundingBox BoundingBox to query
    * @returns {Iterable<Object>} iterable of GeoJSON features
    */
-  iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName: string, boundingBox: BoundingBox): IterableIterator<Feature> {
-    var featureDao = this.getFeatureDao(tableName);
+  iterateGeoJSONFeaturesInTableWithinBoundingBox(
+    tableName: string,
+    boundingBox: BoundingBox,
+  ): IterableIterator<Feature> {
+    const featureDao = this.getFeatureDao(tableName);
     return featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
   }
   /**
@@ -390,7 +408,7 @@ export class GeoPackage {
    * @returns {Promise}
    */
   async createGeometryColumnsTable(): Promise<boolean> {
-    var dao = this.getGeometryColumnsDao();
+    const dao = this.getGeometryColumnsDao();
     if (dao.isTableExists()) {
       return true;
     }
@@ -402,8 +420,8 @@ export class GeoPackage {
    * @returns {AttributeDao}
    */
   getAttributeDaoWithTableName(tableName: string): AttributeDao<AttributeRow> {
-    var dao = this.getContentsDao();
-    var contents = dao.queryForId(tableName);
+    const dao = this.getContentsDao();
+    const contents = dao.queryForId(tableName);
     return this.getAttributeDaoWithContents(contents);
   }
   /**
@@ -415,24 +433,24 @@ export class GeoPackage {
     if (!contents) {
       throw new Error('Non null Contents is required to create an Attributes DAO');
     }
-    var reader = new AttributeTableReader(contents.table_name);
-    var table: AttributeTable = reader.readTable(this.connection) as AttributeTable;
+    const reader = new AttributeTableReader(contents.table_name);
+    const table: AttributeTable = reader.readTable(this.connection) as AttributeTable;
     table.setContents(contents);
     return new AttributeDao(this, table);
   }
   async createAttributeTable(tableName: string, columns: UserColumn[], dataColumns?: DataColumns[]): Promise<boolean> {
-    var attributeTable = new AttributeTable(tableName, columns);
+    const attributeTable = new AttributeTable(tableName, columns);
     this.tableCreator.createUserTable(attributeTable);
-    var contents = new Contents();
+    const contents = new Contents();
     contents.table_name = tableName;
     contents.data_type = ContentsDao.GPKG_CDT_ATTRIBUTES_NAME;
     contents.identifier = tableName;
     contents.last_change = new Date().toISOString();
     this.getContentsDao().create(contents);
     if (dataColumns && dataColumns.length) {
-      await this.createDataColumns()
-      var dataColumnsDao = this.getDataColumnsDao();
-      dataColumns.forEach(function (dataColumn) {
+      await this.createDataColumns();
+      const dataColumnsDao = this.getDataColumnsDao();
+      dataColumns.forEach(function(dataColumn) {
         dataColumnsDao.create(dataColumn);
       });
     }
@@ -442,18 +460,35 @@ export class GeoPackage {
    * Create the given {@link module:features/user/featureTable~FeatureTable}
    * @param  {FeatureTable}   featureTable    feature table
    */
-  createFeatureTable(featureTable: FeatureTable): { lastInsertRowid: number, changes: number} {
+  createFeatureTable(featureTable: FeatureTable): { lastInsertRowid: number; changes: number } {
     return this.tableCreator.createUserTable(featureTable);
   }
-  createFeatureTableWithGeometryColumns(geometryColumns: GeometryColumns, boundingBox: BoundingBox, srsId: number, columns?: UserColumn[]): Promise<boolean> {
-    return this.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, srsId, columns, undefined);
+  createFeatureTableWithGeometryColumns(
+    geometryColumns: GeometryColumns,
+    boundingBox: BoundingBox,
+    srsId: number,
+    columns?: UserColumn[],
+  ): Promise<boolean> {
+    return this.createFeatureTableWithGeometryColumnsAndDataColumns(
+      geometryColumns,
+      boundingBox,
+      srsId,
+      columns,
+      undefined,
+    );
   }
-  async createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns: GeometryColumns, boundingBox: BoundingBox, srsId: number, columns?: UserColumn[], dataColumns?: DataColumns[]): Promise<boolean> {
+  async createFeatureTableWithGeometryColumnsAndDataColumns(
+    geometryColumns: GeometryColumns,
+    boundingBox: BoundingBox,
+    srsId: number,
+    columns?: UserColumn[],
+    dataColumns?: DataColumns[],
+  ): Promise<boolean> {
     await this.createGeometryColumnsTable();
 
-    var featureTable = new FeatureTable(geometryColumns.table_name, columns);
+    const featureTable = new FeatureTable(geometryColumns.table_name, columns);
     this.createFeatureTable(featureTable);
-    var contents = new Contents();
+    const contents = new Contents();
     contents.table_name = geometryColumns.table_name;
     contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
     contents.identifier = geometryColumns.table_name;
@@ -467,9 +502,9 @@ export class GeoPackage {
     geometryColumns.srs_id = srsId;
     this.getGeometryColumnsDao().create(geometryColumns);
     if (dataColumns) {
-      await this.createDataColumns()
-      var dataColumnsDao = this.getDataColumnsDao();
-      dataColumns.forEach(function (dataColumn) {
+      await this.createDataColumns();
+      const dataColumnsDao = this.getDataColumnsDao();
+      dataColumns.forEach(function(dataColumn) {
         dataColumnsDao.create(dataColumn);
       });
     }
@@ -480,7 +515,7 @@ export class GeoPackage {
    * @returns {Promise} resolves when the table is created
    */
   async createTileMatrixSetTable(): Promise<boolean> {
-    var dao = this.getTileMatrixSetDao();
+    const dao = this.getTileMatrixSetDao();
     if (dao.isTableExists()) {
       return true;
     }
@@ -491,7 +526,7 @@ export class GeoPackage {
    * @returns {Promise} resolves when the table is created
    */
   async createTileMatrixTable(): Promise<boolean> {
-    var dao = this.getTileMatrixDao();
+    const dao = this.getTileMatrixDao();
     if (dao.isTableExists()) {
       return true;
     }
@@ -503,7 +538,7 @@ export class GeoPackage {
    * @param  {module:tiles/user/tileTable~TileTable} tileTable
    * @return {object} the result of {@link module:db/geoPackageConnection~GeoPackageConnection#run}
    */
-  createTileTable(tileTable: TileTable): { lastInsertRowid: number, changes: number} {
+  createTileTable(tileTable: TileTable): { lastInsertRowid: number; changes: number } {
     return this.tableCreator.createUserTable(tileTable);
   }
   /**
@@ -516,7 +551,13 @@ export class GeoPackage {
    * @param {Number} tileMatrixSetSrsId srs id of the matrix set
    * @returns {Promise<TileMatrixSet>} `Promise` of the created {@link module:tiles/matrixset~TileMatrixSet}
    */
-  async createTileTableWithTableName(tableName: string, contentsBoundingBox: BoundingBox, contentsSrsId: number, tileMatrixSetBoundingBox: BoundingBox, tileMatrixSetSrsId: number): Promise<TileMatrixSet> {
+  async createTileTableWithTableName(
+    tableName: string,
+    contentsBoundingBox: BoundingBox,
+    contentsSrsId: number,
+    tileMatrixSetBoundingBox: BoundingBox,
+    tileMatrixSetSrsId: number,
+  ): Promise<TileMatrixSet> {
     const columns = TileTable.createRequiredColumns();
     const tileTable = new TileTable(tableName, columns);
     const contents = new Contents();
@@ -555,16 +596,24 @@ export class GeoPackage {
    * @param {number} [tileSize=256] optional tile size in pixels
    * @returns {module:geoPackage~GeoPackage} `this` `GeoPackage`
    */
-  createStandardWebMercatorTileMatrix(epsg3857TileBoundingBox: BoundingBox, tileMatrixSet: TileMatrixSet, minZoom: number, maxZoom: number, tileSize: number = 256): GeoPackage {
+  createStandardWebMercatorTileMatrix(
+    epsg3857TileBoundingBox: BoundingBox,
+    tileMatrixSet: TileMatrixSet,
+    minZoom: number,
+    maxZoom: number,
+    tileSize = 256,
+  ): GeoPackage {
     tileSize = tileSize || 256;
-    var tileMatrixDao = this.getTileMatrixDao();
-    for (var zoom = minZoom; zoom <= maxZoom; zoom++) {
-      var box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
-      var matrixWidth = (box.maxLongitude - box.minLongitude) + 1;
-      var matrixHeight = (box.maxLatitude - box.minLatitude) + 1;
-      var pixelXSize = ((epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth) / tileSize;
-      var pixelYSize = ((epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight) / tileSize;
-      var tileMatrix = new TileMatrix();
+    const tileMatrixDao = this.getTileMatrixDao();
+    for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
+      const box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
+      const matrixWidth = box.maxLongitude - box.minLongitude + 1;
+      const matrixHeight = box.maxLatitude - box.minLatitude + 1;
+      const pixelXSize =
+        (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
+      const pixelYSize =
+        (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
+      const tileMatrix = new TileMatrix();
       tileMatrix.table_name = tileMatrixSet.table_name;
       tileMatrix.zoom_level = zoom;
       tileMatrix.matrix_width = matrixWidth;
@@ -586,8 +635,8 @@ export class GeoPackage {
    * @param  {Number}   tileColumn column of this tile
    */
   addTile(tileStream: any, tableName: string, zoom: number, tileRow: number, tileColumn: number): number {
-    var tileDao = this.getTileDao(tableName);
-    var newRow = tileDao.newRow();
+    const tileDao = this.getTileDao(tableName);
+    const newRow = tileDao.newRow();
     newRow.setZoomLevel(zoom);
     newRow.setTileColumn(tileColumn);
     newRow.setTileRow(tileRow);
@@ -598,7 +647,7 @@ export class GeoPackage {
    * Create the Data Columns table if it does not already exist
    */
   async createDataColumns(): Promise<boolean> {
-    var dao = this.getDataColumnsDao();
+    const dao = this.getDataColumnsDao();
     if (dao.isTableExists()) {
       return true;
     }
@@ -608,60 +657,64 @@ export class GeoPackage {
    * Create the Data Column Constraints table if it does not already exist
    */
   async createDataColumnConstraintsTable(): Promise<boolean> {
-    var dao = this.getDataColumnConstraintsDao();
+    const dao = this.getDataColumnConstraintsDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createDataColumnConstraints();
   }
   async createMetadataTable(): Promise<boolean> {
-    var dao = this.getMetadataDao();
+    const dao = this.getMetadataDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createMetadata();
   }
   async createMetadataReferenceTable(): Promise<boolean> {
-    var dao = this.getMetadataReferenceDao();
+    const dao = this.getMetadataReferenceDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createMetadataReference();
   }
   async createExtensionTable(): Promise<boolean> {
-    var dao = this.getExtensionDao();
+    const dao = this.getExtensionDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createExtensions();
   }
   async createTableIndexTable(): Promise<boolean> {
-    var dao = this.getTableIndexDao();
+    const dao = this.getTableIndexDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createTableIndex();
   }
-  async createGeometryIndexTable(featureDao: FeatureDao): Promise<boolean> {
-    var dao = this.getGeometryIndexDao(featureDao);
+  async createGeometryIndexTable(featureDao: FeatureDao<FeatureRow>): Promise<boolean> {
+    const dao = this.getGeometryIndexDao(featureDao);
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createGeometryIndex();
   }
-  async createStyleMappingTable(tableName: string, columns?: UserColumn[], dataColumns?: DataColumns[]): Promise<boolean> {
-    var attributeTable = new StyleMappingTable(tableName, columns);
+  async createStyleMappingTable(
+    tableName: string,
+    columns?: UserColumn[],
+    dataColumns?: DataColumns[],
+  ): Promise<boolean> {
+    const attributeTable = new StyleMappingTable(tableName, columns);
     this.tableCreator.createUserTable(attributeTable);
-    var contents = new Contents();
+    const contents = new Contents();
     contents.table_name = tableName;
     contents.data_type = ContentsDao.GPKG_CDT_ATTRIBUTES_NAME;
     contents.identifier = tableName;
     contents.last_change = new Date().toISOString();
     this.getContentsDao().create(contents);
     if (dataColumns) {
-      await this.createDataColumns()
-      var dataColumnsDao = this.getDataColumnsDao();
-      dataColumns.forEach(function (dataColumn) {
+      await this.createDataColumns();
+      const dataColumnsDao = this.getDataColumnsDao();
+      dataColumns.forEach(function(dataColumn) {
         dataColumnsDao.create(dataColumn);
       });
     }
@@ -672,11 +725,11 @@ export class GeoPackage {
    * @returns {string} application id
    */
   getApplicationId(): string {
-    var connection = this.getDatabase();
+    const connection = this.getDatabase();
     return connection.getApplicationId();
   }
-  getInfoForTable(tableDao: TileDao | FeatureDao) {
-    var info = {
+  getInfoForTable(tableDao: TileDao | FeatureDao<FeatureRow>): any {
+    const info = {
       tableName: tableDao.table_name,
       tableType: tableDao.table.getTableType(),
       count: tableDao.getCount(),
@@ -707,13 +760,12 @@ export class GeoPackage {
       info.maxWebMapZoom = tableDao.maxWebMapZoom;
       info.zoomLevels = tableDao.tileMatrices.length;
     }
-    var dao;
-    var contentsRetriever;
+    let dao;
+    let contentsRetriever;
     if (tableDao instanceof FeatureDao) {
       dao = this.getGeometryColumnsDao();
       contentsRetriever = tableDao.geometryColumns;
-    }
-    else if (tableDao instanceof TileDao) {
+    } else if (tableDao instanceof TileDao) {
       dao = this.getTileMatrixSetDao();
       contentsRetriever = tableDao.tileMatrixSet;
       info.tileMatrixSet = {};
@@ -723,7 +775,7 @@ export class GeoPackage {
       info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
       info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
     }
-    var contents = dao.getContents(contentsRetriever);
+    const contents = dao.getContents(contentsRetriever);
     info.contents = {};
     info.contents.tableName = contents.table_name;
     info.contents.dataType = contents.data_type;
@@ -734,60 +786,59 @@ export class GeoPackage {
     info.contents.maxX = contents.max_x;
     info.contents.minY = contents.min_y;
     info.contents.maxY = contents.max_y;
-    var contentsDao = this.getContentsDao();
-    var contentsSrs = contentsDao.getSrs(contents);
+    const contentsDao = this.getContentsDao();
+    const contentsSrs = contentsDao.getSrs(contents);
     info.contents.srs = {
       name: contentsSrs.srs_name,
       id: contentsSrs.srs_id,
       organization: contentsSrs.organization,
       organization_coordsys_id: contentsSrs.organization_coordsys_id,
       definition: contentsSrs.definition,
-      description: contentsSrs.description
+      description: contentsSrs.description,
     };
-    var srs = tableDao.getSrs();
+    const srs = tableDao.getSrs();
     info.srs = {
       name: srs.srs_name,
       id: srs.srs_id,
       organization: srs.organization,
       organization_coordsys_id: srs.organization_coordsys_id,
       definition: srs.definition,
-      description: srs.description
+      description: srs.description,
     };
     info.columns = [];
     info.columnMap = {};
-    var dcd = this.getDataColumnsDao();
-    tableDao.table.columns.forEach(function (column: UserColumn) {
-      var dataColumn = dcd.getDataColumns(tableDao.table.table_name, column.name);
-      info.columns.push({
-        index: column.index,
-        name: column.name,
-        max: column.max,
-        min: column.min,
-        notNull: column.notNull,
-        primaryKey: column.primaryKey,
-        dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
-        displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
-        dataColumn: dataColumn
-      });
-      info.columnMap[column.name] = info.columns[info.columns.length - 1];
-    }.bind(this));
+    const dcd = this.getDataColumnsDao();
+    tableDao.table.columns.forEach(
+      function(column: UserColumn): any {
+        const dataColumn = dcd.getDataColumns(tableDao.table.table_name, column.name);
+        info.columns.push({
+          index: column.index,
+          name: column.name,
+          max: column.max,
+          min: column.min,
+          notNull: column.notNull,
+          primaryKey: column.primaryKey,
+          dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
+          displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
+          dataColumn: dataColumn,
+        });
+        info.columnMap[column.name] = info.columns[info.columns.length - 1];
+      }.bind(this),
+    );
     return info;
   }
-  static loadProjections(items: string[]) {
-    if (!items)
-      throw new Error('Invalid array of projections');
-    for (var i = 0; i < items.length; i++) {
-      if (!defs[items[i]])
-        throw new Error('Projection not found');
+  static loadProjections(items: string[]): void {
+    if (!items) throw new Error('Invalid array of projections');
+    for (let i = 0; i < items.length; i++) {
+      if (!defs[items[i]]) throw new Error('Projection not found');
       this.addProjection(items[i], defs[items[i]]);
     }
   }
-  static addProjection(name: string, definition: string) {
-    if (!name || !definition)
-      throw new Error('Invalid projection name/definition');
+  static addProjection(name: string, definition: string): void {
+    if (!name || !definition) throw new Error('Invalid projection name/definition');
     proj4.defs('' + name, '' + definition);
   }
-  static hasProjection(name: string) {
+  static hasProjection(name: string): any {
     return proj4.defs('' + name);
   }
 }

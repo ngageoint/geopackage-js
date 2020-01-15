@@ -1,4 +1,4 @@
-import {UserColumn} from "../user/userColumn";
+import { UserColumn } from '../user/userColumn';
 
 /**
  * @module dao/columnValues
@@ -8,7 +8,7 @@ import {UserColumn} from "../user/userColumn";
  * @class ColumnValues
  */
 export class ColumnValues {
-  values: { [key: string]: UserColumn | any} = {};
+  values: { [key: string]: UserColumn | any } = {};
   columns: string[] = [];
   /**
    * adds a column to the structure
@@ -28,5 +28,3 @@ export class ColumnValues {
     return this.values[columnName];
   }
 }
-
-

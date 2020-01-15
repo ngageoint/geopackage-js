@@ -2,7 +2,7 @@
  * @module user/userColumn
  */
 
-import {DataTypes} from '../db/dataTypes';
+import { DataTypes } from '../db/dataTypes';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -18,7 +18,15 @@ import {DataTypes} from '../db/dataTypes';
  */
 export class UserColumn {
   min: number;
-  constructor(public index: number, public name: string, public dataType: any, public max?: number, public notNull?: boolean, public defaultValue?: any, public primaryKey?: boolean) {
+  constructor(
+    public index: number,
+    public name: string,
+    public dataType: DataTypes,
+    public max?: number,
+    public notNull?: boolean,
+    public defaultValue?: any,
+    public primaryKey?: boolean,
+  ) {
     this.validateMax();
   }
   /**
@@ -26,8 +34,8 @@ export class UserColumn {
    * @return {module:db/dataTypes~GPKGDataType}
    */
   getTypeName(): string {
-    var type = undefined;
-    if (this.dataType !== DataTypes.GPKGDataType.GPKG_DT_GEOMETRY) {
+    let type = undefined;
+    if (this.dataType !== DataTypes.GEOMETRY) {
       type = DataTypes.nameFromType(this.dataType);
     }
     return type;
@@ -35,10 +43,18 @@ export class UserColumn {
   /**
    * Validate that if max is set, the data type is text or blob
    */
-  validateMax() {
-    if (this.max && this.dataType !== DataTypes.GPKGDataType.GPKG_DT_TEXT && this.dataType !== DataTypes.GPKGDataType.GPKG_DT_BLOB) {
-      throw new Error('Column max is only supported for TEXT and BLOB columns. column: ' + this.name + ', max: ' + this.max + ', type: ' + this.dataType);
+  validateMax(): boolean {
+    if (this.max && this.dataType !== DataTypes.TEXT && this.dataType !== DataTypes.BLOB) {
+      throw new Error(
+        'Column max is only supported for TEXT and BLOB columns. column: ' +
+          this.name +
+          ', max: ' +
+          this.max +
+          ', type: ' +
+          this.dataType,
+      );
     }
+    return true;
   }
   /**
    *  Create a new primary key column
@@ -49,7 +65,7 @@ export class UserColumn {
    *  @return {module:user/userColumn~UserColumn} created column
    */
   static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): UserColumn {
-    return new UserColumn(index, name, DataTypes.GPKGDataType.GPKG_DT_INTEGER, undefined, true, undefined, true);
+    return new UserColumn(index, name, DataTypes.INTEGER, undefined, true, undefined, true);
   }
   /**
    *  Create a new column
@@ -62,7 +78,13 @@ export class UserColumn {
    *
    *  @return {module:user/userColumn~UserColumn} created column
    */
-  static createColumnWithIndex(index: number, name: string, type: any, notNull?: boolean, defaultValue?: any): UserColumn {
+  static createColumnWithIndex(
+    index: number,
+    name: string,
+    type: any,
+    notNull?: boolean,
+    defaultValue?: any,
+  ): UserColumn {
     return UserColumn.createColumnWithIndexAndMax(index, name, type, undefined, notNull, defaultValue);
   }
   /**
@@ -77,7 +99,14 @@ export class UserColumn {
    *
    *  @return {module:user/userColumn~UserColumn} created column
    */
-  static createColumnWithIndexAndMax(index: number, name: string, type: any, max: number, notNull: boolean, defaultValue: any): UserColumn {
+  static createColumnWithIndexAndMax(
+    index: number,
+    name: string,
+    type: any,
+    max: number,
+    notNull: boolean,
+    defaultValue: any,
+  ): UserColumn {
     return new UserColumn(index, name, type, max, notNull, defaultValue, false);
   }
 }

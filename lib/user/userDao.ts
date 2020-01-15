@@ -1,13 +1,18 @@
-import {Dao} from '../dao/dao';
-import {GeoPackage} from '../geoPackage';
-import {UserMappingTable} from '../extension/relatedTables/userMappingTable'
-import {UserTableReader} from './userTableReader'
-import {MediaTable} from '../extension/relatedTables/mediaTable'
-import {SimpleAttributesTable} from '../extension/relatedTables/simpleAttributesTable'
-import {UserRow} from './userRow'
-import {RelationType} from '../extension/relatedTables/relationType'
-import {ColumnValues} from '../dao/columnValues'
-import {UserTable} from './userTable';
+import { Dao } from '../dao/dao';
+import { GeoPackage } from '../geoPackage';
+import { UserMappingTable } from '../extension/relatedTables/userMappingTable';
+import { UserTableReader } from './userTableReader';
+import { MediaTable } from '../extension/relatedTables/mediaTable';
+import { SimpleAttributesTable } from '../extension/relatedTables/simpleAttributesTable';
+import { UserRow } from './userRow';
+import { RelationType } from '../extension/relatedTables/relationType';
+import { ColumnValues } from '../dao/columnValues';
+import { UserTable } from './userTable';
+import { DataTypes } from '../..';
+import { MediaRow } from '../extension/relatedTables/mediaRow';
+import { SimpleAttributesRow } from '../extension/relatedTables/simpleAttributesRow';
+import { FeatureRow } from '../features/user/featureRow';
+import { ExtendedRelation } from '../extension/relatedTables/extendedRelation';
 
 /**
  * Abstract User DAO for reading user tables
@@ -16,7 +21,7 @@ import {UserTable} from './userTable';
  * @param  {module:db/geoPackageConnection~GeoPackageConnection} geoPackage        connection
  * @param  {string} table table name
  */
-export class UserDao<T extends UserRow> extends Dao<T> {
+export class UserDao<T extends UserRow> extends Dao<UserRow> {
   table_name: string;
   columns: string[];
   constructor(geoPackage: GeoPackage, public table: UserTable) {
@@ -25,8 +30,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
     this.gpkgTableName = table.table_name;
     if (table.getPkColumn()) {
       this.idColumns = [table.getPkColumn().name];
-    }
-    else {
+    } else {
       this.idColumns = [];
     }
     this.columns = table.columnNames;
@@ -36,7 +40,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Object} [results] results to create the row from if not specified, an empty row is created
    * @return {module:user/userRow~UserRow}
    */
-  createObject(results: any): any {
+  createObject(results: any): UserRow {
     if (results) {
       return this.getRow(results);
     }
@@ -54,7 +58,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Number} columnIndex index
    * @param  {Object} value       value
    */
-  setValueInObject(object, columnIndex, value) {
+  setValueInObject(object: T, columnIndex: number, value: any): void {
     object.setValueNoValidationWithIndex(columnIndex, value);
   }
   /**
@@ -62,14 +66,13 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Object} results result to create the row from
    * @return {module:user/userRow~UserRow}         the user row
    */
-  getRow(results): any {
-    var row = undefined;
-    if (!this.table)
-      return row;
-    var columns = this.table.columnCount();
-    var columnTypes = {};
-    for (var i = 0; i < columns; i++) {
-      var column = this.table.getColumnWithIndex(i);
+  getRow(results: any): UserRow {
+    const row = undefined;
+    if (!this.table) return row;
+    const columns = this.table.columnCount();
+    const columnTypes: { [key: string]: DataTypes } = {};
+    for (let i = 0; i < columns; i++) {
+      const column = this.table.getColumnWithIndex(i);
       columnTypes[column.name] = column.dataType;
     }
     return this.newRowWithColumnTypes(columnTypes, results);
@@ -78,7 +81,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * Get the table for this dao
    * @return {module:user/userTable~UserTable}
    */
-  getTable() {
+  getTable(): UserTable {
     return this.table;
   }
   /**
@@ -87,7 +90,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:user/userRow~UserRow}             user row
    */
-  newRowWithColumnTypes<T>(columnTypes, values): any {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): UserRow {
     return new UserRow(this.table, columnTypes, values);
   }
   /**
@@ -99,30 +102,36 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
    * @return {Promise}
    */
-  async linkRelatedRow(userRow, relatedRow, relationType, mappingTable?: string | UserMappingTable, mappingColumnValues?: typeof ColumnValues): Promise<number> {
-    var rte = this.geoPackage.getRelatedTablesExtension();
-    var baseTableName = userRow.table.table_name;
-    var relatedTableName = relatedRow.table.table_name;
-    var relationship = rte.getRelationshipBuilder()
+  async linkRelatedRow(
+    userRow: UserRow,
+    relatedRow: UserRow,
+    relationType: RelationType,
+    mappingTable?: string | UserMappingTable,
+    mappingColumnValues?: ColumnValues,
+  ): Promise<number> {
+    const rte = this.geoPackage.getRelatedTablesExtension();
+    const baseTableName = userRow.table.table_name;
+    const relatedTableName = relatedRow.table.table_name;
+    const relationship = rte
+      .getRelationshipBuilder()
       .setBaseTableName(baseTableName)
       .setRelatedTableName(relatedTableName)
       .setRelationType(relationType);
-    var mappingTableName;
+    let mappingTableName;
     if (!mappingTable || typeof mappingTable === 'string') {
       mappingTable = mappingTable || baseTableName + '_' + relatedTableName;
       relationship.setMappingTableName(mappingTable);
       mappingTableName = mappingTable;
-    }
-    else {
+    } else {
       relationship.setUserMappingTable(mappingTable);
       mappingTableName = mappingTable.table_name;
     }
-    await rte.addRelationship(relationship)
-    var userMappingDao = rte.getMappingDao(mappingTableName);
-    var userMappingRow = userMappingDao.newRow();
+    await rte.addRelationship(relationship);
+    const userMappingDao = rte.getMappingDao(mappingTableName);
+    const userMappingRow = userMappingDao.newRow();
     userMappingRow.setBaseId(userRow.getId());
     userMappingRow.setRelatedId(relatedRow.getId());
-    for (var column in mappingColumnValues) {
+    for (const column in mappingColumnValues) {
       userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
     }
     return userMappingDao.create(userMappingRow);
@@ -135,7 +144,12 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
    * @return {Promise}
    */
-  linkFeatureRow(userRow, featureRow, mappingTable, mappingColumnValues) {
+  async linkFeatureRow(
+    userRow: UserRow,
+    featureRow: FeatureRow,
+    mappingTable?: string | UserMappingTable,
+    mappingColumnValues?: ColumnValues,
+  ): Promise<number> {
     return this.linkRelatedRow(userRow, featureRow, RelationType.FEATURES, mappingTable, mappingColumnValues);
   }
   /**
@@ -146,7 +160,12 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
    * @return {Promise}
    */
-  linkMediaRow(userRow, mediaRow, mappingTable, mappingColumnValues) {
+  async linkMediaRow(
+    userRow: UserRow,
+    mediaRow: MediaRow,
+    mappingTable?: string | UserMappingTable,
+    mappingColumnValues?: ColumnValues,
+  ): Promise<number> {
     return this.linkRelatedRow(userRow, mediaRow, RelationType.MEDIA, mappingTable, mappingColumnValues);
   }
   /**
@@ -157,25 +176,36 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
    * @return {Promise}
    */
-  linkSimpleAttributesRow(userRow, simpleAttributesRow, mappingTable, mappingColumnValues) {
-    return this.linkRelatedRow(userRow, simpleAttributesRow, RelationType.SIMPLE_ATTRIBUTES, mappingTable, mappingColumnValues);
+  linkSimpleAttributesRow(
+    userRow: UserRow,
+    simpleAttributesRow: SimpleAttributesRow,
+    mappingTable?: string | UserMappingTable,
+    mappingColumnValues?: ColumnValues,
+  ): Promise<number> {
+    return this.linkRelatedRow(
+      userRow,
+      simpleAttributesRow,
+      RelationType.SIMPLE_ATTRIBUTES,
+      mappingTable,
+      mappingColumnValues,
+    );
   }
   /**
    * Get all media rows that are linked to this user row
    * @param  {module:user/userRow~UserRow} userRow user row
    * @return {module:extension/relatedTables~MediaRow[]}
    */
-  getLinkedMedia(userRow) {
-    var mediaRelations = this.getMediaRelations();
-    var rte = this.geoPackage.getRelatedTablesExtension();
-    var linkedMedia = [];
-    for (var i = 0; i < mediaRelations.length; i++) {
-      var mediaRelation = mediaRelations[i];
-      var mediaDao = rte.getMediaDao(mediaRelation);
-      var userMappingDao = rte.getMappingDao(mediaRelation.mapping_table_name);
-      var mappings = userMappingDao.queryByBaseId(userRow.getId());
-      for (var m = 0; m < mappings.length; m++) {
-        var relatedId = mappings[m].related_id;
+  getLinkedMedia(userRow: UserRow): MediaRow[] {
+    const mediaRelations = this.getMediaRelations();
+    const rte = this.geoPackage.getRelatedTablesExtension();
+    const linkedMedia = [];
+    for (let i = 0; i < mediaRelations.length; i++) {
+      const mediaRelation = mediaRelations[i];
+      const mediaDao = rte.getMediaDao(mediaRelation);
+      const userMappingDao = rte.getMappingDao(mediaRelation.mapping_table_name);
+      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      for (let m = 0; m < mappings.length; m++) {
+        const relatedId = mappings[m].related_id;
         linkedMedia.push(mediaDao.queryForId(relatedId));
       }
     }
@@ -186,17 +216,17 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:user/userRow~UserRow} userRow user row
    * @return {module:extension/relatedTables~SimpleAttributeRow[]}
    */
-  getLinkedSimpleAttributes(userRow) {
-    var simpleRelations = this.getSimpleAttributesRelations();
-    var rte = this.geoPackage.getRelatedTablesExtension();
-    var linkedSimpleAttributes = [];
-    for (var i = 0; i < simpleRelations.length; i++) {
-      var simpleRelation = simpleRelations[i];
-      var simpleDao = rte.getSimpleAttributesDao(simpleRelation);
-      var userMappingDao = rte.getMappingDao(simpleRelation.mapping_table_name);
-      var mappings = userMappingDao.queryByBaseId(userRow.getId());
-      for (var m = 0; m < mappings.length; m++) {
-        var relatedId = mappings[m].related_id;
+  getLinkedSimpleAttributes(userRow: UserRow): SimpleAttributesRow[] {
+    const simpleRelations = this.getSimpleAttributesRelations();
+    const rte = this.geoPackage.getRelatedTablesExtension();
+    const linkedSimpleAttributes = [];
+    for (let i = 0; i < simpleRelations.length; i++) {
+      const simpleRelation = simpleRelations[i];
+      const simpleDao = rte.getSimpleAttributesDao(simpleRelation);
+      const userMappingDao = rte.getMappingDao(simpleRelation.mapping_table_name);
+      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      for (let m = 0; m < mappings.length; m++) {
+        const relatedId = mappings[m].related_id;
         linkedSimpleAttributes.push(simpleDao.queryForId(relatedId));
       }
     }
@@ -207,17 +237,17 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {module:user/userRow~UserRow} userRow user row
    * @return {module:features/user/featureRow~FeatureRow[]}
    */
-  getLinkedFeatures(userRow) {
-    var featureRelations = this.getFeatureRelations();
-    var rte = this.geoPackage.getRelatedTablesExtension();
-    var linkedFeatures = [];
-    for (var i = 0; i < featureRelations.length; i++) {
-      var featureRelation = featureRelations[i];
-      var featureDao = this.geoPackage.getFeatureDao(featureRelation.base_table_name);
-      var userMappingDao = rte.getMappingDao(featureRelation.mapping_table_name);
-      var mappings = userMappingDao.queryByBaseId(userRow.getId());
-      for (var m = 0; m < mappings.length; m++) {
-        var relatedId = mappings[m].related_id;
+  getLinkedFeatures(userRow: UserRow): FeatureRow[] {
+    const featureRelations = this.getFeatureRelations();
+    const rte = this.geoPackage.getRelatedTablesExtension();
+    const linkedFeatures = [];
+    for (let i = 0; i < featureRelations.length; i++) {
+      const featureRelation = featureRelations[i];
+      const featureDao = this.geoPackage.getFeatureDao(featureRelation.base_table_name);
+      const userMappingDao = rte.getMappingDao(featureRelation.mapping_table_name);
+      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      for (let m = 0; m < mappings.length; m++) {
+        const relatedId = mappings[m].related_id;
         linkedFeatures.push(featureDao.queryForId(relatedId));
       }
     }
@@ -227,21 +257,21 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * Get all simple attribute relations to this table
    * @return {Object[]}
    */
-  getSimpleAttributesRelations() {
+  getSimpleAttributesRelations(): ExtendedRelation[] {
     return this.getRelationsWithName(SimpleAttributesTable.RELATION_TYPE.name);
   }
   /**
    * Get all feature relations to this table
    * @return {Object[]}
    */
-  getFeatureRelations() {
+  getFeatureRelations(): ExtendedRelation[] {
     return this.getRelationsWithName(RelationType.FEATURES.name);
   }
   /**
    * Get all media relations to this table
    * @return {Object[]}
    */
-  getMediaRelations() {
+  getMediaRelations(): ExtendedRelation[] {
     return this.getRelationsWithName(MediaTable.RELATION_TYPE.name);
   }
   /**
@@ -249,14 +279,14 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param {string} name
    * @return {Object[]}
    */
-  getRelationsWithName(name) {
+  getRelationsWithName(name: string): ExtendedRelation[] {
     return this.geoPackage.getExtendedRelationDao().getBaseTableRelationsWithName(this.table_name, name);
   }
   /**
    * Get all relations to this table
    * @return {Object[]}
    */
-  getRelations() {
+  getRelations(): ExtendedRelation[] {
     return this.geoPackage.getExtendedRelationDao().getBaseTableRelations(this.table_name);
   }
   /**
@@ -264,10 +294,10 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @param  {Number[]} ids ids to query for
    * @return {Object[]}
    */
-  getRows(ids) {
-    var rows = [];
-    for (var i = 0; i < ids.length; i++) {
-      var row = this.queryForId(ids[i]);
+  getRows(ids: number[]): T[] {
+    const rows = [];
+    for (let i = 0; i < ids.length; i++) {
+      const row = this.queryForId(ids[i]);
       if (row) {
         rows.push(row);
       }
@@ -279,7 +309,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    *
    *  @return zoom level
    */
-  getZoomLevel() {
+  getZoomLevel(): number {
     return 0;
     // if(self.projection == nil){
     //     [NSException raise:@"No Projection" format:@"No projection was set which is required to determine the zoom level"];
@@ -297,7 +327,7 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * Get count of all rows in this table
    * @return {Number}
    */
-  getCount() {
+  getCount(): number {
     return this.connection.count(this.table_name);
   }
   /**
@@ -307,8 +337,8 @@ export class UserDao<T extends UserRow> extends Dao<T> {
    * @return {module:user/userDao~UserDao}
    */
   static readTable(geoPackage: GeoPackage, tableName: string): UserDao<UserRow> {
-    var reader = new UserTableReader(tableName);
-    var userTable = reader.readTable(geoPackage.getDatabase());
+    const reader = new UserTableReader(tableName);
+    const userTable = reader.readTable(geoPackage.getDatabase());
     return new UserDao(geoPackage, userTable);
   }
 }

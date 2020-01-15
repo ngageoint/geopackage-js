@@ -2,23 +2,31 @@
  * @module extension/style
  */
 
-import {BaseExtension} from '../baseExtension';
-import {Extension} from '../extension';
-import {ContentsIdDao} from '../contents/contentsIdDao'
-import {IconTable} from './iconTable'
-import {IconDao} from './iconDao'
-import {StyleTable} from './styleTable'
-import {StyleDao} from './styleDao'
-import {StyleMappingTable} from './styleMappingTable'
-import {StyleMappingDao} from './styleMappingDao'
-import {UserMappingTable} from '../relatedTables/userMappingTable'
-import {StyleTableReader} from './styleTableReader'
-import {UserTableReader} from '../../user/userTableReader'
-import {FeatureTable} from '../../features/user/featureTable'
-import FeatureStyles from './featureStyles'
-import FeatureStyle from './featureStyle'
-import Styles from './styles'
-import Icons from './icons'
+import { BaseExtension } from '../baseExtension';
+import { Extension } from '../extension';
+import { ContentsIdDao } from '../contents/contentsIdDao';
+import { IconTable } from './iconTable';
+import { IconDao } from './iconDao';
+import { StyleTable } from './styleTable';
+import { StyleDao } from './styleDao';
+import { StyleMappingTable } from './styleMappingTable';
+import { StyleMappingDao } from './styleMappingDao';
+import { UserMappingTable } from '../relatedTables/userMappingTable';
+import { StyleTableReader } from './styleTableReader';
+import { UserTableReader } from '../../user/userTableReader';
+import { FeatureTable } from '../../features/user/featureTable';
+import FeatureStyles from './featureStyles';
+import FeatureStyle from './featureStyle';
+import Styles from './styles';
+import Icons from './icons';
+import { IconRow } from './iconRow';
+import { FeatureRow } from '../../features/user/featureRow';
+import { RelatedTablesExtension } from '../relatedTables';
+import { ContentsIdExtension } from '../contents';
+import { GeoPackage } from '../../geoPackage';
+import { ExtendedRelation } from '../relatedTables/extendedRelation';
+import { StyleRow } from './styleRow';
+import { StyleMappingRow } from './styleMappingRow';
 
 /**
  * Style extension
@@ -27,351 +35,475 @@ import Icons from './icons'
  * @constructor
  */
 export class FeatureStyleExtension extends BaseExtension {
-  relatedTablesExtension: any;
-  contentsIdExtension: any;
+  relatedTablesExtension: RelatedTablesExtension;
+  contentsIdExtension: ContentsIdExtension;
   public static readonly EXTENSION_NAME = 'nga_feature_style';
   public static readonly EXTENSION_AUTHOR = 'nga';
   public static readonly EXTENSION_NAME_NO_AUTHOR = 'feature_style';
-  public static readonly EXTENSION_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html';
-  public static readonly TABLE_MAPPING_STYLE = FeatureStyleExtension.EXTENSION_AUTHOR + "_style_";
-  public static readonly TABLE_MAPPING_TABLE_STYLE = FeatureStyleExtension.EXTENSION_AUTHOR + "_style_default_";
-  public static readonly TABLE_MAPPING_ICON = FeatureStyleExtension.EXTENSION_AUTHOR + "_icon_";
-  public static readonly TABLE_MAPPING_TABLE_ICON = FeatureStyleExtension.EXTENSION_AUTHOR + "_icon_default_";
-  constructor(geoPackage) {
+  public static readonly EXTENSION_DEFINITION =
+    'http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html';
+  public static readonly TABLE_MAPPING_STYLE = FeatureStyleExtension.EXTENSION_AUTHOR + '_style_';
+  public static readonly TABLE_MAPPING_TABLE_STYLE = FeatureStyleExtension.EXTENSION_AUTHOR + '_style_default_';
+  public static readonly TABLE_MAPPING_ICON = FeatureStyleExtension.EXTENSION_AUTHOR + '_icon_';
+  public static readonly TABLE_MAPPING_TABLE_ICON = FeatureStyleExtension.EXTENSION_AUTHOR + '_icon_default_';
+  constructor(geoPackage: GeoPackage) {
     super(geoPackage);
     this.relatedTablesExtension = geoPackage.getRelatedTablesExtension();
     this.contentsIdExtension = geoPackage.getContentsIdExtension();
   }
   /**
-	 * Get or create the metadata extension
-	 *  @param {module:features/user/featureTable|String} featureTable, defaults to null
-	 * @return {Promise}
-	 */
-  getOrCreateExtension(featureTable) {
-    return this.getOrCreate(FeatureStyleExtension.EXTENSION_NAME, this.getFeatureTableName(featureTable), null, FeatureStyleExtension.EXTENSION_DEFINITION, Extension.READ_WRITE);
+   * Get or create the metadata extension
+   *  @param {module:features/user/featureTable|String} featureTable, defaults to null
+   * @return {Promise}
+   */
+  getOrCreateExtension(featureTable: FeatureTable | string): Promise<Extension> {
+    return this.getOrCreate(
+      FeatureStyleExtension.EXTENSION_NAME,
+      this.getFeatureTableName(featureTable),
+      null,
+      FeatureStyleExtension.EXTENSION_DEFINITION,
+      Extension.READ_WRITE,
+    );
   }
   /**
-	 * Determine if the GeoPackage has the extension or has the extension for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {Boolean}
-	 */
-  has(featureTable) {
+   * Determine if the GeoPackage has the extension or has the extension for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {Boolean}
+   */
+  has(featureTable: FeatureTable | string): boolean {
     return this.hasExtension(FeatureStyleExtension.EXTENSION_NAME, this.getFeatureTableName(featureTable), null);
   }
   /**
-	 * Gets featureTables
-	 * @returns {String[]}
-	 */
-  getTables() {
-    var tables = [];
+   * Gets featureTables
+   * @returns {String[]}
+   */
+  getTables(): string[] {
+    const tables = [];
     if (this.extensionsDao.isTableExists()) {
-      var extensions = this.extensionsDao.queryAllByExtension(FeatureStyleExtension.EXTENSION_NAME);
-      for (var i = 0; i < extensions.length; i++) {
+      const extensions = this.extensionsDao.queryAllByExtension(FeatureStyleExtension.EXTENSION_NAME);
+      for (let i = 0; i < extensions.length; i++) {
         tables.push(extensions[i].table_name);
       }
     }
     return tables;
   }
   /**
-	 * Get the related tables extension
-	 * @returns {module:extension/relatedTables~RelatedTablesExtension}
-	 */
-  getRelatedTables() {
+   * Get the related tables extension
+   * @returns {module:extension/relatedTables~RelatedTablesExtension}
+   */
+  getRelatedTables(): RelatedTablesExtension {
     return this.relatedTablesExtension;
   }
   /**
-	 * Get the contentsId extension
-	 * @returns {module:extension/contents~ContentsIdExtension}
-	 */
-  getContentsId() {
+   * Get the contentsId extension
+   * @returns {module:extension/contents~ContentsIdExtension}
+   */
+  getContentsId(): ContentsIdExtension {
     return this.contentsIdExtension;
   }
   /**
-	 * Create style, icon, table style, and table icon relationships for the
-	 * feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Promise}
-	 */
-  createRelationships(featureTable) {
-    var promises = [];
+   * Create style, icon, table style, and table icon relationships for the
+   * feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Promise}
+   */
+  async createRelationships(
+    featureTable: FeatureTable | string,
+  ): Promise<{
+    styleRelationship: ExtendedRelation;
+    tableStyleRelationship: ExtendedRelation;
+    iconRelationship: ExtendedRelation;
+    tableIconRelationship: ExtendedRelation;
+  }> {
+    const promises = [];
     promises.push(this.createStyleRelationship(featureTable));
     promises.push(this.createTableStyleRelationship(featureTable));
     promises.push(this.createIconRelationship(featureTable));
     promises.push(this.createTableIconRelationship(featureTable));
-    return Promise.all(promises);
+    return Promise.all(promises).then(
+      ([styleRelationship, tableStyleRelationship, iconRelationship, tableIconRelationship]) => ({
+        styleRelationship,
+        tableStyleRelationship,
+        iconRelationship,
+        tableIconRelationship,
+      }),
+    );
   }
   /**
-	 * Check if feature table has a style, icon, table style, or table icon
-	 * relationships
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {boolean}
-	 */
-  hasRelationship(featureTable: String | typeof FeatureTable): Boolean {
-    return this.hasStyleRelationship(featureTable)
-			|| this.hasTableStyleRelationship(featureTable)
-			|| this.hasIconRelationship(featureTable)
-			|| this.hasTableIconRelationship(featureTable);
+   * Check if feature table has a style, icon, table style, or table icon
+   * relationships
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {boolean}
+   */
+  hasRelationship(featureTable: string | FeatureTable): boolean {
+    return (
+      this.hasStyleRelationship(featureTable) ||
+      this.hasTableStyleRelationship(featureTable) ||
+      this.hasIconRelationship(featureTable) ||
+      this.hasTableIconRelationship(featureTable)
+    );
   }
   /**
-	 * Create a style relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Promise}
-	 */
-  createStyleRelationship(featureTable: String | typeof FeatureTable): Promise<any> {
-    return this._createStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable), this.getFeatureTableName(featureTable), this.getFeatureTableName(featureTable), StyleTable.TABLE_NAME);
+   * Create a style relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Promise}
+   */
+  createStyleRelationship(featureTable: string | FeatureTable): Promise<ExtendedRelation> {
+    return this._createStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable),
+      this.getFeatureTableName(featureTable),
+      this.getFeatureTableName(featureTable),
+      StyleTable.TABLE_NAME,
+    );
   }
   /**
-	 * Determine if a style relationship exists for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {boolean}
-	 */
-  hasStyleRelationship(featureTable) {
-    return this._hasStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable), this.getFeatureTableName(featureTable), StyleTable.TABLE_NAME);
+   * Determine if a style relationship exists for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {boolean}
+   */
+  hasStyleRelationship(featureTable: string | FeatureTable): boolean {
+    return this._hasStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable),
+      this.getFeatureTableName(featureTable),
+      StyleTable.TABLE_NAME,
+    );
   }
   /**
-	 * Create a feature table style relationship
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Promise}
-	 */
-  createTableStyleRelationship(featureTable: String | typeof FeatureTable): Promise<any> {
-    return this._createStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable), this.getFeatureTableName(featureTable), ContentsIdDao.TABLE_NAME, StyleTable.TABLE_NAME);
+   * Create a feature table style relationship
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Promise}
+   */
+  createTableStyleRelationship(featureTable: string | FeatureTable): Promise<ExtendedRelation> {
+    return this._createStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable),
+      this.getFeatureTableName(featureTable),
+      ContentsIdDao.TABLE_NAME,
+      StyleTable.TABLE_NAME,
+    );
   }
   /**
-	 * Determine if a feature table style relationship exists
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {boolean} true if relationship exists
-	 */
-  hasTableStyleRelationship(featureTable) {
-    return this._hasStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable), ContentsIdDao.TABLE_NAME, StyleTable.TABLE_NAME);
+   * Determine if a feature table style relationship exists
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {boolean} true if relationship exists
+   */
+  hasTableStyleRelationship(featureTable: string | FeatureTable): boolean {
+    return this._hasStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable),
+      ContentsIdDao.TABLE_NAME,
+      StyleTable.TABLE_NAME,
+    );
   }
   /**
-	 * Create an icon relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Promise}
-	 */
-  createIconRelationship(featureTable: String | typeof FeatureTable): Promise<any> {
-    return this._createStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable), this.getFeatureTableName(featureTable), this.getFeatureTableName(featureTable), IconTable.TABLE_NAME);
+   * Create an icon relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Promise}
+   */
+  createIconRelationship(featureTable: string | FeatureTable): Promise<ExtendedRelation> {
+    return this._createStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable),
+      this.getFeatureTableName(featureTable),
+      this.getFeatureTableName(featureTable),
+      IconTable.TABLE_NAME,
+    );
   }
   /**
-	 * Determine if an icon relationship exists for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {boolean} true if relationship exists
-	 */
-  hasIconRelationship(featureTable: String | typeof FeatureTable): boolean {
-    return this._hasStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable), this.getFeatureTableName(featureTable), IconTable.TABLE_NAME);
+   * Determine if an icon relationship exists for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {boolean} true if relationship exists
+   */
+  hasIconRelationship(featureTable: string | FeatureTable): boolean {
+    return this._hasStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable),
+      this.getFeatureTableName(featureTable),
+      IconTable.TABLE_NAME,
+    );
   }
   /**
-	 * Create a feature table icon relationship
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Promise}
-	 */
-  createTableIconRelationship(featureTable: String | typeof FeatureTable): Promise<any> {
-    return this._createStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable), this.getFeatureTableName(featureTable), ContentsIdDao.TABLE_NAME, IconTable.TABLE_NAME);
+   * Create a feature table icon relationship
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Promise}
+   */
+  createTableIconRelationship(featureTable: string | FeatureTable): Promise<ExtendedRelation> {
+    return this._createStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable),
+      this.getFeatureTableName(featureTable),
+      ContentsIdDao.TABLE_NAME,
+      IconTable.TABLE_NAME,
+    );
   }
   /**
-	 * Determine if a feature table icon relationship exists
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @returns {Boolean} true if relationship exists
-	 */
-  hasTableIconRelationship(featureTable) {
-    return this._hasStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable), ContentsIdDao.TABLE_NAME, IconTable.TABLE_NAME);
+   * Determine if a feature table icon relationship exists
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @returns {Boolean} true if relationship exists
+   */
+  hasTableIconRelationship(featureTable: string | FeatureTable): boolean {
+    return this._hasStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable),
+      ContentsIdDao.TABLE_NAME,
+      IconTable.TABLE_NAME,
+    );
   }
   /**
-	 * Get the mapping table name
-	 * @param tablePrefix table name prefix
-	 * @param {module:features/user/featureTable|String} featureTable feature table name
-	 * @returns {String} mapping table name
-	 */
-  getMappingTableName(tablePrefix, featureTable) {
+   * Get the mapping table name
+   * @param tablePrefix table name prefix
+   * @param {module:features/user/featureTable|String} featureTable feature table name
+   * @returns {String} mapping table name
+   */
+  getMappingTableName(tablePrefix: string, featureTable: string | FeatureTable): string {
     return tablePrefix + this.getFeatureTableName(featureTable);
   }
   /**
-	 * Check if the style extension relationship between a feature table and
-	 * style extension table exists
-	 * @param {String} mappingTableName mapping table name
-	 * @param {String} baseTable base table name
-	 * @param {String} relatedTable related table name
-	 * @returns {boolean} true if relationship exists
-	 */
-  _hasStyleRelationship(mappingTableName, baseTable, relatedTable) {
+   * Check if the style extension relationship between a feature table and
+   * style extension table exists
+   * @param {String} mappingTableName mapping table name
+   * @param {String} baseTable base table name
+   * @param {String} relatedTable related table name
+   * @returns {boolean} true if relationship exists
+   */
+  _hasStyleRelationship(mappingTableName: string, baseTable: string, relatedTable: string): boolean {
     return this.relatedTablesExtension.hasRelations(baseTable, relatedTable, mappingTableName);
   }
   /**
-	 * Create a style extension relationship between a feature table and style
-	 * extension table
-	 * @param {String} mappingTableName mapping table name
-	 * @param {String} featureTable feature table
-	 * @param {String} baseTable base table name
-	 * @param {String} relatedTable related table name
-	 * @return {Promise}
-	 * @private
-	 */
-  _createStyleRelationship(mappingTableName, featureTable, baseTable, relatedTable) {
+   * Create a style extension relationship between a feature table and style
+   * extension table
+   * @param {String} mappingTableName mapping table name
+   * @param {String} featureTable feature table
+   * @param {String} baseTable base table name
+   * @param {String} relatedTable related table name
+   * @return {Promise}
+   * @private
+   */
+  async _createStyleRelationship(
+    mappingTableName: string,
+    featureTable: string,
+    baseTable: string,
+    relatedTable: string,
+  ): Promise<ExtendedRelation> {
     if (!this._hasStyleRelationship(mappingTableName, baseTable, relatedTable)) {
       // Create the extension
-      return this.getOrCreateExtension(featureTable).then(function () {
-        if (baseTable === ContentsIdDao.TABLE_NAME && !this.contentsIdExtension.has()) {
-          return this.contentsIdExtension.getOrCreateExtension().then(function () {
-            return this._handleCreateStyleRelationship(mappingTableName, baseTable, relatedTable);
-          }.bind(this));
-        }
-        else {
-          return this._handleCreateStyleRelationship(mappingTableName, baseTable, relatedTable);
-        }
-      }.bind(this));
-    }
-    else {
-      return Promise.resolve();
+      await this.getOrCreateExtension(featureTable);
+      if (baseTable === ContentsIdDao.TABLE_NAME && !this.contentsIdExtension.has()) {
+        await this.contentsIdExtension.getOrCreateExtension();
+      }
+      return this._handleCreateStyleRelationship(mappingTableName, baseTable, relatedTable);
+    } else {
+      const relationships = this.geoPackage
+        .getExtendedRelationDao()
+        .getRelations(baseTable, relatedTable, mappingTableName);
+      // TODO this isn't quite right
+      return relationships[0];
     }
   }
   /**
-	 * Private function to aid in creation of the a style extension relationship between a feature table and style extension table
-	 * @param {String} mappingTableName
-	 * @param {String} baseTable
-	 * @param {String} relatedTable
-	 * @return {Promise}
-	 * @private
-	 */
-  _handleCreateStyleRelationship(mappingTableName, baseTable, relatedTable) {
+   * Private function to aid in creation of the a style extension relationship between a feature table and style extension table
+   * @param {String} mappingTableName
+   * @param {String} baseTable
+   * @param {String} relatedTable
+   * @return {Promise}
+   * @private
+   */
+  async _handleCreateStyleRelationship(
+    mappingTableName: string,
+    baseTable: string,
+    relatedTable: string,
+  ): Promise<ExtendedRelation> {
     if (relatedTable === StyleTable.TABLE_NAME) {
-      return this.relatedTablesExtension.addAttributesRelationship(this.geoPackage.getRelatedTablesExtension().getRelationshipBuilder()
-        .setBaseTableName(baseTable)
-        .setUserMappingTable(StyleMappingTable.create(mappingTableName))
-        .setRelatedTable(StyleTable.create()));
-    }
-    else {
-      return this.relatedTablesExtension.addMediaRelationship(this.geoPackage.getRelatedTablesExtension().getRelationshipBuilder()
-        .setBaseTableName(baseTable)
-        .setUserMappingTable(StyleMappingTable.create(mappingTableName))
-        .setRelatedTable(IconTable.create()));
-    }
-  }
-  /**
-	 * Delete the style and icon table and row relationships for all feature
-	 * tables
-	 */
-  deleteAllRelationships() {
-    var tables = this.getTables();
-    for (var i = 0; i < tables.length; i++) {
-      this.deleteRelationships(tables[i]);
+      return this.relatedTablesExtension.addAttributesRelationship(
+        this.geoPackage
+          .getRelatedTablesExtension()
+          .getRelationshipBuilder()
+          .setBaseTableName(baseTable)
+          .setUserMappingTable(StyleMappingTable.create(mappingTableName))
+          .setRelatedTable(StyleTable.create()),
+      );
+    } else {
+      return this.relatedTablesExtension.addMediaRelationship(
+        this.geoPackage
+          .getRelatedTablesExtension()
+          .getRelationshipBuilder()
+          .setBaseTableName(baseTable)
+          .setUserMappingTable(StyleMappingTable.create(mappingTableName))
+          .setRelatedTable(IconTable.create()),
+      );
     }
   }
   /**
-	 * Delete the style and icon table and row relationships for the feature
-	 * table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteRelationships(featureTable) {
-    this.deleteStyleRelationship(featureTable);
-    this.deleteTableStyleRelationship(featureTable);
-    this.deleteIconRelationship(featureTable);
-    this.deleteTableIconRelationship(featureTable);
+   * Delete the style and icon table and row relationships for all feature
+   * tables
+   */
+  deleteAllRelationships(): {
+    styleRelationships: number;
+    tableStyleRelationships: number;
+    iconRelationship: number;
+    tableIconRelationship: number;
+  } {
+    const removed = {
+      styleRelationships: 0,
+      tableStyleRelationships: 0,
+      iconRelationship: 0,
+      tableIconRelationship: 0,
+    };
+    const tables = this.getTables();
+    for (let i = 0; i < tables.length; i++) {
+      const {
+        styleRelationships,
+        tableStyleRelationships,
+        iconRelationship,
+        tableIconRelationship,
+      } = this.deleteRelationships(tables[i]);
+
+      removed.styleRelationships += styleRelationships;
+      removed.tableStyleRelationships += tableStyleRelationships;
+      removed.iconRelationship += iconRelationship;
+      removed.tableIconRelationship += tableIconRelationship;
+    }
+    return removed;
   }
   /**
-	 * Delete a style relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteStyleRelationship(featureTable) {
-    this._deleteStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable), featureTable);
+   * Delete the style and icon table and row relationships for the feature
+   * table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteRelationships(
+    featureTable: string | FeatureTable,
+  ): {
+    styleRelationships: number;
+    tableStyleRelationships: number;
+    iconRelationship: number;
+    tableIconRelationship: number;
+  } {
+    return {
+      styleRelationships: this.deleteStyleRelationship(featureTable),
+      tableStyleRelationships: this.deleteTableStyleRelationship(featureTable),
+      iconRelationship: this.deleteIconRelationship(featureTable),
+      tableIconRelationship: this.deleteTableIconRelationship(featureTable),
+    };
   }
   /**
-	 * Delete a table style relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableStyleRelationship(featureTable) {
-    this._deleteStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable), featureTable);
+   * Delete a style relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteStyleRelationship(featureTable: string | FeatureTable): number {
+    return this._deleteStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable),
+      featureTable,
+    );
   }
   /**
-	 * Delete a icon relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteIconRelationship(featureTable) {
-    this._deleteStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable), featureTable);
+   * Delete a table style relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableStyleRelationship(featureTable: string | FeatureTable): number {
+    return this._deleteStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable),
+      featureTable,
+    );
   }
   /**
-	 * Delete a table icon relationship for the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableIconRelationship(featureTable) {
-    this._deleteStyleRelationship(this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable), featureTable);
+   * Delete a icon relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteIconRelationship(featureTable: string | FeatureTable): number {
+    return this._deleteStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable),
+      featureTable,
+    );
   }
   /**
-	 * Delete a style extension feature table relationship and the mapping table
-	 * @param {String} mappingTableName
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @private
-	 */
-  _deleteStyleRelationship(mappingTableName, featureTable) {
-    var relationships = this.geoPackage.getExtendedRelationDao().queryByMappingTableName(mappingTableName);
-    for (var i = 0; i < relationships.length; i++) {
-      this.relatedTablesExtension.removeRelationship(relationships[i]);
+   * Delete a table icon relationship for the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableIconRelationship(featureTable: string | FeatureTable): number {
+    return this._deleteStyleRelationship(
+      this.getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable),
+      featureTable,
+    );
+  }
+  /**
+   * Delete a style extension feature table relationship and the mapping table
+   * @param {String} mappingTableName
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @private
+   */
+  _deleteStyleRelationship(mappingTableName: string, featureTable: string | FeatureTable): number {
+    let removed = 0;
+    const relationships = this.geoPackage.getExtendedRelationDao().queryByMappingTableName(mappingTableName);
+    for (let i = 0; i < relationships.length; i++) {
+      removed += this.relatedTablesExtension.removeRelationship(relationships[i]);
     }
     if (!this.hasRelationship(featureTable)) {
       if (this.extensionsDao.isTableExists()) {
-        this.extensionsDao.deleteByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, this.getFeatureTableName(featureTable));
+        this.extensionsDao.deleteByExtensionAndTableName(
+          FeatureStyleExtension.EXTENSION_NAME,
+          this.getFeatureTableName(featureTable),
+        );
       }
     }
+    return removed;
   }
   /**
-	 * Get a Style Mapping DAO
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleMappingDao} style mapping DAO
-	 */
-  getStyleMappingDao(featureTable) {
+   * Get a Style Mapping DAO
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleMappingDao} style mapping DAO
+   */
+  getStyleMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable);
   }
   /**
-	 * Get a Table Style Mapping DAO
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleMappingDao} table style mapping DAO
-	 */
-  getTableStyleMappingDao(featureTable) {
+   * Get a Table Style Mapping DAO
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleMappingDao} table style mapping DAO
+   */
+  getTableStyleMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable);
   }
   /**
-	 * Get a Icon Mapping DAO
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleMappingDao} icon mapping DAO
-	 */
-  getIconMappingDao(featureTable) {
+   * Get a Icon Mapping DAO
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleMappingDao} icon mapping DAO
+   */
+  getIconMappingDao(featureTable: FeatureTable | string): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable);
   }
   /**
-	 * Get a Table Icon Mapping DAO
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleMappingDao} table icon mapping DAO
-	 */
-  getTableIconMappingDao(featureTable) {
+   * Get a Table Icon Mapping DAO
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleMappingDao} table icon mapping DAO
+   */
+  getTableIconMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable);
   }
   /**
-	 * Get a Style Mapping DAO from a table name
-	 * @param {String} tablePrefix table name prefix
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleMappingDao} style mapping dao
-	 * @private
-	 */
-  _getMappingDao(tablePrefix, featureTable) {
-    var featureTableName = this.getFeatureTableName(featureTable);
-    var tableName = tablePrefix + featureTableName;
-    var dao = null;
+   * Get a Style Mapping DAO from a table name
+   * @param {String} tablePrefix table name prefix
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleMappingDao} style mapping dao
+   * @private
+   */
+  _getMappingDao(tablePrefix: string, featureTable: string | FeatureTable): StyleMappingDao {
+    const featureTableName = this.getFeatureTableName(featureTable);
+    const tableName = tablePrefix + featureTableName;
+    let dao = null;
     if (this.geoPackage.isTable(tableName)) {
-      dao = new StyleMappingDao(this.relatedTablesExtension.getUserDao(tableName, UserMappingTable.requiredColumns()), this.geoPackage);
+      dao = new StyleMappingDao(
+        this.relatedTablesExtension.getUserDao(tableName, UserMappingTable.requiredColumns()),
+        this.geoPackage,
+      );
     }
     return dao;
   }
   /**
-	 * Get a style DAO
-	 * @return {module:extension/style.StyleDao} style DAO
-	 */
-  getStyleDao() {
-    var styleDao = null;
+   * Get a style DAO
+   * @return {module:extension/style.StyleDao} style DAO
+   */
+  getStyleDao(): StyleDao {
+    let styleDao = null;
     if (this.geoPackage.isTable(StyleTable.TABLE_NAME)) {
-      var dao = this.geoPackage.getContentsDao();
-      var contents = dao.queryForId(StyleTable.TABLE_NAME);
+      const dao = this.geoPackage.getContentsDao();
+      const contents = dao.queryForId(StyleTable.TABLE_NAME);
       if (contents) {
-        var reader = new StyleTableReader(contents.table_name);
-        var table = reader.readTable(this.geoPackage.connection) as StyleTable;
+        const reader = new StyleTableReader(contents.table_name);
+        const table = reader.readTable(this.geoPackage.connection) as StyleTable;
         this.relatedTablesExtension.setContents(table);
         styleDao = new StyleDao(this.geoPackage, table);
       }
@@ -379,31 +511,31 @@ export class FeatureStyleExtension extends BaseExtension {
     return styleDao;
   }
   /**
-	 * Get a icon DAO
-	 * @return {module:extension/style.IconDao}
-	 */
-  getIconDao() {
-    var iconDao = null;
+   * Get a icon DAO
+   * @return {module:extension/style.IconDao}
+   */
+  getIconDao(): IconDao {
+    let iconDao = null;
     if (this.geoPackage.isTable(IconTable.TABLE_NAME)) {
-      var reader = new UserTableReader(IconTable.TABLE_NAME, IconTable.requiredColumns());
-      var userTable = reader.readTable(this.geoPackage.getDatabase());
-      var table = new IconTable(userTable.table_name, userTable.columns, IconTable.requiredColumns());
+      const reader = new UserTableReader(IconTable.TABLE_NAME, IconTable.requiredColumns());
+      const userTable = reader.readTable(this.geoPackage.getDatabase());
+      const table = new IconTable(userTable.table_name, userTable.columns, IconTable.requiredColumns());
       table.setContents(this.geoPackage.getContentsDao().queryForId(IconTable.TABLE_NAME));
       iconDao = new IconDao(this.geoPackage, table);
     }
     return iconDao;
   }
   /**
-	 * Get the feature table default feature styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.FeatureStyles} table feature styles or null
-	 */
-  getTableFeatureStyles(featureTable) {
-    var featureStyles = null;
-    var id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
+   * Get the feature table default feature styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.FeatureStyles} table feature styles or null
+   */
+  getTableFeatureStyles(featureTable: string | FeatureTable): FeatureStyles {
+    let featureStyles = null;
+    const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
-      var styles = this.getTableStyles(featureTable);
-      var icons = this.getTableIcons(featureTable);
+      const styles = this.getTableStyles(featureTable);
+      const icons = this.getTableIcons(featureTable);
       if (styles !== null || icons !== null) {
         featureStyles = new FeatureStyles(styles, icons);
       }
@@ -411,104 +543,101 @@ export class FeatureStyleExtension extends BaseExtension {
     return featureStyles;
   }
   /**
-	 * Get the default style of the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.StyleRow} style row
-	 */
-  getTableStyleDefault(featureTable) {
+   * Get the default style of the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.StyleRow} style row
+   */
+  getTableStyleDefault(featureTable: string | FeatureTable): StyleRow {
     return this.getTableStyle(featureTable, null);
   }
   /**
-	 * Get the style of the feature table and geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 * @return {module:extension/style.StyleRow} style row
-	 */
-  getTableStyle(featureTable, geometryType) {
-    var style = null;
-    var styles = this.getTableStyles(featureTable);
+   * Get the style of the feature table and geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   * @return {module:extension/style.StyleRow} style row
+   */
+  getTableStyle(featureTable: string | FeatureTable, geometryType: string): StyleRow {
+    let style = null;
+    const styles = this.getTableStyles(featureTable);
     if (styles !== null) {
       if (geometryType === null) {
         style = styles.getDefault();
-      }
-      else {
+      } else {
         style = styles.getStyle(geometryType);
       }
     }
     return style;
   }
   /**
-	 * Get the feature table default styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.Styles} table styles or null
-	 */
-  getTableStyles(featureTable) {
-    var styles = null;
-    var id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
+   * Get the feature table default styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.Styles} table styles or null
+   */
+  getTableStyles(featureTable: string | FeatureTable): Styles {
+    let styles = null;
+    const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
       styles = this.getStyles(id, this.getTableStyleMappingDao(featureTable));
     }
     return styles;
   }
   /**
-	 * Get the default icon of the feature table
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.IconRow} icon row
-	 */
-  getTableIconDefault(featureTable) {
+   * Get the default icon of the feature table
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.IconRow} icon row
+   */
+  getTableIconDefault(featureTable: string | FeatureTable): IconRow {
     return this.getTableIcon(featureTable, null);
   }
   /**
-	 * Get the icon of the feature table and geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 * @return {module:extension/style.IconRow} icon row
-	 */
-  getTableIcon(featureTable, geometryType) {
-    var icon = null;
-    var icons = this.getTableIcons(featureTable);
+   * Get the icon of the feature table and geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   * @return {module:extension/style.IconRow} icon row
+   */
+  getTableIcon(featureTable: string | FeatureTable, geometryType: string): IconRow {
+    let icon = null;
+    const icons = this.getTableIcons(featureTable);
     if (icons !== null) {
       if (geometryType === null) {
         icon = icons.getDefault();
-      }
-      else {
+      } else {
         icon = icons.getIcon(geometryType);
       }
     }
     return icon;
   }
   /**
-	 * Get the feature table default icons
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {module:extension/style.Icons} table icons or null
-	 */
-  getTableIcons(featureTable) {
-    var icons = null;
-    var id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
+   * Get the feature table default icons
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {module:extension/style.Icons} table icons or null
+   */
+  getTableIcons(featureTable: string | FeatureTable): Icons {
+    let icons = null;
+    const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
       icons = this.getIcons(id, this.getTableIconMappingDao(featureTable));
     }
     return icons;
   }
   /**
-	 * Gets Icons for featureId and mappingDao
-	 * @param {Number} featureId
-	 * @param mappingDao
-	 * @returns {module:extension/style.Icons}
-	 * @private
-	 */
-  getIcons(featureId, mappingDao) {
-    var icons = new Icons();
+   * Gets Icons for featureId and mappingDao
+   * @param {Number} featureId
+   * @param mappingDao
+   * @returns {module:extension/style.Icons}
+   * @private
+   */
+  getIcons(featureId: number, mappingDao: StyleMappingDao): Icons {
+    let icons = new Icons();
     if (mappingDao !== null) {
-      var iconDao = this.getIconDao();
-      var styleMappingRows = mappingDao.queryByBaseId(featureId);
-      for (var i = 0; i < styleMappingRows.length; i++) {
-        var styleMappingRow = mappingDao.createObject(styleMappingRows[i]);
-        var iconRow = iconDao.queryForId(styleMappingRow.getRelatedId());
+      const iconDao = this.getIconDao();
+      const styleMappingRows = mappingDao.queryByBaseId(featureId);
+      for (let i = 0; i < styleMappingRows.length; i++) {
+        const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
+        const iconRow = iconDao.queryForId(styleMappingRow.getRelatedId());
         if (styleMappingRow.getGeometryTypeName() === null) {
           icons.setDefault(iconRow);
-        }
-        else {
+        } else {
           icons.setIcon(iconRow, styleMappingRow.getGeometryTypeName());
         }
       }
@@ -519,23 +648,22 @@ export class FeatureStyleExtension extends BaseExtension {
     return icons;
   }
   /**
-	 * Gets Styles for featureId and mappingDao
-	 * @param {Number} featureId
-	 * @param {module:extension/style.StyleMappingDao} mappingDao
-	 * @returns {module:extension/style.Styles}
-	 */
-  getStyles(featureId, mappingDao) {
-    var styles = new Styles();
+   * Gets Styles for featureId and mappingDao
+   * @param {Number} featureId
+   * @param {module:extension/style.StyleMappingDao} mappingDao
+   * @returns {module:extension/style.Styles}
+   */
+  getStyles(featureId: number, mappingDao: StyleMappingDao): Styles {
+    let styles = new Styles();
     if (mappingDao !== null) {
-      var styleDao = this.getStyleDao();
-      var styleMappingRows = mappingDao.queryByBaseId(featureId);
-      for (var i = 0; i < styleMappingRows.length; i++) {
-        var styleMappingRow = mappingDao.createObject(styleMappingRows[i]);
-        var styleRow = styleDao.queryForId(styleMappingRow.getRelatedId());
+      const styleDao = this.getStyleDao();
+      const styleMappingRows = mappingDao.queryByBaseId(featureId);
+      for (let i = 0; i < styleMappingRows.length; i++) {
+        const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
+        const styleRow = styleDao.queryForId(styleMappingRow.getRelatedId());
         if (styleMappingRow.getGeometryTypeName() === null) {
           styles.setDefault(styleRow);
-        }
-        else {
+        } else {
           styles.setStyle(styleRow, styleMappingRow.getGeometryTypeName());
         }
       }
@@ -546,96 +674,102 @@ export class FeatureStyleExtension extends BaseExtension {
     return styles;
   }
   /**
-	 * Get the feature styles for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @return {module:extension/style.FeatureStyles} feature styles or null
-	 */
-  getFeatureStylesForFeatureRow(featureRow) {
+   * Get the feature styles for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @return {module:extension/style.FeatureStyles} feature styles or null
+   */
+  getFeatureStylesForFeatureRow(featureRow: FeatureRow): FeatureStyles {
     return this.getFeatureStyles(featureRow.featureTable, featureRow.getId());
   }
   /**
-	 * Get the feature styles for the feature row
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @return {module:extension/style.FeatureStyles} feature styles or null
-	 */
-  getFeatureStyles(featureTable, featureId) {
-    var styles = this.getStyles(featureId, this.getStyleMappingDao(featureTable));
-    var icons = this.getIcons(featureId, this.getIconMappingDao(featureTable));
-    var featureStyles = null;
+   * Get the feature styles for the feature row
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @return {module:extension/style.FeatureStyles} feature styles or null
+   */
+  getFeatureStyles(featureTable: string | FeatureTable, featureId: number): FeatureStyles {
+    const styles = this.getStyles(featureId, this.getStyleMappingDao(featureTable));
+    const icons = this.getIcons(featureId, this.getIconMappingDao(featureTable));
+    let featureStyles = null;
     if (styles !== null || icons !== null) {
       featureStyles = new FeatureStyles(styles, icons);
     }
     return featureStyles;
   }
   /**
-	 * Get the styles for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @return {module:extension/style.Styles} styles or null
-	 */
-  getStylesForFeatureRow(featureRow) {
+   * Get the styles for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @return {module:extension/style.Styles} styles or null
+   */
+  getStylesForFeatureRow(featureRow: FeatureRow): Styles {
     return this.getStyles(featureRow.getId(), this.getStyleMappingDao(featureRow.featureTable.table_name));
   }
   /**
-	 * Get the styles for the feature id
-	 * @param {String} tableName table name
-	 * @param {Number} featureId feature id
-	 * @return {module:extension/style.Styles} styles or null
-	 */
-  getStylesForFeatureId(tableName, featureId) {
+   * Get the styles for the feature id
+   * @param {String} tableName table name
+   * @param {Number} featureId feature id
+   * @return {module:extension/style.Styles} styles or null
+   */
+  getStylesForFeatureId(tableName: string, featureId: number): Styles {
     return this.getStyles(featureId, this.getStyleMappingDao(tableName));
   }
   /**
-	 * Get the icons for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @return {module:extension/style.Icons} icons or null
-	 */
-  getIconsForFeatureRow(featureRow) {
+   * Get the icons for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @return {module:extension/style.Icons} icons or null
+   */
+  getIconsForFeatureRow(featureRow: FeatureRow): Icons {
     return this.getIcons(featureRow.getId(), this.getIconMappingDao(featureRow.featureTable.table_name));
   }
   /**
-	 * Get the icons for the feature id
-	 * @param {String} tableName table name
-	 * @param {Number} featureId feature id
-	 * @return {module:extension/style.Icons} icons or null
-	 */
-  getIconsForFeatureId(tableName, featureId) {
+   * Get the icons for the feature id
+   * @param {String} tableName table name
+   * @param {Number} featureId feature id
+   * @return {module:extension/style.Icons} icons or null
+   */
+  getIconsForFeatureId(tableName: string, featureId: number): Icons {
     return this.getIcons(featureId, this.getIconMappingDao(tableName));
   }
   /**
-	 * Get the feature style (style and icon) of the feature row, searching in
-	 * order: feature geometry type style or icon, feature default style or
-	 * icon, table geometry type style or icon, table default style or icon
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @return {module:extension/style.FeatureStyle} feature style
-	 */
-  getFeatureStyleForFeatureRow(featureRow) {
-    return new FeatureStyle(this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true), this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true));
+   * Get the feature style (style and icon) of the feature row, searching in
+   * order: feature geometry type style or icon, feature default style or
+   * icon, table geometry type style or icon, table default style or icon
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @return {module:extension/style.FeatureStyle} feature style
+   */
+  getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
+    return new FeatureStyle(
+      this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true),
+      this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true),
+    );
   }
   /**
-	 * Get the feature style (style and icon) of the feature, searching in
-	 * order: feature geometry type style or icon, feature default style or
-	 * icon, table geometry type style or icon, table default style or icon
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @return {module:extension/style.FeatureStyle} feature style
-	 */
-  getFeatureStyleDefault(featureRow) {
-    return new FeatureStyle(this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), null, true), this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), null, true));
+   * Get the feature style (style and icon) of the feature, searching in
+   * order: feature geometry type style or icon, feature default style or
+   * icon, table geometry type style or icon, table default style or icon
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @return {module:extension/style.FeatureStyle} feature style
+   */
+  getFeatureStyleDefault(featureRow: FeatureRow): FeatureStyle {
+    return new FeatureStyle(
+      this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), null, true),
+      this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), null, true),
+    );
   }
   /**
-	 * Get the icon of the feature, searching in order: feature geometry type
-	 * icon, feature default icon, when tableIcon enabled continue searching:
-	 * table geometry type icon, table default icon
-	 * @param {module:features/user/featureTable|String} featureTable
-	 * @param {Number} featureId
-	 * @param {String} geometryType
-	 * @param {Boolean} tableIcon
-	 * @returns {module:extension/style.IconRow}
-	 * @private
-	 */
-  getIcon(featureTable, featureId, geometryType, tableIcon) {
-    var iconRow = null;
-    var icons = this.getIcons(featureId, this.getIconMappingDao(featureTable));
+   * Get the icon of the feature, searching in order: feature geometry type
+   * icon, feature default icon, when tableIcon enabled continue searching:
+   * table geometry type icon, table default icon
+   * @param {module:features/user/featureTable|String} featureTable
+   * @param {Number} featureId
+   * @param {String} geometryType
+   * @param {Boolean} tableIcon
+   * @returns {module:extension/style.IconRow}
+   * @private
+   */
+  getIcon(featureTable: string | FeatureTable, featureId: number, geometryType: string, tableIcon: boolean): IconRow {
+    let iconRow = null;
+    const icons = this.getIcons(featureId, this.getIconMappingDao(featureTable));
     if (icons !== null) {
       iconRow = icons.getIcon(geometryType);
     }
@@ -645,19 +779,24 @@ export class FeatureStyleExtension extends BaseExtension {
     return iconRow;
   }
   /**
-	 * Get the style of the feature, searching in order: feature geometry type
-	 * style, feature default style, when tableStyle enabled continue searching:
-	 * table geometry type style, table default style
-	 * @param {module:features/user/featureTable|String} featureTable
-	 * @param {Number} featureId
-	 * @param {String} geometryType
-	 * @param {Boolean} tableStyle
-	 * @returns {module:extension/style.StyleRow}
-	 * @private
-	 */
-  getStyle(featureTable, featureId, geometryType, tableStyle) {
-    var styleRow = null;
-    var styles = this.getStyles(featureId, this.getStyleMappingDao(featureTable));
+   * Get the style of the feature, searching in order: feature geometry type
+   * style, feature default style, when tableStyle enabled continue searching:
+   * table geometry type style, table default style
+   * @param {module:features/user/featureTable|String} featureTable
+   * @param {Number} featureId
+   * @param {String} geometryType
+   * @param {Boolean} tableStyle
+   * @returns {module:extension/style.StyleRow}
+   * @private
+   */
+  getStyle(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    geometryType: string,
+    tableStyle: boolean,
+  ): StyleRow {
+    let styleRow = null;
+    const styles = this.getStyles(featureId, this.getStyleMappingDao(featureTable));
     if (styles !== null) {
       styleRow = styles.getStyle(geometryType);
     }
@@ -667,420 +806,576 @@ export class FeatureStyleExtension extends BaseExtension {
     return styleRow;
   }
   /**
-	 * Set the feature table default feature styles
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {module:extension/style.FeatureStyles} featureStyles feature styles
-	 * @return {Promise}
-	 */
-  setTableFeatureStyles(featureTable, featureStyles) {
+   * Set the feature table default feature styles
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {module:extension/style.FeatureStyles} featureStyles feature styles
+   * @return {Promise}
+   */
+  async setTableFeatureStyles(
+    featureTable: string | FeatureTable,
+    featureStyles?: FeatureStyles,
+  ): Promise<{
+    tableStyles: {
+      styleDefault: number;
+      styles: number[];
+    };
+    tableIcons: {
+      iconDefault: number;
+      icons: number[];
+    };
+    deleted?: {
+      styles: number;
+      icons: number;
+    };
+  }> {
     if (featureStyles !== null) {
-      var promises = [];
+      const promises = [];
       promises.push(this.setTableStyles(featureTable, featureStyles.getStyles()));
       promises.push(this.setTableIcons(featureTable, featureStyles.getIcons()));
-      return Promise.all(promises);
-    }
-    else {
-      this.deleteTableFeatureStyles(featureTable);
-      return Promise.resolve();
+      return Promise.all(promises).then(([tableStyles, tableIcons]) => ({
+        tableStyles,
+        tableIcons,
+      }));
+    } else {
+      return {
+        deleted: this.deleteTableFeatureStyles(featureTable),
+        tableStyles: undefined,
+        tableIcons: undefined,
+      };
     }
   }
   /**
-	 * Set the feature table default styles
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {module:extension/style.Styles} styles default styles
-	 * @return {Promise}
-	 */
-  setTableStyles(featureTable, styles) {
-    // var tableName = featureTable.table_name ? featureTable.table_name : featureTable;
-    this.deleteTableStyles(featureTable);
+   * Set the feature table default styles
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {module:extension/style.Styles} styles default styles
+   * @return {Promise}
+   */
+  async setTableStyles(
+    featureTable: string | FeatureTable,
+    styles?: Styles,
+  ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
+    const deleted = this.deleteTableStyles(featureTable);
     if (styles !== null) {
-      var promises = [];
+      const promises = [];
       if (styles.getDefault() !== null) {
         promises.push(this.setTableStyleDefault(featureTable, styles.getDefault()));
       }
-      var keys = Object.keys(styles.styles);
-      for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        var value = styles.styles[key];
+      const keys = Object.keys(styles.styles);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = styles.styles[key];
         promises.push(this.setTableStyle(featureTable, key, value));
       }
-      return Promise.all(promises);
-    }
-    else {
-      return Promise.resolve();
+      return Promise.all(promises).then(([styleDefault, ...styles]) => ({
+        styleDefault,
+        styles,
+        deleted,
+      }));
     }
   }
   /**
-	 * Set the feature table style default
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setTableStyleDefault(featureTable, style) {
+   * Set the feature table style default
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setTableStyleDefault(featureTable: string | FeatureTable, style: StyleRow): Promise<number> {
     return this.setTableStyle(featureTable, null, style);
   }
   /**
-	 * Set the feature table style for the geometry type
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setTableStyle(featureTable, geometryType, style) {
+   * Set the feature table style for the geometry type
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setTableStyle(featureTable: string | FeatureTable, geometryType: string, style?: StyleRow): Promise<number> {
     this.deleteTableStyle(featureTable, geometryType);
     if (style !== null) {
-      return this.createTableStyleRelationship(featureTable).then(function () {
-        var featureContentsId = this.contentsIdExtension.getOrCreateIdByTableName(this.getFeatureTableName(featureTable));
-        var styleId = this.getOrInsertStyle(style);
-        var mappingDao = this.getTableStyleMappingDao(featureTable);
-        this.insertStyleMapping(mappingDao, featureContentsId.id, styleId, geometryType);
-      }.bind(this));
-    }
-    else {
-      return Promise.resolve();
+      await this.createTableStyleRelationship(featureTable);
+      const featureContentsId = this.contentsIdExtension.getOrCreateIdByTableName(
+        this.getFeatureTableName(featureTable),
+      );
+      const styleId = this.getOrInsertStyle(style);
+      const mappingDao = this.getTableStyleMappingDao(featureTable);
+      return this.insertStyleMapping(mappingDao, featureContentsId.id, styleId, geometryType);
     }
   }
   /**
-	 * Set the feature table default icons
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {module:extension/style.Icons} icons default icons
-	 * @return {Promise}
-	 */
-  setTableIcons(featureTable, icons) {
-    this.deleteTableIcons(featureTable);
+   * Set the feature table default icons
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {module:extension/style.Icons} icons default icons
+   * @return {Promise}
+   */
+  async setTableIcons(
+    featureTable: string | FeatureTable,
+    icons?: Icons,
+  ): Promise<{ iconDefault: number; icons: number[]; deleted: number }> {
+    const deleted = this.deleteTableIcons(featureTable);
     if (icons !== null) {
-      var promises = [];
+      const promises = [];
       if (icons.getDefault() !== null) {
         promises.push(this.setTableIconDefault(featureTable, icons.getDefault()));
       }
-      var keys = Object.keys(icons.icons);
-      for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        var value = icons.icons[key];
+      const keys = Object.keys(icons.icons);
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = icons.icons[key];
         promises.push(this.setTableIcon(featureTable, key, value));
       }
-      return Promise.all(promises);
-    }
-    else {
-      return Promise.resolve();
+      return Promise.all(promises).then(([iconDefault, ...icons]) => ({
+        iconDefault,
+        icons,
+        deleted,
+      }));
     }
   }
   /**
-	 * Set the feature table icon default
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setTableIconDefault(featureTable, icon) {
+   * Set the feature table icon default
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  setTableIconDefault(featureTable: string | FeatureTable, icon?: IconRow): Promise<number> {
     return this.setTableIcon(featureTable, null, icon);
   }
   /**
-	 * Set the feature table icon for the geometry type
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setTableIcon(featureTable, geometryType, icon) {
+   * Set the feature table icon for the geometry type
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setTableIcon(featureTable: string | FeatureTable, geometryType: string, icon?: IconRow): Promise<number> {
     this.deleteTableIcon(featureTable, geometryType);
     if (icon !== null) {
-      return this.createTableIconRelationship(featureTable).then(function () {
-        var featureContentsId = this.contentsIdExtension.getOrCreateIdByTableName(this.getFeatureTableName(featureTable));
-        var iconId = this.getOrInsertIcon(icon);
-        var mappingDao = this.getTableIconMappingDao(featureTable);
-        this.insertStyleMapping(mappingDao, featureContentsId.id, iconId, geometryType);
-      }.bind(this));
-    }
-    else {
-      return Promise.resolve();
+      await this.createTableIconRelationship(featureTable);
+      const featureContentsId = this.contentsIdExtension.getOrCreateIdByTableName(
+        this.getFeatureTableName(featureTable),
+      );
+      const iconId = this.getOrInsertIcon(icon);
+      const mappingDao = this.getTableIconMappingDao(featureTable);
+      return this.insertStyleMapping(mappingDao, featureContentsId.id, iconId, geometryType);
     }
   }
   /**
-	 * Set the feature styles for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.FeatureStyles} featureStyles feature styles
-	 * @return {Promise}
-	 */
-  setFeatureStylesForFeatureRow(featureRow, featureStyles) {
+   * Set the feature styles for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.FeatureStyles} featureStyles feature styles
+   * @return {Promise}
+   */
+  async setFeatureStylesForFeatureRow(
+    featureRow: FeatureRow,
+    featureStyles: FeatureStyles,
+  ): Promise<{
+    styles: { styleDefault: number; styles: number[] };
+    icons: {
+      iconDefault: number;
+      icons: number[];
+      deleted?: {
+        style: number;
+        icon: number;
+      };
+    };
+  }> {
     return this.setFeatureStyles(featureRow.featureTable.table_name, featureRow.getId(), featureStyles);
   }
+
   /**
-	 * Set the feature styles for the feature table and feature id
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.FeatureStyles} featureStyles feature styles
-	 * @return {Promise}
-	 */
-  setFeatureStyles(featureTable, featureId, featureStyles) {
+   * Set the feature styles for the feature table and feature id
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.FeatureStyles} featureStyles feature styles
+   * @return {Promise}
+   */
+  async setFeatureStyles(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    featureStyles?: FeatureStyles,
+  ): Promise<{
+    styles: { styleDefault: number; styles: number[] };
+    icons: { iconDefault: number; icons: number[] };
+    deleted?: {
+      deletedStyles: number;
+      deletedIcons: number;
+    };
+  }> {
     if (featureStyles !== null) {
-      var promises = [];
+      const promises = [];
       promises.push(this.setStyles(featureTable, featureId, featureStyles.getStyles()));
       promises.push(this.setIcons(featureTable, featureId, featureStyles.getIcons()));
-      return Promise.all(promises);
-    }
-    else {
-      this.deleteStyles(featureTable);//, featureId);
-      this.deleteIcons(featureTable);//, featureId);
-      return Promise.resolve();
+      return Promise.all(promises).then(([styles, icons]) => ({
+        styles,
+        icons,
+      }));
+    } else {
+      const deletedStyles = this.deleteStyles(featureTable); //, featureId);
+      const deletedIcons = this.deleteIcons(featureTable); //, featureId);
+      return {
+        styles: undefined,
+        icons: undefined,
+        deleted: {
+          deletedStyles,
+          deletedIcons,
+        },
+      };
     }
   }
   /**
-	 * Set the feature style (style and icon) of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.FeatureStyle} featureStyle feature style
-	 * @return {Promise}
-	 */
-  setFeatureStyleForFeatureRow(featureRow, featureStyle) {
+   * Set the feature style (style and icon) of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.FeatureStyle} featureStyle feature style
+   * @return {Promise}
+   */
+  async setFeatureStyleForFeatureRow(
+    featureRow: FeatureRow,
+    featureStyle: FeatureStyle,
+  ): Promise<{
+    style: number;
+    icon: number;
+    deleted?: {
+      style: number;
+      icon: number;
+    };
+  }> {
     return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), featureStyle);
   }
   /**
-	 * Set the feature style (style and icon) of the feature row for the
-	 * specified geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.FeatureStyle} featureStyle feature style
-	 * @return {Promise}
-	 */
-  setFeatureStyleForFeatureRowAndGeometryType(featureRow, geometryType, featureStyle) {
+   * Set the feature style (style and icon) of the feature row for the
+   * specified geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.FeatureStyle} featureStyle feature style
+   * @return {Promise}
+   */
+  async setFeatureStyleForFeatureRowAndGeometryType(
+    featureRow: FeatureRow,
+    geometryType: string,
+    featureStyle: FeatureStyle,
+  ): Promise<{
+    style: number;
+    icon: number;
+    deleted?: {
+      style: number;
+      icon: number;
+    };
+  }> {
     return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.getId(), geometryType, featureStyle);
   }
   /**
-	 * Set the feature style default (style and icon) of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.FeatureStyle} featureStyle feature style
-	 * @return {Promise}
-	 */
-  setFeatureStyleDefaultForFeatureRow(featureRow, featureStyle) {
+   * Set the feature style default (style and icon) of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.FeatureStyle} featureStyle feature style
+   * @return {Promise}
+   */
+  async setFeatureStyleDefaultForFeatureRow(
+    featureRow: FeatureRow,
+    featureStyle: FeatureStyle,
+  ): Promise<{
+    style: number;
+    icon: number;
+    deleted?: {
+      style: number;
+      icon: number;
+    };
+  }> {
     return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.getId(), null, featureStyle);
   }
   /**
-	 * Set the feature style (style and icon) of the feature
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.FeatureStyle} featureStyle feature style
-	 * @return {Promise}
-	 */
-  async setFeatureStyle(featureTable, featureId, geometryType, featureStyle) {
+   * Set the feature style (style and icon) of the feature
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.FeatureStyle} featureStyle feature style
+   * @return {Promise}
+   */
+  async setFeatureStyle(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    geometryType: string,
+    featureStyle?: FeatureStyle,
+  ): Promise<{
+    style: number;
+    icon: number;
+    deleted?: {
+      style: number;
+      icon: number;
+    };
+  }> {
     if (featureStyle !== null) {
-      var promises = [];
+      const promises = [];
       promises.push(this.setStyle(featureTable, featureId, geometryType, featureStyle.getStyle()));
       promises.push(this.setIcon(featureTable, featureId, geometryType, featureStyle.getIcon()));
-      return Promise.all(promises);
-    }
-    else {
-      this.deleteStyle(featureTable, featureId, geometryType);
-      this.deleteIcon(featureTable, featureId, geometryType);
-      return Promise.resolve();
+      return Promise.all(promises).then(([style, icon]) => ({
+        style,
+        icon,
+      }));
+    } else {
+      return {
+        style: undefined,
+        icon: undefined,
+        deleted: {
+          style: this.deleteStyle(featureTable, featureId, geometryType),
+          icon: this.deleteIcon(featureTable, featureId, geometryType),
+        },
+      };
     }
   }
   /**
-	 * Set the feature style (style and icon) of the feature
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.FeatureStyle} featureStyle feature style
-	 * @return {Promise}
-	 */
-  setFeatureStyleDefault(featureTable, featureId, featureStyle) {
+   * Set the feature style (style and icon) of the feature
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.FeatureStyle} featureStyle feature style
+   * @return {Promise}
+   */
+  async setFeatureStyleDefault(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    featureStyle: FeatureStyle,
+  ): Promise<{
+    style: number;
+    icon: number;
+    deleted?: {
+      style: number;
+      icon: number;
+    };
+  }> {
     return this.setFeatureStyle(featureTable, featureId, null, featureStyle);
   }
   /**
-	 * Set the styles for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.Styles} styles styles
-	 * @return {Promise}
-	 */
-  setStylesForFeatureRow(featureRow, styles) {
+   * Set the styles for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.Styles} styles styles
+   * @return {Promise}
+   */
+  async setStylesForFeatureRow(
+    featureRow: FeatureRow,
+    styles: Styles,
+  ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
     return this.setStyles(featureRow.featureTable.table_name, featureRow.getId(), styles);
   }
   /**
-	 * Set the styles for the feature table and feature id
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.Styles} styles styles
-	 * @return {Promise}
-	 */
-  setStyles(featureTable, featureId, styles) {
-    this.deleteStylesForFeatureId(featureTable, featureId);
+   * Set the styles for the feature table and feature id
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.Styles} styles styles
+   * @return {Promise}
+   */
+  async setStyles(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    styles?: Styles,
+  ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
+    const deleted = this.deleteStylesForFeatureId(featureTable, featureId);
     if (styles !== null) {
-      var promises = [];
+      const promises = [];
       if (styles.getDefault() !== null) {
         promises.push(this.setStyleDefault(featureTable, featureId, styles.getDefault()));
       }
-      var keys = Object.keys(styles.styles);
-      for (var i = 0; i < keys.length; i++) {
+      const keys = Object.keys(styles.styles);
+      for (let i = 0; i < keys.length; i++) {
         promises.push(this.setStyle(featureTable, featureId, keys[i], styles.styles[keys[i]]));
       }
-      return Promise.all(promises);
-    }
-    else {
-      return Promise.resolve();
+      return Promise.all(promises).then(([styleDefault, ...styles]) => ({
+        styleDefault,
+        styles,
+        deleted,
+      }));
+    } else {
+      return {
+        styleDefault: undefined,
+        styles: undefined,
+        deleted,
+      };
     }
   }
   /**
-	 * Set the style of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setStyleForFeatureRow(featureRow, style) {
+   * Set the style of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
     return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), style);
   }
   /**
-	 * Set the style of the feature row for the specified geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setStyleForFeatureRowAndGeometryType(featureRow, geometryType, style) {
+   * Set the style of the feature row for the specified geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setStyleForFeatureRowAndGeometryType(
+    featureRow: FeatureRow,
+    geometryType: string,
+    style: StyleRow,
+  ): Promise<number> {
     return this.setStyle(featureRow.featureTable.table_name, featureRow.getId(), geometryType, style);
   }
   /**
-	 * Set the default style of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setStyleDefaultForFeatureRow(featureRow, style) {
+   * Set the default style of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
     return this.setStyle(featureRow.featureTable.table_name, featureRow.getId(), null, style);
   }
   /**
-	 * Set the style of the feature
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setStyle(featureTable, featureId, geometryType, style) {
+   * Set the style of the feature
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setStyle(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    geometryType: string,
+    style: StyleRow,
+  ): Promise<number> {
     this.deleteStyle(featureTable, featureId, geometryType);
     if (style !== null) {
-      return this.createStyleRelationship(featureTable).then(function () {
-        var styleId = this.getOrInsertStyle(style);
-        var mappingDao = this.getStyleMappingDao(featureTable);
-        this.insertStyleMapping(mappingDao, featureId, styleId, geometryType);
-      }.bind(this));
-    }
-    else {
-      return Promise.resolve();
+      await this.createStyleRelationship(featureTable);
+      const styleId = this.getOrInsertStyle(style);
+      const mappingDao = this.getStyleMappingDao(featureTable);
+      return this.insertStyleMapping(mappingDao, featureId, styleId, geometryType);
     }
   }
   /**
-	 * Set the default style of the feature
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Promise}
-	 */
-  setStyleDefault(featureTable, featureId, style) {
+   * Set the default style of the feature
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Promise}
+   */
+  async setStyleDefault(featureTable: string | FeatureTable, featureId: number, style: StyleRow): Promise<number> {
     return this.setStyle(featureTable, featureId, null, style);
   }
   /**
-	 * Set the icons for the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.Icons} icons icons
-	 * @return {Promise}
-	 */
-  setIconsForFeatureRow(featureRow, icons) {
+   * Set the icons for the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.Icons} icons icons
+   * @return {Promise}
+   */
+  async setIconsForFeatureRow(
+    featureRow: FeatureRow,
+    icons: Icons,
+  ): Promise<{ iconDefault: number; icons: number[]; deleted: number }> {
     return this.setIcons(featureRow.featureTable.table_name, featureRow.getId(), icons);
   }
   /**
-	 * Set the icons for the feature table and feature id
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.Icons} icons icons
-	 * @return {Promise}
-	 */
-  setIcons(featureTable, featureId, icons) {
-    this.deleteIconsForFeatureId(featureTable, featureId);
+   * Set the icons for the feature table and feature id
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.Icons} icons icons
+   * @return {Promise}
+   */
+  async setIcons(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    icons?: Icons,
+  ): Promise<{ iconDefault: number; icons: number[]; deleted: number }> {
+    const deleted = this.deleteIconsForFeatureId(featureTable, featureId);
     if (icons !== null) {
-      var promises = [];
+      const promises = [];
       if (icons.getDefault() !== null) {
         promises.push(this.setIconDefault(featureTable, featureId, icons.getDefault()));
       }
-      var keys = Object.keys(icons.icons);
-      for (var i = 0; i < keys.length; i++) {
+      const keys = Object.keys(icons.icons);
+      for (let i = 0; i < keys.length; i++) {
         promises.push(this.setIcon(featureTable, featureId, keys[i], icons.icons[keys[i]]));
       }
-      return Promise.all(promises);
-    }
-    else {
-      return Promise.resolve();
+      return Promise.all(promises).then(([iconDefault, ...icons]) => ({
+        iconDefault,
+        icons,
+        deleted,
+      }));
+    } else {
+      return {
+        iconDefault: undefined,
+        icons: undefined,
+        deleted,
+      };
     }
   }
   /**
-	 * Set the icon of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setIconForFeatureRow(featureRow, icon) {
+   * Set the icon of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
     return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), icon);
   }
   /**
-	 * Set the icon of the feature row for the specified geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setIconForFeatureRowAndGeometryType(featureRow, geometryType, icon) {
+   * Set the icon of the feature row for the specified geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setIconForFeatureRowAndGeometryType(
+    featureRow: FeatureRow,
+    geometryType: string,
+    icon: IconRow,
+  ): Promise<number> {
     return this.setIcon(featureRow.featureTable.table_name, featureRow.getId(), geometryType, icon);
   }
   /**
-	 * Set the default icon of the feature row
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setIconDefaultForFeatureRow(featureRow, icon) {
+   * Set the default icon of the feature row
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
     return this.setIcon(featureRow.featureTable.table_name, featureRow.getId(), null, icon);
   }
   /**
-	 * Get the icon of the feature, searching in order: feature geometry type
-	 * icon, feature default icon, table geometry type icon, table default icon
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setIcon(featureTable, featureId, geometryType, icon) {
+   * Get the icon of the feature, searching in order: feature geometry type
+   * icon, feature default icon, table geometry type icon, table default icon
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setIcon(
+    featureTable: string | FeatureTable,
+    featureId: number,
+    geometryType: string,
+    icon?: IconRow,
+  ): Promise<number> {
     this.deleteIcon(featureTable, featureId, geometryType);
     if (icon !== null) {
-      return this.createIconRelationship(featureTable).then(function () {
-        var iconId = this.getOrInsertIcon(icon);
-        var mappingDao = this.getIconMappingDao(featureTable);
-        this.insertStyleMapping(mappingDao, featureId, iconId, geometryType);
-      }.bind(this));
-    }
-    else {
-      return Promise.resolve();
+      await this.createIconRelationship(featureTable);
+      const iconId = this.getOrInsertIcon(icon);
+      const mappingDao = this.getIconMappingDao(featureTable);
+      return this.insertStyleMapping(mappingDao, featureId, iconId, geometryType);
     }
   }
   /**
-	 * Set the default icon of the feature
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Promise}
-	 */
-  setIconDefault(featureTable, featureId, icon) {
+   * Set the default icon of the feature
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Promise}
+   */
+  async setIconDefault(featureTable: string | FeatureTable, featureId: number, icon: IconRow): Promise<number> {
     return this.setIcon(featureTable, featureId, null, icon);
   }
   /**
-	 * Get the style id, either from the existing style or by inserting a new one
-	 * @param {module:extension/style.StyleRow} style style row
-	 * @return {Number} style id
-	 */
-  getOrInsertStyle(style) {
-    var styleId;
+   * Get the style id, either from the existing style or by inserting a new one
+   * @param {module:extension/style.StyleRow} style style row
+   * @return {Number} style id
+   */
+  getOrInsertStyle(style: StyleRow): number {
+    let styleId;
     if (style.hasId()) {
       styleId = style.getId();
-    }
-    else {
-      var styleDao = this.getStyleDao();
+    } else {
+      const styleDao = this.getStyleDao();
       if (styleDao !== null) {
         styleId = styleDao.create(style);
         style.setId(styleId);
@@ -1089,17 +1384,16 @@ export class FeatureStyleExtension extends BaseExtension {
     return styleId;
   }
   /**
-	 * Get the icon id, either from the existing icon or by inserting a new one
-	 * @param {module:extension/style.IconRow} icon icon row
-	 * @return {Number} icon id
-	 */
-  getOrInsertIcon(icon) {
-    var iconId;
+   * Get the icon id, either from the existing icon or by inserting a new one
+   * @param {module:extension/style.IconRow} icon icon row
+   * @return {Number} icon id
+   */
+  getOrInsertIcon(icon: IconRow): number {
+    let iconId;
     if (icon.hasId()) {
       iconId = icon.getId();
-    }
-    else {
-      var iconDao = this.getIconDao();
+    } else {
+      const iconDao = this.getIconDao();
       if (iconDao != null) {
         iconId = iconDao.create(icon);
         icon.setId(iconId);
@@ -1108,198 +1402,241 @@ export class FeatureStyleExtension extends BaseExtension {
     return iconId;
   }
   /**
-	 * Insert a style mapping row
-	 * @param {module:extension/style.StyleMappingDao} mappingDao mapping dao
-	 * @param {Number} baseId base id, either contents id or feature id
-	 * @param {Number} relatedId related id, either style or icon id
-	 * @param {String} geometryType geometry type or null
-	 */
-  insertStyleMapping(mappingDao, baseId, relatedId, geometryType) {
-    var row = mappingDao.newRow();
+   * Insert a style mapping row
+   * @param {module:extension/style.StyleMappingDao} mappingDao mapping dao
+   * @param {Number} baseId base id, either contents id or feature id
+   * @param {Number} relatedId related id, either style or icon id
+   * @param {String} geometryType geometry type or null
+   */
+  insertStyleMapping(mappingDao: StyleMappingDao, baseId: number, relatedId: number, geometryType?: string): number {
+    const row = mappingDao.newRow();
     row.setBaseId(baseId);
     row.setRelatedId(relatedId);
     row.setGeometryTypeName(geometryType);
-    mappingDao.create(row);
+    return mappingDao.create(row);
   }
   /**
-	 * Delete all feature styles including table styles, table icons, style, and icons
-	 * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-	 */
-  deleteAllFeatureStyles(featureTable) {
-    this.deleteTableFeatureStyles(featureTable);
-    this.deleteFeatureStyles(featureTable);
+   * Delete all feature styles including table styles, table icons, style, and icons
+   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   */
+  deleteAllFeatureStyles(
+    featureTable: string | FeatureTable,
+  ): {
+    tableStyles: {
+      styles: number;
+      icons: number;
+    };
+    styles: {
+      styles: number;
+      icons: number;
+    };
+  } {
+    return {
+      tableStyles: this.deleteTableFeatureStyles(featureTable),
+      styles: this.deleteFeatureStyles(featureTable),
+    };
   }
   /**
-	 * Delete all styles including table styles and feature row style
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteAllStyles(featureTable) {
-    this.deleteTableStyles(featureTable);
-    this.deleteStyles(featureTable);
+   * Delete all styles including table styles and feature row style
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteAllStyles(
+    featureTable: string | FeatureTable,
+  ): {
+    tableStyles: number;
+    styles: number;
+  } {
+    return {
+      tableStyles: this.deleteTableStyles(featureTable),
+      styles: this.deleteStyles(featureTable),
+    };
   }
   /**
-	 * Delete all icons including table icons and feature row icons
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteAllIcons(featureTable) {
-    this.deleteTableIcons(featureTable);
-    this.deleteIcons(featureTable);
+   * Delete all icons including table icons and feature row icons
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteAllIcons(
+    featureTable: string | FeatureTable,
+  ): {
+    tableIcons: number;
+    icons: number;
+  } {
+    return {
+      tableIcons: this.deleteTableIcons(featureTable),
+      icons: this.deleteIcons(featureTable),
+    };
   }
   /**
-	 * Delete the feature table feature styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableFeatureStyles(featureTable) {
-    this.deleteTableStyles(featureTable);
-    this.deleteTableIcons(featureTable);
+   * Delete the feature table feature styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableFeatureStyles(
+    featureTable: string | FeatureTable,
+  ): {
+    styles: number;
+    icons: number;
+  } {
+    return {
+      styles: this.deleteTableStyles(featureTable),
+      icons: this.deleteTableIcons(featureTable),
+    };
   }
   /**
-	 * Delete the feature table styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableStyles(featureTable) {
-    this.deleteTableMappings(this.getTableStyleMappingDao(featureTable), featureTable);
+   * Delete the feature table styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableStyles(featureTable: string | FeatureTable): number {
+    return this.deleteTableMappings(this.getTableStyleMappingDao(featureTable), featureTable);
   }
   /**
-	 * Delete the feature table default style
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableStyleDefault(featureTable) {
-    this.deleteTableStyle(featureTable, null);
+   * Delete the feature table default style
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableStyleDefault(featureTable: string | FeatureTable): number {
+    return this.deleteTableStyle(featureTable, null);
   }
   /**
-	 * Delete the feature table style for the geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 */
-  deleteTableStyle(featureTable, geometryType) {
-    this.deleteTableMapping(this.getTableStyleMappingDao(featureTable), featureTable, geometryType);
+   * Delete the feature table style for the geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   */
+  deleteTableStyle(featureTable: string | FeatureTable, geometryType: string): number {
+    return this.deleteTableMapping(this.getTableStyleMappingDao(featureTable), featureTable, geometryType);
   }
   /**
-	 * Delete the feature table icons
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableIcons(featureTable) {
-    this.deleteTableMappings(this.getTableIconMappingDao(featureTable), featureTable);
+   * Delete the feature table icons
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableIcons(featureTable: string | FeatureTable): number {
+    return this.deleteTableMappings(this.getTableIconMappingDao(featureTable), featureTable);
   }
   /**
-	 * Delete the feature table default icon
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableIconDefault(featureTable) {
-    this.deleteTableIcon(featureTable, null);
+   * Delete the feature table default icon
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableIconDefault(featureTable: string | FeatureTable): number {
+    return this.deleteTableIcon(featureTable, null);
   }
   /**
-	 * Delete the feature table icon for the geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 */
-  deleteTableIcon(featureTable, geometryType) {
-    this.deleteTableMapping(this.getTableIconMappingDao(featureTable), featureTable, geometryType);
+   * Delete the feature table icon for the geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   */
+  deleteTableIcon(featureTable: string | FeatureTable, geometryType: string): number {
+    return this.deleteTableMapping(this.getTableIconMappingDao(featureTable), featureTable, geometryType);
   }
   /**
-	 * Delete the table style mappings
-	 * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteTableMappings(mappingDao, featureTable) {
+   * Delete the table style mappings
+   * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteTableMappings(mappingDao: StyleMappingDao, featureTable: string | FeatureTable): number {
     if (mappingDao !== null) {
-      var featureContentsId = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
+      const featureContentsId = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
       if (featureContentsId !== null) {
-        mappingDao.deleteByBaseId(featureContentsId);
+        return mappingDao.deleteByBaseId(featureContentsId);
       }
     }
+    return 0;
   }
   /**
-	 * Delete the table style mapping with the geometry type value
-	 * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {String} geometryType geometry type
-	 */
-  deleteTableMapping(mappingDao, featureTable, geometryType) {
+   * Delete the table style mapping with the geometry type value
+   * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {String} geometryType geometry type
+   */
+  deleteTableMapping(mappingDao: StyleMappingDao, featureTable: string | FeatureTable, geometryType: string): number {
     if (mappingDao !== null) {
-      var featureContentsId = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
+      const featureContentsId = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
       if (featureContentsId !== null) {
-        mappingDao.deleteByBaseIdAndGeometryType(featureContentsId, geometryType);
+        return mappingDao.deleteByBaseIdAndGeometryType(featureContentsId, geometryType);
       }
     }
+    return 0;
   }
   /**
-	 * Delete all feature styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteFeatureStyles(featureTable) {
-    this.deleteStyles(featureTable);
-    this.deleteIcons(featureTable);
+   * Delete all feature styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteFeatureStyles(
+    featureTable: string | FeatureTable,
+  ): {
+    styles: number;
+    icons: number;
+  } {
+    return {
+      styles: this.deleteStyles(featureTable),
+      icons: this.deleteIcons(featureTable),
+    };
   }
   /**
-	 * Delete all styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteStyles(featureTable) {
-    this.deleteMappings(this.getStyleMappingDao(featureTable));
+   * Delete all styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteStyles(featureTable: string | FeatureTable): number {
+    return this.deleteMappings(this.getStyleMappingDao(featureTable));
   }
   /**
-	 * Delete feature row styles
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteStylesForFeatureRow(featureRow) {
-    this.deleteStylesForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
+   * Delete feature row styles
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteStylesForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteStylesForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
   }
   /**
-	 * Delete feature row styles
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 */
-  deleteStylesForFeatureId(featureTable, featureId) {
-    this.deleteMappingsForFeatureId(this.getStyleMappingDao(featureTable), featureId);
+   * Delete feature row styles
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   */
+  deleteStylesForFeatureId(featureTable: string | FeatureTable, featureId: number): number {
+    return this.deleteMappingsForFeatureId(this.getStyleMappingDao(featureTable), featureId);
   }
   /**
-	 * Delete the feature row default style
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteStyleDefaultForFeatureRow(featureRow) {
-    this.deleteStyleForFeatureRowAndGeometryType(featureRow, null);
+   * Delete the feature row default style
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteStyleDefaultForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, null);
   }
   /**
-	 * Delete the feature row default style
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 */
-  deleteStyleDefault(featureTable, featureId) {
-    this.deleteStyle(featureTable, featureId, null);
+   * Delete the feature row default style
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   */
+  deleteStyleDefault(featureTable: string | FeatureTable, featureId: number): number {
+    return this.deleteStyle(featureTable, featureId, null);
   }
   /**
-	 * Delete the feature row style for the feature row geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteStyleForFeatureRow(featureRow) {
-    this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+   * Delete the feature row style for the feature row geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteStyleForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
-	 * Delete the feature row style for the geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {String} geometryType geometry type
-	 */
-  deleteStyleForFeatureRowAndGeometryType(featureRow, geometryType) {
-    this.deleteStyle(featureRow.featureTable, featureRow.getId(), geometryType);
+   * Delete the feature row style for the geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {String} geometryType geometry type
+   */
+  deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+    return this.deleteStyle(featureRow.featureTable, featureRow.getId(), geometryType);
   }
   /**
-	 * Delete the feature row style for the geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 */
-  deleteStyle(featureTable, featureId, geometryType) {
-    this.deleteMapping(this.getStyleMappingDao(featureTable), featureId, geometryType);
+   * Delete the feature row style for the geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   */
+  deleteStyle(featureTable: string | FeatureTable, featureId: number, geometryType: string): number {
+    return this.deleteMapping(this.getStyleMappingDao(featureTable), featureId, geometryType);
   }
   /**
    * Delete the style row and associated mappings by style row
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {module:extension/style.StyleRow} styleRow style row
    */
-  deleteStyleAndMappingsByStyleRow (featureTable, styleRow) {
-    this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.getId())
+  deleteStyleAndMappingsByStyleRow(featureTable: string | FeatureTable, styleRow: StyleRow): number {
+    return this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.getId());
   }
 
   /**
@@ -1307,79 +1644,79 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {Number} styleRowId style row id
    */
-  deleteStyleAndMappingsByStyleRowId(featureTable, styleRowId) {
-    this.getStyleDao().deleteById(styleRowId)
-    this.getStyleMappingDao(featureTable).deleteByRelatedId(styleRowId)
-    this.getTableStyleMappingDao(featureTable).deleteByRelatedId(styleRowId)
+  deleteStyleAndMappingsByStyleRowId(featureTable: string | FeatureTable, styleRowId: number): number {
+    this.getStyleDao().deleteById(styleRowId);
+    this.getStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
+    return this.getTableStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
   }
   /**
-	 * Delete all icons
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 */
-  deleteIcons(featureTable) {
-    this.deleteMappings(this.getIconMappingDao(featureTable));
+   * Delete all icons
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   */
+  deleteIcons(featureTable: string | FeatureTable): number {
+    return this.deleteMappings(this.getIconMappingDao(featureTable));
   }
   /**
-	 * Delete feature row icons
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteIconsForFeatureRow(featureRow) {
-    this.deleteIconsForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
+   * Delete feature row icons
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteIconsForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteIconsForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
   }
   /**
-	 * Delete feature row icons
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 */
-  deleteIconsForFeatureId(featureTable, featureId) {
-    this.deleteMappingsForFeatureId(this.getIconMappingDao(featureTable), featureId);
+   * Delete feature row icons
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   */
+  deleteIconsForFeatureId(featureTable: string | FeatureTable, featureId: number): number {
+    return this.deleteMappingsForFeatureId(this.getIconMappingDao(featureTable), featureId);
   }
   /**
-	 * Delete the feature row default icon
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteIconDefaultForFeatureRow(featureRow) {
-    this.deleteIconDefault(featureRow.featureTable.table_name, featureRow.getId());
+   * Delete the feature row default icon
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteIconDefaultForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteIconDefault(featureRow.featureTable.table_name, featureRow.getId());
   }
   /**
-	 * Delete the feature row default icon
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 */
-  deleteIconDefault(featureTable, featureId) {
-    this.deleteIcon(featureTable, featureId, null);
+   * Delete the feature row default icon
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   */
+  deleteIconDefault(featureTable: FeatureTable | string, featureId: number): number {
+    return this.deleteIcon(featureTable, featureId, null);
   }
   /**
-	 * Delete the feature row icon for the feature row geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 */
-  deleteIconForFeatureRow(featureRow) {
-    this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+   * Delete the feature row icon for the feature row geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   */
+  deleteIconForFeatureRow(featureRow: FeatureRow): number {
+    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
-	 * Delete the feature row icon for the geometry type
-	 * @param {module:features/user/featureRow} featureRow feature row
-	 * @param {String} geometryType geometry type
-	 */
-  deleteIconForFeatureRowAndGeometryType(featureRow, geometryType) {
-    this.deleteIcon(featureRow.featureTable, featureRow.getId(), geometryType);
+   * Delete the feature row icon for the geometry type
+   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {String} geometryType geometry type
+   */
+  deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+    return this.deleteIcon(featureRow.featureTable, featureRow.getId(), geometryType);
   }
   /**
-	 * Delete the feature row icon for the geometry type
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 */
-  deleteIcon(featureTable, featureId, geometryType) {
-    this.deleteMapping(this.getIconMappingDao(featureTable), featureId, geometryType);
+   * Delete the feature row icon for the geometry type
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   */
+  deleteIcon(featureTable: FeatureTable | string, featureId: number, geometryType: string): number {
+    return this.deleteMapping(this.getIconMappingDao(featureTable), featureId, geometryType);
   }
   /**
    * Delete the icon row and associated mappings by icon row
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {module:extension/style.IconRow} iconRow icon row
    */
-  deleteIconAndMappingsByIconRow(featureTable, iconRow) {
-    this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.getId())
+  deleteIconAndMappingsByIconRow(featureTable: FeatureTable | string, iconRow: IconRow): number {
+    return this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.getId());
   }
 
   /**
@@ -1387,110 +1724,114 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {Number} iconRowId icon row id
    */
-  deleteIconAndMappingsByIconRowId(featureTable, iconRowId) {
-    this.getIconDao().deleteById(iconRowId)
-    this.getIconMappingDao(featureTable).deleteByRelatedId(iconRowId)
-    this.getTableIconMappingDao(featureTable).deleteByRelatedId(iconRowId)
+  deleteIconAndMappingsByIconRowId(featureTable: FeatureTable | string, iconRowId: number): number {
+    this.getIconDao().deleteById(iconRowId);
+    this.getIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
+    return this.getTableIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
   }
   /**
-	 * Delete all style mappings
-	 * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
-	 */
-  deleteMappings(mappingDao) {
+   * Delete all style mappings
+   * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
+   */
+  deleteMappings(mappingDao?: StyleMappingDao): number {
     if (mappingDao !== null) {
-      mappingDao.deleteAll();
+      return mappingDao.deleteAll();
     }
+    return 0;
   }
   /**
-	 * Delete the style mappings
-	 * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
-	 * @param {Number} featureId feature id
-	 */
-  deleteMappingsForFeatureId(mappingDao, featureId) {
+   * Delete the style mappings
+   * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {Number} featureId feature id
+   */
+  deleteMappingsForFeatureId(mappingDao?: StyleMappingDao, featureId?: number): number {
+    if (mappingDao !== null && featureId) {
+      return mappingDao.deleteByBaseId(featureId);
+    }
+    return 0;
+  }
+  /**
+   * Delete the style mapping with the geometry type value
+   * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {Number} featureId feature id
+   * @param {String} geometryType geometry type
+   */
+  deleteMapping(mappingDao?: StyleMappingDao, featureId?: number, geometryType?: string): number {
     if (mappingDao !== null) {
-      mappingDao.deleteByBaseId(featureId);
+      return mappingDao.deleteByBaseIdAndGeometryType(featureId, geometryType);
     }
+    return 0;
   }
   /**
-	 * Delete the style mapping with the geometry type value
-	 * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
-	 * @param {Number} featureId feature id
-	 * @param {String} geometryType geometry type
-	 */
-  deleteMapping(mappingDao, featureId, geometryType) {
-    if (mappingDao !== null) {
-      mappingDao.deleteByBaseIdAndGeometryType(featureId, geometryType);
-    }
-  }
-  /**
-	 * Get all the unique style row ids the table maps to
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return style row ids
-	 */
-  getAllTableStyleIds(featureTable) {
-    var styleIds = null;
-    var mappingDao = this.getTableStyleMappingDao(featureTable);
-    if (mappingDao !== null) {
-      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
-    }
-    return styleIds;
-  }
-  /**
-	 * Get all the unique icon row ids the table maps to
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return icon row ids
-	 */
-  getAllTableIconIds(featureTable) {
-    var styleIds = null;
-    var mappingDao = this.getTableIconMappingDao(featureTable);
+   * Get all the unique style row ids the table maps to
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return style row ids
+   */
+  getAllTableStyleIds(featureTable: FeatureTable | string): number[] {
+    let styleIds = null;
+    const mappingDao = this.getTableStyleMappingDao(featureTable);
     if (mappingDao !== null) {
       styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
     }
     return styleIds;
   }
   /**
-	 * Get all the unique style row ids the features map to
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Number[]} style row ids
-	 */
-  getAllStyleIds(featureTable) {
-    var styleIds = null;
-    var mappingDao = this.getStyleMappingDao(featureTable);
+   * Get all the unique icon row ids the table maps to
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return icon row ids
+   */
+  getAllTableIconIds(featureTable: FeatureTable | string): number[] {
+    let styleIds = null;
+    const mappingDao = this.getTableIconMappingDao(featureTable);
     if (mappingDao !== null) {
       styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
     }
     return styleIds;
   }
   /**
-	 * Get all the unique icon row ids the features map to
-	 * @param {module:features/user/featureTable|String} featureTable feature table
-	 * @return {Number[]} icon row ids
-	 */
-  getAllIconIds(featureTable) {
-    var styleIds = null;
-    var mappingDao = this.getIconMappingDao(featureTable);
+   * Get all the unique style row ids the features map to
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Number[]} style row ids
+   */
+  getAllStyleIds(featureTable: FeatureTable | string): number[] {
+    let styleIds = null;
+    const mappingDao = this.getStyleMappingDao(featureTable);
     if (mappingDao !== null) {
       styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
     }
     return styleIds;
   }
   /**
-	 * Get name of feature table
-	 * @param featureTable
-	 * @returns {String}
-	 */
-  getFeatureTableName(featureTable) {
-    return featureTable.table_name ? featureTable.table_name : featureTable;
+   * Get all the unique icon row ids the features map to
+   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @return {Number[]} icon row ids
+   */
+  getAllIconIds(featureTable: FeatureTable | string): number[] {
+    let styleIds = null;
+    const mappingDao = this.getIconMappingDao(featureTable);
+    if (mappingDao !== null) {
+      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
+    }
+    return styleIds;
   }
   /**
-	 * Remove all traces of the extension
-	 */
-  removeExtension() {
+   * Get name of feature table
+   * @param featureTable
+   * @returns {String}
+   */
+  getFeatureTableName(featureTable: FeatureTable | string): string {
+    return featureTable instanceof FeatureTable ? featureTable.table_name : featureTable;
+  }
+  /**
+   * Remove all traces of the extension
+   */
+  removeExtension(): number {
     this.deleteAllRelationships();
     this.geoPackage.deleteTable(StyleTable.TABLE_NAME);
     this.geoPackage.deleteTable(IconTable.TABLE_NAME);
     if (this.extensionsDao.isTableExists()) {
-      this.extensionsDao.deleteByExtension(FeatureStyleExtension.EXTENSION_NAME);
+      return this.extensionsDao.deleteByExtension(FeatureStyleExtension.EXTENSION_NAME);
     }
+    return 0;
   }
 }

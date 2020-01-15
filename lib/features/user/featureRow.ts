@@ -1,14 +1,14 @@
-import {FeatureTable} from "./featureTable";
-import {UserRow} from '../../user/userRow';
-import {FeatureColumn} from './featureColumn';
-import {DataTypes} from '../../db/dataTypes';
-import { GeometryData } from '../../geom/geometryData'
+import { FeatureTable } from './featureTable';
+import { UserRow } from '../../user/userRow';
+import { FeatureColumn } from './featureColumn';
+import { DataTypes } from '../../db/dataTypes';
+import { GeometryData } from '../../geom/geometryData';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * featureRow module.
  * @module features/user/featureRow
  */
-
 
 /**
  * Feature Row containing the values from a single result set row
@@ -17,7 +17,7 @@ import { GeometryData } from '../../geom/geometryData'
  * @param  {Array} values       values
  */
 export class FeatureRow extends UserRow {
-  constructor(public featureTable: FeatureTable, columnTypes?: any[], values?: any[]) {
+  constructor(public featureTable: FeatureTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(featureTable, columnTypes, values);
   }
   /**
@@ -46,8 +46,8 @@ export class FeatureRow extends UserRow {
    * @return {String} geometry data
    */
   getGeometryType(): string {
-    var geometryType = null;
-    var geometry = this.getValueWithIndex(this.featureTable.geometryIndex);
+    let geometryType = null;
+    const geometry = this.getValueWithIndex(this.featureTable.geometryIndex);
     if (geometry !== null) {
       geometryType = geometry.toGeoJSON().type;
     }
@@ -57,24 +57,23 @@ export class FeatureRow extends UserRow {
    * set the geometry
    * @param {Buffer} geometryData geometry data
    */
-  setGeometry(geometryData: GeometryData) {
+  setGeometry(geometryData: GeometryData): void {
     this.setValueWithIndex(this.featureTable.geometryIndex, geometryData);
   }
   toObjectValue(index: number, value: any): any {
-    var objectValue = value;
-    var column = this.getColumnWithIndex(index);
+    let objectValue = value;
+    const column = this.getColumnWithIndex(index);
     if (column instanceof FeatureColumn && column.isGeometry() && value) {
       objectValue = new GeometryData(value);
     }
     return objectValue;
   }
   toDatabaseValue(columnName: string): any {
-    var column = this.getColumnWithColumnName(columnName);
-    var value = this.getValueWithColumnName(columnName);
+    const column = this.getColumnWithColumnName(columnName);
+    const value = this.getValueWithColumnName(columnName);
     if (column instanceof FeatureColumn && column.isGeometry() && value.toData) {
       return value.toData();
-    }
-    else if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
+    } else if (column.dataType === DataTypes.BOOLEAN) {
       return value === true ? 1 : 0;
     }
     return value;

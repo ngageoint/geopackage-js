@@ -2,7 +2,7 @@
  * @module extension/relatedTables
  */
 
-import {ContentsDao} from '../../core/contents/contentsDao';
+import { ContentsDao } from '../../core/contents/contentsDao';
 
 /**
  * Spec supported User-Defined Related Data Tables
@@ -19,7 +19,10 @@ export class RelationType {
    * Relate sets of tabular text or numeric data
    * @type {Object}
    */
-  public static readonly SIMPLE_ATTRIBUTES: RelationType = new RelationType('simple_attributes', ContentsDao.GPKG_CDT_ATTRIBUTES_NAME);
+  public static readonly SIMPLE_ATTRIBUTES: RelationType = new RelationType(
+    'simple_attributes',
+    ContentsDao.GPKG_CDT_ATTRIBUTES_NAME,
+  );
 
   /**
    * Relate features or attributes to multimedia files such as pictures and videos
@@ -31,7 +34,10 @@ export class RelationType {
    * Attribute type relation
    * @type {Object}
    */
-  public static readonly ATTRIBUTES: RelationType = new RelationType('attributes', ContentsDao.GPKG_CDT_ATTRIBUTES_NAME);
+  public static readonly ATTRIBUTES: RelationType = new RelationType(
+    'attributes',
+    ContentsDao.GPKG_CDT_ATTRIBUTES_NAME,
+  );
 
   /**
    * Tile type relation
@@ -39,7 +45,7 @@ export class RelationType {
    */
   public static readonly TILES: RelationType = new RelationType('tiles', ContentsDao.GPKG_CDT_TILES_NAME);
 
-  constructor(public name: string, public dataType: string) { }
+  constructor(public name: string, public dataType: string) {}
   /**
    * Get the relation type from the name
    * @param  {string} name name

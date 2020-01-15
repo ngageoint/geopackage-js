@@ -23,14 +23,14 @@ export class FeatureTilePointIcon {
   /**
    * Pin the icon to the point, lower middle on the point
    */
-  pinIconDefault() {
+  pinIconDefault(): void {
     this.xOffset = this.width / 2.0;
     this.yOffset = this.height;
   }
   /**
    * Center the icon on the point
    */
-  pinIconCenter() {
+  pinIconCenter(): void {
     this.xOffset = this.width / 2.0;
     this.yOffset = this.height / 2.0;
   }
@@ -52,8 +52,8 @@ export class FeatureTilePointIcon {
    * Set the display width and adjust the x offset
    * @param {Number} width icon display width
    */
-  setWidth(width: number) {
-    this.xOffset = this.xOffset / this.width * width;
+  setWidth(width: number): void {
+    this.xOffset = (this.xOffset / this.width) * width;
     this.width = width;
   }
   /**
@@ -67,8 +67,8 @@ export class FeatureTilePointIcon {
    * Set the display height and adjust the y offset
    * @param {Number} height  icon display height
    */
-  setHeight(height: number) {
-    this.yOffset = this.yOffset / this.height * height;
+  setHeight(height: number): void {
+    this.yOffset = (this.yOffset / this.height) * height;
     this.height = height;
   }
   /**
@@ -82,7 +82,7 @@ export class FeatureTilePointIcon {
    * Set the x offset
    * @param {Number} xOffset x offset
    */
-  setXOffset(xOffset: number) {
+  setXOffset(xOffset: number): void {
     this.xOffset = xOffset;
   }
   /**
@@ -96,7 +96,7 @@ export class FeatureTilePointIcon {
    * Set the y offset
    * @param {Number} yOffset y offset
    */
-  setYOffset(yOffset: number) {
+  setYOffset(yOffset: number): void {
     this.yOffset = yOffset;
   }
 }

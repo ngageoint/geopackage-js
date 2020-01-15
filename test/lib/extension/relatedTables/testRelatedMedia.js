@@ -63,21 +63,21 @@ describe('Related Media tests', function() {
     var idColumn = mediaTable.getIdColumn();
     should.exist(idColumn);
     idColumn.name.should.be.equal(MediaTable.COLUMN_ID);
-    idColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_INTEGER);
+    idColumn.dataType.should.be.equal(DataType.INTEGER);
     idColumn.notNull.should.be.equal(true);
     idColumn.primaryKey.should.be.equal(true);
 
     var dataColumn = mediaTable.getDataColumn();
     should.exist(dataColumn);
     dataColumn.name.should.be.equal(MediaTable.COLUMN_DATA);
-    dataColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_BLOB);
+    dataColumn.dataType.should.be.equal(DataType.BLOB);
     dataColumn.notNull.should.be.equal(true);
     dataColumn.primaryKey.should.be.equal(false);
 
     var contentTypeColumn = mediaTable.getContentTypeColumn();
     should.exist(contentTypeColumn);
     contentTypeColumn.name.should.be.equal(MediaTable.COLUMN_CONTENT_TYPE);
-    contentTypeColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_TEXT);
+    contentTypeColumn.dataType.should.be.equal(DataType.TEXT);
     contentTypeColumn.notNull.should.be.equal(true);
     contentTypeColumn.primaryKey.should.be.equal(false);
 
@@ -90,14 +90,14 @@ describe('Related Media tests', function() {
     var baseIdColumn = userMappingTable.getBaseIdColumn();
     should.exist(baseIdColumn);
     baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
-    baseIdColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_INTEGER);
+    baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
     baseIdColumn.notNull.should.be.equal(true);
     baseIdColumn.primaryKey.should.be.equal(false);
 
     var relatedIdColumn = userMappingTable.getRelatedIdColumn();
     should.exist(relatedIdColumn);
     relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
-    relatedIdColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_INTEGER);
+    relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
     relatedIdColumn.notNull.should.be.equal(true);
     relatedIdColumn.primaryKey.should.be.equal(false);
     rte.has(userMappingTable.table_name).should.be.equal(false);

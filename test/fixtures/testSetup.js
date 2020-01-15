@@ -88,13 +88,17 @@ module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
 };
 
-module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
+module.exports.diffCanvas = async function(actualCanvas, expectedTilePath, callback) {
   if (typeof(process) !== 'undefined' && process.version) {
-    ImageUtils.getImage(expectedTilePath).then(img => {
+    return ImageUtils.getImage(expectedTilePath).then(img => {
       var Canvas = require('canvas');
       var expectedCanvas = Canvas.createCanvas(256, 256);
       expectedCanvas.getContext('2d').drawImage(img, 0, 0);
-      callback(null, actualCanvas.toDataURL() === expectedCanvas.toDataURL());
+      let same = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
+      if (callback) {
+        callback(null, same);
+      }
+      return same;
     });
   } else {
     module.exports.loadTile(expectedTilePath, function(err, expectedTile) {
@@ -106,10 +110,16 @@ module.exports.diffCanvas = function(actualCanvas, expectedTilePath, callback) {
         targetImageUrl: 'data:image/png;base64,' + expectedBase64
       })
         .then(function(result) {
-          callback(null, true);
+          if (callback) {
+            callback(null, true);
+          }
+          return true;
         })
         .catch(function(reason) {
-          callback(null, false);
+          if (callback) {
+            callback(null, false);
+          }
+          return false;
         });
     });
   }

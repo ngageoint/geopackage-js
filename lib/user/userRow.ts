@@ -3,25 +3,24 @@
  * @module user/userRow
  */
 
-import {UserTable} from './userTable'
+import { UserTable } from './userTable';
 
-import {DataTypes} from '../db/dataTypes';
+import { DataTypes } from '../db/dataTypes';
 import { UserColumn } from '../..';
 
 export class UserRow {
-
   /**
    * User Row containing the values from a single result row
    * @param table User Table
    * @param columnTypes Column types of this row, based upon the data values
    * @param values Array of the row values
    */
-  constructor(public table: UserTable, public columnTypes?: any, public values?: any) {
+  constructor(public table: UserTable, public columnTypes?: { [key: string]: DataTypes }, public values?: any) {
     if (!this.columnTypes) {
-      var columnCount = this.table.columnCount();
+      const columnCount = this.table.columnCount();
       this.columnTypes = {};
       this.values = {};
-      for (var i = 0; i < columnCount; i++) {
+      for (let i = 0; i < columnCount; i++) {
         this.columnTypes[this.table.columnNames[i]] = this.table.columns[i].dataType;
         this.values[this.table.columnNames[i]] = this.table.columns[i].defaultValue;
       }
@@ -63,7 +62,7 @@ export class UserRow {
    * @return {object}       value
    */
   getValueWithIndex(index: number): any {
-    var value = this.values[this.getColumnNameWithIndex(index)];
+    let value = this.values[this.getColumnNameWithIndex(index)];
     if (value !== undefined) {
       value = this.toObjectValue(index, value);
     }
@@ -75,14 +74,12 @@ export class UserRow {
    * @return {Object}            value
    */
   getValueWithColumnName(columnName: string): any {
-    var value = this.values[columnName];
-    var dataType = this.getRowColumnTypeWithColumnName(columnName);
-    if (value === undefined || value === null)
-      return value;
-    if (dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
+    const value = this.values[columnName];
+    const dataType = this.getRowColumnTypeWithColumnName(columnName);
+    if (value === undefined || value === null) return value;
+    if (dataType === DataTypes.BOOLEAN) {
       return value === 1 ? true : false;
-    }
-    else if (dataType === DataTypes.GPKGDataType.GPKG_DT_BLOB) {
+    } else if (dataType === DataTypes.BLOB) {
       return Buffer.from(value);
     }
     return value;
@@ -93,9 +90,9 @@ export class UserRow {
    * @param value value from the database
    */
   toObjectValue(index: number, value: any): any {
-    var objectValue = value;
-    var column = this.getColumnWithIndex(index);
-    if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN && value) {
+    const objectValue = value;
+    const column = this.getColumnWithIndex(index);
+    if (column.dataType === DataTypes.BOOLEAN && value) {
       return value === 1 ? true : false;
     }
     return objectValue;
@@ -105,9 +102,9 @@ export class UserRow {
    * @param columnName name of the column
    */
   toDatabaseValue(columnName: string): any {
-    var column = this.getColumnWithColumnName(columnName);
-    var value = this.getValueWithColumnName(columnName);
-    if (column.dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
+    const column = this.getColumnWithColumnName(columnName);
+    const value = this.getValueWithColumnName(columnName);
+    if (column.dataType === DataTypes.BOOLEAN) {
       return value === true ? 1 : 0;
     }
     return value;
@@ -172,9 +169,16 @@ export class UserRow {
    * @param {Number} index index
    * @param {object} value value
    */
-  setValueWithIndex(index: number, value: any) {
+  setValueWithIndex(index: number, value: any): void {
     if (index === this.table.pkIndex) {
-      throw new Error('Cannot update the primary key of the row.  Table Name: ' + this.table.table_name + ', Index: ' + index + ', Name: ' + this.table.getPkColumn().name);
+      throw new Error(
+        'Cannot update the primary key of the row.  Table Name: ' +
+          this.table.table_name +
+          ', Index: ' +
+          index +
+          ', Name: ' +
+          this.table.getPkColumn().name,
+      );
     }
     this.setValueWithColumnName(this.getColumnNameWithIndex(index), value);
   }
@@ -183,7 +187,7 @@ export class UserRow {
    * @param {Number} index index
    * @param {Object} value value
    */
-  setValueNoValidationWithIndex(index: number, value: any) {
+  setValueNoValidationWithIndex(index: number, value: any): void {
     this.values[this.getColumnNameWithIndex(index)] = value;
   }
   /**
@@ -191,18 +195,15 @@ export class UserRow {
    * @param {string} columnName column name
    * @param {Object} value      value
    */
-  setValueWithColumnName(columnName: string, value: any) {
-    var dataType = this.getRowColumnTypeWithColumnName(columnName);
-    if (dataType === DataTypes.GPKGDataType.GPKG_DT_BOOLEAN) {
-      value === true ? this.values[columnName] = 1 : this.values[columnName] = 0;
-    }
-    else if (dataType === DataTypes.GPKGDataType.GPKG_DT_DATE) {
+  setValueWithColumnName(columnName: string, value: any): void {
+    const dataType = this.getRowColumnTypeWithColumnName(columnName);
+    if (dataType === DataTypes.BOOLEAN) {
+      value === true ? (this.values[columnName] = 1) : (this.values[columnName] = 0);
+    } else if (dataType === DataTypes.DATE) {
       this.values[columnName] = value.toISOString().slice(0, 10);
-    }
-    else if (dataType === DataTypes.GPKGDataType.GPKG_DT_DATETIME) {
+    } else if (dataType === DataTypes.DATETIME) {
       this.values[columnName] = value.toISOString();
-    }
-    else {
+    } else {
       this.values[columnName] = value;
     }
   }
@@ -210,9 +211,9 @@ export class UserRow {
     return this.table.pkIndex !== undefined;
   }
   hasId(): boolean {
-    var hasId = false;
+    let hasId = false;
     if (this.hasIdColumn()) {
-      var objectValue = this.getValueWithIndex(this.table.pkIndex);
+      const objectValue = this.getValueWithIndex(this.table.pkIndex);
       hasId = objectValue !== null && objectValue !== undefined && typeof objectValue === 'number';
     }
     return hasId;
@@ -221,13 +222,13 @@ export class UserRow {
    * Set the primary key id value
    * @param {Number} id id
    */
-  setId(id: number) {
+  setId(id: number): void {
     this.values[this.table.getPkColumn().name] = id;
   }
   /**
    * Clears the id so the row can be used as part of an insert or create
    */
-  resetId() {
+  resetId(): void {
     this.values[this.table.getPkColumn().name] = undefined;
   }
   /**
@@ -236,9 +237,9 @@ export class UserRow {
    * @param  {Object} value      value
    * @param  {Array} valueTypes value types
    */
-  // @ts-ignore
   // eslint-disable-next-line no-unused-vars
-  validateValueWithColumn(column, value, valueTypes) {
+  validateValueWithColumn(column: UserColumn, value: any, valueTypes: any[]): boolean {
     // TODO implement validation
+    return true;
   }
 }

@@ -1,14 +1,14 @@
 export class OptionBuilder {
   static build(optionList: string[]): any {
-    var optionBuilder = {};
+    const optionBuilder = {};
     optionList.forEach(function(option) {
-      optionBuilder['set'+option.slice(0,1).toUpperCase()+option.slice(1)] = function(param) {
+      optionBuilder['set' + option.slice(0, 1).toUpperCase() + option.slice(1)] = function(param: any): OptionBuilder {
         this[option] = param;
         return this;
-      }
-      optionBuilder['get'+option.slice(0,1).toUpperCase()+option.slice(1)] = function() {
+      };
+      optionBuilder['get' + option.slice(0, 1).toUpperCase() + option.slice(1)] = function(): any {
         return this[option];
-      }
+      };
     });
     return optionBuilder;
   }

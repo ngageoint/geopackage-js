@@ -1,12 +1,12 @@
 /**
  * @module extension/relatedTables
  */
-import {UserCustomDao} from '../../user/custom/userCustomDao';
-import {GeoPackage} from '../../geoPackage';
-import {UserMappingTable} from './userMappingTable';
-import {UserMappingRow} from './userMappingRow';
-import {ColumnValues} from '../../dao/columnValues';
-import {UserRow} from '../../user/userRow';
+import { UserCustomDao } from '../../user/custom/userCustomDao';
+import { GeoPackage } from '../../geoPackage';
+import { UserMappingTable } from './userMappingTable';
+import { UserMappingRow } from './userMappingRow';
+import { ColumnValues } from '../../dao/columnValues';
+import { UserRow } from '../../user/userRow';
 import { DataTypes } from '../../..';
 
 /**
@@ -17,18 +17,24 @@ import { DataTypes } from '../../..';
  * @param {UserMappingTable} [userMappingTable]
  */
 export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<UserMappingRow> {
-
   public table: UserMappingTable;
-  
-  constructor(userCustomDao: UserCustomDao<UserMappingRow>, geoPackage: GeoPackage, userMappingTable?: UserMappingTable) {
-    super(geoPackage, userMappingTable || new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));
+
+  constructor(
+    userCustomDao: UserCustomDao<UserMappingRow>,
+    geoPackage: GeoPackage,
+    userMappingTable?: UserMappingTable,
+  ) {
+    super(
+      geoPackage,
+      userMappingTable || new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns),
+    );
   }
   /**
    * Create a new {module:user/custom~UserCustomTable}
    * @param  {module:user/custom~UserCustomDao} userCustomDao
    * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
    */
-  createMappingTable(userCustomDao: UserCustomDao<UserRow>) {
+  createMappingTable(userCustomDao: UserCustomDao<UserRow>): UserMappingTable {
     return new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
   }
   /**
@@ -51,7 +57,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  newRowWithColumnTypes(columnTypes: DataTypes[], values: ColumnValues[]): UserMappingRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): UserMappingRow {
     return new UserMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -60,7 +66,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
   getUserMappingRow(result: any): UserMappingRow {
-    return this.getRow(result);
+    return this.getRow(result) as UserMappingRow;
   }
   /**
    * Query by base id
@@ -68,7 +74,10 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Object[]}
    */
   queryByBaseId(baseId: UserMappingRow | number): any[] {
-    return this.queryForAllEq(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
+    return this.queryForAllEq(
+      UserMappingTable.COLUMN_BASE_ID,
+      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+    );
   }
   /**
    * Query by related id
@@ -76,7 +85,10 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Object[]}
    */
   queryByRelatedId(relatedId: UserMappingRow | number): any[] {
-    return this.queryForAllEq(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
+    return this.queryForAllEq(
+      UserMappingTable.COLUMN_RELATED_ID,
+      relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+    );
   }
   /**
    * Query by base id and related id
@@ -85,10 +97,13 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Iterable<any>}
    */
   queryByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): IterableIterator<any> {
-    var values = new ColumnValues();
+    const values = new ColumnValues();
     values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     if (relatedId !== undefined) {
-      values.addColumn(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
+      values.addColumn(
+        UserMappingTable.COLUMN_RELATED_ID,
+        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+      );
     }
     return this.queryForFieldValues(values);
   }
@@ -97,7 +112,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Number[]}
    */
   uniqueRelatedIds(): number[] {
-    var query = 'SELECT DISTINCT ';
+    let query = 'SELECT DISTINCT ';
     query += UserMappingTable.COLUMN_RELATED_ID;
     query += ' FROM ';
     query += "'" + this.gpkgTableName + "'";
@@ -110,10 +125,13 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Number}
    */
   countByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
-    var values = new ColumnValues();
+    const values = new ColumnValues();
     values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     if (relatedId !== undefined) {
-      values.addColumn(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
+      values.addColumn(
+        UserMappingTable.COLUMN_RELATED_ID,
+        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+      );
     }
     return this.count(values);
   }
@@ -123,9 +141,12 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Number} number of deleted rows
    */
   deleteByBaseId(baseId: UserMappingRow | number): number {
-    var where = '';
-    where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
-    var whereArgs = this.buildWhereArgs([baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId]);
+    let where = '';
+    where += this.buildWhereWithFieldAndValue(
+      UserMappingTable.COLUMN_BASE_ID,
+      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+    );
+    const whereArgs = this.buildWhereArgs([baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId]);
     return this.deleteWhere(where, whereArgs);
   }
   /**
@@ -134,9 +155,12 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Number} number of deleted rows
    */
   deleteByRelatedId(relatedId: UserMappingRow | number): number {
-    var where = '';
-    where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
-    var whereArgs = this.buildWhereArgs([relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId]);
+    let where = '';
+    where += this.buildWhereWithFieldAndValue(
+      UserMappingTable.COLUMN_RELATED_ID,
+      relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+    );
+    const whereArgs = this.buildWhereArgs([relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId]);
     return this.deleteWhere(where, whereArgs);
   }
   /**
@@ -146,15 +170,21 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @return {Number} number of deleted rows
    */
   deleteByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
-    var where = '';
-    var whereParams = [baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId];
-    where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
+    let where = '';
+    const whereParams = [baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId];
+    where += this.buildWhereWithFieldAndValue(
+      UserMappingTable.COLUMN_BASE_ID,
+      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+    );
     if (relatedId !== undefined) {
       where += ' and ';
-      where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_RELATED_ID, relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
+      where += this.buildWhereWithFieldAndValue(
+        UserMappingTable.COLUMN_RELATED_ID,
+        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+      );
       whereParams.push(relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
     }
-    var whereArgs = this.buildWhereArgs(whereParams);
+    const whereArgs = this.buildWhereArgs(whereParams);
     return this.deleteWhere(where, whereArgs);
   }
 }

@@ -2,12 +2,12 @@
  * SimpleAttributesDao module.
  * @module extension/relatedTables
  */
-import {UserDao} from '../../user/userDao';
-import {SimpleAttributesTable} from './simpleAttributesTable'
-import {SimpleAttributesRow} from './simpleAttributesRow'
-import {GeoPackage} from '../../geoPackage';
+import { UserDao } from '../../user/userDao';
+import { SimpleAttributesTable } from './simpleAttributesTable';
+import { SimpleAttributesRow } from './simpleAttributesRow';
+import { GeoPackage } from '../../geoPackage';
 import { DataTypes } from '../../..';
-import {ColumnValues} from '../../dao/columnValues';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables
@@ -17,7 +17,6 @@ import {ColumnValues} from '../../dao/columnValues';
  * @param  {string} table table name
  */
 export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<SimpleAttributesRow> {
- 
   constructor(geoPackage: GeoPackage, public simpleAttributesTable: SimpleAttributesTable) {
     super(geoPackage, simpleAttributesTable);
   }
@@ -34,7 +33,7 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~SimpleAttributesRow}             simple attributes row
    */
-  newRowWithColumnTypes(columnTypes: DataTypes[], values: ColumnValues[]): SimpleAttributesRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): SimpleAttributesRow {
     return new SimpleAttributesRow(this.simpleAttributesTable, columnTypes, values);
   }
   /**
@@ -50,9 +49,9 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
    * @return {module:extension/relatedTables~SimpleAttributesRow[]}
    */
   getRows(ids: number[]): SimpleAttributesRow[] {
-    var simpleAttributesRows = [];
-    for (var i = 0; i < ids.length; i++) {
-      var row = this.queryForId(ids[i]);
+    const simpleAttributesRows = [];
+    for (let i = 0; i < ids.length; i++) {
+      const row = this.queryForId(ids[i]);
       if (row) {
         simpleAttributesRows.push(row);
       }

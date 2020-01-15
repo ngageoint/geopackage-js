@@ -40,14 +40,14 @@ describe('GeoPackage Feature table create tests', function() {
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-    columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+    columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.TEXT, false, ""));
+    columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.INTEGER, false, ""));
 
     geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
       .then(function(result) {
@@ -78,11 +78,11 @@ describe('GeoPackage Feature table create tests', function() {
     var properties = [];
     properties.push({
       name: 'Name',
-      dataType: DataTypes.GPKG_DT_TEXT_NAME
+      dataType: DataTypes.nameFromType(DataTypes.TEXT)
     });
     properties.push({
       name: 'Number',
-      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+      dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
     GeoPackageAPI.createFeatureTableWithProperties(geopackage, 'NewTable', properties)
@@ -124,14 +124,14 @@ describe('GeoPackage Feature table create tests', function() {
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, "default"));
-    columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, 5));
+    columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.TEXT, false, "default"));
+    columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.INTEGER, false, 5));
 
     var dc = new DataColumns();
     dc.table_name = 'test_features.test';
@@ -222,16 +222,16 @@ describe('GeoPackage Feature table create tests', function() {
       var columns = [];
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-      columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+      columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.TEXT, 5, false, null));
+      columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.BLOB, 7, false, null));
       columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkb.typeMap.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(9, 'test space', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.REAL, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.BOOLEAN, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.BLOB, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.INTEGER, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(9, 'test space', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(10, 'test-dash', DataTypes.TEXT, false, ""));
 
       return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
         .then(function(result) {

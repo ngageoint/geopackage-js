@@ -1,6 +1,6 @@
-import {GeoPackage} from "../../geoPackage";
-import {Extension} from '../extension';
-import {BaseExtension} from '../baseExtension';
+import { GeoPackage } from '../../geoPackage';
+import { Extension } from '../extension';
+import { BaseExtension } from '../baseExtension';
 
 /**
  * OGC Well known text representation of Coordinate Reference Systems extensionName

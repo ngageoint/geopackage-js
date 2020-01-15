@@ -1,6 +1,6 @@
-import {Dao} from '../../dao/dao';
-import {ColumnValues} from '../../dao/columnValues'
-import {ExtendedRelation} from './extendedRelation';
+import { Dao } from '../../dao/dao';
+import { ColumnValues } from '../../dao/columnValues';
+import { ExtendedRelation } from './extendedRelation';
 
 /**
  * Extended Relations Data Access Object
@@ -13,7 +13,8 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
   public static readonly COLUMN_BASE_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.base_table_name';
   public static readonly COLUMN_BASE_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.base_primary_column';
   public static readonly COLUMN_RELATED_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.related_table_name';
-  public static readonly COLUMN_RELATED_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.related_primary_column';
+  public static readonly COLUMN_RELATED_PRIMARY_COLUMN: string =
+    ExtendedRelationDao.TABLE_NAME + '.related_primary_column';
   public static readonly COLUMN_RELATION_NAME: string = ExtendedRelationDao.TABLE_NAME + '.relation_name';
   public static readonly COLUMN_MAPPING_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.mapping_table_name';
 
@@ -24,7 +25,7 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation}
    */
   createObject(result?: any): ExtendedRelation {
-    var er = new ExtendedRelation();
+    const er = new ExtendedRelation();
     if (result) {
       er.base_table_name = result.base_table_name;
       er.base_primary_column = result.base_primary_column;
@@ -42,7 +43,7 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {Promise}
    */
   createTable(): Promise<boolean> {
-    var tc = this.geoPackage.getTableCreator();
+    const tc = this.geoPackage.getTableCreator();
     return tc.createExtendedRelations();
   }
   /**
@@ -50,9 +51,9 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {string[]}
    */
   getBaseTables(): string[] {
-    var baseTables: string[] = [];
-    var baseTableColumns = this.queryForColumns('base_table_name');
-    for (var i = 0; i < baseTableColumns.length; i++) {
+    const baseTables: string[] = [];
+    const baseTableColumns = this.queryForColumns('base_table_name');
+    for (let i = 0; i < baseTableColumns.length; i++) {
       baseTables.push(baseTableColumns[i].base_table_name);
     }
     return baseTables;
@@ -62,9 +63,9 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {string[]}
    */
   getRelatedTables(): string[] {
-    var relatedTables = [];
-    var relatedTableColumns = this.queryForColumns('related_table_name');
-    for (var i = 0; i < relatedTableColumns.length; i++) {
+    const relatedTables = [];
+    const relatedTableColumns = this.queryForColumns('related_table_name');
+    for (let i = 0; i < relatedTableColumns.length; i++) {
       relatedTables.push(relatedTableColumns[i].related_table_name);
     }
     return relatedTables;
@@ -75,8 +76,8 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   getBaseTableRelations(baseTable: string): ExtendedRelation[] {
-    var results = [];
-    for (var relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTable)) {
+    const results = [];
+    for (const relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTable)) {
       results.push(this.createObject(relation));
     }
     return results;
@@ -87,8 +88,8 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   getRelatedTableRelations(relatedTable: string): ExtendedRelation[] {
-    var results = [];
-    for (var relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTable)) {
+    const results = [];
+    for (const relation of this.queryForAllEq(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTable)) {
       results.push(this.createObject(relation));
     }
     return results;
@@ -100,13 +101,13 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   getBaseTableRelationsWithName(baseTable: string, name: string): ExtendedRelation[] {
-    var fields = new ColumnValues();
+    const fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTable);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATION_NAME, name);
-    var where = this.buildWhere(fields, 'and');
-    var whereArgs = this.buildWhereArgs(fields);
-    var results = [];
-    for (var relation of this.queryForAll(where, whereArgs)) {
+    const where = this.buildWhere(fields, 'and');
+    const whereArgs = this.buildWhereArgs(fields);
+    const results = [];
+    for (const relation of this.queryForAll(where, whereArgs)) {
       results.push(this.createObject(relation));
     }
     return results;
@@ -117,13 +118,13 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   getTableRelations(table: string): ExtendedRelation[] {
-    var fields = new ColumnValues();
+    const fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, table);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, table);
-    var where = this.buildWhere(fields, 'or');
-    var whereArgs = this.buildWhereArgs(fields);
-    var results = [];
-    for (var relation of this.queryForAll(where, whereArgs)) {
+    const where = this.buildWhere(fields, 'or');
+    const whereArgs = this.buildWhereArgs(fields);
+    const results = [];
+    for (const relation of this.queryForAll(where, whereArgs)) {
       results.push(this.createObject(relation));
     }
     return results;
@@ -136,14 +137,14 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   getRelations(baseTableName?: string, relatedTableName?: string, mappingTableName?: string): ExtendedRelation[] {
-    var fields = new ColumnValues();
+    const fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTableName);
     fields.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTableName);
     fields.addColumn(ExtendedRelationDao.COLUMN_MAPPING_TABLE_NAME, mappingTableName);
-    var where = this.buildWhereLike(fields, 'and');
-    var whereArgs = this.buildWhereArgs(fields);
-    var results = [];
-    for (var relation of this.queryForAll(where, whereArgs)) {
+    const where = this.buildWhereLike(fields, 'and');
+    const whereArgs = this.buildWhereArgs(fields);
+    const results = [];
+    for (const relation of this.queryForAll(where, whereArgs)) {
       results.push(this.createObject(relation));
     }
     return results;
@@ -154,12 +155,12 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * @return {module:extension/relatedTables~ExtendedRelation[]}
    */
   queryByMappingTableName(mappingTableName: string): ExtendedRelation[] {
-    var fields = new ColumnValues();
+    const fields = new ColumnValues();
     fields.addColumn(ExtendedRelationDao.COLUMN_MAPPING_TABLE_NAME, mappingTableName);
-    var where = this.buildWhere(fields, 'and');
-    var whereArgs = this.buildWhereArgs(fields);
-    var results = [];
-    for (var relation of this.queryForAll(where, whereArgs)) {
+    const where = this.buildWhere(fields, 'and');
+    const whereArgs = this.buildWhereArgs(fields);
+    const results = [];
+    for (const relation of this.queryForAll(where, whereArgs)) {
       results.push(this.createObject(relation));
     }
     return results;

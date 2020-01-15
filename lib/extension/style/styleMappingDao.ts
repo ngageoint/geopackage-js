@@ -2,13 +2,15 @@
  * @memberOf module:extension/style
  * @class StyleMappingDao
  */
-import {UserMappingDao} from '../relatedTables/userMappingDao';
-import {UserCustomDao} from '../../user/custom/userCustomDao';
-import {GeoPackage} from '../../geoPackage';
-import {StyleMappingTable} from './styleMappingTable';
-import {UserMappingTable} from '../relatedTables/userMappingTable';
-import {StyleMappingRow} from './styleMappingRow';
-import {UserRow} from '../../user/userRow';
+import { UserMappingDao } from '../relatedTables/userMappingDao';
+import { UserCustomDao } from '../../user/custom/userCustomDao';
+import { GeoPackage } from '../../geoPackage';
+import { StyleMappingTable } from './styleMappingTable';
+import { UserMappingTable } from '../relatedTables/userMappingTable';
+import { StyleMappingRow } from './styleMappingRow';
+import { UserRow } from '../../user/userRow';
+import { DataTypes } from '../../..';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * Style Mapping DAO for reading user mapping data tables
@@ -20,8 +22,16 @@ import {UserRow} from '../../user/userRow';
  */
 export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
   public table: StyleMappingTable;
-  constructor(userCustomDao: UserCustomDao<StyleMappingRow>, geoPackage: GeoPackage, styleMappingTable?: StyleMappingTable) {
-    super(userCustomDao, geoPackage, styleMappingTable || new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns));
+  constructor(
+    userCustomDao: UserCustomDao<StyleMappingRow>,
+    geoPackage: GeoPackage,
+    styleMappingTable?: StyleMappingTable,
+  ) {
+    super(
+      userCustomDao,
+      geoPackage,
+      styleMappingTable || new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns),
+    );
   }
   /**
    * Create a new {module:user/custom~UserCustomTable}
@@ -44,7 +54,7 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values values
    * @return {module:extension/style.StyleMappingRow} style mapping row
    */
-  newRowWithColumnTypes(columnTypes: any[], values: any[]): StyleMappingRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): StyleMappingRow {
     return new StyleMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -54,11 +64,11 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @return {Number} number of deleted rows
    */
   deleteByBaseIdAndGeometryType(baseId: number, geometryType: string): number {
-    var where = '';
+    let where = '';
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId);
     where += ' AND ';
     where += this.buildWhereWithFieldAndValue(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, geometryType);
-    var whereArgs = this.buildWhereArgs([baseId, geometryType]);
+    const whereArgs = this.buildWhereArgs([baseId, geometryType]);
     return this.deleteWhere(where, whereArgs);
   }
 }

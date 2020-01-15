@@ -3,10 +3,10 @@
  * @module extension/relatedTables
  */
 
-import {UserRow} from '../../user/userRow';
-import {SimpleAttributesTable} from './simpleAttributesTable';
+import { UserRow } from '../../user/userRow';
+import { SimpleAttributesTable } from './simpleAttributesTable';
 import { DataTypes, UserColumn } from '../../..';
-import {ColumnValues} from '../../dao/columnValues';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
@@ -17,7 +17,11 @@ import {ColumnValues} from '../../dao/columnValues';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class SimpleAttributesRow extends UserRow {
-  constructor(public simpleAttributesTable: SimpleAttributesTable, columnTypes?: DataTypes[], values?: ColumnValues[]) {
+  constructor(
+    public simpleAttributesTable: SimpleAttributesTable,
+    columnTypes?: { [key: string]: DataTypes },
+    values?: ColumnValues[],
+  ) {
     super(simpleAttributesTable, columnTypes, values);
   }
   /**

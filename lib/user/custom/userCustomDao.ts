@@ -1,10 +1,10 @@
 /**
  * @module user/custom
  */
-import {UserDao} from '../userDao';
-import {GeoPackage} from '../../geoPackage';
-import {UserCustomTableReader} from './userCustomTableReader';
-import {UserRow} from '../userRow';
+import { UserDao } from '../userDao';
+import { GeoPackage } from '../../geoPackage';
+import { UserCustomTableReader } from './userCustomTableReader';
+import { UserRow } from '../userRow';
 
 /**
  * User Custom Dao
@@ -14,8 +14,7 @@ import {UserRow} from '../userRow';
  * @param  {module:user/custom~UserCustomTable} userCustomTable user custom table
  */
 export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
-
-  createObject(results: any) {
+  createObject(results: any): UserRow {
     return this.getRow(results);
   }
   /**
@@ -33,8 +32,8 @@ export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
    * @return {module:user/custom~UserCustomDao}
    */
   static readTable(geoPackage: GeoPackage, tableName: string, requiredColumns?: string[]): UserCustomDao<UserRow> {
-    var reader = new UserCustomTableReader(tableName, requiredColumns);
-    var userCustomTable = reader.readTable(geoPackage.getDatabase());
+    const reader = new UserCustomTableReader(tableName, requiredColumns);
+    const userCustomTable = reader.readTable(geoPackage.getDatabase());
     return new UserCustomDao(geoPackage, userCustomTable);
   }
 }

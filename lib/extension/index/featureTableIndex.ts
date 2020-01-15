@@ -2,18 +2,19 @@
  * Feature Table Index
  * @module extension/index
  */
-import {RTreeIndex} from '../rtree/rtreeIndex';
-import {BaseExtension} from '../baseExtension';
-import {GeoPackage} from '../../geoPackage';
-import {Extension} from '../extension';
-import {TableIndex} from './tableIndex'
-import {FeatureDao} from'../../features/user/featureDao'
-import {GeometryIndexDao} from'./geometryIndexDao'
-import {RTreeIndexDao} from'../rtree/rtreeIndexDao'
-import {EnvelopeBuilder} from '../../geom/envelopeBuilder'
+import { RTreeIndex } from '../rtree/rtreeIndex';
+import { BaseExtension } from '../baseExtension';
+import { GeoPackage } from '../../geoPackage';
+import { Extension } from '../extension';
+import { TableIndex } from './tableIndex';
+import { FeatureDao } from '../../features/user/featureDao';
+import { GeometryIndexDao } from './geometryIndexDao';
+import { RTreeIndexDao } from '../rtree/rtreeIndexDao';
+import { EnvelopeBuilder } from '../../geom/envelopeBuilder';
 import { TableIndexDao } from './tableIndexDao';
 import { GeometryData, BoundingBox } from '../../..';
 import { Envelope } from '../../geom/envelope';
+import { FeatureRow } from '../../features/user/featureRow';
 
 /**
  * This class will either use the RTree index if it exists, or the
@@ -26,17 +27,18 @@ import { Envelope } from '../../geom/envelope';
 export class FeatureTableIndex extends BaseExtension {
   public static readonly EXTENSION_GEOMETRY_INDEX_AUTHOR: string = 'nga';
   public static readonly EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR: string = 'geometry_index';
-  public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
-  progress: any;
-  featureDao: FeatureDao;
+  public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string =
+    'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
+  progress: Function;
+  featureDao: FeatureDao<FeatureRow>;
   tableName: string;
   columnName: string;
   tableIndexDao: TableIndexDao;
   geometryIndexDao: GeometryIndexDao;
   rtreeIndexDao: RTreeIndexDao;
   rtreeIndex: RTreeIndex;
-  rtreeIndexed: Boolean;
-  constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
+  rtreeIndexed: boolean;
+  constructor(geoPackage: GeoPackage, featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
     this.progress;
     /**
@@ -44,7 +46,10 @@ export class FeatureTableIndex extends BaseExtension {
      * @type {module:features/user/featureDao~FeatureDao}
      */
     this.featureDao = featureDao;
-    this.extensionName = Extension.buildExtensionName(FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR, FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR);
+    this.extensionName = Extension.buildExtensionName(
+      FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR,
+      FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR,
+    );
     this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
     this.tableName = featureDao.table_name;
     this.columnName = featureDao.getGeometryColumnName();
@@ -74,15 +79,16 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Promise<Boolean>} promise resolved when the indexing is complete
    */
   async indexWithForce(force?: false, progress?: Function): Promise<boolean> {
-    progress = progress || function () { };
-    this.progress = function (message) {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    progress = progress || function(): void {};
+    this.progress = function(message: any): void {
       setTimeout(progress, 0, message);
     };
-    var indexed = this.isIndexed();
+    const indexed = this.isIndexed();
     if (force || !indexed) {
-      await this.getOrCreateExtension();      
-      let tableIndex = await this.getOrCreateTableIndex();
-      await this.createOrClearGeometryIndicies()
+      await this.getOrCreateExtension();
+      const tableIndex = await this.getOrCreateTableIndex();
+      await this.createOrClearGeometryIndicies();
       return this.indexTable(tableIndex);
     } else {
       return indexed;
@@ -93,28 +99,24 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Boolean}
    */
   isIndexed(): boolean {
-    if (this.rtreeIndexed)
-      return true;
+    if (this.rtreeIndexed) return true;
     try {
-      var result = this.getFeatureTableIndexExtension();
+      const result = this.getFeatureTableIndexExtension();
       if (result) {
-        var contentsDao = this.geoPackage.getContentsDao();
-        var contents = contentsDao.queryForId(this.tableName);
-        if (!contents)
-          return false;
-        var lastChange = new Date(contents.last_change);
-        var tableIndex: TableIndex = this.tableIndexDao.queryForId(this.tableName);
+        const contentsDao = this.geoPackage.getContentsDao();
+        const contents = contentsDao.queryForId(this.tableName);
+        if (!contents) return false;
+        const lastChange = new Date(contents.last_change);
+        const tableIndex: TableIndex = this.tableIndexDao.queryForId(this.tableName);
         if (!tableIndex || !tableIndex.last_indexed) {
           return false;
         }
-        var lastIndexed = new Date(tableIndex.last_indexed);
+        const lastIndexed = new Date(tableIndex.last_indexed);
         return lastIndexed >= lastChange;
-      }
-      else {
+      } else {
         return false;
       }
-    }
-    catch (e) {
+    } catch (e) {
       return false;
     }
   }
@@ -131,16 +133,21 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {module:extension~Extension}
    */
   async getOrCreateExtension(): Promise<Extension> {
-    return this.getOrCreate(this.extensionName, this.tableName, this.columnName, this.extensionDefinition, Extension.READ_WRITE);
+    return this.getOrCreate(
+      this.extensionName,
+      this.tableName,
+      this.columnName,
+      this.extensionDefinition,
+      Extension.READ_WRITE,
+    );
   }
   /**
    * Get or create if needed the table index
    * @return {Promise<TableIndex>}
    */
   async getOrCreateTableIndex(): Promise<TableIndex> {
-    var tableIndex = this.getTableIndex();
-    if (tableIndex)
-      return tableIndex;
+    const tableIndex = this.getTableIndex();
+    if (tableIndex) return tableIndex;
     await this.tableIndexDao.createTable();
     this.createTableIndex();
     return this.getTableIndex();
@@ -150,7 +157,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {module:extension/index~TableIndex}
    */
   createTableIndex(): number {
-    var ti = new TableIndex();
+    const ti = new TableIndex();
     ti.table_name = this.tableName;
     ti.last_indexed = new Date();
     return this.tableIndexDao.create(ti);
@@ -162,8 +169,7 @@ export class FeatureTableIndex extends BaseExtension {
   getTableIndex(): TableIndex {
     if (this.tableIndexDao.isTableExists()) {
       return this.tableIndexDao.queryForId(this.tableName);
-    }
-    else {
+    } else {
       return;
     }
   }
@@ -180,8 +186,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Number} number of rows deleted
    */
   clearGeometryIndicies(): number {
-    var where = this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
-    var whereArgs = this.geometryIndexDao.buildWhereArgs(this.tableName);
+    const where = this.geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, this.tableName);
+    const whereArgs = this.geometryIndexDao.buildWhereArgs(this.tableName);
     return this.geometryIndexDao.deleteWhere(where, whereArgs);
   }
   /**
@@ -194,8 +200,7 @@ export class FeatureTableIndex extends BaseExtension {
       setTimeout(() => {
         this.indexChunk(0, tableIndex, resolve, reject);
       });
-    })
-    .then(() => {
+    }).then(() => {
       return this.updateLastIndexed(tableIndex).changes === 1;
     });
   }
@@ -207,12 +212,12 @@ export class FeatureTableIndex extends BaseExtension {
    * @param  {Function} reject     called if there is an error
    */
   indexChunk(page: number, tableIndex: TableIndex, resolve: Function, reject: Function): void {
-    var rows = this.featureDao.queryForChunk(100, page);
+    const rows = this.featureDao.queryForChunk(100, page);
     if (rows.length) {
-      this.progress('Indexing ' + (page * 100) + ' to ' + ((page + 1) * 100));
-      console.log('Indexing ' + (page * 100) + ' to ' + ((page + 1) * 100));
+      this.progress('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
+      console.log('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
       rows.forEach(row => {
-        var fr = this.featureDao.getRow(row);
+        const fr = this.featureDao.getRow(row) as FeatureRow;
         this.indexRow(tableIndex, fr.getId(), fr.getGeometry());
       });
       setTimeout(() => {
@@ -230,20 +235,18 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Boolean} success
    */
   indexRow(tableIndex: TableIndex, geomId: number, geomData: GeometryData): boolean {
-    if (!geomData)
-      return false;
-    var envelope = geomData.envelope;
+    if (!geomData) return false;
+    let envelope = geomData.envelope;
     if (!envelope) {
-      var geometry = geomData.geometry;
+      const geometry = geomData.geometry;
       if (geometry) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geometry);
       }
     }
     if (envelope) {
-      var geometryIndex = this.geometryIndexDao.populate(tableIndex, geomId, envelope);
+      const geometryIndex = this.geometryIndexDao.populate(tableIndex, geomId, envelope);
       return this.geometryIndexDao.createOrUpdate(geometryIndex);
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -258,7 +261,7 @@ export class FeatureTableIndex extends BaseExtension {
       tableIndex.table_name = this.tableName;
     }
     tableIndex.last_indexed = new Date().toISOString();
-    var updateIndex = this.tableIndexDao.createOrUpdate(tableIndex);
+    const updateIndex = this.tableIndexDao.createOrUpdate(tableIndex);
     return updateIndex;
   }
   /**
@@ -268,8 +271,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {IterableIterator}
    */
   queryWithBoundingBox(boundingBox: BoundingBox, projection: string): IterableIterator<any> {
-    var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
-    var envelope = projectedBoundingBox.buildEnvelope();
+    const projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
+    const envelope = projectedBoundingBox.buildEnvelope();
     return this.queryWithGeometryEnvelope(envelope);
   }
   /**
@@ -280,8 +283,7 @@ export class FeatureTableIndex extends BaseExtension {
   queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<any> {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.queryWithGeometryEnvelope(envelope);
-    }
-    else {
+    } else {
       return this.geometryIndexDao.queryWithGeometryEnvelope(envelope);
     }
   }
@@ -292,8 +294,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Number}
    */
   countWithBoundingBox(boundingBox: BoundingBox, projection: string): number {
-    var projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
-    var envelope = projectedBoundingBox.buildEnvelope();
+    const projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
+    const envelope = projectedBoundingBox.buildEnvelope();
     return this.countWithGeometryEnvelope(envelope);
   }
   /**
@@ -304,8 +306,7 @@ export class FeatureTableIndex extends BaseExtension {
   countWithGeometryEnvelope(envelope: Envelope): number {
     if (this.rtreeIndexed) {
       return this.rtreeIndexDao.countWithGeometryEnvelope(envelope);
-    }
-    else {
+    } else {
       return this.geometryIndexDao.countWithGeometryEnvelope(envelope);
     }
   }

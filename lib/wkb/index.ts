@@ -3,7 +3,9 @@
  * @module wkb
  */
 
-interface WKTMap { [key: string]: number; }
+interface WKTMap {
+  [key: string]: number;
+}
 
 export class WKB {
   public static readonly typeMap = {
@@ -14,7 +16,7 @@ export class WKB {
       MultiPoint: 'MULTIPOINT',
       MultiLineString: 'MULTILINESTRING',
       MultiPolygon: 'MULTIPOLYGON',
-      GeometryCollection: 'GEOMETRYCOLLECTION'
+      GeometryCollection: 'GEOMETRYCOLLECTION',
     },
     wkb: {
       Point: 1,
@@ -23,8 +25,8 @@ export class WKB {
       MultiPoint: 4,
       MultiLineString: 5,
       MultiPolygon: 6,
-      GeometryCollection: 7
-    }
+      GeometryCollection: 7,
+    },
   };
 
   public static readonly wktToEnum: WKTMap = {
@@ -35,7 +37,7 @@ export class WKB {
     [WKB.typeMap.wkt.MultiLineString]: WKB.typeMap.wkb.MultiLineString,
     [WKB.typeMap.wkt.MultiPolygon]: WKB.typeMap.wkb.MultiPolygon,
     [WKB.typeMap.wkt.GeometryCollection]: WKB.typeMap.wkb.GeometryCollection,
-  }
+  };
 
   /**
    * number from name

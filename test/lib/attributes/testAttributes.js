@@ -36,13 +36,13 @@ describe('GeoPackage Attribute table create tests', function() {
 
     var columns = [];
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
+    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.TEXT, false, ""));
+    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.INTEGER, false, ""));
     await geopackage.createAttributeTable(tableName, columns)
     var contentsVerified = Verification.verifyContentsForTable(geopackage, tableName);
     contentsVerified.should.be.equal(true);
@@ -56,7 +56,7 @@ describe('GeoPackage Attribute table create tests', function() {
     var properties = [];
     properties.push({
       name: 'Name',
-      dataType: DataTypes.GPKG_DT_TEXT_NAME,
+      dataType: DataTypes.nameFromType(DataTypes.TEXT),
       dataColumn: new DataColumns({
         table_name: 'NewTable',
         column_name: 'Name',
@@ -68,7 +68,7 @@ describe('GeoPackage Attribute table create tests', function() {
     });
     properties.push({
       name: 'Number',
-      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+      dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
     GeoPackageAPI.createAttributeTableWithProperties(geopackage, 'NewTable', properties)
@@ -113,11 +113,11 @@ describe('GeoPackage Attribute table create tests', function() {
     var properties = [];
     properties.push({
       name: 'Name',
-      dataType: DataTypes.GPKG_DT_TEXT_NAME
+      dataType: DataTypes.nameFromType(DataTypes.TEXT)
     });
     properties.push({
       name: 'Number',
-      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+      dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
     var dao = GeoPackageAPI.createMediaTableWithProperties(geopackage, 'NewTable', properties);
@@ -159,11 +159,11 @@ describe('GeoPackage Attribute table create tests', function() {
     var properties = [];
     properties.push({
       name: 'Name',
-      dataType: DataTypes.GPKG_DT_TEXT_NAME
+      dataType: DataTypes.nameFromType(DataTypes.TEXT)
     });
     properties.push({
       name: 'Number',
-      dataType: DataTypes.GPKG_DT_INTEGER_NAME
+      dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
     var dao = GeoPackageAPI.createSimpleAttributesTableWithProperties(geopackage, 'NewTable', properties);
@@ -217,13 +217,13 @@ describe('GeoPackage Attribute table create tests', function() {
     var columns = [];
 
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
+    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.TEXT, false, ""));
+    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.INTEGER, false, ""));
 
     var table = new AttributeTable(geopackage.connection, columns);
     (function() {
@@ -237,13 +237,13 @@ describe('GeoPackage Attribute table create tests', function() {
     var columns = [];
 
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
+    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.TEXT, false, ""));
+    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.INTEGER, false, ""));
 
     var table = new AttributeTable(geopackage.connection, columns);
 
@@ -257,13 +257,13 @@ describe('GeoPackage Attribute table create tests', function() {
     var columns = [];
 
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, "default"));
-    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, 5));
+    columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+    columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
+    columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.TEXT, false, "default"));
+    columns.push(UserColumn.createColumnWithIndex(2, 'test_real.test', DataTypes.REAL, false, null));
+    columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+    columns.push(UserColumn.createColumnWithIndex(4, 'test_blob.test', DataTypes.BLOB, false, null));
+    columns.push(UserColumn.createColumnWithIndex(5, 'test_integer.test', DataTypes.INTEGER, false, 5));
 
     var dc = new DataColumns();
     dc.table_name = 'test_attributes.test';
@@ -345,17 +345,17 @@ describe('GeoPackage Attribute table create tests', function() {
       var columns = [];
 
       columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-      columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
-      columns.push(UserColumn.createColumnWithIndex(10, 'test_boolean2', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
+      columns.push(UserColumn.createColumnWithIndexAndMax(6, 'test_text_limited', DataTypes.TEXT, 5, false, null));
+      columns.push(UserColumn.createColumnWithIndexAndMax(7, 'test_blob_limited', DataTypes.BLOB, 7, false, null));
+      columns.push(UserColumn.createColumnWithIndex(10, 'test_boolean2', DataTypes.BOOLEAN, false, null));
 
-      columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(UserColumn.createColumnWithIndex(2, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-      columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-      columns.push(UserColumn.createColumnWithIndex(4, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-      columns.push(UserColumn.createColumnWithIndex(5, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
-      columns.push(UserColumn.createColumnWithIndex(8, 'test space', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(UserColumn.createColumnWithIndex(9, 'test-dash', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+      columns.push(UserColumn.createColumnWithIndex(1, 'test_text.test', DataTypes.TEXT, false, ""));
+      columns.push(UserColumn.createColumnWithIndex(2, 'test_real', DataTypes.REAL, false, null));
+      columns.push(UserColumn.createColumnWithIndex(3, 'test_boolean', DataTypes.BOOLEAN, false, null));
+      columns.push(UserColumn.createColumnWithIndex(4, 'test_blob', DataTypes.BLOB, false, null));
+      columns.push(UserColumn.createColumnWithIndex(5, 'test_integer', DataTypes.INTEGER, false, ""));
+      columns.push(UserColumn.createColumnWithIndex(8, 'test space', DataTypes.TEXT, false, ""));
+      columns.push(UserColumn.createColumnWithIndex(9, 'test-dash', DataTypes.TEXT, false, ""));
 
       return geopackage.createAttributeTable(tableName, columns)
         .then(function(result) {

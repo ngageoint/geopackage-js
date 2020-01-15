@@ -1,6 +1,6 @@
-import { CustomFeaturesTile } from './customFeaturesTile'
-import concat from 'concat-stream'
-import path from 'path'
+import { CustomFeaturesTile } from './customFeaturesTile';
+import concat from 'concat-stream';
+import path from 'path';
 
 /**
  * Draws a tile indicating the number of features that exist within the tile,
@@ -23,10 +23,10 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
     super();
     this.textSize = 18;
     this.textFont = 'PT Mono';
-    this.textColor = "rgba(255, 255, 255, 1.0)";
+    this.textColor = 'rgba(255, 255, 255, 1.0)';
     this.circleStrokeWidth = 3;
-    this.circleBorderColor = "rgba(0, 0, 0, 0.25)";
-    this.circleFillColor = "rgba(0, 0, 0, 1.0)";
+    this.circleBorderColor = 'rgba(0, 0, 0, 0.25)';
+    this.circleFillColor = 'rgba(0, 0, 0, 1.0)';
     this.circlePaddingPercentage = 0.25;
     this.defaultFontRegistered = false;
   }
@@ -34,11 +34,14 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * register a font
    * @private
    */
-  _registerDefaultFont() {
+  _registerDefaultFont(): void {
     if (!this.defaultFontRegistered) {
       if (CustomFeaturesTile.useNodeCanvas) {
-        var Canvas = require('canvas');
-        Canvas.registerFont(path.join(__dirname, '..', '..', '..', 'fonts', 'PTMono-Regular.ttf'), { family: 'PT Mono' });
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Canvas = require('canvas');
+        Canvas.registerFont(path.join(__dirname, '..', '..', '..', 'fonts', 'PTMono-Regular.ttf'), {
+          family: 'PT Mono',
+        });
       }
       this.defaultFontRegistered = true;
     }
@@ -54,7 +57,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the text size
    * @param {Number} textSize text size
    */
-  setTextSize(textSize: number) {
+  setTextSize(textSize: number): void {
     this.textSize = textSize;
   }
   /**
@@ -68,7 +71,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the text color
    * @param {String} textColor text color
    */
-  setTextColor(textColor: string) {
+  setTextColor(textColor: string): void {
     this.textColor = textColor;
   }
   /**
@@ -82,7 +85,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the circle stroke width
    * @param {Number} circleStrokeWidth circle stroke width
    */
-  setCircleStrokeWidth(circleStrokeWidth: number) {
+  setCircleStrokeWidth(circleStrokeWidth: number): void {
     this.circleStrokeWidth = circleStrokeWidth;
   }
   /**
@@ -96,7 +99,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the circle color
    * @param {String} circleBorderColor circle color
    */
-  setCircleColor(circleBorderColor: string) {
+  setCircleColor(circleBorderColor: string): void {
     this.circleBorderColor = circleBorderColor;
   }
   /**
@@ -110,7 +113,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the circle fill color
    * @param {String} circleFillColor circle fill color
    */
-  setCircleFillColor(circleFillColor: string) {
+  setCircleFillColor(circleFillColor: string): void {
     this.circleFillColor = circleFillColor;
   }
   /**
@@ -125,9 +128,9 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * 0.0 and 1.0
    * @param {Number} circlePaddingPercentage circle padding percentage
    */
-  setCirclePaddingPercentage(circlePaddingPercentage: number) {
+  setCirclePaddingPercentage(circlePaddingPercentage: number): void {
     if (circlePaddingPercentage < 0.0 || circlePaddingPercentage > 1.0) {
-      throw new Error("Circle padding percentage must be between 0.0 and 1.0: " + circlePaddingPercentage);
+      throw new Error('Circle padding percentage must be between 0.0 and 1.0: ' + circlePaddingPercentage);
     }
     this.circlePaddingPercentage = circlePaddingPercentage;
   }
@@ -143,7 +146,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    *
    * @param {Number} tileBorderStrokeWidth tile border stroke width
    */
-  setTileBorderStrokeWidth(tileBorderStrokeWidth: number) {
+  setTileBorderStrokeWidth(tileBorderStrokeWidth: number): void {
     this.tileBorderStrokeWidth = tileBorderStrokeWidth;
   }
   /**
@@ -157,7 +160,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the tile border color
    * @param {String} tileBorderColor tile border color
    */
-  setTileBorderColor(tileBorderColor: string) {
+  setTileBorderColor(tileBorderColor: string): void {
     this.tileBorderColor = tileBorderColor;
   }
   /**
@@ -171,7 +174,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the tile fill color
    * @param {String} tileFillColor tile fill color
    */
-  setTileFillColor(tileFillColor: string) {
+  setTileFillColor(tileFillColor: string): void {
     this.tileFillColor = tileFillColor;
   }
   /**
@@ -185,7 +188,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the draw unindexed tiles option
    * @param {Boolean} drawUnindexedTiles draw unindexed tiles flag
    */
-  setDrawUnindexedTiles(drawUnindexedTiles: boolean) {
+  setDrawUnindexedTiles(drawUnindexedTiles: boolean): void {
     this.drawUnindexedTiles = drawUnindexedTiles;
   }
   /**
@@ -199,7 +202,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * Set the compression format
    * @param {String} compressFormat either 'png' or 'jpeg'
    */
-  setCompressFormat(compressFormat: string) {
+  setCompressFormat(compressFormat: string): void {
     this.compressFormat = compressFormat;
   }
   /**
@@ -209,14 +212,14 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * @param canvas
    * @returns {Promise<String|Buffer>}
    */
-  async drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer>  {
-    var image = null;
+  async drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
+    let image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
       // inside.
       // The table is not indexed and more features exist than the max
       // feature count set.
-      image = this.drawTile(tileWidth, tileHeight, "?", canvas);
+      image = this.drawTile(tileWidth, tileHeight, '?', canvas);
     }
     return image;
   }
@@ -229,26 +232,24 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * @return {Promise<String|Buffer>}
    */
   async drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
-    // @ts-ignore
     // eslint-disable-next-line complexity
-    return new Promise(function (resolve) {
+    return new Promise(resolve => {
       this._registerDefaultFont();
-      var canvas;
+      let canvas;
       if (tileCanvas !== undefined && tileCanvas !== null) {
         canvas = tileCanvas;
-      }
-      else {
+      } else {
         if (CustomFeaturesTile.useNodeCanvas) {
-          var Canvas = require('canvas');
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const Canvas = require('canvas');
           canvas = Canvas.createCanvas(tileWidth, tileHeight);
-        }
-        else {
+        } else {
           canvas = document.createElement('canvas');
           canvas.width = tileWidth;
           canvas.height = tileHeight;
         }
       }
-      var context = canvas.getContext('2d');
+      const context = canvas.getContext('2d');
       context.clearRect(0, 0, tileWidth, tileHeight);
       // Draw the tile border
       if (this.tileFillColor !== null) {
@@ -261,18 +262,18 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      context.font = this.textSize + 'px \'' + this.textFont + '\'';
-      var textSize = context.measureText(text);
-      var textWidth = textSize.width;
-      var textHeight = this.textSize;
+      context.font = this.textSize + "px '" + this.textFont + "'";
+      const textSize = context.measureText(text);
+      const textWidth = textSize.width;
+      const textHeight = this.textSize;
       // Determine the center of the tile
-      var centerX = Math.round(tileWidth / 2.0);
-      var centerY = Math.round(tileHeight / 2.0);
+      const centerX = Math.round(tileWidth / 2.0);
+      const centerY = Math.round(tileHeight / 2.0);
       // Draw the circle
       if (this.circleBorderColor != null || this.circleFillColor != null) {
-        var diameter = Math.max(textWidth, textHeight);
-        var radius = Math.round(diameter / 2.0);
-        radius = Math.round(radius + (diameter * this.circlePaddingPercentage));
+        const diameter = Math.max(textWidth, textHeight);
+        let radius = Math.round(diameter / 2.0);
+        radius = Math.round(radius + diameter * this.circlePaddingPercentage);
         // Draw the circle
         if (this.circleFillColor != null) {
           context.fillStyle = this.circleFillColor;
@@ -292,27 +293,25 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
         }
       }
       // Draw the text
-      var textX = centerX - Math.round(textWidth / 2.0);
-      var textY = centerY;
+      const textX = centerX - Math.round(textWidth / 2.0);
+      const textY = centerY;
       context.fillStyle = this.textColor;
-      context.textBaseline = "middle";
+      context.textBaseline = 'middle';
       context.fillText(text, textX, textY);
       if (CustomFeaturesTile.useNodeCanvas) {
-        var writeStream = concat(function (buffer) {
+        const writeStream = concat(function(buffer) {
           resolve(buffer);
         });
-        var stream = null;
+        let stream = null;
         if (this.compressFormat === 'png') {
           stream = canvas.createPNGStream();
-        }
-        else {
+        } else {
           stream = canvas.createJPEGStream();
         }
         stream.pipe(writeStream);
-      }
-      else {
+      } else {
         resolve(canvas.toDataURL('image/' + this.compressFormat));
       }
-    }.bind(this));
+    });
   }
 }

@@ -1,12 +1,12 @@
-import {Dao} from '../../dao/dao';
-import {RTreeIndex} from './rtreeIndex';
-import {FeatureDao} from '../../features/user/featureDao';
-import {GeoPackage} from '../../geoPackage';
-import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
+import { Dao } from '../../dao/dao';
+import { RTreeIndex } from './rtreeIndex';
+import { FeatureDao } from '../../features/user/featureDao';
+import { GeoPackage } from '../../geoPackage';
+import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder';
+import { FeatureRow } from '../../features/user/featureRow';
 /**
  * RTree module.
  */
-
 
 /**
  * RTree Index Data Access Object
@@ -14,18 +14,17 @@ import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder'
  * @extends Dao
  */
 export class RTreeIndexDao extends Dao<RTreeIndex> {
-
-  public static readonly TABLE_NAME: string = "rtree";
-  public static readonly COLUMN_TABLE_NAME: string = RTreeIndexDao.TABLE_NAME + ".table_name";
-  public static readonly COLUMN_GEOM_ID: string = RTreeIndexDao.TABLE_NAME + ".geom_id";
-  public static readonly COLUMN_MIN_X: string = RTreeIndexDao.TABLE_NAME + ".minx";
-  public static readonly COLUMN_MAX_X: string = RTreeIndexDao.TABLE_NAME + ".maxx";
-  public static readonly COLUMN_MIN_Y: string = RTreeIndexDao.TABLE_NAME + ".miny";
-  public static readonly COLUMN_MAX_Y: string = RTreeIndexDao.TABLE_NAME + ".maxy";
-  public static readonly COLUMN_MIN_Z: string = RTreeIndexDao.TABLE_NAME + ".minz";
-  public static readonly COLUMN_MAX_Z: string = RTreeIndexDao.TABLE_NAME + ".maxz";
-  public static readonly COLUMN_MIN_M: string = RTreeIndexDao.TABLE_NAME + ".minm";
-  public static readonly COLUMN_MAX_M: string = RTreeIndexDao.TABLE_NAME + ".maxm";
+  public static readonly TABLE_NAME: string = 'rtree';
+  public static readonly COLUMN_TABLE_NAME: string = RTreeIndexDao.TABLE_NAME + '.table_name';
+  public static readonly COLUMN_GEOM_ID: string = RTreeIndexDao.TABLE_NAME + '.geom_id';
+  public static readonly COLUMN_MIN_X: string = RTreeIndexDao.TABLE_NAME + '.minx';
+  public static readonly COLUMN_MAX_X: string = RTreeIndexDao.TABLE_NAME + '.maxx';
+  public static readonly COLUMN_MIN_Y: string = RTreeIndexDao.TABLE_NAME + '.miny';
+  public static readonly COLUMN_MAX_Y: string = RTreeIndexDao.TABLE_NAME + '.maxy';
+  public static readonly COLUMN_MIN_Z: string = RTreeIndexDao.TABLE_NAME + '.minz';
+  public static readonly COLUMN_MAX_Z: string = RTreeIndexDao.TABLE_NAME + '.maxz';
+  public static readonly COLUMN_MIN_M: string = RTreeIndexDao.TABLE_NAME + '.minm';
+  public static readonly COLUMN_MAX_M: string = RTreeIndexDao.TABLE_NAME + '.maxm';
 
   public static readonly EXTENSION_NAME: string = 'gpkg_rtree_index';
   public static readonly EXTENSION_RTREE_INDEX_AUTHOR: string = 'gpkg';
@@ -33,9 +32,9 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
   public static readonly EXTENSION_RTREE_INDEX_DEFINITION: string = 'http://www.geopackage.org/spec/#extension_rtree';
 
   gpkgTableName = RTreeIndexDao.TABLE_NAME;
-  featureDao: FeatureDao;
+  featureDao: FeatureDao<FeatureRow>;
 
-  constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
+  constructor(geoPackage: GeoPackage, featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
     this.featureDao = featureDao;
   }
@@ -48,16 +47,20 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
    * @returns {{whereArgs: Array, where: string, join: string, tableNameArr: string[]}}
    * @private
    */
-  _generateGeometryEnvelopeQuery(envelope: { minX: number, maxX: number, minY: number, maxY: number}): {whereArgs: any[], where: string, join: string, tableNameArr: string[]} {
-    var tableName = this.featureDao.gpkgTableName;
-    var where = '';
-    var minXLessThanMaxX = envelope.minX < envelope.maxX;
+  _generateGeometryEnvelopeQuery(envelope: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+  }): { whereArgs: any[]; where: string; join: string; tableNameArr: string[] } {
+    const tableName = this.featureDao.gpkgTableName;
+    let where = '';
+    const minXLessThanMaxX = envelope.minX < envelope.maxX;
     if (minXLessThanMaxX) {
       where += this.buildWhereWithFieldAndValue('minx', envelope.maxX, '<=');
       where += ' and ';
       where += this.buildWhereWithFieldAndValue('maxx', envelope.minX, '>=');
-    }
-    else {
+    } else {
       where += '(';
       where += this.buildWhereWithFieldAndValue('minx', envelope.maxX, '<=');
       where += ' or ';
@@ -79,10 +82,19 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
     }
     whereArgs.push(envelope.maxY, envelope.minY);
     return {
-      join: 'inner join ' + tableName + ' on ' + tableName + '.' + this.featureDao.idColumns[0] + ' = ' + this.gpkgTableName + '.id',
+      join:
+        'inner join ' +
+        tableName +
+        ' on ' +
+        tableName +
+        '.' +
+        this.featureDao.idColumns[0] +
+        ' = ' +
+        this.gpkgTableName +
+        '.id',
       where,
       whereArgs,
-      tableNameArr: [tableName + '.*']
+      tableNameArr: [tableName + '.*'],
     };
   }
   /**
@@ -90,12 +102,20 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
    * @param  {any} envelope envelope
    * @return {IterableIterator<any>}
    */
-  queryWithGeometryEnvelope(envelope: { minX: number, maxX: number, minY: number, maxY: number}): IterableIterator<any> {
-    var result = this._generateGeometryEnvelopeQuery(envelope);
+  queryWithGeometryEnvelope(envelope: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+  }): IterableIterator<any> {
+    const result = this._generateGeometryEnvelopeQuery(envelope);
     return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
   }
-  countWithGeometryEnvelope(envelope: { minX: number, maxX: number, minY: number, maxY: number}): number {
-    var result = this._generateGeometryEnvelopeQuery(envelope);
-    return this.connection.get(SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", result.where), result.whereArgs).count;
+  countWithGeometryEnvelope(envelope: { minX: number; maxX: number; minY: number; maxY: number }): number {
+    const result = this._generateGeometryEnvelopeQuery(envelope);
+    return this.connection.get(
+      SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", result.where),
+      result.whereArgs,
+    ).count;
   }
 }

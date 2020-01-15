@@ -1,4 +1,3 @@
-
 export class FeatureDrawType {
   /**
    * Circle for a point
@@ -11,5 +10,5 @@ export class FeatureDrawType {
   /**
    * Fill for a polygon
    */
-  public static readonly FILL: string = 'FILL'
+  public static readonly FILL: string = 'FILL';
 }

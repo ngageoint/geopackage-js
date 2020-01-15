@@ -3,10 +3,11 @@
  * @class IconTable
  */
 
-import {MediaTable} from '../relatedTables/mediaTable';
-import {UserCustomColumn} from '../../user/custom/userCustomColumn';
+import { MediaTable } from '../relatedTables/mediaTable';
+import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 
-import {DataTypes} from '../../db/dataTypes';
+import { DataTypes } from '../../db/dataTypes';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * Icon Requirements Class Media Table
@@ -24,7 +25,7 @@ export class IconTable extends MediaTable {
   public static readonly COLUMN_HEIGHT = 'height';
   public static readonly COLUMN_ANCHOR_U = 'anchor_u';
   public static readonly COLUMN_ANCHOR_V = 'anchor_v';
-  
+
   readonly TABLE_TYPE = 'media';
 
   constructor(tableName, columns, requiredColumns) {
@@ -34,116 +35,128 @@ export class IconTable extends MediaTable {
    * Get the name column index
    * @return int
    */
-  getNameColumnIndex() {
+  getNameColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_NAME);
   }
   /**
    * Get the name column
    * @return {module:user/userColumn~UserColumn}
    */
-  getNameColumn() {
+  getNameColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_NAME);
   }
   /**
    * Get the description column index
    * @return int
    */
-  getDescriptionColumnIndex() {
+  getDescriptionColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_DESCRIPTION);
   }
   /**
    * Get the description column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDescriptionColumn() {
+  getDescriptionColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_DESCRIPTION);
   }
   /**
    * Get the width column index
    * @return int
    */
-  getWidthColumnIndex() {
+  getWidthColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_WIDTH);
   }
   /**
    * Get the width column
    * @return {module:user/userColumn~UserColumn}
    */
-  getWidthColumn() {
+  getWidthColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_WIDTH);
   }
   /**
    * Get the height column index
    * @return int
    */
-  getHeightColumnIndex() {
+  getHeightColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_HEIGHT);
   }
   /**
    * Get the height column
    * @return {module:user/userColumn~UserColumn}
    */
-  getHeightColumn() {
+  getHeightColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_HEIGHT);
   }
   /**
    * Get the anchor_u column index
    * @return int
    */
-  getAnchorUColumnIndex() {
+  getAnchorUColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_ANCHOR_U);
   }
   /**
    * Get the anchor_u column
    * @return {module:user/userColumn~UserColumn}
    */
-  getAnchorUColumn() {
+  getAnchorUColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_ANCHOR_U);
   }
   /**
    * Get the anchor_v column index
    * @return int
    */
-  getAnchorVColumnIndex() {
+  getAnchorVColumnIndex(): number {
     return this.getColumnIndex(IconTable.COLUMN_ANCHOR_V);
   }
   /**
    * Get the anchor_v column
    * @return {module:user/userColumn~UserColumn}
    */
-  getAnchorVColumn() {
+  getAnchorVColumn(): UserColumn {
     return this.getColumnWithColumnName(IconTable.COLUMN_ANCHOR_V);
   }
   /**
    * Create a media table with a minimum required columns followed by the additional columns
    * @return {module:extension/relatedTables~MediaTable}
    */
-  static create() {
+  static create(): IconTable {
     return new IconTable(IconTable.TABLE_NAME, IconTable.createColumns(), IconTable.requiredColumns());
   }
-  static createRequiredColumns() {
+  static createRequiredColumns(): UserColumn[] {
     return MediaTable.createRequiredColumns();
   }
   /**
    * Get the required columns
    * @return {string[]}
    */
-  static requiredColumns() {
+  static requiredColumns(): string[] {
     return MediaTable.requiredColumns();
   }
   /**
    * Create the columns
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createColumns() {
-    var columns = IconTable.createRequiredColumns();
-    var index = columns.length;
-    columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_NAME, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_WIDTH, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
+  static createColumns(): UserColumn[] {
+    const columns = IconTable.createRequiredColumns();
+    let index = columns.length;
+    columns.push(
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_NAME, DataTypes.TEXT, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, DataTypes.TEXT, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_WIDTH, DataTypes.REAL, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, DataTypes.REAL, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, DataTypes.REAL, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, DataTypes.REAL, undefined, false, undefined),
+    );
     return columns;
   }
 }

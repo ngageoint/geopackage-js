@@ -247,9 +247,9 @@ describe('FeatureDao tests', function() {
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       // @ts-ignore
       columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.TEXT, false, ""));
 
       var box1 = {
         "type": "Polygon",

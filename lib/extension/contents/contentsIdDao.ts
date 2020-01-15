@@ -1,11 +1,5 @@
-import {Dao} from '../../dao/dao';
-
-/**
- * @memberOf module:extension/contents
- * @class ContentsIdDao
- */
-
-import {ContentsId} from './contentsId';
+import { Dao } from '../../dao/dao';
+import { ContentsId } from './contentsId';
 
 /**
  * Contents Id Data Access Object
@@ -13,11 +7,11 @@ import {ContentsId} from './contentsId';
  * @extends Dao
  */
 export class ContentsIdDao extends Dao<ContentsId> {
-  public static readonly TABLE_NAME: string  = 'nga_contents_id';
-  public static readonly COLUMN_ID: string  = 'id';
-  public static readonly COLUMN_TABLE_NAME: string  = 'table_name';
+  public static readonly TABLE_NAME: string = 'nga_contents_id';
+  public static readonly COLUMN_ID: string = 'id';
+  public static readonly COLUMN_TABLE_NAME: string = 'table_name';
 
-  readonly gpkgTableName: string  = ContentsIdDao.TABLE_NAME;
+  readonly gpkgTableName: string = ContentsIdDao.TABLE_NAME;
   readonly idColumns: string[] = ['id'];
   /**
    * Create a {module:extension/contents.ContentsId} object
@@ -38,9 +32,9 @@ export class ContentsIdDao extends Dao<ContentsId> {
    * @return {string[]}
    */
   getTableNames(): string[] {
-    var tableNames = [];
-    var tableNameColumns = this.queryForColumns('table_name');
-    for (var i = 0; i < tableNameColumns.length; i++) {
+    const tableNames = [];
+    const tableNameColumns = this.queryForColumns('table_name');
+    for (let i = 0; i < tableNameColumns.length; i++) {
       tableNames.push(tableNameColumns[i].table_name);
     }
     return tableNames;
@@ -51,11 +45,13 @@ export class ContentsIdDao extends Dao<ContentsId> {
    * @return {module:extension/contents.ContentsId}
    */
   queryForTableName(tableName: string): ContentsId {
-    var contentsIds = this.queryForAll(this.buildWhereWithFieldAndValue(ContentsIdDao.COLUMN_TABLE_NAME, tableName), this.buildWhereArgs(tableName));
+    const contentsIds = this.queryForAll(
+      this.buildWhereWithFieldAndValue(ContentsIdDao.COLUMN_TABLE_NAME, tableName),
+      this.buildWhereArgs(tableName),
+    );
     if (contentsIds.length > 0) {
       return contentsIds[0];
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -64,7 +60,10 @@ export class ContentsIdDao extends Dao<ContentsId> {
    * @param  {string} tableName the table name to delete by
    * @return {number} number of deleted rows
    */
-  deleteByTableName(tableName:string): number {
-    return this.deleteWhere(this.buildWhereWithFieldAndValue(ContentsIdDao.COLUMN_TABLE_NAME, tableName), this.buildWhereArgs(tableName));
+  deleteByTableName(tableName: string): number {
+    return this.deleteWhere(
+      this.buildWhereWithFieldAndValue(ContentsIdDao.COLUMN_TABLE_NAME, tableName),
+      this.buildWhereArgs(tableName),
+    );
   }
 }

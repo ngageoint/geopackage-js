@@ -3,8 +3,11 @@
  * @class StyleRow
  */
 
-import {AttributeRow} from '../../attributes/attributeRow';
-import {StyleTable} from './styleTable';
+import { AttributeRow } from '../../attributes/attributeRow';
+import { StyleTable } from './styleTable';
+import { UserColumn } from '../../user/userColumn';
+import { DataTypes } from '../../..';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * Style Row
@@ -20,7 +23,7 @@ export class StyleRow extends AttributeRow {
    */
   private static readonly colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
   styleTable: StyleTable;
-  constructor(styleTable: StyleTable, columnTypes?: any[], values?: any[]) {
+  constructor(styleTable: StyleTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(styleTable, columnTypes, values);
     this.styleTable = styleTable;
   }
@@ -28,70 +31,70 @@ export class StyleRow extends AttributeRow {
    * Get the name column
    * @return {module:user/userColumn~UserColumn}
    */
-  getNameColumn() {
+  getNameColumn(): UserColumn {
     return this.styleTable.getNameColumn();
   }
   /**
    * Gets the name
    * @return {String}
    */
-  getName() {
+  getName(): string {
     return this.getValueWithColumnName(this.getNameColumn().name);
   }
   /**
    * Sets the name for the row
    * @param {String} name name
    */
-  setName(name) {
+  setName(name: string): void {
     this.setValueWithColumnName(this.getNameColumn().name, name);
   }
   /**
    * Get the description column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDescriptionColumn() {
+  getDescriptionColumn(): UserColumn {
     return this.styleTable.getDescriptionColumn();
   }
   /**
    * Gets the description
    * @return {String}
    */
-  getDescription() {
+  getDescription(): string {
     return this.getValueWithColumnName(this.getDescriptionColumn().name);
   }
   /**
    * Sets the description for the row
    * @param {String} description description
    */
-  setDescription(description) {
+  setDescription(description: string): void {
     this.setValueWithColumnName(this.getDescriptionColumn().name, description);
   }
   /**
    * Get the color column
    * @return {module:user/userColumn~UserColumn}
    */
-  getColorColumn() {
+  getColorColumn(): UserColumn {
     return this.styleTable.getColorColumn();
   }
   /**
    * Get the style color
    * @return {String} color
    */
-  getColor() {
+  getColor(): string {
     return this.createColor(this.getHexColor(), this.getOpacity());
   }
   /**
    * Check if the style has a color
    * @return true if has a color
    */
-  hasColor() {
+  hasColor(): boolean {
     return this._hasColor(this.getHexColor(), this.getOpacity());
   }
   /**
    * Get the color
    * @return {String} color
    */
-  getHexColor() {
+  getHexColor(): string {
     return this.getValueWithColumnName(this.getColorColumn().name);
   }
   /**
@@ -99,7 +102,7 @@ export class StyleRow extends AttributeRow {
    * @param {String} color color
    * @param {Number} opacity opacity
    */
-  setColor(color, opacity) {
+  setColor(color: string, opacity: number): void {
     this.setHexColor(color);
     this.setOpacity(opacity);
   }
@@ -107,30 +110,30 @@ export class StyleRow extends AttributeRow {
    * Sets the color for the row
    * @param {String} color color
    */
-  setHexColor(color) {
-    var validatedColor = this.validateColor(color);
+  setHexColor(color: string): void {
+    const validatedColor = this.validateColor(color);
     this.setValueWithColumnName(this.getColorColumn().name, validatedColor);
   }
   /**
    * Get the opacity column
    * @return {module:user/userColumn~UserColumn}
    */
-  getOpacityColumn() {
+  getOpacityColumn(): UserColumn {
     return this.styleTable.getOpacityColumn();
   }
   /**
    * Gets the opacity
    * @return {Number}
    */
-  getOpacity() {
+  getOpacity(): number {
     return this.getValueWithColumnName(this.getOpacityColumn().name);
   }
   /**
    * Get the opacity or default value
    * @return {Number} opacity
    */
-  getOpacityOrDefault() {
-    var opacity = this.getOpacity();
+  getOpacityOrDefault(): number {
+    let opacity = this.getOpacity();
     if (opacity === null) {
       opacity = 1.0;
     }
@@ -140,7 +143,7 @@ export class StyleRow extends AttributeRow {
    * Sets the opacity for the row
    * @param {Number} opacity opacity
    */
-  setOpacity(opacity) {
+  setOpacity(opacity: number): void {
     this.validateOpacity(opacity);
     this.setValueWithColumnName(this.getOpacityColumn().name, opacity);
   }
@@ -148,23 +151,23 @@ export class StyleRow extends AttributeRow {
    * Get the width column
    * @return {module:user/userColumn~UserColumn}
    */
-  getWidthColumn() {
+  getWidthColumn(): UserColumn {
     return this.styleTable.getWidthColumn();
   }
   /**
    * Gets the width
    * @return {number}
    */
-  getWidth() {
+  getWidth(): number {
     return this.getValueWithColumnName(this.getWidthColumn().name);
   }
   /**
    * Sets the width for the row
    * @param {Number} width width
    */
-  setWidth(width) {
+  setWidth(width: number): void {
     if (width !== null && width < 0.0) {
-      throw new Error("Width must be greater than or equal to 0.0, invalid value: " + width);
+      throw new Error('Width must be greater than or equal to 0.0, invalid value: ' + width);
     }
     this.setValueWithColumnName(this.getWidthColumn().name, width);
   }
@@ -172,8 +175,8 @@ export class StyleRow extends AttributeRow {
    * Get the width value or default width
    * @return width
    */
-  getWidthOrDefault() {
-    var width = this.getWidth();
+  getWidthOrDefault(): number {
+    let width = this.getWidth();
     if (width === null) {
       width = 1.0;
     }
@@ -183,28 +186,28 @@ export class StyleRow extends AttributeRow {
    * Get the fill color column
    * @return {module:user/userColumn~UserColumn}
    */
-  getFillColorColumn() {
+  getFillColorColumn(): UserColumn {
     return this.styleTable.getFillColorColumn();
   }
   /**
    * Get the style fill color
    * @return {String} color
    */
-  getFillColor() {
+  getFillColor(): string {
     return this.createColor(this.getFillHexColor(), this.getFillOpacity());
   }
   /**
    * Check if the style has a fill color
    * @return true if has a color
    */
-  hasFillColor() {
+  hasFillColor(): boolean {
     return this._hasColor(this.getFillHexColor(), this.getFillOpacity());
   }
   /**
    * Get the fill color
    * @return {String} color
    */
-  getFillHexColor() {
+  getFillHexColor(): string {
     return this.getValueWithColumnName(this.getFillColorColumn().name);
   }
   /**
@@ -212,7 +215,7 @@ export class StyleRow extends AttributeRow {
    * @param {String} color color
    * @param {Number} opacity opacity
    */
-  setFillColor(color, opacity) {
+  setFillColor(color: string, opacity: number): void {
     this.setFillHexColor(color);
     this.setFillOpacity(opacity);
   }
@@ -220,29 +223,29 @@ export class StyleRow extends AttributeRow {
    * Sets the fill color for the row
    * @param {String} color color
    */
-  setFillHexColor(color) {
-    var validatedColor = this.validateColor(color);
+  setFillHexColor(color: string): void {
+    const validatedColor = this.validateColor(color);
     this.setValueWithColumnName(this.getFillColorColumn().name, validatedColor);
   }
   /**
    * Get the fill opacity column
    * @return {module:user/userColumn~UserColumn}
    */
-  getFillOpacityColumn() {
+  getFillOpacityColumn(): UserColumn {
     return this.styleTable.getFillOpacityColumn();
   }
   /**
    * Gets the fill opacity
    * @return {Number}
    */
-  getFillOpacity() {
+  getFillOpacity(): number {
     return this.getValueWithColumnName(this.getFillOpacityColumn().name);
   }
   /**
    * Sets the fill opacity for the row
    * @param {Number} fillOpacity fillOpacity
    */
-  setFillOpacity(fillOpacity) {
+  setFillOpacity(fillOpacity: number): void {
     this.validateOpacity(fillOpacity);
     this.setValueWithColumnName(this.getFillOpacityColumn().name, fillOpacity);
   }
@@ -250,8 +253,8 @@ export class StyleRow extends AttributeRow {
    * Get the fill opacity or default value
    * @return {Number} fill opacity
    */
-  getFillOpacityOrDefault() {
-    var fillOpacity = this.getFillOpacity();
+  getFillOpacityOrDefault(): number {
+    let fillOpacity = this.getFillOpacity();
     if (fillOpacity == null) {
       fillOpacity = 1.0;
     }
@@ -261,14 +264,14 @@ export class StyleRow extends AttributeRow {
    * Validate and adjust the color value
    * @param {String} color color
    */
-  validateColor(color) {
-    var validated = color;
+  validateColor(color: string): string {
+    let validated = color;
     if (color != null) {
-      if (!color.startsWith("#")) {
-        validated = "#" + color;
+      if (!color.startsWith('#')) {
+        validated = '#' + color;
       }
       if (!StyleRow.colorPattern.test(validated)) {
-        throw new Error("Color must be in hex format #RRGGBB or #RGB, invalid value: " + color);
+        throw new Error('Color must be in hex format #RRGGBB or #RGB, invalid value: ' + color);
       }
       validated = validated.toUpperCase();
     }
@@ -278,10 +281,11 @@ export class StyleRow extends AttributeRow {
    * Validate the opacity value
    * @param {Number} opacity opacity
    */
-  validateOpacity(opacity) {
+  validateOpacity(opacity: number): boolean {
     if (opacity != null && (opacity < 0.0 || opacity > 1.0)) {
-      throw new Error("Opacity must be set inclusively between 0.0 and 1.0, invalid value: " + opacity);
+      throw new Error('Opacity must be set inclusively between 0.0 and 1.0, invalid value: ' + opacity);
     }
+    return true;
   }
   /**
    * Create a color from the hex color and opacity
@@ -289,15 +293,15 @@ export class StyleRow extends AttributeRow {
    * @param {Number} opacity opacity
    * @return {String} rgba color
    */
-  createColor(hexColor, opacity) {
-    var color = '#000000';
+  createColor(hexColor: string, opacity: number): string {
+    let color = '#000000';
     if (hexColor !== null) {
       color = hexColor;
     }
     if (opacity !== null) {
-      var a = Math.round(opacity * 255).toString(16);
+      let a = Math.round(opacity * 255).toString(16);
       if (a.length === 1) {
-        a = "0" + a;
+        a = '0' + a;
       }
       color += a;
     }
@@ -309,7 +313,7 @@ export class StyleRow extends AttributeRow {
    * @param {Number} opacity opacity
    * @return true if has a color
    */
-  _hasColor(hexColor, opacity) {
+  _hasColor(hexColor: string, opacity: number): boolean {
     return hexColor !== null || opacity !== null;
   }
 }

@@ -1,8 +1,8 @@
-import {DBAdapter} from './dbAdapter';
-import fs from 'fs'
-import path from 'path'
-import http from 'http'
-import os from 'os'
+import { DBAdapter } from './dbAdapter';
+import fs from 'fs';
+import path from 'path';
+import http from 'http';
+import os from 'os';
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
@@ -18,45 +18,46 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   async initialize(): Promise<this> {
-    var bettersqlite = await import('better-sqlite3');
-    var Database = bettersqlite.default;
+    const bettersqlite = await import('better-sqlite3');
+    const Database = bettersqlite.default;
     try {
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
-          let url: string = this.filePath as string;
+          const url: string = this.filePath as string;
           return new Promise((resolve, reject) => {
-            http.get(url, (response) => {
-              if (response.statusCode !== 200) {
-                reject(new Error('Unable to reach url: ' + this.filePath));
-              }
-              var tmpPath = path.join(os.tmpdir(), Date.now() + Math.floor(Math.random()*100) + '.gpkg');
-              var writeStream = fs.createWriteStream(tmpPath);
-              response.pipe(writeStream);
-              writeStream.on('close', () => {
-                try {
-                  this.db = new Database(tmpPath);
-                  // verify that this is an actual database
-                  this.db.pragma('journal_mode = WAL');
-                  this.filePath = tmpPath;
-                  resolve(this);
-                } catch (err) {
-                  console.log('error', err);
-                  reject(err);
+            http
+              .get(url, response => {
+                if (response.statusCode !== 200) {
+                  reject(new Error('Unable to reach url: ' + this.filePath));
                 }
+                const tmpPath = path.join(os.tmpdir(), Date.now() + Math.floor(Math.random() * 100) + '.gpkg');
+                const writeStream = fs.createWriteStream(tmpPath);
+                response.pipe(writeStream);
+                writeStream.on('close', () => {
+                  try {
+                    this.db = new Database(tmpPath);
+                    // verify that this is an actual database
+                    this.db.pragma('journal_mode = WAL');
+                    this.filePath = tmpPath;
+                    resolve(this);
+                  } catch (err) {
+                    console.log('error', err);
+                    reject(err);
+                  }
+                });
+              })
+              .on('error', e => {
+                reject(e);
               });
-            })
-            .on('error', (e) => {
-              reject(e);
-            });
-          })
+          });
         } else {
           this.db = new Database(this.filePath);
           return this;
         }
       } else if (this.filePath) {
         // write this byte array to a file then open it
-        var byteArray = this.filePath;
-        var tmpPath = path.join(os.tmpdir(), Date.now() + '.gpkg');
+        const byteArray = this.filePath;
+        const tmpPath = path.join(os.tmpdir(), Date.now() + '.gpkg');
         return new Promise((resolve, reject) => {
           fs.writeFile(tmpPath, byteArray, () => {
             this.db = new Database(tmpPath);
@@ -73,17 +74,16 @@ export class SqliteAdapter implements DBAdapter {
         });
       } else {
         console.log('create in memory');
-        this.db = new Database("memory", {
-          memory: !this.filePath
+        this.db = new Database('memory', {
+          memory: !this.filePath,
         });
         return this;
       }
-
     } catch (err) {
       console.log('Error opening database', err);
       throw err;
     }
-  };
+  }
   // /**
   //  * Creates an adapter from an already established better-sqlite3 database connection
   //  * @param  {*} db better-sqlite3 database connection
@@ -115,7 +115,7 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Buffer containing the contents of the database as a file
    */
   async export(): Promise<any> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       return fs.readFile(this.filePath as string, (err, data) => {
         resolve(data);
       });
@@ -139,12 +139,11 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object}
    */
-  get(sql: string, params?: [] | Object): any {
-    var statement = this.db.prepare(sql);
+  get(sql: string, params?: [] | Record<string, any>): any {
+    const statement = this.db.prepare(sql);
     if (params) {
       return statement.get(params);
-    }
-    else {
+    } else {
       return statement.get();
     }
   }
@@ -153,10 +152,9 @@ export class SqliteAdapter implements DBAdapter {
    * @param {String} tableName
    * @returns {Boolean}
    */
-  isTableExists(tableName: string): Boolean {
-    var statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
-    var result;
-    result = statement.get({ name: tableName });
+  isTableExists(tableName: string): boolean {
+    const statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
+    const result = statement.get({ name: tableName });
     return !!result;
   }
   /**
@@ -166,12 +164,11 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql: string, params?: [] | Object): any[] {
-    var statement = this.db.prepare(sql);
+  all(sql: string, params?: [] | Record<string, any>): any[] {
+    const statement = this.db.prepare(sql);
     if (params) {
       return statement.all(params);
-    }
-    else {
+    } else {
       return statement.all();
     }
   }
@@ -182,12 +179,11 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Iterable.<Object>}
    */
-  each(sql: string, params?: [] | Object): IterableIterator<any> {
-    var statement = this.db.prepare(sql);
+  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
+    const statement = this.db.prepare(sql);
     if (params) {
       return statement.iterate(params);
-    }
-    else {
+    } else {
       return statement.iterate();
     }
   }
@@ -201,12 +197,11 @@ export class SqliteAdapter implements DBAdapter {
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number} {
-    var statement = this.db.prepare(sql);
+  run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number } {
+    const statement = this.db.prepare(sql);
     if (params) {
       return statement.run(params);
-    }
-    else {
+    } else {
       return statement.run();
     }
   }
@@ -216,8 +211,8 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql: string, params?: [] | Object): number {
-    var statement = this.db.prepare(sql);
+  insert(sql: string, params?: [] | Record<string, any>): number {
+    const statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
   /**
@@ -226,8 +221,8 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} params bind parameters
    * @return {Number} deleted rows
    */
-  delete(sql: string, params?: [] | Object): number {
-    var statement = this.db.prepare(sql);
+  delete(sql: string, params?: [] | Record<string, any>): number {
+    const statement = this.db.prepare(sql);
     return statement.run(params).changes;
   }
   /**
@@ -237,13 +232,12 @@ export class SqliteAdapter implements DBAdapter {
    */
   dropTable(table: string): boolean {
     try {
-      var statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
-      var result = statement.run();
-      var vacuum = this.db.prepare('VACUUM');
+      const statement = this.db.prepare('DROP TABLE IF EXISTS "' + table + '"');
+      const result = statement.run();
+      const vacuum = this.db.prepare('VACUUM');
       vacuum.run();
       return result.changes === 0;
-    }
-    catch (e) {
+    } catch (e) {
       console.log('Drop Table Error', e);
       return false;
     }
@@ -255,16 +249,15 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName: string, where?: string, whereArgs?: [] | Object): number {
-    var sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
+  count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+    let sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;
     }
-    var statement = this.db.prepare(sql);
+    const statement = this.db.prepare(sql);
     if (whereArgs) {
       return statement.get(whereArgs).count;
-    }
-    else {
+    } else {
       return statement.get().count;
     }
   }

@@ -1,7 +1,7 @@
-import {UserRow} from "../../user/userRow";
-import {UserTable} from "../../user/userTable";
-import { DublinCoreType } from "./dublinCoreType";
-import {UserColumn} from "../../user/userColumn";
+import { UserRow } from '../../user/userRow';
+import { UserTable } from '../../user/userTable';
+import { DublinCoreType } from './dublinCoreType';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * Dublin Core Metadata Initiative
@@ -20,17 +20,17 @@ export class DublinCoreMetadata {
    * @return {Boolean}
    */
   public static hasColumn(table: UserTable | UserRow, type: DublinCoreType): boolean {
-    var userTable: UserTable;
+    let userTable: UserTable;
     if (table instanceof UserRow) {
       userTable = table.table;
     } else {
       userTable = table;
     }
-    var hasColumn = userTable.hasColumn(type.name);
+    let hasColumn = userTable.hasColumn(type.name);
     if (!userTable.hasColumn(type.name)) {
-      var synonyms = type.synonyms;
+      const synonyms = type.synonyms;
       if (synonyms) {
-        for (var i = 0; i < synonyms.length; i++) {
+        for (let i = 0; i < synonyms.length; i++) {
           hasColumn = userTable.hasColumn(synonyms[i]);
           if (hasColumn) {
             break;
@@ -48,20 +48,20 @@ export class DublinCoreMetadata {
    * @return {module:user/userColumn~UserColumn}
    */
   public static getColumn(table: UserTable | UserRow, type: DublinCoreType): UserColumn {
-    var userTable: UserTable;
+    let userTable: UserTable;
     if (table instanceof UserRow) {
       userTable = table.table;
     } else {
       userTable = table;
     }
-    var column: UserColumn;
-    var hasColumn = userTable.hasColumn(type.name);
+    let column: UserColumn;
+    let hasColumn = userTable.hasColumn(type.name);
     if (hasColumn) {
       column = userTable.getColumnWithColumnName(type.name);
     } else {
-      var synonyms = type.synonyms;
+      const synonyms = type.synonyms;
       if (synonyms) {
-        for (var i = 0; i < synonyms.length; i++) {
+        for (let i = 0; i < synonyms.length; i++) {
           hasColumn = userTable.hasColumn(synonyms[i]);
           if (hasColumn) {
             column = userTable.getColumnWithColumnName(synonyms[i]);
@@ -80,7 +80,7 @@ export class DublinCoreMetadata {
    * @return {Object}
    */
   public static getValue(row: UserRow, type: DublinCoreType): any {
-    var name = DublinCoreMetadata.getColumn(row, type).name;
+    const name = DublinCoreMetadata.getColumn(row, type).name;
     return row.getValueWithColumnName(name);
   }
 
@@ -91,8 +91,7 @@ export class DublinCoreMetadata {
    * @param  {Object} value value to set
    */
   public static setValue(row: UserRow, type: DublinCoreType, value: any): void {
-    var column = DublinCoreMetadata.getColumn(row, type);
+    const column = DublinCoreMetadata.getColumn(row, type);
     row.setValueWithColumnName(column.name, value);
   }
-
 }

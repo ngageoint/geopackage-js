@@ -1,4 +1,3 @@
-
 /**
  * Stores minimal application schema identifying, descriptive and MIME type
  * information about columns in user vector feature and tile matrix data tables
@@ -18,42 +17,42 @@ export class DataColumns {
   table_name: string;
 
   /**
- * the name of the table column
- * @member {string}
- */
+   * the name of the table column
+   * @member {string}
+   */
   column_name: string;
 
   /**
- * A human-readable identifier (e.g. short name) for the column_name content
- * @member {string}
- */
+   * A human-readable identifier (e.g. short name) for the column_name content
+   * @member {string}
+   */
   name: string;
 
   /**
- * A human-readable formal title for the column_name content
- * @member {string}
- */
+   * A human-readable formal title for the column_name content
+   * @member {string}
+   */
   title: string;
 
   /**
- * A human-readable description for the table_name contente
- * @member {string}
- */
+   * A human-readable description for the table_name contente
+   * @member {string}
+   */
   description: string;
 
   /**
- * MIME type of columnName if BLOB type or NULL for other types
- * @member {string}
- */
+   * MIME type of columnName if BLOB type or NULL for other types
+   * @member {string}
+   */
   mime_type: string;
 
   /**
- * Case sensitive column value constraint name specified
- */
+   * Case sensitive column value constraint name specified
+   */
   constraint_name: string;
 
   /**
-   * 
+   *
    * @param {object} [object] object containing properties to apply to this
    */
   constructor(object?: any) {

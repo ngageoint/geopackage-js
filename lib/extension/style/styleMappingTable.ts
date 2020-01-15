@@ -3,9 +3,10 @@
  * @class StyleMappingTable
  */
 
-import {UserMappingTable} from '../relatedTables/userMappingTable';
-import {UserCustomColumn} from '../../user/custom/userCustomColumn'
-import {DataTypes} from '../../db/dataTypes'
+import { UserMappingTable } from '../relatedTables/userMappingTable';
+import { UserCustomColumn } from '../../user/custom/userCustomColumn';
+import { DataTypes } from '../../db/dataTypes';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * Contains style mapping table factory and utility methods
@@ -21,14 +22,14 @@ export class StyleMappingTable extends UserMappingTable {
    * Get the geometry type name column index
    * @return int
    */
-  getGeometryTypeNameColumnIndex() {
+  getGeometryTypeNameColumnIndex(): number {
     return this.getColumnIndex(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME);
   }
   /**
    * Get the geometry type name column
    * @return {module:user/userColumn~UserColumn}
    */
-  getGeometryTypeNameColumn() {
+  getGeometryTypeNameColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME);
   }
   /**
@@ -43,10 +44,19 @@ export class StyleMappingTable extends UserMappingTable {
    * Create the columns
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createColumns() {
-    var columns = UserMappingTable.createRequiredColumns();
-    var index = columns.length;
-    columns.push(UserCustomColumn.createColumn(index, StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
+  static createColumns(): UserColumn[] {
+    const columns = UserMappingTable.createRequiredColumns();
+    const index = columns.length;
+    columns.push(
+      UserCustomColumn.createColumn(
+        index,
+        StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME,
+        DataTypes.TEXT,
+        undefined,
+        false,
+        undefined,
+      ),
+    );
     return columns;
   }
 }

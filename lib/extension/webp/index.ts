@@ -1,13 +1,6 @@
-import {GeoPackage} from "../../geoPackage";
-
-/**
- * WebPExtension module.
- * @module WebPExtension
- * @see module:extension/BaseExtension
- */
-
-import {BaseExtension} from '../baseExtension'
-import {Extension} from '../extension';
+import { GeoPackage } from '../../geoPackage';
+import { BaseExtension } from '../baseExtension';
+import { Extension } from '../extension';
 
 export class WebPExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_webp';
@@ -19,6 +12,12 @@ export class WebPExtension extends BaseExtension {
     this.tableName = tableName;
   }
   getOrCreateExtension(): Promise<Extension> {
-    return this.getOrCreate(WebPExtension.EXTENSION_NAME, this.tableName, 'tile_data', WebPExtension.EXTENSION_WEBP_DEFINITION, Extension.READ_WRITE);
+    return this.getOrCreate(
+      WebPExtension.EXTENSION_NAME,
+      this.tableName,
+      'tile_data',
+      WebPExtension.EXTENSION_WEBP_DEFINITION,
+      Extension.READ_WRITE,
+    );
   }
 }

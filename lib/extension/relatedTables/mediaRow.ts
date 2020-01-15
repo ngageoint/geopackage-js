@@ -1,14 +1,13 @@
-import {MediaTable} from "./mediaTable";
-import {UserRow} from '../../user/userRow';
-import {ImageUtils} from '../../tiles/imageUtils';
-import { UserColumn, DataTypes } from "../../..";
-import {ColumnValues} from "../../dao/columnValues";
+import { MediaTable } from './mediaTable';
+import { UserRow } from '../../user/userRow';
+import { ImageUtils } from '../../tiles/imageUtils';
+import { UserColumn, DataTypes } from '../../..';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * MediaRow module.
  * @module extension/relatedTables
  */
-
 
 /**
  * User Media Row containing the values from a single result set row
@@ -19,7 +18,7 @@ import {ColumnValues} from "../../dao/columnValues";
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class MediaRow extends UserRow {
-  constructor(public mediaTable: MediaTable, columnTypes?: DataTypes[], values?: ColumnValues[]) {
+  constructor(public mediaTable: MediaTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(mediaTable, columnTypes, values);
   }
   /**
@@ -70,7 +69,7 @@ export class MediaRow extends UserRow {
    * Sets the data for the row
    * @param  {Buffer} data data
    */
-  setData(data: Buffer) {
+  setData(data: Buffer): void {
     this.setValueWithColumnName(this.getDataColumn().name, data);
   }
   /**
@@ -91,7 +90,7 @@ export class MediaRow extends UserRow {
    * Sets the content type for the row
    * @param  {string} contentType contentType
    */
-  setContentType(contentType: string) {
+  setContentType(contentType: string): void {
     this.setValueWithColumnName(this.getContentTypeColumn().name, contentType);
   }
 }

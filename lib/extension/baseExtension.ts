@@ -1,7 +1,7 @@
-import {GeoPackage} from "../geoPackage";
-import {GeoPackageConnection} from "../db/geoPackageConnection";
-import {Extension} from './extension';
-import {ExtensionDao} from './extensionDao';
+import { GeoPackage } from '../geoPackage';
+import { GeoPackageConnection } from '../db/geoPackageConnection';
+import { Extension } from './extension';
+import { ExtensionDao } from './extensionDao';
 /**
  * Base Extension
  */
@@ -51,12 +51,18 @@ export abstract class BaseExtension {
    * @param  {String}   scopeType     extension scope type
    * @return {Promise<Extension>}
    */
-  async getOrCreate(extensionName: string, tableName: string | null, columnName: string | null, definition: string, scopeType: string): Promise<Extension> {
-    var extension = this.getExtension(extensionName, tableName, columnName);
+  async getOrCreate(
+    extensionName: string,
+    tableName: string | null,
+    columnName: string | null,
+    definition: string,
+    scopeType: string,
+  ): Promise<Extension> {
+    const extension = this.getExtension(extensionName, tableName, columnName);
     if (extension.length) {
       return extension[0];
     }
-    await this.extensionsDao.createTable()
+    await this.extensionsDao.createTable();
     this.createExtension(extensionName, tableName, columnName, definition, scopeType);
     return this.getExtension(extensionName, tableName, columnName)[0];
   }
@@ -83,7 +89,7 @@ export abstract class BaseExtension {
   hasExtension(extensionName: string, tableName: string, columnName: string): boolean {
     return !!this.getExtension(extensionName, tableName, columnName).length;
   }
-  
+
   /**
    * Create the extension
    * @param {string} extensionName
@@ -92,8 +98,14 @@ export abstract class BaseExtension {
    * @param {string} definition
    * @param {string} scopeType
    */
-  createExtension(extensionName: string, tableName: string, columnName: string, definition: string, scopeType: string): number {
-    var extension = new Extension();
+  createExtension(
+    extensionName: string,
+    tableName: string,
+    columnName: string,
+    definition: string,
+    scopeType: string,
+  ): number {
+    const extension = new Extension();
     extension.table_name = tableName;
     extension.column_name = columnName;
     extension.extension_name = extensionName;

@@ -9,13 +9,13 @@ export interface DBAdapter {
   getDBConnection(): any;
   export(): Promise<any>;
   registerFunction(name: string, functionDefinition: Function): this;
-  get(sql: string, params?: [] | Object): any;
-  isTableExists(tableName: string): Boolean;
-  all(sql: string, params?: [] | Object | null): any[];
-  each(sql: string, params?: [] | Object): IterableIterator<any>;
-  run(sql: string, params?: [] | Object): {changes: number, lastInsertRowid: number};
-  insert(sql: string, params?: [] | Object): number;
-  delete(sql: string, params?: [] | Object): number;
+  get(sql: string, params?: [] | Record<string, any>): any;
+  isTableExists(tableName: string): boolean;
+  all(sql: string, params?: [] | Record<string, any> | null): any[];
+  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any>;
+  run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number };
+  insert(sql: string, params?: [] | Record<string, any>): number;
+  delete(sql: string, params?: [] | Record<string, any>): number;
   dropTable(table: string): boolean;
-  count(tableName: string, where?: string, whereArgs?: [] | Object): number;
+  count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number;
 }

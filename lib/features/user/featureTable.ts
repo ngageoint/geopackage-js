@@ -2,9 +2,9 @@
  * featureTable module.
  * @module features/user/featureTable
  */
-import {UserTable} from '../../user/userTable';
-import {FeatureColumn} from './featureColumn';
-import {UserColumn} from '../../user/userColumn';
+import { UserTable } from '../../user/userTable';
+import { FeatureColumn } from './featureColumn';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * Represents a user feature table
@@ -15,9 +15,9 @@ export class FeatureTable extends UserTable {
   geometryIndex: number;
   constructor(tableName: string, columns?: UserColumn[]) {
     super(tableName, columns);
-    var geometry = undefined;
-    for (var i = 0; i < columns.length; i++) {
-      var column = columns[i];
+    let geometry = undefined;
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
       if (column instanceof FeatureColumn && column.isGeometry()) {
         this.duplicateCheck(column.index, geometry, /* WKB_GEOMETRY_NAME */ 'GEOMETRY');
         geometry = column.index;

@@ -334,7 +334,7 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
-    it('should get the 0 0 0 tile in a canvas', function() {
+    it('should get the 0 0 0 tile in a canvas', async function() {
       var canvas;
       if (typeof(process) !== 'undefined' && process.version) {
         var Canvas = require('canvas');
@@ -342,7 +342,20 @@ describe('GeoPackageAPI tests', function() {
       } else {
         canvas = document.createElement('canvas');
       }
-      return GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
+      await GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
+      testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '3857_rivers_world_tile.png'));
+    });
+
+    it('should get the world as a 4326 tile in a canvas', async function() {
+      var canvas;
+      if (typeof(process) !== 'undefined' && process.version) {
+        var Canvas = require('canvas');
+        canvas = Canvas.createCanvas(512, 256);
+      } else {
+        canvas = document.createElement('canvas');
+      }
+      await GeoPackage.draw4326TileInCanvas(indexedGeopackage, 'rivers_tiles', -90, -180, 90, 180, 0, 512, 256, canvas);
+      testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '4326_rivers_world_tile.png'));
     });
 
     it('should get the 0 0 0 vector tile', function() {
@@ -465,14 +478,14 @@ describe('GeoPackageAPI tests', function() {
       geometryColumns.m = 0;
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-      columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+      columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.TEXT, 5, false, null));
+      columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null));
       columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.REAL, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.BLOB, false, null));
+      columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.INTEGER, false, ""));
 
       return GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
       .then(function(featureDao) {

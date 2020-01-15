@@ -8,7 +8,6 @@ import concat from 'concat-stream';
  * for the text paint object).
  */
 export class ShadedFeaturesTile extends CustomFeaturesTile {
-
   constructor() {
     super();
   }
@@ -24,7 +23,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    *
    * @param {Number} tileBorderStrokeWidth tile border stroke width
    */
-  setTileBorderStrokeWidth(tileBorderStrokeWidth: number) {
+  setTileBorderStrokeWidth(tileBorderStrokeWidth: number): void {
     this.tileBorderStrokeWidth = tileBorderStrokeWidth;
   }
   /**
@@ -38,7 +37,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Set the tile border color
    * @param {String} tileBorderColor tile border color
    */
-  setTileBorderColor(tileBorderColor: string) {
+  setTileBorderColor(tileBorderColor: string): void {
     this.tileBorderColor = tileBorderColor;
   }
   /**
@@ -52,7 +51,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Set the tile fill color
    * @param {String} tileFillColor tile fill color
    */
-  setTileFillColor(tileFillColor: string) {
+  setTileFillColor(tileFillColor: string): void {
     this.tileFillColor = tileFillColor;
   }
   /**
@@ -66,7 +65,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Set the draw unindexed tiles option
    * @param {Boolean} drawUnindexedTiles draw unindexed tiles flag
    */
-  setDrawUnindexedTiles(drawUnindexedTiles: boolean) {
+  setDrawUnindexedTiles(drawUnindexedTiles: boolean): void {
     this.drawUnindexedTiles = drawUnindexedTiles;
   }
   /**
@@ -80,7 +79,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * Set the compression format
    * @param {String} compressFormat either 'png' or 'jpeg'
    */
-  setCompressFormat(compressFormat: string) {
+  setCompressFormat(compressFormat: string): void {
     this.compressFormat = compressFormat;
   }
   /**
@@ -91,13 +90,13 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @returns {Promise<String|Buffer>}
    */
   async drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
-    var image = null;
+    let image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
       // inside.
       // The table is not indexed and more features exist than the max
       // feature count set.
-      image = this.drawTile(tileWidth, tileHeight, "?", canvas);
+      image = this.drawTile(tileWidth, tileHeight, '?', canvas);
     }
     return image;
   }
@@ -109,26 +108,23 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @param tileCanvas
    * @return {Promise<String|Buffer>}
    */
-  // @ts-ignore
   async drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
-    // @ts-ignore
-    return new Promise(function (resolve) {
-      var canvas;
+    return new Promise(resolve => {
+      let canvas;
       if (tileCanvas !== undefined && tileCanvas !== null) {
         canvas = tileCanvas;
-      }
-      else {
+      } else {
         if (CustomFeaturesTile.useNodeCanvas) {
-          var Canvas = require('canvas');
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const Canvas = require('canvas');
           canvas = Canvas.createCanvas(tileWidth, tileHeight);
-        }
-        else {
+        } else {
           canvas = document.createElement('canvas');
           canvas.width = tileWidth;
           canvas.height = tileHeight;
         }
       }
-      var context = canvas.getContext('2d');
+      const context = canvas.getContext('2d');
       context.clearRect(0, 0, tileWidth, tileHeight);
       // Draw the tile border
       if (this.tileFillColor !== null) {
@@ -142,21 +138,19 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
       if (CustomFeaturesTile.useNodeCanvas) {
-        var writeStream = concat(function (buffer) {
+        const writeStream = concat(function(buffer) {
           resolve(buffer);
         });
-        var stream = null;
+        let stream = null;
         if (this.compressFormat === 'png') {
           stream = canvas.createPNGStream();
-        }
-        else {
+        } else {
           stream = canvas.createJPEGStream();
         }
         stream.pipe(writeStream);
-      }
-      else {
+      } else {
         resolve(canvas.toDataURL('image/' + this.compressFormat));
       }
-    }.bind(this));
+    });
   }
 }

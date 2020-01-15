@@ -126,14 +126,14 @@ describe('Related Tile tests', function() {
         var baseIdColumn = userMappingTable.getBaseIdColumn();
         should.exist(baseIdColumn);
         baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
-        baseIdColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_INTEGER);
+        baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
         baseIdColumn.notNull.should.be.equal(true);
         baseIdColumn.primaryKey.should.be.equal(false);
 
         var relatedIdColumn = userMappingTable.getRelatedIdColumn();
         should.exist(relatedIdColumn);
         relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
-        relatedIdColumn.dataType.should.be.equal(DataType.GPKGDataType.GPKG_DT_INTEGER);
+        relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
         relatedIdColumn.notNull.should.be.equal(true);
         relatedIdColumn.primaryKey.should.be.equal(false);
         rte.has(userMappingTable.table_name).should.be.equal(false);

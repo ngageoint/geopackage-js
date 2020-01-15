@@ -7,14 +7,14 @@ module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryT
   var columns = [];
 
   columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-  columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.GPKGDataType.GPKG_DT_TEXT, 5, false, null));
-  columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.GPKGDataType.GPKG_DT_BLOB, 7, false, null));
+  columns.push(FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited', DataTypes.TEXT, 5, false, null));
+  columns.push(FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited', DataTypes.BLOB, 7, false, null));
   columns.push(FeatureColumn.createGeometryColumn(1, geometryColumn, geometryType, false, null));
-  columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text', DataTypes.GPKGDataType.GPKG_DT_TEXT, false, ""));
-  columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.GPKGDataType.GPKG_DT_REAL, false, null));
-  columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, false, null));
-  columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.GPKGDataType.GPKG_DT_BLOB, false, null));
-  columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.GPKGDataType.GPKG_DT_INTEGER, false, ""));
+  columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text', DataTypes.TEXT, false, ""));
+  columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real', DataTypes.REAL, false, null));
+  columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean', DataTypes.BOOLEAN, false, null));
+  columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob', DataTypes.BLOB, false, null));
+  columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer', DataTypes.INTEGER, false, ""));
 
   return new FeatureTable(tableName, columns);
 };

@@ -11,6 +11,7 @@ export class Contents {
    * @member {string}
    */
   table_name: string;
+
   /**
    * Type of data stored in the table:. “features” per clause Features,
    * “tiles” per clause Tiles, or an implementer-defined value for other data
@@ -18,42 +19,50 @@ export class Contents {
    * @member {string}
    */
   data_type: string;
+
   /**
    * A human-readable identifier (e.g. short name) for the table_name content
    * @member {string}
    */
   identifier: string;
+
   /**
    * A human-readable description for the table_name content
    * @member {string}
    */
   description: string;
+
   /**
    * timestamp value in ISO 8601 format as defined by the strftime function
    * %Y-%m-%dT%H:%M:%fZ format string applied to the current time
    * @member {Date}
    */
   last_change: string;
+
   /**
    * Bounding box minimum easting or longitude for all content in table_name
    * @member {Number}
    */
   min_x: number;
+
   /**
    * Bounding box minimum northing or latitude for all content in table_name
    * @member {Number}
    */
   min_y: number;
+
   /**
    * Bounding box maximum easting or longitude for all content in table_name
    * @member {Number}
    */
   max_x: number;
+
   /**
    * Bounding box maximum northing or latitude for all content in table_name
    * @member {Number}
    */
   max_y: number;
+
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
    * @member {SRSRef}

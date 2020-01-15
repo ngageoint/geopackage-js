@@ -2,10 +2,10 @@
  * mediaTable module.
  * @module extension/relatedTables
  */
-import {UserRelatedTable} from './userRelatedTable';
-import {RelationType} from './relationType';
-import {UserColumn} from '../../user/userColumn';
-import {DataTypes} from '../../db/dataTypes';
+import { UserRelatedTable } from './userRelatedTable';
+import { RelationType } from './relationType';
+import { UserColumn } from '../../user/userColumn';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Media Requirements Class User-Defined Related Data Table
@@ -27,7 +27,7 @@ export class MediaTable extends UserRelatedTable {
     super(tableName, MediaTable.RELATION_TYPE.name, MediaTable.RELATION_TYPE.dataType, columns, requiredColumns);
   }
 
-  getTableType() {
+  getTableType(): string {
     return this.TABLE_TYPE;
   }
   /**
@@ -58,7 +58,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:extension/relatedTables~MediaTable}
    */
   static create(tableName: string, additionalColumns?: UserColumn[]): MediaTable {
-    var columns = MediaTable.createRequiredColumns();
+    let columns = MediaTable.createRequiredColumns();
     if (additionalColumns) {
       columns = columns.concat(additionalColumns);
     }
@@ -70,7 +70,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {string[]}
    */
   static requiredColumns(idColumnName = MediaTable.COLUMN_ID): string[] {
-    var requiredColumns = [];
+    const requiredColumns = [];
     requiredColumns.push(idColumnName);
     requiredColumns.push(MediaTable.COLUMN_DATA);
     requiredColumns.push(MediaTable.COLUMN_CONTENT_TYPE);
@@ -93,7 +93,7 @@ export class MediaTable extends UserRelatedTable {
     return [
       MediaTable.createIdColumn(startingIndex++, idColumnName),
       MediaTable.createDataColumn(startingIndex++),
-      MediaTable.createContentTypeColumn(startingIndex++)
+      MediaTable.createContentTypeColumn(startingIndex++),
     ];
   }
   /**
@@ -111,7 +111,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createDataColumn(index: number): UserColumn {
-    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, DataTypes.GPKGDataType.GPKG_DT_BLOB, true);
+    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, DataTypes.BLOB, true);
   }
   /**
    * Create the content type column
@@ -119,6 +119,6 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createContentTypeColumn(index: number): UserColumn {
-    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, DataTypes.GPKGDataType.GPKG_DT_TEXT, true);
+    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, DataTypes.TEXT, true);
   }
 }

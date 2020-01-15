@@ -11,21 +11,21 @@ module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   var columnIndex = startingIndex;
 
   // Add Dublin Core Metadata term columns
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DATE.name, DataTypes.GPKGDataType.GPKG_DT_DATETIME, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT, notNull));
 
   // Add test columns for common data types, some with limits
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text", DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull, ''));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_real", DataTypes.GPKGDataType.GPKG_DT_REAL, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_boolean", DataTypes.GPKGDataType.GPKG_DT_BOOLEAN, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob", DataTypes.GPKGDataType.GPKG_DT_BLOB, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_integer", DataTypes.GPKGDataType.GPKG_DT_INTEGER, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text_limited", DataTypes.GPKGDataType.GPKG_DT_TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob_limited", DataTypes.GPKGDataType.GPKG_DT_BLOB, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_date", DataTypes.GPKGDataType.GPKG_DT_DATE, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_datetime", DataTypes.GPKGDataType.GPKG_DT_DATETIME, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text", DataTypes.TEXT, notNull, ''));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_real", DataTypes.REAL, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_boolean", DataTypes.BOOLEAN, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob", DataTypes.BLOB, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_integer", DataTypes.INTEGER, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text_limited", DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob_limited", DataTypes.BLOB, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_date", DataTypes.DATE, notNull));
+  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_datetime", DataTypes.DATETIME, notNull));
 
   return columns;
 }
@@ -59,29 +59,29 @@ module.exports.populateRow = function(table, row, skipColumns) {
 
       var value;
       switch (column.dataType) {
-        case DataTypes.GPKGDataType.GPKG_DT_TEXT:
+        case DataTypes.TEXT:
           var text = Math.random().toString(36).replace(/[^a-z]+/g, '');
           if (column.max != null) {
             text = text.substr(0, column.max);
           }
           value = text;
           break;
-        case DataTypes.GPKGDataType.GPKG_DT_REAL:
-        case DataTypes.GPKGDataType.GPKG_DT_DOUBLE:
+        case DataTypes.REAL:
+        case DataTypes.DOUBLE:
           value = Math.random() * 5000.0;
           break;
-        case DataTypes.GPKGDataType.GPKG_DT_BOOLEAN:
+        case DataTypes.BOOLEAN:
           value = Math.random() < .5 ? false : true;
           break;
-        case DataTypes.GPKGDataType.GPKG_DT_INTEGER:
-        case DataTypes.GPKGDataType.GPKG_DT_INT:
+        case DataTypes.INTEGER:
+        case DataTypes.INT:
           value = Math.floor(Math.random() * 500);
           break;
-        case DataTypes.GPKGDataType.GPKG_DT_BLOB:
+        case DataTypes.BLOB:
           value = Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
           break;
-        case DataTypes.GPKGDataType.GPKG_DT_DATE:
-        case DataTypes.GPKGDataType.GPKG_DT_DATETIME:
+        case DataTypes.DATE:
+        case DataTypes.DATETIME:
           value = new Date();
           break;
       }
@@ -103,7 +103,7 @@ module.exports.validateUserRow = function(columns, userRow) {
     var rowType = userRow.getRowColumnTypeWithIndex(i);
     var value = userRow.getValueWithIndex(i);
     switch(rowType) {
-      case DataTypes.GPKGDataType.GPKG_DT_INTEGER:
+      case DataTypes.INTEGER:
 
 
     }

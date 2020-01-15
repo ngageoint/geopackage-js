@@ -10,11 +10,11 @@ import { Metadata } from '../metadata';
  * @class MetadataReference
  */
 export class MetadataReference {
-  public static readonly GEOPACKAGE: string = "geopackage";
-  public static readonly TABLE: string = "table";
-  public static readonly COLUMN: string = "column";
-  public static readonly ROW: string = "row";
-  public static readonly ROW_COL: string = "row/col";
+  public static readonly GEOPACKAGE: string = 'geopackage';
+  public static readonly TABLE: string = 'table';
+  public static readonly COLUMN: string = 'column';
+  public static readonly ROW: string = 'row';
+  public static readonly ROW_COL: string = 'row/col';
 
   /**
    * Lowercase metadata reference scope; one of ‘geopackage’, ‘table’, ‘column’, ’row’, ’row/col’
@@ -72,11 +72,10 @@ export class MetadataReference {
    * Set the metadata
    * @param  {Metadata} [metadata] metadata
    */
-  setMetadata(metadata?: Metadata) {
+  setMetadata(metadata?: Metadata): void {
     if (metadata) {
       this.md_file_id = metadata.id;
-    }
-    else {
+    } else {
       this.md_file_id = -1;
     }
   }
@@ -84,32 +83,31 @@ export class MetadataReference {
    * Set the parent metadata
    * @param  {Metadata} [metadata] parent metadata
    */
-  setParentMetadata(metadata?: Metadata) {
+  setParentMetadata(metadata?: Metadata): void {
     if (metadata) {
       this.md_parent_id = metadata.id;
-    }
-    else {
+    } else {
       this.md_parent_id = -1;
     }
   }
-  setReferenceScopeType(referenceScopeType: string) {
+  setReferenceScopeType(referenceScopeType: string): void {
     this.reference_scope = referenceScopeType;
     switch (referenceScopeType) {
-    case MetadataReference.GEOPACKAGE:
-      this.table_name = undefined;
-      this.column_name = undefined;
-      this.row_id_value = undefined;
-      break;
-    case MetadataReference.TABLE:
-      this.column_name = undefined;
-      this.row_id_value = undefined;
-      break;
-    case MetadataReference.ROW:
-      this.column_name = undefined;
-      break;
-    case MetadataReference.COLUMN:
-      this.row_id_value = undefined;
-      break;
+      case MetadataReference.GEOPACKAGE:
+        this.table_name = undefined;
+        this.column_name = undefined;
+        this.row_id_value = undefined;
+        break;
+      case MetadataReference.TABLE:
+        this.column_name = undefined;
+        this.row_id_value = undefined;
+        break;
+      case MetadataReference.ROW:
+        this.column_name = undefined;
+        break;
+      case MetadataReference.COLUMN:
+        this.row_id_value = undefined;
+        break;
     }
   }
 }

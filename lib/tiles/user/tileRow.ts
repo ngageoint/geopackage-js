@@ -1,6 +1,8 @@
-import {TileTable} from "./tileTable";
-import {UserRow} from '../../user/userRow';
-import {TileColumn} from "./tileColumn";
+import { TileTable } from './tileTable';
+import { UserRow } from '../../user/userRow';
+import { TileColumn } from './tileColumn';
+import { DataTypes } from '../../..';
+import { ColumnValues } from '../../dao/columnValues';
 /**
  * tileRow module.
  * @module tiles/user/tileRow
@@ -16,11 +18,11 @@ import {TileColumn} from "./tileColumn";
  */
 export class TileRow extends UserRow {
   tileTable: TileTable;
-  constructor(tileTable: TileTable, columnTypes?: any[], values?: any[]) {
+  constructor(tileTable: TileTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(tileTable, columnTypes, values);
     this.tileTable = tileTable;
   }
-  toObjectValue(value: any) {
+  toObjectValue(value: any): any {
     return value;
   }
   toDatabaseValue(columnName: string): any {
@@ -51,7 +53,7 @@ export class TileRow extends UserRow {
    * Set the zoom level
    * @param {Number} zoomLevel zoom level
    */
-  setZoomLevel(zoomLevel: number) {
+  setZoomLevel(zoomLevel: number): void {
     this.setValueWithIndex(this.getZoomLevelColumnIndex(), zoomLevel);
   }
   /**
@@ -79,7 +81,7 @@ export class TileRow extends UserRow {
    * Set the tile column
    * @param {number} tileColumn tile column
    */
-  setTileColumn(tileColumn: number) {
+  setTileColumn(tileColumn: number): void {
     this.setValueWithColumnName(this.getTileColumnColumn().name, tileColumn);
   }
   /**
@@ -107,7 +109,7 @@ export class TileRow extends UserRow {
    * Set the tile row
    * @param {Number} tileRow tile row
    */
-  setTileRow(tileRow: number) {
+  setTileRow(tileRow: number): void {
     this.setValueWithColumnName(this.getRowColumn().name, tileRow);
   }
   /**
@@ -135,14 +137,14 @@ export class TileRow extends UserRow {
    * Set the tile data
    * @param {Buffer} tileData tile data
    */
-  setTileData(tileData: Buffer) {
+  setTileData(tileData: Buffer): void {
     this.setValueWithColumnName(this.getTileDataColumn().name, tileData);
   }
   /**
    * Get the tile data as an image
    * @return {*} tile image
    */
-  getTileDataImage() {
+  getTileDataImage(): void {
     // TODO
   }
 }

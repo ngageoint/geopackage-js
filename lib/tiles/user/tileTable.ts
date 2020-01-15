@@ -2,8 +2,8 @@
  * @module tiles/user/tileTable
  */
 
-import {UserTable} from '../../user/userTable';
-import {TileColumn} from './tileColumn';
+import { UserTable } from '../../user/userTable';
+import { TileColumn } from './tileColumn';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
@@ -19,31 +19,31 @@ export class TileTable extends UserTable {
   tileDataIndex: number;
   constructor(tableName: string, columns: TileColumn[]) {
     super(tableName, columns);
-    var uniqueColumns = [];
-    for (var i = 0; i < columns.length; i++) {
-      var column = columns[i];
-      var columnName = column.name;
-      var columnIndex = column.index;
+    const uniqueColumns = [];
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
+      const columnName = column.name;
+      const columnIndex = column.index;
       switch (columnName) {
-      case TileColumn.COLUMN_ZOOM_LEVEL:
-        this.duplicateCheck(columnIndex, this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
-        this.zoomLevelIndex = columnIndex;
-        uniqueColumns.push(column);
-        break;
-      case TileColumn.COLUMN_TILE_COLUMN:
-        this.duplicateCheck(columnIndex, this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
-        this.tileColumnIndex = columnIndex;
-        uniqueColumns.push(column);
-        break;
-      case TileColumn.COLUMN_TILE_ROW:
-        this.duplicateCheck(columnIndex, this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
-        this.tileRowIndex = columnIndex;
-        uniqueColumns.push(column);
-        break;
-      case TileColumn.COLUMN_TILE_DATA:
-        this.duplicateCheck(columnIndex, this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
-        this.tileDataIndex = columnIndex;
-        break;
+        case TileColumn.COLUMN_ZOOM_LEVEL:
+          this.duplicateCheck(columnIndex, this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
+          this.zoomLevelIndex = columnIndex;
+          uniqueColumns.push(column);
+          break;
+        case TileColumn.COLUMN_TILE_COLUMN:
+          this.duplicateCheck(columnIndex, this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
+          this.tileColumnIndex = columnIndex;
+          uniqueColumns.push(column);
+          break;
+        case TileColumn.COLUMN_TILE_ROW:
+          this.duplicateCheck(columnIndex, this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
+          this.tileRowIndex = columnIndex;
+          uniqueColumns.push(column);
+          break;
+        case TileColumn.COLUMN_TILE_DATA:
+          this.duplicateCheck(columnIndex, this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
+          this.tileDataIndex = columnIndex;
+          break;
       }
     }
     this.uniqueConstraints = [{ columns: uniqueColumns }];
@@ -75,7 +75,7 @@ export class TileTable extends UserTable {
     return TileTable.createRequiredColumnsWithStartingIndex(0);
   }
   static createRequiredColumnsWithStartingIndex(startingIndex: number): TileColumn[] {
-    var columns = [];
+    const columns = [];
     columns.push(TileColumn.createIdColumn(startingIndex++));
     columns.push(TileColumn.createZoomLevelColumn(startingIndex++));
     columns.push(TileColumn.createTileColumnColumn(startingIndex++));

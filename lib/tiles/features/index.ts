@@ -1,24 +1,24 @@
-import concat from 'concat-stream'
-import * as d3geo  from 'd3-geo'
-import reproject from 'reproject'
-import PolyToLine from '@turf/polygon-to-line'
+import concat from 'concat-stream';
+import * as d3geo from 'd3-geo';
+import reproject from 'reproject';
+import PolyToLine from '@turf/polygon-to-line';
 
-import {FeatureDao} from "../../features/user/featureDao"
-import {TileBoundingBoxUtils} from '../tileBoundingBoxUtils'
-import { BoundingBox } from '../../boundingBox'
-import { ImageUtils } from '../imageUtils'
-import IconCache from '../../extension/style/iconCache'
-import { GeometryCache } from './geometryCache'
-import { FeatureDrawType } from './featureDrawType'
-import FeaturePaintCache from './featurePaintCache'
-import { Paint } from './paint'
-import { FeatureTableStyles } from '../../extension/style/featureTableStyles'
-import {GeoPackage} from '../../geoPackage'
-import {FeatureTable} from '../../features/user/featureTable'
-import {FeatureRow} from '../../features/user/featureRow'
-import {StyleRow} from '../../extension/style/styleRow'
-import { FeatureTilePointIcon } from './featureTilePointIcon'
-import { CustomFeaturesTile } from './custom/customFeaturesTile'
+import { FeatureDao } from '../../features/user/featureDao';
+import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
+import { BoundingBox } from '../../boundingBox';
+import { ImageUtils } from '../imageUtils';
+import IconCache from '../../extension/style/iconCache';
+import { GeometryCache } from './geometryCache';
+import { FeatureDrawType } from './featureDrawType';
+import FeaturePaintCache from './featurePaintCache';
+import { Paint } from './paint';
+import { FeatureTableStyles } from '../../extension/style/featureTableStyles';
+import { GeoPackage } from '../../geoPackage';
+import { FeatureRow } from '../../features/user/featureRow';
+import { StyleRow } from '../../extension/style/styleRow';
+import { FeatureTilePointIcon } from './featureTilePointIcon';
+import { CustomFeaturesTile } from './custom/customFeaturesTile';
+import FeatureStyle from '../../extension/style/featureStyle';
 /**
  * FeatureTiles module.
  * @module tiles/features
@@ -29,33 +29,37 @@ import { CustomFeaturesTile } from './custom/customFeaturesTile'
  *  from those features.
  */
 export class FeatureTiles {
-  private static readonly isElectron: boolean = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-  // @ts-ignore
-  private static readonly isPhantom: boolean = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-  private static readonly isNode: boolean = typeof (process) !== 'undefined' && !!process.version;
-  private static readonly useNodeCanvas: boolean = FeatureTiles.isNode && !FeatureTiles.isPhantom && !FeatureTiles.isElectron;
-  compressFormat: string = 'png';
-  pointRadius: number = 4.0;
+  private static readonly isElectron: boolean = !!(
+    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
+  );
+  private static readonly isNode: boolean = typeof process !== 'undefined' && !!process.version;
+  private static readonly useNodeCanvas: boolean = FeatureTiles.isNode && !FeatureTiles.isElectron;
+  compressFormat = 'png';
+  pointRadius = 4.0;
   pointPaint: Paint = new Paint();
-  pointIcon: any = null;
+  pointIcon: FeatureTilePointIcon = null;
   linePaint: Paint = new Paint();
-  lineStrokeWidth: number = 2.0;
+  lineStrokeWidth = 2.0;
   polygonPaint: Paint = new Paint();
-  polygonStrokeWidth: number = 2.0;
-  fillPolygon: boolean = true;
+  polygonStrokeWidth = 2.0;
+  fillPolygon = true;
   polygonFillPaint: Paint = new Paint();
   featurePaintCache: FeaturePaintCache = new FeaturePaintCache();
   geometryCache: GeometryCache = new GeometryCache();
-  cacheGeometries: boolean = true;
+  cacheGeometries = true;
   iconCache: IconCache = new IconCache();
-  scale: number = 1.0;
+  scale = 1.0;
   geoPackage: GeoPackage;
   featureTableStyles: any;
   maxFeaturesPerTile: number = null;
   maxFeaturesTileDraw: any = null;
   widthOverlap: number;
   heightOverlap: number;
-  constructor(public featureDao: FeatureDao, public tileWidth: number = 256, public tileHeight: number = 256) {
+  constructor(
+    public featureDao: FeatureDao<FeatureRow>,
+    public tileWidth: number = 256,
+    public tileHeight: number = 256,
+  ) {
     this.linePaint.setStrokeWidth(2.0);
     this.polygonPaint.setStrokeWidth(2.0);
     this.polygonFillPaint.setColor('#00000011');
@@ -72,7 +76,7 @@ export class FeatureTiles {
    * Manually set the width and height draw overlap
    * @param {Number} pixels pixels
    */
-  setDrawOverlap(pixels: number) {
+  setDrawOverlap(pixels: number): void {
     this.setWidthDrawOverlap(pixels);
     this.setHeightDrawOverlap(pixels);
   }
@@ -87,7 +91,7 @@ export class FeatureTiles {
    * Manually set the width draw overlap
    * @param {Number} pixels pixels
    */
-  setWidthDrawOverlap(pixels: number) {
+  setWidthDrawOverlap(pixels: number): void {
     this.widthOverlap = pixels;
   }
   /**
@@ -101,14 +105,14 @@ export class FeatureTiles {
    * Manually set the height draw overlap
    * @param {Number} pixels pixels
    */
-  setHeightDrawOverlap(pixels: number) {
+  setHeightDrawOverlap(pixels: number): void {
     this.heightOverlap = pixels;
   }
   /**
    * Get the feature DAO
    * @return {module:features/user/featureDao} feature dao
    */
-  getFeatureDao(): FeatureDao {
+  getFeatureDao(): FeatureDao<FeatureRow> {
     return this.featureDao;
   }
   /**
@@ -122,27 +126,27 @@ export class FeatureTiles {
    * Set the feature table styles
    * @param {module:extension/style~FeatureTableStyles} featureTableStyles feature table styles
    */
-  setFeatureTableStyles(featureTableStyles: FeatureTableStyles) {
+  setFeatureTableStyles(featureTableStyles: FeatureTableStyles): void {
     this.featureTableStyles = featureTableStyles;
   }
   /**
    * Ignore the feature table styles within the GeoPackage
    */
-  ignoreFeatureTableStyles() {
+  ignoreFeatureTableStyles(): void {
     this.setFeatureTableStyles(null);
     this.calculateDrawOverlap();
   }
   /**
    * Clear all caches
    */
-  clearCache() {
+  clearCache(): void {
     this.clearStylePaintCache();
     this.clearIconCache();
   }
   /**
    * Clear the style paint cache
    */
-  clearStylePaintCache() {
+  clearStylePaintCache(): void {
     this.featurePaintCache.clear();
   }
   /**
@@ -151,20 +155,20 @@ export class FeatureTiles {
    * @param {Number} size
    * @since 3.3.0
    */
-  setStylePaintCacheSize(size: number) {
+  setStylePaintCacheSize(size: number): void {
     this.featurePaintCache.resize(size);
   }
   /**
    * Clear the icon cache
    */
-  clearIconCache() {
+  clearIconCache(): void {
     this.iconCache.clear();
   }
   /**
    * Set / resize the icon cache size
    * @param {Number} size new size
    */
-  setIconCacheSize(size: number) {
+  setIconCacheSize(size: number): void {
     this.iconCache.resize(size);
   }
   /**
@@ -178,7 +182,7 @@ export class FeatureTiles {
    * Set the tile width
    * @param {Number} tileWidth tile width
    */
-  setTileWidth(tileWidth:number) {
+  setTileWidth(tileWidth: number): void {
     this.tileWidth = tileWidth;
   }
   /**
@@ -192,7 +196,7 @@ export class FeatureTiles {
    * Set the tile height
    * @param {Number} tileHeight tile height
    */
-  setTileHeight(tileHeight: number) {
+  setTileHeight(tileHeight: number): void {
     this.tileHeight = tileHeight;
   }
   /**
@@ -206,7 +210,7 @@ export class FeatureTiles {
    * Set the compress format
    * @param {String} compressFormat compress format
    */
-  setCompressFormat(compressFormat: string) {
+  setCompressFormat(compressFormat: string): void {
     this.compressFormat = compressFormat;
   }
   /**
@@ -214,7 +218,7 @@ export class FeatureTiles {
    *
    * @param {Number} scale scale factor
    */
-  setScale(scale: number) {
+  setScale(scale: number): void {
     this.scale = scale;
     this.linePaint.setStrokeWidth(scale * this.lineStrokeWidth);
     this.polygonPaint.setStrokeWidth(scale * this.polygonStrokeWidth);
@@ -225,7 +229,7 @@ export class FeatureTiles {
    * Set CacheGeometries flag. When set to true, geometries will be cached.
    * @param {Boolean} cacheGeometries
    */
-  setCacheGeometries(cacheGeometries: boolean) {
+  setCacheGeometries(cacheGeometries: boolean): void {
     this.cacheGeometries = cacheGeometries;
   }
 
@@ -233,8 +237,8 @@ export class FeatureTiles {
    * Set geometry cache's max size
    * @param {Number} maxSize
    */
-  setGeometryCacheMaxSize(maxSize: number) {
-    this.geometryCache.resize(maxSize)
+  setGeometryCacheMaxSize(maxSize: number): void {
+    this.geometryCache.resize(maxSize);
   }
   /**
    * Get the scale
@@ -243,66 +247,65 @@ export class FeatureTiles {
   getScale(): number {
     return this.scale;
   }
-  calculateDrawOverlap() {
+  calculateDrawOverlap(): void {
     if (this.pointIcon) {
       this.heightOverlap = this.scale * this.pointIcon.getHeight();
       this.widthOverlap = this.scale * this.pointIcon.getWidth();
-    }
-    else {
+    } else {
       this.heightOverlap = this.scale * this.pointRadius;
       this.widthOverlap = this.scale * this.pointRadius;
     }
-    var lineHalfStroke = this.scale * this.lineStrokeWidth / 2.0;
+    const lineHalfStroke = (this.scale * this.lineStrokeWidth) / 2.0;
     this.heightOverlap = Math.max(this.heightOverlap, lineHalfStroke);
     this.widthOverlap = Math.max(this.widthOverlap, lineHalfStroke);
-    var polygonHalfStroke = this.scale * this.polygonStrokeWidth / 2.0;
+    const polygonHalfStroke = (this.scale * this.polygonStrokeWidth) / 2.0;
     this.heightOverlap = Math.max(this.heightOverlap, polygonHalfStroke);
     this.widthOverlap = Math.max(this.widthOverlap, polygonHalfStroke);
     if (this.featureTableStyles !== null && this.featureTableStyles.has()) {
-      var styleRowIds = [];
-      var tableStyleIds = this.featureTableStyles.getAllTableStyleIds();
+      let styleRowIds = [];
+      const tableStyleIds = this.featureTableStyles.getAllTableStyleIds();
       if (tableStyleIds !== null) {
         styleRowIds = styleRowIds.concat(tableStyleIds);
       }
-      var styleIds = this.featureTableStyles.getAllStyleIds();
+      const styleIds = this.featureTableStyles.getAllStyleIds();
       if (styleIds != null) {
         styleRowIds = styleRowIds.concat(styleIds.filter(id => styleRowIds.indexOf(id) === -1));
       }
-      var styleDao = this.featureTableStyles.getStyleDao();
-      for (var i = 0; i < styleRowIds.length; i++) {
-        var styleRowId = styleRowIds[i];
-        var styleRow = styleDao.queryForId(styleRowId);
-        var styleHalfWidth = this.scale * (styleRow.getWidthOrDefault() / 2.0);
+      const styleDao = this.featureTableStyles.getStyleDao();
+      for (let i = 0; i < styleRowIds.length; i++) {
+        const styleRowId = styleRowIds[i];
+        const styleRow = styleDao.queryForId(styleRowId);
+        const styleHalfWidth = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         this.widthOverlap = Math.max(this.widthOverlap, styleHalfWidth);
         this.heightOverlap = Math.max(this.heightOverlap, styleHalfWidth);
       }
-      var iconRowIds = [];
-      var tableIconIds = this.featureTableStyles.getAllTableIconIds();
+      let iconRowIds = [];
+      const tableIconIds = this.featureTableStyles.getAllTableIconIds();
       if (tableIconIds != null) {
         iconRowIds = iconRowIds.concat(tableIconIds);
       }
-      var iconIds = this.featureTableStyles.getAllIconIds();
+      const iconIds = this.featureTableStyles.getAllIconIds();
       if (iconIds != null) {
         iconRowIds = iconRowIds.concat(iconIds.filter(id => iconRowIds.indexOf(id) === -1));
       }
-      var iconDao = this.featureTableStyles.getIconDao();
-      for (i = 0; i < iconRowIds.length; i++) {
-        var iconRowId = iconRowIds[i];
-        var iconRow = iconDao.queryForId(iconRowId);
-        var iconDimensions = iconRow.getDerivedDimensions();
-        var iconWidth = this.scale * Math.ceil(iconDimensions[0]);
-        var iconHeight = this.scale * Math.ceil(iconDimensions[1]);
+      const iconDao = this.featureTableStyles.getIconDao();
+      for (let i = 0; i < iconRowIds.length; i++) {
+        const iconRowId = iconRowIds[i];
+        const iconRow = iconDao.queryForId(iconRowId);
+        const iconDimensions = iconRow.getDerivedDimensions();
+        const iconWidth = this.scale * Math.ceil(iconDimensions[0]);
+        const iconHeight = this.scale * Math.ceil(iconDimensions[1]);
         this.widthOverlap = Math.max(this.widthOverlap, iconWidth);
         this.heightOverlap = Math.max(this.heightOverlap, iconHeight);
       }
     }
   }
-  setDrawOverlapsWithPixels(pixels: number) {
+  setDrawOverlapsWithPixels(pixels: number): void {
     this.widthOverlap = pixels;
     this.heightOverlap = pixels;
   }
-  getFeatureStyle(featureRow: FeatureRow) {
-    var featureStyle = null;
+  getFeatureStyle(featureRow: FeatureRow): FeatureStyle {
+    let featureStyle = null;
     if (this.featureTableStyles !== null) {
       featureStyle = this.featureTableStyles.getFeatureStyleForFeatureRow(featureRow);
     }
@@ -313,8 +316,8 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPointPaint(featureStyle: any) {
-    var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.CIRCLE);
+  getPointPaint(featureStyle: FeatureStyle): Paint {
+    let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.CIRCLE);
     if (paint == null) {
       paint = this.pointPaint;
     }
@@ -325,8 +328,8 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getLinePaint(featureStyle: any) {
-    var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
+  getLinePaint(featureStyle: FeatureStyle): Paint {
+    let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint === null) {
       paint = this.linePaint;
     }
@@ -337,8 +340,8 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPolygonPaint(featureStyle: any) {
-    var paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
+  getPolygonPaint(featureStyle: any): Paint {
+    let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint == null) {
       paint = this.polygonPaint;
     }
@@ -350,16 +353,15 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPolygonFillPaint(featureStyle: any) {
-    var paint = null;
-    var hasStyleColor = false;
+  getPolygonFillPaint(featureStyle: FeatureStyle): Paint {
+    let paint = null;
+    let hasStyleColor = false;
     if (featureStyle != null) {
-      var style = featureStyle.getStyle();
+      const style = featureStyle.getStyle();
       if (style != null) {
         if (style.hasFillColor()) {
           paint = this.getStylePaint(style, FeatureDrawType.FILL);
-        }
-        else {
+        } else {
           hasStyleColor = style.hasColor();
         }
       }
@@ -375,10 +377,10 @@ export class FeatureTiles {
    * @param drawType draw type
    * @return feature style paint
    */
-  getFeatureStylePaint(featureStyle: any, drawType: any) {
-    var paint = null;
+  getFeatureStylePaint(featureStyle: FeatureStyle, drawType: FeatureDrawType): Paint {
+    let paint = null;
     if (featureStyle != null) {
-      var style = featureStyle.getStyle();
+      const style = featureStyle.getStyle();
       if (style !== null && style.hasColor()) {
         paint = this.getStylePaint(style, drawType);
       }
@@ -391,26 +393,23 @@ export class FeatureTiles {
    * @param drawType draw type
    * @return {Paint} paint
    */
-  getStylePaint(style: StyleRow, drawType: string) {
-    var paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
+  getStylePaint(style: StyleRow, drawType: FeatureDrawType): Paint {
+    let paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
     if (paint === undefined || paint === null) {
-      var color = null;
-      var strokeWidth = null;
+      let color = null;
+      let strokeWidth = null;
       if (drawType === FeatureDrawType.CIRCLE) {
         color = style.getColor();
-      }
-      else if (drawType === FeatureDrawType.STROKE) {
+      } else if (drawType === FeatureDrawType.STROKE) {
         color = style.getColor();
         strokeWidth = this.scale * style.getWidthOrDefault();
-      }
-      else if (drawType === FeatureDrawType.FILL) {
+      } else if (drawType === FeatureDrawType.FILL) {
         color = style.getFillColor();
         strokeWidth = this.scale * style.getWidthOrDefault();
+      } else {
+        throw new Error('Unsupported Draw Type: ' + drawType);
       }
-      else {
-        throw new Error("Unsupported Draw Type: " + drawType);
-      }
-      var stylePaint = new Paint();
+      const stylePaint = new Paint();
       stylePaint.setColor(color);
       if (strokeWidth !== null) {
         stylePaint.setStrokeWidth(strokeWidth);
@@ -434,7 +433,7 @@ export class FeatureTiles {
    * Set the point radius
    * @param {Number} pointRadius point radius
    */
-  setPointRadius(pointRadius: number) {
+  setPointRadius(pointRadius: number): void {
     this.pointRadius = pointRadius;
   }
   /**
@@ -448,7 +447,7 @@ export class FeatureTiles {
    * Set point color
    * @param {String} pointColor point color
    */
-  setPointColor(pointColor: string) {
+  setPointColor(pointColor: string): void {
     this.pointPaint.setColor(pointColor);
   }
   /**
@@ -462,7 +461,7 @@ export class FeatureTiles {
    * Set the point icon
    * @param {module:tiles/features.FeatureTilePointIcon} pointIcon point icon
    */
-  setPointIcon(pointIcon: FeatureTilePointIcon) {
+  setPointIcon(pointIcon: FeatureTilePointIcon): void {
     this.pointIcon = pointIcon;
   }
   /**
@@ -476,7 +475,7 @@ export class FeatureTiles {
    * Set line stroke width
    * @param {Number} lineStrokeWidth line stroke width
    */
-  setLineStrokeWidth(lineStrokeWidth: number) {
+  setLineStrokeWidth(lineStrokeWidth: number): void {
     this.lineStrokeWidth = lineStrokeWidth;
     this.linePaint.setStrokeWidth(this.scale * this.lineStrokeWidth);
   }
@@ -491,7 +490,7 @@ export class FeatureTiles {
    * Set line color
    * @param {String} lineColor line color
    */
-  setLineColor(lineColor: string) {
+  setLineColor(lineColor: string): void {
     this.linePaint.setColor(lineColor);
   }
   /**
@@ -505,7 +504,7 @@ export class FeatureTiles {
    * Set polygon stroke width
    * @param {Number} polygonStrokeWidth polygon stroke width
    */
-  setPolygonStrokeWidth(polygonStrokeWidth: number) {
+  setPolygonStrokeWidth(polygonStrokeWidth: number): void {
     this.polygonStrokeWidth = polygonStrokeWidth;
     this.polygonPaint.setStrokeWidth(this.scale * this.polygonStrokeWidth);
   }
@@ -520,7 +519,7 @@ export class FeatureTiles {
    * Set polygon color
    * @param {String} polygonColor polygon color
    */
-  setPolygonColor(polygonColor: string) {
+  setPolygonColor(polygonColor: string): void {
     this.polygonPaint.setColor(polygonColor);
   }
   /**
@@ -534,7 +533,7 @@ export class FeatureTiles {
    * Set the fill polygon
    * @param {Boolean} fillPolygon fill polygon
    */
-  setFillPolygon(fillPolygon: boolean) {
+  setFillPolygon(fillPolygon: boolean): void {
     this.fillPolygon = fillPolygon;
   }
   /**
@@ -548,7 +547,7 @@ export class FeatureTiles {
    * Set polygon fill color
    * @param {String} polygonFillColor polygon fill color
    */
-  setPolygonFillColor(polygonFillColor: string) {
+  setPolygonFillColor(polygonFillColor: string): void {
     this.polygonFillPaint.setColor(polygonFillColor);
   }
   /**
@@ -563,7 +562,7 @@ export class FeatureTiles {
    * to create a single tile, the tile is not created.
    * @param {Number} maxFeaturesPerTile  max features per tile
    */
-  setMaxFeaturesPerTile(maxFeaturesPerTile: number) {
+  setMaxFeaturesPerTile(maxFeaturesPerTile: number): void {
     this.maxFeaturesPerTile = maxFeaturesPerTile;
   }
   /**
@@ -579,179 +578,186 @@ export class FeatureTiles {
    * a single tile than the max at #getMaxFeaturesPerTile exist
    * @param {module:tiles/features/custom~CustomFeatureTile} maxFeaturesTileDraw max features tile draw
    */
-  setMaxFeaturesTileDraw(maxFeaturesTileDraw: CustomFeaturesTile) {
+  setMaxFeaturesTileDraw(maxFeaturesTileDraw: CustomFeaturesTile): void {
     this.maxFeaturesTileDraw = maxFeaturesTileDraw;
   }
   getFeatureCountXYZ(x: number, y: number, z: number): number {
-    var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+    let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
     boundingBox = this.expandBoundingBox(boundingBox);
     return this.featureDao.countWebMercatorBoundingBox(boundingBox);
   }
   async drawTile(x: number, y: number, z: number, canvas = null): Promise<any> {
-    var indexed = this.featureDao.isIndexed();
+    const indexed = this.featureDao.isIndexed();
     if (indexed) {
       return this.drawTileQueryIndex(x, y, z, canvas);
-    }
-    else {
+    } else {
       return this.drawTileQueryAll(x, y, z, canvas);
     }
   }
   async drawTileQueryAll(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
-    var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+    let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     boundingBox = this.expandBoundingBox(boundingBox);
-    var count = this.featureDao.getCount();
+    const count = this.featureDao.getCount();
     if (this.maxFeaturesPerTile === null || count <= this.maxFeaturesPerTile) {
       return this.drawTileWithBoundingBox(boundingBox, zoom, canvas);
-    }
-    else if (this.maxFeaturesTileDraw !== null) {
+    } else if (this.maxFeaturesTileDraw !== null) {
       return this.maxFeaturesTileDraw.drawUnindexedTile(256, 256, canvas);
     }
   }
   async drawTileQueryIndex(x: number, y: number, z: number, tileCanvas?: any): Promise<any> {
-    var boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    var expandedBoundingBox = this.expandBoundingBox(boundingBox);
-    var width = 256;
-    var height = 256;
-    var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 << z), width * (1 << z));
-    var xTranslate = -positionAndScale.xPositionInFinalTileStart;
-    var yTranslate = -positionAndScale.yPositionInFinalTileStart;
-    var pi = Math.PI, tau = 2 * pi;
-    var drawProjection = d3geo.geoMercator()
-      .scale((1 << z) * 256 / tau)
+    const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+    const expandedBoundingBox = this.expandBoundingBox(boundingBox);
+    const width = 256;
+    const height = 256;
+    const positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(
+      boundingBox,
+      height,
+      width,
+      new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244),
+      height * (1 << z),
+      width * (1 << z),
+    );
+    const xTranslate = -positionAndScale.xPositionInFinalTileStart;
+    const yTranslate = -positionAndScale.yPositionInFinalTileStart;
+    const pi = Math.PI,
+      tau = 2 * pi;
+    const drawProjection = d3geo
+      .geoMercator()
+      .scale(((1 << z) * 256) / tau)
       .center([-180, 85.0511287798066])
       .translate([xTranslate, yTranslate]);
-    var canvas;
+    let canvas;
     if (tileCanvas !== null) {
       canvas = tileCanvas;
     }
-    var context;
     if (canvas === undefined || canvas === null) {
       if (FeatureTiles.useNodeCanvas) {
-        var Canvas = require('canvas');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Canvas = require('canvas');
         canvas = Canvas.createCanvas(width, height);
-      }
-      else {
+      } else {
         canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
       }
     }
-    context = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
     context.clearRect(0, 0, width, height);
-    var srs = this.featureDao.getSrs();
-    var tileCount = this.featureDao.countWebMercatorBoundingBox(expandedBoundingBox);
+    const srs = this.featureDao.getSrs();
+    const tileCount = this.featureDao.countWebMercatorBoundingBox(expandedBoundingBox);
     if (this.maxFeaturesPerTile === null || tileCount <= this.maxFeaturesPerTile) {
-      var iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
-      for (var featureRow of iterator) {
-        var geojson = null;
+      const iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
+      for (const featureRow of iterator) {
+        let geojson = null;
         if (this.cacheGeometries) {
-          geojson = this.geometryCache.getGeometryForFeatureRow(featureRow)
+          geojson = this.geometryCache.getGeometryForFeatureRow(featureRow);
         }
         if (geojson === undefined || geojson === null) {
           geojson = featureRow.getGeometry().geometry.toGeoJSON();
           this.geometryCache.setGeometry(featureRow.getId(), geojson);
         }
-        var style = this.getFeatureStyle(featureRow);
+        const style = this.getFeatureStyle(featureRow);
         if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
           geojson = reproject.toWgs84(geojson, this.featureDao.projection);
         }
         await this.addFeatureToBatch(geojson, context, drawProjection, boundingBox, style);
       }
-      // @ts-ignore
-      return new Promise(function (resolve, reject) {
+      return new Promise(resolve => {
         if (FeatureTiles.useNodeCanvas) {
-          var writeStream = concat(function (buffer) {
+          const writeStream = concat(function(buffer) {
             resolve(buffer);
           });
-          var stream = null;
+          let stream = null;
           if (this.compressFormat === 'png') {
             stream = canvas.createPNGStream();
-          }
-          else {
+          } else {
             stream = canvas.createJPEGStream();
           }
           stream.pipe(writeStream);
-        }
-        else {
+        } else {
           resolve(canvas.toDataURL('image/' + this.compressFormat));
         }
-      }.bind(this));
-    }
-    else if (this.maxFeaturesTileDraw !== null) {
+      });
+    } else if (this.maxFeaturesTileDraw !== null) {
       // Draw the max features tile
       return this.maxFeaturesTileDraw.drawTile(width, height, tileCount, canvas);
     }
   }
   async drawTileWithBoundingBox(boundingBox: BoundingBox, zoom: number, tileCanvas?: any): Promise<any> {
-    var width = 256;
-    var height = 256;
-    var positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(boundingBox, height, width, new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244), height * (1 << zoom), width * (1 << zoom));
-    var xTranslate = -positionAndScale.xPositionInFinalTileStart;
-    var yTranslate = -positionAndScale.yPositionInFinalTileStart;
-    var pi = Math.PI, tau = 2 * pi;
-    var drawProjection = d3geo.geoMercator()
-      .scale((1 << zoom) * 256 / tau)
+    const width = 256;
+    const height = 256;
+    const positionAndScale = TileBoundingBoxUtils.determinePositionAndScale(
+      boundingBox,
+      height,
+      width,
+      new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244),
+      height * (1 << zoom),
+      width * (1 << zoom),
+    );
+    const xTranslate = -positionAndScale.xPositionInFinalTileStart;
+    const yTranslate = -positionAndScale.yPositionInFinalTileStart;
+    const pi = Math.PI,
+      tau = 2 * pi;
+    const drawProjection = d3geo
+      .geoMercator()
+      .scale(((1 << zoom) * 256) / tau)
       .center([-180, 85.0511287798066])
       .translate([xTranslate, yTranslate]);
-    var canvas;
+    let canvas;
     if (tileCanvas !== null) {
       canvas = tileCanvas;
     }
-    var context;
     if (canvas === undefined || canvas === null) {
       if (FeatureTiles.useNodeCanvas) {
-        var Canvas = require('canvas');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Canvas = require('canvas');
         canvas = Canvas.createCanvas(width, height);
-      }
-      else {
+      } else {
         canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
       }
     }
-    context = canvas.getContext('2d');
+    const context = canvas.getContext('2d');
     context.clearRect(0, 0, width, height);
-    var featureDao = this.featureDao;
-    var srs = featureDao.getSrs();
-    var each = featureDao.queryForEach();
-    var featureRows = [];
-    for (var row of each) {
+    const featureDao = this.featureDao;
+    const srs = featureDao.getSrs();
+    const each = featureDao.queryForEach();
+    const featureRows = [];
+    for (const row of each) {
       featureRows.push(featureDao.getRow(row));
     }
-    for (var fr of featureRows) {
-      var gj = null;
+    for (const fr of featureRows) {
+      let gj = null;
       if (this.cacheGeometries) {
-        gj = this.geometryCache.getGeometryForFeatureRow(fr)
+        gj = this.geometryCache.getGeometryForFeatureRow(fr);
       }
       if (gj === undefined || gj === null) {
         gj = fr.getGeometry().geometry.toGeoJSON();
         this.geometryCache.setGeometry(fr.getId(), gj);
       }
-      var style = this.getFeatureStyle(fr);
+      const style = this.getFeatureStyle(fr);
       if (srs.organization !== 'EPSG' || srs.organization_coordsys_id !== 4326) {
         gj = reproject.toWgs84(gj, featureDao.projection);
       }
       await this.addFeatureToBatch(gj, context, drawProjection, boundingBox, style);
     }
-    // @ts-ignore
-    return new Promise(function (resolve, reject) {
+    return new Promise(resolve => {
       if (FeatureTiles.useNodeCanvas) {
-        var writeStream = concat(function (buffer) {
+        const writeStream = concat(function(buffer) {
           resolve(buffer);
         });
-        var stream = null;
+        let stream = null;
         if (this.compressFormat === 'png') {
           stream = canvas.createPNGStream();
-        }
-        else {
+        } else {
           stream = canvas.createJPEGStream();
         }
         stream.pipe(writeStream);
-      }
-      else {
+      } else {
         resolve(canvas.toDataURL('image/' + this.compressFormat));
       }
-    }.bind(this));
+    });
   }
   /**
    * Draw a point in the context
@@ -762,45 +768,48 @@ export class FeatureTiles {
    * @param featureStyle
    * @param drawProjection
    */
-  // @ts-ignore
-  async drawPoint(path: any, geoJson: any, context: any, boundingBox: BoundingBox, featureStyle: any, drawProjection: Function) {
-    var width;
-    var height;
-    var iconX;
-    var iconY;
-    var transformedCoords = drawProjection([geoJson.coordinates[0], geoJson.coordinates[1]]);
-    var x = transformedCoords[0];
-    var y = transformedCoords[1];
+  async drawPoint(
+    path: any,
+    geoJson: any,
+    context: any,
+    boundingBox: BoundingBox,
+    featureStyle: FeatureStyle,
+    drawProjection: Function,
+  ): Promise<void> {
+    let width;
+    let height;
+    let iconX;
+    let iconY;
+    const transformedCoords = drawProjection([geoJson.coordinates[0], geoJson.coordinates[1]]);
+    const x = transformedCoords[0];
+    const y = transformedCoords[1];
     if (featureStyle !== undefined && featureStyle !== null && featureStyle.hasIcon()) {
-      var iconRow = featureStyle.getIcon();
-      var image = await this.iconCache.createIcon(iconRow);
+      const iconRow = featureStyle.getIcon();
+      const image = await this.iconCache.createIcon(iconRow);
       width = Math.round(this.scale * iconRow.getWidth());
       height = Math.round(this.scale * iconRow.getHeight());
       if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height && y <= this.tileHeight + height) {
-        var anchorU = iconRow.getAnchorUOrDefault();
-        var anchorV = iconRow.getAnchorVOrDefault();
-        iconX = Math.round(x - (anchorU * width));
-        iconY = Math.round(y - (anchorV * height));
+        const anchorU = iconRow.getAnchorUOrDefault();
+        const anchorV = iconRow.getAnchorVOrDefault();
+        iconX = Math.round(x - anchorU * width);
+        iconY = Math.round(y - anchorV * height);
         context.drawImage(image, iconX, iconY, width, height);
       }
-    }
-    else if (this.pointIcon !== undefined && this.pointIcon !== null) {
+    } else if (this.pointIcon !== undefined && this.pointIcon !== null) {
       width = Math.round(this.scale * this.pointIcon.getWidth());
       height = Math.round(this.scale * this.pointIcon.getHeight());
-      if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height
-        && y <= this.tileHeight + height) {
+      if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height && y <= this.tileHeight + height) {
         iconX = Math.round(x - this.scale * this.pointIcon.getXOffset());
         iconY = Math.round(y - this.scale * this.pointIcon.getYOffset());
-        ImageUtils.scaleBitmap(this.pointIcon.getIcon(), this.scale).then((image) => {
+        ImageUtils.scaleBitmap(this.pointIcon.getIcon(), this.scale).then(image => {
           context.drawImage(image, iconX, iconY, width, height);
         });
       }
-    }
-    else {
+    } else {
       context.save();
-      var radius = null;
+      let radius = null;
       if (featureStyle !== undefined && featureStyle !== null) {
-        var styleRow = featureStyle.getStyle();
+        const styleRow = featureStyle.getStyle();
         if (styleRow !== undefined && styleRow !== null) {
           radius = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         }
@@ -808,10 +817,10 @@ export class FeatureTiles {
       if (radius == null) {
         radius = this.scale * this.pointRadius;
       }
-      var pointPaint = this.getPointPaint(featureStyle);
+      const pointPaint = this.getPointPaint(featureStyle);
       if (x >= 0 - radius && x <= this.tileWidth + radius && y >= 0 - radius && y <= this.tileHeight + radius) {
-        var circleX = Math.round(x);
-        var circleY = Math.round(y);
+        const circleX = Math.round(x);
+        const circleY = Math.round(y);
         context.beginPath();
         context.arc(circleX, circleY, radius, 0, 2 * Math.PI, true);
         context.closePath();
@@ -828,10 +837,10 @@ export class FeatureTiles {
    * @param context
    * @param featureStyle
    */
-  drawLine(path, geoJson, context, featureStyle) {
+  drawLine(path: any, geoJson: any, context: any, featureStyle: FeatureStyle): void {
     context.save();
     context.beginPath();
-    var paint = this.getLinePaint(featureStyle);
+    const paint = this.getLinePaint(featureStyle);
     context.strokeStyle = paint.getColorRGBA();
     context.lineWidth = paint.getStrokeWidth();
     path(geoJson);
@@ -846,18 +855,17 @@ export class FeatureTiles {
    * @param context
    * @param featureStyle
    */
-  drawPolygon(path, geoJson, context, featureStyle) {
+  drawPolygon(path: any, geoJson: any, context: any, featureStyle: FeatureStyle): void {
     context.save();
     context.beginPath();
-    // @ts-ignore
-    path(PolyToLine(geoJson).geometry);
+    path((PolyToLine(geoJson) as any).geometry);
     context.closePath();
-    var fillPaint = this.getPolygonFillPaint(featureStyle);
+    const fillPaint = this.getPolygonFillPaint(featureStyle);
     if (fillPaint !== undefined && fillPaint !== null) {
       context.fillStyle = fillPaint.getColorRGBA();
       context.fill();
     }
-    var paint = this.getPolygonPaint(featureStyle);
+    const paint = this.getPolygonPaint(featureStyle);
     context.strokeStyle = paint.getColorRGBA();
     context.lineWidth = paint.getStrokeWidth();
     context.stroke();
@@ -871,46 +879,48 @@ export class FeatureTiles {
    * @param boundingBox
    * @param featureStyle
    */
-  async addFeatureToBatch(geoJson, context, drawProjection, boundingBox, featureStyle) {
-    var path = d3geo.geoPath()
+  async addFeatureToBatch(
+    geoJson: any,
+    context: any,
+    drawProjection: any,
+    boundingBox: BoundingBox,
+    featureStyle: FeatureStyle,
+  ): Promise<void> {
+    const path = d3geo
+      .geoPath()
       .context(context)
       .projection(drawProjection);
-    var i, c;
+    let i, c;
     if (geoJson.type === 'Point') {
       await this.drawPoint(path, geoJson, context, boundingBox, featureStyle, drawProjection);
-    }
-    else if (geoJson.type === 'LineString') {
+    } else if (geoJson.type === 'LineString') {
       this.drawLine(path, geoJson, context, featureStyle);
-    }
-    else if (geoJson.type === 'Polygon') {
+    } else if (geoJson.type === 'Polygon') {
       this.drawPolygon(path, geoJson, context, featureStyle);
-    }
-    else if (geoJson.type === 'MultiPoint') {
+    } else if (geoJson.type === 'MultiPoint') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
         c = geoJson.coordinates[i];
-        var ptGeom = {
+        const ptGeom = {
           type: 'Point',
-          coordinates: c
+          coordinates: c,
         };
         await this.drawPoint(path, ptGeom, context, boundingBox, featureStyle, drawProjection);
       }
-    }
-    else if (geoJson.type === 'MultiLineString') {
+    } else if (geoJson.type === 'MultiLineString') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
         c = geoJson.coordinates[i];
-        var lsGeom = {
+        const lsGeom = {
           type: 'LineString',
-          coordinates: c
+          coordinates: c,
         };
         this.drawLine(path, lsGeom, context, featureStyle);
       }
-    }
-    else if (geoJson.type === 'MultiPolygon') {
+    } else if (geoJson.type === 'MultiPolygon') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
         c = geoJson.coordinates[i];
-        var pGeom = {
+        const pGeom = {
           type: 'Polygon',
-          coordinates: c
+          coordinates: c,
         };
         this.drawPolygon(path, pGeom, context, featureStyle);
       }
@@ -930,12 +940,35 @@ export class FeatureTiles {
    * @param tileWebMercatorBoundingBox  tile web mercator bounding box
    * @return {BoundingBox} bounding box
    */
-  expandWebMercatorBoundingBox(webMercatorBoundingBox: BoundingBox, tileWebMercatorBoundingBox: BoundingBox): BoundingBox {
+  expandWebMercatorBoundingBox(
+    webMercatorBoundingBox: BoundingBox,
+    tileWebMercatorBoundingBox: BoundingBox,
+  ): BoundingBox {
     // Create an expanded bounding box to handle features outside the tile  that overlap
-    var minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(this.tileWidth, webMercatorBoundingBox, tileWebMercatorBoundingBox, 0 - this.widthOverlap);
-    var maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(this.tileWidth, webMercatorBoundingBox, tileWebMercatorBoundingBox, this.tileWidth + this.widthOverlap);
-    var maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(this.tileHeight, webMercatorBoundingBox, tileWebMercatorBoundingBox, 0 - this.heightOverlap);
-    var minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(this.tileHeight, webMercatorBoundingBox, tileWebMercatorBoundingBox, this.tileHeight + this.heightOverlap);
+    let minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+      this.tileWidth,
+      webMercatorBoundingBox,
+      tileWebMercatorBoundingBox,
+      0 - this.widthOverlap,
+    );
+    let maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+      this.tileWidth,
+      webMercatorBoundingBox,
+      tileWebMercatorBoundingBox,
+      this.tileWidth + this.widthOverlap,
+    );
+    let maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+      this.tileHeight,
+      webMercatorBoundingBox,
+      tileWebMercatorBoundingBox,
+      0 - this.heightOverlap,
+    );
+    let minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+      this.tileHeight,
+      webMercatorBoundingBox,
+      tileWebMercatorBoundingBox,
+      this.tileHeight + this.heightOverlap,
+    );
     // Choose the most expanded longitudes and latitudes
     minLongitude = Math.min(minLongitude, webMercatorBoundingBox.minLongitude);
     maxLongitude = Math.max(maxLongitude, webMercatorBoundingBox.maxLongitude);

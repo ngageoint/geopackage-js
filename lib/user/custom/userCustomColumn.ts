@@ -2,7 +2,7 @@
  * @module user/custom
  */
 
-import {UserColumn} from '../userColumn';
+import { UserColumn } from '../userColumn';
 
 /**
  * Create a new user custom columnd
@@ -15,7 +15,15 @@ import {UserColumn} from '../userColumn';
  *  @param {Boolean} primaryKey primary key
  */
 export class UserCustomColumn extends UserColumn {
-  constructor(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean) {
+  constructor(
+    index: number,
+    name: string,
+    dataType: any,
+    max?: number,
+    notNull?: boolean,
+    defaultValue?: any,
+    primaryKey?: boolean,
+  ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);
     // eslint-disable-next-line eqeqeq
     if (dataType == null) {
@@ -34,7 +42,14 @@ export class UserCustomColumn extends UserColumn {
    *
    *  @return {module:user/custom~UserCustomColumn} created column
    */
-  static createColumn(index: number, name: string, dataType: any, max?: number, notNull?: boolean, defaultValue?: any): UserCustomColumn {
+  static createColumn(
+    index: number,
+    name: string,
+    dataType: any,
+    max?: number,
+    notNull?: boolean,
+    defaultValue?: any,
+  ): UserCustomColumn {
     return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, false);
   }
 }

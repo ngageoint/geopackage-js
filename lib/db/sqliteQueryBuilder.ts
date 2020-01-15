@@ -31,8 +31,19 @@ export class SqliteQueryBuilder {
    * @param  {Number} [offset]   offset
    * @return {string}
    */
-  static buildQuery(distinct: boolean, tables: string, columns?: string[], where?: string, join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): string {
-    var query = '';
+  static buildQuery(
+    distinct: boolean,
+    tables: string,
+    columns?: string[],
+    where?: string,
+    join?: string,
+    groupBy?: string,
+    having?: string,
+    orderBy?: string,
+    limit?: number,
+    offset?: number,
+  ): string {
+    let query = '';
     if (SqliteQueryBuilder.isEmpty(groupBy) && !SqliteQueryBuilder.isEmpty(having)) {
       throw new Error('Illegal Arguments: having clauses require a groupBy clause');
     }
@@ -41,7 +52,7 @@ export class SqliteQueryBuilder {
     if (distinct) {
       query += 'distinct ';
     }
-    if(columns && columns.length) {
+    if (columns && columns.length) {
       query = SqliteQueryBuilder.appendColumnsToString(columns, query);
     } else {
       query += '* ';
@@ -68,10 +79,10 @@ export class SqliteQueryBuilder {
    * @return {string} count statement
    */
   static buildCount(tables: string, where?: string): string {
-    var query = 'select count(*) as count from ' + tables;
+    let query = 'select count(*) as count from ' + tables;
     query = SqliteQueryBuilder.appendClauseToString(query, ' where ', where);
     return query;
-  };
+  }
 
   /**
    * Builds an insert statement using the properties of the object
@@ -83,11 +94,11 @@ export class SqliteQueryBuilder {
     if (object.getColumnNames) {
       return SqliteQueryBuilder.buildInsertFromColumnNames(table, object);
     }
-    var insert = 'insert into ' + table + ' (';
-    var keys = '';
-    var values = '';
-    var first = true;
-    for (var key in object) {
+    let insert = 'insert into ' + table + ' (';
+    let keys = '';
+    let values = '';
+    let first = true;
+    for (const key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key) && object[key] !== undefined) {
         if (!first) {
           keys += ',';
@@ -110,13 +121,13 @@ export class SqliteQueryBuilder {
    * @return {string} insert statement
    */
   static buildInsertFromColumnNames(table: string, object: any): string {
-    var insert = 'insert into ' + table + ' (';
-    var keys = '';
-    var values = '';
-    var first = true;
-    var columnNames = object.getColumnNames();
-    for (var i = 0; i < columnNames.length; i++) {
-      var key = columnNames[i];
+    let insert = 'insert into ' + table + ' (';
+    let keys = '';
+    let values = '';
+    let first = true;
+    const columnNames = object.getColumnNames();
+    for (let i = 0; i < columnNames.length; i++) {
+      const key = columnNames[i];
       if (!first) {
         keys += ',';
         values += ',';
@@ -136,14 +147,14 @@ export class SqliteQueryBuilder {
    * @return {Object} bind parameters
    */
   static buildUpdateOrInsertObject(object: any): any {
-    var insertOrUpdate = {};
+    const insertOrUpdate = {};
     if (object.getColumnNames) {
-      var columnNames = object.getColumnNames();
-      for (var i = 0; i < columnNames.length; i++) {
+      const columnNames = object.getColumnNames();
+      for (let i = 0; i < columnNames.length; i++) {
         insertOrUpdate[SqliteQueryBuilder.fixColumnName(columnNames[i])] = object.toDatabaseValue(columnNames[i]);
       }
     } else {
-      for (var key in object) {
+      for (const key in object) {
         if (Object.prototype.hasOwnProperty.call(object, key) && object[key] !== undefined) {
           if (object.toDatabaseValue) {
             insertOrUpdate[SqliteQueryBuilder.fixColumnName(key)] = object.toDatabaseValue(key);
@@ -170,21 +181,21 @@ export class SqliteQueryBuilder {
    * @param  {Array|Object} [whereArgs] where bind parameters
    * @return {Object} object with a sql property containing the update statement and an args property with bind arguments
    */
-  static buildUpdate(table: string, values: any, where: string, whereArgs: any[] | any): { sql: string, args: any[] } {
-    var args: any[] = [];
-    var update = 'update ' + table + ' set ';
-    var first = true;
-    for (var columnName in values) {
+  static buildUpdate(table: string, values: any, where: string, whereArgs: any[] | any): { sql: string; args: any[] } {
+    const args: any[] = [];
+    let update = 'update ' + table + ' set ';
+    let first = true;
+    for (const columnName in values) {
       if (!first) {
         update += ', ';
       }
       first = false;
-      update += '"'+ columnName + '"';
+      update += '"' + columnName + '"';
       args.push(values[columnName]);
       update += '=?';
     }
     if (whereArgs) {
-      for (var i = 0; i < whereArgs.length; i++) {
+      for (let i = 0; i < whereArgs.length; i++) {
         args.push(whereArgs[i]);
       }
     }
@@ -194,7 +205,7 @@ export class SqliteQueryBuilder {
     }
     return {
       sql: update,
-      args: args
+      args: args,
     };
   }
 
@@ -205,13 +216,13 @@ export class SqliteQueryBuilder {
    * @return {string} update statement
    */
   static buildObjectUpdate(table: string, object: any): string {
-    var update = 'update ' + table + ' set ';
-    var first = true;
+    let update = 'update ' + table + ' set ';
+    let first = true;
     if (object.getColumnNames) {
-      var columnNames = object.getColumnNames();
+      const columnNames = object.getColumnNames();
 
-      for (var i = 0; i < columnNames.length; i++) {
-        var key = columnNames[i];
+      for (let i = 0; i < columnNames.length; i++) {
+        const key = columnNames[i];
         if (!first) {
           update += ', ';
         }
@@ -220,7 +231,7 @@ export class SqliteQueryBuilder {
         update += '$' + SqliteQueryBuilder.fixColumnName(key);
       }
     } else {
-      for (var prop in object) {
+      for (const prop in object) {
         if (!first) {
           update += ', ';
         }
@@ -242,21 +253,21 @@ export class SqliteQueryBuilder {
     }
     return string;
   }
-  
-  private static appendColumnsToString(columns: string[], string: string) {
+
+  private static appendColumnsToString(columns: string[], string: string): string {
     if (!columns || !columns.length) return string;
     string += SqliteQueryBuilder.columnToAppend(columns[0]);
-    for (var i = 1; i < columns.length; i++) {
+    for (let i = 1; i < columns.length; i++) {
       string += ', ' + SqliteQueryBuilder.columnToAppend(columns[i]);
     }
     string += ' ';
     return string;
   }
-  
-  private static columnToAppend(column: string) {
+
+  private static columnToAppend(column: string): string {
     return column.indexOf('*') !== -1 ? column : '"' + column + '"';
   }
-  
+
   private static isEmpty(string: string | undefined): boolean {
     return !string || string.length === 0;
   }

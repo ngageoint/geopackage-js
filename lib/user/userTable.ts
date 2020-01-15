@@ -1,6 +1,6 @@
-import {UserColumn} from './userColumn'
+import { UserColumn } from './userColumn';
 
-import {DataTypes} from '../db/dataTypes';
+import { DataTypes } from '../db/dataTypes';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -27,7 +27,7 @@ export class UserTable {
   pkIndex: number;
 
   /**
-   * 
+   *
    * @param table_name the name of the table
    * @param columns array of columns
    * @param requiredColumns required columns
@@ -35,23 +35,32 @@ export class UserTable {
   constructor(public table_name: string, public columns: UserColumn[], public requiredColumns?: string[]) {
     this.uniqueConstraints = [];
     // Sort the columns by index
-    this.columns.sort(function (a, b) {
+    this.columns.sort(function(a, b) {
       return a.index - b.index;
     });
-    for (var i = 0; i < this.columns.length; i++) {
-      var column = this.columns[i];
+    for (let i = 0; i < this.columns.length; i++) {
+      const column = this.columns[i];
       if (column.index !== i) {
-        throw new Error('Column has wrong index of ' + column.index + ', found at index: ' + i + ', Table Name: ' + this.table_name);
+        throw new Error(
+          'Column has wrong index of ' + column.index + ', found at index: ' + i + ', Table Name: ' + this.table_name,
+        );
       }
     }
     this.nameToIndex = {};
-    this.columnNames = new Array();
-    for (i = 0; i < this.columns.length; i++) {
-      column = this.columns[i];
-      var index = column.index;
+    this.columnNames = [];
+    for (let i = 0; i < this.columns.length; i++) {
+      const column = this.columns[i];
+      const index = column.index;
       if (column.primaryKey) {
         if (this.pkIndex !== undefined) {
-          throw new Error('More than one primary key column was found for table \'' + this.table_name + '\'. Index ' + this.pkIndex + ' and ' + index);
+          throw new Error(
+            "More than one primary key column was found for table '" +
+              this.table_name +
+              "'. Index " +
+              this.pkIndex +
+              ' and ' +
+              index,
+          );
         }
         this.pkIndex = index;
       }
@@ -61,7 +70,7 @@ export class UserTable {
   }
 
   getTableType(): string {
-    return "userTable";
+    return 'userTable';
   }
 
   /**
@@ -71,10 +80,20 @@ export class UserTable {
    * @param  {string} column        column
    * @throws Throws an error if previous index is not undefined
    */
-  duplicateCheck(index: number, previousIndex?: number, column?: string) {
+  duplicateCheck(index: number, previousIndex?: number, column?: string): boolean {
     if (previousIndex !== undefined) {
-      throw new Error('More than one ' + column + ' column was found for table \'' + this.table_name + '\'. Index ' + previousIndex + ' and ' + index);
+      throw new Error(
+        'More than one ' +
+          column +
+          " column was found for table '" +
+          this.table_name +
+          "'. Index " +
+          previousIndex +
+          ' and ' +
+          index,
+      );
     }
+    return true;
   }
   /**
    * Check for the expected data type
@@ -82,11 +101,21 @@ export class UserTable {
    * @param  {module:user/userColumn~UserColumn} column   column
    * @throws Will throw an error if the actual column type does not match the expected column type
    */
-  typeCheck(expected: any, column: UserColumn) {
-    var actual = column.dataType;
+  typeCheck(expected: any, column: UserColumn): boolean {
+    const actual = column.dataType;
     if (!actual || actual !== expected) {
-      throw new Error('Unexpected ' + column.name + ' column data type was found for table \'' + this.table_name + '\', expected: ' + DataTypes.nameFromType(expected) + ', actual: ' + column.dataType);
+      throw new Error(
+        'Unexpected ' +
+          column.name +
+          " column data type was found for table '" +
+          this.table_name +
+          "', expected: " +
+          DataTypes.nameFromType(expected) +
+          ', actual: ' +
+          column.dataType,
+      );
     }
+    return true;
   }
   /**
    * Check for missing columns
@@ -94,10 +123,11 @@ export class UserTable {
    * @param  {string} column column
    * @throws Will throw an error if no column is found
    */
-  missingCheck(index: number, column: string) {
+  missingCheck(index: number, column: string): boolean {
     if (index === undefined || index === null) {
-      throw new Error('No ' + column + ' column was found for table \'' + this.table_name + '\'');
+      throw new Error('No ' + column + " column was found for table '" + this.table_name + "'");
     }
+    return true;
   }
   /**
    * Get the column index of the column name
@@ -106,9 +136,9 @@ export class UserTable {
    * @throws Will throw an error if the column is not found in the table
    */
   getColumnIndex(columnName: string): number {
-    var index = this.nameToIndex[columnName];
+    const index = this.nameToIndex[columnName];
     if (index === undefined || index === null) {
-      throw new Error('Column does not exist in table \'' + this.table_name + '\', column: ' + columnName);
+      throw new Error("Column does not exist in table '" + this.table_name + "', column: " + columnName);
     }
     return index;
   }
@@ -121,8 +151,7 @@ export class UserTable {
     try {
       this.getColumnIndex(columnName);
       return true;
-    }
-    catch (e) {
+    } catch (e) {
       return false;
     }
   }
@@ -171,7 +200,12 @@ export class UserTable {
   getIdColumn(): UserColumn {
     return this.getPkColumn();
   }
-  addUniqueConstraint(uniqueConstraint: any) {
-    this.uniqueConstraints.push(uniqueConstraint);
+  /**
+   * Add a unique constraint
+   * @param uniqueConstraint unique constraint to add
+   * @returns number of unique constraints
+   */
+  addUniqueConstraint(uniqueConstraint: any): number {
+    return this.uniqueConstraints.push(uniqueConstraint);
   }
 }

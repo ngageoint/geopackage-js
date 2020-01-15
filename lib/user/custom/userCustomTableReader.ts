@@ -1,11 +1,11 @@
 /**
  * @module user/custom
  */
-import {UserCustomTable} from './userCustomTable';
-import {UserTableReader} from '../userTableReader';
-import {UserCustomColumn} from './userCustomColumn';
+import { UserCustomTable } from './userCustomTable';
+import { UserTableReader } from '../userTableReader';
+import { UserCustomColumn } from './userCustomColumn';
 
-import {DataTypes} from '../../db/dataTypes';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * User custom table reader
@@ -36,8 +36,17 @@ export class UserCustomTableReader extends UserTableReader {
    * @param {Boolean} primaryKey primary key
    * @return {module:user/custom~UserCustomColumn}
    */
-  createColumnWithResults(result: any, index: number, name: string, type: string, max?: number, notNull?: boolean, defaultValue?: any, primaryKey?: boolean): UserCustomColumn {
-    var dataType = DataTypes.fromName(type);
+  createColumnWithResults(
+    result: any,
+    index: number,
+    name: string,
+    type: string,
+    max?: number,
+    notNull?: boolean,
+    defaultValue?: any,
+    primaryKey?: boolean,
+  ): UserCustomColumn {
+    const dataType = DataTypes.fromName(type);
     return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, primaryKey);
   }
 }

@@ -1,6 +1,6 @@
-import {Dao} from '../../dao/dao';
+import { Dao } from '../../dao/dao';
 
-import {SpatialReferenceSystem} from './spatialReferenceSystem';
+import { SpatialReferenceSystem } from './spatialReferenceSystem';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao
@@ -18,13 +18,13 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * srsName field name
    * @type {String}
    */
-  public static readonly COLUMN_SRS_NAME: string = "srs_name";
+  public static readonly COLUMN_SRS_NAME: string = 'srs_name';
 
   /**
    * srsId field name
    * @type {String}
    */
-  public static readonly COLUMN_SRS_ID: string = "srs_id";
+  public static readonly COLUMN_SRS_ID: string = 'srs_id';
 
   /**
    * id field name, srsId
@@ -36,25 +36,25 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * organization field name
    * @type {String}
    */
-  public static readonly COLUMN_ORGANIZATION: string = "organization";
+  public static readonly COLUMN_ORGANIZATION: string = 'organization';
 
   /**
    * organizationCoordsysId field name
    * @type {String}
    */
-  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID: string = "organization_coordsys_id";
+  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID: string = 'organization_coordsys_id';
 
   /**
    * definition field name
    * @type {String}
    */
-  public static readonly COLUMN_DEFINITION: string = "definition";
+  public static readonly COLUMN_DEFINITION: string = 'definition';
 
   /**
    * description field name
    * @type {String}
    */
-  public static readonly COLUMN_DESCRIPTION: string = "description";
+  public static readonly COLUMN_DESCRIPTION: string = 'description';
 
   readonly idColumns: string[] = [SpatialReferenceSystemDao.COLUMN_SRS_ID];
   /**
@@ -90,7 +90,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {Number} id of the created row
    */
   createWgs84(): number {
-    var srs = this.getBySrsId(4326);
+    let srs = this.getBySrsId(4326);
     if (srs) {
       return srs.srs_id;
     }
@@ -99,10 +99,12 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
     srs.srs_id = 4326;
     srs.organization = 'EPSG';
     srs.organization_coordsys_id = 4326;
-    srs.definition = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+    srs.definition =
+      'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
     srs.description = 'longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid';
     if (this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
-      srs.definition_12_063 = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
+      srs.definition_12_063 =
+        'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
     }
     return this.create(srs);
   }
@@ -111,8 +113,8 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * Requirement 11)
    * @return {Number} id of the created row
    */
-  createUndefinedCartesian(): number  {
-    var srs = this.getBySrsId(-1);
+  createUndefinedCartesian(): number {
+    let srs = this.getBySrsId(-1);
     if (srs) {
       return srs.srs_id;
     }
@@ -133,8 +135,8 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * Requirement 11)
    * @return {Number} id of the created row
    */
-  createUndefinedGeographic(): number  {
-    var srs = this.getBySrsId(0);
+  createUndefinedGeographic(): number {
+    let srs = this.getBySrsId(0);
     if (srs) {
       return srs.srs_id;
     }
@@ -155,8 +157,8 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * exist
    * @return {Number} id of the created row
    */
-  createWebMercator(): number  {
-    var srs = this.getBySrsId(3857);
+  createWebMercator(): number {
+    let srs = this.getBySrsId(3857);
     if (srs) {
       return srs.srs_id;
     }
@@ -165,10 +167,12 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
     srs.srs_id = 3857;
     srs.organization = 'EPSG';
     srs.organization_coordsys_id = 3857;
-    srs.definition = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+    srs.definition =
+      'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
     srs.description = 'Spherical Mercator projection coordinate system';
     if (this.connection.columnAndTableExists('gpkg_spatial_ref_sys', 'definition_12_063')) {
-      srs.definition_12_063 = 'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
+      srs.definition_12_063 =
+        'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
     }
     return this.create(srs);
   }

@@ -56,5 +56,4 @@ export class TileMatrix {
    * @member {Number}
    */
   pixel_y_size: number;
-
 }

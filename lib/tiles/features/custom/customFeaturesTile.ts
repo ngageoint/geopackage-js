@@ -7,12 +7,11 @@
  * @constructor
  */
 export abstract class CustomFeaturesTile {
-
-  static readonly isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-  // @ts-ignore
-  static readonly isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-  static readonly isNode = typeof (process) !== 'undefined' && process.version;
-  static readonly useNodeCanvas = CustomFeaturesTile.isNode && !CustomFeaturesTile.isPhantom && !CustomFeaturesTile.isElectron;
+  static readonly isElectron = !!(
+    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
+  );
+  static readonly isNode = typeof process !== 'undefined' && process.version;
+  static readonly useNodeCanvas = CustomFeaturesTile.isNode && !CustomFeaturesTile.isElectron;
 
   tileBorderStrokeWidth: number;
   tileBorderColor: string;
@@ -23,8 +22,8 @@ export abstract class CustomFeaturesTile {
   constructor() {
     this.compressFormat = 'png';
     this.tileBorderStrokeWidth = 2;
-    this.tileBorderColor = "rgba(0, 0, 0, 1.0)";
-    this.tileFillColor = "rgba(0, 0, 0, 0.0625)";
+    this.tileBorderColor = 'rgba(0, 0, 0, 1.0)';
+    this.tileFillColor = 'rgba(0, 0, 0, 0.0625)';
     this.drawUnindexedTiles = true;
   }
 

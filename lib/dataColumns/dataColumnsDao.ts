@@ -1,7 +1,7 @@
-import {Dao} from '../dao/dao'
-import {ContentsDao} from '../core/contents/contentsDao'
-import {DataColumns} from './dataColumns'
-import {Contents} from '../core/contents/contents';
+import { Dao } from '../dao/dao';
+import { ContentsDao } from '../core/contents/contentsDao';
+import { DataColumns } from './dataColumns';
+import { Contents } from '../core/contents/contents';
 /**
  * DataColumns module.
  * @module dataColumns
@@ -16,19 +16,19 @@ import {Contents} from '../core/contents/contents';
  * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
 export class DataColumnsDao extends Dao<DataColumns> {
-  public static readonly TABLE_NAME: string  = "gpkg_data_columns";
-  public static readonly COLUMN_PK1: string  = "table_name";
-  public static readonly COLUMN_PK2: string  = "column_name";
-  public static readonly COLUMN_TABLE_NAME: string  = "table_name";
-  public static readonly COLUMN_COLUMN_NAME: string  = "column_name";
-  public static readonly COLUMN_NAME: string  = "name";
-  public static readonly COLUMN_TITLE: string  = "title";
-  public static readonly COLUMN_DESCRIPTION: string  = "description";
-  public static readonly COLUMN_MIME_TYPE: string  = "mime_type";
-  public static readonly COLUMN_CONSTRAINT_NAME: string  = "constraint_name";
+  public static readonly TABLE_NAME: string = 'gpkg_data_columns';
+  public static readonly COLUMN_PK1: string = 'table_name';
+  public static readonly COLUMN_PK2: string = 'column_name';
+  public static readonly COLUMN_TABLE_NAME: string = 'table_name';
+  public static readonly COLUMN_COLUMN_NAME: string = 'column_name';
+  public static readonly COLUMN_NAME: string = 'name';
+  public static readonly COLUMN_TITLE: string = 'title';
+  public static readonly COLUMN_DESCRIPTION: string = 'description';
+  public static readonly COLUMN_MIME_TYPE: string = 'mime_type';
+  public static readonly COLUMN_CONSTRAINT_NAME: string = 'constraint_name';
 
-  readonly gpkgTableName: string  = DataColumnsDao.TABLE_NAME;
-  readonly idColumns: string[]  = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
+  readonly gpkgTableName: string = DataColumnsDao.TABLE_NAME;
+  readonly idColumns: string[] = [DataColumnsDao.COLUMN_PK1, DataColumnsDao.COLUMN_PK2];
 
   /**
    * Creates a new {module:dataColumns~DataColumns} object
@@ -43,7 +43,7 @@ export class DataColumnsDao extends Dao<DataColumns> {
    * @return {module:core/contents~Contents}             contents
    */
   getContents(dataColumns: DataColumns): Contents {
-    var cd = new ContentsDao(this.geoPackage);
+    const cd = new ContentsDao(this.geoPackage);
     return cd.queryForId(dataColumns.table_name);
   }
   /**
@@ -58,19 +58,20 @@ export class DataColumnsDao extends Dao<DataColumns> {
    * Get DataColumn by column name and table name
    * @param  {String} tableName  table name
    * @param  {String} columnName column name
-   * @return {module:dataColumns~DataColumns} 
+   * @return {module:dataColumns~DataColumns}
    */
   getDataColumns(tableName: string, columnName: string): DataColumns {
-    var exists = this.isTableExists();
+    const exists = this.isTableExists();
     if (!exists) {
       return;
     }
-    var where = this.buildWhereWithFieldAndValue(DataColumnsDao.COLUMN_TABLE_NAME, tableName) +
+    const where =
+      this.buildWhereWithFieldAndValue(DataColumnsDao.COLUMN_TABLE_NAME, tableName) +
       ' and ' +
       this.buildWhereWithFieldAndValue(DataColumnsDao.COLUMN_COLUMN_NAME, columnName);
-    var values = [tableName, columnName];
-    var dataColumn;
-    for (var row of this.queryWhere(where, values)) {
+    const values = [tableName, columnName];
+    let dataColumn;
+    for (const row of this.queryWhere(where, values)) {
       dataColumn = row;
     }
     return dataColumn;

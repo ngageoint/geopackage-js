@@ -2,11 +2,11 @@
  * @memberOf module:extension/style
  * @class StyleTable
  */
-import {AttributeTable} from '../../attributes/attributeTable'
-import {RelationType} from '../relatedTables/relationType';
-import {UserColumn} from '../../user/userColumn'
-import {UserCustomColumn} from '../../user/custom/userCustomColumn';
-import {DataTypes} from '../../db/dataTypes'
+import { AttributeTable } from '../../attributes/attributeTable';
+import { RelationType } from '../relatedTables/relationType';
+import { UserColumn } from '../../user/userColumn';
+import { UserCustomColumn } from '../../user/custom/userCustomColumn';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Icon Requirements Class Media Table
@@ -15,20 +15,20 @@ import {DataTypes} from '../../db/dataTypes'
  * @constructor
  */
 export class StyleTable extends AttributeTable {
-  public static readonly TABLE_NAME = 'nga_style';
-  public static readonly COLUMN_ID = 'id';
-  public static readonly COLUMN_NAME = 'name';
-  public static readonly COLUMN_DESCRIPTION = 'description';
-  public static readonly COLUMN_COLOR = 'color';
-  public static readonly COLUMN_OPACITY = 'opacity';
-  public static readonly COLUMN_WIDTH = 'width';
-  public static readonly COLUMN_FILL_COLOR = 'fill_color';
-  public static readonly COLUMN_FILL_OPACITY = 'fill_opacity';
-  readonly TABLE_TYPE = 'media';
+  public static readonly TABLE_NAME: string = 'nga_style';
+  public static readonly COLUMN_ID: string = 'id';
+  public static readonly COLUMN_NAME: string = 'name';
+  public static readonly COLUMN_DESCRIPTION: string = 'description';
+  public static readonly COLUMN_COLOR: string = 'color';
+  public static readonly COLUMN_OPACITY: string = 'opacity';
+  public static readonly COLUMN_WIDTH: string = 'width';
+  public static readonly COLUMN_FILL_COLOR: string = 'fill_color';
+  public static readonly COLUMN_FILL_OPACITY: string = 'fill_opacity';
+  readonly TABLE_TYPE: string = 'media';
   data_type: string;
   relation_name: string;
 
-  constructor(tableName, columns) {
+  constructor(tableName: string, columns: UserCustomColumn[]) {
     super(tableName, columns);
     this.data_type = RelationType.ATTRIBUTES.dataType;
     this.relation_name = RelationType.ATTRIBUTES.name;
@@ -37,122 +37,143 @@ export class StyleTable extends AttributeTable {
    * Get the name column index
    * @return int
    */
-  getNameColumnIndex() {
+  getNameColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_NAME);
   }
   /**
    * Get the name column
    * @return {module:user/userColumn~UserColumn}
    */
-  getNameColumn() {
+  getNameColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_NAME);
   }
   /**
    * Get the description column index
    * @return int
    */
-  getDescriptionColumnIndex() {
+  getDescriptionColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_DESCRIPTION);
   }
   /**
    * Get the description column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDescriptionColumn() {
+  getDescriptionColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_DESCRIPTION);
   }
   /**
    * Get the color column index
    * @return int
    */
-  getColorColumnIndex() {
+  getColorColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_COLOR);
   }
   /**
    * Get the color column
    * @return {module:user/userColumn~UserColumn}
    */
-  getColorColumn() {
+  getColorColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_COLOR);
   }
   /**
    * Get the opacity column index
    * @return int
    */
-  getOpacityColumnIndex() {
+  getOpacityColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_OPACITY);
   }
   /**
    * Get the opacity column
    * @return {module:user/userColumn~UserColumn}
    */
-  getOpacityColumn() {
+  getOpacityColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_OPACITY);
   }
   /**
    * Get the width column index
    * @return int
    */
-  getWidthColumnIndex() {
+  getWidthColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_WIDTH);
   }
   /**
    * Get the width column
    * @return {module:user/userColumn~UserColumn}
    */
-  getWidthColumn() {
+  getWidthColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_WIDTH);
   }
   /**
    * Get the fill_color column index
    * @return int
    */
-  getFillColorColumnIndex() {
+  getFillColorColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_FILL_COLOR);
   }
   /**
    * Get the fill_color column
    * @return {module:user/userColumn~UserColumn}
    */
-  getFillColorColumn() {
+  getFillColorColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_FILL_COLOR);
   }
   /**
    * Get the fill_opacity column index
    * @return int
    */
-  getFillOpacityColumnIndex() {
+  getFillOpacityColumnIndex(): number {
     return this.getColumnIndex(StyleTable.COLUMN_FILL_OPACITY);
   }
   /**
    * Get the fill_opacity column
    * @return {module:user/userColumn~UserColumn}
    */
-  getFillOpacityColumn() {
+  getFillOpacityColumn(): UserColumn {
     return this.getColumnWithColumnName(StyleTable.COLUMN_FILL_OPACITY);
   }
   /**
    * Create a media table with a minimum required columns followed by the additional columns
    * @return {module:extension/style.StyleTable}
    */
-  static create() {
+  static create(): StyleTable {
     return new StyleTable(StyleTable.TABLE_NAME, StyleTable.createColumns());
   }
   /**
    * Create the columns
    * @return {module:user/custom~UserCustomColumn[]}
    */
-  static createColumns() {
-    var columns = [];
-    var index = 0;
+  static createColumns(): UserCustomColumn[] {
+    const columns = [];
+    let index = 0;
     columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(index++, StyleTable.COLUMN_ID));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_NAME, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_DESCRIPTION, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_COLOR, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, DataTypes.GPKGDataType.GPKG_DT_TEXT, undefined, false, undefined));
-    columns.push(UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, DataTypes.GPKGDataType.GPKG_DT_REAL, undefined, false, undefined));
+    columns.push(
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_NAME, DataTypes.TEXT, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(
+        index++,
+        StyleTable.COLUMN_DESCRIPTION,
+        DataTypes.TEXT,
+        undefined,
+        false,
+        undefined,
+      ),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_COLOR, DataTypes.TEXT, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, DataTypes.REAL, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, DataTypes.REAL, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, DataTypes.TEXT, undefined, false, undefined),
+    );
+    columns.push(
+      UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, DataTypes.REAL, undefined, false, undefined),
+    );
     return columns;
   }
 }

@@ -3,7 +3,7 @@
  * SpatialReferenceSystem module.
  * @module core/srs
  */
-import proj4 from 'proj4'
+import proj4 from 'proj4';
 
 /**
  * Spatial Reference System object. The coordinate reference system definitions it contains are referenced by the GeoPackage Contents and GeometryColumns objects to relate the vector and tile data in user tables to locations on the earth.
@@ -52,18 +52,14 @@ export class SpatialReferenceSystem {
    * @return {*}
    */
   getProjection(): any {
-    if (this.organization === 'NONE')
-      return {};
+    if (this.organization === 'NONE') return {};
     if (this.organization_coordsys_id === 4326 && (this.organization === 'EPSG' || this.organization === 'epsg')) {
       return proj4('EPSG:4326');
-    }
-    else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
+    } else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
       return proj4(this.definition_12_063);
-    }
-    else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
+    } else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
       return proj4(this.definition);
-    }
-    else if (this.organization && this.organization_coordsys_id) {
+    } else if (this.organization && this.organization_coordsys_id) {
       return proj4(this.organization.toUpperCase() + ':' + this.organization_coordsys_id);
     }
     return {};

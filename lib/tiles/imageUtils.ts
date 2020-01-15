@@ -1,20 +1,19 @@
 import sizeOf from 'image-size';
 
 export class ImageUtils {
-  public static readonly isElectron = !!(typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1);
-  // @ts-ignore
-  public static readonly isPhantom = !!(typeof window !== 'undefined' && window.callPhantom && window._phantom);
-  public static readonly isNode = typeof(process) !== 'undefined' && process.version;
-  public static readonly useNodeCanvas =  ImageUtils.isNode && !ImageUtils.isPhantom && !ImageUtils.isElectron;
+  public static readonly isElectron = !!(
+    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
+  );
+  public static readonly isNode = typeof process !== 'undefined' && process.version;
+  public static readonly useNodeCanvas = ImageUtils.isNode && !ImageUtils.isElectron;
 
   /**
    * Get image for data
    * @param {Buffer|String} data file data or file path
    * @returns {Object}
    */
-  public static getImageSize(data: Buffer | string) {
-    // @ts-ignore
-    return sizeOf(data);
+  public static getImageSize(data: Buffer | string): any {
+    return sizeOf.imageSize(data);
   }
 
   /**
@@ -25,21 +24,22 @@ export class ImageUtils {
    */
   public static async getImage(data: Buffer | string, contentType = 'image/png'): Promise<any> {
     return new Promise((resolve, reject) => {
-      var image;
+      let image;
       if (ImageUtils.useNodeCanvas) {
-        var Canvas = require('canvas');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Canvas = require('canvas');
         image = new Canvas.Image();
       } else {
         // eslint-disable-next-line no-undef
         image = new Image();
       }
-      image.onload = () => {
+      image.onload = (): void => {
         resolve(image);
       };
-      image.onerror = (error) => {
+      image.onerror = (error): void => {
         reject(error);
       };
-      var src = data;
+      let src = data;
       if (data instanceof Buffer) {
         src = 'data:' + contentType + ';base64,' + data.toString('base64');
       }
@@ -53,10 +53,9 @@ export class ImageUtils {
    * @param {Number} scale
    * @returns {Promise<typeof Image>}
    */
-  public static getScaledImage(data: Buffer | string, scale: number) {
-    return ImageUtils.getImage(data).then((image) => {
-      return ImageUtils.scaleBitmap(image, scale);
-    });
+  public static async getScaledImage(data: Buffer | string, scale: number): Promise<any> {
+    const image = await ImageUtils.getImage(data);
+    return ImageUtils.scaleBitmap(image, scale);
   }
 
   /**
@@ -69,15 +68,14 @@ export class ImageUtils {
     if (scale === 1.0) {
       return image;
     } else {
-      // @ts-ignore
-      var iconWidth = image.width;
-      // @ts-ignore
-      var iconHeight = image.height;
-      var scaledWidth = Math.round(scale * iconWidth);
-      var scaledHeight = Math.round(scale * iconHeight);
-      var canvas, ctx, img;
+      const iconWidth = image.width;
+      const iconHeight = image.height;
+      const scaledWidth = Math.round(scale * iconWidth);
+      const scaledHeight = Math.round(scale * iconHeight);
+      let canvas, img;
       if (ImageUtils.useNodeCanvas) {
-        var Canvas = require('canvas');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const Canvas = require('canvas');
         canvas = Canvas.createCanvas(scaledWidth, scaledHeight);
         img = new Canvas.Image();
       } else {
@@ -88,11 +86,12 @@ export class ImageUtils {
         // eslint-disable-next-line no-undef
         img = new Image();
       }
-      ctx = canvas.getContext('2d');
-      // @ts-ignore
+      const ctx = canvas.getContext('2d');
       ctx.drawImage(image, 0, 0, iconWidth, iconHeight, 0, 0, scaledWidth, scaledHeight);
       return new Promise(resolve => {
-        img.onload = () => { resolve(img); };
+        img.onload = (): void => {
+          resolve(img);
+        };
         img.src = canvas.toDataURL();
       });
     }

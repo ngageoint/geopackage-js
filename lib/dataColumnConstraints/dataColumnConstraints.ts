@@ -1,4 +1,3 @@
-
 /**
  * Contains data to specify restrictions on basic data type column values
  * @class DataColumnConstraints

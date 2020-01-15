@@ -1,4 +1,3 @@
-
 /**
  * Table Index object, for indexing data within user tables
  */

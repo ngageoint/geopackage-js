@@ -3,10 +3,10 @@
  * @module extension/relatedTables
  */
 
-import {UserTable} from '../../user/userTable';
-import {UserColumn} from '../../user/userColumn';
-import {UserCustomColumn} from '../../user/custom/userCustomColumn';
-import {DataTypes} from '../../db/dataTypes';
+import { UserTable } from '../../user/userTable';
+import { UserColumn } from '../../user/userColumn';
+import { UserCustomColumn } from '../../user/custom/userCustomColumn';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Contains user mapping table factory and utility methods
@@ -17,9 +17,9 @@ import {DataTypes} from '../../db/dataTypes';
 export class UserMappingTable extends UserTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
   public static readonly COLUMN_RELATED_ID: string = 'related_id';
-  
+
   getTableType(): string {
-    return "userMappingTable";
+    return 'userMappingTable';
   }
   /**
    * Get the base id column
@@ -42,7 +42,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:extension/relatedTables~UserMappingTable}
    */
   static create(tableName: string, columns?: UserColumn[]): UserMappingTable {
-    var allColumns = UserMappingTable.createRequiredColumns(0);
+    let allColumns = UserMappingTable.createRequiredColumns(0);
     if (columns) {
       allColumns = allColumns.concat(columns);
     }
@@ -63,7 +63,7 @@ export class UserMappingTable extends UserTable {
   static createRequiredColumns(startingIndex = 0): UserColumn[] {
     return [
       UserMappingTable.createBaseIdColumn(startingIndex++),
-      UserMappingTable.createRelatedIdColumn(startingIndex)
+      UserMappingTable.createRelatedIdColumn(startingIndex),
     ];
   }
   /**
@@ -72,7 +72,13 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createBaseIdColumn(index: number): UserColumn {
-    var baseIdColumn = UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, DataTypes.GPKGDataType.GPKG_DT_INTEGER, undefined, true);
+    const baseIdColumn = UserCustomColumn.createColumn(
+      index,
+      UserMappingTable.COLUMN_BASE_ID,
+      DataTypes.INTEGER,
+      undefined,
+      true,
+    );
     return baseIdColumn;
   }
   /**
@@ -81,7 +87,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createRelatedIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, DataTypes.GPKGDataType.GPKG_DT_INTEGER, undefined, true);
+    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, DataTypes.INTEGER, undefined, true);
   }
   /**
    * Get the required columns
