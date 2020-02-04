@@ -25,7 +25,7 @@ import fs from 'fs';
 import geojsonvt from 'geojson-vt';
 import vtpbf from 'vt-pbf';
 import Pbf from 'pbf';
-import VectorTile from '@mapbox/vector-tile';
+// import VectorTile from '@mapbox/vector-tile';
 import pointToLineDistance from '@turf/point-to-line-distance';
 import polygonToLine from '@turf/polygon-to-line';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -53,6 +53,7 @@ interface ClosestFeature extends Feature {
  */
 
 export class GeoPackageAPI {
+  static readonly version: string = '3.0.0';
   /**
    * In Node, open a GeoPackage file at the given path, or in a browser, load an
    * in-memory GeoPackage from the given byte array.
@@ -1120,29 +1121,29 @@ export class GeoPackageAPI {
     return features;
   }
 
-  static convertPBFToVectorTile(pbf: Uint8Array | ArrayBuffer): VectorTile {
-    return new VectorTile.VectorTile(new Pbf(pbf));
-  }
+  // static convertPBFToVectorTile(pbf: Uint8Array | ArrayBuffer): VectorTile {
+  //   return new VectorTile.VectorTile(new Pbf(pbf));
+  // }
 
-  /**
-   * Gets a mapbox VectorTile for the x y z web mercator tile specified
-   * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
-   * @param  {string} table      table name
-   * @param  {Number} x          x tile
-   * @param  {Number} y          y tile
-   * @param  {Number} z          web zoom
-   * @return {typeof VectorTile}
-   */
-  static async getVectorTile(
-    geopackage: GeoPackage,
-    table: string,
-    x: number,
-    y: number,
-    z: number,
-  ): Promise<VectorTile> {
-    const pbf = await GeoPackageAPI.getVectorTileProtobuf(geopackage, table, x, y, z);
-    return new VectorTile.VectorTile(new Pbf(pbf));
-  }
+  // /**
+  //  * Gets a mapbox VectorTile for the x y z web mercator tile specified
+  //  * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
+  //  * @param  {string} table      table name
+  //  * @param  {Number} x          x tile
+  //  * @param  {Number} y          y tile
+  //  * @param  {Number} z          web zoom
+  //  * @return {typeof VectorTile}
+  //  */
+  // static async getVectorTile(
+  //   geopackage: GeoPackage,
+  //   table: string,
+  //   x: number,
+  //   y: number,
+  //   z: number,
+  // ): Promise<VectorTile> {
+  //   const pbf = await GeoPackageAPI.getVectorTileProtobuf(geopackage, table, x, y, z);
+  //   return new VectorTile.VectorTile(new Pbf(pbf));
+  // }
 
   /**
    * Gets a protobuf for the x y z web mercator tile specified
