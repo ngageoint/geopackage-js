@@ -23,6 +23,7 @@ describe('SpatialReferenceSystem tests', function() {
 
     var projection = srs.getProjection();
     should.exist(projection);
+    // @ts-ignore
     projection.oProj.projName.should.be.equal('longlat');
   });
 
@@ -33,6 +34,7 @@ describe('SpatialReferenceSystem tests', function() {
 
     var projection = srs.getProjection();
     should.exist(projection);
+    // @ts-ignore
     projection.oProj.title.should.be.equal('WGS 84 / Pseudo-Mercator');
   });
 
@@ -42,13 +44,14 @@ describe('SpatialReferenceSystem tests', function() {
 
     var projection = srs.getProjection();
     should.exist(projection);
+    // @ts-ignore
     projection.oProj.projName.should.be.equal('merc');
   });
 
-  it('should return an emtpy object when the projection could not be determined', function() {
+  it('should return null when the projection could not be determined', function() {
     var srs = new SpatialReferenceSystem();
     var projection = srs.getProjection();
-    projection.should.be.empty;
+    should.not.exist(projection);
   })
 
   it('should get a projection from a definition_12_063', function() {
@@ -57,6 +60,7 @@ describe('SpatialReferenceSystem tests', function() {
 
     var projection = srs.getProjection();
     should.exist(projection);
+    // @ts-ignore
     projection.oProj.projName.should.be.equal('merc');
   });
 

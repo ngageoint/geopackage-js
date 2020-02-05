@@ -85,7 +85,7 @@ export class ContentsDao extends Dao<Contents> {
    * @param  {module:core/contents~Contents} contents Contents to get the projection from
    * @return {*}          proj4 projection
    */
-  getProjection(contents: Contents): any {
+  getProjection(contents: Contents): proj4.Converter {
     const srs = this.getSrs(contents);
     const srsDao = this.geoPackage.getSpatialReferenceSystemDao();
     return srsDao.getProjection(srs);

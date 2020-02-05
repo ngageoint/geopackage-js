@@ -127,7 +127,7 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
     const dao = this.geoPackage.getContentsDao();
     return dao.queryForId(geometryColumns.table_name);
   }
-  getProjection(projectionObject: GeometryColumns): any {
+  getProjection(projectionObject: GeometryColumns): proj4.Converter {
     const srs = this.getSrs(projectionObject);
     const srsDao = this.geoPackage.getSpatialReferenceSystemDao();
     return srsDao.getProjection(srs);

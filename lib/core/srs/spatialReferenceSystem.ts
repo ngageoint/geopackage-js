@@ -51,8 +51,8 @@ export class SpatialReferenceSystem {
    * Return the proj4 projection specified by this SpatialReferenceSystem
    * @return {*}
    */
-  getProjection(): any {
-    if (this.organization === 'NONE') return {};
+  getProjection(): proj4.Converter {
+    if (this.organization === 'NONE') return null;
     if (this.organization_coordsys_id === 4326 && (this.organization === 'EPSG' || this.organization === 'epsg')) {
       return proj4('EPSG:4326');
     } else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
@@ -62,6 +62,6 @@ export class SpatialReferenceSystem {
     } else if (this.organization && this.organization_coordsys_id) {
       return proj4(this.organization.toUpperCase() + ':' + this.organization_coordsys_id);
     }
-    return {};
+    return null;
   }
 }

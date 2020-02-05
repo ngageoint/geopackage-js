@@ -59,7 +59,7 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
     }
     return tableNames;
   }
-  getProjection(tileMatrixSet: TileMatrixSet): any {
+  getProjection(tileMatrixSet: TileMatrixSet): proj4.Converter {
     const srs = this.getSrs(tileMatrixSet);
     if (!srs) return;
     const srsDao = this.geoPackage.getSpatialReferenceSystemDao();

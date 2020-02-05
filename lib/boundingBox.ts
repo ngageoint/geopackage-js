@@ -87,6 +87,10 @@ export class BoundingBox {
     );
   }
 
+  isConverter(x: proj4.Converter | string): x is proj4.Converter {
+    return (x as proj4.Converter).forward !== undefined;
+  }
+
   /**
    * Project the bounding box into a new projection
    *
@@ -94,12 +98,12 @@ export class BoundingBox {
    * @param {string} to
    * @return {BoundingBox}
    */
-  projectBoundingBox(from?: string, to?: string): BoundingBox {
+  projectBoundingBox(from?: string | proj4.Converter, to?: string | proj4.Converter): BoundingBox {
     if (from && from !== 'undefined' && to && to !== 'undefined') {
       if (
-        to.toUpperCase &&
+        !this.isConverter(to) &&
         to.toUpperCase() === 'EPSG:3857' &&
-        from.toUpperCase &&
+        !this.isConverter(from) &&
         from.toUpperCase() === 'EPSG:4326'
       ) {
         this.maxLatitude = Math.min(this.maxLatitude, 85.0511);
@@ -107,10 +111,33 @@ export class BoundingBox {
         this.minLongitude = Math.max(this.minLongitude, -180.0);
         this.maxLongitude = Math.min(this.maxLongitude, 180.0);
       }
-      const min = proj4(from, to, [this.minLongitude, this.minLatitude]);
-      const max = proj4(from, to, [this.maxLongitude, this.maxLatitude]);
-      const projected = new BoundingBox(min[0], max[0], min[1], max[1]);
-      return projected;
+
+      // if they are both strings, let proj4 do it
+      if (!this.isConverter(to) && !this.isConverter(from)) {
+        const min = proj4(from, to, [this.minLongitude, this.minLatitude]);
+        const max = proj4(from, to, [this.maxLongitude, this.maxLatitude]);
+        const projected = new BoundingBox(min[0], max[0], min[1], max[1]);
+        return projected;
+      }
+      // if they are both projections to from.inverse then to.forward
+      else {
+        let toConverter: proj4.Converter;
+        if (this.isConverter(to)) {
+          toConverter = to;
+        } else {
+          toConverter = proj4(to);
+        }
+        let fromConverter: proj4.Converter;
+        if (this.isConverter(from)) {
+          fromConverter = from;
+        } else {
+          fromConverter = proj4(from);
+        }
+        const min = toConverter.forward(fromConverter.inverse([this.minLongitude, this.minLatitude]));
+        const max = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.maxLatitude]));
+        const projected = new BoundingBox(min[0], max[0], min[1], max[1]);
+        return projected;
+      }
     }
     return this;
   }

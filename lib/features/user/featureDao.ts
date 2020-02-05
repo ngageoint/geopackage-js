@@ -34,7 +34,7 @@ import { ColumnValues } from '../../dao/columnValues';
 export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   dataColumnsDao: DataColumnsDao;
   featureTableIndex: FeatureTableIndex;
-  projection: any;
+  projection: proj4.Converter;
   constructor(
     geoPackage: GeoPackage,
     public table: FeatureTable,
@@ -355,7 +355,11 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     return new BoundingBox(contents.min_x, contents.max_x, contents.min_y, contents.max_y);
   }
 
-  static reprojectFeature(featureRow: FeatureRow, srs: SpatialReferenceSystem, projection: string): GeoJsonObject {
+  static reprojectFeature(
+    featureRow: FeatureRow,
+    srs: SpatialReferenceSystem,
+    projection: proj4.Converter | string,
+  ): GeoJsonObject {
     let geometry = featureRow.getGeometry().toGeoJSON();
     if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
       geometry = reproject.reproject(geometry, projection, 'EPSG:4326');

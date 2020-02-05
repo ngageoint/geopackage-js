@@ -73,7 +73,18 @@ export class TileBoundingBoxUtils {
     sWidth: number;
     sHeight: number;
   } {
-    const p = {} as any;
+    const p = {} as {
+      yPositionInFinalTileStart: number;
+      xPositionInFinalTileStart: number;
+      dx: number;
+      dy: number;
+      sx: number;
+      sy: number;
+      dWidth: number;
+      dHeight: number;
+      sWidth: number;
+      sHeight: number;
+    };
 
     const finalTileWidth = totalBoundingBox.maxLongitude - totalBoundingBox.minLongitude;
     const xoffsetMin = geoPackageTileBoundingBox.minLongitude - totalBoundingBox.minLongitude;
@@ -116,7 +127,12 @@ export class TileBoundingBoxUtils {
    *  @param {*} [options] options object
    *  @return {BoundingBox} a bounding box in EPSG:3857 meters
    */
-  static getWebMercatorBoundingBoxFromXYZ(x: number, y: number, zoom: number, options?: any): BoundingBox {
+  static getWebMercatorBoundingBoxFromXYZ(
+    x: number,
+    y: number,
+    zoom: number,
+    options?: { tileSize?: number; buffer?: number },
+  ): BoundingBox {
     const tilesPerSide = TileBoundingBoxUtils.tilesPerSideWithZoom(zoom);
     const tileSize = TileBoundingBoxUtils.tileSizeWithTilesPerSide(tilesPerSide);
 

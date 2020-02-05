@@ -81,7 +81,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * Return the proj4 projection specified by this SpatialReferenceSystem
    * @return {typeof proj4}
    */
-  getProjection(srs: SpatialReferenceSystem): any {
+  getProjection(srs: SpatialReferenceSystem): proj4.Converter {
     return srs.getProjection();
   }
   /**

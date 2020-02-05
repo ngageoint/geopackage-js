@@ -270,7 +270,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param  {string} projection  projection the boundingBox is in
    * @return {IterableIterator}
    */
-  queryWithBoundingBox(boundingBox: BoundingBox, projection: string): IterableIterator<any> {
+  queryWithBoundingBox(boundingBox: BoundingBox, projection: string | proj4.Converter): IterableIterator<any> {
     const projectedBoundingBox = boundingBox.projectBoundingBox(projection, this.featureDao.projection);
     const envelope = projectedBoundingBox.buildEnvelope();
     return this.queryWithGeometryEnvelope(envelope);

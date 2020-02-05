@@ -159,7 +159,7 @@ describe('GeometryColumns tests', function() {
       m: 0
     });
     var projection = gcd.getProjection(table);
-    should.exist(projection);
+    should.not.exist(projection);
   });
 
 });
