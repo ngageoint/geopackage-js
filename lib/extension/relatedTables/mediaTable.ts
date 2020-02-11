@@ -111,7 +111,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createDataColumn(index: number): UserColumn {
-    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, DataTypes.BLOB, true);
+    return UserColumn.createColumn(index, MediaTable.COLUMN_DATA, DataTypes.BLOB, true);
   }
   /**
    * Create the content type column
@@ -119,6 +119,6 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createContentTypeColumn(index: number): UserColumn {
-    return UserColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, DataTypes.TEXT, true);
+    return UserColumn.createColumn(index, MediaTable.COLUMN_CONTENT_TYPE, DataTypes.TEXT, true);
   }
 }

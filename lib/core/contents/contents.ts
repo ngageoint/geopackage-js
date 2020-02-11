@@ -67,5 +67,5 @@ export class Contents {
    * Unique identifier for each Spatial Reference System within a GeoPackage
    * @member {SRSRef}
    */
-  srs_id: any;
+  srs_id: number;
 }

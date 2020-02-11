@@ -72,13 +72,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createBaseIdColumn(index: number): UserColumn {
-    const baseIdColumn = UserCustomColumn.createColumn(
-      index,
-      UserMappingTable.COLUMN_BASE_ID,
-      DataTypes.INTEGER,
-      undefined,
-      true,
-    );
+    const baseIdColumn = UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, DataTypes.INTEGER, true);
     return baseIdColumn;
   }
   /**
@@ -87,7 +81,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createRelatedIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, DataTypes.INTEGER, undefined, true);
+    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, DataTypes.INTEGER, true);
   }
   /**
    * Get the required columns

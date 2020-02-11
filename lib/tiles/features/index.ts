@@ -20,6 +20,7 @@ import { StyleRow } from '../../extension/style/styleRow';
 import { FeatureTilePointIcon } from './featureTilePointIcon';
 import { CustomFeaturesTile } from './custom/customFeaturesTile';
 import FeatureStyle from '../../extension/style/featureStyle';
+import { IconRow } from '../../extension/style/iconRow';
 /**
  * FeatureTiles module.
  * @module tiles/features
@@ -35,7 +36,7 @@ export class FeatureTiles {
   );
   private static readonly isNode: boolean = typeof process !== 'undefined' && !!process.version;
   private static readonly useNodeCanvas: boolean = FeatureTiles.isNode && !FeatureTiles.isElectron;
-  projection: any = null;
+  projection: proj4.Converter = null;
   simplifyGeometries = true;
   compressFormat = 'png';
   pointRadius = 4.0;
@@ -53,9 +54,9 @@ export class FeatureTiles {
   iconCache: IconCache = new IconCache();
   scale = 1.0;
   geoPackage: GeoPackage;
-  featureTableStyles: any;
+  featureTableStyles: FeatureTableStyles;
   maxFeaturesPerTile: number = null;
-  maxFeaturesTileDraw: any = null;
+  maxFeaturesTileDraw: CustomFeaturesTile = null;
   widthOverlap: number;
   heightOverlap: number;
   constructor(
@@ -285,7 +286,7 @@ export class FeatureTiles {
       const styleDao = this.featureTableStyles.getStyleDao();
       for (let i = 0; i < styleRowIds.length; i++) {
         const styleRowId = styleRowIds[i];
-        const styleRow = styleDao.queryForId(styleRowId);
+        const styleRow = styleDao.queryForId(styleRowId) as StyleRow;
         const styleHalfWidth = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         this.widthOverlap = Math.max(this.widthOverlap, styleHalfWidth);
         this.heightOverlap = Math.max(this.heightOverlap, styleHalfWidth);
@@ -302,7 +303,7 @@ export class FeatureTiles {
       const iconDao = this.featureTableStyles.getIconDao();
       for (let i = 0; i < iconRowIds.length; i++) {
         const iconRowId = iconRowIds[i];
-        const iconRow = iconDao.queryForId(iconRowId);
+        const iconRow = iconDao.queryForId(iconRowId) as IconRow;
         const iconDimensions = iconRow.getDerivedDimensions();
         const iconWidth = this.scale * Math.ceil(iconDimensions[0]);
         const iconHeight = this.scale * Math.ceil(iconDimensions[1]);
@@ -351,7 +352,7 @@ export class FeatureTiles {
    * @param featureStyle feature style
    * @return paint
    */
-  getPolygonPaint(featureStyle: any): Paint {
+  getPolygonPaint(featureStyle: FeatureStyle): Paint {
     let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint == null) {
       paint = this.polygonPaint;
@@ -683,7 +684,7 @@ export class FeatureTiles {
       });
     } else if (this.maxFeaturesTileDraw !== null) {
       // Draw the max features tile
-      return this.maxFeaturesTileDraw.drawTile(width, height, tileCount, canvas);
+      return this.maxFeaturesTileDraw.drawTile(width, height, tileCount.toString(), canvas);
     }
   }
   async drawTileWithBoundingBox(boundingBox: BoundingBox, zoom: number, tileCanvas?: any): Promise<any> {

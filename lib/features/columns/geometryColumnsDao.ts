@@ -114,8 +114,7 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
    *  @param {module:dao/geometryColumns~GeometryColumns} geometryColumns geometry columns
    */
   getSrs(geometryColumns: GeometryColumns): SpatialReferenceSystem {
-    const dao = this.geoPackage.getSpatialReferenceSystemDao();
-    return dao.queryForId(geometryColumns.srs_id);
+    return this.geoPackage.spatialReferenceSystemDao.queryForId(geometryColumns.srs_id);
   }
   /**
    *  Get the Contents of the Geometry Columns
@@ -124,12 +123,10 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
    *  @return {ContentsDao} contents dao
    */
   getContents(geometryColumns: GeometryColumns): Contents {
-    const dao = this.geoPackage.getContentsDao();
-    return dao.queryForId(geometryColumns.table_name);
+    return this.geoPackage.contentsDao.queryForId(geometryColumns.table_name);
   }
   getProjection(projectionObject: GeometryColumns): proj4.Converter {
     const srs = this.getSrs(projectionObject);
-    const srsDao = this.geoPackage.getSpatialReferenceSystemDao();
-    return srsDao.getProjection(srs);
+    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
   }
 }

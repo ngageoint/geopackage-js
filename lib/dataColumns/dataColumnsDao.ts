@@ -51,7 +51,7 @@ export class DataColumnsDao extends Dao<DataColumns> {
    * @param  {String} constraintName     constraint name
    * @return {Iterable.<Object>} iterator of database objects
    */
-  queryByConstraintName(constraintName: string): IterableIterator<any> {
+  queryByConstraintName(constraintName: string): IterableIterator<DataColumns> {
     return this.queryForEach(DataColumnsDao.COLUMN_CONSTRAINT_NAME, constraintName);
   }
   /**

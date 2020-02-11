@@ -24,7 +24,7 @@ describe('UserTableReader tests', function() {
 
   it('should read the table', function() {
     var reader = new UserTableReader('point2d');
-    var table = reader.readTable(geoPackage.getDatabase());
+    var table = reader.readTable(geoPackage.database);
     table.table_name.should.be.equal('point2d');
     table.columns.length.should.be.equal(8);
     table.columns[0].name.should.be.equal('fid');
@@ -39,7 +39,7 @@ describe('UserTableReader tests', function() {
 
   it('should query the table', function() {
     var reader = new UserTableReader('point2d');
-    var table = reader.readTable(geoPackage.getDatabase());
+    var table = reader.readTable(geoPackage.database);
     var ud = new UserDao(geoPackage, table);
     var results = ud.queryForAll();
     should.exist(results);

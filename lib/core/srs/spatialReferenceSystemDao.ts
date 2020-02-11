@@ -82,7 +82,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {typeof proj4}
    */
   getProjection(srs: SpatialReferenceSystem): proj4.Converter {
-    return srs.getProjection();
+    return srs.projection;
   }
   /**
    * Creates the required EPSG WGS84 Spatial Reference System (spec

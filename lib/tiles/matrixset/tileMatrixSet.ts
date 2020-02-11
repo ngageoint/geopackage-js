@@ -62,16 +62,16 @@ export class TileMatrixSet {
    */
   max_y: number;
 
-  setBoundingBox(boundingBox: BoundingBox): void {
+  set boundingBox(boundingBox: BoundingBox) {
     this.min_x = boundingBox.minLongitude;
     this.max_x = boundingBox.maxLongitude;
     this.min_y = boundingBox.minLatitude;
     this.max_y = boundingBox.maxLatitude;
   }
-  getBoundingBox(): BoundingBox {
+  get boundingBox(): BoundingBox {
     return new BoundingBox(this.min_x, this.max_x, this.min_y, this.max_y);
   }
-  setContents(contents: Contents): void {
+  set contents(contents: Contents) {
     if (contents && contents.data_type === 'tiles') {
       this.table_name = contents.table_name;
     }

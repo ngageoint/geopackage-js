@@ -3,6 +3,7 @@
  */
 
 import { DataTypes } from '../db/dataTypes';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -24,7 +25,7 @@ export class UserColumn {
     public dataType: DataTypes,
     public max?: number,
     public notNull?: boolean,
-    public defaultValue?: any,
+    public defaultValue?: DBValue,
     public primaryKey?: boolean,
   ) {
     this.validateMax();
@@ -67,26 +68,7 @@ export class UserColumn {
   static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): UserColumn {
     return new UserColumn(index, name, DataTypes.INTEGER, undefined, true, undefined, true);
   }
-  /**
-   *  Create a new column
-   *
-   *  @param {Number} index        column index
-   *  @param {string} name         column name
-   *  @param {module:db/dataTypes~GPKGDataType} type         data type
-   *  @param {Boolean} [notNull]      not null
-   *  @param {Object} [defaultValue] default value or nil
-   *
-   *  @return {module:user/userColumn~UserColumn} created column
-   */
-  static createColumnWithIndex(
-    index: number,
-    name: string,
-    type: any,
-    notNull?: boolean,
-    defaultValue?: any,
-  ): UserColumn {
-    return UserColumn.createColumnWithIndexAndMax(index, name, type, undefined, notNull, defaultValue);
-  }
+
   /**
    *  Create a new column
    *
@@ -99,13 +81,13 @@ export class UserColumn {
    *
    *  @return {module:user/userColumn~UserColumn} created column
    */
-  static createColumnWithIndexAndMax(
+  static createColumn(
     index: number,
     name: string,
-    type: any,
-    max: number,
-    notNull: boolean,
-    defaultValue: any,
+    type: DataTypes,
+    notNull = false,
+    defaultValue?: DBValue,
+    max?: number,
   ): UserColumn {
     return new UserColumn(index, name, type, max, notNull, defaultValue, false);
   }

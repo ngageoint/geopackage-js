@@ -33,7 +33,7 @@ export class FeatureTableStyles {
     } else {
       this.tableName = tableNameOrTable;
     }
-    this.featureStyleExtension = geoPackage.getFeatureStyleExtension();
+    this.featureStyleExtension = geoPackage.featureStyleExtension;
     this.cachedTableFeatureStyles = new FeatureStyles();
     // this.tableName = tableName;
   }

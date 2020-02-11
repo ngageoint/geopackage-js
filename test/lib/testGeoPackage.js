@@ -112,8 +112,7 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var dao = geoPackage.getContentsDao();
-      var contents = dao.queryForId('FEATURESriversds');
+      var contents = geoPackage.contentsDao.queryForId('FEATURESriversds');
       var featureDao = geoPackage.getFeatureDaoWithContents(contents);
       should.exist(featureDao);
       featureDao.getGeometryType().should.be.equal('GEOMETRY');
@@ -126,8 +125,7 @@ describe('GeoPackage tests', function() {
     return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var dao = geoPackage.getContentsDao();
-      var contents = dao.queryForId('TILESosmds');
+      var contents = geoPackage.contentsDao.queryForId('TILESosmds');
       return geoPackage.getTileDaoWithContents(contents);
     });
   });

@@ -44,12 +44,12 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     super(geoPackage, table);
     this.dataColumnsDao = new DataColumnsDao(geoPackage);
     this.featureTableIndex = new FeatureTableIndex(geoPackage, this);
-    const dao = geoPackage.getGeometryColumnsDao();
+    const dao = geoPackage.geometryColumnsDao;
     if (!dao.getContents(geometryColumns)) {
-      throw new Error('Geometry Columns ' + geometryColumns.getId() + ' has null Contents');
+      throw new Error('Geometry Columns ' + geometryColumns.id + ' has null Contents');
     }
     if (!dao.getSrs(geometryColumns)) {
-      throw new Error('Geometry Columns ' + geometryColumns.getId() + ' has null Spatial Reference System');
+      throw new Error('Geometry Columns ' + geometryColumns.id + ' has null Spatial Reference System');
     }
     this.projection = dao.getProjection(geometryColumns);
   }
@@ -63,7 +63,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     return super.getRow(results) as FeatureRow;
   }
   getContents(): Contents {
-    const dao = this.geoPackage.getGeometryColumnsDao();
+    const dao = this.geoPackage.geometryColumnsDao;
     return dao.getContents(this.geometryColumns);
   }
   /**
@@ -105,10 +105,10 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    */
   //TODO is this a string?
   getGeometryType(): string {
-    return this.geometryColumns.getGeometryType();
+    return this.geometryColumns.geometryType;
   }
   getSrs(): SpatialReferenceSystem {
-    return this.geoPackage.getGeometryColumnsDao().getSrs(this.geometryColumns);
+    return this.geoPackage.geometryColumnsDao.getSrs(this.geometryColumns);
   }
   /**
    * Determine if the feature table is indexed

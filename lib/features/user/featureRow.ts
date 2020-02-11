@@ -4,6 +4,7 @@ import { FeatureColumn } from './featureColumn';
 import { DataTypes } from '../../db/dataTypes';
 import { GeometryData } from '../../geom/geometryData';
 import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * featureRow module.
@@ -38,7 +39,7 @@ export class FeatureRow extends UserRow {
    * Get the geometry
    * @return {Buffer} geometry data
    */
-  getGeometry(): any {
+  getGeometry(): GeometryData {
     return this.getValueWithIndex(this.featureTable.geometryIndex);
   }
   /**
@@ -60,15 +61,18 @@ export class FeatureRow extends UserRow {
   setGeometry(geometryData: GeometryData): void {
     this.setValueWithIndex(this.featureTable.geometryIndex, geometryData);
   }
-  toObjectValue(index: number, value: any): any {
-    let objectValue = value;
+  toObjectValue(index: number, value: DBValue): object | GeometryData {
+    let objectValue = value as object;
     const column = this.getColumnWithIndex(index);
-    if (column instanceof FeatureColumn && column.isGeometry() && value) {
+    if (
+      (column instanceof FeatureColumn && column.isGeometry() && value && value instanceof Buffer) ||
+      value instanceof Uint8Array
+    ) {
       objectValue = new GeometryData(value);
     }
     return objectValue;
   }
-  toDatabaseValue(columnName: string): any {
+  toDatabaseValue(columnName: string): DBValue {
     const column = this.getColumnWithColumnName(columnName);
     const value = this.getValueWithColumnName(columnName);
     if (column instanceof FeatureColumn && column.isGeometry() && value.toData) {

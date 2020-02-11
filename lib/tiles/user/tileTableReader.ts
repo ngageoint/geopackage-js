@@ -19,13 +19,12 @@ export class TileTableReader extends UserTableReader {
     super(tileMatrixSet.table_name);
   }
   readTileTable(geoPackage: GeoPackage): TileTable {
-    return this.readTable(geoPackage.getDatabase()) as TileTable;
+    return this.readTable(geoPackage.database) as TileTable;
   }
   createTable(tableName: string, columns: TileColumn[]): TileTable {
     return new TileTable(tableName, columns);
   }
-  createColumnWithResults(
-    results: any,
+  createColumn(
     index: number,
     name: string,
     type: string,

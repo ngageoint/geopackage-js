@@ -33,7 +33,7 @@ export class UserCustomDao<T extends UserRow> extends UserDao<UserRow> {
    */
   static readTable(geoPackage: GeoPackage, tableName: string, requiredColumns?: string[]): UserCustomDao<UserRow> {
     const reader = new UserCustomTableReader(tableName, requiredColumns);
-    const userCustomTable = reader.readTable(geoPackage.getDatabase());
+    const userCustomTable = reader.readTable(geoPackage.database);
     return new UserCustomDao(geoPackage, userCustomTable);
   }
 }

@@ -4,6 +4,7 @@
 
 import { UserColumn } from '../../user/userColumn';
 import { DataTypes } from '../../db/dataTypes';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
@@ -21,10 +22,10 @@ export class TileColumn extends UserColumn {
   constructor(
     index: number,
     name: string,
-    dataType: any,
+    dataType: DataTypes,
     max?: number,
     notNull?: boolean,
-    defaultValue?: any,
+    defaultValue?: DBValue,
     primaryKey?: boolean,
   ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);

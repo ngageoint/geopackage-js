@@ -124,17 +124,15 @@ describe('FeatureDao tests', function() {
       });
     });
 
-    it('should iterate GeoJSON features', function() {
+    it('should iterate GeoJSON features', async function() {
       var count = 0;
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      GeoPackageAPI.iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(filename, 'QueryTest', bb)
-      .then(function(iterator) {
-        for (var feature of iterator) {
-          feature.properties.name.should.be.equal('box1');
-          count++;
-        }
-        count.should.be.equal(1);
-      });
+      const iterator = await GeoPackageAPI.iterateGeoJSONFeatures(filename, 'QueryTest', bb)
+      for (var feature of iterator) {
+        feature.properties.name.should.be.equal('box1');
+        count++;
+      }
+      count.should.be.equal(1);
     });
   });
 
@@ -247,9 +245,9 @@ describe('FeatureDao tests', function() {
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       // @ts-ignore
       columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(2, 'name', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(3, '_feature_id', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumnWithIndex(4, '_properties_id', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(2, 'name', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(3, '_feature_id', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(4, '_properties_id', DataTypes.TEXT, false, ""));
 
       var box1 = {
         "type": "Polygon",
@@ -601,7 +599,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should create a media relationship between a feature and a media row', function() {
-      var rte = geopackage.getRelatedTablesExtension();
+      var rte = geopackage.relatedTablesExtension;
       var additionalMediaColumns = RelatedTablesUtils.createAdditionalUserColumns(MediaTable.numRequiredColumns());
       var mediaTable = MediaTable.create('media_table', additionalMediaColumns);
       rte.createRelatedTable(mediaTable);
@@ -632,7 +630,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should create a simple attributes relationship between a feature and a simple attributes row', function() {
-      var rte = geopackage.getRelatedTablesExtension();
+      var rte = geopackage.relatedTablesExtension;
       var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(SimpleAttributesTable.numRequiredColumns(), true);
       var simpleTable = SimpleAttributesTable.create('simple_table', simpleUserColumns);
       rte.createRelatedTable(simpleTable);

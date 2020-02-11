@@ -10,7 +10,7 @@ import TileUtilities from './tileUtilities';
 import ProjectTile from './projectTile';
 
 export class CanvasTileCreator extends TileCreator {
-  canvas: any;
+  canvas: HTMLCanvasElement;
   ctx: any;
   image: HTMLImageElement;
   tileCanvas: HTMLCanvasElement;

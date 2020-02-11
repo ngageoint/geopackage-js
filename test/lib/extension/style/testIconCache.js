@@ -74,10 +74,10 @@ describe('IconCache Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = await GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, [])
-    await geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName)
-    await geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension()
-    await geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension()
+    featureTable = await GeoPackageAPI.createFeatureTable(geopackage, featureTableName)
+    await geopackage.featureStyleExtension.getOrCreateExtension(featureTableName)
+    await geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
+    await geopackage.featureStyleExtension.getContentsId().getOrCreateExtension()
     featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
     await featureTableStyles.createIconRelationship()
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))

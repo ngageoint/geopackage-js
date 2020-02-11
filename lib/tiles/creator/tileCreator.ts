@@ -30,7 +30,7 @@ export abstract class TileCreator {
     tileMatrix: TileMatrix,
     tileMatrixSet: TileMatrixSet,
     tileBoundingBox: BoundingBox,
-    srs: any,
+    srs: SpatialReferenceSystem,
     projectionTo: string,
     canvas: any,
   ): Promise<TileCreator> {
@@ -99,7 +99,7 @@ export abstract class TileCreator {
   }
   async projectTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
     const bb = TileBoundingBoxUtils.getTileBoundingBox(
-      this.tileMatrixSet.getBoundingBox(),
+      this.tileMatrixSet.boundingBox,
       this.tileMatrix,
       gridColumn,
       gridRow,

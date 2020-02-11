@@ -53,7 +53,7 @@ export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    */
   static readTable(geoPackage: GeoPackage, tableName: string): MediaDao<MediaRow> {
     const reader = new UserTableReader(tableName);
-    const userTable = reader.readTable(geoPackage.getDatabase()) as MediaTable;
+    const userTable = reader.readTable(geoPackage.database) as MediaTable;
     return new MediaDao(geoPackage, userTable);
   }
 }

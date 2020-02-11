@@ -41,10 +41,10 @@ export class Extension {
   setExtensionName(author: string, extensionName: string): void {
     this.extension_name = Extension.buildExtensionName(author, extensionName);
   }
-  getAuthor(): string {
+  get author(): string {
     return Extension.getAuthorWithExtensionName(this.extension_name);
   }
-  getExtensionNameNoAuthor(): string {
+  get extensionNameNoAuthor(): string {
     return Extension.getExtensionNameNoAuthor(this.extension_name);
   }
   static buildExtensionName(author: string, extensionName: string): string {

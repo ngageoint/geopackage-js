@@ -4,6 +4,7 @@
 
 import { UserColumn } from '../../user/userColumn';
 import { DataTypes } from '../../db/dataTypes';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Represents a user feature column
@@ -69,7 +70,7 @@ export class FeatureColumn extends UserColumn {
     name: string,
     type: string,
     notNull: boolean,
-    defaultValue?: any,
+    defaultValue?: DBValue,
   ): FeatureColumn {
     return new FeatureColumn(index, name, type, undefined, notNull, defaultValue, false, type);
   }
@@ -79,39 +80,18 @@ export class FeatureColumn extends UserColumn {
    *  @param {Number} index        column index
    *  @param {string} name         column name
    *  @param {module:db/dataTypes~GPKGDataType} type         data type
-   *  @param {Boolean} [notNull]      not null
-   *  @param {Object} [defaultValue] default value or nil
-   *
-   *  @return feature column
-   */
-  static createColumnWithIndex(
-    index: number,
-    name: string,
-    type: any,
-    notNull?: boolean,
-    defaultValue?: any,
-  ): FeatureColumn {
-    return FeatureColumn.createColumnWithIndexAndMax(index, name, type, undefined, notNull, defaultValue);
-  }
-  /**
-   *  Create a new column
-   *
-   *  @param {Number} index        column index
-   *  @param {string} name         column name
-   *  @param {module:db/dataTypes~GPKGDataType} type         data type
-   *  @param {Number} max max value
    *  @param {Boolean} notNull      not null
    *  @param {Object} defaultValue default value or nil
-   *
+   *  @param {Number} max max value
    *  @return feature column
    */
-  static createColumnWithIndexAndMax(
+  static createColumn(
     index: number,
     name: string,
-    type: any,
-    max: number,
-    notNull: boolean,
-    defaultValue: any,
+    type: DataTypes,
+    notNull = true,
+    defaultValue?: DBValue,
+    max?: number,
   ): FeatureColumn {
     return new FeatureColumn(index, name, type, max, notNull, defaultValue, false);
   }

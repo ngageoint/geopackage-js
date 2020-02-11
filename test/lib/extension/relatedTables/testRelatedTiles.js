@@ -55,7 +55,7 @@ describe('Related Tile tests', function() {
     var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
     var contentsSrsId = 4326;
     var tileMatrixSetSrsId = 3857;
-    geoPackage.getSpatialReferenceSystemDao().createWebMercator();
+    geoPackage.spatialReferenceSystemDao.createWebMercator();
     return geoPackage.createTileTableWithTableName(tileTableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
       .then(function(result) {
         tileMatrixSet = result;
@@ -102,7 +102,7 @@ describe('Related Tile tests', function() {
 
     return createTiles()
       .then(function() {
-        var rte = geoPackage.getRelatedTablesExtension();
+        var rte = geoPackage.relatedTablesExtension;
         rte.has().should.be.equal(false);
 
         var extendedRelationships = rte.getRelationships();
@@ -141,7 +141,7 @@ describe('Related Tile tests', function() {
         // Create the media table, content row, and relationship between the
   	  // feature table and media table
 
-        var contentsDao = geoPackage.getContentsDao();
+        var contentsDao = geoPackage.contentsDao;
         var contentsTables = contentsDao.getTables();
         var relationship = RelatedTablesExtension.RelationshipBuilder()
           .setBaseTableName(baseTableName)

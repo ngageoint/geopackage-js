@@ -25,7 +25,8 @@
   },
   "devDependencies": {
     "browserify": "^14.1.0",
-    "browserify-css": "^0.9.1"
+    "browserify-css": "^0.9.1",
+    "typescript": "3.7.5"
   },
   "browserify": {
     "transform": [
@@ -36,6 +37,7 @@
     "create": "npm install --no-optional",
     "postinstall": "npm run build",
     "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
-    "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js"
+    "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js",
+    "tsc": "rm -rf ./built && tsc"
   }
 }

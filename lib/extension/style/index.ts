@@ -48,8 +48,8 @@ export class FeatureStyleExtension extends BaseExtension {
   public static readonly TABLE_MAPPING_TABLE_ICON = FeatureStyleExtension.EXTENSION_AUTHOR + '_icon_default_';
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.relatedTablesExtension = geoPackage.getRelatedTablesExtension();
-    this.contentsIdExtension = geoPackage.getContentsIdExtension();
+    this.relatedTablesExtension = geoPackage.relatedTablesExtension;
+    this.contentsIdExtension = geoPackage.contentsIdExtension;
   }
   /**
    * Get or create the metadata extension
@@ -287,9 +287,7 @@ export class FeatureStyleExtension extends BaseExtension {
       }
       return this._handleCreateStyleRelationship(mappingTableName, baseTable, relatedTable);
     } else {
-      const relationships = this.geoPackage
-        .getExtendedRelationDao()
-        .getRelations(baseTable, relatedTable, mappingTableName);
+      const relationships = this.geoPackage.extendedRelationDao.getRelations(baseTable, relatedTable, mappingTableName);
       // TODO this isn't quite right
       return relationships[0];
     }
@@ -309,8 +307,7 @@ export class FeatureStyleExtension extends BaseExtension {
   ): Promise<ExtendedRelation> {
     if (relatedTable === StyleTable.TABLE_NAME) {
       return this.relatedTablesExtension.addAttributesRelationship(
-        this.geoPackage
-          .getRelatedTablesExtension()
+        this.geoPackage.relatedTablesExtension
           .getRelationshipBuilder()
           .setBaseTableName(baseTable)
           .setUserMappingTable(StyleMappingTable.create(mappingTableName))
@@ -318,8 +315,7 @@ export class FeatureStyleExtension extends BaseExtension {
       );
     } else {
       return this.relatedTablesExtension.addMediaRelationship(
-        this.geoPackage
-          .getRelatedTablesExtension()
+        this.geoPackage.relatedTablesExtension
           .getRelationshipBuilder()
           .setBaseTableName(baseTable)
           .setUserMappingTable(StyleMappingTable.create(mappingTableName))
@@ -427,7 +423,7 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   _deleteStyleRelationship(mappingTableName: string, featureTable: string | FeatureTable): number {
     let removed = 0;
-    const relationships = this.geoPackage.getExtendedRelationDao().queryByMappingTableName(mappingTableName);
+    const relationships = this.geoPackage.extendedRelationDao.queryByMappingTableName(mappingTableName);
     for (let i = 0; i < relationships.length; i++) {
       removed += this.relatedTablesExtension.removeRelationship(relationships[i]);
     }
@@ -499,8 +495,7 @@ export class FeatureStyleExtension extends BaseExtension {
   getStyleDao(): StyleDao {
     let styleDao = null;
     if (this.geoPackage.isTable(StyleTable.TABLE_NAME)) {
-      const dao = this.geoPackage.getContentsDao();
-      const contents = dao.queryForId(StyleTable.TABLE_NAME);
+      const contents = this.geoPackage.contentsDao.queryForId(StyleTable.TABLE_NAME);
       if (contents) {
         const reader = new StyleTableReader(contents.table_name);
         const table = reader.readTable(this.geoPackage.connection) as StyleTable;
@@ -518,9 +513,9 @@ export class FeatureStyleExtension extends BaseExtension {
     let iconDao = null;
     if (this.geoPackage.isTable(IconTable.TABLE_NAME)) {
       const reader = new UserTableReader(IconTable.TABLE_NAME, IconTable.requiredColumns());
-      const userTable = reader.readTable(this.geoPackage.getDatabase());
+      const userTable = reader.readTable(this.geoPackage.database);
       const table = new IconTable(userTable.table_name, userTable.columns, IconTable.requiredColumns());
-      table.setContents(this.geoPackage.getContentsDao().queryForId(IconTable.TABLE_NAME));
+      table.setContents(this.geoPackage.contentsDao.queryForId(IconTable.TABLE_NAME));
       iconDao = new IconDao(this.geoPackage, table);
     }
     return iconDao;

@@ -3,6 +3,8 @@
  */
 
 import { UserColumn } from '../userColumn';
+import { DataTypes } from '../../db/dataTypes';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Create a new user custom columnd
@@ -18,10 +20,10 @@ export class UserCustomColumn extends UserColumn {
   constructor(
     index: number,
     name: string,
-    dataType: any,
+    dataType: DataTypes,
     max?: number,
     notNull?: boolean,
-    defaultValue?: any,
+    defaultValue?: DBValue,
     primaryKey?: boolean,
   ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);
@@ -45,11 +47,11 @@ export class UserCustomColumn extends UserColumn {
   static createColumn(
     index: number,
     name: string,
-    dataType: any,
+    type: DataTypes,
+    notNull = false,
+    defaultValue?: DBValue,
     max?: number,
-    notNull?: boolean,
-    defaultValue?: any,
   ): UserCustomColumn {
-    return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, false);
+    return new UserCustomColumn(index, name, type, max, notNull, defaultValue, false);
   }
 }

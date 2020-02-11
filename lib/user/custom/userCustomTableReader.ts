@@ -6,6 +6,7 @@ import { UserTableReader } from '../userTableReader';
 import { UserCustomColumn } from './userCustomColumn';
 
 import { DataTypes } from '../../db/dataTypes';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User custom table reader
@@ -37,13 +38,12 @@ export class UserCustomTableReader extends UserTableReader {
    * @return {module:user/custom~UserCustomColumn}
    */
   createColumnWithResults(
-    result: any,
     index: number,
     name: string,
     type: string,
     max?: number,
     notNull?: boolean,
-    defaultValue?: any,
+    defaultValue?: DBValue,
     primaryKey?: boolean,
   ): UserCustomColumn {
     const dataType = DataTypes.fromName(type);

@@ -43,7 +43,7 @@ export class RelatedTablesExtension extends BaseExtension {
 
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.extendedRelationDao = geoPackage.getExtendedRelationDao();
+    this.extendedRelationDao = geoPackage.extendedRelationDao;
   }
   /**
    * Get or create the extension
@@ -80,7 +80,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~UserRelatedTable} userRelatedTable user related table
    */
   setContents(userRelatedTable: UserRelatedTable): boolean {
-    const contents = this.geoPackage.getContentsDao().queryForId(userRelatedTable.table_name);
+    const contents = this.geoPackage.contentsDao.queryForId(userRelatedTable.table_name);
     return userRelatedTable.setContents(contents);
   }
   /**
@@ -114,7 +114,7 @@ export class RelatedTablesExtension extends BaseExtension {
   getRelationships(baseTableName?: string): ExtendedRelation[] {
     if (this.extendedRelationDao.isTableExists()) {
       if (baseTableName) {
-        return this.geoPackage.getExtendedRelationDao().getBaseTableRelations(baseTableName);
+        return this.geoPackage.extendedRelationDao.getBaseTableRelations(baseTableName);
       }
       return this.extendedRelationDao.queryForAll();
     }
@@ -149,7 +149,7 @@ export class RelatedTablesExtension extends BaseExtension {
       }
       for (let m = 0; m < mappingRows.length; m++) {
         const mappingRow = mappingRows[m];
-        mappingRow.row = userDao.queryForId(mappingRow.related_id);
+        mappingRow.row = userDao.queryForId(mappingRow.getRelatedId());
       }
     }
     return relationships;
@@ -240,7 +240,7 @@ export class RelatedTablesExtension extends BaseExtension {
    */
   getPrimaryKeyColumnName(tableName: string): string {
     const reader = new UserTableReader(tableName);
-    const table = reader.readTable(this.geoPackage.getDatabase());
+    const table = reader.readTable(this.geoPackage.database);
     return table.getPkColumn().name;
   }
   /**
@@ -387,7 +387,6 @@ export class RelatedTablesExtension extends BaseExtension {
    */
   removeRelationship(
     relationship:
-      | any
       | ExtendedRelation
       | {
           relationType?: RelationType;
@@ -396,28 +395,37 @@ export class RelatedTablesExtension extends BaseExtension {
           relatedTableName?: string;
           relationAuthor?: string;
           mappingTableName?: string;
-          userMappingTable?: UserMappingTable;
+          userMappingTable?: string;
           relatedTable?: UserRelatedTable;
         },
   ): number {
-    // this is an ExtendedRelation
-    if (Object.prototype.hasOwnProperty.call(relationship, 'base_table_name')) {
-      relationship.baseTableName = relationship.base_table_name;
-      relationship.relatedTableName = relationship.related_table_name;
-      relationship.relationName = relationship.relation_name;
-      relationship.userMappingTable = relationship.mapping_table_name;
-    }
-    if (relationship.relationType) {
-      relationship.relationName = relationship.relationType.name;
-    }
-    if (relationship.relationAuthor) {
-      relationship.relationName = this.buildRelationName(relationship.relationAuthor, relationship.relationName);
+    let relationName: string;
+    let relatedTableName: string;
+    let baseTableName: string;
+    let userMappingTable: string;
+
+    if (relationship instanceof ExtendedRelation) {
+      relationName = relationship.relation_name;
+      relatedTableName = relationship.related_table_name;
+      baseTableName = relationship.base_table_name;
+      userMappingTable = relationship.mapping_table_name;
+    } else {
+      relationName = relationship.relationName;
+      relatedTableName = relationship.relatedTableName;
+      baseTableName = relationship.baseTableName;
+      userMappingTable = relationship.userMappingTable;
+      if (relationship.relationType) {
+        relationName = relationship.relationType.name;
+      }
+      if (relationship.relationAuthor) {
+        relationName = this.buildRelationName(relationship.relationAuthor, relationName);
+      }
     }
     if (this.extendedRelationDao.isTableExists()) {
       const values = new ColumnValues();
-      values.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, relationship.baseTableName);
-      values.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relationship.relatedTableName);
-      values.addColumn(ExtendedRelationDao.COLUMN_RELATION_NAME, relationship.relationName);
+      values.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTableName);
+      values.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTableName);
+      values.addColumn(ExtendedRelationDao.COLUMN_RELATION_NAME, relationName);
       const iterator = this.extendedRelationDao.queryForFieldValues(values);
       const tablesToDelete: string[] = [];
       const relationsToDelete: ExtendedRelation[] = [];
@@ -428,10 +436,7 @@ export class RelatedTablesExtension extends BaseExtension {
       tablesToDelete.forEach(table => {
         this.geoPackage.deleteTable(table);
       });
-      this.extensionsDao.deleteByExtensionAndTableName(
-        RelatedTablesExtension.EXTENSION_NAME,
-        relationship.userMappingTable,
-      );
+      this.extensionsDao.deleteByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, userMappingTable);
       for (const extendedRelation of relationsToDelete) {
         this.extendedRelationDao.delete(extendedRelation);
       }
@@ -473,8 +478,8 @@ export class RelatedTablesExtension extends BaseExtension {
       contents.table_name = relatedTable.table_name;
       contents.data_type = relatedTable.data_type;
       contents.identifier = relatedTable.table_name;
-      this.geoPackage.getContentsDao().create(contents);
-      const refreshed = this.geoPackage.getContentsDao().refresh(contents);
+      this.geoPackage.contentsDao.create(contents);
+      const refreshed = this.geoPackage.contentsDao.refresh(contents);
       relatedTable.setContents(refreshed);
     }
     return true;
@@ -558,9 +563,15 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {Number} baseId           base id
    * @return {module:extension/relatedTables~UserMappingRow[]} user mapping rows
    */
-  getMappingRowsForBase(mappingTableName: string | ExtendedRelation, baseId: number): any[] {
+  getMappingRowsForBase(mappingTableName: string | ExtendedRelation, baseId: number): UserMappingRow[] {
     const mappingDao = this.getMappingDao(mappingTableName);
-    return mappingDao.queryByBaseId(baseId);
+    mappingDao.getUserMappingRow(mappingDao.queryByBaseId(baseId));
+    const mappingRows: UserMappingRow[] = [];
+    const rows = mappingDao.queryByBaseId(baseId);
+    rows.forEach(row => {
+      mappingRows.push(mappingDao.getUserMappingRow(row));
+    });
+    return mappingRows;
   }
   /**
    * Get the base id mappings for the base id
@@ -593,9 +604,9 @@ export class RelatedTablesExtension extends BaseExtension {
       table = tableName;
     }
     const reader = new UserTableReader(table, MediaTable.requiredColumns());
-    const userTable = reader.readTable(this.geoPackage.getDatabase());
+    const userTable = reader.readTable(this.geoPackage.database);
     table = new MediaTable(userTable.table_name, userTable.columns, MediaTable.requiredColumns());
-    table.setContents(this.geoPackage.getContentsDao().queryForId(table.table_name));
+    table.setContents(this.geoPackage.contentsDao.queryForId(table.table_name));
     return new MediaDao(this.geoPackage, table);
   }
   /**
@@ -614,13 +625,13 @@ export class RelatedTablesExtension extends BaseExtension {
         table = tableName.related_table_name;
       }
       const reader = new UserTableReader(table, SimpleAttributesTable.requiredColumns());
-      const userTable = reader.readTable(this.geoPackage.getDatabase());
+      const userTable = reader.readTable(this.geoPackage.database);
       table = new SimpleAttributesTable(
         userTable.table_name,
         userTable.columns,
         SimpleAttributesTable.requiredColumns(),
       );
-      table.setContents(this.geoPackage.getContentsDao().queryForId(table.table_name));
+      table.setContents(this.geoPackage.contentsDao.queryForId(table.table_name));
     }
     return new SimpleAttributesDao(this.geoPackage, table);
   }
@@ -640,8 +651,8 @@ export class RelatedTablesExtension extends BaseExtension {
     if (this.extendedRelationDao.isTableExists()) {
       const extendedRelations = this.extendedRelationDao.queryForAll();
       extendedRelations.forEach(
-        function(relation): any {
-          this.geoPackage.deleteTable(relation.mapping_table_name);
+        function(relation: { mapping_table_name: string }): boolean {
+          return this.geoPackage.deleteTable(relation.mapping_table_name);
         }.bind(this),
       );
       this.geoPackage.deleteTable(ExtendedRelationDao.TABLE_NAME);

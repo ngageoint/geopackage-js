@@ -62,22 +62,19 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
   getProjection(tileMatrixSet: TileMatrixSet): proj4.Converter {
     const srs = this.getSrs(tileMatrixSet);
     if (!srs) return;
-    const srsDao = this.geoPackage.getSpatialReferenceSystemDao();
-    return srsDao.getProjection(srs);
+    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
   }
   /**
    * Get the Spatial Reference System of the Tile Matrix set
    * @param  {TileMatrixSet}   tileMatrixSet tile matrix set
    */
   getSrs(tileMatrixSet: TileMatrixSet): SpatialReferenceSystem {
-    const dao = this.geoPackage.getSpatialReferenceSystemDao();
-    return dao.queryForId(tileMatrixSet.srs_id);
+    return this.geoPackage.spatialReferenceSystemDao.queryForId(tileMatrixSet.srs_id);
   }
   /**
    * @param {TileMatrixSet} tileMatrixSet
    */
   getContents(tileMatrixSet: TileMatrixSet): Contents {
-    const dao = this.geoPackage.getContentsDao();
-    return dao.queryForId(tileMatrixSet.table_name);
+    return this.geoPackage.contentsDao.queryForId(tileMatrixSet.table_name);
   }
 }

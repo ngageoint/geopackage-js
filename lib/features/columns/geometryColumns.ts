@@ -41,16 +41,16 @@ export class GeometryColumns {
    * 0: z values prohibited; 1: z values mandatory; 2: z values optional
    * @member {byte}
    */
-  z: any;
+  z: number;
   /**
    * 0: m values prohibited; 1: m values mandatory; 2: m values optional
    * @member {byte}
    */
-  m: any;
-  getGeometryType(): string {
+  m: number;
+  get geometryType(): string {
     return this.geometry_type_name;
   }
-  getId(): string {
+  get id(): string {
     return `${this.table_name} ${this.column_name}`;
   }
 }

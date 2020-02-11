@@ -23,7 +23,7 @@ export class UserTable {
    * @type {Object}
    */
   nameToIndex: {};
-  uniqueConstraints: any[];
+  uniqueConstraints: { columns: UserColumn[] }[];
   pkIndex: number;
 
   /**
@@ -101,7 +101,7 @@ export class UserTable {
    * @param  {module:user/userColumn~UserColumn} column   column
    * @throws Will throw an error if the actual column type does not match the expected column type
    */
-  typeCheck(expected: any, column: UserColumn): boolean {
+  typeCheck(expected: DataTypes, column: UserColumn): boolean {
     const actual = column.dataType;
     if (!actual || actual !== expected) {
       throw new Error(
@@ -205,7 +205,7 @@ export class UserTable {
    * @param uniqueConstraint unique constraint to add
    * @returns number of unique constraints
    */
-  addUniqueConstraint(uniqueConstraint: any): number {
+  addUniqueConstraint(uniqueConstraint: { columns: UserColumn[] }): number {
     return this.uniqueConstraints.push(uniqueConstraint);
   }
 }

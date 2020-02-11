@@ -109,7 +109,7 @@ describe('Related Tables tests', function() {
       relationships.length.should.be.equal(1);
       relationships[0].related_table_name.should.be.equal('cats_media');
       relationships[0].mappingRows.length.should.be.equal(2);
-      relationships[0].mappingRows[0].row.id.should.be.equal(relationships[0].mappingRows[0].related_id);
+      relationships[0].mappingRows[0].row.id.should.be.equal(relationships[0].mappingRows[0].getRelatedId());
     });
   });
 

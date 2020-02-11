@@ -1,5 +1,6 @@
 import proj4 from 'proj4';
 import { Envelope } from './geom/envelope';
+import { Feature, Polygon } from 'geojson';
 
 /**
  * Create a new bounding box
@@ -49,7 +50,7 @@ export class BoundingBox {
       maxX: this.maxLongitude,
     };
   }
-  toGeoJSON(): any {
+  toGeoJSON(): Feature<Polygon> {
     return {
       type: 'Feature',
       properties: {},

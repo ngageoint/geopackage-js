@@ -26,37 +26,37 @@ export class DataColumns {
    * A human-readable identifier (e.g. short name) for the column_name content
    * @member {string}
    */
-  name: string;
+  name?: string;
 
   /**
    * A human-readable formal title for the column_name content
    * @member {string}
    */
-  title: string;
+  title?: string;
 
   /**
    * A human-readable description for the table_name contente
    * @member {string}
    */
-  description: string;
+  description?: string;
 
   /**
    * MIME type of columnName if BLOB type or NULL for other types
    * @member {string}
    */
-  mime_type: string;
+  mime_type?: string;
 
   /**
    * Case sensitive column value constraint name specified
    */
-  constraint_name: string;
+  constraint_name?: string;
 
   /**
    *
    * @param {object} [object] object containing properties to apply to this
    */
-  constructor(object?: any) {
-    object = object || {};
+  constructor(object?: DataColumns) {
+    object = object || ({} as DataColumns);
     this.table_name = object.table_name;
     this.column_name = object.column_name;
     this.name = object.name;

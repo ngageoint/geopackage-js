@@ -55,7 +55,7 @@ export class GeometryIndex {
    * @member {Number}
    */
   max_m: number;
-  setTableIndex(tableIndex: TableIndex): void {
+  set tableIndex(tableIndex: TableIndex) {
     this.table_name = tableIndex.table_name;
   }
 }

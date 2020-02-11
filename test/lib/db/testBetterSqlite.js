@@ -34,7 +34,7 @@ describe('Database opening tests', function(done) {
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testDb = created.path;
-    db = created.geopackage.getDatabase().getDBConnection();
+    db = created.geopackage.database.getDBConnection();
   });
 
   afterEach(async function() {

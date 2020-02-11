@@ -1,22 +1,22 @@
 
 module.exports.verifySRS = function(geopackage) {
-  var db = geopackage.getDatabase();
+  var db = geopackage.database;
   return !!db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_spatial_ref_sys'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='view' AND name=?", ['st_spatial_ref_sys'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='view' AND name=?", ['spatial_ref_sys']);
 }
 
 module.exports.verifyContents = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_contents']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_contents']);
 }
 
 module.exports.verifyContentsForTable = function(geopackage, tableName) {
   return module.exports.verifyContents(geopackage)
-    && !!geopackage.getDatabase().get("SELECT * from gpkg_contents where table_name = ?", [tableName]);
+    && !!geopackage.database.get("SELECT * from gpkg_contents where table_name = ?", [tableName]);
 }
 
 module.exports.verifyGeometryColumns = function(geopackage) {
-  var db = geopackage.getDatabase();
+  var db = geopackage.database;
   return !!db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_geometry_columns'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='view' AND name=?", ['st_geometry_columns'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='view' AND name=?", ['geometry_columns']);
@@ -24,16 +24,16 @@ module.exports.verifyGeometryColumns = function(geopackage) {
 
 module.exports.verifyGeometryColumnsForTable = function(geopackage, tableName) {
   return module.exports.verifyGeometryColumns(geopackage)
-    && !!geopackage.getDatabase().get("SELECT * from gpkg_geometry_columns where table_name = ?", [tableName]);
+    && !!geopackage.database.get("SELECT * from gpkg_geometry_columns where table_name = ?", [tableName]);
 }
 
 
 module.exports.verifyTileMatrixSet = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_tile_matrix_set']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_tile_matrix_set']);
 }
 
 module.exports.verifyTileMatrix = function(geopackage) {
-  var db = geopackage.getDatabase();
+  var db = geopackage.database;
   return !!db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_tile_matrix'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_tile_matrix_zoom_level_insert'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_tile_matrix_zoom_level_update'])
@@ -48,15 +48,15 @@ module.exports.verifyTileMatrix = function(geopackage) {
 }
 
 module.exports.verifyDataColumns = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_data_columns']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_data_columns']);
 }
 
 module.exports.verifyDataColumnConstraints = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_data_column_constraints']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_data_column_constraints']);
 }
 
 module.exports.verifyMetadata = function(geopackage) {
-  var db = geopackage.getDatabase();
+  var db = geopackage.database;
   return !!db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_metadata'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_metadata_md_scope_insert'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_metadata_md_scope_update']);
@@ -64,7 +64,7 @@ module.exports.verifyMetadata = function(geopackage) {
 
 module.exports.verifyMetadataReference = function(geopackage) {
 
-  var db = geopackage.getDatabase();
+  var db = geopackage.database;
   return !!db.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_metadata_reference'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_metadata_reference_reference_scope_insert'])
     && !!db.get("SELECT name FROM sqlite_master WHERE type='trigger' AND name=?", ['gpkg_metadata_reference_reference_scope_update'])
@@ -77,25 +77,25 @@ module.exports.verifyMetadataReference = function(geopackage) {
 }
 
 module.exports.verifyContentsId = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_contents_id']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_contents_id']);
 }
 
 module.exports.verifyExtensions = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_extensions']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['gpkg_extensions']);
 }
 
 module.exports.verifyTableIndex = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_table_index']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_table_index']);
 }
 
 module.exports.verifyGeometryIndex = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_geometry_index']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_geometry_index']);
 }
 
 module.exports.verifyFeatureTileLink = function(geopackage) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_feature_tile_link']);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", ['nga_feature_tile_link']);
 }
 
 module.exports.verifyTableExists = function(geopackage, table) {
-  return !!geopackage.getDatabase().get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [table]);
+  return !!geopackage.database.get("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [table]);
 }

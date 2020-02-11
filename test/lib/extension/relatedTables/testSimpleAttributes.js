@@ -119,7 +119,7 @@ describe('Related Simple Attributes tests', function() {
     // Create the simple attributes table, content row, and relationship between the
 	  // attributes table and simple attributes table
 
-    var contentsDao = geoPackage.getContentsDao();
+    var contentsDao = geoPackage.contentsDao;
     var contentsTables = contentsDao.getTables();
     contentsTables.indexOf(simpleTable.table_name).should.be.equal(-1);
     var relationship = RelatedTablesExtension.RelationshipBuilder()

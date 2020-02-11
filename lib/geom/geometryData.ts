@@ -18,10 +18,10 @@ export class GeometryData {
   byteOrder: number;
   srsId: number;
   geometry: wkx.Geometry;
-  envelope: any;
+  envelope: Envelope;
   buffer: Buffer;
-  geometryError: any;
-  extended: any;
+  geometryError: string;
+  extended: boolean;
   constructor(buffer?: Buffer | Uint8Array) {
     this.empty = true;
     this.byteOrder = GeometryData.BIG_ENDIAN;

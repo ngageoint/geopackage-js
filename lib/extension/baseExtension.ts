@@ -11,10 +11,6 @@ import { ExtensionDao } from './extensionDao';
  */
 export abstract class BaseExtension {
   /**
-   * GeoPackage object
-   */
-  readonly geoPackage: GeoPackage;
-  /**
    * Connecton to the GeoPackage
    */
   protected readonly connection: GeoPackageConnection;
@@ -34,13 +30,14 @@ export abstract class BaseExtension {
    * extension table name
    */
   tableName: string;
+
   /**
-   * @param {module:geoPackage~GeoPackage} geoPackage
+   *
+   * @param geoPackage GeoPackage object
    */
-  constructor(geoPackage: GeoPackage) {
-    this.geoPackage = geoPackage;
+  constructor(public readonly geoPackage: GeoPackage) {
     this.connection = geoPackage.connection;
-    this.extensionsDao = geoPackage.getExtensionDao();
+    this.extensionsDao = geoPackage.extensionDao;
   }
   /**
    * Get the extension or create as needed

@@ -6,6 +6,7 @@ import { UserTable } from './userTable';
 import { GeoPackageConnection } from '../..';
 import { UserColumn } from './userColumn';
 import { DataTypes } from '../db/dataTypes';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * @class
@@ -52,7 +53,7 @@ export class UserTableReader {
       if (result[UserTableReader.GPKG_UTR_DFLT_VALUE]) {
         defaultValue = result[UserTableReader.GPKG_UTR_DFLT_VALUE].replace(/\\'/g, '');
       }
-      const column = this.createColumnWithResults(result, index, name, type, max, notNull, defaultValue, primarykey);
+      const column = this.createColumn(index, name, type, max, notNull, defaultValue, primarykey);
       columnList.push(column);
     }
     if (columnList.length === 0) {
@@ -62,7 +63,6 @@ export class UserTableReader {
   }
   /**
    * Creates a user column
-   * @param {Object} result
    * @param {Number} index        column index
    * @param {string} name         column name
    * @param {module:db/dataTypes~GPKGDataType} type         data type
@@ -72,14 +72,13 @@ export class UserTableReader {
    * @param {Boolean} primaryKey primary key
    * @return {module:user/custom~UserCustomColumn}
    */
-  createColumnWithResults(
-    result: any,
+  createColumn(
     index: number,
     name: string,
     type: string,
     max?: number,
     notNull?: boolean,
-    defaultValue?: any,
+    defaultValue?: DBValue,
     primaryKey?: boolean,
   ): UserColumn {
     const dataType = DataTypes.fromName(type);

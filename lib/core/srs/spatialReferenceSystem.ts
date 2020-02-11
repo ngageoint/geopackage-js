@@ -51,7 +51,7 @@ export class SpatialReferenceSystem {
    * Return the proj4 projection specified by this SpatialReferenceSystem
    * @return {*}
    */
-  getProjection(): proj4.Converter {
+  get projection(): proj4.Converter {
     if (this.organization === 'NONE') return null;
     if (this.organization_coordsys_id === 4326 && (this.organization === 'EPSG' || this.organization === 'epsg')) {
       return proj4('EPSG:4326');

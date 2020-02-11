@@ -30,7 +30,7 @@ describe('Contents tests', function() {
   });
 
   it('should create a new contents entry', function() {
-    var contentsDao = geoPackage.getContentsDao();
+    var contentsDao = geoPackage.contentsDao;
     var contents = contentsDao.createObject();
     contents.table_name = 'testit';
     contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;

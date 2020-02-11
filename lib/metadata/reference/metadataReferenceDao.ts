@@ -32,7 +32,7 @@ export class MetadataReferenceDao extends Dao<MetadataReference> {
     values[MetadataReferenceDao.COLUMN_MD_PARENT_ID] = null;
     const where = this.buildWhereWithFieldAndValue(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
     const whereArgs = this.buildWhereArgs(parentId);
-    return this.updateWithValues(values, where, whereArgs);
+    return this.updateWithValues(values, where, whereArgs).changes;
   }
   /**
    * @param {Number} fileId

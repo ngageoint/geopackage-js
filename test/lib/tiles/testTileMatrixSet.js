@@ -78,7 +78,7 @@ describe('Tile Matrix Set tests', function() {
   it('should get the BoundingBox from the TileMatrixSet', function(done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
-    var bb = tileMatrixSet.getBoundingBox();
+    var bb = tileMatrixSet.boundingBox;
     bb.minLongitude.should.be.equal(-20037508.342789244);
     bb.maxLongitude.should.be.equal(20037508.342789244);
     bb.minLatitude.should.be.equal(-20037508.342789244);
@@ -90,7 +90,7 @@ describe('Tile Matrix Set tests', function() {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
     var bb = new BoundingBox(-1, 1, -1, 1);
-    tileMatrixSet.setBoundingBox(bb);
+    tileMatrixSet.boundingBox = bb;
     tileMatrixSet.should.have.property('min_x', -1);
     tileMatrixSet.should.have.property('min_y', -1);
     tileMatrixSet.should.have.property('max_x', 1);

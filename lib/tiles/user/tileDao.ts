@@ -32,7 +32,7 @@ export class TileDao extends UserDao<TileRow> {
   heights: number[];
   minZoom: number;
   maxZoom: number;
-  srs: any;
+  srs: SpatialReferenceSystem;
   projection: string;
   minWebMapZoom: number;
   maxWebMapZoom: number;
@@ -62,7 +62,7 @@ export class TileDao extends UserDao<TileRow> {
     this.initialize();
   }
   initialize(): void {
-    const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
+    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     this.srs = tileMatrixSetDao.getSrs(this.tileMatrixSet);
     this.projection = this.srs.organization.toUpperCase() + ':' + this.srs.organization_coordsys_id;
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
@@ -70,7 +70,7 @@ export class TileDao extends UserDao<TileRow> {
       const tileMatrix = this.tileMatrices[i];
       let width = tileMatrix.pixel_x_size * tileMatrix.tile_width;
       let height = tileMatrix.pixel_y_size * tileMatrix.tile_height;
-      const proj4Projection: any = proj4(this.projection);
+      const proj4Projection: proj4.Converter & { to_meter?: number } = proj4(this.projection);
       if (proj4Projection.to_meter) {
         width = proj4Projection.to_meter * tileMatrix.pixel_x_size * tileMatrix.tile_width;
         height = proj4Projection.to_meter * tileMatrix.pixel_y_size * tileMatrix.tile_height;
@@ -142,7 +142,7 @@ export class TileDao extends UserDao<TileRow> {
     }
   }
   getBoundingBox(): BoundingBox {
-    return this.tileMatrixSet.getBoundingBox();
+    return this.tileMatrixSet.boundingBox;
   }
   queryForTileGridWithZoomLevel(zoomLevel: number): TileGrid {
     const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
@@ -428,18 +428,18 @@ export class TileDao extends UserDao<TileRow> {
     return this.deleteWhere(where, whereArgs);
   }
   getSrs(): SpatialReferenceSystem {
-    return this.geoPackage.getSpatialReferenceSystemDao().getBySrsId(this.tileMatrixSet.srs_id);
+    return this.geoPackage.spatialReferenceSystemDao.getBySrsId(this.tileMatrixSet.srs_id);
   }
   dropTable(): boolean {
-    const tileMatrixDao = this.geoPackage.getTileMatrixDao();
+    const tileMatrixDao = this.geoPackage.tileMatrixDao;
     const dropResult = UserDao.prototype.dropTable.call(this);
-    const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
+    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     tileMatrixSetDao.delete(this.tileMatrixSet);
     for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
       const tileMatrix = this.tileMatrices[i];
       tileMatrixDao.delete(tileMatrix);
     }
-    const dao = this.geoPackage.getContentsDao();
+    const dao = this.geoPackage.contentsDao;
     dao.deleteById(this.gpkgTableName);
     return dropResult;
   }
@@ -450,14 +450,14 @@ export class TileDao extends UserDao<TileRow> {
     values[TileMatrixSetDao.COLUMN_TABLE_NAME] = newName;
     const where = this.buildWhereWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, oldName);
     const whereArgs = this.buildWhereArgs([oldName]);
-    const contentsDao = this.geoPackage.getContentsDao();
+    const contentsDao = this.geoPackage.contentsDao;
     const contents = contentsDao.queryForId(oldName);
     contents.table_name = newName;
     contents.identifier = newName;
     contentsDao.create(contents);
-    const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
+    const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     tileMatrixSetDao.updateWithValues(values, where, whereArgs);
-    const tileMatrixDao = this.geoPackage.getTileMatrixDao();
+    const tileMatrixDao = this.geoPackage.tileMatrixDao;
     const tileMatrixUpdate = {};
     tileMatrixUpdate[TileMatrixDao.COLUMN_TABLE_NAME] = newName;
     const tileMatrixWhere = this.buildWhereWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, oldName);

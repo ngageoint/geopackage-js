@@ -94,15 +94,15 @@ describe('StyleExtension Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = await GeoPackageAPI.createFeatureTableWithProperties(geopackage, featureTableName, [])
+    featureTable = await GeoPackageAPI.createFeatureTable(geopackage, featureTableName)
     var box = {
       "type": "Polygon",
       "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
     };
     featureRowId = createRow(box, 'box', geopackage.getFeatureDao(featureTableName));
-    await geopackage.getFeatureStyleExtension().getOrCreateExtension(featureTableName)
-    await geopackage.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension()
-    await geopackage.getFeatureStyleExtension().getContentsId().getOrCreateExtension()
+    await geopackage.featureStyleExtension.getOrCreateExtension(featureTableName)
+    await geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
+    await geopackage.featureStyleExtension.getContentsId().getOrCreateExtension()
     featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))
     // @ts-ignore
@@ -115,7 +115,7 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should create extension for feature table', function() {
-    var extensions = geopackage.getExtensionDao().queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
+    var extensions = geopackage.extensionDao.queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
     should.exist(extensions.length);
     if (extensions.length) {
       extensions.length.should.be.equal(1);
@@ -123,21 +123,21 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should check if geopackage has extension or not', function() {
-    geopackage.getFeatureStyleExtension().has(featureTableName).should.be.equal(true);
-    geopackage.getFeatureStyleExtension().has('not_valid_feature_table').should.be.equal(false);
+    geopackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
+    geopackage.featureStyleExtension.has('not_valid_feature_table').should.be.equal(false);
     featureTableStyles.has().should.be.equal(true);
   });
 
   it('should return all feature tables with style extension', function() {
-    geopackage.getFeatureStyleExtension().getTables().length.should.be.equal(1);
+    geopackage.featureStyleExtension.getTables().length.should.be.equal(1);
   });
 
   it('should get related tables extension', function() {
-    geopackage.getFeatureStyleExtension().getRelatedTables().should.be.equal(geopackage.getRelatedTablesExtension());
+    geopackage.featureStyleExtension.getRelatedTables().should.be.equal(geopackage.relatedTablesExtension);
   });
 
   it('should get content id extension', function() {
-    geopackage.getFeatureStyleExtension().getContentsId().should.be.equal(geopackage.getContentsIdExtension());
+    geopackage.featureStyleExtension.getContentsId().should.be.equal(geopackage.contentsIdExtension);
   });
 
   it('should create relationships', function() {
@@ -196,7 +196,7 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should create style relationship even if contentsIdExtension does not yet exist', function() {
-    geopackage.getContentsIdExtension().removeExtension();
+    geopackage.contentsIdExtension.removeExtension();
     return featureTableStyles.createTableIconRelationship().then(function () {
       featureTableStyles.hasTableIconRelationship().should.be.equal(true);
     });
@@ -205,7 +205,7 @@ describe('StyleExtension Tests', function() {
   it('should delete all relationships', function() {
     return featureTableStyles.createTableStyleRelationship().then(function () {
       featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
-      geopackage.getFeatureStyleExtension().deleteAllRelationships();
+      geopackage.featureStyleExtension.deleteAllRelationships();
       featureTableStyles.hasTableStyleRelationship().should.be.equal(false);
     });
   });
@@ -432,7 +432,7 @@ describe('StyleExtension Tests', function() {
     // test table style default
     var tableStyleDefault = randomStyle(featureTableStyles);
     await featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    geopackage.getFeatureStyleExtension().has(featureTableName).should.be.equal(true);
+    geopackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
     featureTableStyles.has().should.be.equal(true);
     featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
     geopackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
@@ -506,8 +506,8 @@ describe('StyleExtension Tests', function() {
       featureStyle.getIcon().getId().should.be.equal(tableIconDefault.getId());
 
       // verify that if no icon or style exist for the feature, that the default for the table is used
-      geopackage.getFeatureStyleExtension().getStyle(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableStyleDefault.getId());
-      geopackage.getFeatureStyleExtension().getIcon(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableIconDefault.getId());
+      geopackage.featureStyleExtension.getStyle(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableStyleDefault.getId());
+      geopackage.featureStyleExtension.getIcon(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableIconDefault.getId());
 
       // Feature Styles
       var featureRowStyles = {};
@@ -582,7 +582,7 @@ describe('StyleExtension Tests', function() {
     should.exist(featureTableStyles.getIconMappingDao());
     should.exist(featureTableStyles.getTableIconMappingDao());
 
-    var featureStyleExtension = geopackage.getFeatureStyleExtension();
+    var featureStyleExtension = geopackage.featureStyleExtension;
     featureStyles = featureTableStyles.getFeatureStyles(featureRow.getId());
     should.exist(featureStyles.getStyles());
     should.exist(featureStyles.getIcons());

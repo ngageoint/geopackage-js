@@ -48,8 +48,8 @@ export class GeoPackageValidate {
    * @param  {Object}   geoPackage GeoPackage to check
    */
   static hasMinimumTables(geoPackage: GeoPackage): boolean {
-    const srsExists = geoPackage.getSpatialReferenceSystemDao().isTableExists();
-    const contentsExists = geoPackage.getContentsDao().isTableExists();
+    const srsExists = geoPackage.spatialReferenceSystemDao.isTableExists();
+    const contentsExists = geoPackage.contentsDao.isTableExists();
     return srsExists && contentsExists;
   }
 

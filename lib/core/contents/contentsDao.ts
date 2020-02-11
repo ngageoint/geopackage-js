@@ -65,7 +65,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {string[]}           Array of table names
    */
   getTables(tableType?: string): string[] {
-    let results: any[];
+    let results: { table_name: string }[];
     if (tableType) {
       const fieldValues = new ColumnValues();
       fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);
@@ -87,8 +87,7 @@ export class ContentsDao extends Dao<Contents> {
    */
   getProjection(contents: Contents): proj4.Converter {
     const srs = this.getSrs(contents);
-    const srsDao = this.geoPackage.getSpatialReferenceSystemDao();
-    return srsDao.getProjection(srs);
+    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
   }
 
   /**
@@ -97,8 +96,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {module:core/srs~SpatialReferenceSystemDao}
    */
   getSrs(contents: Contents): SpatialReferenceSystem {
-    const dao = this.geoPackage.getSpatialReferenceSystemDao();
-    return dao.queryForId(contents.srs_id);
+    return this.geoPackage.spatialReferenceSystemDao.queryForId(contents.srs_id);
   }
 
   /**
@@ -107,8 +105,8 @@ export class ContentsDao extends Dao<Contents> {
    * @return {module:features/columns~GeometryColumns}
    */
   getGeometryColumns(contents: Contents): GeometryColumns {
-    const dao: GeometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
-    const results: any[] = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
+    const dao: GeometryColumnsDao = this.geoPackage.geometryColumnsDao;
+    const results: GeometryColumns[] = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
     if (results?.length) {
       const gc: GeometryColumns = dao.createObject();
       dao.populateObjectFromResult(gc, results[0]);
@@ -123,7 +121,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {module:tiles/matrixset~TileMatrixSet}
    */
   getTileMatrixSet(contents: Contents): TileMatrixSet {
-    const dao = this.geoPackage.getTileMatrixSetDao();
+    const dao = this.geoPackage.tileMatrixSetDao;
     const results = dao.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name);
     if (results?.length) {
       const tms = dao.createObject();
@@ -139,7 +137,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {module:tiles/matrix~TileMatrix}
    */
   getTileMatrix(contents: Contents): TileMatrix[] {
-    const dao = this.geoPackage.getTileMatrixDao();
+    const dao = this.geoPackage.tileMatrixDao;
     const results = dao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, contents.table_name);
     if (!results || !results.length) return undefined;
     const tileMatricies = [];

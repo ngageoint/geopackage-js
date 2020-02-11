@@ -55,7 +55,7 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geopackage.getSpatialReferenceSystemDao().createWebMercator();
+      geopackage.spatialReferenceSystemDao.createWebMercator();
       return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
         .then(function(result) {
           tileMatrixSet = result;
@@ -69,7 +69,7 @@ describe('GeoPackage Tile table create tests', function() {
       geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geopackage.getTileMatrixDao().queryForId([tableName, zoom]);
+        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
@@ -87,7 +87,7 @@ describe('GeoPackage Tile table create tests', function() {
       geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, 100);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geopackage.getTileMatrixDao().queryForId([tableName, zoom]);
+        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
@@ -148,7 +148,7 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geopackage.getSpatialReferenceSystemDao().createWebMercator();
+      geopackage.spatialReferenceSystemDao.createWebMercator();
       return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
         .then(function(result) {
           tileMatrixSet = result;

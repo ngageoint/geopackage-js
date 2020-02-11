@@ -30,7 +30,6 @@ export class FeatureTableIndex extends BaseExtension {
   public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string =
     'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
   progress: Function;
-  featureDao: FeatureDao<FeatureRow>;
   tableName: string;
   columnName: string;
   tableIndexDao: TableIndexDao;
@@ -38,14 +37,14 @@ export class FeatureTableIndex extends BaseExtension {
   rtreeIndexDao: RTreeIndexDao;
   rtreeIndex: RTreeIndex;
   rtreeIndexed: boolean;
-  constructor(geoPackage: GeoPackage, featureDao: FeatureDao<FeatureRow>) {
+  /**
+   *
+   * @param geoPackage GeoPackage object
+   * @param featureDao FeatureDao to index
+   */
+  constructor(geoPackage: GeoPackage, public featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
     this.progress;
-    /**
-     * Feature Dao to index
-     * @type {module:features/user/featureDao~FeatureDao}
-     */
-    this.featureDao = featureDao;
     this.extensionName = Extension.buildExtensionName(
       FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR,
       FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR,
@@ -53,7 +52,7 @@ export class FeatureTableIndex extends BaseExtension {
     this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
     this.tableName = featureDao.table_name;
     this.columnName = featureDao.getGeometryColumnName();
-    this.tableIndexDao = geoPackage.getTableIndexDao();
+    this.tableIndexDao = geoPackage.tableIndexDao;
     this.geometryIndexDao = geoPackage.getGeometryIndexDao(featureDao);
     this.rtreeIndexDao = new RTreeIndexDao(geoPackage, featureDao);
     this.rtreeIndexDao.gpkgTableName = 'rtree_' + this.tableName + '_' + this.columnName;
@@ -103,7 +102,7 @@ export class FeatureTableIndex extends BaseExtension {
     try {
       const result = this.getFeatureTableIndexExtension();
       if (result) {
-        const contentsDao = this.geoPackage.getContentsDao();
+        const contentsDao = this.geoPackage.contentsDao;
         const contents = contentsDao.queryForId(this.tableName);
         if (!contents) return false;
         const lastChange = new Date(contents.last_change);
@@ -201,7 +200,7 @@ export class FeatureTableIndex extends BaseExtension {
         this.indexChunk(0, tableIndex, resolve, reject);
       });
     }).then(() => {
-      return this.updateLastIndexed(tableIndex).changes === 1;
+      return this.updateLastIndexed(tableIndex) === 1;
     });
   }
   /**
@@ -245,7 +244,7 @@ export class FeatureTableIndex extends BaseExtension {
     }
     if (envelope) {
       const geometryIndex = this.geometryIndexDao.populate(tableIndex, geomId, envelope);
-      return this.geometryIndexDao.createOrUpdate(geometryIndex);
+      return this.geometryIndexDao.createOrUpdate(geometryIndex) === 1;
     } else {
       return false;
     }
@@ -255,7 +254,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param  {module:extension/index~TableIndex} tableIndex TableIndex
    * @return {Object} update status
    */
-  updateLastIndexed(tableIndex: TableIndex): any {
+  updateLastIndexed(tableIndex: TableIndex): number {
     if (!tableIndex) {
       tableIndex = new TableIndex();
       tableIndex.table_name = this.tableName;

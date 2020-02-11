@@ -28,9 +28,9 @@ global.mochaAsync = module.exports.mochaAsync = (fn) => {
 global.openGeoPackage = async (path) => {
   let geopackage = await GeoPackageAPI.open(path);
   should.exist(geopackage);
-  should.exist(geopackage.getDatabase().getDBConnection());
-  geopackage.getPath().should.be.equal(path);
-  geopackage.getName().should.be.equal(Path.basename(path));
+  should.exist(geopackage.database.getDBConnection());
+  geopackage.path.should.be.equal(path);
+  geopackage.name.should.be.equal(Path.basename(path));
   return {
     geopackage,
     path

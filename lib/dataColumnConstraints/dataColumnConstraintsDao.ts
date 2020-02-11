@@ -1,5 +1,6 @@
 import { Dao } from '../dao/dao';
 import { DataColumnConstraints } from './dataColumnConstraints';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * DataColumnConstraints module.
@@ -45,7 +46,7 @@ export class DataColumnConstraintsDao extends Dao<DataColumnConstraints> {
    * @param  {String} constraintName     constraint name
    * @return {Iterable}
    */
-  queryByConstraintName(constraintName: string): IterableIterator<any> {
+  queryByConstraintName(constraintName: string): IterableIterator<DataColumnConstraints> {
     return this.queryForEach(DataColumnConstraintsDao.COLUMN_CONSTRAINT_NAME, constraintName);
   }
   /**
@@ -55,7 +56,7 @@ export class DataColumnConstraintsDao extends Dao<DataColumnConstraints> {
    * @param  {String} value              value
    * @return {module:dataColumnConstraints~DataColumnConstraints}
    */
-  queryUnique(constraintName: string, constraintType: string, value: any): DataColumnConstraints {
+  queryUnique(constraintName: string, constraintType: string, value: string): DataColumnConstraints {
     const dataColumnConstraints = new DataColumnConstraints();
     dataColumnConstraints.constraint_name = constraintName;
     dataColumnConstraints.constraint_type = constraintType;

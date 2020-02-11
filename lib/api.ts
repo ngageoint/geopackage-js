@@ -22,10 +22,6 @@ import wkx from 'wkx';
 import reproject from 'reproject';
 import path from 'path';
 import fs from 'fs';
-import geojsonvt from 'geojson-vt';
-import vtpbf from 'vt-pbf';
-import Pbf from 'pbf';
-// import VectorTile from '@mapbox/vector-tile';
 import pointToLineDistance from '@turf/point-to-line-distance';
 import polygonToLine from '@turf/polygon-to-line';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -40,12 +36,29 @@ import { MediaRow } from './extension/relatedTables/mediaRow';
 import { ExtendedRelation } from './extension/relatedTables/extendedRelation';
 import { Feature, FeatureCollection, Point, Geometry, LineString, Polygon, MultiPolygon } from 'geojson';
 import { TileRow } from './tiles/user/tileRow';
+import { DBValue } from './db/dbAdapter';
 
-interface ClosestFeature extends Feature {
-  gp_table?: string;
-  gp_name?: string;
+interface ClosestFeature {
+  feature_count: number;
+  coverage: boolean;
+  gp_table: string;
+  gp_name: string;
   distance?: number;
 }
+
+type ColumnMap = {
+  [key: string]: {
+    index: number;
+    name: string;
+    max?: number;
+    min?: number;
+    notNull?: boolean;
+    primaryKey?: boolean;
+    dataType?: DataTypes;
+    displayName: string;
+    dataColumn?: DataColumns;
+  };
+};
 
 /**
  * This module is the entry point to the GeoPackage API, providing static
@@ -171,85 +184,48 @@ export class GeoPackageAPI {
   static async createFeatureTable(
     geopackage: GeoPackage,
     tableName: string,
-    geometryColumn: GeometryColumns,
-    featureColumns?: UserColumn[],
-  ): Promise<FeatureDao<FeatureRow>> {
-    return GeoPackageAPI.createFeatureTableWithDataColumns(geopackage, tableName, geometryColumn, featureColumns, null);
-  }
-
-  static async createFeatureTableWithDataColumns(
-    geopackage: GeoPackage,
-    tableName: string,
-    geometryColumn: GeometryColumns,
-    featureColumns?: UserColumn[],
+    featureColumns?: UserColumn[] | { name: string; dataType: string }[],
+    geometryColumn?: GeometryColumns,
     dataColumns?: DataColumns[],
+    boundingBox = new BoundingBox(-180, 180, -90, 90),
+    boundingBoxSrsId = 4326,
   ): Promise<FeatureDao<FeatureRow>> {
-    const boundingBox = new BoundingBox(-180, 180, -90, 90);
-    return GeoPackageAPI.createFeatureTableWithDataColumnsAndBoundingBox(
-      geopackage,
-      tableName,
-      geometryColumn,
-      featureColumns,
-      dataColumns,
-      boundingBox,
-      4326,
-    );
-  }
-
-  static async createFeatureTableWithDataColumnsAndBoundingBox(
-    geopackage: GeoPackage,
-    tableName: string,
-    geometryColumn: GeometryColumns,
-    featureColumns?: UserColumn[],
-    dataColumns?: DataColumns[],
-    boundingBox?: BoundingBox,
-    boundingBoxSrsId?: number,
-  ): Promise<FeatureDao<FeatureRow>> {
-    await geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(
-      geometryColumn,
-      boundingBox,
-      boundingBoxSrsId,
-      featureColumns,
-      dataColumns,
-    );
-    return geopackage.getFeatureDao(tableName);
-  }
-
-  /**
-   * Create a feature table with the properties specified.
-   * @param {module:geoPackage~GeoPackage} geopackage the geopackage object
-   * @param {Object[]} properties properties to create columns from
-   * @param {string} properties.name name of the column
-   * @param {string} properties.dataType name of the data type
-   * @return {Promise}
-   */
-  static async createFeatureTableWithProperties(
-    geopackage: GeoPackage,
-    tableName: string,
-    properties: { name: string; dataType: string }[],
-  ): Promise<boolean> {
-    const geometryColumns = new GeometryColumns();
+    const geometryColumns = geometryColumn || new GeometryColumns();
     geometryColumns.table_name = tableName;
     geometryColumns.column_name = 'geometry';
     geometryColumns.geometry_type_name = 'GEOMETRY';
     geometryColumns.z = 0;
     geometryColumns.m = 0;
-
-    const boundingBox = new BoundingBox(-180, 180, -80, 80);
-
-    const columns = [];
-    let columnNumber = 0;
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geometry', 'GEOMETRY', false, null));
-
-    for (let i = 0; i < properties.length; i++) {
-      const property = properties[i];
+    let columns: UserColumn[] = [];
+    if (featureColumns && featureColumns.length > 0 && featureColumns[0] instanceof UserColumn) {
+      columns = featureColumns as UserColumn[];
+    } else {
+      let columnNumber = 0;
+      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
       columns.push(
-        FeatureColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)),
+        FeatureColumn.createGeometryColumn(
+          columnNumber++,
+          geometryColumns.column_name,
+          geometryColumns.geometry_type_name,
+          false,
+          null,
+        ),
       );
+
+      for (let i = 0; featureColumns && i < featureColumns.length; i++) {
+        const property = featureColumns[i] as { name: string; dataType: string };
+        columns.push(FeatureColumn.createColumn(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
+      }
     }
 
-    return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns);
+    await geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(
+      geometryColumns,
+      boundingBox,
+      boundingBoxSrsId,
+      columns,
+      dataColumns,
+    );
+    return geopackage.getFeatureDao(tableName);
   }
 
   /**
@@ -262,7 +238,7 @@ export class GeoPackageAPI {
    * @param {DataColumns} [properties.dataColumn] data column for the property
    * @return {Promise}
    */
-  static async createAttributeTableWithProperties(
+  static async createAttributeTable(
     geopackage: GeoPackage,
     tableName: string,
     properties: {
@@ -287,9 +263,7 @@ export class GeoPackageAPI {
 
     for (let i = 0; i < properties.length; i++) {
       const property = properties[i];
-      columns.push(
-        UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)),
-      );
+      columns.push(UserColumn.createColumn(columnNumber++, property.name, DataTypes.fromName(property.dataType)));
       if (property.dataColumn) {
         const dc = new DataColumns();
         dc.table_name = property.dataColumn.table_name;
@@ -306,7 +280,7 @@ export class GeoPackageAPI {
     return geopackage.createAttributeTable(tableName, columns, dataColumns);
   }
 
-  static addAttributeRow(geopackage: GeoPackage, tableName: string, row: any): number {
+  static addAttributeRow(geopackage: GeoPackage, tableName: string, row: unknown): number {
     const attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
     const attributeRow = attributeDao.getRow(row);
     return attributeDao.create(attributeRow);
@@ -320,19 +294,19 @@ export class GeoPackageAPI {
    * @param {string} properties.dataType name of the data type
    * @return {Promise}
    */
-  static createSimpleAttributesTableWithProperties(
+  static createSimpleAttributesTable(
     geopackage: GeoPackage,
     tableName: string,
     properties: { name: string; dataType: string }[],
   ): SimpleAttributesDao<SimpleAttributesRow> {
-    const relatedTables = geopackage.getRelatedTablesExtension();
+    const relatedTables = geopackage.relatedTablesExtension;
     const columns = [];
     let columnNumber = SimpleAttributesTable.numRequiredColumns();
     if (properties) {
       for (let i = 0; i < properties.length; i++) {
         const property = properties[i];
         columns.push(
-          UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType), true),
+          UserColumn.createColumn(columnNumber++, property.name, DataTypes.fromName(property.dataType), true),
         );
       }
     }
@@ -349,19 +323,26 @@ export class GeoPackageAPI {
    * @param {string} properties.dataType name of the data type
    * @return {Promise}
    */
-  static createMediaTableWithProperties(
+  static createMediaTable(
     geopackage: GeoPackage,
     tableName: string,
-    properties: { name: string; dataType: string }[],
+    properties: { name: string; dataType: string; notNull?: boolean; defaultValue?: DBValue; max?: number }[],
   ): MediaDao<MediaRow> {
-    const relatedTables = geopackage.getRelatedTablesExtension();
+    const relatedTables = geopackage.relatedTablesExtension;
     const columns = [];
     let columnNumber = MediaTable.numRequiredColumns();
     if (properties) {
       for (let i = 0; i < properties.length; i++) {
         const property = properties[i];
         columns.push(
-          UserColumn.createColumnWithIndex(columnNumber++, property.name, DataTypes.fromName(property.dataType)),
+          UserColumn.createColumn(
+            columnNumber++,
+            property.name,
+            DataTypes.fromName(property.dataType),
+            property.notNull,
+            property.defaultValue,
+            property.max,
+          ),
         );
       }
     }
@@ -377,7 +358,7 @@ export class GeoPackageAPI {
     contentType: string,
     additionalProperties?: {},
   ): number {
-    const relatedTables = geopackage.getRelatedTablesExtension();
+    const relatedTables = geopackage.relatedTablesExtension;
     const mediaDao = relatedTables.getMediaDao(tableName);
     const row = mediaDao.newRow();
     row.setContentType(contentType);
@@ -395,11 +376,11 @@ export class GeoPackageAPI {
     mediaTableName: string,
     mediaId: number,
   ): Promise<number> {
-    const relatedTables = geopackage.getRelatedTablesExtension();
+    const relatedTables = geopackage.relatedTablesExtension;
     return relatedTables.linkRelatedIds(baseTableName, baseId, mediaTableName, mediaId, RelationType.MEDIA);
   }
 
-  static getLinkedMedia(geopackage: GeoPackage, baseTableName: string, baseId: number): any[] {
+  static getLinkedMedia(geopackage: GeoPackage, baseTableName: string, baseId: number): MediaRow[] {
     const relationships = GeoPackageAPI.getRelatedRows(geopackage, baseTableName, baseId);
     const mediaRelationships = [];
     for (let i = 0; i < relationships.length; i++) {
@@ -416,7 +397,7 @@ export class GeoPackageAPI {
   }
 
   static getRelatedRows(geopackage: GeoPackage, baseTableName: string, baseId: number): ExtendedRelation[] {
-    return geopackage.getRelatedTablesExtension().getRelatedRows(baseTableName, baseId);
+    return geopackage.relatedTablesExtension.getRelatedRows(baseTableName, baseId);
   }
 
   /**
@@ -424,8 +405,14 @@ export class GeoPackageAPI {
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {object}   feature    GeoJSON feature to add
    * @param  {string}   tableName  name of the table that will store the feature
+   * @param {boolean} index updates the FeatureTableIndex extension if it exists
    */
-  static addGeoJSONFeatureToGeoPackage(geopackage: GeoPackage, feature: Feature, tableName: string): number {
+  static addGeoJSONFeatureToGeoPackage(
+    geopackage: GeoPackage,
+    feature: Feature,
+    tableName: string,
+    index = false,
+  ): number {
     const featureDao = geopackage.getFeatureDao(tableName);
     const srs = featureDao.getSrs();
     const featureRow = featureDao.newRow();
@@ -445,48 +432,14 @@ export class GeoPackageAPI {
       }
     }
 
-    return featureDao.create(featureRow);
-  }
-
-  /**
-   * Adds a GeoJSON feature to the GeoPackage and updates the FeatureTableIndex extension if it exists
-   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
-   * @param  {object}   feature    GeoJSON feature to add
-   * @param  {string}   tableName  name of the table that will store the feature
-   */
-  static addGeoJSONFeatureToGeoPackageAndIndex(
-    geopackage: GeoPackage,
-    feature: helpers.Feature,
-    tableName: string,
-  ): number {
-    const featureDao = geopackage.getFeatureDao(tableName);
-    if (!featureDao) throw new Error('No feature Dao for table ' + tableName);
-    const srs = featureDao.getSrs();
-    const featureRow = featureDao.newRow();
-    const geometryData = new GeometryData();
-    geometryData.setSrsId(srs.srs_id);
-
-    const reprojectedFeature = reproject.reproject(feature, 'EPSG:4326', featureDao.projection);
-
-    const featureGeometry =
-      typeof reprojectedFeature.geometry === 'string'
-        ? JSON.parse(reprojectedFeature.geometry)
-        : reprojectedFeature.geometry;
-    const geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
-    geometryData.setGeometry(geometry);
-    featureRow.setGeometry(geometryData);
-    for (const propertyKey in feature.properties) {
-      if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
-        featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
-      }
-    }
-
     const id = featureDao.create(featureRow);
-    const fti = featureDao.featureTableIndex;
-    const tableIndex = fti.getTableIndex();
-    if (!tableIndex) return id;
-    fti.indexRow(tableIndex, id, geometryData);
-    fti.updateLastIndexed(tableIndex);
+    if (index) {
+      const fti = featureDao.featureTableIndex;
+      const tableIndex = fti.getTableIndex();
+      if (!tableIndex) return id;
+      fti.indexRow(tableIndex, id, geometryData);
+      fti.updateLastIndexed(tableIndex);
+    }
     return id;
   }
 
@@ -527,30 +480,20 @@ export class GeoPackageAPI {
    * @param  {string}   tableName   Table name to query
    * @param  {BoundingBox}   boundingBox BoundingBox to query
    */
-  static iterateGeoJSONFeaturesInTableWithinBoundingBox(
-    geoPackage: GeoPackage,
-    tableName: string,
-    boundingBox: BoundingBox,
-  ): IterableIterator<Feature> {
-    return geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
-  }
-
-  /**
-   * Iterates GeoJSON features in a feature table that matches the bounding box
-   * @param  {string}   geoPackagePath  path to the GeoPackage file
-   * @param  {string}   tableName   Table name to query
-   * @param  {BoundingBox}   boundingBox BoundingBox to query
-   */
-  static async iterateGeoJSONFeaturesFromPathInTableWithinBoundingBox(
-    geoPackagePath: string,
+  static async iterateGeoJSONFeatures(
+    geoPackage: GeoPackage | string,
     tableName: string,
     boundingBox: BoundingBox,
   ): Promise<IterableIterator<Feature>> {
-    const geoPackage = await GeoPackageAPI.open(geoPackagePath);
-    return geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
+    if (geoPackage instanceof GeoPackage) {
+      return geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
+    } else {
+      const gp = await GeoPackageAPI.open(geoPackage);
+      return gp.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
+    }
   }
 
-  static createDataColumnMap(featureDao: FeatureDao<FeatureRow>): any {
+  static createDataColumnMap(featureDao: FeatureDao<FeatureRow>): ColumnMap {
     const columnMap = {};
     const dcd = new DataColumnsDao(featureDao.geoPackage);
     featureDao.table.columns.forEach(
@@ -636,7 +579,7 @@ export class GeoPackageAPI {
    * @param  {string}   table      name of the table to get the feature from
    * @param  {Number}   featureId  ID of the feature
    */
-  static getFeature(geopackage: GeoPackage, table: string, featureId: any): Feature {
+  static getFeature(geopackage: GeoPackage, table: string, featureId: number): Feature {
     const featureDao = geopackage.getFeatureDao(table);
     const srs = featureDao.getSrs();
     let feature = featureDao.queryForId(featureId) as FeatureRow;
@@ -657,7 +600,11 @@ export class GeoPackageAPI {
   }
 
   // eslint-disable-next-line complexity
-  static parseFeatureRowIntoGeoJSON(featureRow: FeatureRow, srs: SpatialReferenceSystem, columnMap?: any): Feature {
+  static parseFeatureRowIntoGeoJSON(
+    featureRow: FeatureRow,
+    srs: SpatialReferenceSystem,
+    columnMap?: ColumnMap,
+  ): Feature {
     const geoJson: Feature = {
       type: 'Feature',
       properties: {},
@@ -666,13 +613,13 @@ export class GeoPackageAPI {
     };
     const geometry = featureRow.getGeometry();
     if (geometry && geometry.geometry) {
-      let geoJsonGeom = geometry.geometry.toGeoJSON();
+      let geoJsonGeom = geometry.geometry.toGeoJSON() as Geometry;
       if (
         srs.definition &&
         srs.definition !== 'undefined' &&
         srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id !== 'EPSG:4326'
       ) {
-        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.getProjection(), 'EPSG:4326');
+        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.projection, 'EPSG:4326');
       }
       geoJson.geometry = geoJsonGeom;
     }
@@ -740,9 +687,25 @@ export class GeoPackageAPI {
     south: number,
     north: number,
   ): {
-    columns: any;
+    columns: {
+      index: number;
+      name: string;
+      max?: number;
+      min?: number;
+      notNull?: boolean;
+      primaryKey?: boolean;
+    }[];
     srs: SpatialReferenceSystem;
-    tiles: any[];
+    tiles: {
+      tableName: string;
+      id: number;
+      minLongitude: number;
+      maxLongitude: number;
+      minLatitude: number;
+      maxLatitude: number;
+      projection: string;
+      values: string[];
+    }[];
     west: number;
     east: number;
     south: number;
@@ -796,7 +759,7 @@ export class GeoPackageAPI {
     );
 
     const grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(
-      tms.getBoundingBox(),
+      tms.boundingBox,
       tm.matrix_width,
       tm.matrix_height,
       mapBoundingBox,
@@ -805,16 +768,20 @@ export class GeoPackageAPI {
     const iterator = tileDao.queryByTileGrid(grid, zoom);
 
     for (const row of iterator) {
-      const tile = {} as any;
+      const tile = {} as {
+        tableName: string;
+        id: number;
+        minLongitude: number;
+        maxLongitude: number;
+        minLatitude: number;
+        maxLatitude: number;
+        projection: string;
+        values: string[];
+      };
       tile.tableName = table;
       tile.id = row.getId();
 
-      const tileBB = TileBoundingBoxUtils.getTileBoundingBox(
-        tms.getBoundingBox(),
-        tm,
-        row.getTileColumn(),
-        row.getRow(),
-      );
+      const tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.boundingBox, tm, row.tileColumn, row.row);
       tile.minLongitude = tileBB.minLongitude;
       tile.maxLongitude = tileBB.maxLongitude;
       tile.minLatitude = tileBB.minLatitude;
@@ -856,9 +823,25 @@ export class GeoPackageAPI {
     south: number,
     north: number,
   ): {
-    columns: any;
+    columns: {
+      index: number;
+      name: string;
+      max?: number;
+      min?: number;
+      notNull?: boolean;
+      primaryKey?: boolean;
+    }[];
     srs: SpatialReferenceSystem;
-    tiles: any[];
+    tiles: {
+      tableName: string;
+      id: number;
+      minLongitude: number;
+      maxLongitude: number;
+      minLatitude: number;
+      maxLatitude: number;
+      projection: string;
+      values: string[];
+    }[];
     west: number;
     east: number;
     south: number;
@@ -915,7 +898,7 @@ export class GeoPackageAPI {
     );
 
     const grid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(
-      tms.getBoundingBox(),
+      tms.boundingBox,
       tm.matrix_width,
       tm.matrix_height,
       mapBoundingBox,
@@ -936,12 +919,7 @@ export class GeoPackageAPI {
       tile.tableName = table;
       tile.id = row.getId();
 
-      const tileBB = TileBoundingBoxUtils.getTileBoundingBox(
-        tms.getBoundingBox(),
-        tm,
-        row.getTileColumn(),
-        row.getRow(),
-      );
+      const tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.boundingBox, tm, row.tileColumn, row.row);
       tile.minLongitude = tileBB.minLongitude;
       tile.maxLongitude = tileBB.maxLongitude;
       tile.minLatitude = tileBB.minLatitude;
@@ -963,8 +941,7 @@ export class GeoPackageAPI {
     }
     return tiles;
   }
-
-  static getFeatureTileFromXYZ(
+  static async getFeatureTileFromXYZ(
     geopackage: GeoPackage,
     table: string,
     x: number,
@@ -972,7 +949,7 @@ export class GeoPackageAPI {
     z: number,
     width: number,
     height: number,
-  ): any {
+  ): Promise<any> {
     x = Number(x);
     y = Number(y);
     z = Number(z);
@@ -992,7 +969,7 @@ export class GeoPackageAPI {
     z: number,
     latitude: number,
     longitude: number,
-  ): ClosestFeature {
+  ): Feature & ClosestFeature {
     x = Number(x);
     y = Number(y);
     z = Number(z);
@@ -1007,7 +984,7 @@ export class GeoPackageAPI {
     if (tileCount > 10000) {
       // too many, send back the entire tile
       // add the goepackage name and table
-      const gj = boundingBox.toGeoJSON();
+      const gj = boundingBox.toGeoJSON() as Feature & ClosestFeature;
       gj.feature_count = tileCount;
       gj.coverage = true;
       gj.gp_table = table;
@@ -1121,66 +1098,6 @@ export class GeoPackageAPI {
     return features;
   }
 
-  // static convertPBFToVectorTile(pbf: Uint8Array | ArrayBuffer): VectorTile {
-  //   return new VectorTile.VectorTile(new Pbf(pbf));
-  // }
-
-  // /**
-  //  * Gets a mapbox VectorTile for the x y z web mercator tile specified
-  //  * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
-  //  * @param  {string} table      table name
-  //  * @param  {Number} x          x tile
-  //  * @param  {Number} y          y tile
-  //  * @param  {Number} z          web zoom
-  //  * @return {typeof VectorTile}
-  //  */
-  // static async getVectorTile(
-  //   geopackage: GeoPackage,
-  //   table: string,
-  //   x: number,
-  //   y: number,
-  //   z: number,
-  // ): Promise<VectorTile> {
-  //   const pbf = await GeoPackageAPI.getVectorTileProtobuf(geopackage, table, x, y, z);
-  //   return new VectorTile.VectorTile(new Pbf(pbf));
-  // }
-
-  /**
-   * Gets a protobuf for the x y z web mercator tile specified
-   * @param  {module:geoPackage~GeoPackage} geopackage open GeoPackage object
-   * @param  {string} table      table name
-   * @param  {Number} x          x tile
-   * @param  {Number} y          y tile
-   * @param  {Number} z          web zoom
-   * @return {any}
-   */
-  static async getVectorTileProtobuf(
-    geopackage: GeoPackage,
-    table: string,
-    x: number,
-    y: number,
-    z: number,
-  ): Promise<Uint8Array | ArrayBuffer> {
-    const features = await GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, table, x, y, z, true);
-    const featureCollection = {
-      type: 'FeatureCollection',
-      features: features,
-    };
-    const tileBuffer = 8;
-    const tileIndex = geojsonvt(featureCollection, { buffer: tileBuffer * 8, maxZoom: z });
-    const tile = tileIndex.getTile(z, x, y);
-
-    const gjvt = {};
-
-    if (tile) {
-      gjvt[table] = tile;
-    } else {
-      gjvt[table] = { features: [] };
-    }
-
-    return vtpbf.fromGeojsonVt(gjvt);
-  }
-
   /**
    * Gets the features in the EPSG:4326 bounding box
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
@@ -1207,37 +1124,7 @@ export class GeoPackageAPI {
   }
 
   /**
-   * Gets a tile image for an XYZ tile pyramid location
-   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
-   * @param  {string}   table      name of the table containing the tiles
-   * @param  {Number}   x          x index of the tile
-   * @param  {Number}   y          y index of the tile
-   * @param  {Number}   z          zoom level of the tile
-   * @param  {Number}   width      width of the resulting tile
-   * @param  {Number}   height     height of the resulting tile
-   * @return {Promise}
-   */
-  static async getTileFromXYZ(
-    geopackage: GeoPackage,
-    table: string,
-    x: number,
-    y: number,
-    z: number,
-    width: number,
-    height: number,
-  ): Promise<any> {
-    x = Number(x);
-    y = Number(y);
-    z = Number(z);
-    width = Number(width);
-    height = Number(height);
-    const tileDao = geopackage.getTileDao(table);
-    const retriever = new GeoPackageTileRetriever(tileDao, width, height);
-    return retriever.getTile(x, y, z);
-  }
-
-  /**
-   * Draws an XYZ tile pyramid location into the provided canvas
+   * Get the standard 3857 XYZ tile from the GeoPackage.  If a canvas is provided, the tile will be drawn in the canvas
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {string}   table      name of the table containing the tiles
    * @param  {Number}   x          x index of the tile
@@ -1247,28 +1134,29 @@ export class GeoPackageAPI {
    * @param  {Number}   height     height of the resulting tile
    * @param  {any}   canvas     canvas element to draw the tile into
    */
-  static async drawXYZTileInCanvas(
+  static async xyzTile(
     geopackage: GeoPackage,
     table: string,
     x: number,
     y: number,
     z: number,
-    width: number,
-    height: number,
-    canvas: any,
+    width = 256,
+    height = 256,
+    canvas?: any,
   ): Promise<any> {
-    x = Number(x);
-    y = Number(y);
-    z = Number(z);
     width = Number(width);
     height = Number(height);
     const tileDao = geopackage.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height);
-    return retriever.drawTileIn(x, y, z, canvas);
+    if (!canvas) {
+      return retriever.getTile(x, y, z);
+    } else {
+      return retriever.drawTileIn(x, y, z, canvas);
+    }
   }
 
   /**
-   * Draws a tile specified by the bounds in EPSG:4326 into the canvas
+   * Draws a tile projected into the specified projection, bounded by the specified by the bounds in EPSG:4326 into the canvas or the image is returned if no canvas is passed in
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {string}   table      name of the table containing the tiles
    * @param  {Number}   minLat     minimum latitude bounds of tile
@@ -1280,7 +1168,7 @@ export class GeoPackageAPI {
    * @param  {Number}   height     height of the resulting tile
    * @param  {any}   canvas     canvas element to draw the tile into
    */
-  static async draw4326TileInCanvas(
+  static async projectedTile(
     geopackage: GeoPackage,
     table: string,
     minLat: number,
@@ -1288,16 +1176,14 @@ export class GeoPackageAPI {
     maxLat: number,
     maxLon: number,
     z: number,
-    width: number,
-    height: number,
-    canvas: any,
+    projection: 'EPSG:4326',
+    width = 256,
+    height = 256,
+    canvas?: any,
   ): Promise<any> {
-    z = Number(z);
-    width = Number(width);
-    height = Number(height);
     const tileDao = geopackage.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height);
     const bounds = new BoundingBox(minLon, maxLon, minLat, maxLat);
-    return retriever.getTileWithWgs84BoundsInProjection(bounds, z, 'EPSG:4326', canvas);
+    return retriever.getTileWithWgs84BoundsInProjection(bounds, z, projection, canvas);
   }
 }

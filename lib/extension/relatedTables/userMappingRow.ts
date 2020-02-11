@@ -17,6 +17,7 @@ import { ColumnValues } from '../../dao/columnValues';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class UserMappingRow extends UserRow {
+  row: UserRow;
   constructor(public table: UserMappingTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
     super(table, columnTypes, values);
   }

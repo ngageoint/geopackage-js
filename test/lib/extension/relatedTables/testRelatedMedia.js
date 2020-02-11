@@ -47,7 +47,7 @@ describe('Related Media tests', function() {
 
   it('should create a media relationship', function() {
     this.timeout(5000);
-    var rte = geoPackage.getRelatedTablesExtension();
+    var rte = geoPackage.relatedTablesExtension;
     rte.has().should.be.equal(false);
 
     var extendedRelationships = rte.getRelationships();
@@ -105,7 +105,7 @@ describe('Related Media tests', function() {
     // Create the media table, content row, and relationship between the
 	  // feature table and media table
 
-    var contentsDao = geoPackage.getContentsDao();
+    var contentsDao = geoPackage.contentsDao;
     var contentsTables = contentsDao.getTables();
     contentsTables.indexOf(mediaTable.table_name).should.be.equal(-1);
     var relationship = RelatedTablesExtension.RelationshipBuilder()

@@ -203,22 +203,22 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
   columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
   columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geometry', type, false, null));
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'text', DataTypes.TEXT, false, ''),
+    FeatureColumn.createColumn(columnNumber++, 'text', DataTypes.TEXT, false, ''),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'real', DataTypes.REAL, false, null),
+    FeatureColumn.createColumn(columnNumber++, 'real', DataTypes.REAL, false, null),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'boolean', DataTypes.BOOLEAN, false, null),
+    FeatureColumn.createColumn(columnNumber++, 'boolean', DataTypes.BOOLEAN, false, null),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'blob', DataTypes.BLOB, false, null),
+    FeatureColumn.createColumn(columnNumber++, 'blob', DataTypes.BLOB, false, null),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'integer', DataTypes.INTEGER, false, null),
+    FeatureColumn.createColumn(columnNumber++, 'integer', DataTypes.INTEGER, false, null),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(
+    FeatureColumn.createColumn(
       columnNumber++,
       'text_limited',
       DataTypes.TEXT,
@@ -227,7 +227,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
     ),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(
+    FeatureColumn.createColumn(
       columnNumber++,
       'blob_limited',
       DataTypes.BLOB,
@@ -236,10 +236,10 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
     ),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(columnNumber++, 'date', DataTypes.DATE, false, null),
+    FeatureColumn.createColumn(columnNumber++, 'date', DataTypes.DATE, false, null),
   );
   columns.push(
-    FeatureColumn.createColumnWithIndex(
+    FeatureColumn.createColumn(
       columnNumber++,
       'datetime',
       DataTypes.DATETIME,
@@ -316,7 +316,7 @@ GeoPackageUtils.createSchemaExtension = function(geopackage) {
       return tc.createDataColumns();
     })
     .then(function() {
-      const dcd = geopackage.getDataColumnConstraintsDao();
+      const dcd = geopackage.dataColumnConstraintsDao;
       const sampleRange = dcd.createObject();
       sampleRange.constraint_name = 'sampleRange';
       sampleRange.constraint_type = DataColumnConstraintsDao.RANGE_TYPE;
@@ -369,7 +369,7 @@ GeoPackageUtils.createSchemaExtension = function(geopackage) {
       sampleGlob.description = 'sampleGlob description';
       dcd.create(sampleGlob);
 
-      const dc = geopackage.getDataColumnsDao();
+      const dc = geopackage.dataColumnsDao;
       const featureTables = geopackage.getFeatureTables();
       for (let i = 0; i < featureTables.length; i++) {
         const tableName = featureTables[i];
@@ -460,7 +460,7 @@ GeoPackageUtils.createRTreeSpatialIndexExtension = function(geopackage) {
 };
 
 GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
-  const relatedTables = geopackage.getRelatedTablesExtension();
+  const relatedTables = geopackage.relatedTablesExtension;
   let mediaTable = MediaTable.create('media');
   relatedTables.createRelatedTable(mediaTable);
 
@@ -501,7 +501,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
           GeoPackageAPI.linkMedia(geopackage, 'geometry2', featureRow.getId(), 'media', ngaRowId).then(function() {
             const relationships = GeoPackageAPI.getLinkedMedia(geopackage, 'geometry2', featureRow.getId());
             relationships.length.should.be.equal(1);
-            relationships[0].id.should.be.equal(ngaRowId);
+            relationships[0].getId().should.be.equal(ngaRowId);
           });
         });
       }, Promise.resolve());
@@ -524,20 +524,20 @@ GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
   const columns = [];
   let columnIndex = UserMappingTable.numRequiredColumns();
   columns.push(
-    UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME),
+    UserColumn.createColumn(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(
+    UserColumn.createColumn(
       columnIndex++,
       DublinCoreType.DESCRIPTION.name,
       DataTypes.TEXT,
     ),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT),
+    UserColumn.createColumn(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT),
+    UserColumn.createColumn(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT),
   );
 
   const userMappingTable = UserMappingTable.create('point1_to_polygon1', columns);
@@ -618,7 +618,7 @@ GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, ti
   );
   const contentsSrsId = 3857;
   const tileMatrixSetSrsId = 3857;
-  geopackage.getSpatialReferenceSystemDao().createWebMercator();
+  geopackage.spatialReferenceSystemDao.createWebMercator();
   return geopackage
     .createTileTableWithTableName(
       tableName,
@@ -686,7 +686,7 @@ GeoPackageUtils.createWebPExtension = function(geopackage) {
 
   const contentsSrsId = 3857;
   const tileMatrixSetSrsId = 3857;
-  geopackage.getSpatialReferenceSystemDao().createWebMercator();
+  geopackage.spatialReferenceSystemDao.createWebMercator();
   return geopackage
     .createTileTableWithTableName(
       tableName,
@@ -715,31 +715,31 @@ GeoPackageUtils.createAttributes = function(geopackage) {
   let columnNumber = 0;
   columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'text', DataTypes.TEXT, false, ''),
+    UserColumn.createColumn(columnNumber++, 'text', DataTypes.TEXT, false, ''),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'real', DataTypes.REAL, false, null),
+    UserColumn.createColumn(columnNumber++, 'real', DataTypes.REAL, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'boolean', DataTypes.BOOLEAN, false, null),
+    UserColumn.createColumn(columnNumber++, 'boolean', DataTypes.BOOLEAN, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'blob', DataTypes.BLOB, false, null),
+    UserColumn.createColumn(columnNumber++, 'blob', DataTypes.BLOB, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'integer', DataTypes.INTEGER, false, null),
+    UserColumn.createColumn(columnNumber++, 'integer', DataTypes.INTEGER, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'text_limited', DataTypes.TEXT, false, null),
+    UserColumn.createColumn(columnNumber++, 'text_limited', DataTypes.TEXT, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'blob_limited', DataTypes.BLOB, false, null),
+    UserColumn.createColumn(columnNumber++, 'blob_limited', DataTypes.BLOB, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'date', DataTypes.DATE, false, null),
+    UserColumn.createColumn(columnNumber++, 'date', DataTypes.DATE, false, null),
   );
   columns.push(
-    UserColumn.createColumnWithIndex(columnNumber++, 'datetime', DataTypes.DATETIME, false, null),
+    UserColumn.createColumn(columnNumber++, 'datetime', DataTypes.DATETIME, false, null),
   );
 
   const dc = new DataColumns();
@@ -831,7 +831,7 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
       return geopackage.createMetadataReferenceTable();
     })
     .then(function() {
-      const metadataDao = geopackage.getMetadataDao();
+      const metadataDao = geopackage.metadataDao;
 
       const md1 = metadataDao.createObject();
       md1.id = 1;
@@ -857,7 +857,7 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
       md3.metadata = 'TEST METADATA 3';
       metadataDao.create(md3);
 
-      const metadataReferenceDao = geopackage.getMetadataReferenceDao();
+      const metadataReferenceDao = geopackage.metadataReferenceDao;
 
       const ref1 = metadataReferenceDao.createObject();
       ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);

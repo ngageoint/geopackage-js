@@ -63,8 +63,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       .then(function() {
         var extensionDao = fti.extensionsDao;
         var extension = extensionDao.queryByExtension(fti.extensionName);
-        extension.getAuthor().should.be.equal('nga');
-        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.author.should.be.equal('nga');
+        extension.extensionNameNoAuthor.should.be.equal('geometry_index');
         extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
         extension.column_name.should.be.equal('geom');
         extension.table_name.should.be.equal('FEATURESriversds');
@@ -75,8 +75,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         var extensionDao = fti.extensionsDao;
         var extensions = extensionDao.queryByExtensionAndTableName(fti.extensionName, fti.tableName);
         var extension = extensions[0];
-        extension.getAuthor().should.be.equal('nga');
-        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.author.should.be.equal('nga');
+        extension.extensionNameNoAuthor.should.be.equal('geometry_index');
         extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
         extension.column_name.should.be.equal('geom');
         extension.table_name.should.be.equal('FEATURESriversds');
@@ -87,8 +87,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         var extensionDao = fti.extensionsDao;
         var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(fti.extensionName, fti.tableName, fti.columnName);
         var extension = extensions[0];
-        extension.getAuthor().should.be.equal('nga');
-        extension.getExtensionNameNoAuthor().should.be.equal('geometry_index');
+        extension.author.should.be.equal('nga');
+        extension.extensionNameNoAuthor.should.be.equal('geometry_index');
         extension.definition.should.be.equal('http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html');
         extension.column_name.should.be.equal('geom');
         extension.table_name.should.be.equal('FEATURESriversds');
@@ -150,7 +150,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var whereArgs = [ 'rivers', 315 ];
 
       var query = sqliteQueryBuilder.buildQuery(false, "'nga_geometry_index'", undefined, whereString);
-      var result = geoPackage.getDatabase().get(query, whereArgs);
+      var result = geoPackage.database.get(query, whereArgs);
       should.exist(result);
       done();
     });

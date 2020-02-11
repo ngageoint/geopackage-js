@@ -6,6 +6,7 @@ import { GeoPackage } from '../../geoPackage';
 import { TableIndex } from './tableIndex';
 import { Envelope } from '../../geom/envelope';
 import { FeatureRow } from '../../features/user/featureRow';
+import { DBValue } from '../../db/dbAdapter';
 /**
  * Geometry Index Data Access Object
  * @class
@@ -42,15 +43,14 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @return {module:extension/index~TableIndex}
    */
   getTableIndex(geometryIndex: GeometryIndex): TableIndex {
-    const dao = this.geoPackage.getTableIndexDao();
-    return dao.queryForId(geometryIndex.table_name);
+    return this.geoPackage.tableIndexDao.queryForId(geometryIndex.table_name);
   }
   /**
    * Query by table name
    * @param  {string} tableName table name
    * @return {Iterable}
    */
-  queryForTableName(tableName: string): IterableIterator<any> {
+  queryForTableName(tableName: string): IterableIterator<GeometryIndex> {
     return this.queryForEach(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
   }
 
@@ -72,7 +72,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    */
   populate(tableIndex: TableIndex, geometryId: number, envelope: Envelope): GeometryIndex {
     const geometryIndex = new GeometryIndex();
-    geometryIndex.setTableIndex(tableIndex);
+    geometryIndex.tableIndex = tableIndex;
     geometryIndex.geom_id = geometryId;
     geometryIndex.min_x = envelope.minX;
     geometryIndex.min_y = envelope.minY;
@@ -115,7 +115,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    */
   _generateGeometryEnvelopeQuery(
     envelope: Envelope,
-  ): { join: string; where: string; whereArgs: any[]; tableNameArr: string[] } {
+  ): { join: string; where: string; whereArgs: DBValue[]; tableNameArr: string[] } {
     const tableName = this.featureDao.gpkgTableName;
     let where = '';
     where += this.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
@@ -188,7 +188,7 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @param  {Boolean} envelope.hasM has m
    * @param  {Boolean} envelope.hasZ has z
    */
-  queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<any> {
+  queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<GeometryIndex> {
     const result = this._generateGeometryEnvelopeQuery(envelope);
     return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
   }

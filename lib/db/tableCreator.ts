@@ -22,7 +22,7 @@ export class TableCreator {
   connection: GeoPackageConnection;
   constructor(geopackage: GeoPackage) {
     this.geopackage = geopackage;
-    this.connection = geopackage.getDatabase();
+    this.connection = geopackage.database;
   }
   /**
    * Creates all required tables and Spatial Reference Systems, in addition to EPSG:3857

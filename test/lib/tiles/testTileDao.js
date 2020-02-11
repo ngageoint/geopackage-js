@@ -70,18 +70,18 @@ describe('TileDao tests', function() {
 
     it('should query for a tile', function() {
       var tileRow = tileDao.queryForTile(0, 0, 0);
-      tileRow.getZoomLevel().should.be.equal(0);
-      tileRow.getTileColumn().should.be.equal(0);
-      tileRow.getRow().should.be.equal(0);
-      var data = tileRow.getTileData();
+      tileRow.zoomLevel.should.be.equal(0);
+      tileRow.tileColumn.should.be.equal(0);
+      tileRow.row.should.be.equal(0);
+      var data = tileRow.tileData;
       should.exist(data);
     });
 
     it('should query for tiles in the zoom level', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesWithZoomLevel(1)) {
-        tileRow.getZoomLevel().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
         count++;
       }
@@ -91,8 +91,8 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level descending order', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesDescending(1)) {
-        tileRow.getZoomLevel().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
         count++;
       }
@@ -102,9 +102,9 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level and column', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesInColumn(1, 1)) {
-        tileRow.getZoomLevel().should.be.equal(1);
-        tileRow.getTileColumn().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(1);
+        tileRow.tileColumn.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
         count++;
       }
@@ -114,9 +114,9 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level and row', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesInRow(1, 1)) {
-        tileRow.getZoomLevel().should.be.equal(1);
-        tileRow.getRow().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(1);
+        tileRow.row.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
         count++;
       }
@@ -133,9 +133,9 @@ describe('TileDao tests', function() {
       var iterator = tileDao.queryByTileGrid(tileGrid, 1);
       var count = 0;
       for (var tileRow of iterator) {
-        tileRow.getZoomLevel().should.be.equal(1);
-        tileRow.getRow().should.be.equal(0);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(1);
+        tileRow.row.should.be.equal(0);
+        var data = tileRow.tileData;
         should.exist(data);
         count++;
       }
@@ -206,18 +206,18 @@ describe('TileDao tests', function() {
     it('should query for a tile', function() {
       return tileDao.queryForTile(1, 1, 4)
       .then(function(tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getTileColumn().should.be.equal(1);
-        tileRow.getRow().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        tileRow.tileColumn.should.be.equal(1);
+        tileRow.row.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
       });
     });
 
     it('should query for tiles in the zoom level', function() {
       return tileDao.queryForTilesWithZoomLevel(4, function(err, tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        var data = tileRow.tileData;
         should.exist(data);
       }).then(function(count) {
         count.should.be.equal(16);
@@ -226,8 +226,8 @@ describe('TileDao tests', function() {
 
     it('should query for tiles in the zoom level descending order', function() {
       tileDao.queryForTilesDescending(4, function(err, tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        var data = tileRow.tileData;
         should.exist(data);
       }).then(function(count) {
         count.should.be.equal(16);
@@ -236,9 +236,9 @@ describe('TileDao tests', function() {
 
     it('should query for tiles in the zoom level and column', function() {
       return tileDao.queryForTilesInColumn(1, 4, function(err, tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getTileColumn().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        tileRow.tileColumn.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
       }).then(function(count) {
         count.should.be.equal(4);
@@ -247,9 +247,9 @@ describe('TileDao tests', function() {
 
     it('should query for tiles in the zoom level and row', function() {
       return tileDao.queryForTilesInRow(1, 4, function(err, tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getRow().should.be.equal(1);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        tileRow.row.should.be.equal(1);
+        var data = tileRow.tileData;
         should.exist(data);
       }).then(function(count) {
         count.should.be.equal(4);
@@ -264,9 +264,9 @@ describe('TileDao tests', function() {
         maxY: 0
       };
       tileDao.queryByTileGrid(tileGrid, 4, function(err, tileRow) {
-        tileRow.getZoomLevel().should.be.equal(4);
-        tileRow.getRow().should.be.equal(0);
-        var data = tileRow.getTileData();
+        tileRow.zoomLevel.should.be.equal(4);
+        tileRow.row.should.be.equal(0);
+        var data = tileRow.tileData;
         should.exist(data);
       })
       .then(function(count) {

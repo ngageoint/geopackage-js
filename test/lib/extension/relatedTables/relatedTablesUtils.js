@@ -11,21 +11,21 @@ module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   var columnIndex = startingIndex;
 
   // Add Dublin Core Metadata term columns
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT, notNull));
 
   // Add test columns for common data types, some with limits
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text", DataTypes.TEXT, notNull, ''));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_real", DataTypes.REAL, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_boolean", DataTypes.BOOLEAN, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob", DataTypes.BLOB, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_integer", DataTypes.INTEGER, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_text_limited", DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_blob_limited", DataTypes.BLOB, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_date", DataTypes.DATE, notNull));
-  columns.push(UserColumn.createColumnWithIndex(columnIndex++, "test_datetime", DataTypes.DATETIME, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_text", DataTypes.TEXT, notNull, ''));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_real", DataTypes.REAL, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_boolean", DataTypes.BOOLEAN, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_blob", DataTypes.BLOB, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_integer", DataTypes.INTEGER, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_text_limited", DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_blob_limited", DataTypes.BLOB, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_date", DataTypes.DATE, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_datetime", DataTypes.DATETIME, notNull));
 
   return columns;
 }
@@ -39,7 +39,7 @@ module.exports.createSimpleUserColumns = function(startingIndex, notNull) {
   for (var i = 0; i < allAdditionalColumns.length; i++) {
     var column = allAdditionalColumns[i];
     if (SimpleAttributesTable.isSimple(column)) {
-      columns.push(UserColumn.createColumnWithIndex(columnIndex++, column.name, column.dataType, column.notNull, column.defaultValue));
+      columns.push(UserColumn.createColumn(columnIndex++, column.name, column.dataType, column.notNull, column.defaultValue));
     }
   }
 

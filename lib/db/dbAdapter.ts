@@ -1,3 +1,5 @@
+export type DBValue = boolean | string | number | Buffer | Uint8Array;
+
 export interface DBAdapter {
   db: any;
   filePath: string | Buffer | Uint8Array;

@@ -109,7 +109,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
     mappingTable?: string | UserMappingTable,
     mappingColumnValues?: ColumnValues,
   ): Promise<number> {
-    const rte = this.geoPackage.getRelatedTablesExtension();
+    const rte = this.geoPackage.relatedTablesExtension;
     const baseTableName = userRow.table.table_name;
     const relatedTableName = relatedRow.table.table_name;
     const relationship = rte
@@ -197,7 +197,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    */
   getLinkedMedia(userRow: UserRow): MediaRow[] {
     const mediaRelations = this.getMediaRelations();
-    const rte = this.geoPackage.getRelatedTablesExtension();
+    const rte = this.geoPackage.relatedTablesExtension;
     const linkedMedia = [];
     for (let i = 0; i < mediaRelations.length; i++) {
       const mediaRelation = mediaRelations[i];
@@ -218,7 +218,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    */
   getLinkedSimpleAttributes(userRow: UserRow): SimpleAttributesRow[] {
     const simpleRelations = this.getSimpleAttributesRelations();
-    const rte = this.geoPackage.getRelatedTablesExtension();
+    const rte = this.geoPackage.relatedTablesExtension;
     const linkedSimpleAttributes = [];
     for (let i = 0; i < simpleRelations.length; i++) {
       const simpleRelation = simpleRelations[i];
@@ -239,7 +239,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    */
   getLinkedFeatures(userRow: UserRow): FeatureRow[] {
     const featureRelations = this.getFeatureRelations();
-    const rte = this.geoPackage.getRelatedTablesExtension();
+    const rte = this.geoPackage.relatedTablesExtension;
     const linkedFeatures = [];
     for (let i = 0; i < featureRelations.length; i++) {
       const featureRelation = featureRelations[i];
@@ -280,14 +280,14 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @return {Object[]}
    */
   getRelationsWithName(name: string): ExtendedRelation[] {
-    return this.geoPackage.getExtendedRelationDao().getBaseTableRelationsWithName(this.table_name, name);
+    return this.geoPackage.extendedRelationDao.getBaseTableRelationsWithName(this.table_name, name);
   }
   /**
    * Get all relations to this table
    * @return {Object[]}
    */
   getRelations(): ExtendedRelation[] {
-    return this.geoPackage.getExtendedRelationDao().getBaseTableRelations(this.table_name);
+    return this.geoPackage.extendedRelationDao.getBaseTableRelations(this.table_name);
   }
   /**
    * Gets the rows in this table by id
@@ -338,7 +338,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    */
   static readTable(geoPackage: GeoPackage, tableName: string): UserDao<UserRow> {
     const reader = new UserTableReader(tableName);
-    const userTable = reader.readTable(geoPackage.getDatabase());
+    const userTable = reader.readTable(geoPackage.database);
     return new UserDao(geoPackage, userTable);
   }
 }

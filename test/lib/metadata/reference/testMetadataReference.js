@@ -36,8 +36,8 @@ describe('Metadata Reference tests', function() {
         Verification.verifyMetadataReference(geopackage).should.be.equal(true);
         Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+        var metadataDao = geopackage.metadataDao;
+        var metadataReferenceDao = geopackage.metadataReferenceDao;
 
         var metadata1 = new Metadata();
         metadata1.id = 1;
@@ -92,8 +92,8 @@ describe('Metadata Reference tests', function() {
         Verification.verifyMetadataReference(geopackage).should.be.equal(true);
         Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+        var metadataDao = geopackage.metadataDao;
+        var metadataReferenceDao = geopackage.metadataReferenceDao;
 
         var metadata1 = new Metadata();
         metadata1.id = 1;
@@ -145,8 +145,8 @@ describe('Metadata Reference tests', function() {
         Verification.verifyMetadataReference(geopackage).should.be.equal(true);
         Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+        var metadataDao = geopackage.metadataDao;
+        var metadataReferenceDao = geopackage.metadataReferenceDao;
 
         var metadata1 = new Metadata();
         metadata1.id = 1;
@@ -232,8 +232,8 @@ describe('Metadata Reference tests', function() {
         Verification.verifyMetadataReference(geopackage).should.be.equal(true);
         Verification.verifyMetadata(geopackage).should.be.equal(true);
 
-        var metadataDao = geopackage.getMetadataDao();
-        var metadataReferenceDao = geopackage.getMetadataReferenceDao();
+        var metadataDao = geopackage.metadataDao;
+        var metadataReferenceDao = geopackage.metadataReferenceDao;
 
         var metadata1 = new Metadata();
         metadata1.id = 1;

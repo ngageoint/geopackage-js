@@ -10,8 +10,8 @@ export class GeoPackageTileRetriever {
   tileDao: TileDao;
   width: number;
   height: number;
-  setWebMercatorBoundingBox: any;
-  setProjectionBoundingBox: any;
+  setWebMercatorBoundingBox: BoundingBox;
+  setProjectionBoundingBox: BoundingBox;
   constructor(tileDao: TileDao, width: number, height: number) {
     this.tileDao = tileDao;
     this.tileDao.adjustTileMatrixLengths();
@@ -22,10 +22,10 @@ export class GeoPackageTileRetriever {
     if (this.setWebMercatorBoundingBox) {
       return this.setWebMercatorBoundingBox;
     } else {
-      const tileMatrixSetDao = this.tileDao.geoPackage.getTileMatrixSetDao();
+      const tileMatrixSetDao = this.tileDao.geoPackage.tileMatrixSetDao;
       const tileMatrixSet = this.tileDao.tileMatrixSet;
       const srs = tileMatrixSetDao.getSrs(tileMatrixSet);
-      this.setProjectionBoundingBox = tileMatrixSet.getBoundingBox();
+      this.setProjectionBoundingBox = tileMatrixSet.boundingBox;
       if (srs.organization_coordsys_id === 4326 && srs.organization === 'EPSG') {
         this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
         this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
@@ -41,7 +41,7 @@ export class GeoPackageTileRetriever {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
     const tileMatrix = this.tileDao.getTileMatrixWithZoomLevel(zoom);
     const tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(
-      this.tileDao.tileMatrixSet.getBoundingBox(),
+      this.tileDao.tileMatrixSet.boundingBox,
       tileMatrix.matrix_width,
       tileMatrix.matrix_height,
       webMercatorBoundingBox,
@@ -123,7 +123,7 @@ export class GeoPackageTileRetriever {
       tileMatrix,
     );
     for (const tile of iterator) {
-      await creator.addTile(tile.getTileData(), tile.getTileColumn(), tile.getRow());
+      await creator.addTile(tile.tileData, tile.tileColumn, tile.row);
     }
     if (!canvas) {
       return creator.getCompleteTile('png');
@@ -135,7 +135,7 @@ export class GeoPackageTileRetriever {
   ): IterableIterator<TileRow> {
     if (tileMatrix) {
       const tileGrid = TileBoundingBoxUtils.getTileGridWithTotalBoundingBox(
-        this.tileDao.tileMatrixSet.getBoundingBox(),
+        this.tileDao.tileMatrixSet.boundingBox,
         tileMatrix.matrix_width,
         tileMatrix.matrix_height,
         tileMatrixProjectionBoundingBox,

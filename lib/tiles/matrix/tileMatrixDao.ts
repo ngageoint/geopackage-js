@@ -47,11 +47,9 @@ export class TileMatrixDao extends Dao<TileMatrix> {
    * @param  {TileMatrix} tileMatrix the tile matrix
    */
   getContents(tileMatrix: TileMatrix): Contents {
-    const dao = this.geoPackage.getContentsDao();
-    return dao.queryForId(tileMatrix.table_name);
+    return this.geoPackage.contentsDao.queryForId(tileMatrix.table_name);
   }
   getTileMatrixSet(tileMatrix: TileMatrix): TileMatrixSet {
-    const dao = this.geoPackage.getTileMatrixSetDao();
-    return dao.queryForId(tileMatrix.table_name);
+    return this.geoPackage.tileMatrixSetDao.queryForId(tileMatrix.table_name);
   }
 }

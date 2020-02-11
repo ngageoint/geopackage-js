@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
-var GeoPackageOptimizer = require('./index.js');
+const GeoPackageOptimizer = require('./index.js');
 
-var fs = require('fs')
-  , GeoPackageAPI = require('@ngageoint/geopackage');
+const fs = require('fs');
+const GeoPackageAPI = require('@ngageoint/geopackage');
+const GeoPackage = GeoPackageAPI.GeoPackage;
 
 console.log('GeoPackage Optimizer For Mobile Clients');
 
-var geoPackageFile = process.argv[2];
-var outputGeoPackageFile = process.argv[3];
+const geoPackageFile = process.argv[2];
+const outputGeoPackageFile = process.argv[3];
 
 if (!geoPackageFile || !outputGeoPackageFile) {
   console.log('Usage: mobile-optimizer <GeoPackage To Process> <GeoPackage To Write>');
@@ -17,48 +18,52 @@ if (!geoPackageFile || !outputGeoPackageFile) {
   process.exit(1);
 }
 
-var same = outputGeoPackageFile === geoPackageFile;
+const same = outputGeoPackageFile === geoPackageFile;
 
 fs.stat(geoPackageFile, function(err, stats) {
   if (err || !stats || !stats.isFile()) {
     console.log('File does not exist.', geoPackageFile);
     process.exit(1);
   }
-  return GeoPackageAPI.open(geoPackageFile)
-  .then(function(inputGeoPackage) {
-    console.log('Processing %s', geoPackageFile);
-    if (same) {
-      return GeoPackageAPI.open(outputGeoPackageFile)
-      .then(function(outputGeoPackage) {
+  console.log('GeoPackageAPI', GeoPackageAPI);
+  console.log('GeoPackage', GeoPackage);
+  return GeoPackage.open(geoPackageFile)
+    .then(function(inputGeoPackage) {
+      console.log('Processing %s', geoPackageFile);
+      if (same) {
+        return GeoPackage.open(outputGeoPackageFile).then(function(outputGeoPackage) {
+          return {
+            inputGeoPackage: inputGeoPackage,
+            outputGeoPackage: outputGeoPackage,
+          };
+        });
+      }
+      return GeoPackage.create(outputGeoPackageFile).then(function(outputGeoPackage) {
         return {
           inputGeoPackage: inputGeoPackage,
-          outputGeoPackage: outputGeoPackage
+          outputGeoPackage: outputGeoPackage,
         };
       });
-    }
-    return GeoPackageAPI.create(outputGeoPackageFile)
-    .then(function(outputGeoPackage) {
-      return {
-        inputGeoPackage: inputGeoPackage,
-        outputGeoPackage: outputGeoPackage
-      };
-    });
-  })
-  .then(function(options) {
-    var outputGeoPackage = options.outputGeoPackage;
-    var inputGeoPackage = options.inputGeoPackage;
+    })
+    .then(function(options) {
+      const outputGeoPackage = options.outputGeoPackage;
+      const inputGeoPackage = options.inputGeoPackage;
 
-    console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
-    return GeoPackageOptimizer.optimize({inputGeoPackage: inputGeoPackage, outputGeoPackage: outputGeoPackage, same: same, progress: function(progress) {
-      if (progress.description) {
-        console.log('Processing %s: %s', progress.layer, progress.description);
-      } else {
-        console.log('Processing %s: %s of %s tiles complete.', progress.layer, progress.count, progress.totalCount);
-      }
-    }})
-    .then(function() {
-      console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
-      process.exit(0);
+      console.log('Writing mobile optimized GeoPackage to %s', outputGeoPackageFile);
+      return GeoPackageOptimizer.optimize({
+        inputGeoPackage: inputGeoPackage,
+        outputGeoPackage: outputGeoPackage,
+        same: same,
+        progress: function(progress) {
+          if (progress.description) {
+            console.log('Processing %s: %s', progress.layer, progress.description);
+          } else {
+            console.log('Processing %s: %s of %s tiles complete.', progress.layer, progress.count, progress.totalCount);
+          }
+        },
+      }).then(function() {
+        console.log('Optimization Complete, optimized file: %s', outputGeoPackageFile);
+        process.exit(0);
+      });
     });
-  });
 });

@@ -31,7 +31,7 @@ export abstract class Dao<T> {
    * @param geoPackage GeoPackage object this dao belongs to
    */
   constructor(readonly geoPackage: GeoPackage) {
-    this.connection = geoPackage.getDatabase();
+    this.connection = geoPackage.database;
   }
 
   /**
@@ -600,8 +600,14 @@ export abstract class Dao<T> {
    * @param  {Object[]} whereArgs where arguments
    * @return {number} number of objects updated
    */
-  //TODO this return value
-  updateWithValues(values: {}, where: string, whereArgs: any[]): any {
+  updateWithValues(
+    values: {},
+    where: string,
+    whereArgs: any[],
+  ): {
+    changes: number;
+    lastInsertRowid: number;
+  } {
     const update = SqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
     return this.connection.run(update.sql, update.args);
   }
@@ -611,8 +617,12 @@ export abstract class Dao<T> {
    * @param  {Object} object object with updated values
    * @return {number} number of objects updated
    */
-  //TODO this return value
-  update(object: T): any {
+  update(
+    object: T,
+  ): {
+    changes: number;
+    lastInsertRowid: number;
+  } {
     const updateValues = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
     let update = SqliteQueryBuilder.buildObjectUpdate("'" + this.gpkgTableName + "'", object);
     const multiId = this.getMultiId(object);
@@ -632,13 +642,12 @@ export abstract class Dao<T> {
    * @param  {Object} object object to update or create
    * @return {number} number of objects modified
    */
-  // TODO this return value
-  createOrUpdate(object: T): any {
+  createOrUpdate(object: T): number {
     const existing = this.queryForSameId(object);
     if (!existing) {
       return this.create(object);
     } else {
-      return this.update(object);
+      return this.update(object).changes;
     }
   }
 

@@ -23,7 +23,7 @@ export class ContentsIdExtension extends BaseExtension {
   contentsIdDao: ContentsIdDao;
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.contentsIdDao = geoPackage.getContentsIdDao();
+    this.contentsIdDao = geoPackage.contentsIdDao;
   }
   /**
    * Get or create the contents id extension
@@ -44,7 +44,7 @@ export class ContentsIdExtension extends BaseExtension {
    * Get the ContentsIdDao
    * @returns {module:extension/contents.ContentsIdDao}
    */
-  getDao(): ContentsIdDao {
+  get dao(): ContentsIdDao {
     return this.contentsIdDao;
   }
   has(): boolean {

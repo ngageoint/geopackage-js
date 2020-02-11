@@ -29,6 +29,9 @@
   "typedocOptions": {
       "mode": "file",
       "out": "docs-ts",
-      "exclude": "./test/**/*"
+      "exclude": "./test/**/*",
+      "excludePrivate": true,
+      "includeVersion": true,
+      "theme": "node_modules/igniteui-typedoc-theme"
   }
 }

@@ -249,24 +249,6 @@ describe('GeoPackageAPI tests', function() {
       await testSetup.deleteGeoPackage(filename);
     });
 
-    // it('should get a vector tile countries_0 pbf tile', function() {
-    //   this.timeout(0);
-    //   return GeoPackage.getVectorTile(indexedGeopackage, 'country', 1, 2, 3)
-    //   .then(function(json) {
-    //     should.exist(json.layers['country']);
-    //     json.layers['country'].length.should.be.equal(14);
-    //   });
-    // });
-
-    // it('should get a vector tile country-name pbf tile', function() {
-    //   this.timeout(0);
-    //   return GeoPackage.getVectorTile(indexedGeopackage, 'country-name', 1, 2, 3)
-    //   .then(function(json) {
-    //     should.exist(json.layers['country-name']);
-    //     json.layers['country-name'].length.should.be.equal(1);
-    //   });
-    // });
-
     it('should get the closest feature in an XYZ tile', function() {
       const closest = GeoPackage.getClosestFeatureInXYZTile(indexedGeopackage, 'country', 0, 0, 0, 40, -119);
       closest.id.should.be.equal(481);
@@ -329,7 +311,7 @@ describe('GeoPackageAPI tests', function() {
     });
 
     it('should get the 0 0 0 tile', function() {
-      return GeoPackage.getTileFromXYZ(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256).then(function(tile) {
+      return GeoPackage.xyzTile(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256).then(function(tile) {
         should.exist(tile);
       });
     });
@@ -342,7 +324,7 @@ describe('GeoPackageAPI tests', function() {
       } else {
         canvas = document.createElement('canvas');
       }
-      await GeoPackage.drawXYZTileInCanvas(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
+      await GeoPackage.xyzTile(indexedGeopackage, 'rivers_tiles', 0, 0, 0, 256, 256, canvas);
       testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '3857_rivers_world_tile.png'));
     });
 
@@ -354,7 +336,7 @@ describe('GeoPackageAPI tests', function() {
       } else {
         canvas = document.createElement('canvas');
       }
-      await GeoPackage.draw4326TileInCanvas(indexedGeopackage, 'rivers_tiles', -90, -180, 90, 180, 0, 512, 256, canvas);
+      await GeoPackage.projectedTile(indexedGeopackage, 'rivers_tiles', -90, -180, 90, 180, 0, 'EPSG:4326', 512, 256, canvas);
       testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '4326_rivers_world_tile.png'));
     });
 
@@ -369,7 +351,7 @@ describe('GeoPackageAPI tests', function() {
     });
 
     it('should add geojson to the geopackage and keep it indexed', function() {
-      const id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(
+      const id = GeoPackage.addGeoJSONFeatureToGeoPackage(
         indexedGeopackage,
         {
           type: 'Feature',
@@ -382,16 +364,17 @@ describe('GeoPackageAPI tests', function() {
           },
         },
         'rivers',
+        true
       );
       // ensure the last indexed changed
-      const db = indexedGeopackage.getDatabase();
+      const db = indexedGeopackage.database;
       const index = db.get('SELECT * FROM nga_geometry_index where geom_id = ?', [id]);
       index.geom_id.should.be.equal(id);
     });
 
     it('should add geojson to the geopackage and keep it indexed and query it', function() {
       // @ts-ignore
-      const id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(
+      const id = GeoPackage.addGeoJSONFeatureToGeoPackage(
         indexedGeopackage,
         {
           type: 'Feature',
@@ -404,6 +387,7 @@ describe('GeoPackageAPI tests', function() {
           },
         },
         'rivers',
+        true
       );
       const features = GeoPackage.queryForGeoJSONFeaturesInTable(
         indexedGeopackage,
@@ -413,9 +397,9 @@ describe('GeoPackageAPI tests', function() {
       features.length.should.be.equal(1);
     });
 
-    it('should add geojson to the geopackage and keep it indexed and iterate it', function() {
+    it('should add geojson to the geopackage and keep it indexed and iterate it', async function() {
       // @ts-ignore
-      const id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(
+      const id = GeoPackage.addGeoJSONFeatureToGeoPackage(
         indexedGeopackage,
         {
           type: 'Feature',
@@ -428,8 +412,9 @@ describe('GeoPackageAPI tests', function() {
           },
         },
         'rivers',
+        true
       );
-      const iterator = GeoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(
+      const iterator = await GeoPackage.iterateGeoJSONFeatures(
         indexedGeopackage,
         'rivers',
         new BoundingBox(-99.9, -99.8, 40.16, 40.18),
@@ -441,7 +426,7 @@ describe('GeoPackageAPI tests', function() {
 
     it('should add geojson to the geopackage and keep it indexed and iterate it and pull the features', function() {
       // @ts-ignore
-      const id = GeoPackage.addGeoJSONFeatureToGeoPackageAndIndex(
+      const id = GeoPackage.addGeoJSONFeatureToGeoPackage(
         indexedGeopackage,
         {
           type: 'Feature',
@@ -454,6 +439,7 @@ describe('GeoPackageAPI tests', function() {
           },
         },
         'rivers',
+        true
       );
       const iterator = GeoPackage.iterateGeoJSONFeaturesFromTable(indexedGeopackage, 'rivers');
       for (const geoJson of iterator.results) {
@@ -491,19 +477,19 @@ describe('GeoPackageAPI tests', function() {
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       columns.push(
-        FeatureColumn.createColumnWithIndexAndMax(7, 'test_text_limited.test', DataTypes.TEXT, 5, false, null),
+        FeatureColumn.createColumn(7, 'test_text_limited.test', DataTypes.TEXT, false, null, 5),
       );
       columns.push(
-        FeatureColumn.createColumnWithIndexAndMax(8, 'test_blob_limited.test', DataTypes.BLOB, 7, false, null),
+        FeatureColumn.createColumn(8, 'test_blob_limited.test', DataTypes.BLOB, false, null, 7),
       );
       columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(2, 'test_text.test', DataTypes.TEXT, false, ''));
-      columns.push(FeatureColumn.createColumnWithIndex(3, 'test_real.test', DataTypes.REAL, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(5, 'test_blob.test', DataTypes.BLOB, false, null));
-      columns.push(FeatureColumn.createColumnWithIndex(6, 'test_integer.test', DataTypes.INTEGER, false, ''));
+      columns.push(FeatureColumn.createColumn(2, 'test_text.test', DataTypes.TEXT, false, ''));
+      columns.push(FeatureColumn.createColumn(3, 'test_real.test', DataTypes.REAL, false, null));
+      columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+      columns.push(FeatureColumn.createColumn(5, 'test_blob.test', DataTypes.BLOB, false, null));
+      columns.push(FeatureColumn.createColumn(6, 'test_integer.test', DataTypes.INTEGER, false, ''));
 
-      return GeoPackage.createFeatureTable(geopackage, tableName, geometryColumns, columns)
+      return GeoPackage.createFeatureTable(geopackage, tableName, columns, geometryColumns)
         .then(function(featureDao) {
           should.exist(featureDao);
           const exists = geopackage.hasFeatureTable(tableName);
@@ -626,10 +612,10 @@ describe('GeoPackageAPI tests', function() {
         matrixSet.min_y.should.equal(matrixSetBounds.minLatitude);
         matrixSet.max_y.should.equal(matrixSetBounds.maxLatitude);
 
-        const dbMatrixSet = geopackage.getTileMatrixSetDao().queryForId(tableName);
+        const dbMatrixSet = geopackage.tileMatrixSetDao.queryForId(tableName);
         dbMatrixSet.should.deep.equal(matrixSet);
 
-        const matrixDao = geopackage.getTileMatrixDao();
+        const matrixDao = geopackage.tileMatrixDao;
         const matrices = matrixDao.queryForAll();
 
         matrices.length.should.equal(4);
@@ -669,10 +655,10 @@ describe('GeoPackageAPI tests', function() {
         matrixSet.min_y.should.equal(matrixSetBounds.minLatitude);
         matrixSet.max_y.should.equal(matrixSetBounds.maxLatitude);
 
-        const dbMatrixSet = geopackage.getTileMatrixSetDao().queryForId(tableName);
+        const dbMatrixSet = geopackage.tileMatrixSetDao.queryForId(tableName);
         dbMatrixSet.should.deep.equal(matrixSet);
 
-        const matrixDao = geopackage.getTileMatrixDao();
+        const matrixDao = geopackage.tileMatrixDao;
         const matrices = matrixDao.queryForAll();
 
         matrices.length.should.equal(5);
@@ -718,7 +704,7 @@ describe('GeoPackageAPI tests', function() {
         result.should.be.equal(1);
         const tileRow = GeoPackage.getTileFromTable(geopackage, tableName, 0, 0, 0);
         // @ts-ignore
-        testSetup.diffImages(tileRow.getTileData(), tilePath, function(err, equal) {
+        testSetup.diffImages(tileRow.tileData, tilePath, function(err, equal) {
           equal.should.be.equal(true);
           done();
         });
@@ -762,7 +748,7 @@ describe('GeoPackageAPI tests', function() {
         fs.readFile(tilePath, function(err, tile) {
           const result = geopackage.addTile(tile, tableName, 0, 0, 0);
           result.should.be.equal(1);
-          GeoPackage.getTileFromXYZ(geopackage, tableName, 0, 0, 0, 256, 256).then(function(tile) {
+          GeoPackage.xyzTile(geopackage, tableName, 0, 0, 0, 256, 256).then(function(tile) {
             // @ts-ignore
             testSetup.diffImages(tile, tilePath, function(err, equal) {
               equal.should.be.equal(true);
@@ -817,7 +803,7 @@ describe('GeoPackageAPI tests', function() {
           } else {
             canvas = document.createElement('canvas');
           }
-          GeoPackage.drawXYZTileInCanvas(geopackage, tableName, 0, 0, 0, 256, 256, canvas)
+          GeoPackage.xyzTile(geopackage, tableName, 0, 0, 0, 256, 256, canvas)
             // @ts-ignore
             .then(function(tile) {
               // @ts-ignore

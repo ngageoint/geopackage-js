@@ -42,8 +42,8 @@ describe('RTree tests', function() {
       var extensionDao = fti.extensionsDao;
       var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(RTreeIndexDao.EXTENSION_NAME, fti.tableName, fti.columnName);
       var extension = extensions[0];
-      extension.getAuthor().should.be.equal('gpkg');
-      extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
+      extension.author.should.be.equal('gpkg');
+      extension.extensionNameNoAuthor.should.be.equal('rtree_index');
       extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
       extension.column_name.should.be.equal('geometry');
       extension.table_name.should.be.equal('line1');
@@ -131,8 +131,8 @@ describe('RTree tests', function() {
         .then(function() {
           var extensionDao = rtreeIndex.extensionsDao;
           var extension = extensionDao.queryByExtension(rtreeIndex.extensionName);
-          extension.getAuthor().should.be.equal('gpkg');
-          extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
+          extension.author.should.be.equal('gpkg');
+          extension.extensionNameNoAuthor.should.be.equal('rtree_index');
           extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
           extension.column_name.should.be.equal('geom');
           extension.table_name.should.be.equal('FEATURESriversds');
