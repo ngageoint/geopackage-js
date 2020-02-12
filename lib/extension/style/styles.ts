@@ -1,37 +1,31 @@
-/**
- * @memberOf module:extension/style
- * @class Styles
- */
+import { StyleRow } from './styleRow';
+
 /**
  * Styles constructor
  * @constructor
  */
-class Styles {
-  constructor() {
-    this.defaultStyle = null;
-    this.styles = {};
-  }
-  setDefault(styleRow) {
+export class Styles {
+  defaultStyle: StyleRow = null;
+  styles: {} = {};
+  setDefault(styleRow: StyleRow): void {
     this.defaultStyle = styleRow;
   }
-  getDefault() {
+  getDefault(): StyleRow {
     return this.defaultStyle;
   }
-  setStyle(styleRow, geometryType) {
+  setStyle(styleRow: StyleRow, geometryType: string): void {
     if (geometryType != null) {
       if (styleRow != null) {
         this.styles[geometryType] = styleRow;
-      }
-      else {
+      } else {
         delete this.styles[geometryType];
       }
-    }
-    else {
+    } else {
       this.setDefault(styleRow);
     }
   }
-  getStyle(geometryType) {
-    var styleRow = null;
+  getStyle(geometryType: string): StyleRow {
+    let styleRow = null;
     if (geometryType != null) {
       styleRow = this.styles[geometryType];
     }
@@ -40,9 +34,7 @@ class Styles {
     }
     return styleRow;
   }
-  isEmpty() {
+  isEmpty(): boolean {
     return Object.keys(this.styles).length === 0 && this.defaultStyle === null;
   }
 }
-
-module.exports = Styles;

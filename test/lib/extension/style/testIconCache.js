@@ -2,7 +2,7 @@ import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
-  , IconCache = require('../../../../lib/extension/style/iconCache')
+  , IconCache = require('../../../../lib/extension/style/iconCache').IconCache
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path')

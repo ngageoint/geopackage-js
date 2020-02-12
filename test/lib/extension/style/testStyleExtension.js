@@ -5,10 +5,10 @@ import {FeatureStyleExtension} from '../../../../lib/extension/style'
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').StyleMappingTable
   , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
-  , Styles = require('../../../../lib/extension/style/styles')
-  , Icons = require('../../../../lib/extension/style/icons')
-  , FeatureStyles = require('../../../../lib/extension/style/featureStyles')
-  , FeatureStyle = require('../../../../lib/extension/style/featureStyle')
+  , Styles = require('../../../../lib/extension/style/styles').Styles
+  , Icons = require('../../../../lib/extension/style/icons').Icons
+  , FeatureStyles = require('../../../../lib/extension/style/featureStyles').FeatureStyles
+  , FeatureStyle = require('../../../../lib/extension/style/featureStyle').FeatureStyle
   , IconTable = require('../../../../lib/extension/style/iconTable').IconTable
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').ContentsIdDao
   // , testSetup = require('../../../fixtures/testSetup')
@@ -445,6 +445,7 @@ describe('StyleExtension Tests', function() {
     var featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
     should.exist(featureStyles.getStyles());
+    console.log('featureStyles.getIcons()', featureStyles.getIcons());
     should.not.exist(featureStyles.getIcons());
     var tableStyles = featureTableStyles.getTableStyles();
     should.exist(tableStyles);

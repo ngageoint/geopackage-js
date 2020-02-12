@@ -2,10 +2,10 @@
  * @memberOf module:extension/style
  * @class FeatureStyleExtension
  */
-import FeatureStyles from './featureStyles';
-import FeatureStyle from './featureStyle';
-import Styles from './styles';
-import Icons from './icons';
+import { FeatureStyles } from './featureStyles';
+import { FeatureStyle } from './featureStyle';
+import { Styles } from './styles';
+import { Icons } from './icons';
 import { FeatureStyleExtension } from '.';
 import { GeoPackage } from '../../geoPackage';
 import { ExtendedRelation } from '../relatedTables/extendedRelation';

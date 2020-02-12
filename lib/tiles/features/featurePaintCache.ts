@@ -1,28 +1,25 @@
-/**
- * Feature Paint Cache.
- * @module tiles/features
- */
-const FeaturePaint = require('./featurePaint');
-
+import { StyleRow } from '../../extension/style/styleRow';
+import { FeaturePaint } from './featurePaint';
+import { FeatureDrawType } from './featureDrawType';
+import { Paint } from './paint';
 /**
  * Constructor, created with cache size of {@link #DEFAULT_CACHE_SIZE}
  * @constructor
  */
-class FeaturePaintCache {
+export class FeaturePaintCache {
+  static DEFAULT_STYLE_PAINT_CACHE_SIZE = 100;
+  paintCache: { [key: number]: FeaturePaint } = {};
+  accessHistory: number[] = [];
   /**
    * @param {Number} size size of the cache
    */
-  constructor(size = null) {
-    this.cacheSize = size !== null ? size : FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE;
-    this.paintCache = {};
-    this.accessHistory = [];
-  }
+  constructor(public cacheSize = FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE) {}
   /**
    * Get the cached featurePaint for the style row or null if not cached
    * @param {module:extension/style~StyleRow} styleRow style row
    * @return {module:tiles/features~FeaturePaint} feature paint or null
    */
-  getFeaturePaintForStyleRow(styleRow) {
+  getFeaturePaintForStyleRow(styleRow: StyleRow): FeaturePaint {
     return this.getFeaturePaint(styleRow.getId());
   }
   /**
@@ -30,7 +27,7 @@ class FeaturePaintCache {
    * @param {Number} styleRowId style row id
    * @return {module:tiles/features~FeaturePaint} feature paint or null
    */
-  getFeaturePaint(styleRowId) {
+  getFeaturePaint(styleRowId: number): FeaturePaint {
     const featurePaint = this.paintCache[styleRowId];
     if (featurePaint) {
       const index = this.accessHistory.indexOf(styleRowId);
@@ -47,7 +44,7 @@ class FeaturePaintCache {
    * @param {module:tiles/features~FeatureDrawType} type feature draw type
    * @return {module:tiles/features~Paint} paint
    */
-  getPaintForStyleRow(styleRow, type) {
+  getPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType): Paint {
     return this.getPaint(styleRow.getId(), type);
   }
   /**
@@ -56,7 +53,7 @@ class FeaturePaintCache {
    * @param {String} type feature draw type
    * @return {module:tiles/features~Paint} paint
    */
-  getPaint(styleId, type) {
+  getPaint(styleId: number, type: FeatureDrawType): Paint {
     let paint = null;
     const featurePaint = this.getFeaturePaint(styleId);
     if (featurePaint !== undefined && featurePaint !== null) {
@@ -70,7 +67,7 @@ class FeaturePaintCache {
    * @param {module:tiles/features~FeatureDrawType} type feature draw type
    * @param {module:tiles/features~Paint} paint paint
    */
-  setPaintForStyleRow(styleRow, type, paint) {
+  setPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType, paint: Paint): void {
     this.setPaint(styleRow.getId(), type, paint);
   }
   /**
@@ -79,7 +76,7 @@ class FeaturePaintCache {
    * @param {module:tiles/features~FeatureDrawType} type feature draw type
    * @param {module:tiles/features~Paint} paint paint
    */
-  setPaint(styleRowId, type, paint) {
+  setPaint(styleRowId: number, type: FeatureDrawType, paint: Paint): void {
     let featurePaint = this.paintCache[styleRowId];
     if (!featurePaint) {
       featurePaint = new FeaturePaint();
@@ -104,7 +101,7 @@ class FeaturePaintCache {
    * @param {Number} styleRowId style row id
    * @return {module:tiles/features~FeaturePaint} removed feature paint or null
    */
-  remove(styleRowId) {
+  remove(styleRowId: number): FeaturePaint {
     const removed = this.paintCache[styleRowId];
     delete this.paintCache[styleRowId];
     if (removed) {
@@ -118,7 +115,7 @@ class FeaturePaintCache {
   /**
    * Clear the cache
    */
-  clear() {
+  clear(): void {
     this.paintCache = {};
     this.accessHistory = [];
   }
@@ -126,7 +123,7 @@ class FeaturePaintCache {
    * Resize the cache
    * @param {Number} maxSize max size
    */
-  resize(maxSize) {
+  resize(maxSize: number): void {
     this.cacheSize = maxSize;
     const keys = Object.keys(this.paintCache);
     if (keys.length > maxSize) {
@@ -140,7 +137,3 @@ class FeaturePaintCache {
     }
   }
 }
-
-FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE = 100;
-
-module.exports = FeaturePaintCache;

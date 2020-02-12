@@ -15,10 +15,10 @@ import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { StyleTableReader } from './styleTableReader';
 import { UserTableReader } from '../../user/userTableReader';
 import { FeatureTable } from '../../features/user/featureTable';
-import FeatureStyles from './featureStyles';
-import FeatureStyle from './featureStyle';
-import Styles from './styles';
-import Icons from './icons';
+import { FeatureStyles } from './featureStyles';
+import { FeatureStyle } from './featureStyle';
+import { Styles } from './styles';
+import { Icons } from './icons';
 import { IconRow } from './iconRow';
 import { FeatureRow } from '../../features/user/featureRow';
 import { RelatedTablesExtension } from '../relatedTables';
@@ -629,7 +629,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
       for (let i = 0; i < styleMappingRows.length; i++) {
         const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
-        const iconRow = iconDao.queryForId(styleMappingRow.getRelatedId());
+        const iconRow = iconDao.queryForId(styleMappingRow.getRelatedId()) as IconRow;
         if (styleMappingRow.getGeometryTypeName() === null) {
           icons.setDefault(iconRow);
         } else {
@@ -655,7 +655,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
       for (let i = 0; i < styleMappingRows.length; i++) {
         const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
-        const styleRow = styleDao.queryForId(styleMappingRow.getRelatedId());
+        const styleRow = styleDao.queryForId(styleMappingRow.getRelatedId()) as StyleRow;
         if (styleMappingRow.getGeometryTypeName() === null) {
           styles.setDefault(styleRow);
         } else {

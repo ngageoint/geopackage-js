@@ -1,14 +1,25 @@
-export class FeatureDrawType {
+export enum FeatureDrawType {
   /**
    * Circle for a point
    */
-  public static readonly CIRCLE: string = 'CIRCLE';
+  CIRCLE = 'CIRCLE',
   /**
    * Stroke for a line of polygon
    */
-  public static readonly STROKE: string = 'STOKE';
+  STROKE = 'STROKE',
   /**
    * Fill for a polygon
    */
-  public static readonly FILL: string = 'FILL';
+  FILL = 'FILL',
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace FeatureDrawType {
+  export function nameFromType(type: FeatureDrawType): string {
+    return FeatureDrawType[type];
+  }
+
+  export function fromName(type: string): FeatureDrawType {
+    return FeatureDrawType[type];
+  }
 }

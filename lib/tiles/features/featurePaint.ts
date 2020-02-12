@@ -1,17 +1,18 @@
+import { FeatureDrawType } from './featureDrawType';
+import { Paint } from './paint';
+
 /**
  * FeaturePaint module.
  * @module tiles/features
  */
-class FeaturePaint {
-  constructor() {
-    this.featurePaints = {};
-  }
+export class FeaturePaint {
+  featurePaints: { [key: string]: Paint } = {};
   /**
    * Get the feature paint for the featureDrawType
    * @param {module:tiles/features~FeatureDrawType} featureDrawType
    * @return {module:tiles/features~FeaturePaint} paint
    */
-  getPaint(featureDrawType) {
+  getPaint(featureDrawType: FeatureDrawType): Paint {
     return this.featurePaints[featureDrawType];
   }
   /**
@@ -19,9 +20,7 @@ class FeaturePaint {
    * @param {module:tiles/features~FeatureDrawType} featureDrawType
    * @param {module:tiles/features~Paint} paint
    */
-  setPaint(featureDrawType, paint) {
+  setPaint(featureDrawType: FeatureDrawType, paint: Paint): void {
     this.featurePaints[featureDrawType] = paint;
   }
 }
-
-module.exports = FeaturePaint;

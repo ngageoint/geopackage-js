@@ -1,4 +1,7 @@
-var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache')
+import { StyleRow } from '../../../../lib/extension/style/styleRow';
+import { StyleTable } from '../../../../lib/extension/style/styleTable';
+
+var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
   , Paint = require('../../../../lib/tiles/features/paint').Paint
   , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
   , should = require('chai').should();
@@ -26,11 +29,13 @@ describe('FeaturePaintCache Tests', function() {
   it('should test paint cache should return paint for style row id', function() {
     var featurePaintCache = new FeaturePaintCache();
     var paint = new Paint();
-    var styleRow = {
-      getId: function() {
+    
+    class MockStyleRow extends StyleRow {
+      getId() {
         return 0;
       }
-    };
+    }
+    var styleRow = new MockStyleRow(new StyleTable('test', []), null);
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
     should.not.exist(featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint));
     should.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));

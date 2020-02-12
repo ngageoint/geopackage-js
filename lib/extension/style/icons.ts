@@ -1,3 +1,5 @@
+import { IconRow } from './iconRow';
+
 /**
  * @memberOf module:extension/style
  * @class Icons
@@ -6,32 +8,28 @@
  * Icons constructor
  * @constructor
  */
-class Icons {
-  constructor() {
-    this.defaultIcon = null;
-    this.icons = {};
-  }
-  setDefault(iconRow) {
+export class Icons {
+  defaultIcon: IconRow = null;
+  icons: {} = {};
+  setDefault(iconRow: IconRow): void {
     this.defaultIcon = iconRow;
   }
-  getDefault() {
+  getDefault(): IconRow {
     return this.defaultIcon;
   }
-  setIcon(iconRow, geometryType) {
+  setIcon(iconRow: IconRow, geometryType: string): void {
     if (geometryType != null) {
       if (iconRow != null) {
         this.icons[geometryType] = iconRow;
-      }
-      else {
+      } else {
         delete this.icons[geometryType];
       }
-    }
-    else {
+    } else {
       this.setDefault(iconRow);
     }
   }
-  getIcon(geometryType) {
-    var iconRow = null;
+  getIcon(geometryType: string): IconRow {
+    let iconRow = null;
     if (geometryType != null) {
       iconRow = this.icons[geometryType];
     }
@@ -40,14 +38,7 @@ class Icons {
     }
     return iconRow;
   }
-  isEmpty() {
+  isEmpty(): boolean {
     return Object.keys(this.icons).length === 0 && this.defaultIcon === null;
   }
 }
-
-
-
-
-
-
-module.exports = Icons;

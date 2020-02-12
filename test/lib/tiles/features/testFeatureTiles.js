@@ -481,19 +481,6 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.getPolygonFillColor().should.be.equal('#00FF00FF')
       ft.setPolygonStrokeWidth(5);
       ft.getPolygonStrokeWidth().should.be.equal(5);
-      class MockStyleRow extends StyleRow {
-        getId() {
-          return 0;
-        }
-      }
-      class MockStyleTable extends StyleTable {
-
-      }
-      var st = new MockStyleTable('table', []);
-      var sr = new MockStyleRow(st);
-      (function() {
-        ft.getStylePaint(sr, 'INVALID');
-      }).should.throw("Unsupported Draw Type: " + 'INVALID');
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {

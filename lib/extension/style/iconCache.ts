@@ -1,3 +1,4 @@
+import { IconRow } from './iconRow';
 /**
  * @memberOf module:extension/style
  * @class IconCache
@@ -6,18 +7,18 @@
  * Constructor, created with cache size of {@link #IconCache.DEFAULT_CACHE_SIZE}
  * @constructor
  */
-class IconCache {
-  constructor(size = null) {
-    this.cacheSize = size !== null ? size : IconCache.DEFAULT_CACHE_SIZE;
-    this.iconCache = {};
-    this.accessHistory = [];
-  }
+export class IconCache {
+  public static DEFAULT_CACHE_SIZE = 100;
+  iconCache: { [key: number]: any } = {};
+  accessHistory: number[] = [];
+
+  constructor(public cacheSize = IconCache.DEFAULT_CACHE_SIZE) {}
   /**
    * Get the cached image for the icon row or null if not cached
    * @param {module:extension/style.IconRow} iconRow icon row
    * @return {Image} icon image or null
    */
-  getIconForIconRow(iconRow) {
+  getIconForIconRow(iconRow: IconRow): any {
     return this.get(iconRow.getId());
   }
   /**
@@ -25,10 +26,10 @@ class IconCache {
    * @param {Number} iconRowId icon row id
    * @return {Image} icon image or null
    */
-  get(iconRowId) {
-    var image = this.iconCache[iconRowId];
+  get(iconRowId: number): any {
+    const image = this.iconCache[iconRowId];
     if (image) {
-      var index = this.accessHistory.indexOf(iconRowId);
+      const index = this.accessHistory.indexOf(iconRowId);
       if (index > -1) {
         this.accessHistory.splice(index, 1);
       }
@@ -42,7 +43,7 @@ class IconCache {
    * @param {Image} image icon image
    * @return {Image} previous cached icon image or null
    */
-  putIconForIconRow(iconRow, image) {
+  putIconForIconRow(iconRow: IconRow, image: any): any {
     return this.put(iconRow.getId(), image);
   }
   /**
@@ -51,18 +52,18 @@ class IconCache {
    * @param {Image} image icon image
    * @return {Image} previous cached icon image or null
    */
-  put(iconRowId, image) {
-    var previous = this.iconCache[iconRowId];
+  put(iconRowId: number, image: any): any {
+    const previous = this.iconCache[iconRowId];
     this.iconCache[iconRowId] = image;
     if (previous) {
-      var index = this.accessHistory.indexOf(iconRowId);
+      const index = this.accessHistory.indexOf(iconRowId);
       if (index > -1) {
         this.accessHistory.splice(index, 1);
       }
     }
     this.accessHistory.push(iconRowId);
     if (Object.keys(this.iconCache).length > this.cacheSize) {
-      var iconId = this.accessHistory.shift();
+      const iconId = this.accessHistory.shift();
       if (iconId) {
         delete this.iconCache[iconId];
       }
@@ -74,7 +75,7 @@ class IconCache {
    * @param {module:extension/style.IconRow} iconRow icon row
    * @return {Image} removed icon image or null
    */
-  removeIconForIconRow(iconRow) {
+  removeIconForIconRow(iconRow: IconRow): any {
     return this.remove(iconRow.getId());
   }
   /**
@@ -82,11 +83,11 @@ class IconCache {
    * @param {Number} iconRowId icon row id
    * @return {Image} removed icon image or null
    */
-  remove(iconRowId) {
-    var removed = this.iconCache[iconRowId];
+  remove(iconRowId: number): any {
+    const removed = this.iconCache[iconRowId];
     delete this.iconCache[iconRowId];
     if (removed) {
-      var index = this.accessHistory.indexOf(iconRowId);
+      const index = this.accessHistory.indexOf(iconRowId);
       if (index > -1) {
         this.accessHistory.splice(index, 1);
       }
@@ -96,7 +97,7 @@ class IconCache {
   /**
    * Clear the cache
    */
-  clear() {
+  clear(): void {
     this.iconCache = {};
     this.accessHistory = [];
   }
@@ -104,12 +105,12 @@ class IconCache {
    * Resize the cache
    * @param {Number} maxSize max size
    */
-  resize(maxSize) {
+  resize(maxSize: number): void {
     this.cacheSize = maxSize;
-    var keys = Object.keys(this.iconCache);
+    const keys = Object.keys(this.iconCache);
     if (keys.length > maxSize) {
-      var numberToRemove = keys.length - maxSize;
-      for (var i = 0; i < numberToRemove; i++) {
+      const numberToRemove = keys.length - maxSize;
+      for (let i = 0; i < numberToRemove; i++) {
         delete this.iconCache[this.accessHistory.shift()];
       }
     }
@@ -119,7 +120,7 @@ class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  createIcon(icon) {
+  async createIcon(icon: IconRow): Promise<any> {
     return this.createAndCacheIcon(icon, this);
   }
   /**
@@ -128,7 +129,7 @@ class IconCache {
    * @param {Number} scale scale factor
    * @return {Promise<Image>} icon image
    */
-  createScaledIcon(icon, scale) {
+  async createScaledIcon(icon: IconRow, scale: number): Promise<any> {
     return this.createAndCacheScaledIcon(icon, scale, this);
   }
   /**
@@ -136,7 +137,7 @@ class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  createIconNoCache(icon) {
+  async createIconNoCache(icon: IconRow): Promise<any> {
     return this.createScaledIconNoCache(icon, 1.0);
   }
   /**
@@ -145,7 +146,7 @@ class IconCache {
    * @param scale scale factor
    * @return {Promise<Image>} icon image
    */
-  createScaledIconNoCache(icon, scale) {
+  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<any> {
     return this.createAndCacheScaledIcon(icon, scale, null);
   }
   /**
@@ -154,7 +155,7 @@ class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  createAndCacheIcon(icon, iconCache) {
+  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<any> {
     return this.createAndCacheScaledIcon(icon, 1.0, iconCache);
   }
   /**
@@ -164,15 +165,15 @@ class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  async createAndCacheScaledIcon(icon, scale, iconCache) {
-    var iconImage = null;
+  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<any> {
+    let iconImage = null;
     if (icon != null) {
-      var iconId = icon.getId();
+      const iconId = icon.getId();
       if (iconCache !== null) {
         iconImage = iconCache.get(iconId);
       }
-      var iconScaledWidth = Math.round(icon.getWidth() * scale);
-      var iconScaledHeight = Math.round(icon.getHeight() * scale);
+      const iconScaledWidth = Math.round(icon.getWidth() * scale);
+      const iconScaledHeight = Math.round(icon.getHeight() * scale);
       if (!iconImage || iconImage.width !== iconScaledWidth || iconImage.height !== iconScaledHeight) {
         iconImage = await icon.getScaledDataImage(scale);
       }
@@ -183,21 +184,3 @@ class IconCache {
     return iconImage;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-IconCache.DEFAULT_CACHE_SIZE = 100;
-
-module.exports = IconCache;
