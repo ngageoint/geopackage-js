@@ -25,12 +25,5 @@
   ],
   "exclude": [
       "./lib/wkb"
-  ],
-  "typedocOptions": {
-      "mode": "file",
-      "out": "docs/api-docs",
-      "exclude": "./test/**/*",
-      "excludePrivate": true,
-      "includeVersion": true
-  }
+  ]
 }

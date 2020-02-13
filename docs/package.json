@@ -26,6 +26,7 @@
   "devDependencies": {
     "browserify": "^14.1.0",
     "browserify-css": "^0.9.1",
+    "typedoc": "^0.15.4",
     "typescript": "3.7.5"
   },
   "browserify": {
@@ -34,10 +35,11 @@
     ]
   },
   "scripts": {
-    "create": "npm install --no-optional",
+    "create": "npm install --no-optional && npm run typedoc --options typedoc.json",
     "postinstall": "npm run build",
     "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
     "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js",
-    "tsc": "rm -rf ./built && tsc"
+    "tsc": "rm -rf ./built && tsc",
+    "typedoc": "rm -rf ./api-docs && typedoc"
   }
 }
