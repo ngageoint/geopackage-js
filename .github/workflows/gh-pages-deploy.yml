@@ -1,6 +1,9 @@
 name: GH Pages Deploy
 
-on: [push]
+on: 
+  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -15,7 +18,7 @@ jobs:
       run: npm run gh-pages-build
     - name: Deploy To gh-pages branch
       uses: peaceiris/actions-gh-pages@v3
-      env:
+      with:
         deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         publish_branch: gh-pages
         publish_dir: ./docs
