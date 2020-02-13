@@ -28,10 +28,9 @@
   ],
   "typedocOptions": {
       "mode": "file",
-      "out": "docs-ts",
+      "out": "docs/api-docs",
       "exclude": "./test/**/*",
       "excludePrivate": true,
-      "includeVersion": true,
-      "theme": "node_modules/igniteui-typedoc-theme"
+      "includeVersion": true
   }
 }

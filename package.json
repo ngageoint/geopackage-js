@@ -113,7 +113,7 @@
   },
   "scripts": {
     "gh-pages-build": "npm run create --prefix docs",
-    "postgh-pages-build": "npm run doc --prefix jsdoc && rm -rf ./docs/node_modules",
+    "postgh-pages-build": "npm run typedoc",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage",
     "test-sqlnode": "nyc --no-clean mocha -r ts-node/register",
     "test-sqljs": "FORCE_SQLJS=true nyc --no-clean mocha -r ts-node/register",
@@ -124,7 +124,7 @@
     "posttest": "npm run tsc",
     "report": "nyc report",
     "tsc": "rm -rf ./built && tsc",
-    "typedoc": "rm -rf ./docs-ts && typedoc",
+    "typedoc": "rm -rf ./docs/api-docs && typedoc",
     "build-browserify": "npm run tsc && browserify -t browserify-css ./built/index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage-browserify.js",
     "no-prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js",
     "prepare": "rm -rf ./built && tsc"
