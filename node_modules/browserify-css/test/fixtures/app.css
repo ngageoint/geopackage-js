@@ -1,0 +1,26 @@
+/**
+ * app.css
+ */
+
+* {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: red;
+  background-image: url("background.png");
+  font-size: 18px;
+}
+
+p {
+  color: purple !important;
+}
+
+@media screen and (min-width: 600px) {
+  body {
+    background-color: green;
+    background-image: url("background-600.png");
+    font-size: 21px;
+  }
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1;"/>
+    <title>Leaflet Basemaps Control</title>
+    <link rel="stylesheet" href="//unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="../L.Control.Basemaps.css" />
+</head>
+<body>
+    <script src="//unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="../L.Control.Basemaps.js"></script>
+    <div id="map" style="position: absolute; top: 0; left:0; bottom:0; right: 0;"></div>
+
+    <script>
+        var map = L.map('map').setView([44.07, -118.78], 5);
+
+        var basemaps = [
+            L.tileLayer('//stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                subdomains: 'abcd',
+                maxZoom: 20,
+                minZoom: 0,
+                label: 'Toner'
+            }),
+            L.tileLayer('//stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.png', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+                subdomains: 'abcd',
+                maxZoom: 16,
+                minZoom: 1,
+                label: 'Watercolor'
+            })
+        ];
+
+        map.addControl(L.control.basemaps({
+            basemaps: basemaps,
+            tileX: 0,
+            tileY: 0,
+            tileZ: 1
+        }));
+
+    </script>
+</body>
+</html>

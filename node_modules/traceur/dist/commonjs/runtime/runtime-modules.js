@@ -1,0 +1,13 @@
+"use strict";
+require("./symbols.js");
+require("./classes.js");
+require("./exportStar.js");
+require("./properTailCalls.js");
+require("./relativeRequire.js");
+require("./spread.js");
+require("./destructuring.js");
+require("./async.js");
+require("./generators.js");
+require("./spawn.js");
+require("./template.js");
+require("./jsx.js");

@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GeoPackage JS</title>
+  <title>GeoPackage Viewer</title>
+  <meta name="description" content="Online GeoPackage viewer. This viewer is able to open GeoPackage files and convert certain types of files to GeoPackages. Powered by a JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
+  <meta name="keywords" content="GeoPackage,GeoPackage JS,javascript,GeoPackage Viewer,Geo Package,NGA,open source">
+  <meta name="author" content="NGA, Daniel Barela">
   <meta name="twitter:site" content="@nga_geoint">
   <meta property="og:site_name" content="NGA">
   <meta name="twitter:url" content="http://ngageoint.github.io/geopackage-js/">
   <meta property="og:url" content="http://ngageoint.github.io/geopackage-js/">
-  <meta name="twitter:title" content="GeoPackage JS">
-  <meta property="og:title" content="GeoPackage JS">
-  <meta name="twitter:description" content="JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
-  <meta property="og:description" content="JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
+  <meta name="twitter:title" content="GeoPackage Viewer">
+  <meta property="og:title" content="GeoPackage Viewer">
+  <meta name="twitter:description" content="Online GeoPackage viewer. This viewer is able to open GeoPackage files and convert certain types of files to GeoPackages. Powered by a JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
+  <meta property="og:description" content="Online GeoPackage viewer. This viewer is able to open GeoPackage files and convert certain types of files to GeoPackages. Powered by a JavaScript library providing GeoPackage functionality and utilities to node and web applications.">
   <meta name="twitter:image" content="http://ngageoint.github.io/geopackage-js/geopackage-js.png">
   <meta property="og:image" content="http://ngageoint.github.io/geopackage-js/geopackage-js.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta property="og:type" content="website">
+
+  <script>
+    function ga() {};
+    ga('send', 'pageview');
+
+  </script>
+
+
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
   <link rel="stylesheet" type="text/css" href="app.css"/>
 </head>
@@ -24,9 +35,37 @@
 
   <div class="side-bar">
     <div style="padding-top: 7px; padding-right: 100px; padding-left: 4px; padding-bottom: 7px;">
+      <div style="font-size: 14px; font-weight: bold;">
+        <div style="padding: 7px;">
+          <a href="./jsdoc/module-api.html" target="_blank">API Documentation</a>
+        </div>
+      </div>
+
+      <div style="padding: 7px; font-size: 14px;">
+        You can load a GeoPackage directly from a URL by including a gpkg parameter in the URL.  Specify which layers (if any) you would like to load with layers parameters.
+      </div>
+      <div style="padding: 7px; font-size: 14px;">
+        For Example <a target="_blank" href="http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers">http://ngageoint.github.io/geopackage-js/?gpkg=http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg&layers=rivers</a>
+      </div>
+
+      <div style="font-size: 12px; display: none;" id="loadFromUrl">
+        <div style="padding: 3px;">
+          Loading GeoPackage from: <span id="geoPackageFromUrl"></span>
+          <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
+        </div>
+      </div>
+
       <div style="padding: 7px;">
         <input type="file" name="file" id="file" class="inputfile" onchange="loadGeoPackage(this.files)"/>
-        <label id="choose-label" for="file">Open a GeoPackage</label>
+        <label id="choose-label" for="file"><span>Open a GeoPackage or Convert a Supported File Type </span> <i style="display: none;" class="fa fa-spinner fa-pulse"></i></label>
+      </div>
+      <div style="padding: 7px">
+        <span style="font-size: 12px;">Supported file types for conversion are GeoJSON, Shapefile, Shapefile Zip, MBTiles</span>
+      </div>
+      <div style="padding: 7px;" id="status" class="gone">
+      </div>
+      <div style="padding: 7px;" id="download" class="gone">
+        <a href="javascript:void(0);" onclick="saveGeoPackage()">Download As GeoPackage</a>
       </div>
 
       <div style="padding: 7px;">
@@ -56,27 +95,29 @@
           <i style="display: none;" class="fa fa-spinner fa-pulse"></i>
         </div> -->
 
-        <span>More sample GeoPackages can be found at <a href="http://www.geopackage.org/#sampledata">http://www.geopackage.org/#sampledata</a></span>
+        <span>More GeoPackages can be found at <a href="http://www.geopackage.org/data.html">http://www.geopackage.org/data.html</a></span>
       </div>
     </div>
     <div id="information" class="information hidden">
       <hr>
       <div class="tableGroup">
-      <div id="tile-tables"></div>
+        <div id="tile-tables"></div>
       </div>
       <div class="tableGroup">
-      <div id="feature-tables"></div>
+        <div id="feature-tables"></div>
+      </div>
     </div>
   </div>
-</div>
 
   <a href="https://github.com/ngageoint/geopackage-js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 
   <script type="text/javascript" src="gp.js"></script>
   <script type="text/javascript" src="common.js"></script>
+  <!-- <script type="text/javascript" src="built/viewer.js"></script> -->
 
   <script id="feature-table-template" type="x-tmpl-mustache">
   <div>
+    <div class="status" id="status-{{tableName}}"><span></span></div>
     <div class="onoffswitch" style="display: inline-block;">
       <input type="checkbox" name="onoffswitch-{{tableName}}" class="onoffswitch-checkbox" id="myonoffswitch-{{tableName}}" onchange="toggleLayer('feature', '{{tableName}}')">
       <label class="onoffswitch-label" for="myonoffswitch-{{tableName}}">
@@ -84,7 +125,7 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
+    <div id="feature-{{tableName}}" class="table-name" style="display: inline-block;">Feature Table: {{tableName}} (<span class="count">{{count}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a><a id="zoom-{{tableName}}" style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a><a style="padding-left: 7px" href="javascript:void(0);" onclick="downloadGeoJSON('{{tableName}}')">Download Layer as GeoJSON</a></div>
     <div class="table-info" style="display: none;">
       <div class="tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.features').hide();; $(this).parent().find('.tab').toggleClass('active');">Metadata</div>
       <div class="tab" style="display: inline-block;" onclick="$(this).parent().find('.features').show(); $(this).parent().find('.metadata').hide(); loadFeatures('{{tableName}}', $(this).parent().find('.features')); $(this).parent().find('.tab').toggleClass('active');">Features</div>
@@ -142,6 +183,7 @@
             <div class="column">
               <div class="item"><span class="label">Index: </span><span class="value">{{index}}</span></div>
               <div class="item"><span class="label">Name: </span><span class="value">{{name}}</span></div>
+              <div class="item"><span class="label">Data Type: </span><span class="value">{{dataType}}</span></div>
               <div class="item"><span class="label">Max: </span><span class="value">{{max}}</span></div>
               <div class="item"><span class="label">Not Null: </span><span class="value">{{notNull}}</span></div>
               <div class="item"><span class="label">Default Value: </span><span class="value">{{defaultValue}}</span></div>
@@ -169,7 +211,7 @@
   </div>
   </script>
   <script id="all-features-template" type="x-tmpl-mustache">
-    <table onmouseout="clearHighlights()">
+    <table id="{{tableName}}-feature-table" onmouseout="clearHighlights()">
       <thead>
         <tr>
           <th></th>
@@ -179,14 +221,22 @@
         </tr>
       </thead>
       {{#features}}
-      <tr onmouseover="highlightFeature({{id}}, '{{tableName}}')" ondblclick="zoomToFeature({{id}}, '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
-      <td><i class="fa fa-circle-o" onclick="toggleFeature({{id}}, '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
+      <tr onmouseover="highlightFeature('{{id}}', '{{tableName}}')" ondblclick="zoomToFeature('{{id}}', '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
+      <td><i class="fa fa-circle-o" onclick="toggleFeature('{{id}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
         {{#values}}
-          <td>{{.}}</td>
+          <td>{{{.}}}</td>
         {{/values}}
       </tr>
       {{/features}}
     </table>
+  </script>
+  <script id="feature-template" type="x-tmpl-mustache">
+    <tr onmouseover="highlightFeature('{{id}}', '{{tableName}}')" ondblclick="zoomToFeature('{{id}}', '{{tableName}}'); $(this).parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o'); $(this).find('.fa').removeClass('fa-circle-o').addClass('fa-check-circle');">
+    <td><i class="fa fa-circle-o" onclick="toggleFeature('{{id}}', '{{tableName}}'); if ($(this).hasClass('fa-circle-o')) { $(this).parent().parent().parent().find('.fa-check-circle').removeClass('fa-check-circle').addClass('fa-circle-o');} $(this).toggleClass('fa-circle-o').toggleClass('fa-check-circle');"></i></td>
+      {{#values}}
+        <td>{{{.}}}</td>
+      {{/values}}
+    </tr>
   </script>
   <script id="tile-table-template" type="x-tmpl-mustache">
   <div>
@@ -197,7 +247,7 @@
         <span class="onoffswitch-switch"></span>
       </label>
     </div>
-    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minZoom}} - {{maxZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
+    <div id="tile-{{tableName}}" class="table-name" style="display: inline-block;">Tile Table: {{tableName}} (<span>Zoom: {{minWebMapZoom}} - {{maxWebMapZoom}}</span>) <a href="javascript:void(0);" onclick="$(this).parent().next().toggle()">details</a> <a id="zoom-{{tableName}}" style="padding-left: 7px" href="javascript:void(0);" onclick="zoomTo({{contents.minX}}, {{contents.minY}}, {{contents.maxX}}, {{contents.maxY}}, '{{contents.srs.organization}}:{{contents.srs.organization_coordsys_id}}')">zoom to</a></div>
     <div class="table-info" style="display: none;">
       <div class="tab metadata-tab active" style="display: inline-block;" onclick="$(this).parent().find('.metadata').show(); $(this).parent().find('.tileListing').hide(); $(this).parent().find('.metadata-tab').addClass('active'); $(this).parent().find('.tile-tab').removeClass('active'); unregisterTileTable('{{tableName}}')">Metadata</div>
       <div class="tab tile-tab" style="display: inline-block;" onclick="$(this).parent().find('.tileListing').show(); $(this).parent().find('.metadata').hide(); loadZooms('{{tableName}}', $(this).parent().find('.tileListing')); $(this).parent().find('.tile-tab').addClass('active'); $(this).parent().find('.metadata-tab').removeClass('active'); registerTileTable('{{tableName}}', $(this).parent().find('.tileListing'));">Tiles</div>
@@ -207,8 +257,10 @@
           <div class="section">
             <div class="item"><span class="label">Total Tiles: </span><span class="value">{{count}}</span></div>
             <div class="item"><span class="label">Zoom Levels: </span><span class="value">{{zoomLevels}}</span></div>
-            <div class="item"><span class="label">Min Zoom: </span><span class="value">{{minZoom}}</span></div>
-            <div class="item"><span class="label">Max Zoom: </span><span class="value">{{maxZoom}}</span></div>
+            <div class="item"><span class="label">Min GeoPackage File Zoom: </span><span class="value">{{minZoom}}</span></div>
+            <div class="item"><span class="label">Max GeoPackage File Zoom: </span><span class="value">{{maxZoom}}</span></div>
+            <div class="item"><span class="label">Min Web Map Zoom: </span><span class="value">{{minWebMapZoom}}</span></div>
+            <div class="item"><span class="label">Max Web Map Zoom: </span><span class="value">{{maxWebMapZoom}}</span></div>
           </div>
         </div>
         <div class="srs">
@@ -305,5 +357,25 @@
       {{/tiles}}
     </table>
   </script>
+
+  <!-- Matomo -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+  _paq.push(["setCookieDomain", "*.ngageoint.github.io"]);
+  _paq.push(["setDomains", ["*.ngageoint.github.io/geopackage-js"]]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://gasmetrics.nga.mil/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '244']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//gasmetrics.nga.mil/piwik/piwik.php?idsite=244&rec=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Matomo Code -->
 </body>
 </html>

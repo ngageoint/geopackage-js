@@ -1,0 +1,28 @@
+.basemaps {
+    padding: 4px;
+}
+.basemaps.closed .basemap {
+    display: none;
+}
+.basemaps.closed .basemap.alt {
+    display: inline-block;
+}
+.basemaps.closed .basemap.alt h4 {
+    display: none;
+}
+
+.basemap {
+    display: inline-block; /* todo: flexbox? */
+    cursor: pointer;
+}
+.basemap.active img {
+    border-color: orange;
+    box-shadow: 2px 2px 4px #000;
+}
+.basemap img {
+    width: 64px;
+    border: 2px solid #FFF;
+    margin: 0 2px;
+    border-radius: 40px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65)
+}

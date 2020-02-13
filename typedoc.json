@@ -1,0 +1,8 @@
+{
+  "mode": "file",
+  "out": "api-docs",
+  "includes": "../.",
+  "exclude": "../test/**/*",
+  "excludePrivate": true,
+  "includeVersion": true
+}

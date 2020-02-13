@@ -1,0 +1,183 @@
+#!/usr/bin/env node
+
+var inquirer = require('inquirer');
+var fs = require('fs');
+var async = require('async');
+var chalk = require('chalk');
+
+var geopackage = require('.')
+  , GeoPackageTileRetriever = geopackage.GeoPackageTileRetriever;
+
+console.log('GeoPackage Command Line');
+
+var gp;
+
+var tables;
+
+var fileQuestion = {
+  type: 'input',
+  name: 'file',
+  message: 'What is the path to the GeoPackage file?',
+  validate: function(input) {
+    var done = this.async();
+
+    async.series({
+      fileExists: function(callback) {
+        fs.stat(input, function(err, stats) {
+          if (err || !stats || !stats.isFile()) {
+            return callback('File does not exist.');
+          }
+          return callback(null, true);
+        });
+      },
+      geoPackage: function(callback) {
+        geopackage.openGeoPackage(input, function(err, result) {
+          if (err || !result) {
+            return callback('Invalid GeoPackage file.');
+          }
+          callback(null, result);
+        });
+      }
+    },
+    function(err, results) {
+      if (err) {
+        return done(err);
+      } else {
+        gp = results.geoPackage;
+        async.series({
+          tileTables: gp.getTileTables.bind(gp),
+          featureTables: gp.getFeatureTables.bind(gp)
+        }, function(err, results) {
+          tables = results;
+          return done(err, !!results);
+        });
+      }
+    });
+  }
+}
+
+inquirer.prompt([fileQuestion]).then(function (answers) {
+  var whichTable = {
+    type: 'list',
+    name: 'table',
+    message: 'Which table would you like to get info for?',
+    choices: []
+  };
+  for (var i = 0; i < tables.tileTables.length; i++) {
+    whichTable.choices.push({value: {name: tables.tileTables[i], type: 'tile'}, name: tables.tileTables[i] + ' - Tile Table', type: 'tile'});
+  }
+  for (var i = 0; i < tables.featureTables.length; i++) {
+    whichTable.choices.push({value: {name: tables.featureTables[i], type: 'feature'}, name: tables.featureTables[i] + ' - Feature Table'});
+  }
+  inquirer.prompt([whichTable]).then(function(answers) {
+    var method;
+    if (answers.table.type === 'feature') {
+      method = 'getFeatureDaoWithTableName';
+    } else if (answers.table.type === 'tile') {
+      method = 'getTileDaoWithTableName';
+    }
+    gp[method](answers.table.name, function(err, dao) {
+      gp.getInfoForTable(dao, function(err, info) {
+        if (answers.table.type === 'tile') {
+          console.log('\n'+chalk.bold(answers.table.name + ' Tile Table Information'));
+          console.log(chalk.gray('Total Tiles: ') + info.count);
+          console.log(chalk.gray('Zoom Levels: ') + info.zoomLevels);
+          console.log(chalk.gray('Min Zoom: ') + info.minZoom);
+          console.log(chalk.gray('Max Zoom: ') + info.maxZoom);
+
+          console.log('\n' + chalk.bold('Tile Matrix Set Bounds'));
+          console.log(chalk.gray('SRS ID: ') + info.tileMatrixSet.srsId);
+          console.log(chalk.gray('Min X: ') + info.tileMatrixSet.minX);
+          console.log(chalk.gray('Min Y : ') + info.tileMatrixSet.minY);
+          console.log(chalk.gray('Max X: ') + info.tileMatrixSet.maxX);
+          console.log(chalk.gray('Max Y: ') + info.tileMatrixSet.maxY);
+
+          console.log('\n'+chalk.bold('Tile Matrix Spatial Reference System'));
+          console.log(chalk.gray('SRS Name: ') + info.srs.count);
+          console.log(chalk.gray('SRS ID: ') + info.srs.id);
+          console.log(chalk.gray('Organization: ') + info.srs.organization);
+          console.log(chalk.gray('Coordsys ID: ') + info.srs.organization_coordsys_id);
+          console.log(chalk.gray('Definition: ') + info.srs.definition);
+          console.log(chalk.gray('Description: ') + info.srs.description);
+
+          console.log('\n'+chalk.bold('Contents'));
+          console.log(chalk.gray('Table Name: ') + info.contents.tableName);
+          console.log(chalk.gray('Data Type: ') + info.contents.dataType);
+          console.log(chalk.gray('Identifier: ') + info.contents.identifier);
+          console.log(chalk.gray('Description: ') + info.contents.description);
+          console.log(chalk.gray('Last Change: ') + info.contents.lastChange);
+          console.log(chalk.gray('Min X: ') + info.contents.minX);
+          console.log(chalk.gray('Min Y : ') + info.contents.minY);
+          console.log(chalk.gray('Max X: ') + info.contents.maxX);
+          console.log(chalk.gray('Max Y: ') + info.contents.maxY);
+
+          console.log('\n\t'+chalk.bold('Contents Spatial Reference System'));
+          console.log('\t'+chalk.gray('SRS Name: ') + info.contents.srs.count);
+          console.log('\t'+chalk.gray('SRS ID: ') + info.contents.srs.id);
+          console.log('\t'+chalk.gray('Organization: ') + info.contents.srs.organization);
+          console.log('\t'+chalk.gray('Coordsys ID: ') + info.contents.srs.organization_coordsys_id);
+          console.log('\t'+chalk.gray('Definition: ') + info.contents.srs.definition);
+          console.log('\t'+chalk.gray('Description: ') + info.contents.srs.description);
+
+          // var gpr = new GeoPackageTileRetriever(dao, 256, 256);
+          // dao.queryForTile(0, 0, 1, function(err, tile) {
+          //   fs.writeFileSync('/tmp/gpcli.png', tile.getTileData());
+          //   asciify('/tmp/gpcli.png', {
+          //     fit: 'box',
+          //     width: 25,
+          //     height: 25
+          //   }, function(asciified) {
+          //     console.log(asciified);
+          //   });
+          // });
+
+        } else if (answers.table.type === 'feature') {
+
+          console.log('\n'+chalk.bold(answers.table.name + ' Feature Table Information'));
+          console.log(chalk.gray('Total Features: ') + info.count);
+
+          console.log('\n'+chalk.bold('Features Spatial Reference System'));
+          console.log(chalk.gray('SRS Name: ') + info.srs.count);
+          console.log(chalk.gray('SRS ID: ') + info.srs.id);
+          console.log(chalk.gray('Organization: ') + info.srs.organization);
+          console.log(chalk.gray('Coordsys ID: ') + info.srs.organization_coordsys_id);
+          console.log(chalk.gray('Definition: ') + info.srs.definition);
+          console.log(chalk.gray('Description: ') + info.srs.description);
+
+          console.log('\n'+chalk.bold('Contents'));
+          console.log(chalk.gray('Table Name: ') + info.contents.tableName);
+          console.log(chalk.gray('Data Type: ') + info.contents.dataType);
+          console.log(chalk.gray('Identifier: ') + info.contents.identifier);
+          console.log(chalk.gray('Description: ') + info.contents.description);
+          console.log(chalk.gray('Last Change: ') + info.contents.lastChange);
+          console.log(chalk.gray('Min X: ') + info.contents.minX);
+          console.log(chalk.gray('Min Y : ') + info.contents.minY);
+          console.log(chalk.gray('Max X: ') + info.contents.maxX);
+          console.log(chalk.gray('Max Y: ') + info.contents.maxY);
+
+          console.log('\n\t'+chalk.bold('Contents Spatial Reference System'));
+          console.log('\t'+chalk.gray('SRS Name: ') + info.contents.srs.count);
+          console.log('\t'+chalk.gray('SRS ID: ') + info.contents.srs.id);
+          console.log('\t'+chalk.gray('Organization: ') + info.contents.srs.organization);
+          console.log('\t'+chalk.gray('Coordsys ID: ') + info.contents.srs.organization_coordsys_id);
+          console.log('\t'+chalk.gray('Definition: ') + info.contents.srs.definition);
+          console.log('\t'+chalk.gray('Description: ') + info.contents.srs.description);
+
+          console.log('\n'+chalk.bold('Geometry Columns'));
+          console.log(chalk.gray('Table Name: ') + info.geometryColumns.tableName);
+          console.log(chalk.gray('Column Name ') + info.geometryColumns.columnName);
+          console.log(chalk.gray('Geometry Type Name: ') + info.geometryColumns.geometryTypeName);
+          console.log(chalk.gray('Z: ') + info.geometryColumns.z);
+          console.log(chalk.gray('M: ') + info.geometryColumns.m);
+
+          console.log('\n'+chalk.bold('Columns'));
+          console.log(chalk.underline('Column Name') + '\t' + chalk.underline('Name') + '\t' + chalk.underline('Title'))
+          for (var i = 0; i < info.columns.length; i++) {
+            var column = info.columns[i];
+            console.log(column.name + '\t' + (column.dataColumn ? (column.dataColumn.name + '\t' + column.dataColumn.title) : ''));
+          }
+        }
+      });
+    });
+  });
+});

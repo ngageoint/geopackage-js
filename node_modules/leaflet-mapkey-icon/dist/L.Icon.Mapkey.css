@@ -1,0 +1,9 @@
+@import url("MapkeyIcons.css");
+.leaflet-mki-blank {
+    text-align: center;
+}
+
+.leaflet-mki {
+    text-align: center;
+    box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, .8);
+}

@@ -1,0 +1,391 @@
+[{
+  "code": "PROJCS[\"NZGD49 / New Zealand Map Grid\",GEOGCS[\"NZGD49\",DATUM[\"New_Zealand_Geodetic_Datum_1949\",SPHEROID[\"International 1924\",6378388,297,AUTHORITY[\"EPSG\",\"7022\"]],TOWGS84[59.47,-5.04,187.44,0.47,-0.1,1.024,-4.5993],AUTHORITY[\"EPSG\",\"6272\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4272\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"New_Zealand_Map_Grid\"],PARAMETER[\"latitude_of_origin\",-41],PARAMETER[\"central_meridian\",173],PARAMETER[\"false_easting\",2510000],PARAMETER[\"false_northing\",6023150],AUTHORITY[\"EPSG\",\"27200\"],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]",
+  "intermediate": [
+  "PROJCS",
+  "NZGD49 / New Zealand Map Grid",
+  [
+    "GEOGCS",
+    "NZGD49",
+    [
+      "DATUM",
+      "New_Zealand_Geodetic_Datum_1949",
+      [
+        "SPHEROID",
+        "International 1924",
+        6378388,
+        297,
+        [
+          "AUTHORITY",
+          "EPSG",
+          "7022"
+        ]
+      ],
+      [
+        "TOWGS84",
+        59.47,
+        -5.04,
+        187.44,
+        0.47,
+        -0.1,
+        1.024,
+        -4.5993
+      ],
+      [
+        "AUTHORITY",
+        "EPSG",
+        "6272"
+      ]
+    ],
+    [
+      "PRIMEM",
+      "Greenwich",
+      0,
+      [
+        "AUTHORITY",
+        "EPSG",
+        "8901"
+      ]
+    ],
+    [
+      "UNIT",
+      "degree",
+      0.01745329251994328,
+      [
+        "AUTHORITY",
+        "EPSG",
+        "9122"
+      ]
+    ],
+    [
+      "AUTHORITY",
+      "EPSG",
+      "4272"
+    ]
+  ],
+  [
+    "UNIT",
+    "metre",
+    1,
+    [
+      "AUTHORITY",
+      "EPSG",
+      "9001"
+    ]
+  ],
+  [
+    "PROJECTION",
+    "New_Zealand_Map_Grid"
+  ],
+  [
+    "PARAMETER",
+    "latitude_of_origin",
+    -41
+  ],
+  [
+    "PARAMETER",
+    "central_meridian",
+    173
+  ],
+  [
+    "PARAMETER",
+    "false_easting",
+    2510000
+  ],
+  [
+    "PARAMETER",
+    "false_northing",
+    6023150
+  ],
+  [
+    "AUTHORITY",
+    "EPSG",
+    "27200"
+  ],
+  [
+    "AXIS",
+    "Easting",
+    "EAST"
+  ],
+  [
+    "AXIS",
+    "Northing",
+    "NORTH"
+  ]
+],
+  "value": {
+    "type": "PROJCS",
+    "name": "NZGD49 / New Zealand Map Grid",
+    "GEOGCS": {
+      "name": "NZGD49",
+      "DATUM": {
+        "name": "New_Zealand_Geodetic_Datum_1949",
+        "SPHEROID": {
+          "name": "International 1924",
+          "a": 6378388,
+          "rf": 297,
+          "auth": [
+            "AUTHORITY",
+            "EPSG",
+            "7022"
+          ]
+        },
+        "TOWGS84": [
+          59.47, -5.04,
+          187.44,
+          0.47, -0.1,
+          1.024, -4.5993
+        ],
+        "AUTHORITY": {
+          "EPSG": "6272"
+        }
+      },
+      "PRIMEM": {
+        "name": "greenwich",
+        "convert": 0,
+        "auth": [
+          "AUTHORITY",
+          "EPSG",
+          "8901"
+        ]
+      },
+      "UNIT": {
+        "name": "degree",
+        "convert": 0.01745329251994328,
+        "auth": [
+          "AUTHORITY",
+          "EPSG",
+          "9122"
+        ]
+      },
+      "AUTHORITY": {
+        "EPSG": "4272"
+      }
+    },
+    "UNIT": {
+      "name": "metre",
+      "convert": 1,
+      "auth": [
+        "AUTHORITY",
+        "EPSG",
+        "9001"
+      ]
+    },
+    "PROJECTION": "New_Zealand_Map_Grid",
+    "latitude_of_origin": -41,
+    "central_meridian": 173,
+    "false_easting": 2510000,
+    "false_northing": 6023150,
+    "AUTHORITY": {
+      "EPSG": "27200"
+    },
+    "AXIS": {
+      "Northing": "NORTH"
+    },
+    "projName": "New_Zealand_Map_Grid",
+    "units": "meter",
+    "to_meter": 1,
+    "datumCode": "nzgd49",
+    "ellps": "intl",
+    "a": 6378388,
+    "rf": 297,
+    "x0": 2510000,
+    "y0": 6023150,
+    "long0": 3.01941960595019,
+    "lat0": -0.7155849933176751,
+    "srsCode": "NZGD49 / New Zealand Map Grid"
+  }
+}, {
+  "code": "PROJCS[\"NAD83 / Massachusetts Mainland\",GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",42.68333333333333],PARAMETER[\"standard_parallel_2\",41.71666666666667],PARAMETER[\"latitude_of_origin\",41],PARAMETER[\"central_meridian\",-71.5],PARAMETER[\"false_easting\",200000],PARAMETER[\"false_northing\",750000],AUTHORITY[\"EPSG\",\"26986\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]",
+  "intermediate":[
+  "PROJCS",
+  "NAD83 / Massachusetts Mainland",
+  [
+    "GEOGCS",
+    "NAD83",
+    [
+      "DATUM",
+      "North_American_Datum_1983",
+      [
+        "SPHEROID",
+        "GRS 1980",
+        6378137,
+        298.257222101,
+        [
+          "AUTHORITY",
+          "EPSG",
+          "7019"
+        ]
+      ],
+      [
+        "AUTHORITY",
+        "EPSG",
+        "6269"
+      ]
+    ],
+    [
+      "PRIMEM",
+      "Greenwich",
+      0,
+      [
+        "AUTHORITY",
+        "EPSG",
+        "8901"
+      ]
+    ],
+    [
+      "UNIT",
+      "degree",
+      0.01745329251994328,
+      [
+        "AUTHORITY",
+        "EPSG",
+        "9122"
+      ]
+    ],
+    [
+      "AUTHORITY",
+      "EPSG",
+      "4269"
+    ]
+  ],
+  [
+    "UNIT",
+    "metre",
+    1,
+    [
+      "AUTHORITY",
+      "EPSG",
+      "9001"
+    ]
+  ],
+  [
+    "PROJECTION",
+    "Lambert_Conformal_Conic_2SP"
+  ],
+  [
+    "PARAMETER",
+    "standard_parallel_1",
+    42.68333333333333
+  ],
+  [
+    "PARAMETER",
+    "standard_parallel_2",
+    41.71666666666667
+  ],
+  [
+    "PARAMETER",
+    "latitude_of_origin",
+    41
+  ],
+  [
+    "PARAMETER",
+    "central_meridian",
+    -71.5
+  ],
+  [
+    "PARAMETER",
+    "false_easting",
+    200000
+  ],
+  [
+    "PARAMETER",
+    "false_northing",
+    750000
+  ],
+  [
+    "AUTHORITY",
+    "EPSG",
+    "26986"
+  ],
+  [
+    "AXIS",
+    "X",
+    "EAST"
+  ],
+  [
+    "AXIS",
+    "Y",
+    "NORTH"
+  ]
+],
+  "value": {
+    "type": "PROJCS",
+    "name": "NAD83 / Massachusetts Mainland",
+    "GEOGCS": {
+      "name": "NAD83",
+      "DATUM": {
+        "name": "North_American_Datum_1983",
+        "SPHEROID": {
+          "name": "GRS 1980",
+          "a": 6378137,
+          "rf": 298.257222101,
+          "auth": [
+            "AUTHORITY",
+            "EPSG",
+            "7019"
+          ]
+        },
+        "AUTHORITY": {
+          "EPSG": "6269"
+        }
+      },
+      "PRIMEM": {
+        "name": "greenwich",
+        "convert": 0,
+        "auth": [
+          "AUTHORITY",
+          "EPSG",
+          "8901"
+        ]
+      },
+      "UNIT": {
+        "name": "degree",
+        "convert": 0.01745329251994328,
+        "auth": [
+          "AUTHORITY",
+          "EPSG",
+          "9122"
+        ]
+      },
+      "AUTHORITY": {
+        "EPSG": "4269"
+      }
+    },
+    "UNIT": {
+      "name": "metre",
+      "convert": 1,
+      "auth": [
+        "AUTHORITY",
+        "EPSG",
+        "9001"
+      ]
+    },
+    "PROJECTION": "Lambert_Conformal_Conic_2SP",
+    "standard_parallel_1": 42.68333333333333,
+    "standard_parallel_2": 41.71666666666667,
+    "latitude_of_origin": 41,
+    "central_meridian": -71.5,
+    "false_easting": 200000,
+    "false_northing": 750000,
+    "AUTHORITY": {
+      "EPSG": "26986"
+    },
+    "AXIS": {
+      "Y": "NORTH"
+    },
+    "projName": "Lambert_Conformal_Conic_2SP",
+    "units": "meter",
+    "to_meter": 1,
+    "datumCode": "north_american_datum_1983",
+    "ellps": "GRS 1980",
+    "a": 6378137,
+    "rf": 298.257222101,
+    "x0": 200000,
+    "y0": 750000,
+    "long0": -1.2479104151759457,
+    "lat0": 0.7155849933176751,
+    "lat1": 0.7449647023929129,
+    "lat2": 0.7280931862903012,
+    "srsCode": "NAD83 / Massachusetts Mainland"
+  }
+}]

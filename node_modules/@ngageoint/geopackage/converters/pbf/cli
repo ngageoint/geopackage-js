@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+var PBFToGeoPackage = require('./index');
+var path = require('path');
+
+console.log('PBF to GeoPackage Converter');
+
+var pbfFile = path.resolve(process.cwd(), process.argv[2]);
+var geoPackageFile = path.resolve(process.cwd(), process.argv[3]);
+
+console.log('Converting %s to %s', pbfFile, geoPackageFile);
+PBFToGeoPackage.convert({
+  pbf: pbfFile,
+  geopackage: oPackageFile,
+}, function(status, callback) {
+  callback();
+}, function(err, result) {
+  if (err) {
+    console.log('File conversion failed with error: ', err);
+  } else {
+    console.log('File conversion complete');
+    console.log('Converted %s to %s', pbfFile, geoPackageFile);
+  }
+});

@@ -1,23 +1,45 @@
 {
   "name": "geopackage-browserify-demo",
   "dependencies": {
+    "@mapbox/vector-tile": "^1.3.1",
+    "@ngageoint/geopackage": "github:ngageoint/geopackage-js",
     "async": "^2.0.0-rc.5",
-    "file-type": "^3.8.0",
-    "geopackage": "../..",
-    "jquery": "^2.2.3",
-    "leaflet": "^0.7.7",
+    "file-saver": "^2.0.0-rc.3",
+    "file-type": "12.4.0",
+    "jquery": "3.0.0",
+    "leaflet": "1.3.4",
+    "leaflet-basemaps": "^0.3.1",
+    "leaflet-mapkey-icon": "github:mapshakers/leaflet-mapkey-icon",
     "mustache": "^2.2.1",
-    "proj4": "^2.3.14",
+    "proj4": "2.4.3",
+    "promise-polyfill": "^6.0.2",
     "reproject": "^1.1.1",
-    "sql.js": "^0.3.2"
+    "webworkify": "^1.5.0"
+  },
+  "no": {
+    "@ngageoint/geojson-to-geopackage": "../converters/geojson",
+    "@ngageoint/shapefile-to-geopackage": "../converters/shapefile",
+    "mbtiles-to-geopackage": "../converters/mbtiles",
+    "shapefile-to-geopackage": "../converters/shapefile",
+    "pbf-to-geopackage": "../converters/pbf"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "browserify-css": "^0.9.1"
+    "browserify": "^14.1.0",
+    "browserify-css": "^0.9.1",
+    "typedoc": "^0.15.4",
+    "typescript": "3.7.5"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-css"
+    ]
   },
   "scripts": {
-    "create": "npm install --no-optional",
+    "create": "npm install --no-optional && npm run typedoc --options typedoc.json",
     "postinstall": "npm run build",
-    "build": "browserify -t browserify-css index.js --standalone gp -o gp.js"
+    "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
+    "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js",
+    "tsc": "rm -rf ./built && tsc",
+    "typedoc": "rm -rf ./api-docs && typedoc"
   }
 }
