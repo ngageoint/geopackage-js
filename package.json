@@ -111,7 +111,7 @@
     ]
   },
   "scripts": {
-    "gh-pages-build": "npm run create --prefix docs",
+    "gh-pages-build": "npm run create --prefix docs && npm run clean --prefix docs",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage",
     "test-sqlnode": "nyc --no-clean mocha -r ts-node/register",
     "test-sqljs": "FORCE_SQLJS=true nyc --no-clean mocha -r ts-node/register",

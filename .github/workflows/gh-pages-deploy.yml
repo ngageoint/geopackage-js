@@ -13,8 +13,6 @@ jobs:
     - uses: actions/checkout@v1
     - name: Build gh-pages
       run: npm run gh-pages-build
-    - name: Clean gh-pages
-      run: npm run clean --prefix docs
     - name: Deploy To gh-pages branch
       uses: peaceiris/actions-gh-pages@v3
       env:
