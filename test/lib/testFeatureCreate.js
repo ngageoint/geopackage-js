@@ -85,7 +85,7 @@ describe('GeoPackage Feature table create tests', function() {
       dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
-    GeoPackageAPI.createFeatureTable(geopackage, 'NewTable', properties)
+    return GeoPackageAPI.createFeatureTable(geopackage, 'NewTable', properties)
       .then(function() {
         var reader = new FeatureTableReader('NewTable');
         var result = reader.readFeatureTable(geopackage);

@@ -89,7 +89,7 @@ export class FeatureColumn extends UserColumn {
     index: number,
     name: string,
     type: DataTypes,
-    notNull = true,
+    notNull = false,
     defaultValue?: DBValue,
     max?: number,
   ): FeatureColumn {
