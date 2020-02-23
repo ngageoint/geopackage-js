@@ -53,13 +53,13 @@ export class DublinCoreType {
    */
   public static fromName(name: string): DublinCoreType {
     for (const prop in DublinCoreType) {
-      const type = DublinCoreType[prop];
+      const type = DublinCoreType[prop as keyof typeof DublinCoreType];
       if (type.name === name) {
         return type;
       }
     }
     for (const prop in DublinCoreType) {
-      const type = DublinCoreType[prop];
+      const type = DublinCoreType[prop as keyof typeof DublinCoreType] as DublinCoreType;
       if (type.synonyms) {
         for (let i = 0; i < type.synonyms.length; i++) {
           if (type.synonyms[i] === name) {

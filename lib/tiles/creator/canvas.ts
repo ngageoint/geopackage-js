@@ -100,7 +100,7 @@ export class CanvasTileCreator extends TileCreator {
   async getCompleteTile(): Promise<any> {
     return this.canvas.toDataURL();
   }
-  async reproject(tileData: any, tilePieceBoundingBox): Promise<void> {
+  async reproject(tileData: any, tilePieceBoundingBox: any): Promise<void> {
     const ctx = this.ctx;
     const piecePosition = TileUtilities.getPiecePosition(
       tilePieceBoundingBox,
@@ -132,11 +132,11 @@ export class CanvasTileCreator extends TileCreator {
       imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data
         .buffer,
     };
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       try {
         const work = require('webworkify');
         const worker = work(require('./tileWorker.js'));
-        worker.onmessage = (e): void => {
+        worker.onmessage = (e: { data: any }): void => {
           resolve(this.workerDone(e.data, piecePosition, ctx));
         };
         worker.postMessage(job, [
@@ -144,7 +144,7 @@ export class CanvasTileCreator extends TileCreator {
         ]);
       } catch (e) {
         const worker = ProjectTile;
-        worker(job, function(err, data) {
+        worker(job, function(err: any, data: any) {
           resolve(this.workerDone(data, piecePosition, ctx));
         });
       }

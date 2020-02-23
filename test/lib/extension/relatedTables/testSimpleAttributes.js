@@ -267,8 +267,7 @@ describe('Related Simple Attributes tests', function() {
             var simpleRows = simpleDao.getRows(mappedIds);
             simpleRows.length.should.be.equal(mappedIds.length);
 
-            simpleRows.forEach(function(row) {
-              var simpleRow = simpleDao.getRow(row);
+            simpleRows.forEach(function(simpleRow) {
               simpleRow.hasId().should.be.equal(true);
               simpleRow.getId().should.be.greaterThan(0);
               simpleIds.indexOf(simpleRow.getId()).should.not.be.equal(-1);

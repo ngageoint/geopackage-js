@@ -105,7 +105,6 @@ export class GeometryData {
   }
   writeEnvelope(): Buffer {
     if (!this.envelope) return Buffer.alloc(0);
-    const writeDoubleMethod = 'writeDouble' + (this.byteOrder ? 'LE' : 'BE');
     let length = 32;
     if (this.envelope.hasZ) {
       length += 16;
@@ -114,19 +113,25 @@ export class GeometryData {
       length += 16;
     }
     const envelopeBuffer = Buffer.alloc(length);
-    envelopeBuffer[writeDoubleMethod](this.envelope.minX, 0);
-    envelopeBuffer[writeDoubleMethod](this.envelope.maxX, 8);
-    envelopeBuffer[writeDoubleMethod](this.envelope.minY, 16);
-    envelopeBuffer[writeDoubleMethod](this.envelope.maxY, 24);
+    let writeDoubleMethod: Function;
+    if (this.byteOrder) {
+      writeDoubleMethod = envelopeBuffer.writeDoubleLE.bind(envelopeBuffer);
+    } else {
+      writeDoubleMethod = envelopeBuffer.writeDoubleBE.bind(envelopeBuffer);
+    }
+    writeDoubleMethod(this.envelope.minX, 0);
+    writeDoubleMethod(this.envelope.maxX, 8);
+    writeDoubleMethod(this.envelope.minY, 16);
+    writeDoubleMethod(this.envelope.maxY, 24);
     let position = 32;
     if (this.envelope.hasZ) {
-      envelopeBuffer[writeDoubleMethod](this.envelope.minZ, position);
-      envelopeBuffer[writeDoubleMethod](this.envelope.maxZ, position + 8);
+      writeDoubleMethod(this.envelope.minZ, position);
+      writeDoubleMethod(this.envelope.maxZ, position + 8);
       position = 48;
     }
     if (this.envelope.hasM) {
-      envelopeBuffer[writeDoubleMethod](this.envelope.minM, position);
-      envelopeBuffer[writeDoubleMethod](this.envelope.maxM, position + 8);
+      writeDoubleMethod(this.envelope.minM, position);
+      writeDoubleMethod(this.envelope.maxM, position + 8);
     }
     return envelopeBuffer;
   }
@@ -187,35 +192,40 @@ export class GeometryData {
     return envelopeIndicator;
   }
   readEnvelope(envelopeIndicator: number, buffer: Buffer): { envelope: Envelope; offset: number } {
-    const readDoubleMethod = 'readDouble' + (this.byteOrder ? 'LE' : 'BE');
+    let readDoubleMethod: Function;
+    if (this.byteOrder) {
+      readDoubleMethod = buffer.readDoubleLE.bind(buffer);
+    } else {
+      readDoubleMethod = buffer.readDoubleBE.bind(buffer);
+    }
     const envelopeByteOffset = 8;
     let reads = 0;
     const envelopeAndOffset = {
       envelope: undefined,
       offset: envelopeByteOffset,
-    };
+    } as { envelope: Envelope; offset: number };
     if (envelopeIndicator <= 0) {
       return envelopeAndOffset;
     }
     const envelope = new Envelope();
     // Read x and y values and create envelope
-    envelope.minX = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
-    envelope.maxX = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
-    envelope.minY = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
-    envelope.maxY = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
+    envelope.minX = readDoubleMethod(envelopeByteOffset + 8 * reads++);
+    envelope.maxX = readDoubleMethod(envelopeByteOffset + 8 * reads++);
+    envelope.minY = readDoubleMethod(envelopeByteOffset + 8 * reads++);
+    envelope.maxY = readDoubleMethod(envelopeByteOffset + 8 * reads++);
     envelope.hasZ = false;
     envelope.hasM = false;
     // Read z values
     if (envelopeIndicator === 2 || envelopeIndicator === 4) {
       envelope.hasZ = true;
-      envelope.minZ = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
-      envelope.maxZ = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
+      envelope.minZ = readDoubleMethod(envelopeByteOffset + 8 * reads++);
+      envelope.maxZ = readDoubleMethod(envelopeByteOffset + 8 * reads++);
     }
     // Read m values
     if (envelopeIndicator === 3 || envelopeIndicator === 4) {
       envelope.hasM = true;
-      envelope.minM = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
-      envelope.maxM = buffer[readDoubleMethod](envelopeByteOffset + 8 * reads++);
+      envelope.minM = readDoubleMethod(envelopeByteOffset + 8 * reads++);
+      envelope.maxM = readDoubleMethod(envelopeByteOffset + 8 * reads++);
     }
     envelopeAndOffset.envelope = envelope;
     envelopeAndOffset.offset = envelopeByteOffset + 8 * reads;

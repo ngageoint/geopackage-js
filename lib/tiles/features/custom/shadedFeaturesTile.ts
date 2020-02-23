@@ -1,4 +1,5 @@
 import { CustomFeaturesTile } from './customFeaturesTile';
+// @ts-ignore
 import concat from 'concat-stream';
 
 /**
@@ -89,7 +90,11 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @param canvas
    * @returns {Promise<String|Buffer>}
    */
-  async drawUnindexedTile(tileWidth: number, tileHeight: number, canvas = null): Promise<string | Buffer> {
+  async drawUnindexedTile(
+    tileWidth: number,
+    tileHeight: number,
+    canvas: any = null,
+  ): Promise<string | Buffer | Uint8Array> {
     let image = null;
     if (this.drawUnindexedTiles) {
       // Draw a tile indicating we have no idea if there are features
@@ -108,7 +113,12 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
    * @param tileCanvas
    * @return {Promise<String|Buffer>}
    */
-  async drawTile(tileWidth: number, tileHeight: number, text: string, tileCanvas: null): Promise<string | Buffer> {
+  async drawTile(
+    tileWidth: number,
+    tileHeight: number,
+    text: string,
+    tileCanvas: null,
+  ): Promise<string | Buffer | Uint8Array> {
     return new Promise(resolve => {
       let canvas;
       if (tileCanvas !== undefined && tileCanvas !== null) {
@@ -138,7 +148,7 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
       if (CustomFeaturesTile.useNodeCanvas) {
-        const writeStream = concat(function(buffer) {
+        const writeStream = concat(function(buffer: Buffer | Uint8Array) {
           resolve(buffer);
         });
         let stream = null;

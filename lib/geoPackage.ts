@@ -48,9 +48,25 @@ import { SpatialReferenceSystem } from './core/srs/spatialReferenceSystem';
 import * as defs from './proj4Defs';
 import { Feature } from 'geojson';
 import { FeatureRow } from './features/user/featureRow';
-for (const def in defs) {
-  if (defs[def]) {
-    proj4.defs(def, defs[def]);
+
+type ColumnMap = {
+  [key: string]: {
+    index: number;
+    name: string;
+    max?: number;
+    min?: number;
+    notNull?: boolean;
+    primaryKey?: boolean;
+    dataType?: string;
+    displayName: string;
+    dataColumn?: DataColumns;
+  };
+};
+
+const anyDefs = defs as any;
+for (const def in anyDefs) {
+  if (anyDefs[def]) {
+    proj4.defs(def, anyDefs[def]);
   }
 }
 
@@ -185,7 +201,7 @@ export class GeoPackage {
    * @returns {module:tiles/user/tileDao~TileDao} the `TileDao` to access [tiles]{@link module:tiles/user/tileTable}
    */
   getTileDaoWithTileMatrixSet(tileMatrixSet: TileMatrixSet): TileDao {
-    const tileMatrices = [];
+    const tileMatrices: TileMatrix[] = [];
     const tileMatrixDao = this.tileMatrixDao;
     const results = tileMatrixDao.queryForAllEq(
       TileMatrixDao.COLUMN_TABLE_NAME,
@@ -710,25 +726,73 @@ export class GeoPackage {
       tableName: tableDao.table_name,
       tableType: tableDao.table.getTableType(),
       count: tableDao.getCount(),
-      geometryColumns: undefined,
+      geometryColumns: undefined as {
+        tableName: string;
+        geometryColumn: string;
+        geometryTypeName: string;
+        z?: number;
+        m?: number;
+      },
       minZoom: undefined as number,
       maxZoom: undefined as number,
       minWebMapZoom: undefined as number,
       maxWebMapZoom: undefined as number,
       zoomLevels: undefined as number,
-      tileMatrixSet: undefined,
-      contents: undefined,
-      srs: undefined,
-      columns: undefined,
-      columnMap: undefined,
+      tileMatrixSet: undefined as {
+        srsId: number;
+        minX: number;
+        maxX: number;
+        minY: number;
+        maxY: number;
+      },
+      contents: undefined as {
+        tableName: string;
+        dataType: string;
+        identifier: string;
+        description: string;
+        lastChange: string;
+        minX: number;
+        maxX: number;
+        minY: number;
+        maxY: number;
+        srs: {
+          name: string;
+          id: number;
+          organization: string;
+          organization_coordsys_id: number;
+          definition: string;
+          description: string;
+        };
+      },
+      srs: undefined as {
+        name: string;
+        id: number;
+        organization: string;
+        organization_coordsys_id: number;
+        definition: string;
+        description: string;
+      },
+      columns: undefined as {
+        index: number;
+        name: string;
+        max?: number;
+        min?: number;
+        notNull?: boolean;
+        primaryKey?: boolean;
+        dataType?: string;
+        displayName: string;
+        dataColumn?: DataColumns;
+      }[],
+      columnMap: undefined as ColumnMap,
     };
     if (tableDao instanceof FeatureDao) {
-      info.geometryColumns = {};
-      info.geometryColumns.tableName = tableDao.geometryColumns.table_name;
-      info.geometryColumns.geometryColumn = tableDao.geometryColumns.column_name;
-      info.geometryColumns.geometryTypeName = tableDao.geometryColumns.geometry_type_name;
-      info.geometryColumns.z = tableDao.geometryColumns.z;
-      info.geometryColumns.m = tableDao.geometryColumns.m;
+      info.geometryColumns = {
+        tableName: tableDao.geometryColumns.table_name,
+        geometryColumn: tableDao.geometryColumns.column_name,
+        geometryTypeName: tableDao.geometryColumns.geometry_type_name,
+        z: tableDao.geometryColumns.z,
+        m: tableDao.geometryColumns.m,
+      };
     }
     if (tableDao instanceof TileDao) {
       info.minZoom = tableDao.minZoom;
@@ -737,33 +801,40 @@ export class GeoPackage {
       info.maxWebMapZoom = tableDao.maxWebMapZoom;
       info.zoomLevels = tableDao.tileMatrices.length;
     }
-    let dao;
-    let contentsRetriever;
+    let contents: Contents;
     if (tableDao instanceof FeatureDao) {
-      dao = this.geometryColumnsDao;
-      contentsRetriever = tableDao.geometryColumns;
+      contents = this.geometryColumnsDao.getContents(tableDao.geometryColumns);
     } else if (tableDao instanceof TileDao) {
-      dao = this.tileMatrixSetDao;
-      contentsRetriever = tableDao.tileMatrixSet;
-      info.tileMatrixSet = {};
-      info.tileMatrixSet.srsId = tableDao.tileMatrixSet.srs_id;
-      info.tileMatrixSet.minX = tableDao.tileMatrixSet.min_x;
-      info.tileMatrixSet.maxX = tableDao.tileMatrixSet.max_x;
-      info.tileMatrixSet.minY = tableDao.tileMatrixSet.min_y;
-      info.tileMatrixSet.maxY = tableDao.tileMatrixSet.max_y;
+      contents = this.tileMatrixSetDao.getContents(tableDao.tileMatrixSet);
+      info.tileMatrixSet = {
+        srsId: tableDao.tileMatrixSet.srs_id,
+        minX: tableDao.tileMatrixSet.min_x,
+        maxX: tableDao.tileMatrixSet.max_x,
+        minY: tableDao.tileMatrixSet.min_y,
+        maxY: tableDao.tileMatrixSet.max_y,
+      };
     }
-    const contents = dao.getContents(contentsRetriever);
-    info.contents = {};
-    info.contents.tableName = contents.table_name;
-    info.contents.dataType = contents.data_type;
-    info.contents.identifier = contents.identifier;
-    info.contents.description = contents.description;
-    info.contents.lastChange = contents.last_change;
-    info.contents.minX = contents.min_x;
-    info.contents.maxX = contents.max_x;
-    info.contents.minY = contents.min_y;
-    info.contents.maxY = contents.max_y;
+
     const contentsSrs = this.contentsDao.getSrs(contents);
+    info.contents = {
+      tableName: contents.table_name,
+      dataType: contents.data_type,
+      identifier: contents.identifier,
+      description: contents.description,
+      lastChange: contents.last_change,
+      minX: contents.min_x,
+      maxX: contents.max_x,
+      minY: contents.min_y,
+      maxY: contents.max_y,
+      srs: {
+        name: contentsSrs.srs_name,
+        id: contentsSrs.srs_id,
+        organization: contentsSrs.organization,
+        organization_coordsys_id: contentsSrs.organization_coordsys_id,
+        definition: contentsSrs.definition,
+        description: contentsSrs.description,
+      },
+    };
     info.contents.srs = {
       name: contentsSrs.srs_name,
       id: contentsSrs.srs_id,
@@ -806,8 +877,8 @@ export class GeoPackage {
   static loadProjections(items: string[]): void {
     if (!items) throw new Error('Invalid array of projections');
     for (let i = 0; i < items.length; i++) {
-      if (!defs[items[i]]) throw new Error('Projection not found');
-      this.addProjection(items[i], defs[items[i]]);
+      if (!anyDefs[items[i]]) throw new Error('Projection not found');
+      this.addProjection(items[i], anyDefs[items[i]]);
     }
   }
   static addProjection(name: string, definition: string): void {

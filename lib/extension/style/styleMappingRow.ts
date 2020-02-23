@@ -7,7 +7,7 @@ import { UserMappingRow } from '../relatedTables/userMappingRow';
 import { StyleMappingTable } from './styleMappingTable';
 import { UserColumn } from '../../user/userColumn';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User Mapping Row containing the values from a single result set row
@@ -22,7 +22,7 @@ export class StyleMappingRow extends UserMappingRow {
   constructor(
     styleMappingTable: StyleMappingTable,
     columnTypes?: { [key: string]: DataTypes },
-    values?: ColumnValues[],
+    values?: Record<string, DBValue>,
   ) {
     super(styleMappingTable, columnTypes, values);
     this.styleMappingTable = styleMappingTable;

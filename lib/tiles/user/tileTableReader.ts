@@ -9,6 +9,7 @@ import { TileColumn } from './tileColumn';
 import { DataTypes } from '../../db/dataTypes';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { GeoPackage } from '../../geoPackage';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Reads the metadata from an existing tile table
@@ -34,7 +35,7 @@ export class TileTableReader extends UserTableReader {
     primaryKey?: boolean,
   ): TileColumn {
     const dataType = DataTypes.fromName(type);
-    const defaultValue = undefined;
+    const defaultValue: DBValue = undefined;
     if (defaultValueIndex) {
       // console.log('default value index', defaultValueIndex);
       // console.log('result', results);

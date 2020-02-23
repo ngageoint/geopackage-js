@@ -1,3 +1,4 @@
+// @ts-ignore
 import concat from 'concat-stream';
 
 import { ImageUtils } from '../imageUtils';
@@ -69,7 +70,7 @@ export class NodeTileCreator extends TileCreator {
   }
   async getCompleteTile(format?: string): Promise<Buffer> {
     return new Promise(resolve => {
-      const writeStream = concat(function(buffer) {
+      const writeStream = concat(function(buffer: Buffer) {
         resolve(buffer);
       });
       let stream = null;

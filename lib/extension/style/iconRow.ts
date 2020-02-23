@@ -3,7 +3,7 @@ import { MediaRow } from '../relatedTables/mediaRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 import { UserColumn } from '../../user/userColumn';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * @memberOf module:extension/style
@@ -20,7 +20,7 @@ import { ColumnValues } from '../../dao/columnValues';
  */
 export class IconRow extends MediaRow {
   iconTable: IconTable;
-  constructor(iconTable: IconTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(iconTable: IconTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
     super(iconTable, columnTypes, values);
     this.iconTable = iconTable;
   }

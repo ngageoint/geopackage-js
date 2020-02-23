@@ -7,7 +7,7 @@ import { AttributeTable } from './attributeTable';
 import { AttributeRow } from './attributeRow';
 import { Contents } from '../core/contents/contents';
 import { DataTypes } from '../..';
-import { ColumnValues } from '../dao/columnValues';
+import { DBValue } from '../db/dbAdapter';
 /**
  * Attribute DAO for reading attribute user data tables
  * @class AttributeDao
@@ -37,7 +37,7 @@ export class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> 
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:attributes/attributeRow~AttributeRow}             attribute row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): AttributeRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): AttributeRow {
     return new AttributeRow(this.table, columnTypes, values);
   }
 

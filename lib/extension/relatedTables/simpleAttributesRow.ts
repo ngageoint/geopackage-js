@@ -6,7 +6,7 @@
 import { UserRow } from '../../user/userRow';
 import { SimpleAttributesTable } from './simpleAttributesTable';
 import { DataTypes, UserColumn } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
@@ -20,7 +20,7 @@ export class SimpleAttributesRow extends UserRow {
   constructor(
     public simpleAttributesTable: SimpleAttributesTable,
     columnTypes?: { [key: string]: DataTypes },
-    values?: ColumnValues[],
+    values?: Record<string, DBValue>,
   ) {
     super(simpleAttributesTable, columnTypes, values);
   }

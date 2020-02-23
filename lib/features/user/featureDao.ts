@@ -2,9 +2,11 @@
  * featureDao module.
  * @module features/user/featureDao
  */
+// @ts-ignore
 import reproject from 'reproject';
 import LineIntersect from '@turf/line-intersect';
 import Intersect from '@turf/intersect';
+// @ts-ignore
 import BooleanWithin from '@turf/boolean-within';
 
 import { FeatureTableIndex } from '../../extension/index/featureTableIndex';
@@ -20,7 +22,8 @@ import { GeoPackage } from '../../geoPackage';
 import { FeatureTable } from './featureTable';
 import { Contents } from '../../core/contents/contents';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
+import { DataColumns } from '../../..';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -53,13 +56,13 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     }
     this.projection = dao.getProjection(geometryColumns);
   }
-  createObject(results: any): FeatureRow {
+  createObject(results: Record<string, DBValue>): FeatureRow {
     if (results) {
       return this.getRow(results) as FeatureRow;
     }
     return this.newRow();
   }
-  getRow(results: any): FeatureRow {
+  getRow(results: Record<string, DBValue>): FeatureRow {
     return super.getRow(results) as FeatureRow;
   }
   getContents(): Contents {
@@ -82,7 +85,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @param  {Array} values      values
    * @return {FeatureRow}             feature row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): FeatureRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): FeatureRow {
     return new FeatureRow(this.getFeatureTable(), columnTypes, values);
   }
   /**
@@ -276,8 +279,31 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     boundingBox: BoundingBox,
     skipVerification = false,
   ): IterableIterator<Feature> {
-    const columns = [];
-    const columnMap = {};
+    const columns = [] as {
+      index: number;
+      name: string;
+      max?: number;
+      min?: number;
+      notNull?: boolean;
+      primaryKey?: boolean;
+      dataType: string;
+      displayName: string;
+      dataColumn: DataColumns;
+    }[];
+    const columnMap: Record<
+      string,
+      {
+        index: number;
+        name: string;
+        max?: number;
+        min?: number;
+        notNull?: boolean;
+        primaryKey?: boolean;
+        dataType: string;
+        displayName: string;
+        dataColumn: DataColumns;
+      }
+    > = {};
     const srs = this.getSrs();
     const projection = this.projection;
     this.table.columns.forEach(column => {
@@ -325,7 +351,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
                   key !== 'id'
                 ) {
                   if (key.toLowerCase() === '_feature_id') {
-                    geoJson.id = featureRow.values[key];
+                    geoJson.id = featureRow.values[key] as string | number;
                   } else if (key.toLowerCase() === '_properties_id') {
                     geoJson.properties[key.substring(12)] = featureRow.values[key];
                   } else {

@@ -19,12 +19,14 @@ import { GeoPackageValidate } from './validate/geoPackageValidate';
 import { FeatureTiles } from './tiles/features';
 
 import wkx from 'wkx';
+// @ts-ignore
 import reproject from 'reproject';
 import path from 'path';
 import fs from 'fs';
 import pointToLineDistance from '@turf/point-to-line-distance';
 import polygonToLine from '@turf/polygon-to-line';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+// @ts-ignore
 import pointDistance from '@turf/distance';
 import * as helpers from '@turf/helpers';
 import { TileMatrixSet } from './tiles/matrixset/tileMatrixSet';
@@ -280,7 +282,7 @@ export class GeoPackageAPI {
     return geopackage.createAttributeTable(tableName, columns, dataColumns);
   }
 
-  static addAttributeRow(geopackage: GeoPackage, tableName: string, row: unknown): number {
+  static addAttributeRow(geopackage: GeoPackage, tableName: string, row: Record<string, DBValue>): number {
     const attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
     const attributeRow = attributeDao.getRow(row);
     return attributeDao.create(attributeRow);
@@ -356,7 +358,7 @@ export class GeoPackageAPI {
     tableName: string,
     dataBuffer: Buffer,
     contentType: string,
-    additionalProperties?: {},
+    additionalProperties?: Record<string, any>,
   ): number {
     const relatedTables = geopackage.relatedTablesExtension;
     const mediaDao = relatedTables.getMediaDao(tableName);
@@ -494,7 +496,7 @@ export class GeoPackageAPI {
   }
 
   static createDataColumnMap(featureDao: FeatureDao<FeatureRow>): ColumnMap {
-    const columnMap = {};
+    const columnMap: Record<string, any> = {};
     const dcd = new DataColumnsDao(featureDao.geoPackage);
     featureDao.table.columns.forEach(
       function(column: UserColumn): void {
@@ -631,7 +633,7 @@ export class GeoPackageAPI {
         key !== 'id'
       ) {
         if (key.toLowerCase() === '_feature_id') {
-          geoJson.id = featureRow.values[key];
+          geoJson.id = featureRow.values[key] as string | number;
         } else if (key.toLowerCase() === '_properties_id') {
           geoJson.properties[key.substring(12)] = featureRow.values[key];
         } else if (columnMap && columnMap[key]) {
@@ -706,11 +708,11 @@ export class GeoPackageAPI {
       projection: string;
       values: string[];
     }[];
-    west: number;
-    east: number;
-    south: number;
-    north: number;
-    zoom: number;
+    west?: string;
+    east?: string;
+    south?: string;
+    north?: string;
+    zoom?: number;
   } {
     const tiles = {
       columns: [],
@@ -721,6 +723,31 @@ export class GeoPackageAPI {
       south: undefined,
       north: undefined,
       zoom: undefined,
+    } as {
+      columns: {
+        index: number;
+        name: string;
+        max: number;
+        min: number;
+        notNull: boolean;
+        primaryKey: boolean;
+      }[];
+      srs: SpatialReferenceSystem;
+      tiles: {
+        tableName: string;
+        id: number;
+        minLongitude: number;
+        maxLongitude: number;
+        minLatitude: number;
+        maxLatitude: number;
+        projection: string;
+        values: string[];
+      }[];
+      west?: string;
+      east?: string;
+      south?: string;
+      north?: string;
+      zoom?: number;
     };
 
     const tileDao = geopackage.getTileDao(table);
@@ -777,7 +804,7 @@ export class GeoPackageAPI {
         maxLatitude: number;
         projection: string;
         values: string[];
-      };
+      } & Record<string, any>;
       tile.tableName = table;
       tile.id = row.getId();
 
@@ -842,11 +869,11 @@ export class GeoPackageAPI {
       projection: string;
       values: string[];
     }[];
-    west: number;
-    east: number;
-    south: number;
-    north: number;
-    zoom: number;
+    west?: string;
+    east?: string;
+    south?: string;
+    north?: string;
+    zoom?: number;
   } {
     const tiles = {
       columns: [],
@@ -857,6 +884,31 @@ export class GeoPackageAPI {
       south: undefined,
       north: undefined,
       zoom: undefined,
+    } as {
+      columns: {
+        index: number;
+        name: string;
+        max: number;
+        min: number;
+        notNull: boolean;
+        primaryKey: boolean;
+      }[];
+      srs: SpatialReferenceSystem;
+      tiles: {
+        tableName: string;
+        id: number;
+        minLongitude: number;
+        maxLongitude: number;
+        minLatitude: number;
+        maxLatitude: number;
+        projection: string;
+        values: string[];
+      }[];
+      west?: string;
+      east?: string;
+      south?: string;
+      north?: string;
+      zoom?: number;
     };
 
     const tileDao = geopackage.getTileDao(table);
@@ -915,7 +967,16 @@ export class GeoPackageAPI {
         maxLatitude: undefined,
         projection: undefined as string,
         values: [],
-      };
+      } as {
+        tableName: string;
+        id: number;
+        minLongitude: number;
+        maxLongitude: number;
+        minLatitude: number;
+        maxLatitude: number;
+        projection: string;
+        values: any[];
+      } & Record<string, any>;
       tile.tableName = table;
       tile.id = row.getId();
 
@@ -1003,7 +1064,7 @@ export class GeoPackageAPI {
     const iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
     const features = [];
     let closestDistance = 100000000000;
-    let closest;
+    let closest: ClosestFeature & Feature;
 
     const centerPoint = helpers.point([longitude, latitude]);
 
@@ -1011,10 +1072,10 @@ export class GeoPackageAPI {
       feature.type = 'Feature';
       const distance = GeoPackageAPI.determineDistance(centerPoint.geometry, feature);
       if (distance < closestDistance) {
-        closest = feature;
+        closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
-      } else if (distance === closestDistance && closest.type !== 'Point') {
-        closest = feature;
+      } else if (distance === closestDistance && closest.geometry.type !== 'Point') {
+        closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
       }
       features.push(feature);

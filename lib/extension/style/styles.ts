@@ -6,7 +6,7 @@ import { StyleRow } from './styleRow';
  */
 export class Styles {
   defaultStyle: StyleRow = null;
-  styles: {} = {};
+  styles: Record<string, StyleRow> = {};
   setDefault(styleRow: StyleRow): void {
     this.defaultStyle = styleRow;
   }

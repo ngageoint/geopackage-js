@@ -824,13 +824,12 @@ export class FeatureStyleExtension extends BaseExtension {
     };
   }> {
     if (featureStyles !== null) {
-      const promises = [];
-      promises.push(this.setTableStyles(featureTable, featureStyles.getStyles()));
-      promises.push(this.setTableIcons(featureTable, featureStyles.getIcons()));
-      return Promise.all(promises).then(([tableStyles, tableIcons]) => ({
-        tableStyles,
-        tableIcons,
-      }));
+      const tableStyles = await this.setTableStyles(featureTable, featureStyles.getStyles());
+      const tableIcons = await this.setTableIcons(featureTable, featureStyles.getIcons());
+      return {
+        tableStyles: tableStyles,
+        tableIcons: tableIcons,
+      };
     } else {
       return {
         deleted: this.deleteTableFeatureStyles(featureTable),
@@ -996,13 +995,12 @@ export class FeatureStyleExtension extends BaseExtension {
     };
   }> {
     if (featureStyles !== null) {
-      const promises = [];
-      promises.push(this.setStyles(featureTable, featureId, featureStyles.getStyles()));
-      promises.push(this.setIcons(featureTable, featureId, featureStyles.getIcons()));
-      return Promise.all(promises).then(([styles, icons]) => ({
+      const styles = await this.setStyles(featureTable, featureId, featureStyles.getStyles());
+      const icons = await this.setIcons(featureTable, featureId, featureStyles.getIcons());
+      return {
         styles,
         icons,
-      }));
+      };
     } else {
       const deletedStyles = this.deleteStyles(featureTable); //, featureId);
       const deletedIcons = this.deleteIcons(featureTable); //, featureId);

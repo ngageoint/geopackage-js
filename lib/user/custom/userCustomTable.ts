@@ -15,7 +15,7 @@ export class UserCustomTable extends UserTable {
   constructor(tableName: string, columns: UserColumn[], requiredColumns: string[]) {
     super(tableName, columns);
     if (requiredColumns && requiredColumns.length) {
-      const found = {};
+      const found: Record<string, number> = {};
       for (let i = 0; i < columns.length; i++) {
         const column = columns[i];
         if (requiredColumns.indexOf(column.name) !== -1) {

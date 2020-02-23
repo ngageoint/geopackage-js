@@ -4,7 +4,16 @@
  * @see module:dao/dao
  */
 import { Metadata } from '../metadata';
+import { DBValue } from '../../db/dbAdapter';
 
+type MetadataReferenceKeys =
+  | 'reference_scope'
+  | 'table_name'
+  | 'column_name'
+  | 'row_id_value'
+  | 'timestamp'
+  | 'md_file_id'
+  | 'md_parent_id';
 /**
  * Links metadata in the gpkg_metadata table to data in the feature, and tiles tables
  * @class MetadataReference
@@ -62,7 +71,7 @@ export class MetadataReference {
   /**
    * @param {string} columnName
    */
-  toDatabaseValue(columnName: string): any {
+  toDatabaseValue(columnName: MetadataReferenceKeys): DBValue {
     if (columnName === 'timestamp') {
       return this.timestamp.toISOString();
     }

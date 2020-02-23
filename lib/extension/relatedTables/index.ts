@@ -565,7 +565,6 @@ export class RelatedTablesExtension extends BaseExtension {
    */
   getMappingRowsForBase(mappingTableName: string | ExtendedRelation, baseId: number): UserMappingRow[] {
     const mappingDao = this.getMappingDao(mappingTableName);
-    mappingDao.getUserMappingRow(mappingDao.queryByBaseId(baseId));
     const mappingRows: UserMappingRow[] = [];
     const rows = mappingDao.queryByBaseId(baseId);
     rows.forEach(row => {

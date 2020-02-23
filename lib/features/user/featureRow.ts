@@ -3,7 +3,6 @@ import { UserRow } from '../../user/userRow';
 import { FeatureColumn } from './featureColumn';
 import { DataTypes } from '../../db/dataTypes';
 import { GeometryData } from '../../geom/geometryData';
-import { ColumnValues } from '../../dao/columnValues';
 import { DBValue } from '../../db/dbAdapter';
 
 /**
@@ -18,7 +17,11 @@ import { DBValue } from '../../db/dbAdapter';
  * @param  {Array} values       values
  */
 export class FeatureRow extends UserRow {
-  constructor(public featureTable: FeatureTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(
+    public featureTable: FeatureTable,
+    columnTypes?: { [key: string]: DataTypes },
+    values?: Record<string, DBValue>,
+  ) {
     super(featureTable, columnTypes, values);
   }
   /**

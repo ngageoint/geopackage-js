@@ -28,9 +28,6 @@ export class IconTable extends MediaTable {
 
   readonly TABLE_TYPE = 'media';
 
-  constructor(tableName, columns, requiredColumns) {
-    super(tableName, columns, requiredColumns);
-  }
   /**
    * Get the name column index
    * @return int

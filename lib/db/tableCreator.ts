@@ -5,10 +5,23 @@ import { UserTable } from '../user/userTable';
 import { DataTypes } from './dataTypes';
 import { GeoPackage } from '../geoPackage';
 import { GeoPackageConnection } from './geoPackageConnection';
-/**
- * Creates tables necessary for GeoPackages
- * @module db/tableCreator
- */
+
+type TableCreatorScripts =
+  | 'spatial_reference_system'
+  | 'contents'
+  | 'geometry_columns'
+  | 'tile_matrix_set'
+  | 'tile_matrix'
+  | 'data_columns'
+  | 'data_column_constraints'
+  | 'metadata'
+  | 'metadata_reference'
+  | 'extensions'
+  | 'table_index'
+  | 'geometry_index'
+  | 'feature_tile_link'
+  | 'extended_relations'
+  | 'contents_id';
 
 /**
  * `TableCreator` provides methods for creating the various standard tables in
@@ -149,7 +162,7 @@ export class TableCreator {
    * @param  {string} creationScriptName creation scripts to run
    * @return {Promise<Boolean>}
    */
-  async createTable(creationScriptName: string): Promise<boolean> {
+  async createTable(creationScriptName: TableCreatorScripts): Promise<boolean> {
     let success = true;
     const scripts = TableCreator.tableCreationScripts[creationScriptName];
     for (let i = 0; i < scripts.length; i++) {

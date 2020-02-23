@@ -116,8 +116,8 @@ describe('Related Attributes tests', function() {
         var manualCount = 0;
 
         for (var i = 0; i < count; i++) {
-          userMappingRow = userMappingRows[i];
-          var row = userMappingDao.getUserMappingRow(userMappingRow);
+          const umr = userMappingRows[i];
+          var row = userMappingDao.getUserMappingRow(umr);
           row.hasId().should.be.equal(false);
           row.getBaseId().should.be.oneOf([4, 5]);
           if (row.getBaseId() === 4) {
@@ -166,7 +166,7 @@ describe('Related Attributes tests', function() {
         var countOfIds = userMappingDao.countByIds(5);
         var queryOfIds = userMappingDao.queryByIds(5);
         var queryCount = 0;
-        for (row of queryOfIds) {
+        for (let counter of queryOfIds) {
           queryCount++;
         }
 

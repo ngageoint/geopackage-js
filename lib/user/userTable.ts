@@ -17,13 +17,13 @@ export class UserTable {
    * Array of column names
    * @type {string[]}
    */
-  columnNames: string[];
+  columnNames: string[] = [];
   /**
    * Mapping between column names and their index
    * @type {Object}
    */
-  nameToIndex: {};
-  uniqueConstraints: { columns: UserColumn[] }[];
+  nameToIndex: { [key: string]: number } = {};
+  uniqueConstraints: { columns: UserColumn[] }[] = [];
   pkIndex: number;
 
   /**
@@ -33,7 +33,6 @@ export class UserTable {
    * @param requiredColumns required columns
    */
   constructor(public table_name: string, public columns: UserColumn[], public requiredColumns?: string[]) {
-    this.uniqueConstraints = [];
     // Sort the columns by index
     this.columns.sort(function(a, b) {
       return a.index - b.index;
@@ -46,8 +45,6 @@ export class UserTable {
         );
       }
     }
-    this.nameToIndex = {};
-    this.columnNames = [];
     for (let i = 0; i < this.columns.length; i++) {
       const column = this.columns[i];
       const index = column.index;

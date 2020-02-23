@@ -7,7 +7,7 @@ import { SimpleAttributesTable } from './simpleAttributesTable';
 import { SimpleAttributesRow } from './simpleAttributesRow';
 import { GeoPackage } from '../../geoPackage';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables
@@ -33,7 +33,10 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~SimpleAttributesRow}             simple attributes row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): SimpleAttributesRow {
+  newRowWithColumnTypes(
+    columnTypes: { [key: string]: DataTypes },
+    values: Record<string, DBValue>,
+  ): SimpleAttributesRow {
     return new SimpleAttributesRow(this.simpleAttributesTable, columnTypes, values);
   }
   /**
@@ -53,7 +56,7 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
     for (let i = 0; i < ids.length; i++) {
       const row = this.queryForId(ids[i]);
       if (row) {
-        simpleAttributesRows.push(row);
+        simpleAttributesRows.push(row as SimpleAttributesRow);
       }
     }
     return simpleAttributesRows;

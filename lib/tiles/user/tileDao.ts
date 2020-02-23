@@ -14,6 +14,7 @@ import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { GeoPackage } from '../../geoPackage';
 import { TileTable } from './tileTable';
 import { DataTypes } from '../../db/dataTypes';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -36,7 +37,7 @@ export class TileDao extends UserDao<TileRow> {
   projection: string;
   minWebMapZoom: number;
   maxWebMapZoom: number;
-  webZoomToGeoPackageZooms: {};
+  webZoomToGeoPackageZooms: Record<number, number>;
   constructor(
     geoPackage: GeoPackage,
     public table: TileTable,
@@ -183,7 +184,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Array} values      values
    * @return {TileRow}             tile row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): TileRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): TileRow {
     return new TileRow(this.getTileTable(), columnTypes, values);
   }
   /**
@@ -234,7 +235,7 @@ export class TileDao extends UserDao<TileRow> {
     fieldValues.addColumn(TileColumn.COLUMN_ZOOM_LEVEL, zoomLevel);
     let tileRow;
     for (const rawRow of this.queryForFieldValues(fieldValues)) {
-      tileRow = this.getRow(rawRow);
+      tileRow = this.getRow(rawRow) as TileRow;
     }
     return tileRow;
   }
@@ -446,7 +447,7 @@ export class TileDao extends UserDao<TileRow> {
   rename(newName: string): void {
     super.rename(newName);
     const oldName = this.tileMatrixSet.table_name;
-    const values = {};
+    const values: Record<string, DBValue> = {};
     values[TileMatrixSetDao.COLUMN_TABLE_NAME] = newName;
     const where = this.buildWhereWithFieldAndValue(TileMatrixSetDao.COLUMN_TABLE_NAME, oldName);
     const whereArgs = this.buildWhereArgs([oldName]);
@@ -458,7 +459,7 @@ export class TileDao extends UserDao<TileRow> {
     const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     tileMatrixSetDao.updateWithValues(values, where, whereArgs);
     const tileMatrixDao = this.geoPackage.tileMatrixDao;
-    const tileMatrixUpdate = {};
+    const tileMatrixUpdate: Record<string, DBValue> = {};
     tileMatrixUpdate[TileMatrixDao.COLUMN_TABLE_NAME] = newName;
     const tileMatrixWhere = this.buildWhereWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, oldName);
     tileMatrixDao.updateWithValues(tileMatrixUpdate, tileMatrixWhere, whereArgs);

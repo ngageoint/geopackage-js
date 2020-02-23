@@ -5,6 +5,7 @@ import { MediaRow } from './mediaRow';
 import { GeoPackage } from '../../geoPackage';
 import { DataTypes } from '../../..';
 import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * MediaDao module.
@@ -35,7 +36,7 @@ export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~MediaRow}             media row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): MediaRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): MediaRow {
     return new MediaRow(this.mediaTable, columnTypes, values);
   }
   /**

@@ -8,7 +8,7 @@ import { AttributeDao } from '../../attributes/attributeDao';
 import { StyleRow } from './styleRow';
 import { GeoPackage } from '../../geoPackage';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Style DAO for reading style tables
@@ -26,7 +26,7 @@ export class StyleDao extends AttributeDao<StyleRow> {
    * @param results
    * @returns {module:extension/style.StyleRow}
    */
-  createObject(results: any): StyleRow {
+  createObject(results: Record<string, DBValue>): StyleRow {
     if (results) {
       return this.getRow(results) as StyleRow;
     }
@@ -45,7 +45,7 @@ export class StyleDao extends AttributeDao<StyleRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.StyleRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): StyleRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): StyleRow {
     return new StyleRow(this.table, columnTypes, values);
   }
 }

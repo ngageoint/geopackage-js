@@ -21,7 +21,7 @@ export abstract class TileCreator {
 
   abstract async initialize(): Promise<TileCreator>;
   abstract getCompleteTile(format?: string): Promise<any>;
-  abstract addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number);
+  abstract addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number): void;
   abstract async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<any>;
 
   static async create(

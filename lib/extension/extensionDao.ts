@@ -3,6 +3,7 @@ import { Dao } from '../dao/dao';
 import { ColumnValues } from '../dao/columnValues';
 
 import { TableCreator } from '../db/tableCreator';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * Extension Data Access Object
@@ -29,11 +30,13 @@ export class ExtensionDao extends Dao<Extension> {
    * @param {object} row raw database row
    * @returns {Extension}
    */
-  createObject(row: any): Extension {
+  createObject(row: Record<string, DBValue>): Extension {
     const e = new Extension();
-    for (const key in row) {
-      e[key] = row[key];
-    }
+    e.table_name = row['table_name'] as string;
+    e.column_name = row['column_name'] as string;
+    e.extension_name = row['extension_name'] as string;
+    e.definition = row['definition'] as string;
+    e.scope = row['scope'] as string;
     return e;
   }
   /**

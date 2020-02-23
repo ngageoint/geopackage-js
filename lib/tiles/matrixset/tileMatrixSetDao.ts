@@ -31,7 +31,7 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
     TileMatrixSetDao.COLUMN_MAX_Y,
   ];
 
-  columnToPropertyMap = {};
+  columnToPropertyMap: { [key: string]: string } = {};
 
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);

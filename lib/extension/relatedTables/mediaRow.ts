@@ -2,7 +2,7 @@ import { MediaTable } from './mediaTable';
 import { UserRow } from '../../user/userRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 import { UserColumn, DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * MediaRow module.
@@ -18,7 +18,11 @@ import { ColumnValues } from '../../dao/columnValues';
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class MediaRow extends UserRow {
-  constructor(public mediaTable: MediaTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(
+    public mediaTable: MediaTable,
+    columnTypes?: { [key: string]: DataTypes },
+    values?: Record<string, DBValue>,
+  ) {
     super(mediaTable, columnTypes, values);
   }
   /**

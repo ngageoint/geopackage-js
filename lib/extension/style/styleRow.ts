@@ -7,7 +7,7 @@ import { AttributeRow } from '../../attributes/attributeRow';
 import { StyleTable } from './styleTable';
 import { UserColumn } from '../../user/userColumn';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Style Row
@@ -23,7 +23,7 @@ export class StyleRow extends AttributeRow {
    */
   private static readonly colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
   styleTable: StyleTable;
-  constructor(styleTable: StyleTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(styleTable: StyleTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
     super(styleTable, columnTypes, values);
     this.styleTable = styleTable;
   }

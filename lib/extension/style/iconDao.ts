@@ -7,7 +7,7 @@ import { IconRow } from './iconRow';
 import { IconTable } from './iconTable';
 import { GeoPackage } from '../../geoPackage';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Icon DAO for reading user icon data tables
@@ -34,7 +34,7 @@ export class IconDao extends MediaDao<IconRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.IconRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): IconRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): IconRow {
     return new IconRow(this.table, columnTypes, values);
   }
 }

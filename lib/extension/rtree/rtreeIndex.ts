@@ -321,7 +321,7 @@ export class RTreeIndex extends BaseExtension {
     this.createIsEmptyFunction();
   }
   createMinXFunction(): void {
-    this.connection.registerFunction('ST_MinX', function(buffer) {
+    this.connection.registerFunction('ST_MinX', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
       let envelope = geom.envelope;
       if (!envelope) {
@@ -331,7 +331,7 @@ export class RTreeIndex extends BaseExtension {
     });
   }
   createMinYFunction(): void {
-    this.connection.registerFunction('ST_MinY', function(buffer) {
+    this.connection.registerFunction('ST_MinY', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
       let envelope = geom.envelope;
       if (!envelope) {
@@ -341,7 +341,7 @@ export class RTreeIndex extends BaseExtension {
     });
   }
   createMaxXFunction(): void {
-    this.connection.registerFunction('ST_MaxX', function(buffer) {
+    this.connection.registerFunction('ST_MaxX', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
       let envelope = geom.envelope;
       if (!envelope) {
@@ -351,7 +351,7 @@ export class RTreeIndex extends BaseExtension {
     });
   }
   createMaxYFunction(): void {
-    this.connection.registerFunction('ST_MaxY', function(buffer) {
+    this.connection.registerFunction('ST_MaxY', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
       let envelope = geom.envelope;
       if (!envelope) {
@@ -361,7 +361,7 @@ export class RTreeIndex extends BaseExtension {
     });
   }
   createIsEmptyFunction(): void {
-    this.connection.registerFunction('ST_IsEmpty', function(buffer) {
+    this.connection.registerFunction('ST_IsEmpty', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
       return !geom || geom.empty || !geom.geometry;
     });

@@ -10,7 +10,7 @@ import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { StyleMappingRow } from './styleMappingRow';
 import { UserRow } from '../../user/userRow';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Style Mapping DAO for reading user mapping data tables
@@ -54,7 +54,7 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values values
    * @return {module:extension/style.StyleMappingRow} style mapping row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): StyleMappingRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): StyleMappingRow {
     return new StyleMappingRow(this.table, columnTypes, values);
   }
   /**

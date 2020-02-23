@@ -52,6 +52,6 @@ export class RelationType {
    * @return {module:extension/relatedTables~RelationType}
    */
   static fromName(name: string): RelationType {
-    return RelationType[name.toUpperCase()];
+    return RelationType[name.toUpperCase() as keyof typeof RelationType] as RelationType;
   }
 }

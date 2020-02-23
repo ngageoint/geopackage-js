@@ -10,7 +10,7 @@ import { IconRow } from './iconRow';
  */
 export class Icons {
   defaultIcon: IconRow = null;
-  icons: {} = {};
+  icons: Record<string, IconRow> = {};
   setDefault(iconRow: IconRow): void {
     this.defaultIcon = iconRow;
   }

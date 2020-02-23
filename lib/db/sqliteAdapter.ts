@@ -18,6 +18,7 @@ export class SqliteAdapter implements DBAdapter {
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   async initialize(): Promise<this> {
+    // @ts-ignore
     const bettersqlite = await import('better-sqlite3');
     const Database = bettersqlite.default;
     try {

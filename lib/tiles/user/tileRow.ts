@@ -2,7 +2,6 @@ import { TileTable } from './tileTable';
 import { UserRow } from '../../user/userRow';
 import { TileColumn } from './tileColumn';
 import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
 import { DBValue } from '../../db/dbAdapter';
 /**
  * tileRow module.
@@ -19,7 +18,7 @@ import { DBValue } from '../../db/dbAdapter';
  */
 export class TileRow extends UserRow {
   tileTable: TileTable;
-  constructor(tileTable: TileTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(tileTable: TileTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
     super(tileTable, columnTypes, values);
     this.tileTable = tileTable;
   }

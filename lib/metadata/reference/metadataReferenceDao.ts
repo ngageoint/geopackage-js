@@ -2,6 +2,7 @@ import { Dao } from '../../dao/dao';
 
 import { ColumnValues } from '../../dao/columnValues';
 import { MetadataReference } from './metadataReference';
+import { DBValue } from '../../db/dbAdapter';
 /**
  * Metadata Reference Data Access Object
  * @class
@@ -28,7 +29,7 @@ export class MetadataReferenceDao extends Dao<MetadataReference> {
    * @return {Number} number of rows updated
    */
   removeMetadataParent(parentId: number): number {
-    const values = {};
+    const values: Record<string, DBValue> = {};
     values[MetadataReferenceDao.COLUMN_MD_PARENT_ID] = null;
     const where = this.buildWhereWithFieldAndValue(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
     const whereArgs = this.buildWhereArgs(parentId);

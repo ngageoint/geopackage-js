@@ -7,24 +7,26 @@
       "target": "es5", // specify ECMAScript target version
       "allowJs": true, // allows a partial TypeScript and JavaScript codebase
       "declaration": true,
-      "checkJs": true, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
+      "checkJs": false, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
       "outDir": "built",
       "downlevelIteration": true,
       "noEmit": false,
-      "noImplicitAny": false,
+      "noImplicitAny": true,
       "esModuleInterop": true,
       "sourceMap": true
   },
   "include": [
       "index.ts",
-      "./lib" // type-checks all js files as well not just .ts extension
-      , "./test"
+      "./lib", // type-checks all js files as well not just .ts extension
+      "@types/reproject/index.d.ts",
+      "@types/@turf/distance/index.d.ts"
   ],
   "exclude": [
       "./lib/wkb",
-      "built/**/*"
+      "built/**/*",
+      "./test",
   ]
 }

@@ -8,6 +8,7 @@ import { UserMappingRow } from './userMappingRow';
 import { ColumnValues } from '../../dao/columnValues';
 import { UserRow } from '../../user/userRow';
 import { DataTypes } from '../../..';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User Mapping DAO for reading user mapping data tables
@@ -57,7 +58,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: ColumnValues[]): UserMappingRow {
+  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): UserMappingRow {
     return new UserMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -65,7 +66,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {Object} result db result
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  getUserMappingRow(result: any): UserMappingRow {
+  getUserMappingRow(result: Record<string, DBValue>): UserMappingRow {
     return this.getRow(result) as UserMappingRow;
   }
   /**
@@ -73,7 +74,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {(UserMappingRow | Number)} baseId base id
    * @return {Object[]}
    */
-  queryByBaseId(baseId: UserMappingRow | number): any[] {
+  queryByBaseId(baseId: UserMappingRow | number): Record<string, DBValue>[] {
     return this.queryForAllEq(
       UserMappingTable.COLUMN_BASE_ID,
       baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
@@ -84,7 +85,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {(Number & UserMappingRow)} relatedId related id
    * @return {Object[]}
    */
-  queryByRelatedId(relatedId: UserMappingRow | number): any[] {
+  queryByRelatedId(relatedId: UserMappingRow | number): Record<string, DBValue>[] {
     return this.queryForAllEq(
       UserMappingTable.COLUMN_RELATED_ID,
       relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
@@ -96,7 +97,10 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {(UserMappingRow | Number)} [relatedId] related id
    * @return {Iterable<any>}
    */
-  queryByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): IterableIterator<any> {
+  queryByIds(
+    baseId: UserMappingRow | number,
+    relatedId?: UserMappingRow | number,
+  ): IterableIterator<Record<string, DBValue>> {
     const values = new ColumnValues();
     values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
     if (relatedId !== undefined) {
@@ -111,7 +115,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * The unique related ids
    * @return {Number[]}
    */
-  uniqueRelatedIds(): number[] {
+  uniqueRelatedIds(): { related_id: number }[] {
     let query = 'SELECT DISTINCT ';
     query += UserMappingTable.COLUMN_RELATED_ID;
     query += ' FROM ';

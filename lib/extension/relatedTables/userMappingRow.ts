@@ -1,7 +1,7 @@
 import { UserMappingTable } from './userMappingTable';
 import { UserRow } from '../../user/userRow';
 import { UserColumn, DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * UserMappingRow module.
@@ -18,7 +18,11 @@ import { ColumnValues } from '../../dao/columnValues';
  */
 export class UserMappingRow extends UserRow {
   row: UserRow;
-  constructor(public table: UserMappingTable, columnTypes?: { [key: string]: DataTypes }, values?: ColumnValues[]) {
+  constructor(
+    public table: UserMappingTable,
+    columnTypes?: { [key: string]: DataTypes },
+    values?: Record<string, DBValue>,
+  ) {
     super(table, columnTypes, values);
   }
   /**

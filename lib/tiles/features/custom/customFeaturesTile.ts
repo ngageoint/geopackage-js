@@ -35,7 +35,12 @@ export abstract class CustomFeaturesTile {
    * @param canvas optional canvas
    * @return {Promise<String|Buffer>}
    */
-  abstract drawTile(tileWidth: number, tileHeight: number, text: string, canvas?: any): Promise<string | Buffer>;
+  abstract drawTile(
+    tileWidth: number,
+    tileHeight: number,
+    text: string,
+    canvas?: any,
+  ): Promise<string | Buffer | Uint8Array>;
   /**
    * Draw a tile with the provided text label in the middle
    * @param {Number} tileWidth
@@ -43,5 +48,9 @@ export abstract class CustomFeaturesTile {
    * @param canvas optional canvas
    * @return {Promise<String|Buffer>}
    */
-  abstract drawUnindexedTile(tileWidth: number, tileHeight: number, canvas?: any): Promise<string | Buffer>;
+  abstract drawUnindexedTile(
+    tileWidth: number,
+    tileHeight: number,
+    canvas?: any,
+  ): Promise<string | Buffer | Uint8Array>;
 }

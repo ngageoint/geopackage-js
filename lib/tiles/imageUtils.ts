@@ -1,4 +1,5 @@
 import sizeOf from 'image-size';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 export class ImageUtils {
   public static readonly isElectron = !!(
@@ -12,7 +13,7 @@ export class ImageUtils {
    * @param {Buffer|String} data file data or file path
    * @returns {Object}
    */
-  public static getImageSize(data: Buffer | string): any {
+  public static getImageSize(data: Buffer | string): ISizeCalculationResult {
     return sizeOf.imageSize(data);
   }
 
@@ -24,7 +25,7 @@ export class ImageUtils {
    */
   public static async getImage(data: Buffer | string, contentType = 'image/png'): Promise<any> {
     return new Promise((resolve, reject) => {
-      let image;
+      let image: any;
       if (ImageUtils.useNodeCanvas) {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const Canvas = require('canvas');
@@ -36,7 +37,7 @@ export class ImageUtils {
       image.onload = (): void => {
         resolve(image);
       };
-      image.onerror = (error): void => {
+      image.onerror = (error: any): void => {
         reject(error);
       };
       let src = data;
@@ -72,7 +73,7 @@ export class ImageUtils {
       const iconHeight = image.height;
       const scaledWidth = Math.round(scale * iconWidth);
       const scaledHeight = Math.round(scale * iconHeight);
-      let canvas, img;
+      let canvas: any, img: any;
       if (ImageUtils.useNodeCanvas) {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const Canvas = require('canvas');

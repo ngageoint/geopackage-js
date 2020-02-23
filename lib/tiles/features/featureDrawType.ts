@@ -20,6 +20,13 @@ export namespace FeatureDrawType {
   }
 
   export function fromName(type: string): FeatureDrawType {
-    return FeatureDrawType[type];
+    switch (type) {
+      case 'CIRCLE':
+        return FeatureDrawType.CIRCLE;
+      case 'STROKE':
+        return FeatureDrawType.STROKE;
+      case 'FILL':
+        return FeatureDrawType.FILL;
+    }
   }
 }

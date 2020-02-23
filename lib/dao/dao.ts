@@ -6,6 +6,7 @@ import { ColumnValues } from './columnValues';
  */
 
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * Base DAO
@@ -328,10 +329,10 @@ export abstract class Dao<T> {
    * @param  {Object} idValue id
    * @return {Object[]} where args
    */
-  buildPkWhereArgs(idValue: any[] | any): any[] {
+  buildPkWhereArgs(idValue: DBValue[] | DBValue): DBValue[] {
     if (Array.isArray(idValue)) {
       const idValuesArray = idValue;
-      let values = [];
+      let values: DBValue[] = [];
       for (let i = 0; i < idValuesArray.length; i++) {
         values = values.concat(this.buildWhereArgs(idValuesArray[i]));
       }
@@ -381,11 +382,11 @@ export abstract class Dao<T> {
    * @param {any[]|ColumnValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgs(values: any[] | ColumnValues | any): any[] | null {
-    let args: any[] = [];
+  buildWhereArgs(values: DBValue[] | ColumnValues | DBValue): DBValue[] | null {
+    let args: DBValue[] = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
-    } else if (values.columns) {
+    } else if (values instanceof ColumnValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
       if (values !== undefined || values !== null) {
@@ -400,7 +401,7 @@ export abstract class Dao<T> {
    * @param {any[]} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithArray(values: any[]): any[] {
+  _buildWhereArgsWithArray(values: DBValue[]): DBValue[] {
     const args = [];
     for (let i = 0; i < values.length; i++) {
       const value = values[i];
@@ -416,7 +417,7 @@ export abstract class Dao<T> {
    * @param {ColumnValues} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithColumnValues(values: ColumnValues): any[] {
+  _buildWhereArgsWithColumnValues(values: ColumnValues): DBValue[] {
     const args = [];
     for (let i = 0; i < values.columns.length; i++) {
       const column = values.columns[i];
@@ -435,7 +436,7 @@ export abstract class Dao<T> {
    * @param  {string} [operation='='] optional operation
    * @return {string} where clause
    */
-  buildWhereWithFieldAndValue(field: string, value: any, operation = '='): string {
+  buildWhereWithFieldAndValue(field: string, value: DBValue, operation = '='): string {
     let whereString = '' + field + ' ';
     if (value === undefined || value === null) {
       whereString += 'is null';
@@ -454,7 +455,7 @@ export abstract class Dao<T> {
    * @param  {string} [orderBy] order by clause
    * @return {Object[]} array of raw database objects
    */
-  queryForAllEq(field: string, value: any, groupBy?: string, having?: string, orderBy?: string): any[] {
+  queryForAllEq(field: string, value: DBValue, groupBy?: string, having?: string, orderBy?: string): any[] {
     const whereString = this.buildWhereWithFieldAndValue(field, value);
     const whereArgs = this.buildWhereArgs(value);
     const query = SqliteQueryBuilder.buildQuery(
@@ -476,7 +477,7 @@ export abstract class Dao<T> {
    * @param  {Object} [value]  value to filter on if fields is a string
    * @return {number} count of objects
    */
-  count(fields?: ColumnValues | string, value?: any): number {
+  count(fields?: ColumnValues | string, value?: DBValue): number {
     if (!fields) {
       return this.connection.count(this.gpkgTableName);
     }
@@ -502,7 +503,7 @@ export abstract class Dao<T> {
    * @param  {any[]} whereArgs arguments to filter on
    * @return {number} count of objects
    */
-  countWhere(where: string, whereArgs: any[]): number {
+  countWhere(where: string, whereArgs: DBValue[]): number {
     const query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
     const result = this.connection.get(query, whereArgs);
     return result?.count;
@@ -515,7 +516,7 @@ export abstract class Dao<T> {
    * @param  {Object[]} [whereArgs] where args
    * @return {number}
    */
-  minOfColumn(column: string, where?: string, whereArgs?: any[]): number {
+  minOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
     return this.connection.minOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
   }
 
@@ -526,7 +527,7 @@ export abstract class Dao<T> {
    * @param  {Object[]} [whereArgs] where args
    * @return {number}
    */
-  maxOfColumn(column: string, where?: string, whereArgs?: any[]): number {
+  maxOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
     return this.connection.maxOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
   }
 
@@ -547,7 +548,7 @@ export abstract class Dao<T> {
    * @param  {Object} idValue id value
    * @return {number} number of objects deleted
    */
-  deleteById(idValue: any): number {
+  deleteById(idValue: DBValue): number {
     const where = this.buildPkWhere(idValue);
     const whereArgs = this.buildPkWhereArgs(idValue);
     return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
@@ -570,7 +571,7 @@ export abstract class Dao<T> {
    * @param  {Object[]} whereArgs where arguments
    * @return {number} number of objects deleted
    */
-  deleteWhere(where: string, whereArgs: any[]): number {
+  deleteWhere(where: string, whereArgs: DBValue[]): number {
     return this.connection.delete("'" + this.gpkgTableName + "'", where, whereArgs);
   }
 
@@ -601,7 +602,7 @@ export abstract class Dao<T> {
    * @return {number} number of objects updated
    */
   updateWithValues(
-    values: {},
+    values: Record<string, DBValue>,
     where: string,
     whereArgs: any[],
   ): {

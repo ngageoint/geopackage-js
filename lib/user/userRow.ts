@@ -7,6 +7,7 @@ import { UserTable } from './userTable';
 
 import { DataTypes } from '../db/dataTypes';
 import { UserColumn } from '../..';
+import { DBValue } from '../db/dbAdapter';
 
 export class UserRow {
   /**
@@ -15,7 +16,11 @@ export class UserRow {
    * @param columnTypes Column types of this row, based upon the data values
    * @param values Array of the row values
    */
-  constructor(public table: UserTable, public columnTypes?: { [key: string]: DataTypes }, public values?: any) {
+  constructor(
+    public table: UserTable,
+    public columnTypes?: { [key: string]: DataTypes },
+    public values?: Record<string, DBValue>,
+  ) {
     if (!this.columnTypes) {
       const columnCount = this.table.columnCount();
       this.columnTypes = {};
@@ -80,7 +85,7 @@ export class UserRow {
     if (dataType === DataTypes.BOOLEAN) {
       return value === 1 ? true : false;
     } else if (dataType === DataTypes.BLOB) {
-      return Buffer.from(value);
+      return Buffer.from(value as Uint8Array);
     }
     return value;
   }
@@ -89,7 +94,7 @@ export class UserRow {
    * @param index column index
    * @param value value from the database
    */
-  toObjectValue(index: number, value: any): any {
+  toObjectValue(index: number, value: DBValue): any {
     const objectValue = value;
     const column = this.getColumnWithIndex(index);
     if (column.dataType === DataTypes.BOOLEAN && value) {
@@ -101,7 +106,7 @@ export class UserRow {
    * Get the value which will be persisted to the database based on the column
    * @param columnName name of the column
    */
-  toDatabaseValue(columnName: string): any {
+  toDatabaseValue(columnName: string): DBValue {
     const column = this.getColumnWithColumnName(columnName);
     const value = this.getValueWithColumnName(columnName);
     if (column.dataType === DataTypes.BOOLEAN) {

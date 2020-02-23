@@ -1,10 +1,10 @@
-import { DBAdapter } from './dbAdapter';
+import { DBAdapter, DBValue } from './dbAdapter';
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
  * @module db/sqljsAdapter
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
  */
-
+// @ts-ignore
 import sqljs from 'rtree-sql.js/dist/sql-asm-memory-growth.js';
 // var sqljs = require('sql.js/js/sql.js');
 
@@ -19,7 +19,7 @@ export class SqljsAdapter implements DBAdapter {
    */
   initialize(): Promise<this> {
     const promise = new Promise<this>((resolve, reject) => {
-      sqljs().then(SQL => {
+      sqljs().then((SQL: { Database: any }) => {
         if (this.filePath && typeof this.filePath === 'string') {
           if (typeof process !== 'undefined' && process.version) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -28,19 +28,19 @@ export class SqljsAdapter implements DBAdapter {
               // eslint-disable-next-line @typescript-eslint/no-var-requires
               const http = require('http');
               http
-                .get(this.filePath, response => {
+                .get(this.filePath, (response: any) => {
                   if (response.statusCode !== 200) {
                     return reject(new Error('Unable to reach url: ' + this.filePath));
                   }
-                  const body = [];
-                  response.on('data', chunk => body.push(chunk));
+                  const body: any = [];
+                  response.on('data', (chunk: any) => body.push(chunk));
                   response.on('end', () => {
                     const t = new Uint8Array(Buffer.concat(body));
                     this.db = new SQL.Database(t);
                     resolve(this);
                   });
                 })
-                .on('error', e => {
+                .on('error', (e: any) => {
                   return reject(e);
                 });
             } else {
@@ -122,7 +122,7 @@ export class SqljsAdapter implements DBAdapter {
   /**
    * Returns a Uint8Array containing the contents of the database as a file
    */
-  async export(): Promise<any> {
+  async export(): Promise<Uint8Array> {
     return this.db.export();
   }
   /**
@@ -144,7 +144,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Array|Object} [params] substitution parameters
    * @return {Object}
    */
-  get(sql: string, params?: [] | Record<string, any>): any {
+  get(sql: string, params?: [] | Record<string, DBValue>): Record<string, DBValue> {
     params = params || [];
     const statement = this.db.prepare(sql);
     statement.bind(params);
@@ -178,7 +178,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql: string, params?: [] | Record<string, any>): any[] {
+  all(sql: string, params?: [] | Record<string, DBValue>): Record<string, DBValue>[] {
     const rows = [];
     const iterator = this.each(sql, params);
     for (const row of iterator) {
@@ -192,14 +192,14 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} params bind parameters
    * @return {IterableIterator<Object>}
    */
-  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
+  each(sql: string, params?: [] | Record<string, DBValue>): IterableIterator<Record<string, DBValue>> {
     const statement = this.db.prepare(sql);
     statement.bind(params);
     return {
-      [Symbol.iterator](): IterableIterator<any> {
+      [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
         return this;
       },
-      next: function(): { value: any; done: boolean } {
+      next: function(): { value: Record<string, DBValue>; done: boolean } {
         if (statement.step()) {
           return {
             value: statement.getAsObject(),
@@ -222,8 +222,8 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Object} object containing a changes property indicating the number of rows changed and a lastInsertROWID indicating the last inserted row
    */
-  run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number } {
-    if (params) {
+  run(sql: string, params?: [] | Record<string, DBValue>): { changes: number; lastInsertRowid: number } {
+    if (params && !(params instanceof Array)) {
       for (const key in params) {
         params['$' + key] = params[key];
       }
@@ -245,8 +245,8 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql: string, params?: [] | Record<string, any>): number {
-    if (params) {
+  insert(sql: string, params?: [] | Record<string, DBValue>): number {
+    if (params && !(params instanceof Array)) {
       for (const key in params) {
         params['$' + key] = params[key];
       }
@@ -267,7 +267,7 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} deleted rows
    */
-  delete(sql: string, params?: [] | Record<string, any>): number {
+  delete(sql: string, params?: [] | Record<string, DBValue>): number {
     let rowsModified = 0;
     const statement = this.db.prepare(sql, params);
     statement.step();
@@ -292,11 +292,11 @@ export class SqljsAdapter implements DBAdapter {
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+  count(tableName: string, where?: string, whereArgs?: [] | Record<string, DBValue>): number {
     let sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;
     }
-    return this.get(sql, whereArgs).count;
+    return this.get(sql, whereArgs).count as number;
   }
 }

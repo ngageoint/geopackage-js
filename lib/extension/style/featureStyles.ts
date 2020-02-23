@@ -12,7 +12,7 @@ import { Icons } from './icons';
  * @constructor
  */
 export class FeatureStyles {
-  constructor(public styles: Styles = null, public icons = null) {}
+  constructor(public styles: Styles = null, public icons: Icons = null) {}
   /**
    * Set style
    * @param {module:extension/style.Styles} styles

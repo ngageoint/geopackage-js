@@ -1,3 +1,5 @@
+import { DBValue } from './dbAdapter';
+
 /**
  * SQLite query builder module.
  * @module db/sqliteQueryBuilder
@@ -147,7 +149,7 @@ export class SqliteQueryBuilder {
    * @return {Object} bind parameters
    */
   static buildUpdateOrInsertObject(object: any): any {
-    const insertOrUpdate = {};
+    const insertOrUpdate: { [key: string]: DBValue } = {};
     if (object.getColumnNames) {
       const columnNames = object.getColumnNames();
       for (let i = 0; i < columnNames.length; i++) {
@@ -181,7 +183,12 @@ export class SqliteQueryBuilder {
    * @param  {Array|Object} [whereArgs] where bind parameters
    * @return {Object} object with a sql property containing the update statement and an args property with bind arguments
    */
-  static buildUpdate(table: string, values: any, where: string, whereArgs: any[] | any): { sql: string; args: any[] } {
+  static buildUpdate(
+    table: string,
+    values: Record<string, DBValue>,
+    where: string,
+    whereArgs: any[] | any,
+  ): { sql: string; args: any[] } {
     const args: any[] = [];
     let update = 'update ' + table + ' set ';
     let first = true;

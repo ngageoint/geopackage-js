@@ -22,6 +22,6 @@ export namespace DataTypes {
   }
 
   export function fromName(type: string): DataTypes {
-    return DataTypes[type];
+    return DataTypes[type as keyof typeof DataTypes] as DataTypes;
   }
 }
