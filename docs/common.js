@@ -495,19 +495,12 @@ window.toggleLayer = function(layerType, table) {
       canvas.height = size.y;
       setTimeout(function() {
         console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        GeoPackageAPI.drawXYZTileInCanvas(
-          geoPackage,
-          table,
-          tilePoint.x,
-          tilePoint.y,
-          tilePoint.z,
-          size.x,
-          size.y,
-          canvas,
-        ).then(function() {
-          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          done(null, canvas);
-        });
+        GeoPackageAPI.xyzTile(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas).then(
+          function() {
+            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+            done(null, canvas);
+          },
+        );
       }, 0);
       return canvas;
     };
