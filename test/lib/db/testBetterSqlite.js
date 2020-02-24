@@ -7,7 +7,7 @@ describe('Database opening tests', function(done) {
 
   function verifyTableExists(db) {
     var statement = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?");
-    var results = statement.get(['mytable']);
+    var results = statement.get(['mytable.test']);
     if(!results) {
       return false;
     }
@@ -15,7 +15,7 @@ describe('Database opening tests', function(done) {
   }
 
   function createTable(db, done) {
-    var create = 'CREATE TABLE mytable ('+
+    var create = 'CREATE TABLE \'mytable.test\' ('+
     '  name TEXT NOT NULL,'+
     '  id INTEGER NOT NULL PRIMARY KEY,'+
     '  description TEXT'+

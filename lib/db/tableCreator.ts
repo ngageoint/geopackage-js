@@ -71,6 +71,8 @@ export class TableCreator {
    * @return {Promise<Boolean>}
    */
   createGeometryColumns(): Promise<boolean> {
+    console.log('create geometry columns');
+    console.trace();
     return this.createTable('geometry_columns');
   }
   /**
@@ -301,7 +303,7 @@ export class TableCreator {
         '  SELECT' +
         '    table_name,' +
         '    column_name,' +
-        '    "ST_" || geometry_type_name AS geometry_type_name,' +
+        "    'ST_' || geometry_type_name AS geometry_type_name," +
         '    g.srs_id,' +
         '    srs_name' +
         '  FROM gpkg_geometry_columns as g JOIN gpkg_spatial_ref_sys AS s' +

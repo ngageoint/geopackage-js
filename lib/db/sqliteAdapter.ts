@@ -1,4 +1,4 @@
-import { DBAdapter } from './dbAdapter';
+import { DBAdapter, DBValue } from './dbAdapter';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';
@@ -140,7 +140,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object}
    */
-  get(sql: string, params?: [] | Record<string, any>): any {
+  get(sql: string, params?: [] | Record<string, DBValue>): Record<string, DBValue> {
     const statement = this.db.prepare(sql);
     if (params) {
       return statement.get(params);

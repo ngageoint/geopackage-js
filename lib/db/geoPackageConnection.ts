@@ -219,8 +219,8 @@ export class GeoPackageConnection {
    * @param  {string} tableName table to check
    * @return {Object}
    */
-  tableExists(tableName: string): any {
-    return this.adapter.get('SELECT name FROM sqlite_master WHERE type="table" AND name=?', [tableName]);
+  tableExists(tableName: string): boolean {
+    return this.adapter.isTableExists(tableName);
   }
   /**
    * Checks if a table and column exist

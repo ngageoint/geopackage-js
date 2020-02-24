@@ -665,7 +665,9 @@ export abstract class Dao<T> {
    * @param {string} newName
    */
   rename(newName: string): void {
-    this.connection.run('ALTER TABLE ' + '"' + this.gpkgTableName + '" RENAME TO "' + newName + '"');
+    console.log('Rename ', 'ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
+    this.connection.run('ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
+    console.log('ran the rename statement in DAO');
     this.gpkgTableName = newName;
   }
 }

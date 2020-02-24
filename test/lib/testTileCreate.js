@@ -25,7 +25,6 @@ describe('GeoPackage Tile table create tests', function() {
   });
 
   it('should create a tile table', function() {
-
     var requiredColumns = TileTable.createRequiredColumns();
     var tileTable = new TileTable(tableName, requiredColumns);
 
