@@ -912,7 +912,7 @@ export class GeoPackageAPI {
     };
 
     const tileDao = geopackage.getTileDao(table);
-    if (webZoom < tileDao.minWebMapZoom || webZoom > tileDao.minWebMapZoom) {
+    if (webZoom < tileDao.minWebMapZoom || webZoom > tileDao.maxWebMapZoom) {
       return;
     }
     tiles.columns = [];
