@@ -909,7 +909,7 @@ window.zoomToTile = function(
   const ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
 
   const tile = GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn);
-  const tileData = tile.getTileData();
+  const tileData = tile.tileData;
   const type = fileType(tileData);
   let binary = '';
   const bytes = tileData;
