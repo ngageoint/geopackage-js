@@ -57,7 +57,7 @@ describe('GeoPackage create tests', function() {
 
   it('should create a user feature table', function(done) {
     var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom',  wkb.typeMap.wkt.Point);
-    var result = geopackage.createFeatureTable(featureTable);
+    var result = geopackage.createUserFeatureTable(featureTable);
     Verification.verifyTableExists(geopackage, 'test_features').should.be.equal(true);
     done();
   });

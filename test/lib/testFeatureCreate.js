@@ -35,8 +35,6 @@ describe('GeoPackage Feature table create tests', function() {
 
   it('should create a feature table', function() {
     var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
-    var boundingBox = new BoundingBox(-180, 180, -80, 80);
-
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
@@ -49,7 +47,7 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumn(5, 'test_blob.test', DataTypes.BLOB, false, null));
     columns.push(FeatureColumn.createColumn(6, 'test_integer.test', DataTypes.INTEGER, false, ""));
 
-    geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+    geopackage.createFeatureTable('geom.test', geometryColumns, columns)
       .then(function(result) {
         result.should.be.equal(true);
         Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
@@ -85,7 +83,7 @@ describe('GeoPackage Feature table create tests', function() {
       dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
-    return GeoPackageAPI.createFeatureTable(geopackage, 'NewTable', properties)
+    return geopackage.createFeatureTableFromProperties('NewTable', properties)
       .then(function() {
         var reader = new FeatureTableReader('NewTable');
         var result = reader.readFeatureTable(geopackage);
@@ -142,7 +140,7 @@ describe('GeoPackage Feature table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    return geopackage.createFeatureTableWithGeometryColumnsAndDataColumns(geometryColumns, boundingBox, 4326, columns, [dc])
+    return geopackage.createFeatureTable('geom.test', geometryColumns, columns, boundingBox, 4326, [dc])
       .then(function() {
         var reader = new FeatureTableReader(tableName);
         var result = reader.readFeatureTable(geopackage);
@@ -217,8 +215,6 @@ describe('GeoPackage Feature table create tests', function() {
 
     beforeEach(function() {
       var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', wkb.typeMap.wkt.Point);
-      var boundingBox = new BoundingBox(-180, 180, -80, 80);
-
       var columns = [];
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
@@ -233,7 +229,7 @@ describe('GeoPackage Feature table create tests', function() {
       columns.push(FeatureColumn.createColumn(9, 'test space', DataTypes.TEXT, false, ""));
       columns.push(FeatureColumn.createColumn(10, 'test-dash', DataTypes.TEXT, false, ""));
 
-      return geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+      return geopackage.createFeatureTable(tableName, geometryColumns, columns)
         .then(function(result) {
           var verified = Verification.verifyGeometryColumns(geopackage)
           && Verification.verifyTableExists(geopackage, tableName)

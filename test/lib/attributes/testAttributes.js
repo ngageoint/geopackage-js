@@ -71,7 +71,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
-    GeoPackageAPI.createAttributeTable(geopackage, 'NewTable', properties)
+    geopackage.createAttributeTable('NewTable', properties)
       .then(function() {
         var reader = new AttributeTableReader('NewTable');
         var result = reader.readTable(geopackage.connection);
@@ -120,7 +120,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
-    var dao = GeoPackageAPI.createMediaTable(geopackage, 'NewTable', properties);
+    var dao = geopackage.createMediaTable('NewTable', properties);
     var reader = new UserTableReader('NewTable');
     var result = reader.readTable(geopackage.connection);
     var columns = result.columns;
@@ -166,7 +166,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: DataTypes.nameFromType(DataTypes.INTEGER)
     });
 
-    var dao = GeoPackageAPI.createSimpleAttributesTable(geopackage, 'NewTable', properties);
+    var dao = geopackage.createSimpleAttributesTable('NewTable', properties);
     var reader = new AttributeTableReader('NewTable');
     var result = reader.readTable(geopackage.connection);
     var columns = result.columns;

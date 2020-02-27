@@ -44,7 +44,7 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should get all the tiles in the bounding box', function() {
-      var tiles = GeoPackageAPI.getTilesInBoundingBox(geoPackage, 'TILESosmds', 1, -180, 180, -85, 85);
+      var tiles = geoPackage.getTilesInBoundingBox('TILESosmds', 1, -180, 180, -85, 85);
       tiles.tiles.length.should.be.equal(4);
     });
 

@@ -120,6 +120,9 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   isIndexed(): boolean {
     return this.featureTableIndex.isIndexed();
   }
+  async index(progress?: Function): Promise<boolean> {
+    return this.featureTableIndex.index(progress);
+  }
   /**
    * Query for count in bounding box
    * @param boundingBox

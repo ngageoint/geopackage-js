@@ -71,8 +71,6 @@ export class TableCreator {
    * @return {Promise<Boolean>}
    */
   createGeometryColumns(): Promise<boolean> {
-    console.log('create geometry columns');
-    console.trace();
     return this.createTable('geometry_columns');
   }
   /**

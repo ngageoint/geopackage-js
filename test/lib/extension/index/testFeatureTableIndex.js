@@ -44,17 +44,14 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       should.not.exist(tableIndex);
-      return fti.index(function(message) {
+      return fti.ngaIndexWithForce(false, function(message) {
         console.log('message', message);
       })
       .then(function(indexed) {
-        console.log('indexed', indexed);
         indexed.should.be.equal(true);
         // ensure it was created
         var fti2 = new FeatureTableIndex(geoPackage, featureDao);
-        tableIndex = fti2.getTableIndex();
-        should.exist(tableIndex);
-        should.exist(tableIndex.last_indexed);
+        fti2.isIndexed().should.be.equal(true);
       })
       .then(function() {
         var exists = fti.hasExtension(fti.extensionName, fti.tableName, fti.columnName)
@@ -104,9 +101,8 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         indexed.should.be.equal(true);
         // ensure it was created
         var fti = featureDao.featureTableIndex;
-        var tableIndex = fti.getTableIndex();
-        should.exist(tableIndex);
-        should.exist(tableIndex.last_indexed);
+        const isIndexed = fti.isIndexed();
+        isIndexed.should.be.equal(true);
       });
     });
 
@@ -117,9 +113,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
         status.should.be.equal(true);
         // ensure it was created
         var fti = featureDao.featureTableIndex;
-        var tableIndex = fti.getTableIndex();
-        should.exist(tableIndex);
-        should.exist(tableIndex.last_indexed);
+        fti.isIndexed().should.be.equal(true);
       });
     });
   });
@@ -172,7 +166,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var fti = featureDao.featureTableIndex;
       var tableIndex = fti.getTableIndex();
       tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
-      return fti.indexWithForce(true)
+      return fti.ngaIndexWithForce(true)
       .then(function(indexed) {
         indexed.should.be.equal(true);
         // ensure it was created

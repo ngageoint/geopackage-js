@@ -66,7 +66,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'FEATURESriversds', 1, 0, 1, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('FEATURESriversds', 1, 0, 1, 256, 256)
       .then(function(data) {
         should.exist(data);
         console.timeEnd('Generating non indexed tiles');
@@ -80,7 +80,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 8, y: 12, z: 5 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'FEATURESriversds', 8, 12, 5, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('FEATURESriversds', 8, 12, 5, 256, 256)
       .then(function(data) {
         should.exist(data);
         console.timeEnd('Generating non indexed tiles');
@@ -127,7 +127,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'rivers', 1, 0, 1, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('rivers', 1, 0, 1, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -141,7 +141,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 0, y: 0, z: 0 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'rivers', 0, 0, 0, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('rivers', 0, 0, 0, 256, 256)
       .then(function(data) {
         should.exist(data);
         console.timeEnd('generating indexed tile');
@@ -155,7 +155,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 8, y: 12, z: 5 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('generating indexed tile');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'rivers', 8, 12, 5, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('rivers', 8, 12, 5, 256, 256)
       .then(function(data) {
         should.exist(data);
         console.timeEnd('generating indexed tile');
@@ -252,7 +252,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153631, y: 91343, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153631, 91343, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153631, 91343, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
@@ -266,7 +266,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153632, y: 91342, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153632, 91342, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153632, 91342, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
@@ -280,7 +280,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153632, y: 91343, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153632, 91343, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153632, 91343, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
@@ -294,7 +294,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153633, y: 91342, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153633, 91342, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153633, 91342, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
@@ -308,7 +308,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153633, y: 91343, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153633, 91343, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153633, 91343, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
@@ -376,7 +376,7 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153632, y: 91343, z: 18 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
-      GeoPackageAPI.getFeatureTileFromXYZ(geoPackage, 'Drawing Layer 1', 153632, 91343, 18, 256, 256)
+      geoPackage.getFeatureTileFromXYZ('Drawing Layer 1', 153632, 91343, 18, 256, 256)
         .then(function(data) {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');

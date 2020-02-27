@@ -55,8 +55,7 @@ export abstract class Dao<T> {
    * Checks if the table exists
    */
   isTableExists(): boolean {
-    const results = this.connection.isTableExists(this.gpkgTableName);
-    return !!results;
+    return this.connection.isTableExists(this.gpkgTableName);
   }
 
   /**
@@ -665,9 +664,7 @@ export abstract class Dao<T> {
    * @param {string} newName
    */
   rename(newName: string): void {
-    console.log('Rename ', 'ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
     this.connection.run('ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
-    console.log('ran the rename statement in DAO');
     this.gpkgTableName = newName;
   }
 }

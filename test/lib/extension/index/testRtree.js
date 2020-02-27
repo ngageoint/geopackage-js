@@ -53,7 +53,7 @@ describe('RTree tests', function() {
     });
 
     it('should query the index from the geopackage api', function() {
-      return GeoPackageAPI.getGeoJSONFeaturesInTile(geoPackage, 'line1', 0, 0, 0)
+      return geoPackage.getGeoJSONFeaturesInTile('line1', 0, 0, 0)
         .then(function(features) {
           features.length.should.be.equal(1);
         });

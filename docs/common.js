@@ -495,12 +495,10 @@ window.toggleLayer = function(layerType, table) {
       canvas.height = size.y;
       setTimeout(function() {
         console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        GeoPackageAPI.xyzTile(geoPackage, table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas).then(
-          function() {
-            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-            done(null, canvas);
-          },
-        );
+        geoPackage.xyzTile(table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas).then(function() {
+          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+          done(null, canvas);
+        });
       }, 0);
       return canvas;
     };
@@ -585,7 +583,7 @@ function mapClickEventHandler(event) {
   const { x, y, z } = getTileFromPoint(event.latlng);
   const closestFeatures = [];
   for (const featureTable in featureLayers) {
-    const cf = GeoPackageAPI.getClosestFeatureInXYZTile(geoPackage, featureTable, x, y, z, latitude, longitude);
+    const cf = geoPackage.getClosestFeatureInXYZTile(featureTable, x, y, z, latitude, longitude);
     if (cf) closestFeatures.push(cf);
   }
   console.log('closest', closestFeatures);
@@ -630,7 +628,7 @@ function addRowToLayer(iterator, row, featureDao, srs, layer) {
   return new Promise(function(resolve, reject) {
     setTimeout(function() {
       const currentRow = featureDao.getFeatureRow(row);
-      const json = GeoPackageAPI.parseFeatureRowIntoGeoJSON(currentRow, srs);
+      const json = GeoPackage.parseFeatureRowIntoGeoJSON(currentRow, srs);
       layer.addData(json);
       resolve(json);
     });
@@ -863,8 +861,7 @@ window.loadTiles = function(tableName, zoom, tilesElement) {
   const tilesTableTemplate = $('#all-tiles-template').html();
   Mustache.parse(tilesTableTemplate);
 
-  const tiles = GeoPackageAPI.getTilesInBoundingBoxWebZoom(
-    geoPackage,
+  const tiles = geoPackage.getTilesInBoundingBoxWebZoom(
     tableName,
     zoom,
     Math.max(-180, mapBounds.getWest()),
@@ -908,7 +905,7 @@ window.zoomToTile = function(
   const sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
   const ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
 
-  const tile = GeoPackageAPI.getTileFromTable(geoPackage, tableName, zoom, tileRow, tileColumn);
+  const tile = geoPackage.getTileFromTable(tableName, zoom, tileRow, tileColumn);
   const tileData = tile.tileData;
   const type = fileType(tileData);
   let binary = '';
@@ -984,7 +981,7 @@ window.loadFeatures = function(tableName, featuresElement) {
 
   const featuresTable = featuresElement.find('#' + tableName + '-feature-table');
 
-  const each = GeoPackageAPI.iterateGeoJSONFeaturesFromTable(geoPackage, tableName);
+  const each = geoPackage.iterateGeoJSONFeaturesFromTable(tableName);
   const promise = Promise.resolve();
   for (const row of each.results) {
     const feature = row;
@@ -1058,7 +1055,7 @@ var highlightLayer = L.geoJson([], {
 map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
-  const geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId);
+  const geoJson = geoPackage.getFeature(tableName, featureId);
   geoJson.properties.tableName = tableName;
   highlightLayer.clearLayers();
   highlightLayer.addData(geoJson);
@@ -1121,7 +1118,7 @@ window.toggleFeature = function(featureId, tableName, zoom, force) {
 
   currentFeature = featureId;
 
-  const geoJson = GeoPackageAPI.getFeature(geoPackage, tableName, featureId);
+  const geoJson = geoPackage.getFeature(tableName, featureId);
   geoJson.properties.tableName = tableName;
   featureLayer.addData(geoJson);
   featureLayer.bringToFront();

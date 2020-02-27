@@ -361,9 +361,10 @@ export class RTreeIndex extends BaseExtension {
     });
   }
   createIsEmptyFunction(): void {
-    this.connection.registerFunction('ST_IsEmpty', function(buffer: Buffer | Uint8Array) {
+    this.connection.registerFunction('ST_IsEmpty', function(buffer: Buffer | Uint8Array): number {
       const geom = new GeometryData(buffer);
-      return !geom || geom.empty || !geom.geometry;
+      const empty = !geom || geom.empty || !geom.geometry;
+      return empty ? 1 : 0;
     });
   }
 }

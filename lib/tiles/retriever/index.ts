@@ -117,7 +117,6 @@ export class GeoPackageTileRetriever {
       targetProjection,
       canvas,
     );
-    console.time('Getting results');
     const iterator = this.retrieveTileResults(
       targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection),
       tileMatrix,

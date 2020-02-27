@@ -1,4 +1,3 @@
-import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
@@ -74,7 +73,7 @@ describe('IconCache Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = await GeoPackageAPI.createFeatureTable(geopackage, featureTableName)
+    featureTable = await geopackage.createFeatureTable(featureTableName)
     await geopackage.featureStyleExtension.getOrCreateExtension(featureTableName)
     await geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
     await geopackage.featureStyleExtension.getContentsId().getOrCreateExtension()

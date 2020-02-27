@@ -94,7 +94,7 @@ describe('StyleExtension Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = await GeoPackageAPI.createFeatureTable(geopackage, featureTableName)
+    featureTable = await geopackage.createFeatureTable(featureTableName)
     var box = {
       "type": "Polygon",
       "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]

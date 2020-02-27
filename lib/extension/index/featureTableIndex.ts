@@ -83,8 +83,45 @@ export class FeatureTableIndex extends BaseExtension {
     this.progress = function(message: any): void {
       setTimeout(progress, 0, message);
     };
-    const indexed = this.isIndexed();
-    if (force || !indexed) {
+    let indexed = this.isIndexed();
+    if (!indexed || force) {
+      const rtreeIndex = new RTreeIndex(this.geoPackage, this.featureDao);
+      await rtreeIndex.create();
+      this.rtreeIndexed = rtreeIndex.hasExtension(
+        rtreeIndex.extensionName,
+        rtreeIndex.tableName,
+        rtreeIndex.columnName,
+      );
+      indexed = this.isIndexed();
+    }
+    if (!indexed) {
+      await this.getOrCreateExtension();
+      const tableIndex = await this.getOrCreateTableIndex();
+      await this.createOrClearGeometryIndicies();
+      return this.indexTable(tableIndex);
+    } else {
+      return indexed;
+    }
+  }
+
+  /**
+   * Index the table using the NGA index and Rtree if not already indexed or force is true
+   * @param  {Boolean} force force index even if the table is already indexed
+   * @param  {Function} progress function which is called with progress while indexing
+   * @return {Promise<Boolean>} promise resolved when the indexing is complete
+   */
+  async ngaIndexWithForce(force?: false, progress?: Function): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    progress = progress || function(): void {};
+    this.progress = function(message: any): void {
+      setTimeout(progress, 0, message);
+    };
+    const indexed = this.isIndexed(true);
+    if (!indexed || force) {
+      const rtreeIndex = new RTreeIndex(this.geoPackage, this.featureDao);
+      await rtreeIndex.create();
+    }
+    if (!indexed || force) {
       await this.getOrCreateExtension();
       const tableIndex = await this.getOrCreateTableIndex();
       await this.createOrClearGeometryIndicies();
@@ -97,8 +134,18 @@ export class FeatureTableIndex extends BaseExtension {
    * Check if the table is indexed either with an RTree or the NGA Feature Table Index
    * @return {Boolean}
    */
-  isIndexed(): boolean {
-    if (this.rtreeIndexed) return true;
+  isIndexed(checkOnlyNGA = false): boolean {
+    if (!checkOnlyNGA) {
+      const rtreeIndex = new RTreeIndex(this.geoPackage, this.featureDao);
+      this.rtreeIndexed = rtreeIndex.hasExtension(
+        rtreeIndex.extensionName,
+        rtreeIndex.tableName,
+        rtreeIndex.columnName,
+      );
+      if (this.rtreeIndexed) {
+        return true;
+      }
+    }
     try {
       const result = this.getFeatureTableIndexExtension();
       if (result) {

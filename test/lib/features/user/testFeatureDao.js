@@ -238,7 +238,6 @@ describe('FeatureDao tests', function() {
 
       // @ts-ignore
       var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
-      var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
       var columns = [];
 
@@ -377,7 +376,7 @@ describe('FeatureDao tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      await geopackage.createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+      await geopackage.createFeatureTable('QueryTest', geometryColumns, columns)
       var featureDao = geopackage.getFeatureDao('QueryTest');
       queryTestFeatureDao = featureDao;
       createRow(box1, 'box1', featureDao);
@@ -409,14 +408,14 @@ describe('FeatureDao tests', function() {
 
     it('should query for _feature_id', function() {
       // @ts-ignore
-      var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'line');
+      var row = geopackage.getFeature('QueryTest', 'line');
       // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
 
     it('should query for _properties_id', function() {
       // @ts-ignore
-      var row = GeoPackageAPI.getFeature(geopackage, 'QueryTest', 'propertiesline');
+      var row = geopackage.getFeature('QueryTest', 'propertiesline');
       // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
@@ -433,7 +432,7 @@ describe('FeatureDao tests', function() {
       // @ts-ignore
       // @ts-ignore
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      return GeoPackageAPI.getFeaturesInBoundingBox(geopackage, 'QueryTest', -.4, -.6, 2.4, 2.6)
+      return geopackage.getFeaturesInBoundingBox('QueryTest', -.4, -.6, 2.4, 2.6)
       .then(function(iterator) {
         for (var feature of iterator) {
           feature.values.name.should.be.equal('box1');
@@ -560,7 +559,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1029, 1013, 11, 256, 256)
+      return geopackage.getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -570,7 +569,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 1026, 1015, 11, 256, 256)
+      return geopackage.getFeatureTileFromXYZ('QueryTest', 1026, 1015, 11, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -580,7 +579,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 features as geojson', function() {
       this.timeout(3000);
       console.time('generating indexed tile');
-      return GeoPackageAPI.getGeoJSONFeaturesInTile(geopackage, 'QueryTest', 64, 63, 7)
+      return geopackage.getGeoJSONFeaturesInTile('QueryTest', 64, 63, 7)
       .then(function(geoJSON) {
         console.timeEnd('generating indexed tile');
         should.exist(geoJSON);
@@ -591,7 +590,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(3000);
       console.time('generating indexed tile');
-      return GeoPackageAPI.getFeatureTileFromXYZ(geopackage, 'QueryTest', 64, 63, 7, 256, 256)
+      return geopackage.getFeatureTileFromXYZ('QueryTest', 64, 63, 7, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);

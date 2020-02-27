@@ -249,7 +249,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
   );
 
   return geopackage
-    .createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, 4326, columns)
+    .createFeatureTable(tableName, geometryColumns, columns, boundingBox, 4326)
     .then(function(result) {
       const featureDao = geopackage.getFeatureDao(tableName);
       for (let i = 0; i < features.length; i++) {
@@ -489,7 +489,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'NGA_Logo.png'));
     })
     .then(function(ngaLogoBuffer) {
-      const ngaRowId = GeoPackageAPI.addMedia(geopackage, 'media', ngaLogoBuffer, 'image/png');
+      const ngaRowId = geopackage.addMedia('media', ngaLogoBuffer, 'image/png');
       const ngaLogo = mediaDao.queryForId(ngaRowId);
 
       const featureDao = geopackage.getFeatureDao('geometry2');
@@ -498,8 +498,8 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       return rows.reduce(function(sequence, row) {
         return sequence.then(function() {
           const featureRow = featureDao.getRow(row);
-          GeoPackageAPI.linkMedia(geopackage, 'geometry2', featureRow.getId(), 'media', ngaRowId).then(function() {
-            const relationships = GeoPackageAPI.getLinkedMedia(geopackage, 'geometry2', featureRow.getId());
+          geopackage.linkMedia('geometry2', featureRow.getId(), 'media', ngaRowId).then(function() {
+            const relationships = geopackage.getLinkedMedia('geometry2', featureRow.getId());
             relationships.length.should.be.equal(1);
             relationships[0].getId().should.be.equal(ngaRowId);
           });
@@ -814,7 +814,7 @@ GeoPackageUtils.createAttributes = function(geopackage) {
       date: new Date().toISOString().slice(0, 10),
       datetime: new Date().toISOString(),
     };
-    GeoPackageAPI.addAttributeRow(geopackage, tableName, row);
+    geopackage.addAttributeRow(tableName, row);
 
     attributeDao.queryForAll().length.should.be.equal(11);
     return geopackage;

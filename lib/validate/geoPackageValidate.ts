@@ -2,11 +2,9 @@ import path from 'path';
 import { GeoPackage } from '../geoPackage';
 import { GeoPackageConstants } from '../geoPackageConstants';
 
-/**
- * GeoPackageValidate module.
- * @module validate/geoPackageValidate
- *
- */
+export class GeoPackageValidationError {
+  constructor(public error: string, public fatal?: boolean) {}
+}
 
 export class GeoPackageValidate {
   /**
@@ -27,11 +25,11 @@ export class GeoPackageValidate {
   /**
    * Validate the extension file as a GeoPackage
    * @param  {string}   filePath Absolute path to the GeoPackage to create
-   * @return {Error}    error if the extension is not valid
+   * @return {GeoPackageValidationError}    error if the extension is not valid
    */
-  static validateGeoPackageExtension(filePath: string): Error {
+  static validateGeoPackageExtension(filePath: string): GeoPackageValidationError {
     if (!GeoPackageValidate.hasGeoPackageExtension(filePath)) {
-      return new Error(
+      return new GeoPackageValidationError(
         "GeoPackage database file '" +
           filePath +
           "' does not have a valid extension of '" +
@@ -39,8 +37,22 @@ export class GeoPackageValidate {
           "' or '" +
           GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION +
           "'",
+        true,
       );
     }
+  }
+
+  static validateMinimumTables(geoPackage: GeoPackage): GeoPackageValidationError[] {
+    const errors: GeoPackageValidationError[] = [];
+    const srsExists = geoPackage.spatialReferenceSystemDao.isTableExists();
+    const contentsExists = geoPackage.contentsDao.isTableExists();
+    if (!srsExists) {
+      errors.push(new GeoPackageValidationError('gpkg_spatial_ref_sys table does not exist', true));
+    }
+    if (!contentsExists) {
+      errors.push(new GeoPackageValidationError('gpkg_contents table does not exist', true));
+    }
+    return errors;
   }
 
   /**
@@ -48,14 +60,6 @@ export class GeoPackageValidate {
    * @param  {Object}   geoPackage GeoPackage to check
    */
   static hasMinimumTables(geoPackage: GeoPackage): boolean {
-    const srsExists = geoPackage.spatialReferenceSystemDao.isTableExists();
-    const contentsExists = geoPackage.contentsDao.isTableExists();
-    return srsExists && contentsExists;
+    return this.validateMinimumTables(geoPackage).length == 0;
   }
-
-  /**
-   * Validation callback is passed an error if the validation failed.
-   * @callback module:validate/geoPackageValidate~validationCallback
-   * @param {Error} null if no error, otherwise describes the error
-   */
 }
