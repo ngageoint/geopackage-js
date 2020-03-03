@@ -106,7 +106,7 @@
     ]
   },
   "scripts": {
-    "gh-pages-build": "npm run install && npm run create --prefix docs && npm run clean --prefix docs",
+    "gh-pages-build": "npm install && npm run create --prefix docs && npm run clean --prefix docs",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage",
     "clean-built": "rm -rf ./built",
     "test-sqlnode": "npm run clean-built && nyc --no-clean mocha -r ts-node/register",
