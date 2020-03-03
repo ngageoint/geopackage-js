@@ -1,7 +1,7 @@
 import { AttributeTable } from './attributeTable';
 import { UserRow } from '../user/userRow';
-import { DataTypes } from '../..';
 import { DBValue } from '../db/dbAdapter';
+import { DataTypes } from '../db/dataTypes';
 
 /**
  * Attribute Row containing the values from a single result set row

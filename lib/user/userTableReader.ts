@@ -3,10 +3,10 @@
  * @module user/userTableReader
  */
 import { UserTable } from './userTable';
-import { GeoPackageConnection } from '../..';
 import { UserColumn } from './userColumn';
 import { DataTypes } from '../db/dataTypes';
 import { DBValue } from '../db/dbAdapter';
+import { GeoPackageConnection } from '../db/geoPackageConnection';
 
 /**
  * @class

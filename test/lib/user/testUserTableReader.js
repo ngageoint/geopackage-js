@@ -64,7 +64,7 @@ describe('UserTableReader tests', function() {
       ur.getRowColumnTypeWithColumnName('fid').should.be.equal(5);
       ur.getColumnWithIndex(0).name.should.be.equal('fid');
       ur.getColumnWithColumnName('fid').name.should.be.equal('fid');
-      ur.getId().should.be.equal(i+1);
+      ur.id.should.be.equal(i+1);
       ur.getPkColumn().name.should.be.equal('fid');
       ur.getColumnWithIndex(0).getTypeName().should.be.equal('INTEGER');
       should.exist(ur.values);

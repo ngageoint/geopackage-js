@@ -410,8 +410,7 @@ describe('GeoPackageAPI tests', function() {
         'rivers',
         true
       );
-      const iterator = await GeoPackage.iterateGeoJSONFeatures(
-        indexedGeopackage,
+      const iterator = await indexedGeopackage.iterateGeoJSONFeatures(
         'rivers',
         new BoundingBox(-99.9, -99.8, 40.16, 40.18),
       );
@@ -436,8 +435,10 @@ describe('GeoPackageAPI tests', function() {
         'rivers',
         true
       );
-      const iterator = indexedGeopackage.iterateGeoJSONFeaturesFromTable('rivers');
-      for (const geoJson of iterator.results) {
+      const iterator = indexedGeopackage.iterateGeoJSONFeatures('rivers');
+      iterator.srs.should.exist;
+      iterator.featureDao.should.exist;
+      for (const geoJson of iterator) {
         // @ts-ignore
         should.exist(geoJson.properties);
       }
@@ -530,12 +531,12 @@ describe('GeoPackageAPI tests', function() {
           should.exist(feature);
           feature.id.should.be.equal(2);
           should.exist(feature.geometry);
-          return geopackage.iterateGeoJSONFeaturesFromTable(tableName);
+          return geopackage.iterateGeoJSONFeatures(tableName);
         })
         .then(function(each) {
           let count = 0;
           // @ts-ignore
-          for (const row of each.results) {
+          for (const row of each) {
             count++;
           }
           count.should.be.equal(2);

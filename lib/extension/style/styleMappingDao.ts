@@ -9,8 +9,8 @@ import { StyleMappingTable } from './styleMappingTable';
 import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { StyleMappingRow } from './styleMappingRow';
 import { UserRow } from '../../user/userRow';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Style Mapping DAO for reading user mapping data tables

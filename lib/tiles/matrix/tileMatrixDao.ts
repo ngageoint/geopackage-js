@@ -7,6 +7,7 @@ import { Dao } from '../../dao/dao';
 import { TileMatrix } from './tileMatrix';
 import { Contents } from '../../core/contents/contents';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -39,8 +40,19 @@ export class TileMatrixDao extends Dao<TileMatrix> {
     TileMatrixDao.COLUMN_PIXEL_Y_SIZE,
   ];
 
-  createObject(): TileMatrix {
-    return new TileMatrix();
+  createObject(results?: Record<string, DBValue>): TileMatrix {
+    const tm = new TileMatrix();
+    if (results) {
+      tm.table_name = results.table_name as string;
+      tm.zoom_level = results.zoom_level as number;
+      tm.matrix_width = results.matrix_width as number;
+      tm.matrix_height = results.matrix_height as number;
+      tm.tile_width = results.tile_width as number;
+      tm.tile_height = results.tile_height as number;
+      tm.pixel_x_size = results.pixel_x_size as number;
+      tm.pixel_y_size = results.pixel_y_size as number;
+    }
+    return tm;
   }
   /**
    * get the Contents of the Tile matrix

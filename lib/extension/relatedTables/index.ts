@@ -116,7 +116,7 @@ export class RelatedTablesExtension extends BaseExtension {
       if (baseTableName) {
         return this.geoPackage.extendedRelationDao.getBaseTableRelations(baseTableName);
       }
-      return this.extendedRelationDao.queryForAll();
+      return (this.extendedRelationDao.queryForAll() as unknown) as ExtendedRelation[];
     }
     return [];
   }
@@ -430,8 +430,8 @@ export class RelatedTablesExtension extends BaseExtension {
       const tablesToDelete: string[] = [];
       const relationsToDelete: ExtendedRelation[] = [];
       for (const extendedRelation of iterator) {
-        tablesToDelete.push(extendedRelation.mapping_table_name);
-        relationsToDelete.push(extendedRelation);
+        tablesToDelete.push(extendedRelation.mapping_table_name as string);
+        relationsToDelete.push((extendedRelation as unknown) as ExtendedRelation);
       }
       tablesToDelete.forEach(table => {
         this.geoPackage.deleteTable(table);

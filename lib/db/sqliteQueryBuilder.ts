@@ -187,9 +187,9 @@ export class SqliteQueryBuilder {
     table: string,
     values: Record<string, DBValue>,
     where: string,
-    whereArgs: any[] | any,
-  ): { sql: string; args: any[] } {
-    const args: any[] = [];
+    whereArgs: DBValue[] | DBValue,
+  ): { sql: string; args: DBValue[] } {
+    const args: DBValue[] = [];
     let update = 'update ' + table + ' set ';
     let first = true;
     for (const columnName in values) {
@@ -202,8 +202,12 @@ export class SqliteQueryBuilder {
       update += '=?';
     }
     if (whereArgs) {
-      for (let i = 0; i < whereArgs.length; i++) {
-        args.push(whereArgs[i]);
+      if (whereArgs instanceof Array) {
+        for (let i = 0; i < whereArgs.length; i++) {
+          args.push(whereArgs[i]);
+        }
+      } else {
+        args.push(whereArgs);
       }
     }
     if (where) {
@@ -254,7 +258,7 @@ export class SqliteQueryBuilder {
     return update;
   }
 
-  private static appendClauseToString(string: string, name: string, clause?: any): string {
+  private static appendClauseToString(string: string, name: string, clause?: DBValue): string {
     if (clause) {
       string += name + clause;
     }

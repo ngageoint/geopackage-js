@@ -6,8 +6,8 @@ import { UserDao } from '../../user/userDao';
 import { SimpleAttributesTable } from './simpleAttributesTable';
 import { SimpleAttributesRow } from './simpleAttributesRow';
 import { GeoPackage } from '../../geoPackage';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables

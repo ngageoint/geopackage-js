@@ -3,9 +3,8 @@ import { UserTableReader } from '../../user/userTableReader';
 import { MediaTable } from './mediaTable';
 import { MediaRow } from './mediaRow';
 import { GeoPackage } from '../../geoPackage';
-import { DataTypes } from '../../..';
-import { ColumnValues } from '../../dao/columnValues';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * MediaDao module.

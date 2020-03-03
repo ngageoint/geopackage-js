@@ -5,8 +5,9 @@
 
 import { UserRow } from '../../user/userRow';
 import { SimpleAttributesTable } from './simpleAttributesTable';
-import { DataTypes, UserColumn } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
@@ -35,7 +36,7 @@ export class SimpleAttributesRow extends UserRow {
    * Gets the id
    * @return {Number}
    */
-  getId(): number {
+  get id(): number {
     return this.getValueWithColumnName(this.getIdColumn().name);
   }
 }

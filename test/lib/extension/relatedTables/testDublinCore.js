@@ -188,7 +188,6 @@ describe('Dublin Core tests', function() {
   it('set synonym value', function() {
     class MockUserRow extends UserRow {
       setValueWithColumnName(name, value) {
-        console.log('set value with name', name);
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'content_type') {
           value.should.be.equal('format');
@@ -327,7 +326,6 @@ describe('Dublin Core tests', function() {
         }
       }
       hasColumn(name) {
-        console.log('looking for column', name);
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
           return true;

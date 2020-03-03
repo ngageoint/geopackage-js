@@ -104,12 +104,14 @@ describe('FeatureDao tests', function() {
 
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'test_shapes_two_points.gpkg');
     var filename;
+    var geoPackage;
 
     beforeEach('should copy the geopackage', async function() {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
+      geoPackage = result.geopackage;
     });
 
     afterEach('should close the geopackage', async function() {
@@ -118,16 +120,14 @@ describe('FeatureDao tests', function() {
 
     it('should query for GeoJSON features', function() {
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      GeoPackageAPI.queryForGeoJSONFeaturesInTableFromPath(filename, 'QueryTest', bb)
-      .then(function(features) {
-        features[0].properties.name.should.be.equal('box1');
-      });
+      const features = geoPackage.queryForGeoJSONFeaturesInTable('QueryTest', bb);
+      features[0].properties.name.should.be.equal('box1');
     });
 
     it('should iterate GeoJSON features', async function() {
       var count = 0;
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      const iterator = await GeoPackageAPI.iterateGeoJSONFeatures(filename, 'QueryTest', bb)
+      const iterator = await geoPackage.iterateGeoJSONFeatures('QueryTest', bb)
       for (var feature of iterator) {
         feature.properties.name.should.be.equal('box1');
         count++;
@@ -665,7 +665,7 @@ describe('FeatureDao tests', function() {
       .then(function() {
         var linkedFeatures = queryTestFeatureDao.getLinkedFeatures(featureRow);
         linkedFeatures.length.should.be.equal(1);
-        linkedFeatures[0].id.should.be.equal(relatedFeatureRow.getId());
+        linkedFeatures[0].id.should.be.equal(relatedFeatureRow.id);
       });
     });
   });

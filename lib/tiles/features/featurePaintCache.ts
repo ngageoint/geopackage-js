@@ -20,7 +20,7 @@ export class FeaturePaintCache {
    * @return {module:tiles/features~FeaturePaint} feature paint or null
    */
   getFeaturePaintForStyleRow(styleRow: StyleRow): FeaturePaint {
-    return this.getFeaturePaint(styleRow.getId());
+    return this.getFeaturePaint(styleRow.id);
   }
   /**
    * Get the cached featurePaint for the style row id or null if not cached
@@ -45,7 +45,7 @@ export class FeaturePaintCache {
    * @return {module:tiles/features~Paint} paint
    */
   getPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType): Paint {
-    return this.getPaint(styleRow.getId(), type);
+    return this.getPaint(styleRow.id, type);
   }
   /**
    * Get the paint for the style row id and draw type
@@ -68,7 +68,7 @@ export class FeaturePaintCache {
    * @param {module:tiles/features~Paint} paint paint
    */
   setPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType, paint: Paint): void {
-    this.setPaint(styleRow.getId(), type, paint);
+    this.setPaint(styleRow.id, type, paint);
   }
   /**
    * Cache the featurePaint for the style row id

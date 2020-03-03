@@ -1,6 +1,7 @@
 import { Dao } from '../../dao/dao';
 import { TableCreator } from '../../db/tableCreator';
 import { TableIndex } from './tableIndex';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Table Index Data Access Object
@@ -20,8 +21,13 @@ export class TableIndexDao extends Dao<TableIndex> {
    * Create a new TableIndex object
    * @return {module:extension/index~TableIndex}
    */
-  createObject(): TableIndex {
-    return new TableIndex();
+  createObject(results?: Record<string, DBValue>): TableIndex {
+    const ti = new TableIndex();
+    if (results) {
+      ti.table_name = results.table_name as string;
+      ti.last_indexed = results.last_indexed as string;
+    }
+    return ti;
   }
   /**
    * Creates the tables necessary

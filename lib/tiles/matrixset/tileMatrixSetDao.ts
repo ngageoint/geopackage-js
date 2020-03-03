@@ -4,6 +4,7 @@ import { GeoPackage } from '../../geoPackage';
 import { TileMatrixSet } from './tileMatrixSet';
 import { Contents } from '../../core/contents/contents';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -43,8 +44,17 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
   }
 
-  createObject(): TileMatrixSet {
-    return new TileMatrixSet();
+  createObject(results?: Record<string, DBValue>): TileMatrixSet {
+    const tms = new TileMatrixSet();
+    if (results) {
+      tms.table_name = results.table_name as string;
+      tms.srs_id = results.srs_id as number;
+      tms.min_y = results.min_y as number;
+      tms.min_x = results.min_x as number;
+      tms.max_y = results.max_y as number;
+      tms.max_x = results.max_x as number;
+    }
+    return tms;
   }
   /**
    * Get the tile table names

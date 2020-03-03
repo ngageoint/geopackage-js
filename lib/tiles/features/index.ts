@@ -658,7 +658,7 @@ export class FeatureTiles {
         }
         if (geojson === undefined || geojson === null) {
           geojson = featureRow.getGeometry().geometry.toGeoJSON() as Geometry & CrsGeometry;
-          this.geometryCache.setGeometry(featureRow.getId(), geojson);
+          this.geometryCache.setGeometry(featureRow.id, geojson);
         }
         const style = this.getFeatureStyle(featureRow);
         await this.drawGeometry(
@@ -726,7 +726,7 @@ export class FeatureTiles {
       }
       if (gj === undefined || gj === null) {
         gj = fr.getGeometry().geometry.toGeoJSON() as Geometry & CrsGeometry;
-        this.geometryCache.setGeometry(fr.getId(), gj);
+        this.geometryCache.setGeometry(fr.id, gj);
       }
       const style = this.getFeatureStyle(fr);
       await this.drawGeometry(simplifyTolerance, gj, context, this.webMercatorTransform.bind(this), boundingBox, style);

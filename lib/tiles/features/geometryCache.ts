@@ -28,7 +28,7 @@ export class GeometryCache {
    * @returns {module:tiles/features~Geometry}
    */
   getGeometryForFeatureRow(featureRow: FeatureRow): Geometry & CrsGeometry {
-    return this.getGeometry(featureRow.getId());
+    return this.getGeometry(featureRow.id);
   }
 
   /**

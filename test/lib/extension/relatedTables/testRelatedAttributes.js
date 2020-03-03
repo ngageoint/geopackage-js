@@ -47,7 +47,7 @@ describe('Related Attributes tests', function() {
     var attributesTables = geoPackage.getAttributesTables();
 
     var baseTableName = geoPackage.getAttributesTables()[0];
-    var attributesDao = geoPackage.getAttributeDaoWithTableName(baseTableName);
+    var attributesDao = geoPackage.getAttributeDao(baseTableName);
 
     var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
     var mappingTableName = 'attributes_2_attributes';

@@ -1,5 +1,6 @@
 import { Dao } from '../../dao/dao';
 import { ContentsId } from './contentsId';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Contents Id Data Access Object
@@ -17,8 +18,13 @@ export class ContentsIdDao extends Dao<ContentsId> {
    * Create a {module:extension/contents.ContentsId} object
    * @return {module:extension/contents.ContentsId}
    */
-  createObject(): ContentsId {
-    return new ContentsId();
+  createObject(results?: Record<string, DBValue>): ContentsId {
+    const c = new ContentsId();
+    if (results) {
+      c.id = results.id as number;
+      c.table_name = results.table_name as string;
+    }
+    return c;
   }
   /**
    * Create the necessary tables for this dao
@@ -35,7 +41,7 @@ export class ContentsIdDao extends Dao<ContentsId> {
     const tableNames = [];
     const tableNameColumns = this.queryForColumns('table_name');
     for (let i = 0; i < tableNameColumns.length; i++) {
-      tableNames.push(tableNameColumns[i].table_name);
+      tableNames.push(tableNameColumns[i].table_name as string);
     }
     return tableNames;
   }
@@ -50,7 +56,7 @@ export class ContentsIdDao extends Dao<ContentsId> {
       this.buildWhereArgs(tableName),
     );
     if (contentsIds.length > 0) {
-      return contentsIds[0];
+      return (contentsIds[0] as unknown) as ContentsId;
     } else {
       return null;
     }

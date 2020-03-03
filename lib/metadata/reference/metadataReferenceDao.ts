@@ -13,7 +13,7 @@ export class MetadataReferenceDao extends Dao<MetadataReference> {
   public static readonly COLUMN_REFERENCE_SCOPE: string = 'reference_scope';
   public static readonly COLUMN_TABLE_NAME: string = 'table_name';
   public static readonly COLUMN_COLUMN_NAME: string = 'column_name';
-  public static readonly COLUMN_ROW_ID: string = 'row_id';
+  public static readonly COLUMN_ROW_ID: string = 'row_id_value';
   public static readonly COLUMN_TIMESTAMP: string = 'timestamp';
   public static readonly COLUMN_MD_FILE_ID: string = 'md_file_id';
   public static readonly COLUMN_MD_PARENT_ID: string = 'md_parent_id';
@@ -21,8 +21,18 @@ export class MetadataReferenceDao extends Dao<MetadataReference> {
   readonly gpkgTableName: string = MetadataReferenceDao.TABLE_NAME;
   readonly idColumns: string[] = [MetadataReferenceDao.COLUMN_MD_FILE_ID, MetadataReferenceDao.COLUMN_MD_PARENT_ID];
 
-  createObject(): MetadataReference {
-    return new MetadataReference();
+  createObject(results?: Record<string, DBValue>): MetadataReference {
+    const mr = new MetadataReference();
+    if (results) {
+      mr.reference_scope = results.reference_scope as string;
+      mr.table_name = results.table_name as string;
+      mr.column_name = results.column_name as string;
+      mr.row_id_value = results.row_id_value as number;
+      mr.timestamp = new Date(results.timestamp as string);
+      mr.md_file_id = results.md_file_id as number;
+      mr.md_parent_id = results.md_parent_id as number;
+    }
+    return mr;
   }
   /**
    * @param {Number} parentId

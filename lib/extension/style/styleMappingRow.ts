@@ -6,8 +6,8 @@
 import { UserMappingRow } from '../relatedTables/userMappingRow';
 import { StyleMappingTable } from './styleMappingTable';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * User Mapping Row containing the values from a single result set row

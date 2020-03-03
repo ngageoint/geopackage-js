@@ -4,6 +4,7 @@ import { FeatureDao } from '../../features/user/featureDao';
 import { GeoPackage } from '../../geoPackage';
 import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder';
 import { FeatureRow } from '../../features/user/featureRow';
+import { DBValue } from '../../db/dbAdapter';
 /**
  * RTree module.
  */
@@ -38,8 +39,11 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
     super(geoPackage);
     this.featureDao = featureDao;
   }
-  createObject(): RTreeIndex {
-    return new RTreeIndex(this.geoPackage, this.featureDao);
+  createObject(results?: Record<string, DBValue>): RTreeIndex {
+    const rti = new RTreeIndex(this.geoPackage, this.featureDao);
+    if (results) {
+    }
+    return rti;
   }
   /**
    * Generate query components

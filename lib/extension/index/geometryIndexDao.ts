@@ -33,8 +33,21 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
     super(geoPackage);
     this.featureDao = featureDao;
   }
-  createObject(): GeometryIndex {
-    return new GeometryIndex();
+  createObject(results?: Record<string, DBValue>): GeometryIndex {
+    const gi = new GeometryIndex();
+    if (results) {
+      gi.table_name = results.table_name as string;
+      gi.geom_id = results.geom_id as number;
+      gi.min_x = results.min_x as number;
+      gi.max_x = results.max_x as number;
+      gi.min_y = results.min_y as number;
+      gi.max_y = results.max_y as number;
+      gi.min_z = results.min_z as number;
+      gi.max_z = results.max_z as number;
+      gi.min_m = results.min_m as number;
+      gi.max_m = results.max_m as number;
+    }
+    return gi;
   }
   /**
    * Get the Table Index of the Geometry Index
@@ -51,7 +64,9 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    * @return {Iterable}
    */
   queryForTableName(tableName: string): IterableIterator<GeometryIndex> {
-    return this.queryForEach(GeometryIndexDao.COLUMN_TABLE_NAME, tableName);
+    return (this.queryForEach(GeometryIndexDao.COLUMN_TABLE_NAME, tableName) as unknown) as IterableIterator<
+      GeometryIndex
+    >;
   }
 
   /**
@@ -190,7 +205,12 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
    */
   queryWithGeometryEnvelope(envelope: Envelope): IterableIterator<GeometryIndex> {
     const result = this._generateGeometryEnvelopeQuery(envelope);
-    return this.queryJoinWhereWithArgs(result.join, result.where, result.whereArgs, result.tableNameArr);
+    return (this.queryJoinWhereWithArgs(
+      result.join,
+      result.where,
+      result.whereArgs,
+      result.tableNameArr,
+    ) as unknown) as IterableIterator<GeometryIndex>;
   }
   /**
    * @param  {Object} envelope envelope

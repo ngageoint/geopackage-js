@@ -168,14 +168,14 @@ describe('Related Tile tests', function() {
             var featureIds = [];
             for (var i = 0; i < allFeatures.length; i++) {
               var row = featureDao.getRow(allFeatures[i]);
-              featureIds.push(row.getId());
+              featureIds.push(row.id);
             }
 
             var allTiles = tileDao.queryForAll();
             var tileIds = [];
             for (var i = 0; i < allTiles.length; i++) {
               var row = tileDao.getRow(allTiles[i]);
-              tileIds.push(row.getId());
+              tileIds.push(row.id);
             }
 
             // Insert user mapping rows between feature ids and media ids
@@ -253,16 +253,16 @@ describe('Related Tile tests', function() {
               var features = featureDao.queryForAll();
               for (var f = 0; f < features.length; f++) {
                 var featureRow = featureDao.getRow(features[f]);
-                var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.getId());
+                var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.id);
                 var tileRows = tileDao.getRows(mappedIds);
                 tileRows.length.should.be.equal(mappedIds.length);
 
                 tileRows.forEach(function(row) {
                   var tileRow = tileDao.getRow(row);
                   tileRow.hasId().should.be.equal(true);
-                  tileRow.getId().should.be.greaterThan(0);
-                  tileIds.indexOf(tileRow.getId()).should.not.be.equal(-1);
-                  tileIds.indexOf(tileRow.getId()).should.not.be.equal(-1);
+                  tileRow.id.should.be.greaterThan(0);
+                  tileIds.indexOf(tileRow.id).should.not.be.equal(-1);
+                  tileIds.indexOf(tileRow.id).should.not.be.equal(-1);
                 });
 
                 totalMapped += mappedIds.length;
@@ -318,14 +318,14 @@ describe('Related Tile tests', function() {
               var totalMapped = 0;
               tiles.forEach(function(row) {
                 var tileRow = tileDao.getRow(row);
-                var mappedIds = rte.getMappingsForRelated(tileRelation.mapping_table_name, tileRow.getId());
+                var mappedIds = rte.getMappingsForRelated(tileRelation.mapping_table_name, tileRow.id);
                 mappedIds.forEach(function(mappedId){
                   var featureRow = featureDao.queryForId(mappedId);
                   should.exist(featureRow);
                   featureRow.hasId().should.be.equal(true);
-                  featureRow.getId().should.be.greaterThan(0);
-                  featureIds.indexOf(featureRow.getId()).should.not.equal(-1);
-                  mappedIds.indexOf(featureRow.getId()).should.not.equal(-1);
+                  featureRow.id.should.be.greaterThan(0);
+                  featureIds.indexOf(featureRow.id).should.not.equal(-1);
+                  mappedIds.indexOf(featureRow.id).should.not.equal(-1);
                   if (featureRow.getValueWithColumnName(featureRow.getGeometryColumn().name)) {
                     var geometryData = featureRow.getGeometry();
                     should.exist(geometryData);

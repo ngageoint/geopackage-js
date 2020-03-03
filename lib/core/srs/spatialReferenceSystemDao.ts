@@ -1,6 +1,7 @@
 import { Dao } from '../../dao/dao';
 
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
+import { DBValue } from '../../db/dbAdapter';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao
@@ -66,8 +67,18 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * Create a new SpatialReferenceSystem object
    * @return {module:core/srs~SpatialReferenceSystem}
    */
-  createObject(): SpatialReferenceSystem {
-    return new SpatialReferenceSystem();
+  createObject(results?: Record<string, DBValue>): SpatialReferenceSystem {
+    const srs = new SpatialReferenceSystem();
+    if (results) {
+      srs.srs_name = results.srs_name as string;
+      srs.srs_id = results.srs_id as number;
+      srs.organization = results.organization as string;
+      srs.organization_coordsys_id = results.organization_coordsys_id as number;
+      srs.definition = results.definition as string;
+      srs.definition_12_063 = results.definition as string;
+      srs.description = results.description as string;
+    }
+    return srs;
   }
   /**
    * Get the Spatial Reference System for the provided id

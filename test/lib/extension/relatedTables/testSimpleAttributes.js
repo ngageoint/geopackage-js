@@ -169,19 +169,19 @@ describe('Related Simple Attributes tests', function() {
         simpleCount.should.be.equal(simpleDao.count());
 
         // Build the Attributes Ids
-        var attributesDao = geoPackage.getAttributeDaoWithTableName(baseTableName);
+        var attributesDao = geoPackage.getAttributeDao(baseTableName);
         var allAttributes = attributesDao.queryForAll();
         var attributeIds = [];
         for (var i = 0; i < allAttributes.length; i++) {
           const row = attributesDao.getRow(allAttributes[i]);
-          attributeIds.push(row.getId());
+          attributeIds.push(row.id);
         }
 
         var allSimpleAttributes = simpleDao.queryForAll();
         var simpleIds = [];
         for (var i = 0; i < allSimpleAttributes.length; i++) {
           const row = simpleDao.getRow(allSimpleAttributes[i]);
-          simpleIds.push(row.getId());
+          simpleIds.push(row.id);
         }
 
         // Insert user mapping rows between feature ids and attribute ids
@@ -263,15 +263,15 @@ describe('Related Simple Attributes tests', function() {
           var attributes = attributesDao.queryForAll();
           for (var f = 0; f < attributes.length; f++) {
             var attributeRow = attributesDao.getRow(attributes[f]);
-            var mappedIds = rte.getMappingsForBase(attributeRelation, attributeRow.getId());
+            var mappedIds = rte.getMappingsForBase(attributeRelation, attributeRow.id);
             var simpleRows = simpleDao.getRows(mappedIds);
             simpleRows.length.should.be.equal(mappedIds.length);
 
             simpleRows.forEach(function(simpleRow) {
               simpleRow.hasId().should.be.equal(true);
-              simpleRow.getId().should.be.greaterThan(0);
-              simpleIds.indexOf(simpleRow.getId()).should.not.be.equal(-1);
-              mappedIds.indexOf(simpleRow.getId()).should.not.be.equal(-1);
+              simpleRow.id.should.be.greaterThan(0);
+              simpleIds.indexOf(simpleRow.id).should.not.be.equal(-1);
+              mappedIds.indexOf(simpleRow.id).should.not.be.equal(-1);
               RelatedTablesUtils.validateUserRow(simpleColumns, simpleRow);
               RelatedTablesUtils.validateSimpleDublinCoreColumns(simpleRow);
             });
@@ -316,7 +316,7 @@ describe('Related Simple Attributes tests', function() {
           });
 
           // Get and test the attributes DAO
-          attributesDao = geoPackage.getAttributeDaoWithTableName(attributesDao.table_name);
+          attributesDao = geoPackage.getAttributeDao(attributesDao.table_name);
           should.exist(attributesDao);
           var attributeTable = attributesDao.table;
           should.exist(attributeTable);
@@ -330,14 +330,14 @@ describe('Related Simple Attributes tests', function() {
           var totalMapped = 0;
           simples.forEach(function(row) {
             var simpleRow = simpleDao.getRow(row);
-            var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.getId());
+            var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.id);
             mappedIds.forEach(function(mappedId){
               var attributeRow = attributesDao.queryForId(mappedId);
               should.exist(attributeRow);
               attributeRow.hasId().should.be.equal(true);
-              attributeRow.getId().should.be.greaterThan(0);
-              attributeIds.indexOf(attributeRow.getId()).should.not.equal(-1);
-              mappedIds.indexOf(attributeRow.getId()).should.not.equal(-1);
+              attributeRow.id.should.be.greaterThan(0);
+              attributeIds.indexOf(attributeRow.id).should.not.equal(-1);
+              mappedIds.indexOf(attributeRow.id).should.not.equal(-1);
             });
             totalMapped += mappedIds.length;
           });

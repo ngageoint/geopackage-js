@@ -39,7 +39,7 @@ describe('FeaturePaintCache Tests', function() {
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
     should.not.exist(featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint));
     should.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
-    should.exist(featurePaintCache.remove(styleRow.getId()));
+    should.exist(featurePaintCache.remove(styleRow.id));
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
   });
 

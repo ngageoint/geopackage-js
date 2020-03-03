@@ -38,18 +38,7 @@ export abstract class Dao<T> {
   /**
    * Creates a object from the result
    */
-  abstract createObject(result: any): T;
-
-  /**
-   * Copies object properties from result object to the object
-   * @param  {Object} object object to copy properties to
-   * @param  {Object} result object to copy properties from
-   */
-  populateObjectFromResult(object: T, result: T): void {
-    for (const key in result) {
-      object[key] = result[key];
-    }
-  }
+  abstract createObject(result: Record<string, DBValue>): T;
 
   /**
    * Checks if the table exists
@@ -71,15 +60,13 @@ export abstract class Dao<T> {
    * @param  id ID of the object to query for
    * @return object created from the raw database object
    */
-  queryForId(id: any): T | undefined {
+  queryForId(id: DBValue): T | undefined {
     const whereString = this.buildPkWhere(id);
     const whereArgs = this.buildPkWhereArgs(id);
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     const result = this.connection.get(query, whereArgs);
     if (!result) return;
     const object = this.createObject(result);
-    // TOOD something is wrong here
-    this.populateObjectFromResult(object, result);
     return object;
   }
 
@@ -104,14 +91,13 @@ export abstract class Dao<T> {
    * @param  idValues ColumnValues with the multi id
    * @return object created from the raw database object
    */
-  queryForMultiId(idValues: any[]): T {
+  queryForMultiId(idValues: DBValue[]): T {
     const whereString = this.buildPkWhere(idValues);
     const whereArgs = this.buildPkWhereArgs(idValues);
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     const result = this.connection.get(query, whereArgs);
     if (!result) return;
     const object = this.createObject(result);
-    this.populateObjectFromResult(object, result);
     return object;
   }
 
@@ -121,7 +107,7 @@ export abstract class Dao<T> {
    * @param  {object[]} [whereArgs] Optional where args array
    * @return {Object[]} raw object array from the database
    */
-  queryForAll(where?: string, whereArgs?: any[]): any[] {
+  queryForAll(where?: string, whereArgs?: DBValue[]): Record<string, DBValue>[] {
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
     return this.connection.all(query, whereArgs);
   }
@@ -132,7 +118,7 @@ export abstract class Dao<T> {
    * @param  {string} value     value of the like clause
    * @return {Object[]} raw object array from the database
    */
-  queryForLike(fieldName: string, value: string): any[] {
+  queryForLike(fieldName: string, value: string): Record<string, DBValue>[] {
     const values = new ColumnValues();
     values.addColumn(fieldName, value);
     const where = this.buildWhereLike(values);
@@ -147,9 +133,9 @@ export abstract class Dao<T> {
    * @param {module:dao/columnValues~ColumnValues} [fieldValues] optional values to filter on
    * @return {Object[]} raw object array from the database
    */
-  queryForColumns(columnName: string, fieldValues?: ColumnValues): any[] {
+  queryForColumns(columnName: string, fieldValues?: ColumnValues): Record<string, DBValue>[] {
     let where: string | undefined = undefined;
-    let whereArgs: any[] | null = null;
+    let whereArgs: DBValue[] | null = null;
     if (fieldValues) {
       where = this.buildWhere(fieldValues);
       whereArgs = this.buildWhereArgs(fieldValues);
@@ -164,7 +150,7 @@ export abstract class Dao<T> {
    * @param  {number} page     chunk number to query for
    * @return {Object[]} raw object array from the database
    */
-  queryForChunk(pageSize: number, page: number): any[] {
+  queryForChunk(pageSize: number, page: number): Record<string, DBValue>[] {
     const query = SqliteQueryBuilder.buildQuery(
       false,
       "'" + this.gpkgTableName + "'",
@@ -191,11 +177,11 @@ export abstract class Dao<T> {
    */
   queryForEach(
     field?: string,
-    value?: any,
+    value?: DBValue,
     groupBy?: string,
     having?: string,
     orderBy?: string,
-  ): IterableIterator<any> {
+  ): IterableIterator<Record<string, DBValue>> {
     if (!field) {
       const query: string = SqliteQueryBuilder.buildQuery(
         false,
@@ -210,7 +196,7 @@ export abstract class Dao<T> {
       return this.connection.each(query);
     } else {
       const whereString: string = this.buildWhereWithFieldAndValue(field, value);
-      const whereArgs: any[] | null = this.buildWhereArgs(value);
+      const whereArgs: DBValue[] | null = this.buildWhereArgs(value);
       const query = SqliteQueryBuilder.buildQuery(
         false,
         "'" + this.gpkgTableName + "'",
@@ -230,9 +216,9 @@ export abstract class Dao<T> {
    * @param  {module:dao/columnValues~ColumnValues} fieldValues ColumnValues to query for
    * @return {IterableIterator<any>}
    */
-  queryForFieldValues(fieldValues: ColumnValues): IterableIterator<any> {
+  queryForFieldValues(fieldValues: ColumnValues): IterableIterator<Record<string, DBValue>> {
     const whereString: string = this.buildWhere(fieldValues);
-    const whereArgs: any[] = this.buildWhereArgs(fieldValues);
+    const whereArgs: DBValue[] = this.buildWhereArgs(fieldValues);
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     return this.connection.each(query, whereArgs);
   }
@@ -245,7 +231,12 @@ export abstract class Dao<T> {
    * @param  {string[]} columns   columns to query for
    * @return {IterableIterator<any>}
    */
-  queryJoinWhereWithArgs(join: string, where?: string, whereArgs?: any[], columns?: string[]): IterableIterator<any> {
+  queryJoinWhereWithArgs(
+    join: string,
+    where?: string,
+    whereArgs?: DBValue[],
+    columns?: string[],
+  ): IterableIterator<Record<string, DBValue>> {
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", columns, where, join);
     return this.connection.each(query, whereArgs);
   }
@@ -257,7 +248,7 @@ export abstract class Dao<T> {
    * @param  {Object[]} whereArgs array of where query values
    * @return {number}
    */
-  countJoinWhereWithArgs(join: string, where?: string, whereArgs?: any[]): number {
+  countJoinWhereWithArgs(join: string, where?: string, whereArgs?: DBValue[]): number {
     const query = "select COUNT(*) as count from '" + this.gpkgTableName + "' " + join + ' where ' + where;
     const result = this.connection.get(query, whereArgs);
     return result?.count;
@@ -269,7 +260,7 @@ export abstract class Dao<T> {
    * @param  {Object[]} whereArgs array of where query values
    * @return {IterableIterator<any>}
    */
-  queryWhereWithArgsDistinct(where: string, whereArgs?: any[]): IterableIterator<any> {
+  queryWhereWithArgsDistinct(where: string, whereArgs?: DBValue[]): IterableIterator<Record<string, DBValue>> {
     const query = SqliteQueryBuilder.buildQuery(true, "'" + this.gpkgTableName + "'", undefined, where);
     return this.connection.each(query, whereArgs);
   }
@@ -286,12 +277,12 @@ export abstract class Dao<T> {
    */
   queryWhere(
     where?: string,
-    whereArgs?: any[],
+    whereArgs?: DBValue[],
     groupBy?: string,
     having?: string,
     orderBy?: string,
     limit?: number,
-  ): IterableIterator<any> {
+  ): IterableIterator<Record<string, DBValue>> {
     const query: string = SqliteQueryBuilder.buildQuery(
       false,
       "'" + this.gpkgTableName + "'",
@@ -454,7 +445,13 @@ export abstract class Dao<T> {
    * @param  {string} [orderBy] order by clause
    * @return {Object[]} array of raw database objects
    */
-  queryForAllEq(field: string, value: DBValue, groupBy?: string, having?: string, orderBy?: string): any[] {
+  queryForAllEq(
+    field: string,
+    value: DBValue,
+    groupBy?: string,
+    having?: string,
+    orderBy?: string,
+  ): Record<string, DBValue>[] {
     const whereString = this.buildWhereWithFieldAndValue(field, value);
     const whereArgs = this.buildWhereArgs(value);
     const query = SqliteQueryBuilder.buildQuery(
@@ -535,9 +532,9 @@ export abstract class Dao<T> {
    * @param  {Object} object object to delete
    * @return {number} number of objects deleted
    */
-  delete(object: T | any): number {
-    if (object.getId) {
-      return this.deleteById(object.getId());
+  delete(object: T | Record<string, DBValue>): number {
+    if (typeof (object as any).getId === 'function') {
+      return this.deleteById((object as any).getId());
     }
     return this.deleteByMultiId(this.getMultiId(object));
   }
@@ -603,7 +600,7 @@ export abstract class Dao<T> {
   updateWithValues(
     values: Record<string, DBValue>,
     where: string,
-    whereArgs: any[],
+    whereArgs: DBValue[],
   ): {
     changes: number;
     lastInsertRowid: number;

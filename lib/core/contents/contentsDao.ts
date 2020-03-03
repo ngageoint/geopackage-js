@@ -8,6 +8,8 @@ import { GeometryColumns } from '../../features/columns/geometryColumns';
 import { TileMatrixSet } from '../../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../../tiles/matrix/tileMatrix';
 import { SpatialReferenceSystem } from '../srs/spatialReferenceSystem';
+import { BoundingBox } from '../../boundingBox';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -55,8 +57,21 @@ export class ContentsDao extends Dao<Contents> {
    * Creates a new Contents object
    * @return {module:core/contents~Contents} new Contents object
    */
-  createObject(): Contents {
-    return new Contents();
+  createObject(results?: Record<string, DBValue>): Contents {
+    const c = new Contents();
+    if (results) {
+      c.table_name = results.table_name as string;
+      c.data_type = results.data_type as string;
+      c.identifier = results.identifier as string;
+      c.description = results.description as string;
+      c.last_change = results.last_change as string;
+      c.min_y = results.min_y as number;
+      c.max_y = results.max_y as number;
+      c.min_x = results.min_x as number;
+      c.max_x = results.max_x as number;
+      c.srs_id = results.srs_id as number;
+    }
+    return c;
   }
 
   /**
@@ -65,7 +80,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {string[]}           Array of table names
    */
   getTables(tableType?: string): string[] {
-    let results: { table_name: string }[];
+    let results = [];
     if (tableType) {
       const fieldValues = new ColumnValues();
       fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);
@@ -75,9 +90,32 @@ export class ContentsDao extends Dao<Contents> {
     }
     const tableNames = [];
     for (let i = 0; i < results.length; i++) {
-      tableNames.push(results[i].table_name);
+      tableNames.push(results[i].table_name as string);
     }
     return tableNames;
+  }
+
+  getContentsForTableType(tableType?: string, reprojectTo4326 = false): Contents[] {
+    const results: Contents[] = [];
+    if (tableType) {
+      const fieldValues = new ColumnValues();
+      fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);
+      for (const row of this.queryForFieldValues(fieldValues)) {
+        const contents = (row as unknown) as Contents;
+        if (reprojectTo4326) {
+          const bb = new BoundingBox(contents.min_x, contents.max_x, contents.min_y, contents.max_y).projectBoundingBox(
+            this.getProjection(contents),
+            'EPSG:4326',
+          );
+          contents.min_x = bb.minLongitude;
+          contents.max_x = bb.maxLongitude;
+          contents.min_y = bb.minLatitude;
+          contents.max_y = bb.maxLatitude;
+        }
+        results.push(contents);
+      }
+    }
+    return results;
   }
 
   /**
@@ -106,10 +144,9 @@ export class ContentsDao extends Dao<Contents> {
    */
   getGeometryColumns(contents: Contents): GeometryColumns {
     const dao: GeometryColumnsDao = this.geoPackage.geometryColumnsDao;
-    const results: GeometryColumns[] = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
+    const results = dao.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, contents.table_name);
     if (results?.length) {
-      const gc: GeometryColumns = dao.createObject();
-      dao.populateObjectFromResult(gc, results[0]);
+      const gc: GeometryColumns = dao.createObject(results[0]);
       return gc;
     }
     return undefined;
@@ -124,9 +161,7 @@ export class ContentsDao extends Dao<Contents> {
     const dao = this.geoPackage.tileMatrixSetDao;
     const results = dao.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.table_name);
     if (results?.length) {
-      const tms = dao.createObject();
-      dao.populateObjectFromResult(tms, results[0]);
-      return tms;
+      return dao.createObject(results[0]);
     }
     return undefined;
   }
@@ -142,8 +177,7 @@ export class ContentsDao extends Dao<Contents> {
     if (!results || !results.length) return undefined;
     const tileMatricies = [];
     for (let i = 0; i < results.length; i++) {
-      const gc = dao.createObject();
-      dao.populateObjectFromResult(gc, results[i]);
+      const gc = dao.createObject(results[i]);
       tileMatricies.push(gc);
     }
     return tileMatricies;

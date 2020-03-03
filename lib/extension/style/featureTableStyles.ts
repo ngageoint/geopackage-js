@@ -347,7 +347,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): FeatureStyle {
-    return this.getFeatureStyle(featureRow.getId(), geometryType);
+    return this.getFeatureStyle(featureRow.id, geometryType);
   }
   /**
    * Get the feature style default (style and icon) of the feature row,
@@ -358,7 +358,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.FeatureStyle} feature style
    */
   getFeatureStyleDefaultForFeatureRow(featureRow: FeatureRow): FeatureStyle {
-    return this.getFeatureStyle(featureRow.getId(), null);
+    return this.getFeatureStyle(featureRow.id, null);
   }
   /**
    * Get the feature style (style and icon) of the feature, searching in
@@ -428,7 +428,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.StyleRow} style row
    */
   getStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): StyleRow {
-    return this.getStyle(featureRow.getId(), geometryType);
+    return this.getStyle(featureRow.id, geometryType);
   }
   /**
    * Get the default style of the feature row, searching in order: feature
@@ -438,7 +438,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.StyleRow} style row
    */
   getStyleDefaultForFeatureRow(featureRow: FeatureRow): StyleRow {
-    return this.getStyle(featureRow.getId(), null);
+    return this.getStyle(featureRow.id, null);
   }
   /**
    * Get the style of the feature, searching in order: feature geometry type
@@ -509,7 +509,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.IconRow} icon row
    */
   getIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): IconRow {
-    return this.getIcon(featureRow.getId(), geometryType);
+    return this.getIcon(featureRow.id, geometryType);
   }
   /**
    * Get the default icon of the feature row, searching in order: feature
@@ -519,7 +519,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.IconRow} icon row
    */
   getIconDefaultForFeatureRow(featureRow: FeatureRow): IconRow {
-    return this.getIcon(featureRow.getId(), null);
+    return this.getIcon(featureRow.id, null);
   }
   /**
    * Get the icon of the feature, searching in order: feature geometry type

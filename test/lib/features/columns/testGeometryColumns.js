@@ -113,7 +113,8 @@ describe('GeometryColumns tests', function() {
       organization: 'NONE',
       organization_coordsys_id: 0,
       definition: 'undefined',
-      description: 'undefined geographic coordinate reference system'
+      description: 'undefined geographic coordinate reference system',
+      definition_12_063: 'undefined'
     });
   });
 

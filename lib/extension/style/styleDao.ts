@@ -7,8 +7,8 @@ import { StyleTable } from './styleTable';
 import { AttributeDao } from '../../attributes/attributeDao';
 import { StyleRow } from './styleRow';
 import { GeoPackage } from '../../geoPackage';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Style DAO for reading style tables

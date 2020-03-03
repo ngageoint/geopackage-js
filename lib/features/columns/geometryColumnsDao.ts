@@ -8,6 +8,7 @@ import { Dao } from '../../dao/dao';
 import { GeometryColumns } from './geometryColumns';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { Contents } from '../../core/contents/contents';
+import { DBValue } from '../../db/dbAdapter';
 /**
  * Geometry Columns Data Access Object
  * @class GeometryColumnsDao
@@ -78,8 +79,17 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
     GeometryColumnsDao.COLUMN_M,
   ];
 
-  createObject(): GeometryColumns {
-    return new GeometryColumns();
+  createObject(results?: Record<string, DBValue>): GeometryColumns {
+    const gc = new GeometryColumns();
+    if (results) {
+      gc.table_name = results.table_name as string;
+      gc.column_name = results.column_name as string;
+      gc.geometry_type_name = results.geometry_type_name as string;
+      gc.srs_id = results.srs_id as number;
+      gc.z = results.z as number;
+      gc.m = results.m as number;
+    }
+    return gc;
   }
   /**
    *  Query for the table name
@@ -89,9 +99,7 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
   queryForTableName(tableName: string): GeometryColumns {
     const results = this.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, tableName);
     if (results && results.length) {
-      const gc = this.createObject();
-      this.populateObjectFromResult(gc, results[0]);
-      return gc;
+      return this.createObject(results[0]);
     }
     return;
   }

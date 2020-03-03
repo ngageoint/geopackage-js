@@ -6,8 +6,8 @@
 import { AttributeRow } from '../../attributes/attributeRow';
 import { StyleTable } from './styleTable';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * Style Row

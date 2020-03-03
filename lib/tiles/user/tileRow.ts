@@ -1,8 +1,8 @@
 import { TileTable } from './tileTable';
 import { UserRow } from '../../user/userRow';
 import { TileColumn } from './tileColumn';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 /**
  * tileRow module.
  * @module tiles/user/tileRow

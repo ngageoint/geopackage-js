@@ -7,8 +7,8 @@ import { UserMappingTable } from './userMappingTable';
 import { UserMappingRow } from './userMappingRow';
 import { ColumnValues } from '../../dao/columnValues';
 import { UserRow } from '../../user/userRow';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * User Mapping DAO for reading user mapping data tables

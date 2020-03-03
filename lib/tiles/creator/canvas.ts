@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import { BoundingBox } from '../../..';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 
 import fileType from 'file-type';
 import { TileCreator } from './tileCreator';
 import TileUtilities from './tileUtilities';
 import ProjectTile from './projectTile';
+import { BoundingBox } from '../../boundingBox';
 
 export class CanvasTileCreator extends TileCreator {
   canvas: HTMLCanvasElement;

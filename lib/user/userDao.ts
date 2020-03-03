@@ -6,14 +6,13 @@ import { MediaTable } from '../extension/relatedTables/mediaTable';
 import { SimpleAttributesTable } from '../extension/relatedTables/simpleAttributesTable';
 import { UserRow } from './userRow';
 import { RelationType } from '../extension/relatedTables/relationType';
-import { ColumnValues } from '../dao/columnValues';
 import { UserTable } from './userTable';
-import { DataTypes } from '../..';
 import { MediaRow } from '../extension/relatedTables/mediaRow';
 import { SimpleAttributesRow } from '../extension/relatedTables/simpleAttributesRow';
 import { FeatureRow } from '../features/user/featureRow';
 import { ExtendedRelation } from '../extension/relatedTables/extendedRelation';
 import { DBValue } from '../db/dbAdapter';
+import { DataTypes } from '../db/dataTypes';
 
 /**
  * Abstract User DAO for reading user tables
@@ -68,6 +67,9 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @return {module:user/userRow~UserRow}         the user row
    */
   getRow(results: Record<string, DBValue>): UserRow {
+    if (results instanceof UserRow) {
+      return results;
+    }
     if (!this.table) return undefined;
     const columns = this.table.columnCount();
     const columnTypes: { [key: string]: DataTypes } = {};
@@ -129,8 +131,8 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
     await rte.addRelationship(relationship);
     const userMappingDao = rte.getMappingDao(mappingTableName);
     const userMappingRow = userMappingDao.newRow();
-    userMappingRow.setBaseId(userRow.getId());
-    userMappingRow.setRelatedId(relatedRow.getId());
+    userMappingRow.setBaseId(userRow.id);
+    userMappingRow.setRelatedId(relatedRow.id);
     for (const column in mappingColumnValues) {
       userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
     }
@@ -203,7 +205,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
       const mediaRelation = mediaRelations[i];
       const mediaDao = rte.getMediaDao(mediaRelation);
       const userMappingDao = rte.getMappingDao(mediaRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      const mappings = userMappingDao.queryByBaseId(userRow.id);
       for (let m = 0; m < mappings.length; m++) {
         const relatedId = mappings[m].related_id;
         linkedMedia.push(mediaDao.queryForId(relatedId) as MediaRow);
@@ -224,7 +226,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
       const simpleRelation = simpleRelations[i];
       const simpleDao = rte.getSimpleAttributesDao(simpleRelation);
       const userMappingDao = rte.getMappingDao(simpleRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      const mappings = userMappingDao.queryByBaseId(userRow.id);
       for (let m = 0; m < mappings.length; m++) {
         const relatedId = mappings[m].related_id;
         linkedSimpleAttributes.push(simpleDao.queryForId(relatedId) as SimpleAttributesRow);
@@ -245,7 +247,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
       const featureRelation = featureRelations[i];
       const featureDao = this.geoPackage.getFeatureDao(featureRelation.base_table_name);
       const userMappingDao = rte.getMappingDao(featureRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.getId());
+      const mappings = userMappingDao.queryByBaseId(userRow.id);
       for (let m = 0; m < mappings.length; m++) {
         const relatedId = mappings[m].related_id;
         linkedFeatures.push(featureDao.queryForId(relatedId) as FeatureRow);

@@ -42,8 +42,7 @@ describe('Tile Matrix tests', function() {
     tileMatrices[0].should.have.property('pixel_x_size', 156543.03392804097);
     tileMatrices[0].should.have.property('pixel_y_size', 156543.033928041);
 
-    var tileMatrix = tileMatrixDao.createObject();
-    tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
+    var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
     tileMatrix.should.have.property('matrix_width', 1);
     tileMatrix.should.have.property('matrix_height', 1);
     tileMatrix.should.have.property('zoom_level', 0);
@@ -56,8 +55,7 @@ describe('Tile Matrix tests', function() {
 
   it('should get the Contents from a TileMatrix', function() {
     var tileMatrices = tileMatrixDao.queryForAll();
-    var tileMatrix = tileMatrixDao.createObject();
-    tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
+    var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
     var contents = tileMatrixDao.getContents(tileMatrix);
     should.exist(contents);
     contents.should.have.property('table_name', 'TILESosmds');
@@ -74,8 +72,7 @@ describe('Tile Matrix tests', function() {
 
   it('should get the TileMatrixSet from a TileMatrix', function() {
     var tileMatrices = tileMatrixDao.queryForAll();
-    var tileMatrix = tileMatrixDao.createObject();
-    tileMatrixDao.populateObjectFromResult(tileMatrix, tileMatrices[0]);
+    var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
     var tileMatrixSet = tileMatrixDao.getTileMatrixSet(tileMatrix);
     should.exist(tileMatrixSet);
     tileMatrixSet.should.have.property('srs_id', 3857);

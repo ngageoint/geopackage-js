@@ -2,6 +2,7 @@ import { Dao } from '../dao/dao';
 import { ContentsDao } from '../core/contents/contentsDao';
 import { DataColumns } from './dataColumns';
 import { Contents } from '../core/contents/contents';
+import { DBValue } from '../db/dbAdapter';
 /**
  * DataColumns module.
  * @module dataColumns
@@ -34,8 +35,18 @@ export class DataColumnsDao extends Dao<DataColumns> {
    * Creates a new {module:dataColumns~DataColumns} object
    * @return {module:dataColumns~DataColumns}
    */
-  createObject(): DataColumns {
-    return new DataColumns();
+  createObject(results?: Record<string, DBValue>): DataColumns {
+    const dc = new DataColumns();
+    if (results) {
+      dc.table_name = results.table_name as string;
+      dc.column_name = results.column_name as string;
+      dc.name = results.name as string;
+      dc.title = results.title as string;
+      dc.description = results.description as string;
+      dc.mime_type = results.mime_type as string;
+      dc.constraint_name = results.constraint_name as string;
+    }
+    return dc;
   }
   /**
    * Get the Contents from the Data Columns
@@ -52,7 +63,9 @@ export class DataColumnsDao extends Dao<DataColumns> {
    * @return {Iterable.<Object>} iterator of database objects
    */
   queryByConstraintName(constraintName: string): IterableIterator<DataColumns> {
-    return this.queryForEach(DataColumnsDao.COLUMN_CONSTRAINT_NAME, constraintName);
+    return (this.queryForEach(DataColumnsDao.COLUMN_CONSTRAINT_NAME, constraintName) as unknown) as IterableIterator<
+      DataColumns
+    >;
   }
   /**
    * Get DataColumn by column name and table name

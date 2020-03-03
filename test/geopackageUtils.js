@@ -498,10 +498,10 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       return rows.reduce(function(sequence, row) {
         return sequence.then(function() {
           const featureRow = featureDao.getRow(row);
-          geopackage.linkMedia('geometry2', featureRow.getId(), 'media', ngaRowId).then(function() {
-            const relationships = geopackage.getLinkedMedia('geometry2', featureRow.getId());
+          geopackage.linkMedia('geometry2', featureRow.id, 'media', ngaRowId).then(function() {
+            const relationships = geopackage.getLinkedMedia('geometry2', featureRow.id);
             relationships.length.should.be.equal(1);
-            relationships[0].getId().should.be.equal(ngaRowId);
+            relationships[0].id.should.be.equal(ngaRowId);
           });
         });
       }, Promise.resolve());
@@ -752,7 +752,7 @@ GeoPackageUtils.createAttributes = function(geopackage) {
   dc.constraint_name = 'test constraint';
 
   return geopackage.createAttributeTable(tableName, columns, [dc]).then(function(result) {
-    const attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
+    const attributeDao = geopackage.getAttributeDao(tableName);
 
     for (let i = 0; i < 10; i++) {
       const attributeRow = attributeDao.newRow();
@@ -862,7 +862,6 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
       const ref1 = metadataReferenceDao.createObject();
       ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
       ref1.setMetadata(md1);
-      console.log('ref1', ref1);
       metadataReferenceDao.create(ref1);
 
       const tileTables = geopackage.getTileTables();

@@ -6,8 +6,8 @@
 import { UserTable } from './userTable';
 
 import { DataTypes } from '../db/dataTypes';
-import { UserColumn } from '../..';
 import { DBValue } from '../db/dbAdapter';
+import { UserColumn } from './userColumn';
 
 export class UserRow {
   /**
@@ -150,7 +150,7 @@ export class UserRow {
    * Get the id value, which is the value of the primary key
    * @return {Number} id value
    */
-  getId(): number {
+  get id(): number {
     if (this.getPkColumn()) {
       return this.getValueWithColumnName(this.getPkColumn().name);
     }

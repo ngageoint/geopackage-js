@@ -367,7 +367,7 @@ describe('GeoPackage Attribute table create tests', function() {
     });
 
     it('should create an attribute', function() {
-      var attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
+      var attributeDao = geopackage.getAttributeDao(tableName);
       var attributeRow = attributeDao.newRow();
       attributeRow.setValueWithColumnName('test_text.test', 'hello');
       attributeRow.setValueWithColumnName('test_real', 3.0);
@@ -400,7 +400,7 @@ describe('GeoPackage Attribute table create tests', function() {
       var attributeDao;
 
       beforeEach(function() {
-        attributeDao = geopackage.getAttributeDaoWithTableName(tableName);
+        attributeDao = geopackage.getAttributeDao(tableName);
         var attributeRow = attributeDao.createObject();
         attributeRow.setValueWithColumnName('test_text.test', 'hello');
         attributeRow.setValueWithColumnName('test_real', 3.0);

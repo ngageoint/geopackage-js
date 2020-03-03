@@ -23,7 +23,7 @@ import { FeatureTable } from './featureTable';
 import { Contents } from '../../core/contents/contents';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
-import { DataColumns } from '../../..';
+import { DataColumns } from '../../dataColumns/dataColumns';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -281,7 +281,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   queryForGeoJSONIndexedFeaturesWithBoundingBox(
     boundingBox: BoundingBox,
     skipVerification = false,
-  ): IterableIterator<Feature> {
+  ): IterableIterator<Feature> & { srs: SpatialReferenceSystem; featureDao: FeatureDao<FeatureRow> } {
     const columns = [] as {
       index: number;
       name: string;
@@ -324,8 +324,15 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
       });
       columnMap[column.name] = columns[columns.length - 1];
     });
-    const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:4326')[Symbol.iterator]();
+    let iterator: IterableIterator<any>;
+    if (boundingBox) {
+      iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:4326')[Symbol.iterator]();
+    } else {
+      iterator = this.queryForEach();
+    }
     return {
+      srs: srs,
+      featureDao: this,
       [Symbol.iterator](): IterableIterator<Feature> {
         return this;
       },
@@ -338,7 +345,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           while (!nextRow.done && !geometry) {
             featureRow = this.getRow(nextRow.value) as FeatureRow;
             geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-            if (!skipVerification) {
+            if (!skipVerification && boundingBox) {
               geometry = FeatureDao.verifyFeature(geometry, boundingBox);
             }
             if (geometry) {
@@ -362,7 +369,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
                   }
                 }
               }
-              geoJson.id = geoJson.id || featureRow.getId();
+              geoJson.id = geoJson.id || featureRow.id;
               return {
                 value: geoJson,
                 done: false,

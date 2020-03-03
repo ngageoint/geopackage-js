@@ -12,9 +12,10 @@ import { GeometryIndexDao } from './geometryIndexDao';
 import { RTreeIndexDao } from '../rtree/rtreeIndexDao';
 import { EnvelopeBuilder } from '../../geom/envelopeBuilder';
 import { TableIndexDao } from './tableIndexDao';
-import { GeometryData, BoundingBox } from '../../..';
 import { Envelope } from '../../geom/envelope';
 import { FeatureRow } from '../../features/user/featureRow';
+import { GeometryData } from '../../geom/geometryData';
+import { BoundingBox } from '../../boundingBox';
 
 /**
  * This class will either use the RTree index if it exists, or the
@@ -264,7 +265,7 @@ export class FeatureTableIndex extends BaseExtension {
       console.log('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
       rows.forEach(row => {
         const fr = this.featureDao.getRow(row) as FeatureRow;
-        this.indexRow(tableIndex, fr.getId(), fr.getGeometry());
+        this.indexRow(tableIndex, fr.id, fr.getGeometry());
       });
       setTimeout(() => {
         this.indexChunk(++page, tableIndex, resolve, reject);

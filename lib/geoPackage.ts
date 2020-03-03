@@ -233,15 +233,39 @@ export class GeoPackage {
     schema.getOrCreateExtension();
     return this;
   }
+
   /**
-   * @returns {module:tiles/user/tileDao~TileDao} the `TileDao` to access [tiles]{@link module:tiles/user/tileTable}
+   * Get a Tile DAO
+   * @param  {string}   tableName table name
+   *  @returns {FeatureDao}
    */
-  getTileDaoWithTileMatrixSet(tileMatrixSet: TileMatrixSet): TileDao {
+  getTileDao(table: string | Contents | TileMatrixSet): TileDao {
+    if (table instanceof Contents) {
+      table = this.contentsDao.getTileMatrixSet(table);
+    } else if (!(table instanceof TileMatrixSet)) {
+      const tms = this.tileMatrixSetDao;
+      const results = tms.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, table);
+      if (results.length > 1) {
+        throw new Error(
+          'Unexpected state. More than one Tile Matrix Set matched for table name: ' +
+            table +
+            ', count: ' +
+            results.length,
+        );
+      } else if (results.length === 0) {
+        throw new Error('No Tile Matrix found for table name: ' + table);
+      }
+      table = tms.createObject(results[0]);
+    }
+
+    if (!table) {
+      throw new Error('Non null TileMatrixSet is required to create Tile DAO');
+    }
     const tileMatrices: TileMatrix[] = [];
     const tileMatrixDao = this.tileMatrixDao;
     const results = tileMatrixDao.queryForAllEq(
       TileMatrixDao.COLUMN_TABLE_NAME,
-      tileMatrixSet.table_name,
+      table.table_name,
       null,
       null,
       TileMatrixDao.COLUMN_ZOOM_LEVEL +
@@ -252,47 +276,40 @@ export class GeoPackage {
         ' DESC',
     );
     results.forEach(function(result) {
-      const tm = new TileMatrix();
-      tileMatrixDao.populateObjectFromResult(tm, result);
+      const tm = tileMatrixDao.createObject(result);
       tileMatrices.push(tm);
     });
-    const tableReader = new TileTableReader(tileMatrixSet);
+    const tableReader = new TileTableReader(table);
     const tileTable = tableReader.readTileTable(this);
-    return new TileDao(this, tileTable, tileMatrixSet, tileMatrices);
+    return new TileDao(this, tileTable, table, tileMatrices);
   }
-  getTileDaoWithContents(contents: Contents): TileDao {
-    const tileMatrixSet = this.contentsDao.getTileMatrixSet(contents);
-    return this.getTileDaoWithTileMatrixSet(tileMatrixSet);
-  }
-  getTileDao(tableName: string): TileDao {
-    const tms = this.tileMatrixSetDao;
-    const results = tms.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, tableName);
-    if (results.length > 1) {
-      throw new Error(
-        'Unexpected state. More than one Tile Matrix Set matched for table name: ' +
-          tableName +
-          ', count: ' +
-          results.length,
-      );
-    } else if (results.length === 0) {
-      throw new Error('No Tile Matrix found for table name: ' + tableName);
-    }
-    const tileMatrixSet = new TileMatrixSet();
-    tms.populateObjectFromResult(tileMatrixSet, results[0]);
-    return this.getTileDaoWithTileMatrixSet(tileMatrixSet);
-  }
+
   /**
    * Return a hash containing arrays of table names grouped under keys `features`,
    * `tiles`, and `attributes`.
    * @return {{features: string[], tiles: string[], attributes: string[]}}
    */
-  getTables(): { features: string[]; tiles: string[]; attributes: string[] } {
-    const tables = {
-      features: this.getFeatureTables(),
-      tiles: this.getTileTables(),
-      attributes: this.getAttributesTables(),
-    };
-    return tables;
+  getTables(): { features: string[]; tiles: string[]; attributes: string[] };
+  getTables(
+    fullInformation = false,
+  ):
+    | { features: Contents[]; tiles: Contents[]; attributes: Contents[] }
+    | { features: string[]; tiles: string[]; attributes: string[] } {
+    if (!fullInformation) {
+      const tables = {
+        features: this.getFeatureTables(),
+        tiles: this.getTileTables(),
+        attributes: this.getAttributesTables(),
+      };
+      return tables;
+    } else {
+      const tables = {
+        features: this.contentsDao.getContentsForTableType(ContentsDao.GPKG_CDT_FEATURES_NAME),
+        tiles: this.contentsDao.getContentsForTableType(ContentsDao.GPKG_CDT_TILES_NAME),
+        attributes: this.contentsDao.getContentsForTableType(ContentsDao.GPKG_CDT_ATTRIBUTES_NAME),
+      };
+      return tables;
+    }
   }
   getAttributesTables(): string[] {
     return this.contentsDao.getTables(ContentsDao.GPKG_CDT_ATTRIBUTES_NAME);
@@ -379,41 +396,26 @@ export class GeoPackage {
     }
     return await fti.index(progress);
   }
-  /**
-   *  Get a Feature DAO from Geometry Columns
-   *
-   *  @param {GeometryColumns} geometryColumns Geometry Columns
-   *  @returns {FeatureDao}
-   */
-  getFeatureDaoWithGeometryColumns(geometryColumns: GeometryColumns): FeatureDao<FeatureRow> {
-    if (!geometryColumns) {
-      throw new Error('Non null Geometry Columns is required to create Feature DAO');
-    }
-    const tableReader = new FeatureTableReader(geometryColumns);
-    const featureTable = tableReader.readFeatureTable(this);
-    const dao = new FeatureDao(this, featureTable, geometryColumns, this.metadataDao);
-    return dao;
-  }
-  /**
-   * Get a Feature DAO from Contents
-   * @param  {Contents}   contents Contents
-   *  @returns {FeatureDao}
-   */
-  getFeatureDaoWithContents(contents: Contents): FeatureDao<FeatureRow> {
-    const columns = this.contentsDao.getGeometryColumns(contents);
-    return this.getFeatureDaoWithGeometryColumns(columns);
-  }
+
   /**
    * Get a Feature DAO from Contents
    * @param  {string}   tableName table name
    *  @returns {FeatureDao}
    */
-  getFeatureDao(tableName: string): FeatureDao<FeatureRow> {
-    const geometryColumns = this.geometryColumnsDao.queryForTableName(tableName);
-    if (!geometryColumns) {
-      throw new Error('No Feature Table exists for table name: ' + tableName);
+  getFeatureDao(table: string | Contents | GeometryColumns): FeatureDao<FeatureRow> {
+    if (table instanceof Contents) {
+      table = this.contentsDao.getGeometryColumns(table);
+    } else if (!(table instanceof GeometryColumns)) {
+      table = this.geometryColumnsDao.queryForTableName(table);
     }
-    return this.getFeatureDaoWithGeometryColumns(geometryColumns);
+
+    if (!table) {
+      throw new Error('Non null Geometry Columns is required to create Feature DAO');
+    }
+    const tableReader = new FeatureTableReader(table);
+    const featureTable = tableReader.readFeatureTable(this);
+    const dao = new FeatureDao(this, featureTable, table, this.metadataDao);
+    return dao;
   }
   /**
    * Queries for GeoJSON features in a feature table
@@ -430,19 +432,7 @@ export class GeoPackage {
     }
     return features;
   }
-  /**
-   * iterates GeoJSON features in a feature table within a bounding box
-   * @param  {String}   tableName   Table name to query
-   * @param  {BoundingBox}   boundingBox BoundingBox to query
-   * @returns {Iterable<Object>} iterable of GeoJSON features
-   */
-  iterateGeoJSONFeaturesInTableWithinBoundingBox(
-    tableName: string,
-    boundingBox: BoundingBox,
-  ): IterableIterator<Feature> {
-    const featureDao = this.getFeatureDao(tableName);
-    return featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
-  }
+
   /**
    * Create the Geometry Columns table if it does not already exist
    * @returns {Promise}
@@ -455,26 +445,20 @@ export class GeoPackage {
   }
   /**
    * Get a Attribute DAO
-   * @param  {string}   tableName table name
-   * @returns {AttributeDao}
-   */
-  getAttributeDaoWithTableName(tableName: string): AttributeDao<AttributeRow> {
-    const contents = this.contentsDao.queryForId(tableName);
-    return this.getAttributeDaoWithContents(contents);
-  }
-  /**
-   * Get a Attribute DAO
    * @param  {Contents}   contents Contents
    * @returns {AttributeDao}
    */
-  getAttributeDaoWithContents(contents: Contents): AttributeDao<AttributeRow> {
-    if (!contents) {
+  getAttributeDao(table: Contents | string): AttributeDao<AttributeRow> {
+    if (!(table instanceof Contents)) {
+      table = this.contentsDao.queryForId(table);
+    }
+    if (!table) {
       throw new Error('Non null Contents is required to create an Attributes DAO');
     }
-    const reader = new AttributeTableReader(contents.table_name);
-    const table: AttributeTable = reader.readTable(this.connection) as AttributeTable;
-    table.setContents(contents);
-    return new AttributeDao(this, table);
+    const reader = new AttributeTableReader(table.table_name);
+    const attributeTable: AttributeTable = reader.readTable(this.connection) as AttributeTable;
+    attributeTable.setContents(table);
+    return new AttributeDao(this, attributeTable);
   }
   /**
    * Create an attribute table with the properties specified.
@@ -657,7 +641,7 @@ export class GeoPackage {
   }
 
   addAttributeRow(tableName: string, row: Record<string, DBValue>): number {
-    const attributeDao = this.getAttributeDaoWithTableName(tableName);
+    const attributeDao = this.getAttributeDao(tableName);
     const attributeRow = attributeDao.getRow(row);
     return attributeDao.create(attributeRow);
   }
@@ -1145,7 +1129,7 @@ export class GeoPackage {
         values: string[];
       } & Record<string, any>;
       tile.tableName = table;
-      tile.id = row.getId();
+      tile.id = row.id;
 
       const tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.boundingBox, tm, row.tileColumn, row.row);
       tile.minLongitude = tileBB.minLongitude;
@@ -1316,7 +1300,7 @@ export class GeoPackage {
         values: any[];
       } & Record<string, any>;
       tile.tableName = table;
-      tile.id = row.getId();
+      tile.id = row.id;
 
       const tileBB = TileBoundingBoxUtils.getTileBoundingBox(tms.boundingBox, tm, row.tileColumn, row.row);
       tile.minLongitude = tileBB.minLongitude;
@@ -1568,61 +1552,12 @@ export class GeoPackage {
     return columnMap;
   }
 
-  /**
-   * @typedef {Object} GeoJSONFeatureIterator
-   * @property {SpatialReferenceSystem} srs SRS of the iterator
-   * @property {FeatureDao} featureDao featureDao of the iterator objects
-   * @property {IterableIterator<FeatureRow>} results iterator of results
-   */
-
-  /**
-   * Iterate GeoJSON features from table
-   * @param  {module:geoPackage~GeoPackage} geopackage      open GeoPackage object
-   * @param  {string} table           Table name to Iterate
-   * @return {GeoJSONFeatureIterator}
-   */
-  iterateGeoJSONFeaturesFromTable(
-    table: string,
-  ): { srs: SpatialReferenceSystem; featureDao: FeatureDao<FeatureRow>; results: IterableIterator<Feature> } {
-    const featureDao = this.getFeatureDao(table);
-    if (!featureDao) {
-      throw new Error('No Table exists with the name ' + table);
-    }
-
-    const columnMap = GeoPackage.createDataColumnMap(featureDao);
-
-    const srs = featureDao.getSrs();
-
-    const iterator = featureDao.queryForEach();
-
-    return {
-      srs: srs,
-      featureDao: featureDao,
-      results: {
-        [Symbol.iterator](): IterableIterator<Feature> {
-          return this;
-        },
-        next: function(): IteratorResult<Feature> {
-          const nextRow = iterator.next();
-          if (!nextRow.done) {
-            let featureRow;
-            let geometry;
-
-            while (!nextRow.done && !geometry) {
-              featureRow = featureDao.getRow(nextRow.value);
-              return {
-                value: GeoPackage.parseFeatureRowIntoGeoJSON(featureRow, srs, columnMap),
-                done: false,
-              };
-            }
-          }
-          return {
-            value: undefined,
-            done: true,
-          };
-        }.bind(this),
-      },
-    };
+  iterateGeoJSONFeatures(
+    tableName: string,
+    boundingBox?: BoundingBox,
+  ): IterableIterator<Feature> & { srs: SpatialReferenceSystem; featureDao: FeatureDao<FeatureRow> } {
+    const featureDao = this.getFeatureDao(tableName);
+    return featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(boundingBox);
   }
 
   /**
@@ -1695,7 +1630,7 @@ export class GeoPackage {
         // geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
       }
     }
-    geoJson.id = geoJson.id || featureRow.getId();
+    geoJson.id = geoJson.id || featureRow.id;
     return geoJson;
   }
 

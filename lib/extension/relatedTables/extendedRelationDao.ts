@@ -1,6 +1,7 @@
 import { Dao } from '../../dao/dao';
 import { ColumnValues } from '../../dao/columnValues';
 import { ExtendedRelation } from './extendedRelation';
+import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Extended Relations Data Access Object
@@ -24,17 +25,17 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * Create a {module:extension/relatedTables~ExtendedRelation} object
    * @return {module:extension/relatedTables~ExtendedRelation}
    */
-  createObject(result?: any): ExtendedRelation {
+  createObject(result?: Record<string, DBValue>): ExtendedRelation {
     const er = new ExtendedRelation();
     if (result) {
-      er.base_table_name = result.base_table_name;
-      er.base_primary_column = result.base_primary_column;
-      er.related_table_name = result.base_primary_column;
-      er.related_table_name = result.related_table_name;
-      er.relation_name = result.relation_name;
-      er.mapping_table_name = result.mapping_table_name;
-      er.related_primary_column = result.related_primary_column;
-      er.id = result.id;
+      er.base_table_name = result.base_table_name as string;
+      er.base_primary_column = result.base_primary_column as string;
+      er.related_table_name = result.base_primary_column as string;
+      er.related_table_name = result.related_table_name as string;
+      er.relation_name = result.relation_name as string;
+      er.mapping_table_name = result.mapping_table_name as string;
+      er.related_primary_column = result.related_primary_column as string;
+      er.id = result.id as number;
     }
     return er;
   }
@@ -54,7 +55,7 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
     const baseTables: string[] = [];
     const baseTableColumns = this.queryForColumns('base_table_name');
     for (let i = 0; i < baseTableColumns.length; i++) {
-      baseTables.push(baseTableColumns[i].base_table_name);
+      baseTables.push(baseTableColumns[i].base_table_name as string);
     }
     return baseTables;
   }
@@ -66,7 +67,7 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
     const relatedTables = [];
     const relatedTableColumns = this.queryForColumns('related_table_name');
     for (let i = 0; i < relatedTableColumns.length; i++) {
-      relatedTables.push(relatedTableColumns[i].related_table_name);
+      relatedTables.push(relatedTableColumns[i].related_table_name as string);
     }
     return relatedTables;
   }

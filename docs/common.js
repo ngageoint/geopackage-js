@@ -981,9 +981,9 @@ window.loadFeatures = function(tableName, featuresElement) {
 
   const featuresTable = featuresElement.find('#' + tableName + '-feature-table');
 
-  const each = geoPackage.iterateGeoJSONFeaturesFromTable(tableName);
+  const each = geoPackage.iterateGeoJSONFeatures(tableName);
   const promise = Promise.resolve();
-  for (const row of each.results) {
+  for (const row of each) {
     const feature = row;
     feature.tableName = tableName;
     feature.values = [];

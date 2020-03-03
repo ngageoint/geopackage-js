@@ -75,39 +75,4 @@ export class GeoPackageAPI {
 
     return geopackage;
   }
-
-  /**
-   * Queries for GeoJSON features in a feature tables
-   * @param  {string}   geoPackagePath  path to the GeoPackage file
-   * @param  {string}   tableName   Table name to query
-   * @param  {BoundingBox}   boundingBox BoundingBox to query
-   */
-  static async queryForGeoJSONFeaturesInTableFromPath(
-    geoPackagePath: string,
-    tableName: string,
-    boundingBox: BoundingBox,
-  ): Promise<Feature[]> {
-    const geoPackage = await GeoPackageAPI.open(geoPackagePath);
-    const features = geoPackage.queryForGeoJSONFeaturesInTable(tableName, boundingBox);
-    geoPackage.close();
-    return features;
-  }
-  /**
-   * Iterates GeoJSON features in a feature table that matches the bounding box
-   * @param  {module:geoPackage~GeoPackage}   geoPackage  open GeoPackage object
-   * @param  {string}   tableName   Table name to query
-   * @param  {BoundingBox}   boundingBox BoundingBox to query
-   */
-  static async iterateGeoJSONFeatures(
-    geoPackage: GeoPackage | string,
-    tableName: string,
-    boundingBox: BoundingBox,
-  ): Promise<IterableIterator<Feature>> {
-    if (geoPackage instanceof GeoPackage) {
-      return geoPackage.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
-    } else {
-      const gp = await GeoPackageAPI.open(geoPackage);
-      return gp.iterateGeoJSONFeaturesInTableWithinBoundingBox(tableName, boundingBox);
-    }
-  }
 }

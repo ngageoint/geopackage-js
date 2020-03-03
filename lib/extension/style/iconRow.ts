@@ -2,8 +2,8 @@ import { IconTable } from './iconTable';
 import { MediaRow } from '../relatedTables/mediaRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * @memberOf module:extension/style

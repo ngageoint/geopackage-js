@@ -113,7 +113,7 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var contents = geoPackage.contentsDao.queryForId('FEATURESriversds');
-      var featureDao = geoPackage.getFeatureDaoWithContents(contents);
+      var featureDao = geoPackage.getFeatureDao(contents);
       should.exist(featureDao);
       featureDao.getGeometryType().should.be.equal('GEOMETRY');
       featureDao.table_name.should.be.equal('FEATURESriversds');
@@ -126,7 +126,7 @@ describe('GeoPackage tests', function() {
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var contents = geoPackage.contentsDao.queryForId('TILESosmds');
-      return geoPackage.getTileDaoWithContents(contents);
+      return geoPackage.getTileDao(contents);
     });
   });
 

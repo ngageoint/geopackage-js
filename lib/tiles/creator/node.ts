@@ -5,8 +5,8 @@ import { ImageUtils } from '../imageUtils';
 import { TileCreator } from './tileCreator';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import { BoundingBox } from '../../..';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { BoundingBox } from '../../boundingBox';
 
 export class NodeTileCreator extends TileCreator {
   canvas: any;

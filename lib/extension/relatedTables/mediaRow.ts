@@ -1,8 +1,9 @@
 import { MediaTable } from './mediaTable';
 import { UserRow } from '../../user/userRow';
 import { ImageUtils } from '../../tiles/imageUtils';
-import { UserColumn, DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { UserColumn } from '../../user/userColumn';
+import { DataTypes } from '../../db/dataTypes';
 
 /**
  * MediaRow module.
@@ -36,7 +37,7 @@ export class MediaRow extends UserRow {
    * Gets the id
    * @return {Number}
    */
-  getId(): number {
+  get id(): number {
     return this.getValueWithColumnName(this.getIdColumn().name);
   }
   /**

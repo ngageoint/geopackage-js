@@ -41,6 +41,6 @@
     "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js",
     "clean": "rm -rf ./node_modules",
     "tsc": "rm -rf ./built && tsc",
-    "typedoc": "rm -rf ./api-docs && typedoc"
+    "typedoc": "rm -rf ./api-docs; typedoc --tsconfig ../tsconfig.json --mode file --out api-docs ../index.ts"
   }
 }

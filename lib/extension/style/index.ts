@@ -674,7 +674,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {module:extension/style.FeatureStyles} feature styles or null
    */
   getFeatureStylesForFeatureRow(featureRow: FeatureRow): FeatureStyles {
-    return this.getFeatureStyles(featureRow.featureTable, featureRow.getId());
+    return this.getFeatureStyles(featureRow.featureTable, featureRow.id);
   }
   /**
    * Get the feature styles for the feature row
@@ -697,7 +697,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {module:extension/style.Styles} styles or null
    */
   getStylesForFeatureRow(featureRow: FeatureRow): Styles {
-    return this.getStyles(featureRow.getId(), this.getStyleMappingDao(featureRow.featureTable.table_name));
+    return this.getStyles(featureRow.id, this.getStyleMappingDao(featureRow.featureTable.table_name));
   }
   /**
    * Get the styles for the feature id
@@ -714,7 +714,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {module:extension/style.Icons} icons or null
    */
   getIconsForFeatureRow(featureRow: FeatureRow): Icons {
-    return this.getIcons(featureRow.getId(), this.getIconMappingDao(featureRow.featureTable.table_name));
+    return this.getIcons(featureRow.id, this.getIconMappingDao(featureRow.featureTable.table_name));
   }
   /**
    * Get the icons for the feature id
@@ -734,8 +734,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true),
-      this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), featureRow.getGeometryType(), true),
+      this.getStyle(featureRow.featureTable.table_name, featureRow.id, featureRow.getGeometryType(), true),
+      this.getIcon(featureRow.featureTable.table_name, featureRow.id, featureRow.getGeometryType(), true),
     );
   }
   /**
@@ -747,8 +747,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   getFeatureStyleDefault(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.featureTable.table_name, featureRow.getId(), null, true),
-      this.getIcon(featureRow.featureTable.table_name, featureRow.getId(), null, true),
+      this.getStyle(featureRow.featureTable.table_name, featureRow.id, null, true),
+      this.getIcon(featureRow.featureTable.table_name, featureRow.id, null, true),
     );
   }
   /**
@@ -972,7 +972,7 @@ export class FeatureStyleExtension extends BaseExtension {
       };
     };
   }> {
-    return this.setFeatureStyles(featureRow.featureTable.table_name, featureRow.getId(), featureStyles);
+    return this.setFeatureStyles(featureRow.featureTable.table_name, featureRow.id, featureStyles);
   }
 
   /**
@@ -1053,7 +1053,7 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   }> {
-    return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.getId(), geometryType, featureStyle);
+    return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.id, geometryType, featureStyle);
   }
   /**
    * Set the feature style default (style and icon) of the feature row
@@ -1072,7 +1072,7 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   }> {
-    return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.getId(), null, featureStyle);
+    return this.setFeatureStyle(featureRow.featureTable.table_name, featureRow.id, null, featureStyle);
   }
   /**
    * Set the feature style (style and icon) of the feature
@@ -1145,7 +1145,7 @@ export class FeatureStyleExtension extends BaseExtension {
     featureRow: FeatureRow,
     styles: Styles,
   ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
-    return this.setStyles(featureRow.featureTable.table_name, featureRow.getId(), styles);
+    return this.setStyles(featureRow.featureTable.table_name, featureRow.id, styles);
   }
   /**
    * Set the styles for the feature table and feature id
@@ -1203,7 +1203,7 @@ export class FeatureStyleExtension extends BaseExtension {
     geometryType: string,
     style: StyleRow,
   ): Promise<number> {
-    return this.setStyle(featureRow.featureTable.table_name, featureRow.getId(), geometryType, style);
+    return this.setStyle(featureRow.featureTable.table_name, featureRow.id, geometryType, style);
   }
   /**
    * Set the default style of the feature row
@@ -1212,7 +1212,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   async setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
-    return this.setStyle(featureRow.featureTable.table_name, featureRow.getId(), null, style);
+    return this.setStyle(featureRow.featureTable.table_name, featureRow.id, null, style);
   }
   /**
    * Set the style of the feature
@@ -1256,7 +1256,7 @@ export class FeatureStyleExtension extends BaseExtension {
     featureRow: FeatureRow,
     icons: Icons,
   ): Promise<{ iconDefault: number; icons: number[]; deleted: number }> {
-    return this.setIcons(featureRow.featureTable.table_name, featureRow.getId(), icons);
+    return this.setIcons(featureRow.featureTable.table_name, featureRow.id, icons);
   }
   /**
    * Set the icons for the feature table and feature id
@@ -1314,7 +1314,7 @@ export class FeatureStyleExtension extends BaseExtension {
     geometryType: string,
     icon: IconRow,
   ): Promise<number> {
-    return this.setIcon(featureRow.featureTable.table_name, featureRow.getId(), geometryType, icon);
+    return this.setIcon(featureRow.featureTable.table_name, featureRow.id, geometryType, icon);
   }
   /**
    * Set the default icon of the feature row
@@ -1323,7 +1323,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   async setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
-    return this.setIcon(featureRow.featureTable.table_name, featureRow.getId(), null, icon);
+    return this.setIcon(featureRow.featureTable.table_name, featureRow.id, null, icon);
   }
   /**
    * Get the icon of the feature, searching in order: feature geometry type
@@ -1366,7 +1366,7 @@ export class FeatureStyleExtension extends BaseExtension {
   getOrInsertStyle(style: StyleRow): number {
     let styleId;
     if (style.hasId()) {
-      styleId = style.getId();
+      styleId = style.id;
     } else {
       const styleDao = this.getStyleDao();
       if (styleDao !== null) {
@@ -1384,7 +1384,7 @@ export class FeatureStyleExtension extends BaseExtension {
   getOrInsertIcon(icon: IconRow): number {
     let iconId;
     if (icon.hasId()) {
-      iconId = icon.getId();
+      iconId = icon.id;
     } else {
       const iconDao = this.getIconDao();
       if (iconDao != null) {
@@ -1574,7 +1574,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteStylesForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteStylesForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
+    return this.deleteStylesForFeatureId(featureRow.featureTable.table_name, featureRow.id);
   }
   /**
    * Delete feature row styles
@@ -1612,7 +1612,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {String} geometryType geometry type
    */
   deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
-    return this.deleteStyle(featureRow.featureTable, featureRow.getId(), geometryType);
+    return this.deleteStyle(featureRow.featureTable, featureRow.id, geometryType);
   }
   /**
    * Delete the feature row style for the geometry type
@@ -1629,7 +1629,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:extension/style.StyleRow} styleRow style row
    */
   deleteStyleAndMappingsByStyleRow(featureTable: string | FeatureTable, styleRow: StyleRow): number {
-    return this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.getId());
+    return this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.id);
   }
 
   /**
@@ -1654,7 +1654,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteIconsForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconsForFeatureId(featureRow.featureTable.table_name, featureRow.getId());
+    return this.deleteIconsForFeatureId(featureRow.featureTable.table_name, featureRow.id);
   }
   /**
    * Delete feature row icons
@@ -1669,7 +1669,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteIconDefaultForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconDefault(featureRow.featureTable.table_name, featureRow.getId());
+    return this.deleteIconDefault(featureRow.featureTable.table_name, featureRow.id);
   }
   /**
    * Delete the feature row default icon
@@ -1692,7 +1692,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {String} geometryType geometry type
    */
   deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
-    return this.deleteIcon(featureRow.featureTable, featureRow.getId(), geometryType);
+    return this.deleteIcon(featureRow.featureTable, featureRow.id, geometryType);
   }
   /**
    * Delete the feature row icon for the geometry type
@@ -1709,7 +1709,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:extension/style.IconRow} iconRow icon row
    */
   deleteIconAndMappingsByIconRow(featureTable: FeatureTable | string, iconRow: IconRow): number {
-    return this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.getId());
+    return this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.id);
   }
 
   /**

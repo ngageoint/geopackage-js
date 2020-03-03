@@ -6,8 +6,8 @@ import { GeoPackage } from '../geoPackage';
 import { AttributeTable } from './attributeTable';
 import { AttributeRow } from './attributeRow';
 import { Contents } from '../core/contents/contents';
-import { DataTypes } from '../..';
 import { DBValue } from '../db/dbAdapter';
+import { DataTypes } from '../db/dataTypes';
 /**
  * Attribute DAO for reading attribute user data tables
  * @class AttributeDao

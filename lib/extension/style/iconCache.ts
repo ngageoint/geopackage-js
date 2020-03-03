@@ -19,7 +19,7 @@ export class IconCache {
    * @return {Image} icon image or null
    */
   getIconForIconRow(iconRow: IconRow): any {
-    return this.get(iconRow.getId());
+    return this.get(iconRow.id);
   }
   /**
    * Get the cached image for the icon row id or null if not cached
@@ -44,7 +44,7 @@ export class IconCache {
    * @return {Image} previous cached icon image or null
    */
   putIconForIconRow(iconRow: IconRow, image: any): any {
-    return this.put(iconRow.getId(), image);
+    return this.put(iconRow.id, image);
   }
   /**
    * Cache the icon image for the icon row id
@@ -76,7 +76,7 @@ export class IconCache {
    * @return {Image} removed icon image or null
    */
   removeIconForIconRow(iconRow: IconRow): any {
-    return this.remove(iconRow.getId());
+    return this.remove(iconRow.id);
   }
   /**
    * Remove the cached image for the icon row id
@@ -168,7 +168,7 @@ export class IconCache {
   async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<any> {
     let iconImage = null;
     if (icon != null) {
-      const iconId = icon.getId();
+      const iconId = icon.id;
       if (iconCache !== null) {
         iconImage = iconCache.get(iconId);
       }

@@ -163,14 +163,14 @@ describe('Related Media tests', function() {
         var featureIds = [];
         for (var i = 0; i < allFeatures.length; i++) {
           var row = featureDao.getRow(allFeatures[i]);
-          featureIds.push(row.getId());
+          featureIds.push(row.id);
         }
 
         var allMedia = mediaDao.queryForAll();
         var mediaIds = [];
         for (var i = 0; i < allMedia.length; i++) {
           var row = mediaDao.getRow(allMedia[i]);
-          mediaIds.push(row.getId());
+          mediaIds.push(row.id);
         }
 
         // Insert user mapping rows between feature ids and media ids
@@ -252,16 +252,16 @@ describe('Related Media tests', function() {
           var features = featureDao.queryForAll();
           for (var f = 0; f < features.length; f++) {
             var featureRow = featureDao.getRow(features[f]);
-            var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.getId());
+            var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.id);
             var mediaRows = mediaDao.getRows(mappedIds);
             mediaRows.length.should.be.equal(mappedIds.length);
 
             mediaRows.forEach(function(row) {
               var mediaRow = mediaDao.getRow(row);
               mediaRow.hasId().should.be.equal(true);
-              mediaRow.getId().should.be.greaterThan(0);
-              mediaIds.indexOf(mediaRow.getId()).should.not.be.equal(-1);
-              mappedIds.indexOf(mediaRow.getId()).should.not.be.equal(-1);
+              mediaRow.id.should.be.greaterThan(0);
+              mediaIds.indexOf(mediaRow.id).should.not.be.equal(-1);
+              mappedIds.indexOf(mediaRow.id).should.not.be.equal(-1);
               mediaRow.getData().equals(tileBuffer).should.be.equal(true);
               contentType.should.be.equal(mediaRow.getContentType());
               RelatedTablesUtils.validateUserRow(mediaColumns, mediaRow);
@@ -321,14 +321,14 @@ describe('Related Media tests', function() {
           var totalMapped = 0;
           medias.forEach(function(row) {
             var mediaRow = mediaDao.getRow(row);
-            var mappedIds = rte.getMappingsForRelated(mediaRelation.mapping_table_name, mediaRow.getId());
+            var mappedIds = rte.getMappingsForRelated(mediaRelation.mapping_table_name, mediaRow.id);
             mappedIds.forEach(function(mappedId){
               var featureRow = featureDao.queryForId(mappedId);
               should.exist(featureRow);
               featureRow.hasId().should.be.equal(true);
-              featureRow.getId().should.be.greaterThan(0);
-              featureIds.indexOf(featureRow.getId()).should.not.equal(-1);
-              mappedIds.indexOf(featureRow.getId()).should.not.equal(-1);
+              featureRow.id.should.be.greaterThan(0);
+              featureIds.indexOf(featureRow.id).should.not.equal(-1);
+              mappedIds.indexOf(featureRow.id).should.not.equal(-1);
               if (featureRow.getValueWithColumnName(featureRow.getGeometryColumn().name)) {
                 var geometryData = featureRow.getGeometry();
                 should.exist(geometryData);

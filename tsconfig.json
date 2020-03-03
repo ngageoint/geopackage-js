@@ -7,7 +7,7 @@
       "target": "es5", // specify ECMAScript target version
       "allowJs": true, // allows a partial TypeScript and JavaScript codebase
       "declaration": true,
-      "checkJs": true, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
+      "checkJs": false, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,

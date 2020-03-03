@@ -1,7 +1,8 @@
 import { UserMappingTable } from './userMappingTable';
 import { UserRow } from '../../user/userRow';
-import { UserColumn, DataTypes } from '../../..';
 import { DBValue } from '../../db/dbAdapter';
+import { DataTypes } from '../../db/dataTypes';
+import { UserColumn } from '../../user/userColumn';
 
 /**
  * UserMappingRow module.

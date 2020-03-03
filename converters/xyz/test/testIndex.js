@@ -42,7 +42,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('xyz');
-        geopackage.getTileDaoWithTableName('xyz', function(err, tileDao){
+        geopackage.getTileDao('xyz', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -68,7 +68,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('xyz');
-        geopackage.getTileDaoWithTableName('xyz', function(err, tileDao){
+        geopackage.getTileDao('xyz', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -100,7 +100,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('tiles');
-        geopackage.getTileDaoWithTableName('tiles', function(err, tileDao){
+        geopackage.getTileDao('tiles', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -131,7 +131,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('tiles');
-        geopackage.getTileDaoWithTableName('tiles', function(err, tileDao){
+        geopackage.getTileDao('tiles', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -160,7 +160,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('xyz');
-        geopackage.getTileDaoWithTableName('xyz', function(err, tileDao){
+        geopackage.getTileDao('xyz', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             XYZToGeoPackage.addLayer({
@@ -175,7 +175,7 @@ describe('XYZ to GeoPackage tests', function() {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('xyz');
                 tables[1].should.be.equal('xyz_1')
-                geopackage.getTileDaoWithTableName('xyz_1', function(err, tileDao){
+                geopackage.getTileDao('xyz_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
                     done();
@@ -208,7 +208,7 @@ describe('XYZ to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('xyz');
-        geopackage.getTileDaoWithTableName('xyz', function(err, tileDao){
+        geopackage.getTileDao('xyz', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             XYZToGeoPackage.addLayer({
@@ -223,7 +223,7 @@ describe('XYZ to GeoPackage tests', function() {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('xyz');
                 tables[1].should.be.equal('xyz_1')
-                geopackage.getTileDaoWithTableName('xyz_1', function(err, tileDao){
+                geopackage.getTileDao('xyz_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
                     done();

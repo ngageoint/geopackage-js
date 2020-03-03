@@ -6,6 +6,7 @@
 import { Dao } from '../dao/dao';
 
 import { Metadata } from './metadata';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * Metadata Data Access Object
@@ -23,7 +24,15 @@ export class MetadataDao extends Dao<Metadata> {
   readonly gpkgTableName: string = MetadataDao.TABLE_NAME;
   readonly idColumns: string[] = [MetadataDao.COLUMN_ID];
 
-  createObject(): Metadata {
-    return new Metadata();
+  createObject(results?: Record<string, DBValue>): Metadata {
+    const m = new Metadata();
+    if (results) {
+      m.id = results.id as number;
+      m.md_scope = results.md_scope as string;
+      m.md_standard_uri = results.md_standard_uri as string;
+      m.mime_type = results.mime_type as string;
+      m.metadata = results.metadata as string;
+    }
+    return m;
   }
 }

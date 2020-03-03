@@ -83,7 +83,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('osm');
-        geopackage.getTileDaoWithTableName('osm', function(err, tileDao){
+        geopackage.getTileDao('osm', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -114,7 +114,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('tiles');
-        geopackage.getTileDaoWithTableName('tiles', function(err, tileDao){
+        geopackage.getTileDao('tiles', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -144,7 +144,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('osm');
-        geopackage.getTileDaoWithTableName('osm', function(err, tileDao){
+        geopackage.getTileDao('osm', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             MBTilesToGeoPackage.addLayer({
@@ -159,7 +159,7 @@ describe('MBTiles to GeoPackage tests', function() {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('osm');
                 tables[1].should.be.equal('osm_1');
-                geopackage.getTileDaoWithTableName('osm_1', function(err, tileDao){
+                geopackage.getTileDao('osm_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
                     done();
@@ -192,7 +192,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('osm');
-        geopackage.getTileDaoWithTableName('osm', function(err, tileDao){
+        geopackage.getTileDao('osm', function(err, tileDao){
           tileDao.getCount(function(err, count) {
             count.should.be.equal(85);
             MBTilesToGeoPackage.addLayer({
@@ -207,7 +207,7 @@ describe('MBTiles to GeoPackage tests', function() {
                 tables.length.should.be.equal(2);
                 tables[0].should.be.equal('osm');
                 tables[1].should.be.equal('osm_1');
-                geopackage.getTileDaoWithTableName('osm_1', function(err, tileDao){
+                geopackage.getTileDao('osm_1', function(err, tileDao){
                   tileDao.getCount(function(err, count) {
                     count.should.be.equal(85);
                     done();
@@ -241,7 +241,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getFeatureTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('pbf');
-        geopackage.getFeatureDaoWithTableName('pbf', function(err, featureDao){
+        geopackage.getFeatureDao('pbf', function(err, featureDao){
           featureDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();
@@ -271,7 +271,7 @@ describe('MBTiles to GeoPackage tests', function() {
       geopackage.getFeatureTables(function(err, tables) {
         tables.length.should.be.equal(1);
         tables[0].should.be.equal('pbf');
-        geopackage.getFeatureDaoWithTableName('pbf', function(err, featureDao){
+        geopackage.getFeatureDao('pbf', function(err, featureDao){
           featureDao.getCount(function(err, count) {
             count.should.be.equal(85);
             done();

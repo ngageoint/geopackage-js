@@ -49,30 +49,30 @@ describe('Related Tables tests', function() {
         for (var f = 0; f < features.length; f++) {
           var feature = features[f];
           var row = baseDao.getRow(feature);
-          var relatedIds = rte.getMappingsForBase(relationship.mapping_table_name, row.getId());
-          if (row.getId() === 1) {
+          var relatedIds = rte.getMappingsForBase(relationship.mapping_table_name, row.id);
+          if (row.id === 1) {
             relatedIds.length.should.be.equal(2);
-          } else if (row.getId() === 2) {
+          } else if (row.id === 2) {
             relatedIds.length.should.be.equal(1);
           }
-          baseIdMappings[row.getId()] = relatedIds;
+          baseIdMappings[row.id] = relatedIds;
         }
 
         var relatedIdMappings = {};
-        var relatedDao = geoPackage.getAttributeDaoWithTableName(relationship.related_table_name);
+        var relatedDao = geoPackage.getAttributeDao(relationship.related_table_name);
         var attributes = relatedDao.queryForAll();
         for (var a = 0; a < attributes.length; a++) {
           var attribute = attributes[a];
           var row = relatedDao.getRow(attribute);
-          var baseIds = rte.getMappingsForRelated(relationship.mapping_table_name, row.getId());
-          if (row.getId() === 17) {
+          var baseIds = rte.getMappingsForRelated(relationship.mapping_table_name, row.id);
+          if (row.id === 17) {
             baseIds.length.should.be.equal(2);
-          } else if (row.getId() === 18) {
+          } else if (row.id === 18) {
             baseIds.length.should.be.equal(3);
-          } else if (row.getId() === 19) {
+          } else if (row.id === 19) {
             baseIds.length.should.be.equal(1);
           }
-          relatedIdMappings[row.getId()] = baseIds;
+          relatedIdMappings[row.id] = baseIds;
         }
 
         for (var baseId in baseIdMappings) {
@@ -201,7 +201,7 @@ describe('Related Tables tests', function() {
         var rowsDeleted = 0;
         for (var i = 0; i < userMappingRows.length; i++) {
           var resultRow = userMappingDao.getUserMappingRow(userMappingRows[i]);
-          should.not.exist(resultRow.getId());
+          should.not.exist(resultRow.id);
           RelatedTablesUtils.validateUserRow(columns, resultRow);
           RelatedTablesUtils.validateDublinCoreColumns(resultRow);
           var deleteResult = userMappingDao.deleteByIds(resultRow.getBaseId(), resultRow.getRelatedId());
