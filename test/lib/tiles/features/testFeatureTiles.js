@@ -7,7 +7,7 @@ var GeoPackageManager = require('../../../../lib/geoPackageManager')
   , should = require('chai').should()
   , path = require('path');
 
-describe('GeoPackage FeatureTiles tests', function() {
+describe.skip('GeoPackage FeatureTiles tests', function() {
 
   describe('Rivers GeoPackage tests', function() {
 

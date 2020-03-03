@@ -22,7 +22,7 @@ describe('GeoPackageAPI tests', function() {
     });
   });
 
-  it('should open the geopackage byte array', function(done) {
+  it.skip('should open the geopackage byte array', function(done) {
     fs.readFile(existingPath, function(err, data) {
       GeoPackage.openGeoPackageByteArray(data, function(err, geopackage) {
         should.not.exist(err);
