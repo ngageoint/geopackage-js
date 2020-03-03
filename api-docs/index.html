@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title></title>
+	<title>@ngageoint/geopackage - v3.0.0-beta.1</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title"></a>
+					<a href="index.html" class="title">@ngageoint/geopackage - v3.0.0-beta.1</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> </h1>
+			<h1> @ngageoint/geopackage - v3.0.0-beta.1</h1>
 		</div>
 	</div>
 </header>
@@ -64,6 +64,281 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
+				<a href="#geopackage-js" id="geopackage-js" style="color: inherit; text-decoration: none;">
+					<h1>GeoPackage JS</h1>
+				</a>
+				<p>GeoPackage JS is an implementation of the OGC GeoPackage spec.  This library works in both the browser and Node 4+.</p>
+				<a href="#demo" id="demo" style="color: inherit; text-decoration: none;">
+					<h3>Demo</h3>
+				</a>
+				<p><a href="http://ngageoint.github.io/geopackage-js/">GeoPackage JS Demo Page</a></p>
+				<p>Cloning this repository and opening the docs/index.html in your browser will run the demo locally.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h3>Installation</h3>
+				</a>
+				<p><a href="https://travis-ci.org/ngageoint/geopackage-js"><img src="https://travis-ci.org/ngageoint/geopackage-js.svg?branch=master" alt="Build Status"></a>
+					<a href="https://www.npmjs.com/package/@ngageoint/geopackage"><img src="https://img.shields.io/npm/v/@ngageoint/geopackage.svg" alt="NPM"></a>
+				<a href="https://coveralls.io/github/ngageoint/geopackage-js"><img src="https://coveralls.io/repos/github/ngageoint/geopackage-js/badge.svg" alt="Coverage Status"></a></p>
+				<pre><code class="language-sh">$ npm install @ngageoint/geopackage</code></pre>
+				<a href="#geopackage-js-library" id="geopackage-js-library" style="color: inherit; text-decoration: none;">
+					<h4>GeoPackage JS Library</h4>
+				</a>
+				<p>The <a href="http://ngageoint.github.io/GeoPackage/">GeoPackage Libraries</a> were developed at the <a href="http://www.nga.mil/">National Geospatial-Intelligence Agency (NGA)</a> in collaboration with <a href="http://www.bit-sys.com/">BIT Systems</a>. The government has &quot;unlimited rights&quot; and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the <a href="http://choosealicense.com/licenses/mit/">MIT license</a>.</p>
+				<a href="#pull-requests" id="pull-requests" style="color: inherit; text-decoration: none;">
+					<h3>Pull Requests</h3>
+				</a>
+				<p>If you&#39;d like to contribute to this project, please make a pull request. We&#39;ll review the pull request and discuss the changes. All pull request contributions to this project will be released under the MIT license.</p>
+				<p>Software source code previously released under an open source license and then modified by NGA staff is considered a &quot;joint work&quot; (see 17 USC § 101); it is partially copyrighted, partially public domain, and as a whole is protected by the copyrights of the non-government authors and must be released according to the terms of the original open source license.</p>
+				<a href="#about" id="about" style="color: inherit; text-decoration: none;">
+					<h3>About</h3>
+				</a>
+				<p><a href="https://github.com/ngageoint/geopackage-js">GeoPackage JS</a> is a <a href="http://ngageoint.github.io/GeoPackage/">GeoPackage Library</a> JavaScript implementation of the Open Geospatial Consortium <a href="http://www.geopackage.org/">GeoPackage</a> <a href="http://www.geopackage.org/spec/">spec</a>.  It is listed as an <a href="http://www.geopackage.org/#implementations_nga">OGC GeoPackage Implementation</a> by the National Geospatial-Intelligence Agency.</p>
+				<p>The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using <a href="https://github.com/kripken/sql.js/">sql.js</a>.  In Node tiles are rendered  <a href="https://github.com/joshmarinacci/node-pureimage">PureImage</a> and GeoPackages are read using <a href="https://github.com/mapbox/node-sqlite3">node-sqlite3</a>.</p>
+				<a href="#changelog" id="changelog" style="color: inherit; text-decoration: none;">
+					<h3>Changelog</h3>
+				</a>
+				<a href="#210" id="210" style="color: inherit; text-decoration: none;">
+					<h5>2.1.0</h5>
+				</a>
+				<ul>
+					<li>Implementation of the Feature Style Extension and Contents ID Extension</li>
+				</ul>
+				<a href="#208" id="208" style="color: inherit; text-decoration: none;">
+					<h5>2.0.8</h5>
+				</a>
+				<ul>
+					<li>Checks for Electron when returning a tile creator</li>
+				</ul>
+				<a href="#20" id="20" style="color: inherit; text-decoration: none;">
+					<h5>2.0</h5>
+				</a>
+				<ul>
+					<li>All new API utilizing Promises</li>
+				</ul>
+				<a href="#114" id="114" style="color: inherit; text-decoration: none;">
+					<h5>1.1.4</h5>
+				</a>
+				<ul>
+					<li>Adds a method to retrieve tiles in EPSG:4326</li>
+				</ul>
+				<a href="#113" id="113" style="color: inherit; text-decoration: none;">
+					<h5>1.1.3</h5>
+				</a>
+				<ul>
+					<li>Fixes issue #115</li>
+				</ul>
+				<a href="#112" id="112" style="color: inherit; text-decoration: none;">
+					<h5>1.1.2</h5>
+				</a>
+				<ul>
+					<li>fix case where GeoPackage Zoom does not correspond to the web map zoom</li>
+				</ul>
+				<a href="#111" id="111" style="color: inherit; text-decoration: none;">
+					<h5>1.1.1</h5>
+				</a>
+				<ul>
+					<li>fix more instances of proj4 bug for react</li>
+					<li>fixed tile generation for images with different x and y pixel densities</li>
+				</ul>
+				<a href="#110" id="110" style="color: inherit; text-decoration: none;">
+					<h5>1.1.0</h5>
+				</a>
+				<ul>
+					<li>accept pull request adding support for react</li>
+					<li>fix bug with projected tiles that spanned the date line</li>
+				</ul>
+				<a href="#1025" id="1025" style="color: inherit; text-decoration: none;">
+					<h5>1.0.25</h5>
+				</a>
+				<ul>
+					<li>ensure we use proj4 2.4.3 instead of 2.4.4</li>
+				</ul>
+				<a href="#1022" id="1022" style="color: inherit; text-decoration: none;">
+					<h5>1.0.22</h5>
+				</a>
+				<ul>
+					<li>Fixed bug where querying for indexed features only returned the geometry instead of the entire feature</li>
+				</ul>
+				<a href="#1019" id="1019" style="color: inherit; text-decoration: none;">
+					<h5>1.0.19</h5>
+				</a>
+				<ul>
+					<li>Remove dependency on Lwip</li>
+				</ul>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h3>Usage</h3>
+				</a>
+				<p>View examples using <a href="https://github.com/ngageoint/geopackage-js/tree/master/docs/bower">Bower</a> and <a href="https://github.com/ngageoint/geopackage-js/tree/master/docs">Browserify</a></p>
+				<p>View the latest <a href="http://ngageoint.github.io/geopackage-js/jsdoc/module-geoPackage-GeoPackage.html">docs</a> (currently being updated).</p>
+				<a href="#browser-usage" id="browser-usage" style="color: inherit; text-decoration: none;">
+					<h4>Browser Usage</h4>
+				</a>
+				<pre><code class="language-javascript">
+<span class="hljs-comment">// attach this method to a file input onchange event</span>
+<span class="hljs-built_in">window</span>.loadGeoPackage = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">files</span>) </span>{
+  <span class="hljs-keyword">var</span> f = files[<span class="hljs-number">0</span>];
+  <span class="hljs-keyword">var</span> r = <span class="hljs-keyword">new</span> FileReader();
+  r.onload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> array = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(r.result);
+    loadByteArray(array);
+  }
+  r.readAsArrayBuffer(f);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">loadByteArray</span>(<span class="hljs-params">array, callback</span>) </span>{
+  <span class="hljs-keyword">var</span> db = <span class="hljs-keyword">new</span> SQL.Database(array);
+  GeoPackageConnection.connectWithDatabase(db, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, connection</span>) </span>{
+    <span class="hljs-keyword">var</span> geoPackage = <span class="hljs-keyword">new</span> GeoPackage(<span class="hljs-string">''</span>, <span class="hljs-string">''</span>, connection);
+
+    <span class="hljs-comment">// Now you can operate on the GeoPackage</span>
+
+    <span class="hljs-comment">// get the tile table names</span>
+    geoPackage.getTileTables(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileTableNames</span>) </span>{
+      <span class="hljs-comment">// tileTableNames is an array of all tile table names</span>
+
+      <span class="hljs-comment">// get the info for the first table</span>
+      geoPackage.getTileDaoWithTableName(tileTableNames[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileDao</span>) </span>{
+        geoPackage.getInfoForTable(tileDao, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, info</span>) </span>{
+          <span class="hljs-comment">// do something with the tile table info</span>
+        });
+
+        <span class="hljs-comment">// draw a tile into a canvas for an XYZ tile</span>
+        <span class="hljs-keyword">var</span> canvas = canvasFromSomewhere;
+        <span class="hljs-keyword">var</span> gpr = <span class="hljs-keyword">new</span> GeoPackageTileRetriever(tileDao, <span class="hljs-number">256</span>, <span class="hljs-number">256</span>);
+        <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">var</span> y = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">var</span> zoom = <span class="hljs-number">0</span>;
+
+        <span class="hljs-built_in">console</span>.time(<span class="hljs-string">'Draw tile '</span> + x + <span class="hljs-string">', '</span> + y + <span class="hljs-string">' zoom: '</span> + zoom);
+        gpr.drawTileIn(x, y, zoom, canvas, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+          <span class="hljs-built_in">console</span>.timeEnd(<span class="hljs-string">'Draw tile '</span> + x + <span class="hljs-string">', '</span> + y + <span class="hljs-string">' zoom: '</span> + zoom);
+        });
+
+        <span class="hljs-comment">// or get a tile base64 data URL for an XYZ tile</span>
+        gpr.getTile(x, y, zoom, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileBase64DataURL</span>) </span>{
+          <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'got the base64 data url'</span>);
+        });
+
+        <span class="hljs-comment">// or get a tile from a GeoPackage tile column and tile row</span>
+        tileDao.queryForTile(tileColumn, tileRow, zoom, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tile</span>) </span>{
+          <span class="hljs-keyword">var</span> tileData = tile.getTileData();  <span class="hljs-comment">// the raw bytes from the GeoPackage</span>
+        });
+
+      });
+    });
+
+    <span class="hljs-comment">// get the feature table names</span>
+    geoPackage.getFeatureTables(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, featureTableNames</span>) </span>{
+      <span class="hljs-comment">// featureTableNames is an array of all feature table names</span>
+
+      <span class="hljs-comment">// get the info for the first table</span>
+      geoPackage.getFeatureDaoWithTableName(featureTableNames[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, featureDao</span>) </span>{
+        geoPackage.getInfoForTable(featureDao, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, info</span>) </span>{
+          <span class="hljs-comment">// do something with the feature table info</span>
+        });
+
+        <span class="hljs-comment">// query for all features</span>
+        featureDao.queryForEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, row, rowDone</span>) </span>{
+          <span class="hljs-keyword">var</span> feature = featureDao.getFeatureRow(row);
+          <span class="hljs-keyword">var</span> geometry = currentRow.getGeometry();
+          <span class="hljs-keyword">if</span> (geometry) {
+            <span class="hljs-keyword">var</span> geom = geometry.geometry;
+            <span class="hljs-keyword">var</span> geoJson = geometry.geometry.toGeoJSON();
+
+            geoJson.properties = {};
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> feature.values) {
+              <span class="hljs-keyword">if</span>(feature.values.hasOwnProperty(key) &amp;&amp; key != feature.getGeometryColumn().name) {
+                <span class="hljs-keyword">var</span> column = info.columnMap[key];
+                geoJson.properties[column.displayName] = currentRow.values[key];
+              }
+            }
+          }
+          rowDone();
+        });
+      });
+    });
+  });
+}
+</code></pre>
+				<a href="#nodejs-usage" id="nodejs-usage" style="color: inherit; text-decoration: none;">
+					<h4>NodeJS Usage</h4>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">var</span> GeoPackageAPI = <span class="hljs-built_in">require</span>(<span class="hljs-string">'@ngageoint/geopackage'</span>)
+  , GeoPackageManager = GeoPackageAPI.GeoPackageManager
+  , GeoPackageConnection = GeoPackageAPI.GeoPackageConnection
+  , GeoPackageTileRetriever = GeoPackageAPI.GeoPackageTileRetriever;
+
+GeoPackageAPI.open(filename, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, geoPackage</span>) </span>{
+
+  <span class="hljs-comment">// Now you can operate on the GeoPackage</span>
+
+  <span class="hljs-comment">// get the tile table names</span>
+  geoPackage.getTileTables(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileTableNames</span>) </span>{
+    <span class="hljs-comment">// tileTableNames is an array of all tile table names</span>
+
+    <span class="hljs-comment">// get the info for the first table</span>
+    geoPackage.getTileDaoWithTableName(tileTableNames[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileDao</span>) </span>{
+      geoPackage.getInfoForTable(tileDao, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, info</span>) </span>{
+        <span class="hljs-comment">// do something with the tile table info</span>
+      });
+
+      <span class="hljs-comment">// draw a tile into a canvas for an XYZ tile</span>
+      <span class="hljs-keyword">var</span> canvas = canvasFromSomewhere;
+      <span class="hljs-keyword">var</span> gpr = <span class="hljs-keyword">new</span> GeoPackageTileRetriever(tileDao, <span class="hljs-number">256</span>, <span class="hljs-number">256</span>);
+      <span class="hljs-keyword">var</span> x = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">var</span> y = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">var</span> zoom = <span class="hljs-number">0</span>;
+
+      <span class="hljs-built_in">console</span>.time(<span class="hljs-string">'Draw tile '</span> + x + <span class="hljs-string">', '</span> + y + <span class="hljs-string">' zoom: '</span> + zoom);
+      gpr.drawTileIn(x, y, zoom, canvas, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-built_in">console</span>.timeEnd(<span class="hljs-string">'Draw tile '</span> + x + <span class="hljs-string">', '</span> + y + <span class="hljs-string">' zoom: '</span> + zoom);
+      });
+
+      <span class="hljs-comment">// or get a tile base64 data URL for an XYZ tile</span>
+      gpr.getTile(x, y, zoom, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tileBase64DataURL</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'got the base64 data url'</span>);
+      });
+
+      <span class="hljs-comment">// or get a tile from a GeoPackage tile column and tile row</span>
+      tileDao.queryForTile(tileColumn, tileRow, zoom, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, tile</span>) </span>{
+        <span class="hljs-keyword">var</span> tileData = tile.getTileData();  <span class="hljs-comment">// the raw bytes from the GeoPackage</span>
+      });
+
+    });
+  });
+
+  <span class="hljs-comment">// get the feature table names</span>
+  geoPackage.getFeatureTables(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, featureTableNames</span>) </span>{
+    <span class="hljs-comment">// featureTableNames is an array of all feature table names</span>
+
+    <span class="hljs-comment">// get the info for the first table</span>
+    geoPackage.getFeatureDaoWithTableName(featureTableNames[<span class="hljs-number">0</span>], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, featureDao</span>) </span>{
+      geoPackage.getInfoForTable(featureDao, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, info</span>) </span>{
+        <span class="hljs-comment">// do something with the feature table info</span>
+      });
+
+      <span class="hljs-comment">// query for all features</span>
+      featureDao.queryForEach(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, row, rowDone</span>) </span>{
+        <span class="hljs-keyword">var</span> feature = featureDao.getFeatureRow(row);
+        <span class="hljs-keyword">var</span> geometry = currentRow.getGeometry();
+        <span class="hljs-keyword">if</span> (geometry) {
+          <span class="hljs-keyword">var</span> geom = geometry.geometry;
+          <span class="hljs-keyword">var</span> geoJson = geometry.geometry.toGeoJSON();
+
+          geoJson.properties = {};
+          <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> feature.values) {
+            <span class="hljs-keyword">if</span>(feature.values.hasOwnProperty(key) &amp;&amp; key != feature.getGeometryColumn().name) {
+              <span class="hljs-keyword">var</span> column = info.columnMap[key];
+              geoJson.properties[column.displayName] = currentRow.values[key];
+            }
+          }
+        }
+        rowDone();
+      });
+    });
+  });
+});
+</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -76,6 +351,408 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/datatypes.html" class="tsd-kind-icon">Data<wbr>Types</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/featuredrawtype.html" class="tsd-kind-icon">Feature<wbr>Draw<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/attributedao.html" class="tsd-kind-icon">Attribute<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/attributerow.html" class="tsd-kind-icon">Attribute<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/attributetable.html" class="tsd-kind-icon">Attribute<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/attributetablereader.html" class="tsd-kind-icon">Attribute<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/baseextension.html" class="tsd-kind-icon">Base<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/boundingbox.html" class="tsd-kind-icon">Bounding<wbr>Box</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/columnvalues.html" class="tsd-kind-icon">Column<wbr>Values</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/contents.html" class="tsd-kind-icon">Contents</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/contentsdao.html" class="tsd-kind-icon">Contents<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/contentsid.html" class="tsd-kind-icon">Contents<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/contentsiddao.html" class="tsd-kind-icon">Contents<wbr>IdDao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/contentsidextension.html" class="tsd-kind-icon">Contents<wbr>IdExtension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/crswktextension.html" class="tsd-kind-icon">Crs<wbr>Wkt<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/customfeaturestile.html" class="tsd-kind-icon">Custom<wbr>Features<wbr>Tile</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/dao.html" class="tsd-kind-icon">Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/datacolumnconstraints.html" class="tsd-kind-icon">Data<wbr>Column<wbr>Constraints</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/datacolumnconstraintsdao.html" class="tsd-kind-icon">Data<wbr>Column<wbr>Constraints<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/datacolumns.html" class="tsd-kind-icon">Data<wbr>Columns</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/datacolumnsdao.html" class="tsd-kind-icon">Data<wbr>Columns<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/dublincoretype.html" class="tsd-kind-icon">Dublin<wbr>Core<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/envelope.html" class="tsd-kind-icon">Envelope</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/envelopebuilder.html" class="tsd-kind-icon">Envelope<wbr>Builder</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/extendedrelation.html" class="tsd-kind-icon">Extended<wbr>Relation</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/extendedrelationdao.html" class="tsd-kind-icon">Extended<wbr>Relation<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/extension.html" class="tsd-kind-icon">Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/extensiondao.html" class="tsd-kind-icon">Extension<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurecolumn.html" class="tsd-kind-icon">Feature<wbr>Column</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/featuredao.html" class="tsd-kind-icon">Feature<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurepaint.html" class="tsd-kind-icon">Feature<wbr>Paint</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurepaintcache.html" class="tsd-kind-icon">Feature<wbr>Paint<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurerow.html" class="tsd-kind-icon">Feature<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurestyle.html" class="tsd-kind-icon">Feature<wbr>Style</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurestyleextension.html" class="tsd-kind-icon">Feature<wbr>Style<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featurestyles.html" class="tsd-kind-icon">Feature<wbr>Styles</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretable.html" class="tsd-kind-icon">Feature<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretableindex.html" class="tsd-kind-icon">Feature<wbr>Table<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretablereader.html" class="tsd-kind-icon">Feature<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretablestyles.html" class="tsd-kind-icon">Feature<wbr>Table<wbr>Styles</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretilepointicon.html" class="tsd-kind-icon">Feature<wbr>Tile<wbr>Point<wbr>Icon</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/featuretiles.html" class="tsd-kind-icon">Feature<wbr>Tiles</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackage.html" class="tsd-kind-icon">Geo<wbr>Package</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackageapi.html" class="tsd-kind-icon">Geo<wbr>PackageAPI</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackageconnection.html" class="tsd-kind-icon">Geo<wbr>Package<wbr>Connection</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackageconstants.html" class="tsd-kind-icon">Geo<wbr>Package<wbr>Constants</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackagetileretriever.html" class="tsd-kind-icon">Geo<wbr>Package<wbr>Tile<wbr>Retriever</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackagevalidate.html" class="tsd-kind-icon">Geo<wbr>Package<wbr>Validate</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geopackagevalidationerror.html" class="tsd-kind-icon">Geo<wbr>Package<wbr>Validation<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometrycache.html" class="tsd-kind-icon">Geometry<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometrycolumns.html" class="tsd-kind-icon">Geometry<wbr>Columns</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometrycolumnsdao.html" class="tsd-kind-icon">Geometry<wbr>Columns<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometrydata.html" class="tsd-kind-icon">Geometry<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometryindex.html" class="tsd-kind-icon">Geometry<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/geometryindexdao.html" class="tsd-kind-icon">Geometry<wbr>Index<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/iconcache.html" class="tsd-kind-icon">Icon<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/icondao.html" class="tsd-kind-icon">Icon<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/iconrow.html" class="tsd-kind-icon">Icon<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/icontable.html" class="tsd-kind-icon">Icon<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/icons.html" class="tsd-kind-icon">Icons</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/imageutils.html" class="tsd-kind-icon">Image<wbr>Utils</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/mediadao.html" class="tsd-kind-icon">Media<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/mediarow.html" class="tsd-kind-icon">Media<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/mediatable.html" class="tsd-kind-icon">Media<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/metadata.html" class="tsd-kind-icon">Metadata</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/metadatadao.html" class="tsd-kind-icon">Metadata<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/metadataextension.html" class="tsd-kind-icon">Metadata<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/metadatareference.html" class="tsd-kind-icon">Metadata<wbr>Reference</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/metadatareferencedao.html" class="tsd-kind-icon">Metadata<wbr>Reference<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/numberfeaturestile.html" class="tsd-kind-icon">Number<wbr>Features<wbr>Tile</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/optionbuilder.html" class="tsd-kind-icon">Option<wbr>Builder</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/paint.html" class="tsd-kind-icon">Paint</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/rtreeindex.html" class="tsd-kind-icon">RTree<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/rtreeindexdao.html" class="tsd-kind-icon">RTree<wbr>Index<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/relatedtablesextension.html" class="tsd-kind-icon">Related<wbr>Tables<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/relationtype.html" class="tsd-kind-icon">Relation<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/schemaextension.html" class="tsd-kind-icon">Schema<wbr>Extension</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/shadedfeaturestile.html" class="tsd-kind-icon">Shaded<wbr>Features<wbr>Tile</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/simpleattributesdao.html" class="tsd-kind-icon">Simple<wbr>Attributes<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/simpleattributesrow.html" class="tsd-kind-icon">Simple<wbr>Attributes<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/simpleattributestable.html" class="tsd-kind-icon">Simple<wbr>Attributes<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/spatialreferencesystem.html" class="tsd-kind-icon">Spatial<wbr>Reference<wbr>System</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/spatialreferencesystemdao.html" class="tsd-kind-icon">Spatial<wbr>Reference<wbr>System<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/sqliteadapter.html" class="tsd-kind-icon">Sqlite<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/sqlitequerybuilder.html" class="tsd-kind-icon">Sqlite<wbr>Query<wbr>Builder</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/sqljsadapter.html" class="tsd-kind-icon">Sqljs<wbr>Adapter</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/styledao.html" class="tsd-kind-icon">Style<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/stylemappingdao.html" class="tsd-kind-icon">Style<wbr>Mapping<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/stylemappingrow.html" class="tsd-kind-icon">Style<wbr>Mapping<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/stylemappingtable.html" class="tsd-kind-icon">Style<wbr>Mapping<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/stylerow.html" class="tsd-kind-icon">Style<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/styletable.html" class="tsd-kind-icon">Style<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/styletablereader.html" class="tsd-kind-icon">Style<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/styles.html" class="tsd-kind-icon">Styles</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tablecreator.html" class="tsd-kind-icon">Table<wbr>Creator</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tableindex.html" class="tsd-kind-icon">Table<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tableindexdao.html" class="tsd-kind-icon">Table<wbr>Index<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tileboundingboxutils.html" class="tsd-kind-icon">Tile<wbr>Bounding<wbr>Box<wbr>Utils</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilecolumn.html" class="tsd-kind-icon">Tile<wbr>Column</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilecreator.html" class="tsd-kind-icon">Tile<wbr>Creator</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tiledao.html" class="tsd-kind-icon">Tile<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilegrid.html" class="tsd-kind-icon">Tile<wbr>Grid</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilematrix.html" class="tsd-kind-icon">Tile<wbr>Matrix</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilematrixdao.html" class="tsd-kind-icon">Tile<wbr>Matrix<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilematrixset.html" class="tsd-kind-icon">Tile<wbr>Matrix<wbr>Set</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilematrixsetdao.html" class="tsd-kind-icon">Tile<wbr>Matrix<wbr>Set<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tilerow.html" class="tsd-kind-icon">Tile<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tiletable.html" class="tsd-kind-icon">Tile<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/tiletablereader.html" class="tsd-kind-icon">Tile<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usercolumn.html" class="tsd-kind-icon">User<wbr>Column</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usercustomcolumn.html" class="tsd-kind-icon">User<wbr>Custom<wbr>Column</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/usercustomdao.html" class="tsd-kind-icon">User<wbr>Custom<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usercustomtable.html" class="tsd-kind-icon">User<wbr>Custom<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usercustomtablereader.html" class="tsd-kind-icon">User<wbr>Custom<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/userdao.html" class="tsd-kind-icon">User<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
+						<a href="classes/usermappingdao.html" class="tsd-kind-icon">User<wbr>Mapping<wbr>Dao</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usermappingrow.html" class="tsd-kind-icon">User<wbr>Mapping<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usermappingtable.html" class="tsd-kind-icon">User<wbr>Mapping<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/userrelatedtable.html" class="tsd-kind-icon">User<wbr>Related<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/userrow.html" class="tsd-kind-icon">User<wbr>Row</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usertable.html" class="tsd-kind-icon">User<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/usertablereader.html" class="tsd-kind-icon">User<wbr>Table<wbr>Reader</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/wkb.html" class="tsd-kind-icon">WKB</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/webpextension.html" class="tsd-kind-icon">WebPExtension</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external tsd-is-not-exported">
+						<a href="interfaces/closestfeature.html" class="tsd-kind-icon">Closest<wbr>Feature</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/crsgeometry.html" class="tsd-kind-icon">Crs<wbr>Geometry</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/dbadapter.html" class="tsd-kind-icon">DBAdapter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external tsd-is-not-exported">
+						<a href="interfaces/wktmap.html" class="tsd-kind-icon">WKTMap</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#columnmap" class="tsd-kind-icon">Column<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#dbvalue" class="tsd-kind-icon">DBValue</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#metadatareferencekeys" class="tsd-kind-icon">Metadata<wbr>Reference<wbr>Keys</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#tablecreatorscripts" class="tsd-kind-icon">Table<wbr>Creator<wbr>Scripts</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#anydefs" class="tsd-kind-icon">any<wbr>Defs</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#proj4" class="tsd-kind-icon">proj4</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
