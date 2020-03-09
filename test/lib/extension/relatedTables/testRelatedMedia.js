@@ -60,21 +60,21 @@ describe('Related Media tests', function() {
     var mediaColumns = mediaTable.columnNames;
     mediaColumns.length.should.be.equal(MediaTable.numRequiredColumns() + additionalMediaColumns.length);
 
-    var idColumn = mediaTable.getIdColumn();
+    var idColumn = mediaTable.idColumn;
     should.exist(idColumn);
     idColumn.name.should.be.equal(MediaTable.COLUMN_ID);
     idColumn.dataType.should.be.equal(DataType.INTEGER);
     idColumn.notNull.should.be.equal(true);
     idColumn.primaryKey.should.be.equal(true);
 
-    var dataColumn = mediaTable.getDataColumn();
+    var dataColumn = mediaTable.dataColumn;
     should.exist(dataColumn);
     dataColumn.name.should.be.equal(MediaTable.COLUMN_DATA);
     dataColumn.dataType.should.be.equal(DataType.BLOB);
     dataColumn.notNull.should.be.equal(true);
     dataColumn.primaryKey.should.be.equal(false);
 
-    var contentTypeColumn = mediaTable.getContentTypeColumn();
+    var contentTypeColumn = mediaTable.contentTypeColumn;
     should.exist(contentTypeColumn);
     contentTypeColumn.name.should.be.equal(MediaTable.COLUMN_CONTENT_TYPE);
     contentTypeColumn.dataType.should.be.equal(DataType.TEXT);
@@ -87,14 +87,14 @@ describe('Related Media tests', function() {
     rte.has(userMappingTable.table_name).should.be.equal(false);
     userMappingTable.columnNames.length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
-    var baseIdColumn = userMappingTable.getBaseIdColumn();
+    var baseIdColumn = userMappingTable.baseIdColumn;
     should.exist(baseIdColumn);
     baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
     baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
     baseIdColumn.notNull.should.be.equal(true);
     baseIdColumn.primaryKey.should.be.equal(false);
 
-    var relatedIdColumn = userMappingTable.getRelatedIdColumn();
+    var relatedIdColumn = userMappingTable.relatedIdColumn;
     should.exist(relatedIdColumn);
     relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
     relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
@@ -130,7 +130,7 @@ describe('Related Media tests', function() {
 
         var mediaDao = rte.getMediaDao(mediaTable);
         should.exist(mediaDao);
-        mediaTable = mediaDao.mediaTable;
+        mediaTable = mediaDao.table;
         should.exist(mediaTable);
         validateContents(mediaTable, mediaTable.contents);
 
@@ -143,8 +143,8 @@ describe('Related Media tests', function() {
 
         for (var i = 0; i < mediaCount-1; i++) {
           var mediaRow = mediaDao.newRow();
-          mediaRow.setData(tileBuffer);
-          mediaRow.setContentType(contentType);
+          mediaRow.data = tileBuffer;
+          mediaRow.contentType = contentType;
           RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
           mediaRowId = mediaDao.create(mediaRow);
           mediaRowId.should.be.greaterThan(0);
@@ -177,8 +177,8 @@ describe('Related Media tests', function() {
         var userMappingDao = rte.getMappingDao(mappingTableName);
         for (var i = 0; i < 10; i++) {
           var userMappingRow = userMappingDao.newRow();
-          userMappingRow.setBaseId(featureIds[Math.floor(Math.random() * featureIds.length)]);
-          userMappingRow.setRelatedId(mediaIds[Math.floor(Math.random() * mediaIds.length)]);
+          userMappingRow.baseId = featureIds[Math.floor(Math.random() * featureIds.length)];
+          userMappingRow.relatedId = mediaIds[Math.floor(Math.random() * mediaIds.length)];
           RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
           var created = userMappingDao.create(userMappingRow);
           created.should.be.greaterThan(0);
@@ -187,7 +187,7 @@ describe('Related Media tests', function() {
         userMappingDao.count().should.be.equal(10);
 
         // Validate the user mapping rows
-        userMappingTable = userMappingDao.getTable();
+        userMappingTable = userMappingDao.table;
         var mappingColumns = userMappingTable.columnNames;
         var userMappingRows = userMappingDao.queryForAll();
         var count = userMappingRows.length;
@@ -198,8 +198,8 @@ describe('Related Media tests', function() {
           var userMappingRow = userMappingRows[i];
           var row = userMappingDao.getUserMappingRow(userMappingRow);
           row.hasId().should.be.equal(false);
-          featureIds.indexOf(row.getBaseId()).should.be.not.equal(-1);
-          mediaIds.indexOf(row.getRelatedId()).should.be.not.equal(-1);
+          featureIds.indexOf(row.baseId).should.be.not.equal(-1);
+          mediaIds.indexOf(row.relatedId).should.be.not.equal(-1);
           RelatedTablesUtils.validateUserRow(mappingColumns, row);
           RelatedTablesUtils.validateDublinCoreColumns(row);
           manualCount++;
@@ -222,9 +222,9 @@ describe('Related Media tests', function() {
           var featureRelation = featureBaseTableRelations[i];
           featureRelation.id.should.be.greaterThan(0);
           featureDao.table_name.should.be.equal(featureRelation.base_table_name);
-          featureDao.getFeatureTable().getPkColumn().name.should.be.equal(featureRelation.base_primary_column);
+          featureDao.getFeatureTable().pkColumn.name.should.be.equal(featureRelation.base_primary_column);
           mediaDao.table_name.should.be.equal(featureRelation.related_table_name);
-          mediaDao.getTable().getPkColumn().name.should.be.equal(featureRelation.related_primary_column);
+          mediaDao.table.pkColumn.name.should.be.equal(featureRelation.related_primary_column);
           MediaTable.RELATION_TYPE.name.should.be.equal(featureRelation.relation_name);
 
           // test the user mappings from the relation
@@ -233,8 +233,8 @@ describe('Related Media tests', function() {
           var mappings = userMappingDao.queryForAll();
           for (var m = 0; m < mappings.length; m++) {
             var userMappingRow = userMappingDao.getUserMappingRow(mappings[i]);
-            featureIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
-            mediaIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
+            featureIds.indexOf(userMappingRow.baseId).should.not.be.equal(-1);
+            mediaIds.indexOf(userMappingRow.relatedId).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
             RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
           }
@@ -242,7 +242,7 @@ describe('Related Media tests', function() {
           // get and test the media DAO
           mediaDao = rte.getMediaDao(featureRelation);
           should.exist(mediaDao);
-          mediaTable = mediaDao.getTable();
+          mediaTable = mediaDao.table;
           should.exist(mediaTable);
           validateContents(mediaTable, mediaTable.contents);
 
@@ -262,8 +262,8 @@ describe('Related Media tests', function() {
               mediaRow.id.should.be.greaterThan(0);
               mediaIds.indexOf(mediaRow.id).should.not.be.equal(-1);
               mappedIds.indexOf(mediaRow.id).should.not.be.equal(-1);
-              mediaRow.getData().equals(tileBuffer).should.be.equal(true);
-              contentType.should.be.equal(mediaRow.getContentType());
+              mediaRow.data.equals(tileBuffer).should.be.equal(true);
+              contentType.should.be.equal(mediaRow.contentType);
               RelatedTablesUtils.validateUserRow(mediaColumns, mediaRow);
               RelatedTablesUtils.validateDublinCoreColumns(mediaRow);
             });
@@ -288,9 +288,9 @@ describe('Related Media tests', function() {
           // Test the relation
           mediaRelation.id.should.be.greaterThan(0);
           featureDao.table_name.should.be.equal(mediaRelation.base_table_name);
-          featureDao.getFeatureTable().getPkColumn().name.should.be.equal(mediaRelation.base_primary_column);
+          featureDao.getFeatureTable().pkColumn.name.should.be.equal(mediaRelation.base_primary_column);
           mediaDao.table_name.should.be.equal(mediaRelation.related_table_name);
-          mediaDao.getTable().getPkColumn().name.should.be.equal(mediaRelation.related_primary_column);
+          mediaDao.table.pkColumn.name.should.be.equal(mediaRelation.related_primary_column);
           MediaTable.RELATION_TYPE.name.should.be.equal(mediaRelation.relation_name);
           mappingTableName.should.be.equal(mediaRelation.mapping_table_name);
 
@@ -300,8 +300,8 @@ describe('Related Media tests', function() {
           var mappings = userMappingDao.queryForAll();
           mappings.forEach(function(row) {
             var userMappingRow = userMappingDao.getUserMappingRow(row);
-            featureIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
-            mediaIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
+            featureIds.indexOf(userMappingRow.baseId).should.not.be.equal(-1);
+            mediaIds.indexOf(userMappingRow.relatedId).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
             RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
           });
@@ -329,8 +329,8 @@ describe('Related Media tests', function() {
               featureRow.id.should.be.greaterThan(0);
               featureIds.indexOf(featureRow.id).should.not.equal(-1);
               mappedIds.indexOf(featureRow.id).should.not.equal(-1);
-              if (featureRow.getValueWithColumnName(featureRow.getGeometryColumn().name)) {
-                var geometryData = featureRow.getGeometry();
+              if (featureRow.getValueWithColumnName(featureRow.geometryColumn.name)) {
+                var geometryData = featureRow.geometry;
                 should.exist(geometryData);
                 if (!geometryData.empty) {
                   should.exist(geometryData.geometry);

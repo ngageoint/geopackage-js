@@ -27,28 +27,21 @@ export class MediaTable extends UserRelatedTable {
     super(tableName, MediaTable.RELATION_TYPE.name, MediaTable.RELATION_TYPE.dataType, columns, requiredColumns);
   }
 
-  getTableType(): string {
+  get tableType(): string {
     return this.TABLE_TYPE;
-  }
-  /**
-   * Get the primary key id column
-   * @return {module:user/userColumn~UserColumn}
-   */
-  getIdColumn(): UserColumn {
-    return this.getPkColumn();
   }
   /**
    * Get the data column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDataColumn(): UserColumn {
+  get dataColumn(): UserColumn {
     return this.getColumnWithColumnName(MediaTable.COLUMN_DATA);
   }
   /**
    * Get the content type column
    * @return {module:user/userColumn~UserColumn}
    */
-  getContentTypeColumn(): UserColumn {
+  get contentTypeColumn(): UserColumn {
     return this.getColumnWithColumnName(MediaTable.COLUMN_CONTENT_TYPE);
   }
   /**

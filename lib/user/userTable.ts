@@ -66,7 +66,7 @@ export class UserTable {
     }
   }
 
-  getTableType(): string {
+  get tableType(): string {
     return 'userTable';
   }
 
@@ -180,22 +180,29 @@ export class UserTable {
    * Get the column count
    * @return {Number} the count of the columns
    */
-  columnCount(): number {
+  get columnCount(): number {
     return this.columns.length;
   }
   /**
    * Get the primary key column
    * @return {module:user/userColumn~UserColumn} the primary key column
    */
-  getPkColumn(): UserColumn {
+  get pkColumn(): UserColumn {
     return this.columns[this.pkIndex];
+  }
+  /**
+   * Get the column index of the id column
+   * @return {Number}
+   */
+  get idColumnIndex(): number {
+    return this.pkIndex;
   }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getIdColumn(): UserColumn {
-    return this.getPkColumn();
+  get idColumn(): UserColumn {
+    return this.pkColumn;
   }
   /**
    * Add a unique constraint

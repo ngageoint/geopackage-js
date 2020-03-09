@@ -55,14 +55,14 @@ describe('Related Attributes tests', function() {
     rte.has(userMappingTable.table_name).should.be.equal(false);
     userMappingTable.columnNames.length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
-    var baseIdColumn = userMappingTable.getBaseIdColumn();
+    var baseIdColumn = userMappingTable.baseIdColumn;
     should.exist(baseIdColumn);
     baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
     baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
     baseIdColumn.notNull.should.be.equal(true);
     baseIdColumn.primaryKey.should.be.equal(false);
 
-    var relatedIdColumn = userMappingTable.getRelatedIdColumn();
+    var relatedIdColumn = userMappingTable.relatedIdColumn;
     should.exist(relatedIdColumn);
     relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
     relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
@@ -89,8 +89,8 @@ describe('Related Attributes tests', function() {
         // Insert user mapping rows between attributes
         var userMappingDao = rte.getMappingDao(mappingTableName);
         var userMappingRow = userMappingDao.newRow();
-        userMappingRow.setBaseId(4);
-        userMappingRow.setRelatedId(7);
+        userMappingRow.baseId = 4;
+        userMappingRow.relatedId = 7;
         RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
         var createdId = userMappingDao.create(userMappingRow);
         createdId.should.be.equal(1);
@@ -98,8 +98,8 @@ describe('Related Attributes tests', function() {
         userMappingDao.count().should.be.equal(1);
 
         userMappingRow = userMappingDao.newRow();
-        userMappingRow.setBaseId(5);
-        userMappingRow.setRelatedId(5);
+        userMappingRow.baseId = 5;
+        userMappingRow.relatedId = 5;
         RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
         createdId = userMappingDao.create(userMappingRow);
         createdId.should.be.equal(2);
@@ -108,7 +108,7 @@ describe('Related Attributes tests', function() {
 
 
         // Validate the user mapping rows
-        userMappingTable = userMappingDao.getTable();
+        userMappingTable = userMappingDao.table;
         var mappingColumns = userMappingTable.columnNames;
         var userMappingRows = userMappingDao.queryForAll();
         var count = userMappingRows.length;
@@ -119,13 +119,13 @@ describe('Related Attributes tests', function() {
           const umr = userMappingRows[i];
           var row = userMappingDao.getUserMappingRow(umr);
           row.hasId().should.be.equal(false);
-          row.getBaseId().should.be.oneOf([4, 5]);
-          if (row.getBaseId() === 4) {
-            row.getBaseId().should.be.equal(4);
-            row.getRelatedId().should.be.equal(7);
-          } else if (row.getBaseId() === 5) {
-            row.getBaseId().should.be.equal(5);
-            row.getRelatedId().should.be.equal(5);
+          row.baseId.should.be.oneOf([4, 5]);
+          if (row.baseId === 4) {
+            row.baseId.should.be.equal(4);
+            row.relatedId.should.be.equal(7);
+          } else if (row.baseId === 5) {
+            row.baseId.should.be.equal(5);
+            row.relatedId.should.be.equal(5);
           }
           RelatedTablesUtils.validateUserRow(mappingColumns, row);
           RelatedTablesUtils.validateDublinCoreColumns(row);
@@ -149,9 +149,9 @@ describe('Related Attributes tests', function() {
           var attributeRelation = attributeBaseTableRelations[i];
           attributeRelation.id.should.be.greaterThan(0);
           attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
-          attributesDao.table.getPkColumn().name.should.be.equal(attributeRelation.base_primary_column);
+          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.base_primary_column);
           baseTableName.should.be.equal(attributeRelation.related_table_name);
-          attributesDao.table.getPkColumn().name.should.be.equal(attributeRelation.related_primary_column);
+          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.related_primary_column);
           'attributes'.should.be.equal(attributeRelation.relation_name);
         }
 

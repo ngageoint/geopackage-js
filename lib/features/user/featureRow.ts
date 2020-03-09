@@ -28,28 +28,35 @@ export class FeatureRow extends UserRow {
    * Get the geometry column index
    * @return {Number} geometry column index
    */
-  getGeometryColumnIndex(): number {
+  get geometryColumnIndex(): number {
     return this.featureTable.geometryIndex;
   }
   /**
    * Get the geometry column
    * @return {FeatureColumn} geometry column
    */
-  getGeometryColumn(): FeatureColumn {
-    return this.featureTable.getGeometryColumn();
+  get geometryColumn(): FeatureColumn {
+    return this.featureTable.geometryColumn;
   }
   /**
    * Get the geometry
    * @return {Buffer} geometry data
    */
-  getGeometry(): GeometryData {
+  get geometry(): GeometryData {
     return this.getValueWithIndex(this.featureTable.geometryIndex);
+  }
+  /**
+   * set the geometry
+   * @param {Buffer} geometryData geometry data
+   */
+  set geometry(geometryData: GeometryData) {
+    this.setValueWithIndex(this.featureTable.geometryIndex, geometryData);
   }
   /**
    * Get the geometry's type
    * @return {String} geometry data
    */
-  getGeometryType(): string {
+  get geometryType(): string {
     let geometryType = null;
     const geometry = this.getValueWithIndex(this.featureTable.geometryIndex);
     if (geometry !== null) {
@@ -57,32 +64,23 @@ export class FeatureRow extends UserRow {
     }
     return geometryType;
   }
-  /**
-   * set the geometry
-   * @param {Buffer} geometryData geometry data
-   */
-  setGeometry(geometryData: GeometryData): void {
-    this.setValueWithIndex(this.featureTable.geometryIndex, geometryData);
-  }
+
   toObjectValue(index: number, value: DBValue): object | GeometryData {
-    let objectValue = value as object;
     const column = this.getColumnWithIndex(index);
     if (
       (column instanceof FeatureColumn && column.isGeometry() && value && value instanceof Buffer) ||
       value instanceof Uint8Array
     ) {
-      objectValue = new GeometryData(value);
+      return new GeometryData(value);
     }
-    return objectValue;
+    return super.toObjectValue(index, value);
   }
   toDatabaseValue(columnName: string): DBValue {
     const column = this.getColumnWithColumnName(columnName);
     const value = this.getValueWithColumnName(columnName);
     if (column instanceof FeatureColumn && column.isGeometry() && value.toData) {
       return value.toData();
-    } else if (column.dataType === DataTypes.BOOLEAN) {
-      return value === true ? 1 : 0;
     }
-    return value;
+    return super.toDatabaseValue(columnName);
   }
 }

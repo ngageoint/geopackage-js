@@ -54,20 +54,6 @@ export class SimpleAttributesTable extends UserRelatedTable {
     return true;
   }
   /**
-   * Get the column index of the id column
-   * @return {Number}
-   */
-  getIdColumnIndex(): number {
-    return this.pkIndex;
-  }
-  /**
-   * Get the primary key id column
-   * @return {module:user/userColumn~UserColumn}
-   */
-  getIdColumn(): UserColumn {
-    return this.getPkColumn();
-  }
-  /**
    * Create a simple attributes table with the columns
    * @param  {string} tableName name of the table
    * @param  {module:user/userColumn~UserColumn[]} additionalColumns additional columns

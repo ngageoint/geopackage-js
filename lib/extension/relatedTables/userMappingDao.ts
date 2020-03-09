@@ -18,8 +18,6 @@ import { DataTypes } from '../../db/dataTypes';
  * @param {UserMappingTable} [userMappingTable]
  */
 export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<UserMappingRow> {
-  public table: UserMappingTable;
-
   constructor(
     userCustomDao: UserCustomDao<UserMappingRow>,
     geoPackage: GeoPackage,
@@ -39,18 +37,11 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
     return new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
   }
   /**
-   * Create a new {module:extension/relatedTables~UserMappingRow}
-   * @return {module:extension/relatedTables~UserMappingRow}
-   */
-  newRow(): UserMappingRow {
-    return new UserMappingRow(this.table);
-  }
-  /**
    * Gets the {module:extension/relatedTables~UserMappingTable}
    * @return {module:extension/relatedTables~UserMappingTable}
    */
-  getTable(): UserMappingTable {
-    return this.table;
+  get table(): UserMappingTable {
+    return this._table as UserMappingTable;
   }
   /**
    * Create a user mapping row
@@ -58,7 +49,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): UserMappingRow {
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): UserMappingRow {
     return new UserMappingRow(this.table, columnTypes, values);
   }
   /**
@@ -77,7 +68,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
   queryByBaseId(baseId: UserMappingRow | number): Record<string, DBValue>[] {
     return this.queryForAllEq(
       UserMappingTable.COLUMN_BASE_ID,
-      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+      baseId instanceof UserMappingRow ? baseId.baseId : baseId,
     );
   }
   /**
@@ -88,7 +79,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
   queryByRelatedId(relatedId: UserMappingRow | number): Record<string, DBValue>[] {
     return this.queryForAllEq(
       UserMappingTable.COLUMN_RELATED_ID,
-      relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+      relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId,
     );
   }
   /**
@@ -102,11 +93,11 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
     relatedId?: UserMappingRow | number,
   ): IterableIterator<Record<string, DBValue>> {
     const values = new ColumnValues();
-    values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
+    values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.baseId : baseId);
     if (relatedId !== undefined) {
       values.addColumn(
         UserMappingTable.COLUMN_RELATED_ID,
-        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+        relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId,
       );
     }
     return this.queryForFieldValues(values);
@@ -130,11 +121,11 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    */
   countByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
     const values = new ColumnValues();
-    values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId);
+    values.addColumn(UserMappingTable.COLUMN_BASE_ID, baseId instanceof UserMappingRow ? baseId.baseId : baseId);
     if (relatedId !== undefined) {
       values.addColumn(
         UserMappingTable.COLUMN_RELATED_ID,
-        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+        relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId,
       );
     }
     return this.count(values);
@@ -148,9 +139,9 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
     let where = '';
     where += this.buildWhereWithFieldAndValue(
       UserMappingTable.COLUMN_BASE_ID,
-      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+      baseId instanceof UserMappingRow ? baseId.baseId : baseId,
     );
-    const whereArgs = this.buildWhereArgs([baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId]);
+    const whereArgs = this.buildWhereArgs([baseId instanceof UserMappingRow ? baseId.baseId : baseId]);
     return this.deleteWhere(where, whereArgs);
   }
   /**
@@ -162,9 +153,9 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
     let where = '';
     where += this.buildWhereWithFieldAndValue(
       UserMappingTable.COLUMN_RELATED_ID,
-      relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+      relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId,
     );
-    const whereArgs = this.buildWhereArgs([relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId]);
+    const whereArgs = this.buildWhereArgs([relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId]);
     return this.deleteWhere(where, whereArgs);
   }
   /**
@@ -175,18 +166,18 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    */
   deleteByIds(baseId: UserMappingRow | number, relatedId?: UserMappingRow | number): number {
     let where = '';
-    const whereParams = [baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId];
+    const whereParams = [baseId instanceof UserMappingRow ? baseId.baseId : baseId];
     where += this.buildWhereWithFieldAndValue(
       UserMappingTable.COLUMN_BASE_ID,
-      baseId instanceof UserMappingRow ? baseId.getBaseId() : baseId,
+      baseId instanceof UserMappingRow ? baseId.baseId : baseId,
     );
     if (relatedId !== undefined) {
       where += ' and ';
       where += this.buildWhereWithFieldAndValue(
         UserMappingTable.COLUMN_RELATED_ID,
-        relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId,
+        relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId,
       );
-      whereParams.push(relatedId instanceof UserMappingRow ? relatedId.getRelatedId() : relatedId);
+      whereParams.push(relatedId instanceof UserMappingRow ? relatedId.relatedId : relatedId);
     }
     const whereArgs = this.buildWhereArgs(whereParams);
     return this.deleteWhere(where, whereArgs);

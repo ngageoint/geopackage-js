@@ -109,7 +109,7 @@ describe('Related Tables tests', function() {
       relationships.length.should.be.equal(1);
       relationships[0].related_table_name.should.be.equal('cats_media');
       relationships[0].mappingRows.length.should.be.equal(2);
-      relationships[0].mappingRows[0].row.id.should.be.equal(relationships[0].mappingRows[0].getRelatedId());
+      relationships[0].mappingRows[0].row.id.should.be.equal(relationships[0].mappingRows[0].relatedId);
     });
   });
 
@@ -155,7 +155,7 @@ describe('Related Tables tests', function() {
       var numColumns = UserMappingTable.numRequiredColumns() + additionalColumns.length;
       numColumns.should.be.equal(userMappingTable.columns.length);
 
-      var baseIdColumn = userMappingTable.getBaseIdColumn();
+      var baseIdColumn = userMappingTable.baseIdColumn;
       should.exist(baseIdColumn);
       baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
       baseIdColumn.notNull.should.be.equal(true);
@@ -184,10 +184,10 @@ describe('Related Tables tests', function() {
         var userMappingRow;
         for (var i = 0; i < 10; i++) {
           userMappingRow = userMappingDao.newRow();
-          userMappingRow.setBaseId(Math.floor(Math.random() * baseResults.length));
-          userMappingRow.setRelatedId(Math.floor(Math.random() * relatedResults.length));
+          userMappingRow.baseId = Math.floor(Math.random() * baseResults.length);
+          userMappingRow.relatedId = Math.floor(Math.random() * relatedResults.length);
           RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-          var result = userMappingDao.create(userMappingRow);
+          userMappingDao.create(userMappingRow);
         }
 
         var count = userMappingDao.getCount();
@@ -204,7 +204,7 @@ describe('Related Tables tests', function() {
           should.not.exist(resultRow.id);
           RelatedTablesUtils.validateUserRow(columns, resultRow);
           RelatedTablesUtils.validateDublinCoreColumns(resultRow);
-          var deleteResult = userMappingDao.deleteByIds(resultRow.getBaseId(), resultRow.getRelatedId());
+          var deleteResult = userMappingDao.deleteByIds(resultRow.baseId, resultRow.relatedId);
           rowsDeleted += deleteResult;
         }
         rowsDeleted.should.be.equal(10);

@@ -49,7 +49,7 @@ describe('GeoPackage tests', function() {
       var each = featureDao.queryForEach();
       for (var row of each) {
         var currentRow = featureDao.getRow(row);
-        var geometry = currentRow.getGeometry();
+        var geometry = currentRow.geometry;
       }
       connection.close();
     });
@@ -65,11 +65,11 @@ describe('GeoPackage tests', function() {
         if (!featureDao) {
           throw new Error('No feature table exists');
         }
-        var srs = featureDao.getSrs();
+        var srs = featureDao.srs;
         var each = featureDao.queryForEach();
         for (var row of each) {
           var currentRow = featureDao.getRow(row);
-          var geometry = currentRow.getGeometry();
+          var geometry = currentRow.geometry;
           if (!geometry) {
             continue;
           }
@@ -115,7 +115,7 @@ describe('GeoPackage tests', function() {
       var contents = geoPackage.contentsDao.queryForId('FEATURESriversds');
       var featureDao = geoPackage.getFeatureDao(contents);
       should.exist(featureDao);
-      featureDao.getGeometryType().should.be.equal('GEOMETRY');
+      featureDao.geometryType.should.be.equal('GEOMETRY');
       featureDao.table_name.should.be.equal('FEATURESriversds');
       connection.close();
     });

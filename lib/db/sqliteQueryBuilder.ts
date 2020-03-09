@@ -93,7 +93,7 @@ export class SqliteQueryBuilder {
    * @return {string} insert statement
    */
   static buildInsert(table: string, object: any): string {
-    if (object.getColumnNames) {
+    if (object.columnNames) {
       return SqliteQueryBuilder.buildInsertFromColumnNames(table, object);
     }
     let insert = 'insert into ' + table + ' (';
@@ -127,7 +127,7 @@ export class SqliteQueryBuilder {
     let keys = '';
     let values = '';
     let first = true;
-    const columnNames = object.getColumnNames();
+    const columnNames = object.columnNames;
     for (let i = 0; i < columnNames.length; i++) {
       const key = columnNames[i];
       if (!first) {
@@ -150,8 +150,8 @@ export class SqliteQueryBuilder {
    */
   static buildUpdateOrInsertObject(object: any): any {
     const insertOrUpdate: { [key: string]: DBValue } = {};
-    if (object.getColumnNames) {
-      const columnNames = object.getColumnNames();
+    if (object.columnNames) {
+      const columnNames = object.columnNames;
       for (let i = 0; i < columnNames.length; i++) {
         insertOrUpdate[SqliteQueryBuilder.fixColumnName(columnNames[i])] = object.toDatabaseValue(columnNames[i]);
       }
@@ -229,8 +229,8 @@ export class SqliteQueryBuilder {
   static buildObjectUpdate(table: string, object: any): string {
     let update = 'update ' + table + ' set ';
     let first = true;
-    if (object.getColumnNames) {
-      const columnNames = object.getColumnNames();
+    if (object.columnNames) {
+      const columnNames = object.columnNames;
 
       for (let i = 0; i < columnNames.length; i++) {
         const key = columnNames[i];

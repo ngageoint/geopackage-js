@@ -17,15 +17,8 @@ import { DataTypes } from '../../db/dataTypes';
  * @param  {string} table table name
  */
 export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<SimpleAttributesRow> {
-  constructor(geoPackage: GeoPackage, public simpleAttributesTable: SimpleAttributesTable) {
-    super(geoPackage, simpleAttributesTable);
-  }
-  /**
-   * Create a new {module:extension/relatedTables~SimpleAttributesRow}
-   * @return {module:extension/relatedTables~SimpleAttributesRow}
-   */
-  newRow(): SimpleAttributesRow {
-    return new SimpleAttributesRow(this.simpleAttributesTable);
+  constructor(geoPackage: GeoPackage, table: SimpleAttributesTable) {
+    super(geoPackage, table);
   }
   /**
    * Create a new {module:extension/relatedTables~SimpleAttributesRow} with the column types and values
@@ -33,18 +26,15 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~SimpleAttributesRow}             simple attributes row
    */
-  newRowWithColumnTypes(
-    columnTypes: { [key: string]: DataTypes },
-    values: Record<string, DBValue>,
-  ): SimpleAttributesRow {
-    return new SimpleAttributesRow(this.simpleAttributesTable, columnTypes, values);
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): SimpleAttributesRow {
+    return new SimpleAttributesRow(this.table, columnTypes, values);
   }
   /**
    * Gets the {module:extension/relatedTables~SimpleAttributesTable}
    * @return {module:extension/relatedTables~SimpleAttributesTable}
    */
-  getTable(): SimpleAttributesTable {
-    return this.simpleAttributesTable;
+  get table(): SimpleAttributesTable {
+    return this._table as SimpleAttributesTable;
   }
   /**
    * Get the simple attributes rows from this table by ids

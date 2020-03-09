@@ -40,7 +40,7 @@ export class TileDao extends UserDao<TileRow> {
   webZoomToGeoPackageZooms: Record<number, number>;
   constructor(
     geoPackage: GeoPackage,
-    public table: TileTable,
+    table: TileTable,
     public tileMatrixSet: TileMatrixSet,
     public tileMatrices: TileMatrix[],
   ) {
@@ -129,7 +129,7 @@ export class TileDao extends UserDao<TileRow> {
     if (tileMatrix) {
       const tileGrid = this.queryForTileGridWithZoomLevel(zoomLevel);
       if (tileGrid) {
-        const matrixSetBoundingBox = this.getBoundingBox();
+        const matrixSetBoundingBox = this.boundingBox;
         boundingBox = TileBoundingBoxUtils.getTileGridBoundingBox(
           matrixSetBoundingBox,
           tileMatrix.matrix_width,
@@ -142,7 +142,7 @@ export class TileDao extends UserDao<TileRow> {
       return boundingBox;
     }
   }
-  getBoundingBox(): BoundingBox {
+  get boundingBox(): BoundingBox {
     return this.tileMatrixSet.boundingBox;
   }
   queryForTileGridWithZoomLevel(zoomLevel: number): TileGrid {
@@ -175,8 +175,8 @@ export class TileDao extends UserDao<TileRow> {
    * get the tile table
    * @return {TileTable} tile table
    */
-  getTileTable(): TileTable {
-    return this.table;
+  get table(): TileTable {
+    return this._table as TileTable;
   }
   /**
    * Create a new tile row with the column types and values
@@ -184,15 +184,8 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Array} values      values
    * @return {TileRow}             tile row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): TileRow {
-    return new TileRow(this.getTileTable(), columnTypes, values);
-  }
-  /**
-   * Create a new tile row
-   * @return {TileRow} tile row
-   */
-  newRow(): TileRow {
-    return new TileRow(this.getTileTable());
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): TileRow {
+    return new TileRow(this.table, columnTypes, values);
   }
   /**
    * Adjust the tile matrix lengths if needed. Check if the tile matrix width
@@ -427,9 +420,6 @@ export class TileDao extends UserDao<TileRow> {
     where += this.buildWhereWithFieldAndValue(TileColumn.COLUMN_TILE_ROW, row);
     const whereArgs = this.buildWhereArgs([zoomLevel, column, row]);
     return this.deleteWhere(where, whereArgs);
-  }
-  getSrs(): SpatialReferenceSystem {
-    return this.geoPackage.spatialReferenceSystemDao.getBySrsId(this.tileMatrixSet.srs_id);
   }
   dropTable(): boolean {
     const tileMatrixDao = this.geoPackage.tileMatrixDao;

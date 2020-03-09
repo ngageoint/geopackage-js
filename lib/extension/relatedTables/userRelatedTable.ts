@@ -33,7 +33,7 @@ export class UserRelatedTable extends UserTable {
     super(tableName, columns, requiredColumns);
   }
 
-  getTableType(): string {
+  get tableType(): string {
     return 'userRelatedTable';
   }
   /**
@@ -42,11 +42,11 @@ export class UserRelatedTable extends UserTable {
    * @throw Error if the contents data type does not match this data type
    */
   setContents(contents: Contents): boolean {
-    this.contents = contents;
     // verify the contents have a relation name data type
     if (!contents.data_type || contents.data_type !== this.data_type) {
       throw new Error('The contents of this related table must have a data type of ' + this.data_type);
     }
+    this.contents = contents;
     return true;
   }
 }

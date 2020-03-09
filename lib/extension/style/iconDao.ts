@@ -17,16 +17,8 @@ import { DataTypes } from '../../db/dataTypes';
  * @constructor
  */
 export class IconDao extends MediaDao<IconRow> {
-  constructor(geoPackage: GeoPackage, public table: IconTable) {
+  constructor(geoPackage: GeoPackage, table: IconTable) {
     super(geoPackage, table);
-    this.mediaTable = table;
-  }
-  /**
-   * Create a new icon row
-   * @return {module:extension/style.IconRow}
-   */
-  newRow(): IconRow {
-    return new IconRow(this.table);
   }
   /**
    * Create a icon row with the column types and values
@@ -34,7 +26,7 @@ export class IconDao extends MediaDao<IconRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.IconRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): IconRow {
-    return new IconRow(this.table, columnTypes, values);
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): IconRow {
+    return new IconRow(this.table as IconTable, columnTypes, values);
   }
 }

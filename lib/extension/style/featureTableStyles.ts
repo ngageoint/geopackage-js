@@ -334,7 +334,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
-    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
   }
   /**
    * Get the feature style (style and icon) of the feature row with the
@@ -416,7 +416,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.StyleRow} style row
    */
   getStyleForFeatureRow(featureRow: FeatureRow): StyleRow {
-    return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+    return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
   }
   /**
    * Get the style of the feature row with the provided geometry type,
@@ -497,7 +497,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.IconRow} icon row
    */
   getIconForFeatureRow(featureRow: FeatureRow): IconRow {
-    return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+    return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
   }
   /**
    * Get the icon of the feature row with the provided geometry type,

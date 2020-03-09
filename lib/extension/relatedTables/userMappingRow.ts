@@ -30,42 +30,42 @@ export class UserMappingRow extends UserRow {
    * Get the base id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getBaseIdColumn(): UserColumn {
-    return this.table.getBaseIdColumn();
+  get baseIdColumn(): UserColumn {
+    return this.table.baseIdColumn;
   }
   /**
    * Gets the base id
    * @return {Number}
    */
-  getBaseId(): number {
-    return this.getValueWithColumnName(this.getBaseIdColumn().name);
+  get baseId(): number {
+    return this.getValueWithColumnName(this.baseIdColumn.name);
   }
   /**
    * Sets the base id
    * @param  {Number} baseId base id
    */
-  setBaseId(baseId: number): void {
-    this.setValueWithColumnName(this.getBaseIdColumn().name, baseId);
+  set baseId(baseId: number) {
+    this.setValueWithColumnName(this.baseIdColumn.name, baseId);
   }
   /**
    * Get the related id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getRelatedIdColumn(): UserColumn {
-    return this.table.getRelatedIdColumn();
+  get relatedIdColumn(): UserColumn {
+    return this.table.relatedIdColumn;
   }
   /**
    * Gets the related id
    * @return {Number}
    */
-  getRelatedId(): number {
-    return this.getValueWithColumnName(this.getRelatedIdColumn().name);
+  get relatedId(): number {
+    return this.getValueWithColumnName(this.relatedIdColumn.name);
   }
   /**
    * Sets the related id
    * @param  {Number} relatedId related id
    */
-  setRelatedId(relatedId: number): void {
-    this.setValueWithColumnName(this.getRelatedIdColumn().name, relatedId);
+  set relatedId(relatedId: number) {
+    this.setValueWithColumnName(this.relatedIdColumn.name, relatedId);
   }
 }

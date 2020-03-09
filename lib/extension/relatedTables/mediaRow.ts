@@ -27,40 +27,33 @@ export class MediaRow extends UserRow {
     super(mediaTable, columnTypes, values);
   }
   /**
-   * Gets the id column
-   * @return {module:user/userColumn~UserColumn}
-   */
-  getIdColumn(): UserColumn {
-    return this.mediaTable.getIdColumn();
-  }
-  /**
-   * Gets the id
-   * @return {Number}
-   */
-  get id(): number {
-    return this.getValueWithColumnName(this.getIdColumn().name);
-  }
-  /**
    * Get the data column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDataColumn(): UserColumn {
-    return this.mediaTable.getDataColumn();
+  get dataColumn(): UserColumn {
+    return this.mediaTable.dataColumn;
   }
   /**
    * Gets the data
    * @return {Buffer}
    */
-  getData(): Buffer {
-    return this.getValueWithColumnName(this.getDataColumn().name);
+  get data(): Buffer {
+    return this.getValueWithColumnName(this.dataColumn.name);
+  }
+  /**
+   * Sets the data for the row
+   * @param  {Buffer} data data
+   */
+  set data(data: Buffer) {
+    this.setValueWithColumnName(this.dataColumn.name, data);
   }
   /**
    * Get the data image
    *
    * @return {Promise<Image>}
    */
-  getDataImage(): Promise<any> {
-    return ImageUtils.getImage(this.getData(), this.getContentType());
+  get dataImage(): Promise<any> {
+    return ImageUtils.getImage(this.data, this.contentType);
   }
   /**
    * Get the scaled data image
@@ -68,34 +61,27 @@ export class MediaRow extends UserRow {
    * @return {Promise<Image>}
    */
   getScaledDataImage(scale: number): Promise<any> {
-    return ImageUtils.getScaledImage(this.getData(), scale);
-  }
-  /**
-   * Sets the data for the row
-   * @param  {Buffer} data data
-   */
-  setData(data: Buffer): void {
-    this.setValueWithColumnName(this.getDataColumn().name, data);
+    return ImageUtils.getScaledImage(this.data, scale);
   }
   /**
    * Get the content type column
    * @return {module:user/userColumn~UserColumn}
    */
-  getContentTypeColumn(): UserColumn {
-    return this.mediaTable.getContentTypeColumn();
+  get contentTypeColumn(): UserColumn {
+    return this.mediaTable.contentTypeColumn;
   }
   /**
    * Gets the content type
    * @return {string}
    */
-  getContentType(): string {
-    return this.getValueWithColumnName(this.getContentTypeColumn().name);
+  get contentType(): string {
+    return this.getValueWithColumnName(this.contentTypeColumn.name);
   }
   /**
    * Sets the content type for the row
    * @param  {string} contentType contentType
    */
-  setContentType(contentType: string): void {
-    this.setValueWithColumnName(this.getContentTypeColumn().name, contentType);
+  set contentType(contentType: string) {
+    this.setValueWithColumnName(this.contentTypeColumn.name, contentType);
   }
 }

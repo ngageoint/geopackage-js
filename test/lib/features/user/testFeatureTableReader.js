@@ -38,7 +38,7 @@ describe('FeatureTableReader tests', function() {
     table.columns[6].name.should.be.equal('datefield');
     table.columns[7].name.should.be.equal('binaryfield');
 
-    table.getGeometryColumn().name.should.be.equal('geom');
+    table.geometryColumn.name.should.be.equal('geom');
   });
 
   it('should read the table with geometry columns', function() {
@@ -58,7 +58,7 @@ describe('FeatureTableReader tests', function() {
     table.columns[6].name.should.be.equal('datefield');
     table.columns[7].name.should.be.equal('binaryfield');
 
-    table.getGeometryColumn().name.should.be.equal('geom');
+    table.geometryColumn.name.should.be.equal('geom');
   });
 
 });

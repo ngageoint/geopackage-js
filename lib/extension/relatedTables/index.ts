@@ -149,7 +149,7 @@ export class RelatedTablesExtension extends BaseExtension {
       }
       for (let m = 0; m < mappingRows.length; m++) {
         const mappingRow = mappingRows[m];
-        mappingRow.row = userDao.queryForId(mappingRow.getRelatedId());
+        mappingRow.row = userDao.queryForId(mappingRow.relatedId);
       }
     }
     return relationships;
@@ -241,7 +241,7 @@ export class RelatedTablesExtension extends BaseExtension {
   getPrimaryKeyColumnName(tableName: string): string {
     const reader = new UserTableReader(tableName);
     const table = reader.readTable(this.geoPackage.database);
-    return table.getPkColumn().name;
+    return table.pkColumn.name;
   }
   /**
    * Adds a features relationship between the base feature and related feature
@@ -553,7 +553,7 @@ export class RelatedTablesExtension extends BaseExtension {
     const relatedIds = [];
     for (let i = 0; i < results.length; i++) {
       const row = mappingDao.getUserMappingRow(results[i]);
-      relatedIds.push(row.getRelatedId());
+      relatedIds.push(row.relatedId);
     }
     return relatedIds;
   }
@@ -584,7 +584,7 @@ export class RelatedTablesExtension extends BaseExtension {
     const baseIds = [];
     for (let i = 0; i < results.length; i++) {
       const row = mappingDao.getUserMappingRow(results[i]);
-      baseIds.push(row.getBaseId());
+      baseIds.push(row.baseId);
     }
     return baseIds;
   }

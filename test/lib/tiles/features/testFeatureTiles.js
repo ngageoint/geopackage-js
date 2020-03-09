@@ -329,7 +329,7 @@ describe('GeoPackage FeatureTiles tests', function() {
         ftpi.setXOffset(0);
         ftpi.setYOffset(0);
         ftpi.pinIconCenter();
-        ft.setPointIcon(ftpi);
+        ft.pointIcon = ftpi;
         ft.calculateDrawOverlap()
         ft.drawTile(153632, 91343, 18)
           .then(function(image) {
@@ -410,26 +410,26 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the x: 153632, y: 91343, z: 18 tile and scale the styles', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
-      should.exist(ft.getFeatureDao());
-      should.exist(ft.getFeatureTableStyles());
-      var featureTableStyles = ft.getFeatureTableStyles();
-      ft.setFeatureTableStyles(null);
-      should.not.exist(ft.getFeatureTableStyles());
-      ft.setFeatureTableStyles(featureTableStyles);
-      ft.setScale(0.5);
-      ft.getScale().should.be.equal(0.5);
-      ft.setTileHeight(256);
-      ft.getTileHeight().should.be.equal(256);
-      ft.setTileWidth(256);
-      ft.getTileWidth().should.be.equal(256);
-      var widthDrawOverlap = ft.getWidthDrawOverlap();
-      var heightDrawOverlap = ft.getHeightDrawOverlap();
-      ft.setWidthDrawOverlap(0);
-      ft.setHeightDrawOverlap(0);
-      ft.getWidthDrawOverlap().should.be.equal(0);
-      ft.getHeightDrawOverlap().should.be.equal(0);
-      ft.setWidthDrawOverlap(widthDrawOverlap);
-      ft.setHeightDrawOverlap(heightDrawOverlap);
+      should.exist(ft.featureDao);
+      should.exist(ft.featureTableStyles);
+      var featureTableStyles = ft.featureTableStyles;
+      ft.featureTableStyles = null;
+      should.not.exist(ft.featureTableStyles);
+      ft.featureTableStyles = featureTableStyles;
+      ft.scale = 0.5;
+      ft.scale.should.be.equal(0.5);
+      ft.tileHeight = 256;
+      ft.tileHeight.should.be.equal(256);
+      ft.tileWidth = 256;
+      ft.tileWidth.should.be.equal(256);
+      var widthDrawOverlap = ft.widthDrawOverlap;
+      var heightDrawOverlap = ft.heightDrawOverlap;
+      ft.widthDrawOverlap = 0;
+      ft.heightDrawOverlap = 0;
+      ft.widthDrawOverlap.should.be.equal(0);
+      ft.heightDrawOverlap.should.be.equal(0);
+      ft.widthDrawOverlap = widthDrawOverlap;
+      ft.heightDrawOverlap = heightDrawOverlap;
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_scaled.png'), function(err, equal) {
@@ -439,17 +439,17 @@ describe('GeoPackage FeatureTiles tests', function() {
         });
     });
 
-    it.skip('should get the x: 153632, y: 91343, z: 18 tile without styling', function(done) {
+    it('should get the x: 153632, y: 91343, z: 18 tile without styling', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.ignoreFeatureTableStyles();
       ft.clearCache();
-      ft.setStylePaintCacheSize(100);
-      ft.setIconCacheSize(100);
-      ft.setCompressFormat('jpeg');
-      ft.getCompressFormat().should.be.equal('jpeg');
-      ft.setCompressFormat('png');
-      ft.setDrawOverlap(0);
+      ft.stylePaintCacheSize = 100;
+      ft.iconCacheSize = 100;
+      ft.compressFormat = 'jpeg';
+      ft.compressFormat.should.be.equal('jpeg');
+      ft.compressFormat = 'png';
+      ft.drawOverlap = 0;
       ft.calculateDrawOverlap();
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
@@ -464,23 +464,23 @@ describe('GeoPackage FeatureTiles tests', function() {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.ignoreFeatureTableStyles();
-      ft.setFillPolygon(true);
-      ft.isFillPolygon().should.be.equal(true);
-      should.not.exist(ft.getPointIcon());
-      ft.setLineColor('#FF0000FF');
-      ft.getLineColor().should.be.equal('#FF0000FF');
-      ft.setLineStrokeWidth(5);
-      ft.getLineStrokeWidth().should.be.equal(5);
-      ft.setPointColor('#FF0000FF');
-      ft.getPointColor().should.be.equal('#FF0000FF');
-      ft.setPointRadius(5);
-      ft.getPointRadius().should.be.equal(5);
-      ft.setPolygonColor('#FF0000FF');
-      ft.getPolygonColor().should.be.equal('#FF0000FF');
-      ft.setPolygonFillColor('#00FF00FF');
-      ft.getPolygonFillColor().should.be.equal('#00FF00FF')
-      ft.setPolygonStrokeWidth(5);
-      ft.getPolygonStrokeWidth().should.be.equal(5);
+      ft.fillPolygon = true;
+      ft.fillPolygon.should.be.equal(true);
+      should.not.exist(ft.pointIcon);
+      ft.lineColor = '#FF0000FF';
+      ft.lineColor.should.be.equal('#FF0000FF');
+      ft.lineStrokeWidth = 5;
+      ft.lineStrokeWidth.should.be.equal(5);
+      ft.pointColor = '#FF0000FF';
+      ft.pointColor.should.be.equal('#FF0000FF');
+      ft.pointRadius = 5;
+      ft.pointRadius.should.be.equal(5);
+      ft.polygonColor = '#FF0000FF';
+      ft.polygonColor.should.be.equal('#FF0000FF');
+      ft.polygonFillColor = '#00FF00FF';
+      ft.polygonFillColor.should.be.equal('#00FF00FF')
+      ft.polygonStrokeWidth = 5;
+      ft.polygonStrokeWidth.should.be.equal(5);
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
@@ -494,9 +494,9 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the max feature number tile and test various functions', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
-      ft.setMaxFeaturesPerTile(1);
-      ft.getMaxFeaturesPerTile().should.be.equal(1);
-      should.not.exist(ft.getMaxFeaturesTileDraw());
+      ft.maxFeaturesPerTile = 1;
+      ft.maxFeaturesPerTile.should.be.equal(1);
+      should.not.exist(ft.maxFeaturesTileDraw);
       var numberFeaturesTile = new NumberFeaturesTile();
       numberFeaturesTile.getCircleColor().should.be.equal("rgba(0, 0, 0, 0.25)");
       numberFeaturesTile.setCircleColor("rgba(0, 0, 0, 0.50)");
@@ -556,8 +556,8 @@ describe('GeoPackage FeatureTiles tests', function() {
       numberFeaturesTile.getCompressFormat().should.be.equal('jpeg');
       numberFeaturesTile.setCompressFormat('png');
 
-      ft.setMaxFeaturesTileDraw(numberFeaturesTile);
-      should.exist(ft.getMaxFeaturesTileDraw());
+      ft.maxFeaturesTileDraw = numberFeaturesTile;
+      should.exist(ft.maxFeaturesTileDraw);
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
@@ -571,9 +571,9 @@ describe('GeoPackage FeatureTiles tests', function() {
     it('should get the max feature shaded tile and test various functions', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
-      ft.setMaxFeaturesPerTile(1);
-      ft.getMaxFeaturesPerTile().should.be.equal(1);
-      should.not.exist(ft.getMaxFeaturesTileDraw());
+      ft.maxFeaturesPerTile = 1;
+      ft.maxFeaturesPerTile.should.be.equal(1);
+      should.not.exist(ft.maxFeaturesTileDraw);
       var shadedFeaturesTile = new ShadedFeaturesTile();
 
       shadedFeaturesTile.getTileBorderStrokeWidth().should.be.equal(2);
@@ -601,8 +601,8 @@ describe('GeoPackage FeatureTiles tests', function() {
       shadedFeaturesTile.getCompressFormat().should.be.equal('jpeg');
       shadedFeaturesTile.setCompressFormat('png');
 
-      ft.setMaxFeaturesTileDraw(shadedFeaturesTile);
-      should.exist(ft.getMaxFeaturesTileDraw());
+      ft.maxFeaturesTileDraw = shadedFeaturesTile;
+      should.exist(ft.maxFeaturesTileDraw);
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {

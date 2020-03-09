@@ -18,21 +18,21 @@ export class UserMappingTable extends UserTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
   public static readonly COLUMN_RELATED_ID: string = 'related_id';
 
-  getTableType(): string {
+  get tableType(): string {
     return 'userMappingTable';
   }
   /**
    * Get the base id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getBaseIdColumn(): UserColumn {
+  get baseIdColumn(): UserColumn {
     return this.getColumnWithColumnName(UserMappingTable.COLUMN_BASE_ID);
   }
   /**
    * Get the related id column
    * @return {module:user/userColumn~UserColumn}
    */
-  getRelatedIdColumn(): UserColumn {
+  get relatedIdColumn(): UserColumn {
     return this.getColumnWithColumnName(UserMappingTable.COLUMN_RELATED_ID);
   }
   /**

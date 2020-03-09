@@ -28,64 +28,64 @@ export class IconRow extends MediaRow {
    * Get the name column
    * @return {module:user/userColumn~UserColumn}
    */
-  getNameColumn(): UserColumn {
+  get nameColumn(): UserColumn {
     return this.iconTable.getNameColumn();
   }
   /**
    * Gets the name
    * @return {String}
    */
-  getName(): string {
-    return this.getValueWithColumnName(this.getNameColumn().name);
+  get name(): string {
+    return this.getValueWithColumnName(this.nameColumn.name);
   }
   /**
    * Sets the name for the row
    * @param {String} name name
    */
-  setName(name: string): void {
-    this.setValueWithColumnName(this.getNameColumn().name, name);
+  set name(name: string) {
+    this.setValueWithColumnName(this.nameColumn.name, name);
   }
   /**
    * Get the description column
    * @return {module:user/userColumn~UserColumn}
    */
-  getDescriptionColumn(): UserColumn {
+  get descriptionColumn(): UserColumn {
     return this.iconTable.getDescriptionColumn();
   }
   /**
    * Gets the description
    * @return {String}
    */
-  getDescription(): string {
-    return this.getValueWithColumnName(this.getDescriptionColumn().name);
+  get description(): string {
+    return this.getValueWithColumnName(this.descriptionColumn.name);
   }
   /**
    * Sets the description for the row
    * @param {string} description description
    */
-  setDescription(description: string): void {
-    this.setValueWithColumnName(this.getDescriptionColumn().name, description);
+  set description(description: string) {
+    this.setValueWithColumnName(this.descriptionColumn.name, description);
   }
   /**
    * Get the width column
    * @return {module:user/userColumn~UserColumn}
    */
-  getWidthColumn(): UserColumn {
+  get widthColumn(): UserColumn {
     return this.iconTable.getWidthColumn();
   }
   /**
    * Gets the width
    * @return {Number}
    */
-  getWidth(): number {
-    return this.getValueWithColumnName(this.getWidthColumn().name);
+  get width(): number {
+    return this.getValueWithColumnName(this.widthColumn.name);
   }
   /**
    * Sets the width for the row
    * @param {Number} width width
    */
-  setWidth(width: number): void {
-    this.setValueWithColumnName(this.getWidthColumn().name, width);
+  set width(width: number) {
+    this.setValueWithColumnName(this.widthColumn.name, width);
   }
   /**
    * Get the width or derived width from the icon data and scaled as needed
@@ -93,10 +93,10 @@ export class IconRow extends MediaRow {
    *
    * @return {Number}  derived width
    */
-  getDerivedWidth(): number {
-    let width = this.getWidth();
+  get derivedWidth(): number {
+    let width = this.width;
     if (width === undefined || width === null) {
-      width = this.getDerivedDimensions()[0];
+      width = this.derivedDimensions[0];
     }
     return width;
   }
@@ -104,22 +104,22 @@ export class IconRow extends MediaRow {
    * Get the height column
    * @return {module:user/userColumn~UserColumn}
    */
-  getHeightColumn(): UserColumn {
+  get heightColumn(): UserColumn {
     return this.iconTable.getHeightColumn();
   }
   /**
    * Gets the height
    * @return {Number}
    */
-  getHeight(): number {
-    return this.getValueWithColumnName(this.getHeightColumn().name);
+  get height(): number {
+    return this.getValueWithColumnName(this.heightColumn.name);
   }
   /**
    * Sets the height for the row
    * @param {Number} height height
    */
-  setHeight(height: number): void {
-    this.setValueWithColumnName(this.getHeightColumn().name, height);
+  set height(height: number) {
+    this.setValueWithColumnName(this.heightColumn.name, height);
   }
   /**
    * Get the height or derived height from the icon data and scaled as needed
@@ -127,10 +127,10 @@ export class IconRow extends MediaRow {
    *
    * @return {Number} derived height
    */
-  getDerivedHeight(): number {
-    let height = this.getHeight();
+  get derivedHeight(): number {
+    let height = this.height;
     if (height === undefined || height === null) {
-      height = this.getDerivedDimensions()[1];
+      height = this.derivedDimensions[1];
     }
     return height;
   }
@@ -138,11 +138,11 @@ export class IconRow extends MediaRow {
    * Get the derived width and height from the values and icon data, scaled as needed
    * @return {Number[]} derived dimensions array with two values, width at index 0, height at index 1
    */
-  getDerivedDimensions(): number[] {
-    let width = this.getWidth();
-    let height = this.getHeight();
+  get derivedDimensions(): number[] {
+    let width = this.width;
+    let height = this.height;
     if (width === undefined || width === null || height === undefined || height === null) {
-      const imageSize = ImageUtils.getImageSize(this.getData());
+      const imageSize = ImageUtils.getImageSize(this.data);
       const dataWidth = imageSize.width;
       const dataHeight = imageSize.height;
       if (width === undefined || width === null) {
@@ -164,30 +164,30 @@ export class IconRow extends MediaRow {
    * Get the anchor_u column
    * @return {module:user/userColumn~UserColumn}
    */
-  getAnchorUColumn(): UserColumn {
+  get anchorUColumn(): UserColumn {
     return this.iconTable.getAnchorUColumn();
   }
   /**
    * Gets the anchor_u
    * @return {Number}
    */
-  getAnchorU(): number {
-    return this.getValueWithColumnName(this.getAnchorUColumn().name);
+  get anchorU(): number {
+    return this.getValueWithColumnName(this.anchorUColumn.name);
   }
   /**
    * Sets the anchor_u for the row
    * @param {Number} anchor_u anchor_u
    */
-  setAnchorU(anchorU: number): void {
+  set anchorU(anchorU: number) {
     this.validateAnchor(anchorU);
-    this.setValueWithColumnName(this.getAnchorUColumn().name, anchorU);
+    this.setValueWithColumnName(this.anchorUColumn.name, anchorU);
   }
   /**
    * Get the anchor u value or the default value of 0.5
    * @return {Number} anchor u value
    */
-  getAnchorUOrDefault(): number {
-    let anchorU = this.getAnchorU();
+  get anchorUOrDefault(): number {
+    let anchorU = this.anchorU;
     if (anchorU == null) {
       anchorU = 0.5;
     }
@@ -197,30 +197,30 @@ export class IconRow extends MediaRow {
    * Get the anchor_v column
    * @return {module:user/userColumn~UserColumn}
    */
-  getAnchorVColumn(): UserColumn {
+  get anchorVColumn(): UserColumn {
     return this.iconTable.getAnchorVColumn();
   }
   /**
    * Gets the anchor_v
    * @return {Number}
    */
-  getAnchorV(): number {
-    return this.getValueWithColumnName(this.getAnchorVColumn().name);
+  get anchorV(): number {
+    return this.getValueWithColumnName(this.anchorVColumn.name);
   }
   /**
    * Sets the anchor_v for the row
    * @param {Number} anchor_v anchor_v
    */
-  setAnchorV(anchorV: number): void {
+  set anchorV(anchorV: number) {
     this.validateAnchor(anchorV);
-    this.setValueWithColumnName(this.getAnchorVColumn().name, anchorV);
+    this.setValueWithColumnName(this.anchorVColumn.name, anchorV);
   }
   /**
    * Get the anchor v value or the default value of 1.0
    * @return {Number} anchor v value
    */
-  getAnchorVOrDefault(): number {
-    let anchorV = this.getAnchorV();
+  get anchorVOrDefault(): number {
+    let anchorV = this.anchorV;
     if (anchorV == null) {
       anchorV = 1.0;
     }

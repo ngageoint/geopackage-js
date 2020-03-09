@@ -18,16 +18,9 @@ import { DataTypes } from '../../db/dataTypes';
  * @param  {string} table table name
  */
 export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
-  constructor(geoPackage: GeoPackage, public mediaTable: MediaTable) {
-    super(geoPackage, mediaTable);
-    this.mediaTable = mediaTable;
-  }
-  /**
-   * Create a new media row
-   * @return {module:extension/relatedTables~MediaRow}
-   */
-  newRow(): MediaRow {
-    return new MediaRow(this.mediaTable);
+  protected _table: MediaTable;
+  constructor(geoPackage: GeoPackage, table: MediaTable) {
+    super(geoPackage, table);
   }
   /**
    * Create a media row with the column types and values
@@ -35,15 +28,15 @@ export class MediaDao<T extends MediaRow> extends UserDao<MediaRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~MediaRow}             media row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): MediaRow {
-    return new MediaRow(this.mediaTable, columnTypes, values);
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): MediaRow {
+    return new MediaRow(this.table, columnTypes, values);
   }
   /**
    * Gets the media table
    * @return {module:extension/relatedTables~MediaTable}
    */
-  getTable(): MediaTable {
-    return this.mediaTable;
+  get table(): MediaTable {
+    return this._table;
   }
   /**
    * Reads the table specified from the geopackage

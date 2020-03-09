@@ -22,12 +22,6 @@ export class TileRow extends UserRow {
     super(tileTable, columnTypes, values);
     this.tileTable = tileTable;
   }
-  toObjectValue(value: DBValue): any {
-    return value;
-  }
-  toDatabaseValue(columnName: string): DBValue {
-    return this.getValueWithColumnName(columnName);
-  }
   /**
    * Get the zoom level column index
    * @return {Number} zoom level column index
@@ -40,7 +34,7 @@ export class TileRow extends UserRow {
    * @return {TileColumn} zoom level column
    */
   get zoomLevelColumn(): TileColumn {
-    return this.tileTable.getZoomLevelColumn();
+    return this.tileTable.zoomLevelColumn;
   }
   /**
    * Get the zoom level
@@ -68,7 +62,7 @@ export class TileRow extends UserRow {
    * @return {TileColumn} tile column column
    */
   get tileColumnColumn(): TileColumn {
-    return this.tileTable.getTileColumnColumn();
+    return this.tileTable.tileColumnColumn;
   }
   /**
    * Get the tile column
@@ -96,7 +90,7 @@ export class TileRow extends UserRow {
    * @return {TileColumn} tile row column
    */
   get rowColumn(): TileColumn {
-    return this.tileTable.getRowColumn();
+    return this.tileTable.rowColumn;
   }
   /**
    * Get the tile row
@@ -124,7 +118,7 @@ export class TileRow extends UserRow {
    * @return {TileColumn} tile data column
    */
   get tileDataColumn(): TileColumn {
-    return this.tileTable.getTileDataColumn();
+    return this.tileTable.tileDataColumn;
   }
   /**
    * Get the tile data

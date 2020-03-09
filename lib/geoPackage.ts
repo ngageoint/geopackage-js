@@ -611,7 +611,7 @@ export class GeoPackage {
    */
   addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
     const featureDao = this.getFeatureDao(tableName);
-    const srs = featureDao.getSrs();
+    const srs = featureDao.srs;
     const featureRow = featureDao.newRow();
     const geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);
@@ -622,7 +622,7 @@ export class GeoPackage {
     const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
     const geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
     geometryData.setGeometry(geometry);
-    featureRow.setGeometry(geometryData);
+    featureRow.geometry = geometryData;
     for (const propertyKey in feature.properties) {
       if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
         featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
@@ -682,8 +682,8 @@ export class GeoPackage {
     const relatedTables = this.relatedTablesExtension;
     const mediaDao = relatedTables.getMediaDao(tableName);
     const row = mediaDao.newRow();
-    row.setContentType(contentType);
-    row.setData(dataBuffer);
+    row.contentType = contentType;
+    row.data = dataBuffer;
     for (const key in additionalProperties) {
       row.setValueWithColumnName(key, additionalProperties[key]);
     }
@@ -1088,7 +1088,7 @@ export class GeoPackage {
         primaryKey: column.primaryKey,
       });
     }
-    const srs = tileDao.getSrs();
+    const srs = tileDao.srs;
     tiles.srs = srs;
     tiles.tiles = [];
 
@@ -1249,7 +1249,7 @@ export class GeoPackage {
         primaryKey: column.primaryKey,
       });
     }
-    const srs = tileDao.getSrs();
+    const srs = tileDao.srs;
     tiles.srs = srs;
     tiles.tiles = [];
 
@@ -1568,7 +1568,7 @@ export class GeoPackage {
    */
   getFeature(table: string, featureId: number): Feature {
     const featureDao = this.getFeatureDao(table);
-    const srs = featureDao.getSrs();
+    const srs = featureDao.srs;
     let feature = featureDao.queryForId(featureId) as FeatureRow;
     if (!feature) {
       let features = featureDao.queryForAllEq('_feature_id', featureId);
@@ -1598,7 +1598,7 @@ export class GeoPackage {
       id: undefined,
       geometry: undefined,
     };
-    const geometry = featureRow.getGeometry();
+    const geometry = featureRow.geometry;
     if (geometry && geometry.geometry) {
       let geoJsonGeom = geometry.geometry.toGeoJSON() as Geometry;
       if (
@@ -1614,7 +1614,7 @@ export class GeoPackage {
     for (const key in featureRow.values) {
       if (
         Object.prototype.hasOwnProperty.call(featureRow.values, key) &&
-        key !== featureRow.getGeometryColumn().name &&
+        key !== featureRow.geometryColumn.name &&
         key !== 'id'
       ) {
         if (key.toLowerCase() === '_feature_id') {
@@ -1626,7 +1626,7 @@ export class GeoPackage {
         } else {
           geoJson.properties[key] = featureRow.values[key];
         }
-      } else if (featureRow.getGeometryColumn().name === key) {
+      } else if (featureRow.geometryColumn.name === key) {
         // geoJson.properties[key] = geometry && !geometry.geometryError ? 'Valid' : geometry.geometryError;
       }
     }
@@ -1740,7 +1740,7 @@ export class GeoPackage {
   getInfoForTable(tableDao: TileDao | FeatureDao<FeatureRow>): any {
     const info = {
       tableName: tableDao.table_name,
-      tableType: tableDao.table.getTableType(),
+      tableType: tableDao.table.tableType,
       count: tableDao.getCount(),
       geometryColumns: undefined as {
         tableName: string;
@@ -1859,7 +1859,7 @@ export class GeoPackage {
       definition: contentsSrs.definition,
       description: contentsSrs.description,
     };
-    const srs = tableDao.getSrs();
+    const srs = tableDao.srs;
     info.srs = {
       name: srs.srs_name,
       id: srs.srs_id,

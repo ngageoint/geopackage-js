@@ -38,9 +38,10 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   dataColumnsDao: DataColumnsDao;
   featureTableIndex: FeatureTableIndex;
   projection: proj4.Converter;
+  protected _table: FeatureTable;
   constructor(
     geoPackage: GeoPackage,
-    public table: FeatureTable,
+    table: FeatureTable,
     public geometryColumns: GeometryColumns,
     public metadataDao: MetadataDao,
   ) {
@@ -76,8 +77,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   getFeatureTable(): FeatureTable {
     return this.table;
   }
-  getTable(): FeatureTable {
-    return this.table;
+  get table(): FeatureTable {
+    return this._table;
   }
   /**
    * Create a new feature row with the column types and values
@@ -85,15 +86,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @param  {Array} values      values
    * @return {FeatureRow}             feature row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): FeatureRow {
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): FeatureRow {
     return new FeatureRow(this.getFeatureTable(), columnTypes, values);
-  }
-  /**
-   * Create a new feature row
-   * @return {FeatureRow} feature row
-   */
-  newRow(): FeatureRow {
-    return new FeatureRow(this.getFeatureTable());
   }
   /**
    * Get the geometry column name
@@ -107,10 +101,10 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @return {Number} well known binary geometry type
    */
   //TODO is this a string?
-  getGeometryType(): string {
+  get geometryType(): string {
     return this.geometryColumns.geometryType;
   }
-  getSrs(): SpatialReferenceSystem {
+  get srs(): SpatialReferenceSystem {
     return this.geoPackage.geometryColumnsDao.getSrs(this.geometryColumns);
   }
   /**
@@ -169,7 +163,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     };
   }
   queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
-    const srs = this.getSrs();
+    const srs = this.srs;
     const projection = this.projection;
     const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
     const thisgetRow = this.getRow.bind(this);
@@ -233,7 +227,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   }
 
   queryIndexedFeaturesWithBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
-    const srs = this.getSrs();
+    const srs = this.srs;
     const projection = this.projection;
 
     const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, projection);
@@ -307,7 +301,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
         dataColumn: DataColumns;
       }
     > = {};
-    const srs = this.getSrs();
+    const srs = this.srs;
     const projection = this.projection;
     this.table.columns.forEach(column => {
       const dataColumn = this.dataColumnsDao.getDataColumns(this.table.table_name, column.name);
@@ -357,7 +351,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
               for (const key in featureRow.values) {
                 if (
                   Object.prototype.hasOwnProperty.call(featureRow.values, key) &&
-                  key !== featureRow.getGeometryColumn().name &&
+                  key !== featureRow.geometryColumn.name &&
                   key !== 'id'
                 ) {
                   if (key.toLowerCase() === '_feature_id') {
@@ -396,7 +390,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     srs: SpatialReferenceSystem,
     projection: proj4.Converter | string,
   ): GeoJsonObject {
-    let geometry = featureRow.getGeometry().toGeoJSON();
+    let geometry = featureRow.geometry.toGeoJSON();
     if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
       geometry = reproject.reproject(geometry, projection, 'EPSG:4326');
     }

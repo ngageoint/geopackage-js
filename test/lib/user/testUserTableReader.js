@@ -46,8 +46,8 @@ describe('UserTableReader tests', function() {
     results.length.should.be.equal(2);
     for (var i = 0; i < results.length; i++) {
       var ur = ud.getRow(results[i]);
-      ur.columnCount().should.be.equal(8);
-      var names = ur.getColumnNames()
+      ur.columnCount.should.be.equal(8);
+      var names = ur.columnNames
       names.should.include('fid');
       names.should.include('geom');
       names.should.include('intfield');
@@ -65,7 +65,7 @@ describe('UserTableReader tests', function() {
       ur.getColumnWithIndex(0).name.should.be.equal('fid');
       ur.getColumnWithColumnName('fid').name.should.be.equal('fid');
       ur.id.should.be.equal(i+1);
-      ur.getPkColumn().name.should.be.equal('fid');
+      ur.pkColumn.name.should.be.equal('fid');
       ur.getColumnWithIndex(0).getTypeName().should.be.equal('INTEGER');
       should.exist(ur.values);
     }

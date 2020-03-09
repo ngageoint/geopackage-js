@@ -22,7 +22,7 @@ export class UserRow {
     public values?: Record<string, DBValue>,
   ) {
     if (!this.columnTypes) {
-      const columnCount = this.table.columnCount();
+      const columnCount = this.table.columnCount;
       this.columnTypes = {};
       this.values = {};
       for (let i = 0; i < columnCount; i++) {
@@ -31,18 +31,26 @@ export class UserRow {
       }
     }
   }
+
+  /**
+   * Gets the id column
+   * @return {module:user/userColumn~UserColumn}
+   */
+  get idColumn(): UserColumn {
+    return this.table.idColumn;
+  }
   /**
    * Get the column count
    * @return {number} column count
    */
-  columnCount(): number {
-    return this.table.columnCount();
+  get columnCount(): number {
+    return this.table.columnCount;
   }
   /**
    * Get the column names
    * @return {Array} column names
    */
-  getColumnNames(): string[] {
+  get columnNames(): string[] {
     return this.table.columnNames;
   }
   /**
@@ -151,23 +159,30 @@ export class UserRow {
    * @return {Number} id value
    */
   get id(): number {
-    if (this.getPkColumn()) {
-      return this.getValueWithColumnName(this.getPkColumn().name);
+    if (this.pkColumn) {
+      return this.getValueWithColumnName(this.pkColumn.name);
     }
+  }
+  /**
+   * Set the primary key id value
+   * @param {Number} id id
+   */
+  set id(id: number) {
+    this.values[this.table.pkColumn.name] = id;
   }
   /**
    * Get the primary key column Index
    * @return {Number} pk index
    */
-  getPkColumnIndex(): number {
+  get pkColumnIndex(): number {
     return this.table.pkIndex;
   }
   /**
    * Get the primary key column
    * @return {UserColumn} pk column
    */
-  getPkColumn(): UserColumn {
-    return this.table.getPkColumn();
+  get pkColumn(): UserColumn {
+    return this.table.pkColumn;
   }
   /**
    * Set the value at the index
@@ -182,7 +197,7 @@ export class UserRow {
           ', Index: ' +
           index +
           ', Name: ' +
-          this.table.getPkColumn().name,
+          this.table.pkColumn.name,
       );
     }
     this.setValueWithColumnName(this.getColumnNameWithIndex(index), value);
@@ -224,17 +239,10 @@ export class UserRow {
     return hasId;
   }
   /**
-   * Set the primary key id value
-   * @param {Number} id id
-   */
-  setId(id: number): void {
-    this.values[this.table.getPkColumn().name] = id;
-  }
-  /**
    * Clears the id so the row can be used as part of an insert or create
    */
   resetId(): void {
-    this.values[this.table.getPkColumn().name] = undefined;
+    this.values[this.table.pkColumn.name] = undefined;
   }
   /**
    * Validate the value and its actual value types against eh column data type class

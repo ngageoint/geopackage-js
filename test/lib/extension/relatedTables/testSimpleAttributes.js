@@ -87,7 +87,7 @@ describe('Related Simple Attributes tests', function() {
     var simpleColumns = simpleTable.columnNames;
     simpleColumns.length.should.be.equal(SimpleAttributesTable.numRequiredColumns() + simpleUserColumns.length);
 
-    var idColumn = simpleTable.getIdColumn();
+    var idColumn = simpleTable.idColumn;
     should.exist(idColumn);
     idColumn.name.should.be.equal(SimpleAttributesTable.COLUMN_ID);
     idColumn.dataType.should.be.equal(DataType.INTEGER);
@@ -101,14 +101,14 @@ describe('Related Simple Attributes tests', function() {
     rte.has(userMappingTable.table_name).should.be.equal(false);
     userMappingTable.columnNames.length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
-    var baseIdColumn = userMappingTable.getBaseIdColumn();
+    var baseIdColumn = userMappingTable.baseIdColumn;
     should.exist(baseIdColumn);
     baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
     baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
     baseIdColumn.notNull.should.be.equal(true);
     baseIdColumn.primaryKey.should.be.equal(false);
 
-    var relatedIdColumn = userMappingTable.getRelatedIdColumn();
+    var relatedIdColumn = userMappingTable.relatedIdColumn;
     should.exist(relatedIdColumn);
     relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
     relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
@@ -145,7 +145,7 @@ describe('Related Simple Attributes tests', function() {
         // Validate the simple attributes DAO
         var simpleDao = rte.getSimpleAttributesDao(simpleTable);
         should.exist(simpleDao);
-        simpleTable = simpleDao.simpleAttributesTable;
+        simpleTable = simpleDao.table;
         should.exist(simpleTable);
         validateContents(simpleTable, simpleTable.contents);
 
@@ -188,8 +188,8 @@ describe('Related Simple Attributes tests', function() {
         var userMappingDao = rte.getMappingDao(mappingTableName);
         for (var i = 0; i < 10; i++) {
           var userMappingRow = userMappingDao.newRow();
-          userMappingRow.setBaseId(attributeIds[Math.floor(Math.random() * attributeIds.length)]);
-          userMappingRow.setRelatedId(simpleIds[Math.floor(Math.random() * simpleIds.length)]);
+          userMappingRow.baseId = attributeIds[Math.floor(Math.random() * attributeIds.length)];
+          userMappingRow.relatedId = simpleIds[Math.floor(Math.random() * simpleIds.length)];
           RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
           var created = userMappingDao.create(userMappingRow);
           created.should.be.greaterThan(0);
@@ -198,7 +198,7 @@ describe('Related Simple Attributes tests', function() {
         userMappingDao.count().should.be.equal(10);
 
         // Validate the user mapping rows
-        userMappingTable = userMappingDao.getTable();
+        userMappingTable = userMappingDao.table;
         var mappingColumns = userMappingTable.columnNames;
         var userMappingRows = userMappingDao.queryForAll();
         var count = userMappingRows.length;
@@ -209,8 +209,8 @@ describe('Related Simple Attributes tests', function() {
           var umr = userMappingRows[i];
           var row2 = userMappingDao.getUserMappingRow(umr);
           row2.hasId().should.be.equal(false);
-          attributeIds.indexOf(row2.getBaseId()).should.be.not.equal(-1);
-          simpleIds.indexOf(row2.getRelatedId()).should.be.not.equal(-1);
+          attributeIds.indexOf(row2.baseId.should.be.not.equal(-1));
+          simpleIds.indexOf(row2.relatedId.should.be.not.equal(-1));
           RelatedTablesUtils.validateUserRow(mappingColumns, row2);
           RelatedTablesUtils.validateDublinCoreColumns(row2);
           manualCount++;
@@ -233,9 +233,9 @@ describe('Related Simple Attributes tests', function() {
           var attributeRelation = attributeBaseTableRelations[i];
           attributeRelation.id.should.be.greaterThan(0);
           attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
-          attributesDao.table.getPkColumn().name.should.be.equal(attributeRelation.base_primary_column);
+          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.base_primary_column);
           simpleDao.table_name.should.be.equal(attributeRelation.related_table_name);
-          simpleDao.getTable().getPkColumn().name.should.be.equal(attributeRelation.related_primary_column);
+          simpleDao.table.pkColumn.name.should.be.equal(attributeRelation.related_primary_column);
           SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(attributeRelation.relation_name);
 
           // test the user mappings from the relation
@@ -244,8 +244,8 @@ describe('Related Simple Attributes tests', function() {
           var mappings = userMappingDao.queryForAll();
           for (var m = 0; m < mappings.length; m++) {
             umr = userMappingDao.getUserMappingRow(mappings[i]);
-            attributeIds.indexOf(umr.getBaseId()).should.not.be.equal(-1);
-            simpleIds.indexOf(umr.getRelatedId()).should.not.be.equal(-1);
+            attributeIds.indexOf(umr.baseId.should.not.be.equal(-1));
+            simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, umr);
             RelatedTablesUtils.validateDublinCoreColumns(umr);
           }
@@ -253,7 +253,7 @@ describe('Related Simple Attributes tests', function() {
           // get and test the attributes DAO
           simpleDao = rte.getSimpleAttributesDao(attributeRelation);
           should.exist(simpleDao);
-          simpleTable = simpleDao.getTable();
+          simpleTable = simpleDao.table;
           should.exist(simpleTable);
           validateContents(simpleTable, simpleTable.contents);
 
@@ -296,9 +296,9 @@ describe('Related Simple Attributes tests', function() {
           // Test the relation
           simpleRelation.id.should.be.greaterThan(0);
           attributesDao.table_name.should.be.equal(simpleRelation.base_table_name);
-          attributesDao.table.getPkColumn().name.should.be.equal(simpleRelation.base_primary_column);
+          attributesDao.table.pkColumn.name.should.be.equal(simpleRelation.base_primary_column);
           simpleDao.table_name.should.be.equal(simpleRelation.related_table_name);
-          simpleDao.getTable().getPkColumn().name.should.be.equal(simpleRelation.related_primary_column);
+          simpleDao.table.pkColumn.name.should.be.equal(simpleRelation.related_primary_column);
           SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(simpleRelation.relation_name);
           mappingTableName.should.be.equal(simpleRelation.mapping_table_name);
 
@@ -309,8 +309,8 @@ describe('Related Simple Attributes tests', function() {
           var umr;
           mappings.forEach(function(row) {
             umr = userMappingDao.getUserMappingRow(row);
-            attributeIds.indexOf(umr.getBaseId()).should.not.be.equal(-1);
-            simpleIds.indexOf(umr.getRelatedId()).should.not.be.equal(-1);
+            attributeIds.indexOf(umr.baseId).should.not.be.equal(-1);
+            simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, umr);
             RelatedTablesUtils.validateDublinCoreColumns(umr);
           });

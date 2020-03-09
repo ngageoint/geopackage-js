@@ -49,7 +49,7 @@ describe('FeatureDao tests', function() {
       var srs = featureDao.srs;
       for (var row of each) {
         var currentRow = featureDao.getRow(row);
-        var geometry = currentRow.getGeometry();
+        var geometry = currentRow.geometry;
         should.exist(geometry);
       }
     });
@@ -355,13 +355,13 @@ describe('FeatureDao tests', function() {
       };
 
       var createRow = function(geoJson, name, featureDao) {
-        var srs = featureDao.getSrs();
+        var srs = featureDao.srs;
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(srs.srs_id);
         var geometry = wkx.Geometry.parseGeoJSON(geoJson);
         geometryData.setGeometry(geometry);
-        featureRow.setGeometry(geometryData);
+        featureRow.geometry = geometryData;
         featureRow.setValueWithColumnName('name', name);
         featureRow.setValueWithColumnName('_feature_id', name);
         featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
@@ -513,7 +513,7 @@ describe('FeatureDao tests', function() {
 
       for (var row of iterator) {
         foundFeatures.push(row.values.name);
-        var geometry = row.getGeometry().toGeoJSON();
+        var geometry = row.geometry.toGeoJSON();
 
         if (geometry.type == 'Point') {
           var distance = pointDistance(centerPoint, geometry);
@@ -605,14 +605,14 @@ describe('FeatureDao tests', function() {
 
       var mediaDao = rte.getMediaDao(mediaTable);
       should.exist(mediaDao);
-      mediaTable = mediaDao.mediaTable;
+      mediaTable = mediaDao.table;
       should.exist(mediaTable);
 
       // Create media row
       var contentType = 'image/png';
       var mediaRow = mediaDao.newRow();
-      mediaRow.setData(tileBuffer);
-      mediaRow.setContentType(contentType);
+      mediaRow.data = tileBuffer;
+      mediaRow.contentType = contentType;
       RelatedTablesUtils.populateRow(mediaTable, mediaRow, MediaTable.requiredColumns());
       var mediaRowId = mediaDao.create(mediaRow);
       mediaRowId.should.be.greaterThan(0);
@@ -636,7 +636,7 @@ describe('FeatureDao tests', function() {
 
       var simpleDao = rte.getSimpleAttributesDao(simpleTable);
       should.exist(simpleDao);
-      simpleTable = simpleDao.simpleAttributesTable;
+      simpleTable = simpleDao.table;
       should.exist(simpleTable);
 
       // Create simple attributes row

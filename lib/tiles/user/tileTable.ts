@@ -56,19 +56,19 @@ export class TileTable extends UserTable {
     this.missingCheck(this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
     this.tileDataIndex = this.tileDataIndex;
   }
-  getZoomLevelColumn(): TileColumn {
+  get zoomLevelColumn(): TileColumn {
     return this.getColumnWithIndex(this.zoomLevelIndex);
   }
-  getTileColumnColumn(): TileColumn {
+  get tileColumnColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileColumnIndex);
   }
-  getRowColumn(): TileColumn {
+  get rowColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileRowIndex);
   }
-  getTileDataColumn(): TileColumn {
+  get tileDataColumn(): TileColumn {
     return this.getColumnWithIndex(this.tileDataIndex);
   }
-  getTableType(): string {
+  get tableType(): string {
     return UserTable.TILE_TABLE;
   }
   static createRequiredColumns(): TileColumn[] {

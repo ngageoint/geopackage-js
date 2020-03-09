@@ -7,7 +7,6 @@ import { UserRow } from '../../user/userRow';
 import { SimpleAttributesTable } from './simpleAttributesTable';
 import { DBValue } from '../../db/dbAdapter';
 import { DataTypes } from '../../db/dataTypes';
-import { UserColumn } from '../../user/userColumn';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
@@ -24,19 +23,5 @@ export class SimpleAttributesRow extends UserRow {
     values?: Record<string, DBValue>,
   ) {
     super(simpleAttributesTable, columnTypes, values);
-  }
-  /**
-   * Gets the primary key id column
-   * @return {module:user/userColumn~UserColumn}
-   */
-  getIdColumn(): UserColumn {
-    return this.simpleAttributesTable.getIdColumn();
-  }
-  /**
-   * Gets the id
-   * @return {Number}
-   */
-  get id(): number {
-    return this.getValueWithColumnName(this.getIdColumn().name);
   }
 }

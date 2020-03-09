@@ -629,7 +629,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
       for (let i = 0; i < styleMappingRows.length; i++) {
         const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
-        const iconRow = iconDao.queryForId(styleMappingRow.getRelatedId()) as IconRow;
+        const iconRow = iconDao.queryForId(styleMappingRow.relatedId) as IconRow;
         if (styleMappingRow.getGeometryTypeName() === null) {
           icons.setDefault(iconRow);
         } else {
@@ -655,7 +655,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
       for (let i = 0; i < styleMappingRows.length; i++) {
         const styleMappingRow = mappingDao.createObject(styleMappingRows[i]) as StyleMappingRow;
-        const styleRow = styleDao.queryForId(styleMappingRow.getRelatedId()) as StyleRow;
+        const styleRow = styleDao.queryForId(styleMappingRow.relatedId) as StyleRow;
         if (styleMappingRow.getGeometryTypeName() === null) {
           styles.setDefault(styleRow);
         } else {
@@ -734,8 +734,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.featureTable.table_name, featureRow.id, featureRow.getGeometryType(), true),
-      this.getIcon(featureRow.featureTable.table_name, featureRow.id, featureRow.getGeometryType(), true),
+      this.getStyle(featureRow.featureTable.table_name, featureRow.id, featureRow.geometryType, true),
+      this.getIcon(featureRow.featureTable.table_name, featureRow.id, featureRow.geometryType, true),
     );
   }
   /**
@@ -1031,7 +1031,7 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   }> {
-    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), featureStyle);
+    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, featureStyle);
   }
   /**
    * Set the feature style (style and icon) of the feature row for the
@@ -1189,7 +1189,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   async setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
-    return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), style);
+    return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, style);
   }
   /**
    * Set the style of the feature row for the specified geometry type
@@ -1300,7 +1300,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   async setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
-    return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), icon);
+    return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, icon);
   }
   /**
    * Set the icon of the feature row for the specified geometry type
@@ -1371,7 +1371,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const styleDao = this.getStyleDao();
       if (styleDao !== null) {
         styleId = styleDao.create(style);
-        style.setId(styleId);
+        style.id = styleId;
       }
     }
     return styleId;
@@ -1389,7 +1389,7 @@ export class FeatureStyleExtension extends BaseExtension {
       const iconDao = this.getIconDao();
       if (iconDao != null) {
         iconId = iconDao.create(icon);
-        icon.setId(iconId);
+        icon.id = iconId;
       }
     }
     return iconId;
@@ -1403,8 +1403,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   insertStyleMapping(mappingDao: StyleMappingDao, baseId: number, relatedId: number, geometryType?: string): number {
     const row = mappingDao.newRow();
-    row.setBaseId(baseId);
-    row.setRelatedId(relatedId);
+    row.baseId = baseId;
+    row.relatedId = relatedId;
     row.setGeometryTypeName(geometryType);
     return mappingDao.create(row);
   }
@@ -1604,7 +1604,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteStyleForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
   }
   /**
    * Delete the feature row style for the geometry type
@@ -1684,7 +1684,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteIconForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
+    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
   }
   /**
    * Delete the feature row icon for the geometry type

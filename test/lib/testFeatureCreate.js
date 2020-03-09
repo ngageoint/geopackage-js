@@ -246,7 +246,7 @@ describe('GeoPackage Feature table create tests', function() {
       geometryData.setSrsId(4326);
       var point = new wkx.Point(1, 2);
       geometryData.setGeometry(point);
-      featureRow.setGeometry(geometryData);
+      featureRow.geometry = geometryData;
       featureRow.setValueWithColumnName('test_text.test', 'hello');
       featureRow.setValueWithColumnName('test_real', 3.0);
       featureRow.setValueWithColumnName('test_boolean', true);
@@ -262,7 +262,7 @@ describe('GeoPackage Feature table create tests', function() {
       count.should.be.equal(1);
       var rows = featureDao.queryForAll();
       var fr = featureDao.getRow(rows[0]);
-      var geom = fr.getGeometry();
+      var geom = fr.geometry;
       geom.geometry.x.should.be.equal(1);
       geom.geometry.y.should.be.equal(2);
       fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
@@ -286,7 +286,7 @@ describe('GeoPackage Feature table create tests', function() {
         geometryData.setSrsId(4326);
         var point = new wkx.Point(1, 2);
         geometryData.setGeometry(point);
-        featureRow.setGeometry(geometryData);
+        featureRow.geometry = geometryData;
         featureRow.setValueWithColumnName('test_text.test', 'hello');
         featureRow.setValueWithColumnName('test_real', 3.0);
         featureRow.setValueWithColumnName('test_boolean', true);
@@ -300,7 +300,7 @@ describe('GeoPackage Feature table create tests', function() {
         count.should.be.equal(1);
         var rows = featureDao.queryForAll();
         var fr = featureDao.getRow(rows[0]);
-        var geom = fr.getGeometry();
+        var geom = fr.geometry;
         geom.geometry.x.should.be.equal(1);
         geom.geometry.y.should.be.equal(2);
         fr.getValueWithColumnName('test_text.test').should.be.equal('hello');

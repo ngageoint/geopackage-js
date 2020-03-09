@@ -263,13 +263,13 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
 };
 
 GeoPackageUtils.createFeature = function(geopackage, geoJson, name, featureDao) {
-  const srs = featureDao.getSrs();
+  const srs = featureDao.srs;
   const featureRow = featureDao.newRow();
   const geometryData = new GeometryData();
   geometryData.setSrsId(srs.srs_id);
   const geometry = wkx.Geometry.parseGeoJSON(geoJson);
   geometryData.setGeometry(geometry);
-  featureRow.setGeometry(geometryData);
+  featureRow.geometry = geometryData;
   featureRow.setValueWithColumnName('text', name);
   featureRow.setValueWithColumnName('real', Math.random() * 5000.0);
   featureRow.setValueWithColumnName('boolean', Math.random() < 0.5 ? false : true);
@@ -470,8 +470,8 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
   return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'BITSystems_Logo.png'))
     .then(function(bitsLogoBuffer) {
       let bitsLogo = mediaDao.newRow();
-      bitsLogo.setContentType('image/png');
-      bitsLogo.setData(bitsLogoBuffer);
+      bitsLogo.contentType = 'image/png';
+      bitsLogo.data = bitsLogoBuffer;
       const bitsRowId = mediaDao.create(bitsLogo);
       bitsLogo = mediaDao.queryForId(bitsRowId);
 

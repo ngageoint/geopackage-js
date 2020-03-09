@@ -22,7 +22,7 @@ export class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> 
    */
   contents: Contents;
 
-  constructor(geoPackage: GeoPackage, public table: AttributeTable) {
+  constructor(geoPackage: GeoPackage, table: AttributeTable) {
     super(geoPackage, table);
     if (!table.contents) {
       throw new Error('Attributes table has null Contents');
@@ -31,21 +31,17 @@ export class AttributeDao<T extends AttributeRow> extends UserDao<AttributeRow> 
     this.contents = table.contents;
   }
 
+  get table(): AttributeTable {
+    return this._table as AttributeTable;
+  }
+
   /**
    * Create a new attribute row with the column types and values
    * @param  {Array} columnTypes column types
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:attributes/attributeRow~AttributeRow}             attribute row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): AttributeRow {
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): AttributeRow {
     return new AttributeRow(this.table, columnTypes, values);
-  }
-
-  /**
-   * Create a new attribute row
-   * @return {module:attributes/attributeRow~AttributeRow} attribute row
-   */
-  newRow(): AttributeRow {
-    return new AttributeRow(this.table);
   }
 }

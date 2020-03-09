@@ -92,8 +92,8 @@ module.exports.populateRow = function(table, row, skipColumns) {
 }
 
 module.exports.validateUserRow = function(columns, userRow) {
-  columns.length.should.be.equal(userRow.columnCount());
-  for (var i = 0; i < userRow.columnCount(); i++) {
+  columns.length.should.be.equal(userRow.columnCount);
+  for (var i = 0; i < userRow.columnCount; i++) {
     var column = userRow.table.columns[i];
     var dataType = column.dataType;
     column.index.should.be.equal(i);

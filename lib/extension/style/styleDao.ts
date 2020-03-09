@@ -18,7 +18,7 @@ import { DataTypes } from '../../db/dataTypes';
  * @constructor
  */
 export class StyleDao extends AttributeDao<StyleRow> {
-  constructor(geoPackage: GeoPackage, public table: StyleTable) {
+  constructor(geoPackage: GeoPackage, table: StyleTable) {
     super(geoPackage, table);
   }
   /**
@@ -32,12 +32,9 @@ export class StyleDao extends AttributeDao<StyleRow> {
     }
     return this.newRow();
   }
-  /**
-   * Create a new style row
-   * @return {module:extension/style.StyleRow}
-   */
-  newRow(): StyleRow {
-    return new StyleRow(this.table);
+
+  get table(): StyleTable {
+    return this._table as StyleTable;
   }
   /**
    * Create a style row with the column types and values
@@ -45,7 +42,7 @@ export class StyleDao extends AttributeDao<StyleRow> {
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/style.StyleRow}             icon row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): StyleRow {
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): StyleRow {
     return new StyleRow(this.table, columnTypes, values);
   }
 }

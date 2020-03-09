@@ -30,10 +30,10 @@ export class FeatureTable extends UserTable {
    * Get the geometry feature column
    * @return {FeatureColumn} geometry feature column
    */
-  getGeometryColumn(): FeatureColumn {
+  get geometryColumn(): FeatureColumn {
     return this.getColumnWithIndex(this.geometryIndex) as FeatureColumn;
   }
-  getTableType(): string {
+  get tableType(): string {
     return UserTable.FEATURE_TABLE;
   }
 }

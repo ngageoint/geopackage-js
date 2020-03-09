@@ -172,8 +172,8 @@ export class IconCache {
       if (iconCache !== null) {
         iconImage = iconCache.get(iconId);
       }
-      const iconScaledWidth = Math.round(icon.getWidth() * scale);
-      const iconScaledHeight = Math.round(icon.getHeight() * scale);
+      const iconScaledWidth = Math.round(icon.width * scale);
+      const iconScaledHeight = Math.round(icon.height * scale);
       if (!iconImage || iconImage.width !== iconScaledWidth || iconImage.height !== iconScaledHeight) {
         iconImage = await icon.getScaledDataImage(scale);
       }

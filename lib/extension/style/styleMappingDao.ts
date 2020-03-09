@@ -42,19 +42,12 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
     return new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
   }
   /**
-   * Create a new {module:extension/style.StyleMappingRow}
-   * @return {module:extension/style.StyleMappingRow}
-   */
-  newRow(): StyleMappingRow {
-    return new StyleMappingRow(this.table);
-  }
-  /**
    * Create a user mapping row
    * @param  {module:db/dataTypes[]} columnTypes  column types
    * @param  {module:dao/columnValues~ColumnValues[]} values values
    * @return {module:extension/style.StyleMappingRow} style mapping row
    */
-  newRowWithColumnTypes(columnTypes: { [key: string]: DataTypes }, values: Record<string, DBValue>): StyleMappingRow {
+  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): StyleMappingRow {
     return new StyleMappingRow(this.table, columnTypes, values);
   }
   /**
