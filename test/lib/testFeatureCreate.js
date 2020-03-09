@@ -157,7 +157,7 @@ describe('GeoPackage Feature table create tests', function() {
           name: 'geom.test',
           notNull: false,
           primaryKey: false,
-          geometryType: 7 },
+          geometryType: 1 },
         { index: 2,
           name: 'test_text.test',
           dataType: 9,
