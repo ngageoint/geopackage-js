@@ -32,7 +32,7 @@ export class FeatureColumn extends UserColumn {
   }
   getTypeName(): string {
     if (this.isGeometry()) {
-      return DataTypes.nameFromType(DataTypes.GEOMETRY);
+      return this.geometryType;
     }
     return this.dataType !== undefined && DataTypes.nameFromType(this.dataType);
   }
