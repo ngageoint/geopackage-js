@@ -441,11 +441,15 @@ function readGeoPackage(geoPackage) {
   });
   const featureTables = geoPackage.getFeatureTables();
   featureTables.forEach(function(table) {
-    const featureDao = geoPackage.getFeatureDao(table);
-    const info = geoPackage.getInfoForTable(featureDao);
-    tableInfos[table] = info;
-    const rendered = Mustache.render(featureTableTemplate, info);
-    featureTableNode.append(rendered);
+    try {
+      const featureDao = geoPackage.getFeatureDao(table);
+      const info = geoPackage.getInfoForTable(featureDao);
+      tableInfos[table] = info;
+      const rendered = Mustache.render(featureTableTemplate, info);
+      featureTableNode.append(rendered);
+    } catch (err) {
+      console.log('Error opening table ' + table, err);
+    }
   });
 }
 
