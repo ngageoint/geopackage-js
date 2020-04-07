@@ -1,6 +1,6 @@
 // @ts-nocheck
 var should = require('chai').should();
-var GeoPackageAPI = require('../..').GeoPackage
+var GeoPackageAPI = require('../..').GeoPackageAPI
 var Path = require('path')
 import { default as testSetup } from './testSetup'
 import {default as fsExtra} from 'fs-extra'

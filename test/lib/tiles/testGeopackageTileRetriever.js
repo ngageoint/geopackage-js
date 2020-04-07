@@ -1,4 +1,3 @@
-import { GeoPackage as GeoPackageAPI } from '../../..'
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever

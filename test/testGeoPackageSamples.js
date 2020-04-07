@@ -1,4 +1,4 @@
-import { GeoPackage as GeoPackageAPI } from '../.'
+import { GeoPackageAPI } from '../.'
 import { default as GeoPackageUtils } from './geopackageUtils'
 // var GeoPackageUtils = require('./geopackageUtils');
 

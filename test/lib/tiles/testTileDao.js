@@ -1,4 +1,3 @@
-import { GeoPackage as GeoPackageAPI } from '../../..'
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var TileDao = require('../../../lib/tiles/user/tileDao').TileDao

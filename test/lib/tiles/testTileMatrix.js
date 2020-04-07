@@ -1,4 +1,3 @@
-import { GeoPackage as GeoPackageAPI } from '../../..'
 
 var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
   , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix

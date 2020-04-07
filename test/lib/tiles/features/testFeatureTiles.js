@@ -1,4 +1,3 @@
-import { GeoPackage as GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {StyleRow} from '../../../../lib/extension/style/styleRow';
 import {StyleTable} from '../../../../lib/extension/style/styleTable';
