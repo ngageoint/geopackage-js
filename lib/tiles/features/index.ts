@@ -69,9 +69,9 @@ export class FeatureTiles {
     public tileHeight: number = 256,
   ) {
     this.projection = featureDao.projection;
-    this.linePaint.setStrokeWidth(2.0);
-    this.polygonPaint.setStrokeWidth(2.0);
-    this.polygonFillPaint.setColor('#00000011');
+    this.linePaint.strokeWidth = 2.0;
+    this.polygonPaint.strokeWidth = 2.0;
+    this.polygonFillPaint.color = '#00000011';
     this.geoPackage = this.featureDao.geoPackage;
     if (this.geoPackage != null) {
       this.featureTableStyles = new FeatureTableStyles(this.geoPackage, featureDao.table);
@@ -166,8 +166,8 @@ export class FeatureTiles {
    */
   set scale(scale: number) {
     this._scale = scale;
-    this.linePaint.setStrokeWidth(scale * this.lineStrokeWidth);
-    this.polygonPaint.setStrokeWidth(scale * this.polygonStrokeWidth);
+    this.linePaint.strokeWidth = scale * this.lineStrokeWidth;
+    this.polygonPaint.strokeWidth = scale * this.polygonStrokeWidth;
     this.featurePaintCache.clear();
   }
   get scale(): number {
@@ -291,7 +291,7 @@ export class FeatureTiles {
     let paint = null;
     let hasStyleColor = false;
     if (featureStyle != null) {
-      const style = featureStyle.getStyle();
+      const style = featureStyle.style;
       if (style != null) {
         if (style.hasFillColor()) {
           paint = this.getStylePaint(style, FeatureDrawType.FILL);
@@ -314,7 +314,7 @@ export class FeatureTiles {
   getFeatureStylePaint(featureStyle: FeatureStyle, drawType: FeatureDrawType): Paint {
     let paint = null;
     if (featureStyle != null) {
-      const style = featureStyle.getStyle();
+      const style = featureStyle.style;
       if (style !== null && style.hasColor()) {
         paint = this.getStylePaint(style, drawType);
       }
@@ -344,9 +344,9 @@ export class FeatureTiles {
         throw new Error('Unsupported Draw Type: ' + drawType);
       }
       const stylePaint = new Paint();
-      stylePaint.setColor(color);
+      stylePaint.color = color;
       if (strokeWidth !== null) {
-        stylePaint.setStrokeWidth(strokeWidth);
+        stylePaint.strokeWidth = strokeWidth;
       }
       paint = this.featurePaintCache.getPaintForStyleRow(style, drawType);
       if (paint === undefined || paint === null) {
@@ -361,14 +361,14 @@ export class FeatureTiles {
    * @return {String} color
    */
   get pointColor(): string {
-    return this.pointPaint.getColor();
+    return this.pointPaint.color;
   }
   /**
    * Set point color
    * @param {String} pointColor point color
    */
   set pointColor(pointColor: string) {
-    this.pointPaint.setColor(pointColor);
+    this.pointPaint.color = pointColor;
   }
   /**
    * Get line stroke width
@@ -383,21 +383,21 @@ export class FeatureTiles {
    */
   set lineStrokeWidth(lineStrokeWidth: number) {
     this._lineStrokeWidth = lineStrokeWidth;
-    this.linePaint.setStrokeWidth(this.scale * this.lineStrokeWidth);
+    this.linePaint.strokeWidth = this.scale * this.lineStrokeWidth;
   }
   /**
    * Get line color
    * @return {String} color
    */
   get lineColor(): string {
-    return this.linePaint.getColor();
+    return this.linePaint.color;
   }
   /**
    * Set line color
    * @param {String} lineColor line color
    */
   set lineColor(lineColor: string) {
-    this.linePaint.setColor(lineColor);
+    this.linePaint.color = lineColor;
   }
   /**
    * Get polygon stroke width
@@ -412,35 +412,35 @@ export class FeatureTiles {
    */
   set polygonStrokeWidth(polygonStrokeWidth: number) {
     this._polygonStrokeWidth = polygonStrokeWidth;
-    this.polygonPaint.setStrokeWidth(this.scale * polygonStrokeWidth);
+    this.polygonPaint.strokeWidth = this.scale * polygonStrokeWidth;
   }
   /**
    * Get polygon color
    * @return {String} color
    */
   get polygonColor(): string {
-    return this.polygonPaint.getColor();
+    return this.polygonPaint.color;
   }
   /**
    * Set polygon color
    * @param {String} polygonColor polygon color
    */
   set polygonColor(polygonColor: string) {
-    this.polygonPaint.setColor(polygonColor);
+    this.polygonPaint.color = polygonColor;
   }
   /**
    * Get polygon fill color
    * @return {String} color
    */
   get polygonFillColor(): string {
-    return this.polygonFillPaint.getColor();
+    return this.polygonFillPaint.color;
   }
   /**
    * Set polygon fill color
    * @param {String} polygonFillColor polygon fill color
    */
   set polygonFillColor(polygonFillColor: string) {
-    this.polygonFillPaint.setColor(polygonFillColor);
+    this.polygonFillPaint.color = polygonFillColor;
   }
   getFeatureCountXYZ(x: number, y: number, z: number): number {
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
@@ -616,7 +616,7 @@ export class FeatureTiles {
     const x = TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, transformedGeoJson.coordinates[0]);
     const y = TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, transformedGeoJson.coordinates[1]);
     if (featureStyle !== undefined && featureStyle !== null && featureStyle.hasIcon()) {
-      const iconRow = featureStyle.getIcon();
+      const iconRow = featureStyle.icon;
       const image = await this.iconCache.createIcon(iconRow);
       width = Math.round(this.scale * iconRow.width);
       height = Math.round(this.scale * iconRow.height);
@@ -641,7 +641,7 @@ export class FeatureTiles {
       context.save();
       let radius = null;
       if (featureStyle !== undefined && featureStyle !== null) {
-        const styleRow = featureStyle.getStyle();
+        const styleRow = featureStyle.style;
         if (styleRow !== undefined && styleRow !== null) {
           radius = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         }
@@ -656,7 +656,7 @@ export class FeatureTiles {
         context.beginPath();
         context.arc(circleX, circleY, radius, 0, 2 * Math.PI, true);
         context.closePath();
-        context.fillStyle = pointPaint.getColorRGBA();
+        context.fillStyle = pointPaint.colorRGBA;
         context.fill();
       }
       context.restore();
@@ -743,8 +743,8 @@ export class FeatureTiles {
     context.save();
     context.beginPath();
     const paint = this.getLinePaint(featureStyle);
-    context.strokeStyle = paint.getColorRGBA();
-    context.lineWidth = paint.getStrokeWidth();
+    context.strokeStyle = paint.colorRGBA;
+    context.lineWidth = paint.strokeWidth;
     this.getPath(simplifyTolerance, geoJson, transform, context, boundingBox);
     context.stroke();
     context.closePath();
@@ -773,12 +773,12 @@ export class FeatureTiles {
     context.closePath();
     const fillPaint = this.getPolygonFillPaint(featureStyle);
     if (fillPaint !== undefined && fillPaint !== null) {
-      context.fillStyle = fillPaint.getColorRGBA();
+      context.fillStyle = fillPaint.colorRGBA;
       context.fill();
     }
     const paint = this.getPolygonPaint(featureStyle);
-    context.strokeStyle = paint.getColorRGBA();
-    context.lineWidth = paint.getStrokeWidth();
+    context.strokeStyle = paint.colorRGBA;
+    context.lineWidth = paint.strokeWidth;
     context.stroke();
     context.restore();
   }

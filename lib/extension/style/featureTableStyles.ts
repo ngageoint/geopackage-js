@@ -233,15 +233,15 @@ export class FeatureTableStyles {
    * @return {module:extension/style.Styles} cached table styles
    */
   getCachedTableStyles(): Styles {
-    let styles = this.cachedTableFeatureStyles.getStyles();
+    let styles = this.cachedTableFeatureStyles.styles;
     if (styles === null) {
-      styles = this.cachedTableFeatureStyles.getStyles();
+      styles = this.cachedTableFeatureStyles.styles;
       if (styles === null) {
         styles = this.getTableStyles();
         if (styles === null) {
           styles = new Styles();
         }
-        this.cachedTableFeatureStyles.setStyles(styles);
+        this.cachedTableFeatureStyles.styles = styles;
       }
     }
     if (styles.isEmpty()) {
@@ -276,15 +276,15 @@ export class FeatureTableStyles {
    * @return {module:extension/style.Icons} cached table icons
    */
   getCachedTableIcons(): Icons {
-    let icons = this.cachedTableFeatureStyles.getIcons();
+    let icons = this.cachedTableFeatureStyles.icons;
     if (icons === null) {
-      icons = this.cachedTableFeatureStyles.getIcons();
+      icons = this.cachedTableFeatureStyles.icons;
       if (icons === null) {
         icons = this.getTableIcons();
         if (icons === null) {
           icons = new Icons();
         }
-        this.cachedTableFeatureStyles.setIcons(icons);
+        this.cachedTableFeatureStyles.icons = icons;
       }
     }
     if (icons.isEmpty()) {
@@ -1088,20 +1088,20 @@ export class FeatureTableStyles {
    * Clear the cached table feature styles
    */
   clearCachedTableFeatureStyles(): void {
-    this.cachedTableFeatureStyles.setStyles(null);
-    this.cachedTableFeatureStyles.setIcons(null);
+    this.cachedTableFeatureStyles.styles = null;
+    this.cachedTableFeatureStyles.icons = null;
   }
   /**
    * Clear the cached table styles
    */
   clearCachedTableStyles(): void {
-    this.cachedTableFeatureStyles.setStyles(null);
+    this.cachedTableFeatureStyles.styles = null;
   }
   /**
    * Clear the cached table icons
    */
   clearCachedTableIcons(): void {
-    this.cachedTableFeatureStyles.setIcons(null);
+    this.cachedTableFeatureStyles.icons = null;
   }
   /**
    * Delete all feature styles

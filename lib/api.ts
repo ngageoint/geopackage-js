@@ -1,12 +1,9 @@
 import { GeoPackage } from './geoPackage';
 import { GeoPackageConnection } from './db/geoPackageConnection';
-import { BoundingBox } from './boundingBox';
 import { GeoPackageValidate } from './validate/geoPackageValidate';
 
 import path from 'path';
 import fs from 'fs';
-
-import { Feature } from 'geojson';
 
 /**
  * This module is the entry point to the GeoPackage API, providing static

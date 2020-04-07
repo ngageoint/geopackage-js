@@ -426,7 +426,6 @@ GeoPackageUtils.createGeometryIndexExtension = function(geopackage) {
         console.log('Index table ' + table);
         const featureDao = geopackage.getFeatureDao(table);
         const fti = featureDao.featureTableIndex;
-        const tableIndex = fti.getTableIndex();
         return fti.index();
       });
     }, Promise.resolve())

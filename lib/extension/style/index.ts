@@ -824,8 +824,8 @@ export class FeatureStyleExtension extends BaseExtension {
     };
   }> {
     if (featureStyles !== null) {
-      const tableStyles = await this.setTableStyles(featureTable, featureStyles.getStyles());
-      const tableIcons = await this.setTableIcons(featureTable, featureStyles.getIcons());
+      const tableStyles = await this.setTableStyles(featureTable, featureStyles.styles);
+      const tableIcons = await this.setTableIcons(featureTable, featureStyles.icons);
       return {
         tableStyles: tableStyles,
         tableIcons: tableIcons,
@@ -995,8 +995,8 @@ export class FeatureStyleExtension extends BaseExtension {
     };
   }> {
     if (featureStyles !== null) {
-      const styles = await this.setStyles(featureTable, featureId, featureStyles.getStyles());
-      const icons = await this.setIcons(featureTable, featureId, featureStyles.getIcons());
+      const styles = await this.setStyles(featureTable, featureId, featureStyles.styles);
+      const icons = await this.setIcons(featureTable, featureId, featureStyles.icons);
       return {
         styles,
         icons,
@@ -1097,8 +1097,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }> {
     if (featureStyle !== null) {
       const promises = [];
-      promises.push(this.setStyle(featureTable, featureId, geometryType, featureStyle.getStyle()));
-      promises.push(this.setIcon(featureTable, featureId, geometryType, featureStyle.getIcon()));
+      promises.push(this.setStyle(featureTable, featureId, geometryType, featureStyle.style));
+      promises.push(this.setIcon(featureTable, featureId, geometryType, featureStyle.icon));
       return Promise.all(promises).then(([style, icon]) => ({
         style,
         icon,

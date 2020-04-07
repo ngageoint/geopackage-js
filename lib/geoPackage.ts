@@ -85,7 +85,7 @@ type ColumnMap = {
   };
 };
 
-interface ClosestFeature {
+export interface ClosestFeature {
   feature_count: number;
   coverage: boolean;
   gp_table: string;
@@ -632,7 +632,7 @@ export class GeoPackage {
     const id = featureDao.create(featureRow);
     if (index) {
       const fti = featureDao.featureTableIndex;
-      const tableIndex = fti.getTableIndex();
+      const tableIndex = fti.tableIndex;
       if (!tableIndex) return id;
       fti.indexRow(tableIndex, id, geometryData);
       fti.updateLastIndexed(tableIndex);

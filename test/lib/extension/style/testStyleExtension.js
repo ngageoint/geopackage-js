@@ -391,12 +391,12 @@ describe('StyleExtension Tests', function() {
     var featureStyle = new FeatureStyle(null, null);
     featureStyle.hasStyle().should.be.equal(false);
     featureStyle.hasIcon().should.be.equal(false);
-    featureStyle.setStyle(styleRow);
-    featureStyle.setIcon(iconRow);
+    featureStyle.style = styleRow;
+    featureStyle.icon = iconRow;
     featureStyle.hasStyle().should.be.equal(true);
     featureStyle.hasIcon().should.be.equal(true);
-    should.exist(featureStyle.getStyle());
-    should.exist(featureStyle.getIcon());
+    should.exist(featureStyle.style);
+    should.exist(featureStyle.icon);
   }));
 
   it('should test IconTable, StyleTable, and StyleMappingTable indices', mochaAsync(async () => {
@@ -444,8 +444,8 @@ describe('StyleExtension Tests', function() {
     await featureTableStyles.setTableStyle('Polygon', polygonStyle);
     var featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
-    should.exist(featureStyles.getStyles());
-    should.not.exist(featureStyles.getIcons());
+    should.exist(featureStyles.styles);
+    should.not.exist(featureStyles.icons);
     var tableStyles = featureTableStyles.getTableStyles();
     should.exist(tableStyles);
     should.exist(tableStyles.getDefault());
@@ -470,8 +470,8 @@ describe('StyleExtension Tests', function() {
 
     featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
-    should.exist(featureStyles.getStyles());
-    var tableIcons = featureStyles.getIcons();
+    should.exist(featureStyles.styles);
+    var tableIcons = featureStyles.icons;
     should.exist(tableIcons);
     should.exist(tableIcons.getDefault());
     tableIconDefault.id.should.be.equal(tableIcons.getDefault().id);
@@ -502,8 +502,8 @@ describe('StyleExtension Tests', function() {
       featureRow = featureDao.createObject(results[i]);
 
       var featureStyle = featureTableStyles.getFeatureStyleDefaultForFeatureRow(featureRow);
-      featureStyle.getStyle().id.should.be.equal(tableStyleDefault.id);
-      featureStyle.getIcon().id.should.be.equal(tableIconDefault.id);
+      featureStyle.style.id.should.be.equal(tableStyleDefault.id);
+      featureStyle.icon.id.should.be.equal(tableIconDefault.id);
 
       // verify that if no icon or style exist for the feature, that the default for the table is used
       geopackage.featureStyleExtension.getStyle(featureTableName, featureRow.id, null, true).id.should.be.equal(tableStyleDefault.id);
@@ -584,8 +584,8 @@ describe('StyleExtension Tests', function() {
 
     var featureStyleExtension = geopackage.featureStyleExtension;
     featureStyles = featureTableStyles.getFeatureStyles(featureRow.id);
-    should.exist(featureStyles.getStyles());
-    should.exist(featureStyles.getIcons());
+    should.exist(featureStyles.styles);
+    should.exist(featureStyles.icons);
 
     should.exist(featureStyleExtension.getFeatureStyleForFeatureRow(featureRow));
     should.exist(featureStyleExtension.getFeatureStyleDefault(featureRow));
@@ -790,7 +790,7 @@ describe('StyleExtension Tests', function() {
     featureStyles = new FeatureStyles();
     var styles = new Styles();
     styles.setDefault(tableStyleDefault);
-    featureStyles.setStyles(styles);
+    featureStyles.styles = styles;
 
     featureTableStyles.getAllTableStyleIds().length.should.be.equal(0);
     featureTableStyles.getAllTableIconIds().length.should.be.equal(0);

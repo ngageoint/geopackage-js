@@ -193,11 +193,11 @@ export class FeatureTableIndex extends BaseExtension {
    * @return {Promise<TableIndex>}
    */
   async getOrCreateTableIndex(): Promise<TableIndex> {
-    const tableIndex = this.getTableIndex();
+    const tableIndex = this.tableIndex;
     if (tableIndex) return tableIndex;
     await this.tableIndexDao.createTable();
     this.createTableIndex();
-    return this.getTableIndex();
+    return this.tableIndex;
   }
   /**
    * Create the table index
@@ -213,7 +213,7 @@ export class FeatureTableIndex extends BaseExtension {
    * Get the table index
    * @return {module:extension/index~TableIndex}
    */
-  getTableIndex(): TableIndex {
+  get tableIndex(): TableIndex {
     if (this.tableIndexDao.isTableExists()) {
       return this.tableIndexDao.queryForId(this.tableName);
     } else {

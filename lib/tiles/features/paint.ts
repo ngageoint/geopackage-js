@@ -3,21 +3,28 @@
  * @module tiles/features
  */
 export class Paint {
-  color = '#000000FF';
-  strokeWidth = 1.0;
+  _color = '#000000FF';
+  _strokeWidth = 1.0;
 
   /**
    * Get the color
    * @returns {String} color String color in the format #RRGGBB or #RRGGBBAA
    */
-  getColor(): string {
-    return this.color;
+  get color(): string {
+    return this._color;
+  }
+  /**
+   * Set the color
+   * @param {String} color String color in the format #RRGGBB or #RRGGBBAA
+   */
+  set color(color: string) {
+    this._color = color;
   }
   /**
    * Get the color
    * @returns {String} color
    */
-  getColorRGBA(): string {
+  get colorRGBA(): string {
     // assumes color is in the format #RRGGBB or #RRGGBBAA
     const red = parseInt(this.color.substr(1, 2), 16);
     const green = parseInt(this.color.substr(3, 2), 16);
@@ -29,24 +36,17 @@ export class Paint {
     return 'rgba(' + red + ',' + green + ',' + blue + ',' + alpha + ')';
   }
   /**
-   * Set the color
-   * @param {String} color String color in the format #RRGGBB or #RRGGBBAA
-   */
-  setColor(color: string): void {
-    this.color = color;
-  }
-  /**
    * Get the stroke width
    * @returns {Number} strokeWidth width in pixels
    */
-  getStrokeWidth(): number {
-    return this.strokeWidth;
+  get strokeWidth(): number {
+    return this._strokeWidth;
   }
   /**
    * Set the stroke width
    * @param {Number} strokeWidth width in pixels
    */
-  setStrokeWidth(strokeWidth: number): void {
-    this.strokeWidth = strokeWidth;
+  set strokeWidth(strokeWidth: number) {
+    this._strokeWidth = strokeWidth;
   }
 }

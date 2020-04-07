@@ -28,10 +28,12 @@ import { NumberFeaturesTile } from './lib/tiles/features/custom/numberFeaturesTi
 import { ShadedFeaturesTile } from './lib/tiles/features/custom/shadedFeaturesTile';
 import { GeoPackageTileRetriever } from './lib/tiles/retriever';
 import TileUtilities from './lib/tiles/creator/tileUtilities';
+import { ClosestFeature, GeoPackage } from './lib/geoPackage';
 
 export {
   proj4Defs,
-  GeoPackageAPI as GeoPackage,
+  GeoPackageAPI,
+  GeoPackage,
   GeoPackageTileRetriever,
   GeoPackageConnection,
   TableCreator,
@@ -59,4 +61,5 @@ export {
   ShadedFeaturesTile,
   BoundingBox,
   DataTypes,
+  ClosestFeature,
 };

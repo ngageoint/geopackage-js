@@ -13,14 +13,14 @@ export class FeatureStyle {
    * Set style
    * @param {module:extension/style.StyleRow} styleRow
    */
-  setStyle(styleRow: StyleRow): void {
+  set style(styleRow: StyleRow) {
     this.styleRow = styleRow;
   }
   /**
    * Get style
    * @returns {module:extension/style.StyleRow}
    */
-  getStyle(): StyleRow {
+  get style(): StyleRow {
     return this.styleRow;
   }
   /**
@@ -34,14 +34,14 @@ export class FeatureStyle {
    * Set icon
    * @param {module:extension/style.IconRow} iconRow
    */
-  setIcon(iconRow: IconRow): void {
+  set icon(iconRow: IconRow) {
     this.iconRow = iconRow;
   }
   /**
    * Get icon
    * @returns {module:extension/style.IconRow}
    */
-  getIcon(): IconRow {
+  get icon(): IconRow {
     return this.iconRow;
   }
   /**

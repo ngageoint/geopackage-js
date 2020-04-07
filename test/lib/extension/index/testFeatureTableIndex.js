@@ -42,7 +42,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     it('should check the index extension', function() {
       this.timeout(10000);
       var fti = featureDao.featureTableIndex;
-      var tableIndex = fti.getTableIndex();
+      var tableIndex = fti.tableIndex;
       should.not.exist(tableIndex);
       return fti.ngaIndexWithForce(false, function(message) {
         console.log('message', message);
@@ -164,14 +164,14 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     it('should force index the table', function() {
       this.timeout(30000);
       var fti = featureDao.featureTableIndex;
-      var tableIndex = fti.getTableIndex();
+      var tableIndex = fti.tableIndex;
       tableIndex.last_indexed.should.be.equal('2016-05-02T12:08:14.144Z');
       return fti.ngaIndexWithForce(true)
       .then(function(indexed) {
         indexed.should.be.equal(true);
         // ensure it was created
         var fti2 = new FeatureTableIndex(geoPackage, featureDao);
-        tableIndex = fti2.getTableIndex();
+        tableIndex = fti2.tableIndex;
         should.exist(tableIndex);
         tableIndex.last_indexed.should.not.be.equal('2016-05-02T12:08:14.144Z');
       });
