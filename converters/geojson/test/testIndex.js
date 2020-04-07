@@ -1,4 +1,4 @@
-var GeoJSONToGeoPackage = require('../index.js');
+var GeoJSONToGeoPackage = require('../index').GeoJSONToGeoPackage;
 
 var path = require('path')
   , fs = require('fs')
@@ -10,9 +10,9 @@ describe('GeoJSON to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
-
-    return GeoJSONToGeoPackage.convert({
-      geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
+    const converter = new GeoJSONToGeoPackage();
+    return converter.convert({
+      geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')
     })
     .then(function(geopackage) {
       should.exist(geopackage);
@@ -29,8 +29,8 @@ describe('GeoJSON to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg'));
     } catch (e) {}
-
-    return GeoJSONToGeoPackage.convert({geojson: path.join(__dirname, 'fixtures', 'id.geojson'), geopackage: path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg')}, function(status) {
+    const converter = new GeoJSONToGeoPackage();
+    return converter.convert({geoJson: path.join(__dirname, 'fixtures', 'id.geojson'), geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'id.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -49,8 +49,9 @@ describe('GeoJSON to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_10m_land.gpkg'));
     } catch (e) {}
+    const converter = new GeoJSONToGeoPackage();
 
-    return GeoJSONToGeoPackage.convert({geojson: path.join(__dirname, 'fixtures', 'ne_10m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_10m_land.gpkg')}, function(status) {
+    return converter.convert({geoJson: path.join(__dirname, 'fixtures', 'ne_10m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_10m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -67,7 +68,9 @@ describe('GeoJSON to GeoPackage tests', function() {
   it('should convert the geojson', function(done) {
     fs.readFile(path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), 'utf8', function(err, data) {
       var geoJson = JSON.parse(data);
-      GeoJSONToGeoPackage.convert({geojson:geoJson})
+      const converter = new GeoJSONToGeoPackage({geoJson});
+
+      converter.convert()
       .then(function(geopackage) {
         var tables = geopackage.getFeatureTables();
         tables.length.should.be.equal(1);
@@ -82,11 +85,76 @@ describe('GeoJSON to GeoPackage tests', function() {
     });
   });
 
+  it('should convert a multilinestring', function(done) {
+    var geoJson = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"scalerank":1,"featureclass":"Country"},"geometry": { type: 'MultiLineString',
+      coordinates: [
+          [ [100.0, 0.0], [101.0, 1.0] ],
+          [ [102.0, 2.0], [103.0, 3.0] ]
+    ] }}]};
+    const converter = new GeoJSONToGeoPackage({geoJson});
+
+      converter.convert()
+      .then(function(geopackage) {
+        var tables = geopackage.getFeatureTables();
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        var featureDao = geopackage.getFeatureDao('features');
+        var count = featureDao.getCount();
+        count.should.be.equal(2);
+      })
+      .then(function() {
+        done();
+      });
+  })
+
+  it('should convert a feature with properties', function(done) {
+    let date = new Date();
+    var geoJson = {"type":"FeatureCollection",
+      "features":[{
+        "type":"Feature",
+        "id": 2,
+        "properties":{
+          "geometry":101,
+          "date": date,
+          "bool": true,
+          "undefined": undefined,
+          "object": { a: 1}
+        },
+        "geometry": {
+          type: 'Point',
+          coordinates: [100.0, 0.0]
+        }
+      }
+    ]};
+    const converter = new GeoJSONToGeoPackage({geoJson});
+
+      converter.convert()
+      .then(function(geopackage) {
+        var tables = geopackage.getFeatureTables();
+        tables.length.should.be.equal(1);
+        tables[0].should.be.equal('features');
+        var featureDao = geopackage.getFeatureDao('features');
+        var count = featureDao.getCount();
+        count.should.be.equal(1);
+        const features = featureDao.queryForAll();
+        features[0]._feature_id.should.be.equal(2);
+        features[0].geometry_property.should.be.equal(101);
+        features[0].bool.should.be.equal(1);
+        features[0].date.should.be.equal(date.toISOString())
+        should.not.exist(features[0].object);
+      })
+      .then(function() {
+        done();
+      });
+  })
+
   it('should convert the natural earth 110m file and add the layer twice', function() {
     try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e){}
-    return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -100,7 +168,7 @@ describe('GeoJSON to GeoPackage tests', function() {
       return geopackage;
     })
     .then(function(geopackage) {
-      return GeoJSONToGeoPackage.addLayer({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+      return converter.addLayer({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
         return Promise.resolve();
       })
       .then(function() {
@@ -119,11 +187,13 @@ describe('GeoJSON to GeoPackage tests', function() {
     });
   });
 
-  it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function() {
+  it('should convert the natural earth 110m file and refuse to create it again without the append flag', function() {
     try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
-    } catch (e) {}
-    return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+    } catch (e){}
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -137,7 +207,39 @@ describe('GeoJSON to GeoPackage tests', function() {
       return geopackage;
     })
     .then(function(geopackage) {
-      return GeoJSONToGeoPackage.addLayer({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:geopackage}, function(status) {
+      converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+        return Promise.resolve();
+      })
+      .then(function() {
+        should.fail('Should have thrown an error');
+      })
+      .catch(function(error) {
+        should.exist(error);
+      })
+    });
+  });
+
+  it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time', function() {
+    try {
+    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+      return Promise.resolve();
+    })
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+      return geopackage;
+    })
+    .then(function(geopackage) {
+      return converter.addLayer({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:geopackage}, function(status) {
         return Promise.resolve();
       });
     })
@@ -153,11 +255,47 @@ describe('GeoJSON to GeoPackage tests', function() {
     });
   });
 
+  it('should convert the natural earth 110m file and add the layer twice using the geopackage object the second time without progress function', function() {
+    try {
+    fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
+    } catch (e) {}
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+      return Promise.resolve();
+    })
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('ne_110m_land');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+      return geopackage;
+    })
+    .then(function(geopackage) {
+      return converter.addLayer({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:geopackage})
+    })
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(2);
+      tables[0].should.be.equal('ne_110m_land');
+      tables[1].should.be.equal('ne_110m_land_1');
+      var featureDao = geopackage.getFeatureDao('ne_110m_land_1');
+      var count = featureDao.getCount();
+      count.should.be.equal(127);
+    })
+  });
+
   it('should convert the natural earth 110m file and add read it out as geojson', function() {
     try {
     fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg'));
     } catch (e) {}
-    return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'ne_110m_land.geojson'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'ne_110m_land.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -169,7 +307,7 @@ describe('GeoJSON to GeoPackage tests', function() {
       var count = featureDao.getCount();
       count.should.be.equal(127);
 
-      return GeoJSONToGeoPackage.extract(geopackage, 'ne_110m_land')
+      return converter.extract(geopackage, 'ne_110m_land')
       .then(function(geoJson) {
         geoJson.features.length.should.be.equal(127);
       });
@@ -180,7 +318,9 @@ describe('GeoJSON to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'zandm.gpkg'));
     } catch (e) {}
-    return GeoJSONToGeoPackage.convert({geojson:path.join(__dirname, 'fixtures', 'zandm.json'), geopackage:path.join(__dirname, 'fixtures', 'tmp', 'zandm.gpkg')}, function(status) {
+    const converter = new GeoJSONToGeoPackage();
+
+    return converter.convert({geoJson:path.join(__dirname, 'fixtures', 'zandm.json'), geoPackage:path.join(__dirname, 'fixtures', 'tmp', 'zandm.gpkg')}, function(status) {
       return Promise.resolve();
     })
     .then(function(geopackage) {
@@ -194,7 +334,7 @@ describe('GeoJSON to GeoPackage tests', function() {
       var iterable = featureDao.queryForEach('_feature_id', 'asdf#456');
       for (var row of iterable) {
         row = featureDao.getRow(row);
-        var geom = row.getGeometry();
+        var geom = row.geometry;
         geom.geometry.z.should.be.equal(121.0);
         geom.geometry.x.should.be.equal(-5.78);
         geom.geometry.y.should.be.equal(4.3);
@@ -206,7 +346,7 @@ describe('GeoJSON to GeoPackage tests', function() {
       iterable = featureDao.queryForEach('_feature_id', 'gserg#897');
       for (var row of iterable) {
         row = featureDao.getRow(row);
-        var geom = row.getGeometry();
+        var geom = row.geometry;
         geom.geometry.points[0].z.should.be.equal(7.7);
         geom.geometry.points[0].x.should.be.equal(-8.6);
         geom.geometry.points[0].y.should.be.equal(2.86);
@@ -216,7 +356,7 @@ describe('GeoJSON to GeoPackage tests', function() {
         row.getValueWithColumnName('_feature_id').should.be.equal('gserg#897');
       }
 
-      return GeoJSONToGeoPackage.extract(geopackage, 'zandm')
+      return converter.extract(geopackage, 'zandm')
       .then(function(geoJson) {
         geoJson.features.length.should.be.equal(2);
         var feature = geoJson.features[0];
