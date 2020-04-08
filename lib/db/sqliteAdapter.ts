@@ -166,7 +166,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Array|Object} [params] bind parameters
    * @return {Object[]}
    */
-  all(sql: string, params?: [] | Record<string, any>): any[] {
+  all(sql: string, params?: [] | Record<string, DBValue>): Record<string, DBValue>[] {
     const statement = this.db.prepare(sql);
     if (params) {
       return statement.all(params);
@@ -181,7 +181,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Iterable.<Object>}
    */
-  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
+  each(sql: string, params?: [] | Record<string, DBValue>): IterableIterator<Record<string, DBValue>> {
     const statement = this.db.prepare(sql);
     if (params) {
       return statement.iterate(params);
@@ -199,7 +199,7 @@ export class SqliteAdapter implements DBAdapter {
    * * `changes`: number of rows the statement changed
    * * `lastInsertROWID`: ID of the last inserted row
    */
-  run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number } {
+  run(sql: string, params?: [] | Record<string, DBValue>): { changes: number; lastInsertRowid: number } {
     const statement = this.db.prepare(sql);
     if (params) {
       return statement.run(params);
@@ -213,7 +213,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} last inserted row id
    */
-  insert(sql: string, params?: [] | Record<string, any>): number {
+  insert(sql: string, params?: [] | Record<string, DBValue>): number {
     const statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
@@ -223,7 +223,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} params bind parameters
    * @return {Number} deleted rows
    */
-  delete(sql: string, params?: [] | Record<string, any>): number {
+  delete(sql: string, params?: [] | Record<string, DBValue>): number {
     const statement = this.db.prepare(sql);
     return statement.run(params).changes;
   }
@@ -251,7 +251,7 @@ export class SqliteAdapter implements DBAdapter {
    * @param  {Object|Array} [whereArgs] where args
    * @return {Number} count
    */
-  count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+  count(tableName: string, where?: string, whereArgs?: [] | Record<string, DBValue>): number {
     let sql = 'SELECT COUNT(*) as count FROM "' + tableName + '"';
     if (where) {
       sql += ' where ' + where;

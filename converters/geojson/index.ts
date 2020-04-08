@@ -21,7 +21,7 @@ export interface GeoJSONConverterOptions {
 export class GeoJSONToGeoPackage {
   constructor(private options?: GeoJSONConverterOptions) {}
 
-  addLayer(options?: GeoJSONConverterOptions, progressCallback?: Function): Promise<any> {
+  async addLayer(options?: GeoJSONConverterOptions, progressCallback?: Function): Promise<any> {
     const clonedOptions = { ...this.options, ...options };
     clonedOptions.append = true;
 
