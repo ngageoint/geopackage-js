@@ -58,7 +58,8 @@ for (const name in defs) {
   }
 }
 
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+const osm = L.tileLayer('https://osm-{s}.gs.mil/tiles/default/{z}/{x}/{y}.png', {
+  subdomains: '1234',
   attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong>',
 });
 const arcworldmap = L.tileLayer(
