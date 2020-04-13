@@ -1,35 +1,41 @@
-var map = L.map('map', {
-  crs: L.CRS.EPSG4326
+const map = L.map('map', {
+  crs: L.CRS.EPSG4326,
 }).setView([45, 15], 3);
 
-var baseLayer = L.tileLayer('https://osm.geointservices.io/tiles/default_pc/{z}/{x}/{y}.png', {
-  attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+const osm = L.tileLayer('https://osm-{s}.gs.mil/tiles/default/{z}/{x}/{y}.png', {
+  subdomains: '1234',
+  attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong>',
 });
-baseLayer.addTo(map);
+osm.addTo(map);
 
-var tileLayer = L.geoPackageTileLayer({
-    geoPackageUrl: './4326.gpkg',
-    layerName: 'Slate_Canvas_tiles'
+const tileLayer = L.geoPackageTileLayer({
+  geoPackageUrl: './4326.gpkg',
+  layerName: 'Slate_Canvas_tiles',
 }).addTo(map);
 
 tileLayer.on('load', function() {
   tileLayer.off('load');
   L.geoPackageFeatureLayer([], {
-      geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
-      layerName: 'rivers',
-      style: function (feature) {
-        return {
-          color: "#F00",
-          weight: 2,
-          opacity: 1
-        };
-      },
-      onEachFeature: function (feature, layer) {
-        var string = "";
-        for (var key in feature.properties) {
-          string += '<div class="item"><span class="label">' + key + ': </span><span class="value">' + feature.properties[key] + '</span></div>';
-        }
-        layer.bindPopup(string);
+    geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+    layerName: 'rivers',
+    style: function(feature) {
+      return {
+        color: '#F00',
+        weight: 2,
+        opacity: 1,
+      };
+    },
+    onEachFeature: function(feature, layer) {
+      let string = '';
+      for (const key in feature.properties) {
+        string +=
+          '<div class="item"><span class="label">' +
+          key +
+          ': </span><span class="value">' +
+          feature.properties[key] +
+          '</span></div>';
       }
+      layer.bindPopup(string);
+    },
   }).addTo(map);
 });
