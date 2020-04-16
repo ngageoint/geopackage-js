@@ -1,0 +1,4 @@
+wkt,date,bool,undefined,object,ID,geometry,number,string
+"MULTILINESTRING ((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))",2015-01-01:00:00:00,true,,{a:1},2,geometry,2,hi
+,2015-01-01:00:00:00,true,,{a:1},2,geometry,2,hi
+
