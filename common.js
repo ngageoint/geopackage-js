@@ -415,7 +415,7 @@ function clearInfo() {
 function loadByteArray(array, callback) {
   clearInfo();
 
-  return GeoPackageAPI.open(array).then(function(gp) {
+  return window.GeoPackage.GeoPackageAPI.open(array).then(function(gp) {
     geoPackage = gp;
     readGeoPackage(gp);
   });
@@ -545,9 +545,9 @@ window.toggleLayer = function(layerType, table) {
             const featureDao = geoPackage.getFeatureDao(table);
             if (!featureDao) return;
             const ft = new window.GeoPackage.FeatureTiles(featureDao, width, height);
-            ft.setMaxFeaturesPerTile(10000);
+            ft.maxFeaturesPerTile = 10000;
             const numberFeaturesTile = new window.GeoPackage.NumberFeaturesTile();
-            ft.setMaxFeaturesTileDraw(numberFeaturesTile);
+            ft.maxFeaturesTileDraw = numberFeaturesTile;
             ft.drawTile(tilePoint.x, tilePoint.y, tilePoint.z, canvas).then(() => {
               console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
               done(null, canvas);
