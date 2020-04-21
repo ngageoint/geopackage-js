@@ -3,6 +3,7 @@
   "dependencies": {
     "@mapbox/vector-tile": "^1.3.1",
     "@ngageoint/geopackage": "github:ngageoint/geopackage-js",
+    "@ngageoint/geojson-to-geopackage": "../converters/geojson",
     "async": "^2.0.0-rc.5",
     "file-saver": "^2.0.0-rc.3",
     "file-type": "12.4.0",

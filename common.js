@@ -111,9 +111,8 @@ window.saveGeoPackage = function() {
 };
 
 window.downloadGeoJSON = function(tableName) {
-  GeoJSONToGeoPackage.extract(geoPackage, tableName).then(function(geoJson) {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(geoJson));
-
+  const converter = new GeoJSONToGeoPackage();
+  converter.extract(geoPackage, tableName).then(function(geoJson) {
     const blob = new Blob([JSON.stringify(geoJson)], { type: 'data:text/json;charset=utf-8' });
     FileSaver.saveAs(blob, tableName + '.geojson');
   });
@@ -136,35 +135,38 @@ function handleGeoJSONByteArray(array, geoJsonDoneCallback) {
     jsonString += String.fromCharCode(array[i]);
   }
   const json = JSON.parse(jsonString);
-  GeoJSONToGeoPackage.convert(
-    {
-      geojson: json,
-    },
-    function(status) {
-      let text = status.status;
-      if (status.completed) {
-        text +=
-          ' - ' +
-          ((status.completed / status.total) * 100).toFixed(2) +
-          ' (' +
-          status.completed +
-          ' of ' +
-          status.total +
-          ')';
-      }
-      $('#status').text(text);
-      return new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          resolve();
-        }, 0);
-      });
-    },
-  ).then(function(gp) {
-    geoPackage = gp;
-    clearInfo();
-    readGeoPackage(gp);
-    geoJsonDoneCallback ? geoJsonDoneCallback() : null;
-  });
+  const converter = new GeoJSONToGeoPackage();
+  converter
+    .convert(
+      {
+        geoJson: json,
+      },
+      function(status) {
+        let text = status.status;
+        if (status.completed) {
+          text +=
+            ' - ' +
+            ((status.completed / status.total) * 100).toFixed(2) +
+            ' (' +
+            status.completed +
+            ' of ' +
+            status.total +
+            ')';
+        }
+        $('#status').text(text);
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve();
+          }, 0);
+        });
+      },
+    )
+    .then(function(gp) {
+      geoPackage = gp;
+      clearInfo();
+      readGeoPackage(gp);
+      geoJsonDoneCallback ? geoJsonDoneCallback() : null;
+    });
 }
 
 function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
