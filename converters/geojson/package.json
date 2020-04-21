@@ -65,6 +65,7 @@
     "report": "nyc report",
     "tsc": "rm -rf ./built && tsc",
     "prepare": "rm -rf ./built && tsc",
+    "postinstall": "rm -rf ./built && tsc",
     "clean-built": "rm -rf ./built",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage"
   }

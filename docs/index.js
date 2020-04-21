@@ -28,3 +28,4 @@ require('leaflet-basemaps');
 const gp = require('@ngageoint/geopackage');
 console.log('gp is', gp);
 window.GeoPackage = gp;
+window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage').GeoJSONToGeoPackage;
