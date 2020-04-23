@@ -32,6 +32,7 @@ export class RTreeIndex extends BaseExtension {
     this.featureCount = featureDao.count();
     this.rtreeIndexDao = new RTreeIndexDao(geoPackage, featureDao);
     this.extensionExists = this.hasExtension(this.extensionName, this.tableName, this.columnName);
+    this.createAllFunctions();
   }
   getRTreeIndexExtension(): Extension[] {
     return this.getExtension(this.extensionName, this.tableName, this.columnName);

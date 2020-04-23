@@ -506,14 +506,18 @@ export class FeatureTiles {
           this.geometryCache.setGeometry(featureRow.id, geojson);
         }
         const style = this.getFeatureStyle(featureRow);
-        await this.drawGeometry(
-          simplifyTolerance,
-          geojson,
-          context,
-          this.webMercatorTransform.bind(this),
-          boundingBox,
-          style,
-        );
+        try {
+          await this.drawGeometry(
+            simplifyTolerance,
+            geojson,
+            context,
+            this.webMercatorTransform.bind(this),
+            boundingBox,
+            style,
+          );
+        } catch (e) {
+          console.log('Error drawing geometry', e);
+        }
       }
       return new Promise(resolve => {
         if (FeatureTiles.useNodeCanvas) {
@@ -574,7 +578,18 @@ export class FeatureTiles {
         this.geometryCache.setGeometry(fr.id, gj);
       }
       const style = this.getFeatureStyle(fr);
-      await this.drawGeometry(simplifyTolerance, gj, context, this.webMercatorTransform.bind(this), boundingBox, style);
+      try {
+        await this.drawGeometry(
+          simplifyTolerance,
+          gj,
+          context,
+          this.webMercatorTransform.bind(this),
+          boundingBox,
+          style,
+        );
+      } catch (e) {
+        console.log('Error drawing geometry', e);
+      }
     }
     return new Promise(resolve => {
       if (FeatureTiles.useNodeCanvas) {
@@ -671,22 +686,27 @@ export class FeatureTiles {
    * @return simplified GeoJSON
    * @since 2.0.0
    */
-  simplifyPoints(simplifyTolerance: number, lineString: any): any {
+  simplifyPoints(simplifyTolerance: number, lineString: any): any | null {
     let simplifiedGeoJSON = null;
     const shouldProject = this.projection !== null && this.featureDao.srs.organization_coordsys_id !== 3857;
     if (this.simplifyGeometries) {
-      // Reproject to web mercator if not in meters
-      if (shouldProject) {
-        lineString = reproject.reproject(lineString, this.projection, proj4('EPSG:3857'));
-      }
-      simplifiedGeoJSON = Simplify(lineString, {
-        tolerance: simplifyTolerance,
-        highQuality: false,
-        mutate: false,
-      });
-      // Reproject back to the original projection
-      if (shouldProject) {
-        simplifiedGeoJSON = reproject.reproject(simplifiedGeoJSON, proj4('EPSG:3857'), this.projection);
+      try {
+        // Reproject to web mercator if not in meters
+        if (shouldProject) {
+          lineString = reproject.reproject(lineString, this.projection, proj4('EPSG:3857'));
+        }
+        simplifiedGeoJSON = Simplify(lineString, {
+          tolerance: simplifyTolerance,
+          highQuality: false,
+          mutate: false,
+        });
+        // Reproject back to the original projection
+        if (shouldProject) {
+          simplifiedGeoJSON = reproject.reproject(simplifiedGeoJSON, proj4('EPSG:3857'), this.projection);
+        }
+      } catch (e) {
+        // This could happen if the linestring contains any empty points [NaN, NaN]
+        console.log('Unable to simplify geometry', e);
       }
     } else {
       simplifiedGeoJSON = lineString;
