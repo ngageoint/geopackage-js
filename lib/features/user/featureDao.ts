@@ -179,8 +179,12 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           let geometry;
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
-            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-            geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+            try {
+              geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+              geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+            } catch (e) {
+              console.log('Error parsing Geometry', e);
+            }
             if (geometry) {
               geometry.properties = featureRow.values;
               return {
@@ -245,8 +249,12 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
 
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
-            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-            geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+            try {
+              geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+              geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+            } catch (e) {
+              console.log('Error parsing Geometry', e);
+            }
             if (geometry) {
               geometry.properties = featureRow.values;
               return {
@@ -338,9 +346,13 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           let geometry: GeoJsonObject;
           while (!nextRow.done && !geometry) {
             featureRow = this.getRow(nextRow.value) as FeatureRow;
-            geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-            if (!skipVerification && boundingBox) {
-              geometry = FeatureDao.verifyFeature(geometry, boundingBox);
+            try {
+              geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+              if (!skipVerification && boundingBox) {
+                geometry = FeatureDao.verifyFeature(geometry, boundingBox);
+              }
+            } catch (e) {
+              console.log('Error parsing Geometry', e);
             }
             if (geometry) {
               const geoJson = {

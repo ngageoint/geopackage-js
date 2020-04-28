@@ -1,8 +1,8 @@
-var MBTilesToGeoPackage = require('../index.js');
+var MBTilesToGeoPackage = require('../index').MBTilesToGeoPackage;
 
 var path = require('path')
   , fs = require('fs')
-  , JSZip = require('jszip')
+  // , JSZip = require('jszip')
   , should = require('chai').should();
 
 describe('MBTiles to GeoPackage tests', function() {
@@ -14,9 +14,9 @@ describe('MBTiles to GeoPackage tests', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'two_layers.zip'));
     } catch (e) {}
-    try {
-      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
-    } catch (e) {}
+    // try {
+    //   fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
+    // } catch (e) {}
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm2.gpkg'));
     } catch (e) {}
@@ -65,16 +65,18 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
-  it('should convert the mbtiles file into a geopackage', function(done) {
+  it.only('should convert the mbtiles file into a geopackage', function(done) {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
     } catch (e) {}
     try {
       fs.mkdirSync(path.join(__dirname, 'fixtures', 'tmp'));
     } catch (e) {}
-    MBTilesToGeoPackage.convert({
+    const converter = new MBTilesToGeoPackage();
+
+    converter.convert({
       mbtiles: path.join(__dirname, 'fixtures', 'osm.mbtiles'),
-      geopackage: path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg')
+      geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg')
     }, function(status, callback) {
       callback();
     }, function(err, geopackage) {
