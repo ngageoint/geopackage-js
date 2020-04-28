@@ -15,6 +15,7 @@ import { GeoPackage } from '../../geoPackage';
 import { TileTable } from './tileTable';
 import { DataTypes } from '../../db/dataTypes';
 import { DBValue } from '../../db/dbAdapter';
+import { TileDaoUtils } from './tileDaoUtils';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -215,6 +216,96 @@ export class TileDao extends UserDao<TileRow> {
   getTileMatrixWithZoomLevel(zoomLevel: number): TileMatrix {
     return this.zoomLevelToTileMatrix[zoomLevel];
   }
+
+
+  /**
+   * Get the zoom level for the provided width and height in the default units
+   * @param length in default units
+   * @return zoom level
+   */
+  getZoomLevelForLength(length: number): number {
+    return TileDaoUtils.getZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
+  }
+
+  /**
+   * Get the zoom level for the provided width and height in the default units
+   * @param width in default units
+   * @param height in default units
+   * @return zoom level
+   * @since 1.2.1
+   */
+  getZoomLevelForWidthAndHeight(width: number, height: number): number {
+    return TileDaoUtils.getZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+  }
+
+  /**
+   * Get the closest zoom level for the provided width and height in the
+   * default units
+   * @param length in default units
+   * @return zoom level
+   * @since 1.2.1
+   */
+  getClosestZoomLevelForLength(length: number): number {
+    return TileDaoUtils.getClosestZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
+  }
+
+  /**
+   * Get the closest zoom level for the provided width and height in the
+   * default units
+   * @param width in default units
+   * @param height in default units
+   * @return zoom level
+   * @since 1.2.1
+   */
+  getClosestZoomLevelForWidthAndHeight(width: number, height: number): number {
+    return TileDaoUtils.getClosestZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+  }
+
+  /**
+   * Get the approximate zoom level for the provided length in the default
+   * units. Tiles may or may not exist for the returned zoom level. The
+   * approximate zoom level is determined using a factor of 2 from the zoom
+   * levels with tiles.
+   * @param length length in default units
+   * @return approximate zoom level
+   * @since 2.0.2
+   */
+  getApproximateZoomLevelForLength(length: number): number {
+    return TileDaoUtils.getApproximateZoomLevelForLength(this.widths, this.heights, this.tileMatrices, length);
+  }
+
+  /**
+   * Get the approximate zoom level for the provided width and height in the
+   * default units. Tiles may or may not exist for the returned zoom level.
+   * The approximate zoom level is determined using a factor of 2 from the
+   * zoom levels with tiles.
+   * @param width width in default units
+   * @param height height in default units
+   * @return approximate zoom level
+   * @since 2.0.2
+   */
+  getApproximateZoomLevelForWidthAndHeight(width: number, height: number): number {
+    return TileDaoUtils.getApproximateZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+  }
+
+  /**
+   * Get the max length in default units that contains tiles
+   * @return max distance length with tiles
+   * @since 1.2.0
+   */
+  getMaxLength(): number {
+    return TileDaoUtils.getMaxLengthForTileWidthsAndHeights(this.widths, this.heights);
+  }
+
+  /**
+   * Get the min length in default units that contains tiles
+   * @return min distance length with tiles
+   * @since 1.2.0
+   */
+  getMinLength(): number {
+    return TileDaoUtils.getMinLengthForTileWidthsAndHeights(this.widths, this.heights);
+  }
+
   /**
    * Query for a tile
    * @param  {Number} column    column

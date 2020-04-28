@@ -13,8 +13,9 @@ import { GeometryData } from './geom/geometryData';
 import { GeoPackageConnection } from './db/geoPackageConnection';
 import { CrsWktExtension } from './extension/crsWkt';
 import { RelatedTablesExtension } from './extension/relatedTables';
-import { FeatureStyleExtension } from './extension/style/.';
-import { ContentsIdExtension } from './extension/contents/.';
+import { FeatureStyleExtension } from './extension/style';
+import { ContentsIdExtension } from './extension/contents';
+import { TileScalingExtension } from './extension/scale';
 import { SpatialReferenceSystemDao } from './core/srs/spatialReferenceSystemDao';
 import { GeometryColumnsDao } from './features/columns/geometryColumnsDao';
 import { FeatureDao } from './features/user/featureDao';
@@ -33,6 +34,7 @@ import { ExtendedRelationDao } from './extension/relatedTables/extendedRelationD
 import { AttributeDao } from './attributes/attributeDao';
 import { TileDao } from './tiles/user/tileDao';
 import { ContentsIdDao } from './extension/contents/contentsIdDao';
+import { TileScalingDao } from './extension/scale/tileScalingDao';
 import { AttributeTable } from './attributes/attributeTable';
 import { TileTableReader } from './tiles/user/tileTableReader';
 import { AttributeTableReader } from './attributes/attributeTableReader';
@@ -124,7 +126,9 @@ export class GeoPackage {
   private _metadataDao: MetadataDao;
   private _extendedRelationDao: ExtendedRelationDao;
   private _contentsIdDao: ContentsIdDao;
+  private _tileScalingDao: TileScalingDao;
   private _contentsIdExtension: ContentsIdExtension;
+  private _tileScalingExtension: TileScalingExtension;
   private _featureStyleExtension: FeatureStyleExtension;
   private _relatedTablesExtension: RelatedTablesExtension;
 
@@ -206,11 +210,17 @@ export class GeoPackage {
   get contentsIdDao(): ContentsIdDao {
     return this._contentsIdDao || (this._contentsIdDao = new ContentsIdDao(this));
   }
+  get tileScalingDao(): TileScalingDao {
+    return this._tileScalingDao || (this._tileScalingDao = new TileScalingDao(this));
+  }
   get contentsIdExtension(): ContentsIdExtension {
     return this._contentsIdExtension || (this._contentsIdExtension = new ContentsIdExtension(this));
   }
   get featureStyleExtension(): FeatureStyleExtension {
     return this._featureStyleExtension || (this._featureStyleExtension = new FeatureStyleExtension(this));
+  }
+  getTileScalingExtension(tableName: string): TileScalingExtension {
+    return this._tileScalingExtension || (this._tileScalingExtension = new TileScalingExtension(this, tableName));
   }
   getGeometryIndexDao(featureDao: FeatureDao<FeatureRow>): GeometryIndexDao {
     return new GeometryIndexDao(this, featureDao);
