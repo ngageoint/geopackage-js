@@ -21,7 +21,8 @@ type TableCreatorScripts =
   | 'geometry_index'
   | 'feature_tile_link'
   | 'extended_relations'
-  | 'contents_id';
+  | 'contents_id'
+  | 'tile_scaling';
 
 /**
  * `TableCreator` provides methods for creating the various standard tables in
@@ -156,6 +157,13 @@ export class TableCreator {
    */
   createContentsId(): Promise<boolean> {
     return this.createTable('contents_id');
+  }
+  /**
+   * Creates the tileScaling tables
+   * @return {Promise<Boolean>}
+   */
+  createTileScaling(): Promise<boolean> {
+    return this.createTable('tile_scaling');
   }
   /**
    * Creates all tables necessary for the specified table creation script name in the GeoPackage
@@ -658,11 +666,22 @@ export class TableCreator {
     ],
     contents_id: [
       'CREATE TABLE nga_contents_id (' +
-        '  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,' +
-        '  table_name TEXT NOT NULL,' +
-        '  CONSTRAINT uk_nci_table_name UNIQUE (table_name),' +
-        '  CONSTRAINT fk_nci_gc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)' +
-        ')',
+      '  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,' +
+      '  table_name TEXT NOT NULL,' +
+      '  CONSTRAINT uk_nci_table_name UNIQUE (table_name),' +
+      '  CONSTRAINT fk_nci_gc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)' +
+      ')',
+    ],
+    tile_scaling: [
+      'CREATE TABLE nga_tile_scaling (' +
+      '  table_name TEXT PRIMARY KEY NOT NULL,' +
+      '  scaling_type TEXT NOT NULL,' +
+      '  zoom_in INTEGER,' +
+      '  zoom_out INTEGER,' +
+      '  CONSTRAINT fk_nts_gtms_tn FOREIGN KEY (table_name) ' +
+      '  REFERENCES gpkg_tile_matrix_set (table_name),' +
+      "  CHECK (scaling_type in ('in','out','in_out','out_in','closest_in_out','closest_out_in'))" +
+      ')',
     ],
   };
 }
