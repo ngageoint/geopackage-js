@@ -37,6 +37,7 @@ require('./lib/extension/testExtensionDao');
 require('./lib/extension/contents/testContentsIdDao');
 require('./lib/extension/style/testIconCache');
 require('./lib/extension/style/testStyleExtension');
+require('./lib/extension/scale/testTileScalingExtension');
 
 describe('Array', function() {
   describe('#indexOf()', function() {

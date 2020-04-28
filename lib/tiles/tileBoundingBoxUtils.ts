@@ -2,6 +2,7 @@ import { TileGrid } from './tileGrid';
 import { BoundingBox } from '../boundingBox';
 import proj4 from 'proj4';
 import { TileMatrix } from './matrix/tileMatrix';
+import Intersect from '@turf/intersect';
 
 /**
  * This module exports utility functions for [slippy map (XYZ)](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
@@ -167,6 +168,10 @@ export class TileBoundingBoxUtils {
    */
   static tileSizeWithTilesPerSide(tilesPerSide: number): number {
     return (2 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+  }
+
+  static intersects(boundingBoxA: BoundingBox, boundingBoxB: BoundingBox): boolean {
+    return Intersect(boundingBoxA.toGeoJSON().geometry, boundingBoxB.toGeoJSON().geometry) != null;
   }
 
   /**
