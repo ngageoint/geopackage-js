@@ -23,6 +23,9 @@ import { DublinCoreType } from './lib/extension/relatedTables/dublinCoreType';
 import { BoundingBox } from './lib/boundingBox';
 import { GeoPackageAPI } from './lib/api';
 import { Metadata } from './lib/metadata/metadata';
+import { FeatureTableStyles } from './lib/extension/style/featureTableStyles';
+import { TileScaling } from './lib/extension/scale/tileScaling';
+import { TileScalingType } from './lib/extension/scale/tileScalingType';
 import { FeatureTiles } from './lib/tiles/features';
 import { NumberFeaturesTile } from './lib/tiles/features/custom/numberFeaturesTile';
 import { ShadedFeaturesTile } from './lib/tiles/features/custom/shadedFeaturesTile';
@@ -56,10 +59,13 @@ export {
   WebPExtension,
   DataColumnsDao,
   DataColumnConstraintsDao,
+  FeatureTableStyles,
   FeatureTiles,
   NumberFeaturesTile,
   ShadedFeaturesTile,
   BoundingBox,
   DataTypes,
   ClosestFeature,
+  TileScaling,
+  TileScalingType,
 };
