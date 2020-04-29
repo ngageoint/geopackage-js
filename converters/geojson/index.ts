@@ -12,7 +12,7 @@ import bbox from '@turf/bbox';
 
 export interface GeoJSONConverterOptions {
   append?: boolean;
-  geoPackage?: GeoPackage;
+  geoPackage?: GeoPackage | string;
   srsNumber?: number;
   tableName?: string;
   geoJson?: any;
@@ -245,7 +245,7 @@ export class GeoJSONToGeoPackage {
   }
 
   async createOrOpenGeoPackage(
-    geopackage: GeoPackage,
+    geopackage: GeoPackage | string,
     options: GeoJSONConverterOptions,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
