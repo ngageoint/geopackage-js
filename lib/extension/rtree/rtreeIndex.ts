@@ -78,23 +78,23 @@ export class RTreeIndex extends BaseExtension {
   }
   createAllTriggers(): boolean {
     const insertTrigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_insert AFTER INSERT ON ' +
+      '_insert" AFTER INSERT ON "' +
       this.tableName +
-      '  WHEN (new.' +
+      '" WHEN (new.' +
       this.columnName +
       ' NOT NULL AND NOT ST_IsEmpty(NEW.' +
       this.columnName +
       ')) ' +
       'BEGIN ' +
-      '  INSERT OR REPLACE INTO rtree_' +
+      '  INSERT OR REPLACE INTO "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' VALUES (' +
+      '" VALUES (' +
       '    NEW.' +
       this.primaryKeyColumn +
       ',' +
@@ -111,15 +111,15 @@ export class RTreeIndex extends BaseExtension {
       '  ); ' +
       'END;';
     const update1Trigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_update1 AFTER UPDATE OF ' +
+      '_update1" AFTER UPDATE OF ' +
       this.columnName +
-      ' ON ' +
+      ' ON "' +
       this.tableName +
-      '  WHEN OLD.' +
+      '" WHEN OLD.' +
       this.primaryKeyColumn +
       ' = NEW.' +
       this.primaryKeyColumn +
@@ -130,11 +130,11 @@ export class RTreeIndex extends BaseExtension {
       this.columnName +
       ')) ' +
       'BEGIN ' +
-      '  INSERT OR REPLACE INTO rtree_' +
+      '  INSERT OR REPLACE INTO "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' VALUES (' +
+      '" VALUES (' +
       '    NEW.' +
       this.primaryKeyColumn +
       ',' +
@@ -151,15 +151,15 @@ export class RTreeIndex extends BaseExtension {
       '  ); ' +
       'END;';
     const update2Trigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_update2 AFTER UPDATE OF ' +
+      '_update2" AFTER UPDATE OF ' +
       this.columnName +
-      ' ON ' +
+      ' ON "' +
       this.tableName +
-      '  WHEN OLD.' +
+      '" WHEN OLD.' +
       this.primaryKeyColumn +
       ' = NEW.' +
       this.primaryKeyColumn +
@@ -170,24 +170,24 @@ export class RTreeIndex extends BaseExtension {
       this.columnName +
       ')) ' +
       'BEGIN ' +
-      '  DELETE FROM rtree_' +
+      '  DELETE FROM "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' WHERE id = OLD.' +
+      '" WHERE id = OLD.' +
       this.primaryKeyColumn +
       '; ' +
       'END;';
     const update3Trigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_update3 AFTER UPDATE OF ' +
+      '_update3" AFTER UPDATE OF ' +
       this.columnName +
-      ' ON ' +
+      ' ON "' +
       this.tableName +
-      '  WHEN OLD.' +
+      '" WHEN OLD.' +
       this.primaryKeyColumn +
       ' != NEW.' +
       this.primaryKeyColumn +
@@ -198,18 +198,18 @@ export class RTreeIndex extends BaseExtension {
       this.columnName +
       ')) ' +
       'BEGIN ' +
-      '  DELETE FROM rtree_' +
+      '  DELETE FROM "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' WHERE id = OLD.' +
+      '" WHERE id = OLD.' +
       this.primaryKeyColumn +
       '; ' +
-      '  INSERT OR REPLACE INTO rtree_' +
+      '  INSERT OR REPLACE INTO "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' VALUES (' +
+      '" VALUES (' +
       '    NEW.' +
       this.primaryKeyColumn +
       ', ' +
@@ -226,13 +226,13 @@ export class RTreeIndex extends BaseExtension {
       '  ); ' +
       'END;';
     const update4Trigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_update4 AFTER UPDATE ON ' +
+      '_update4" AFTER UPDATE ON "' +
       this.tableName +
-      '  WHEN OLD.' +
+      '"  WHEN OLD.' +
       this.primaryKeyColumn +
       ' != NEW.' +
       this.primaryKeyColumn +
@@ -243,32 +243,32 @@ export class RTreeIndex extends BaseExtension {
       this.columnName +
       ')) ' +
       'BEGIN ' +
-      '  DELETE FROM rtree_' +
+      '  DELETE FROM "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' WHERE id IN (OLD.' +
+      '" WHERE id IN (OLD.' +
       this.primaryKeyColumn +
       ', NEW.' +
       this.primaryKeyColumn +
       '); ' +
       'END;';
     const deleteTrigger =
-      'CREATE TRIGGER rtree_' +
+      'CREATE TRIGGER "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      '_delete AFTER DELETE ON ' +
+      '_delete" AFTER DELETE ON "' +
       this.tableName +
-      '  WHEN old.' +
+      '" WHEN old.' +
       this.columnName +
       ' NOT NULL ' +
       'BEGIN' +
-      '  DELETE FROM rtree_' +
+      '  DELETE FROM "rtree_' +
       this.tableName +
       '_' +
       this.columnName +
-      ' WHERE id = OLD.' +
+      '" WHERE id = OLD.' +
       this.primaryKeyColumn +
       '; ' +
       'END;';
@@ -284,33 +284,33 @@ export class RTreeIndex extends BaseExtension {
   loadRTreeIndex(): boolean {
     return (
       this.connection.run(
-        'INSERT OR REPLACE INTO rtree_' +
-          this.tableName +
-          '_' +
-          this.columnName +
-          ' SELECT ' +
-          this.primaryKeyColumn +
-          ', st_minx(' +
-          this.columnName +
-          '), st_maxx(' +
-          this.columnName +
-          '), st_miny(' +
-          this.columnName +
-          '), st_maxy(' +
-          this.columnName +
-          ') FROM ' +
-          this.tableName,
+        'INSERT OR REPLACE INTO "rtree_' +
+        this.tableName +
+        '_' +
+        this.columnName +
+        '" SELECT ' +
+        this.primaryKeyColumn +
+        ', st_minx(' +
+        this.columnName +
+        '), st_maxx(' +
+        this.columnName +
+        '), st_miny(' +
+        this.columnName +
+        '), st_maxy(' +
+        this.columnName +
+        ') FROM "' +
+        this.tableName + '"',
       ).changes === 1
     );
   }
   createRTreeIndex(): boolean {
     return (
       this.connection.run(
-        'CREATE VIRTUAL TABLE rtree_' +
-          this.tableName +
-          '_' +
-          this.columnName +
-          ' USING rtree(id, minx, maxx, miny, maxy)',
+        'CREATE VIRTUAL TABLE "rtree_' +
+        this.tableName +
+        '_' +
+        this.columnName +
+        '" USING rtree(id, minx, maxx, miny, maxy)',
       ).changes === 1
     );
   }
