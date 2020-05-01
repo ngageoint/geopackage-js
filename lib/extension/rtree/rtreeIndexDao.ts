@@ -87,18 +87,18 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
     whereArgs.push(envelope.maxY, envelope.minY);
     return {
       join:
-        'inner join ' +
+        'inner join "' +
         tableName +
-        ' on ' +
+        '" on "' +
         tableName +
-        '.' +
+        '".' +
         this.featureDao.idColumns[0] +
-        ' = ' +
+        ' = "' +
         this.gpkgTableName +
-        '.id',
+        '".id',
       where,
       whereArgs,
-      tableNameArr: [tableName + '.*'],
+      tableNameArr: ['"' + tableName + '".*'],
     };
   }
   /**
