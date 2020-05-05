@@ -236,12 +236,12 @@ export class GeoPackageTileRetriever {
                 }
 
                 zoomLevels = [];
-                const maxLevels = Math.max(firstLevels.size(), secondLevels.size());
+                const maxLevels = Math.max(firstLevels.length, secondLevels.length);
                 for (let i = 0; i < maxLevels; i++) {
-                  if (i < firstLevels.size()) {
+                  if (i < firstLevels.length) {
                     zoomLevels.push(firstLevels[i]);
                   }
-                  if (i < secondLevels.size()) {
+                  if (i < secondLevels.length) {
                     zoomLevels.push(secondLevels[i]);
                   }
                 }
