@@ -1710,6 +1710,12 @@ export class GeoPackage {
     height = Number(height);
     const tileDao = this.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height);
+    if (this.getTileScalingExtension(table).has()) {
+      const tileScaling = this.getTileScalingExtension(table).dao.queryForTableName(table)
+      if (tileScaling) {
+        retriever.setScaling(tileScaling)
+      }
+    }
     if (!canvas) {
       return retriever.getTile(x, y, z);
     } else {
