@@ -113,8 +113,9 @@ export class GeoPackageTileRetriever {
     const projectedBoundingBox = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
 
     const tileMatrices = this.getTileMatrices(projectedBoundingBox);
+    let tileFound = false;
     let tile = null;
-    for (let i = 0; !tile && i < tileMatrices.length; i++) {
+    for (let i = 0; !tileFound && i < tileMatrices.length; i++) {
       const tileMatrix = tileMatrices[i];
       const tileWidth = tileMatrix.tile_width;
       const tileHeight = tileMatrix.tile_height;
@@ -131,8 +132,9 @@ export class GeoPackageTileRetriever {
       const iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
       for (const tile of iterator) {
         await creator.addTile(tile.tileData, tile.tileColumn, tile.row);
+        tileFound = true;
       }
-      if (!canvas) {
+      if (!canvas && tileFound) {
         tile = creator.getCompleteTile('png');
       }
     }
