@@ -137,7 +137,7 @@ export class CanvasTileCreator extends TileCreator {
         const work = require('webworkify');
         const worker = work(require('./tileWorker.js'));
         worker.onmessage = (e: { data: any }): void => {
-          resolve(this.workerDone(e.data, piecePosition, ctx));
+          resolve(CanvasTileCreator.workerDone(e.data, piecePosition, ctx));
         };
         worker.postMessage(job, [
           this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
@@ -145,12 +145,12 @@ export class CanvasTileCreator extends TileCreator {
       } catch (e) {
         const worker = ProjectTile;
         worker(job, function(err: any, data: any) {
-          resolve(this.workerDone(data, piecePosition, ctx));
+          resolve(CanvasTileCreator.workerDone(data, piecePosition, ctx));
         });
       }
     });
   }
-  workerDone(data: any, piecePosition: any, ctx: any): void {
+  static workerDone(data: any, piecePosition: any, ctx: any): void {
     if (data.message === 'done') {
       const imageData = new Uint8ClampedArray(data.imageData);
       const offsetX = piecePosition.startX;
