@@ -70,6 +70,7 @@ export class CanvasTileCreator extends TileCreator {
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<void> {
     await this.loadImage(tileData);
     // This is being cut and scaled
+    await this.projectTile(tileData, gridColumn, gridRow);
     if (this.chunks && this.chunks.length) {
       return this.chunks.reduce((sequence, chunk) => {
         const type = fileType(tileData);
@@ -94,9 +95,6 @@ export class CanvasTileCreator extends TileCreator {
           });
         });
       }, Promise.resolve());
-    } else {
-      // otherwise, project the tile
-      return this.projectTile(tileData, gridColumn, gridRow);
     }
   }
   async getCompleteTile(): Promise<any> {
@@ -145,7 +143,6 @@ export class CanvasTileCreator extends TileCreator {
           this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
         ]);
       } catch (e) {
-        console.error(e)
         const worker = ProjectTile;
         worker(job, function(err: any, data: any) {
           resolve(CanvasTileCreator.workerDone(data, piecePosition, ctx));
