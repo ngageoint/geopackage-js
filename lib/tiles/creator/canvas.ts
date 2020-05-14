@@ -61,6 +61,7 @@ export class CanvasTileCreator extends TileCreator {
     return new Promise((resolve: Function) => {
       this.chunks = [];
       this.image.onload = (): void => {
+        this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
         resolve(this.tileContext.drawImage(this.image, 0, 0));
       };
       this.image.src = 'data:' + type.mime + ';base64,' + base64Data;
