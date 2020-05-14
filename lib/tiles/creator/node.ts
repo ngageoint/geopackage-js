@@ -53,6 +53,7 @@ export class NodeTileCreator extends TileCreator {
   }
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
     const tile = await ImageUtils.getImage(tileData);
+    this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
     this.tileContext.drawImage(tile, 0, 0);
     this.chunks = [];
     await this.projectTile(tileData, gridColumn, gridRow);

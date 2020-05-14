@@ -61,6 +61,7 @@ export class CanvasTileCreator extends TileCreator {
     return new Promise((resolve: Function) => {
       this.chunks = [];
       this.image.onload = (): void => {
+        this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
         resolve(this.tileContext.drawImage(this.image, 0, 0));
       };
       this.image.src = 'data:' + type.mime + ';base64,' + base64Data;
@@ -68,9 +69,9 @@ export class CanvasTileCreator extends TileCreator {
   }
 
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<void> {
-    const type = fileType(tileData);
     await this.loadImage(tileData);
-    this.projectTile(tileData, gridColumn, gridRow);
+    // This is being cut and scaled
+    await this.projectTile(tileData, gridColumn, gridRow);
     if (this.chunks && this.chunks.length) {
       return this.chunks.reduce((sequence, chunk) => {
         const type = fileType(tileData);
