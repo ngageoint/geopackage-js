@@ -1,5 +1,5 @@
 const
-    TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
+  TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
   , TileUtils = require('../../../lib/tiles/creator/tileUtilities')
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox;
 
@@ -14,7 +14,7 @@ describe('TileBoundingBoxUtils tests', function() {
 
 
     var maxColumn = TileBoundingBoxUtils.getTileColumnWithTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
-    maxColumn.should.be.equal(2);
+    maxColumn.should.be.equal(3);
     done();
   });
 
