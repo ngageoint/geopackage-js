@@ -65,7 +65,7 @@ describe('MBTiles to GeoPackage tests', function() {
     });
   });
 
-  it.only('should convert the mbtiles file into a geopackage', function(done) {
+  it.only('should convert the mbtiles file into a geopackage', function() {
     try {
       fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'));
     } catch (e) {}
@@ -76,11 +76,11 @@ describe('MBTiles to GeoPackage tests', function() {
 
     converter.convert({
       mbtiles: path.join(__dirname, 'fixtures', 'osm.mbtiles'),
-      geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg')
+      geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'osm.gpkg'),
+      readonly: true
     }, function(status, callback) {
       callback();
-    }, function(err, geopackage) {
-      should.not.exist(err);
+    }).then(function(geopackage) {
       should.exist(geopackage);
       geopackage.getTileTables(function(err, tables) {
         tables.length.should.be.equal(1);

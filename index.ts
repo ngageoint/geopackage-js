@@ -32,6 +32,10 @@ import { ShadedFeaturesTile } from './lib/tiles/features/custom/shadedFeaturesTi
 import { GeoPackageTileRetriever } from './lib/tiles/retriever';
 import TileUtilities from './lib/tiles/creator/tileUtilities';
 import { ClosestFeature, GeoPackage } from './lib/geoPackage';
+import { ContentsDao } from './lib/core/contents/contentsDao';
+import { TileMatrixSet } from './lib/tiles/matrixset/tileMatrixSet';
+import { TileMatrix } from './lib/tiles/matrix/tileMatrix';
+import { TileBoundingBoxUtils } from './lib/tiles/tileBoundingBoxUtils';
 
 export {
   proj4Defs,
@@ -68,4 +72,8 @@ export {
   ClosestFeature,
   TileScaling,
   TileScalingType,
+  ContentsDao,
+  TileMatrixSet,
+  TileMatrix,
+  TileBoundingBoxUtils,
 };

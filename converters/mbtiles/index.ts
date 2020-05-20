@@ -15,6 +15,8 @@ export interface MBTilesConverterOptions {
   append?: boolean;
   geoPackage?: string;
   mbtiles?: string;
+  readonly?: boolean;
+  keepOriginalTables?: boolean;
 }
 
 export class MBTilesToGeoPackage {
@@ -113,39 +115,54 @@ export class MBTilesToGeoPackage {
       tileMatrixDao.create(tileMatrix);
     }
 
-    const rowMapCreateTable = `CREATE TABLE gpkg_tms_row_map (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      zoom_level INTEGER,
-      tile_column INTEGER,
-      tile_row INTEGER,
-      tms_tile_row INTEGER
-    )`;
+    // if readonly, we can simply create views that map mbtiles rows to geopackage rows
+    // This could be enhanced in the future to use view triggers, however if the mbtiles file already used a view for the tiles table
+    // we would need to be cognizant of where the real data came from
+    console.log('options.readonly?', options.readonly);
+    if (options.readonly) {
+      const rowMapCreateTable = `CREATE TABLE gpkg_tms_row_map (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        zoom_level INTEGER,
+        tile_column INTEGER,
+        tile_row INTEGER,
+        tms_tile_row INTEGER
+      )`;
 
-    const insertRowMapRows = `INSERT INTO gpkg_tms_row_map(zoom_level, tile_column, tile_row, tms_tile_row)
+      const insertRowMapRows = `INSERT INTO gpkg_tms_row_map(zoom_level, tile_column, tile_row, tms_tile_row)
+        SELECT
+        tiles.zoom_level AS zoom_level,
+        tiles.tile_column AS tile_column,
+        tm.matrix_height - 1 - tiles.tile_row as tile_row,
+        tiles.tile_row AS tms_tile_row
+        FROM tiles JOIN
+        gpkg_tile_matrix tm ON tiles.zoom_level = tm.zoom_level AND tm.table_name = '${name}'`;
+
+      const tileGpkgView = `CREATE VIEW ${name} AS
       SELECT
-      tiles.zoom_level AS zoom_level,
-      tiles.tile_column AS tile_column,
-      tm.matrix_height - 1 - tiles.tile_row as tile_row,
-      tiles.tile_row AS tms_tile_row
-      FROM tiles JOIN
-      gpkg_tile_matrix tm ON tiles.zoom_level = tm.zoom_level AND tm.table_name = '${name}'`;
+      gpkg_tms_row_map.id AS id,
+      gpkg_tms_row_map.zoom_level AS zoom_level,
+      gpkg_tms_row_map.tile_column AS tile_column,
+      gpkg_tms_row_map.tile_row as tile_row,
+      t.tile_data AS tile_data
+      FROM gpkg_tms_row_map JOIN
+      tiles t ON gpkg_tms_row_map.zoom_level = t.zoom_level 
+      AND gpkg_tms_row_map.tms_tile_row = t.tile_row 
+      AND gpkg_tms_row_map.tile_column = t.tile_column `;
 
-    const tileGpkgView = `CREATE VIEW ${name} AS
-    SELECT
-    gpkg_tms_row_map.id AS id,
-    gpkg_tms_row_map.zoom_level AS zoom_level,
-    gpkg_tms_row_map.tile_column AS tile_column,
-    gpkg_tms_row_map.tile_row as tile_row,
-    t.tile_data AS tile_data
-    FROM gpkg_tms_row_map JOIN
-    tiles t ON gpkg_tms_row_map.zoom_level = t.zoom_level 
-    AND gpkg_tms_row_map.tms_tile_row = t.tile_row 
-    AND gpkg_tms_row_map.tile_column = t.tile_column `;
+      const db = geoPackage.database.adapter;
+      const rowCreateResult = db.run(rowMapCreateTable);
+      const insertRowMapResult = db.run(insertRowMapRows);
+      const tileGpkgViewResult = db.run(tileGpkgView);
+      console.log('row create result', rowCreateResult);
+      console.log('insert row map result', insertRowMapResult);
+      console.log('tilegpkgviewresult', tileGpkgViewResult);
+    } else {
+      // if we want to create a non-readonly geopackage, the safest thing to do is to rewrite the data into geopackage tables
 
-    const db = geoPackage.database.adapter;
-    db.run(rowMapCreateTable);
-    db.run(insertRowMapRows);
-    db.run(tileGpkgView);
+      // If we do not want to keep the original tables, in order to not duplicate data they can be deleted here
+      if (options.keepOriginalTables) {
+      }
+    }
 
     return geoPackage;
   }
