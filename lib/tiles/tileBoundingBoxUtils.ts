@@ -2,7 +2,6 @@ import { TileGrid } from './tileGrid';
 import { BoundingBox } from '../boundingBox';
 import proj4 from 'proj4';
 import { TileMatrix } from './matrix/tileMatrix';
-import Intersect from '@turf/intersect';
 
 /**
  * This module exports utility functions for [slippy map (XYZ)](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames)
@@ -171,7 +170,18 @@ export class TileBoundingBoxUtils {
   }
 
   static intersects(boundingBoxA: BoundingBox, boundingBoxB: BoundingBox): boolean {
-    return Intersect(boundingBoxA.toGeoJSON().geometry, boundingBoxB.toGeoJSON().geometry) != null;
+    return TileBoundingBoxUtils.intersection(boundingBoxA, boundingBoxB) != null;
+  }
+
+  static intersection(boundingBoxA: BoundingBox, boundingBoxB: BoundingBox): BoundingBox {
+    const x1 = Math.max(boundingBoxA.minLongitude, boundingBoxB.minLongitude);
+    const y1 = Math.max(boundingBoxA.minLatitude, boundingBoxB.minLatitude);
+    const x2 = Math.min(boundingBoxA.maxLongitude, boundingBoxB.maxLongitude);
+    const y2 = Math.min(boundingBoxA.maxLatitude,  boundingBoxB.maxLatitude);
+    if (x1 > x2 || y1 > y2) {
+      return null;
+    }
+    return new BoundingBox(x1, x2, y1, y2);
   }
 
   /**
@@ -209,7 +219,6 @@ export class TileBoundingBoxUtils {
       totalBoundingBox,
       matrixWidth,
       boundingBox.maxLongitude,
-      true,
     );
     if (minColumn < matrixWidth && maxColumn >= 0) {
       if (minColumn < 0) {
@@ -224,7 +233,6 @@ export class TileBoundingBoxUtils {
       totalBoundingBox,
       matrixHeight,
       boundingBox.minLatitude,
-      true,
     );
     let minRow = TileBoundingBoxUtils.getRowWithTotalBoundingBox(
       totalBoundingBox,
@@ -258,7 +266,6 @@ export class TileBoundingBoxUtils {
     webMercatorTotalBox: BoundingBox,
     matrixWidth: number,
     longitude: number,
-    max?: boolean,
   ): number {
     const minX = webMercatorTotalBox.minLongitude;
     const maxX = webMercatorTotalBox.maxLongitude;
@@ -272,12 +279,6 @@ export class TileBoundingBoxUtils {
       const tileWidth = matrixWidthMeters / matrixWidth;
       const tileIdDouble = (longitude - minX) / tileWidth;
       tileId = ~~tileIdDouble;
-      if (max) {
-        // if the edge lands right on the calculated edge, subtract one
-        if (tileIdDouble === tileId) {
-          tileId--;
-        }
-      }
     }
     return tileId;
   }
@@ -295,7 +296,6 @@ export class TileBoundingBoxUtils {
     webMercatorTotalBox: BoundingBox,
     matrixHeight: number,
     latitude: number,
-    max?: boolean,
   ): number {
     const minY = webMercatorTotalBox.minLatitude;
     const maxY = webMercatorTotalBox.maxLatitude;
@@ -310,12 +310,6 @@ export class TileBoundingBoxUtils {
       const tileHeight = matrixHeightMeters / matrixHeight;
       const tileIdDouble = (maxY - latitude) / tileHeight;
       tileId = ~~tileIdDouble;
-      if (max) {
-        // if the edge lands right on the calculated edge, add one
-        if (tileIdDouble === tileId) {
-          tileId--;
-        }
-      }
     }
     return tileId;
   }
@@ -509,5 +503,14 @@ export class TileBoundingBoxUtils {
    */
   static toleranceDistanceWidthAndHeight(zoom: number, pixelWidth: number, pixelHeight: number): number {
     return this.toleranceDistance(zoom, Math.max(pixelWidth, pixelHeight));
+  }
+
+  static getFloatRoundedRectangle(width: number, height: number, boundingBox: BoundingBox, boundingBoxSection: any ) {
+    const left = Math.round(TileBoundingBoxUtils.getXPixel(width, boundingBox, boundingBoxSection.minLongitude));
+    const right = Math.round(TileBoundingBoxUtils.getXPixel(width, boundingBox, boundingBoxSection.maxLongitude));
+    const top = Math.round(TileBoundingBoxUtils.getYPixel(height, boundingBox, boundingBoxSection.maxLatitude));
+    const bottom = Math.round(TileBoundingBoxUtils.getYPixel(height, boundingBox, boundingBoxSection.minLatitude));
+    const isValid = left < right && top < bottom;
+    return { left, right, bottom, top, isValid };
   }
 }

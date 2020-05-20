@@ -496,7 +496,11 @@ export class FeatureTiles {
     const tileCount = this.featureDao.countWebMercatorBoundingBox(expandedBoundingBox);
     if (this.maxFeaturesPerTile === null || tileCount <= this.maxFeaturesPerTile) {
       const iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
+      const featureRows = [];
       for (const featureRow of iterator) {
+        featureRows.push(featureRow);
+      }
+      for (const featureRow of featureRows) {
         let geojson = null;
         if (this.cacheGeometries) {
           geojson = this.geometryCache.getGeometryForFeatureRow(featureRow);

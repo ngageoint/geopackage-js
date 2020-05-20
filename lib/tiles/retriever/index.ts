@@ -1,4 +1,3 @@
-import proj4 from 'proj4';
 import { TileDao } from '../user/tileDao';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
@@ -52,13 +51,15 @@ export class GeoPackageTileRetriever {
     let hasTile = false;
     if (x >= 0 && y >= 0 && zoom >= 0) {
       const tilesBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-      hasTile = this.hasTileForBoundingBox(tilesBoundingBox);
+      hasTile = this.hasTileForBoundingBox(tilesBoundingBox, 'EPSG:3857');
     }
     return hasTile;
   }
 
-  hasTileForBoundingBox(tilesBoundingBox: BoundingBox): boolean {
-    const tileMatrices = this.getTileMatrices(tilesBoundingBox);
+  hasTileForBoundingBox(tilesBoundingBox: BoundingBox, targetProjection: string): boolean {
+    const projectedBoundingBox = tilesBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
+
+    const tileMatrices = this.getTileMatrices(projectedBoundingBox);
     let hasTile = false;
     for (let i = 0; !hasTile && i < tileMatrices.length; i++) {
       const tileMatrix = tileMatrices[i];
@@ -66,9 +67,9 @@ export class GeoPackageTileRetriever {
         this.tileDao.tileMatrixSet.boundingBox,
         tileMatrix.matrix_width,
         tileMatrix.matrix_height,
-        tilesBoundingBox,
+        projectedBoundingBox,
       );
-      hasTile = !!this.tileDao.countByTileGrid(tileGrid, tileMatrix.zoom_level);
+      hasTile = this.tileDao.countByTileGrid(tileGrid, tileMatrix.zoom_level) > 0;
     }
     return hasTile;
   }
@@ -113,8 +114,9 @@ export class GeoPackageTileRetriever {
     const projectedBoundingBox = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
 
     const tileMatrices = this.getTileMatrices(projectedBoundingBox);
+    let tileFound = false;
     let tile = null;
-    for (let i = 0; !tile && i < tileMatrices.length; i++) {
+    for (let i = 0; !tileFound && i < tileMatrices.length; i++) {
       const tileMatrix = tileMatrices[i];
       const tileWidth = tileMatrix.tile_width;
       const tileHeight = tileMatrix.tile_height;
@@ -128,11 +130,21 @@ export class GeoPackageTileRetriever {
         targetProjection,
         canvas,
       );
-      const iterator = this.retrieveTileResults(targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection), tileMatrix);
+      const iterator = this.retrieveTileResults(projectedBoundingBox, tileMatrix);
       for (const tile of iterator) {
-        await creator.addTile(tile.tileData, tile.tileColumn, tile.row);
+        // Get the bounding box of the tile
+        const tileBoundingBox = TileBoundingBoxUtils.getTileBoundingBox(this.tileDao.tileMatrixSet.boundingBox, tileMatrix, tile.tileColumn, tile.row);
+        const overlap = TileBoundingBoxUtils.intersection(projectedBoundingBox, tileBoundingBox);
+        if (overlap != null) {
+          const src = TileBoundingBoxUtils.getFloatRoundedRectangle(tileMatrix.tile_width, tileMatrix.tile_height, tileBoundingBox, overlap)
+          const dest = TileBoundingBoxUtils.getFloatRoundedRectangle(this.width, this.height, projectedBoundingBox, overlap)
+          if (src.isValid && dest.isValid) {
+            await creator.addTile(tile.tileData, tile.tileColumn, tile.row);
+            tileFound = true;
+          }
+        }
       }
-      if (!canvas) {
+      if (!canvas && tileFound) {
         tile = creator.getCompleteTile('png');
       }
     }
@@ -236,12 +248,12 @@ export class GeoPackageTileRetriever {
                 }
 
                 zoomLevels = [];
-                const maxLevels = Math.max(firstLevels.size(), secondLevels.size());
+                const maxLevels = Math.max(firstLevels.length, secondLevels.length);
                 for (let i = 0; i < maxLevels; i++) {
-                  if (i < firstLevels.size()) {
+                  if (i < firstLevels.length) {
                     zoomLevels.push(firstLevels[i]);
                   }
-                  if (i < secondLevels.size()) {
+                  if (i < secondLevels.length) {
                     zoomLevels.push(secondLevels[i]);
                   }
                 }
