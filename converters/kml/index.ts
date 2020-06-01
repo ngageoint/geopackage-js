@@ -6,11 +6,11 @@ import {
   DataTypes,
   BoundingBox,
 } from '@ngageoint/geopackage';
-import fs from 'fs';
-import path from 'path';
-import bbox from '@turf/bbox';
+const fs = require('fs');
+const path = require('path');
+// import bbox from '@turf/bbox';
 
-import xmlStream from 'xml-stream';
+const xmlStream = require('xml-stream');
 
 export interface KMLConverterOptions {
   append?: boolean;
@@ -28,7 +28,7 @@ export class KMLToGeoPackage {
     // geopackage: GeoPackage,
     tableName: string,
   ): void {
-    this.streamKML('KML_Samples.kml', 0);
+    this.streamKML('../KML_Samples.kml', 0);
   }
 
   streamKML(kml: string, pass: number): void {
@@ -46,5 +46,5 @@ export class KMLToGeoPackage {
     }
   }
 }
-const test = new KMLToGeoPackage();
-test.convertKMLToGeoPackage('', '');
+// const test = new KMLToGeoPackage();
+// test.convertKMLToGeoPackage('', '');

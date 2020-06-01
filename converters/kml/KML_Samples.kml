@@ -102,7 +102,6 @@
         ]]></text>
       </BalloonStyle>
     </Style>
-    
     <Folder>
       <name>Placemarks</name>
       <description>These are just some of the different kinds of placemarks with
@@ -162,7 +161,6 @@
         </Point>
       </Placemark>
     </Folder>
-
     <Folder>
       <name>Styles and Markup</name>
       <visibility>0</visibility>

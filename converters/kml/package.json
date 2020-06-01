@@ -60,6 +60,7 @@
   "files": [
     "built",
     "index.ts",
+    "test.js",
     "cli",
     "lib"
   ],
