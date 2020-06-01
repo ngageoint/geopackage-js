@@ -10,27 +10,41 @@ import fs from 'fs';
 import path from 'path';
 import bbox from '@turf/bbox';
 
-const xmlStream = require('xml-stream');
+import xmlStream from 'xml-stream';
 
 export interface KMLConverterOptions {
   append?: boolean;
   geoPackage?: GeoPackage | string;
   srsNumber?: number;
- tableName?: string;
+  tableName?: string;
   geoJson?: any;
 }
 
 export class KMLToGeoPackage {
   constructor(private options?: KMLToGeoPackage) {}
 
-  async convertKMLToGeoPackage(
-    kml: any, 
-    geopackage: GeoPackage,
-    tableName: string
-  ): Promise<GeoPackage> {
-    console.log("Hello")
+  convertKMLToGeoPackage(
+    kml: string, 
+    // geopackage: GeoPackage,
+    tableName: string,
+  ): void {
+    this.streamKML('KML_Samples.kml', 0);
   }
 
-  async
-  
+  streamKML(kml: string, pass: number): void {
+    if (pass === 0) {
+      const stream = fs.createReadStream(path.join(__dirname, kml));
+      const xml = new xmlStream(stream);
+      xml.on('endElement: Placemark', function(node) {
+        console.log(node);
+        console.log(node.hasOwnProperty("LookAt"));
+        // FeatureColumn.createColumn(index, prop.name, DataTypes.fromName(prop.type), false, null);
+      });
+    } else {
+      const stream = fs.createReadStream(path.join(__dirname, kml));
+      const xml2 = new xmlStream(stream);
+    }
+  }
 }
+const test = new KMLToGeoPackage();
+test.convertKMLToGeoPackage('', '');
