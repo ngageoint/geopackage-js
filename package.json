@@ -47,7 +47,8 @@
     "reproject": "1.2.5",
     "rtree-sql.js": "1.0.0",
     "webworkify": "^1.1.0",
-    "wkx": "0.4.8"
+    "wkx": "0.4.8",
+    "xml-stream": "^0.4.5"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "0.1.3",
