@@ -9,12 +9,21 @@
 
 const KMLToGeoPackage = require('./built/index.js').KMLToGeoPackage;
 const path = require('path');
-const fs = require('fs');
-const xmlStream = require('xml-stream');
+// const fs = require('fs');
+// const xmlStream = require('xml-stream');
 
 const test = new KMLToGeoPackage();
-const kmlPath = path.join(__dirname, 'KML_Samples.kml');
-test.convertKMLToGeoPackage(kmlPath, '');
+const kmlPath = path.join(__dirname, 'doc.kml');
+test
+  .convertKMLToGeoPackage(kmlPath, '')
+  .then(value => {
+    console.log('Returned ', value);
+  })
+  .catch(e => {
+    console.log(e.message);
+  });
+console.log('Before');
+
 // stream = fs.createReadStream(path.join(__dirname, 'KML_Samples.kml'));
 // const xml = new xmlStream(stream);
 // const converter = new GeoJSONToGeoPackage();
