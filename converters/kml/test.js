@@ -12,7 +12,9 @@ const path = require('path');
 const fs = require('fs');
 const xmlStream = require('xml-stream');
 
-KMLToGeoPackage.prototype.convertKMLToGeoPackage('', '');
+const test = new KMLToGeoPackage();
+const kmlPath = path.join(__dirname, 'KML_Samples.kml');
+test.convertKMLToGeoPackage(kmlPath, '');
 // stream = fs.createReadStream(path.join(__dirname, 'KML_Samples.kml'));
 // const xml = new xmlStream(stream);
 // const converter = new GeoJSONToGeoPackage();

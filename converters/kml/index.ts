@@ -24,16 +24,16 @@ export class KMLToGeoPackage {
   constructor(private options?: KMLToGeoPackage) {}
 
   convertKMLToGeoPackage(
-    kml: string, 
+    kmlPath: string, 
     // geopackage: GeoPackage,
     tableName: string,
   ): void {
-    this.streamKML('../KML_Samples.kml', 0);
+    this.streamKML(kmlPath, 0);
   }
 
-  streamKML(kml: string, pass: number): void {
+  streamKML(kmlPath: string, pass: number): void {
     if (pass === 0) {
-      const stream = fs.createReadStream(path.join(__dirname, kml));
+      const stream = fs.createReadStream(kmlPath);
       const xml = new xmlStream(stream);
       xml.on('endElement: Placemark', function(node) {
         console.log(node);
@@ -41,7 +41,7 @@ export class KMLToGeoPackage {
         // FeatureColumn.createColumn(index, prop.name, DataTypes.fromName(prop.type), false, null);
       });
     } else {
-      const stream = fs.createReadStream(path.join(__dirname, kml));
+      const stream = fs.createReadStream(path.join(__dirname, kmlPath));
       const xml2 = new xmlStream(stream);
     }
   }
