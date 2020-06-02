@@ -13,14 +13,15 @@ const path = require('path');
 // const xmlStream = require('xml-stream');
 
 const test = new KMLToGeoPackage();
-const kmlPath = path.join(__dirname, 'doc.kml');
+const kmlPath = path.join(__dirname, 'KML_Samples.kml');
 test
   .convertKMLToGeoPackage(kmlPath, '')
   .then(value => {
     console.log('Returned ', value);
+    console.log('Test', test.boundingBox);
   })
   .catch(e => {
-    console.log(e.message);
+    console.log('Error', e.message);
   });
 console.log('Before');
 
