@@ -1,4 +1,4 @@
-// import {
+// import  {
 //   GeoPackage,
 //   GeoPackageAPI,
 //   FeatureColumn,
@@ -6,16 +6,17 @@
 //   DataTypes,
 //   BoundingBox,
 // } from '@ngageoint/geopackage';
-
+const GeoPackage = require('@ngageoint/geopackage');
 const KMLToGeoPackage = require('./built/index.js').KMLToGeoPackage;
 const path = require('path');
 // const fs = require('fs');
 // const xmlStream = require('xml-stream');
 
 const test = new KMLToGeoPackage();
+// let tempGeo = new GeoPackage.GeoPackage();
 const kmlPath = path.join(__dirname, 'KML_Samples.kml');
 test
-  .convertKMLToGeoPackage(kmlPath, '')
+  .convertKMLToGeoPackage(kmlPath, './temp.gpkg')
   .then(value => {
     console.log('Returned ', value);
     console.log('Test', test.boundingBox);

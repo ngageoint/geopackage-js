@@ -33,18 +33,19 @@ export class KMLToGeoPackage {
   boundingBox: BoundingBox;
   constructor(private options?: KMLToGeoPackage) {}
 
-  async convertKMLToGeoPackage(
-    kmlPath: string,
-    // geopackage: GeoPackage,
-    tableName: string,
-  ): Promise<Set<string>> {
-    const props = this.getAllPropertiesKML(kmlPath);
-    return this.addToTable(kmlPath, await props, 'test');
+  async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<Set<string>> {
+    const props = this.getMetaDataKML(kmlPath);
+    return this.setupTableKML(kmlPath, await props, geopackage, 'test');
     // return this.properties;
   }
 
-  addToTable(kmlPath: string, properties: Set<string>, tableName: string): Promise<any>{
-    return new Promise(resolve => {
+  async setupTableKML(
+    kmlPath: string,
+    properties: Set<string>,
+    geopackage: GeoPackage,
+    tableName: string,
+  ): Promise<any> {
+    return new Promise(async resolve => {
       const geometryColumns = new GeometryColumns();
       geometryColumns.table_name = tableName;
       geometryColumns.column_name = 'geometry';
@@ -61,6 +62,21 @@ export class KMLToGeoPackage {
         columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
         index++;
       }
+      await this.createOrOpenGeoPackage(geopackage, { append: true })
+        .then(async value => {
+          const featureDao = await value.createFeatureTable(
+            tableName,
+            geometryColumns,
+            columns,
+            this.boundingBox,
+            4326,
+          );
+          this.addDataToTableKML(kmlPath, value, tableName);
+        })
+        .catch(e => {
+          console.log(e.message);
+        });
+
       // for (const key in properties) {
       //   const prop = properties[key];
       //   if (prop.name.toLowerCase() !== 'id') {
@@ -83,7 +99,39 @@ export class KMLToGeoPackage {
     });
   }
 
-  getAllPropertiesKML(kmlPath: string): Promise<any> {
+  addDataToTableKML(kmlPath: string, geopackage: GeoPackage, tableName: string): void {
+    const stream = fs.createReadStream(kmlPath);
+    const xml = new xmlStream(stream);
+    xml.collect('LinearRing');
+    xml.on('endElement: Placemark', (node: any) => {
+      // console.log(node);
+      if (node.hasOwnProperty('Polygon')) {
+        const temp = { type: 'Polygon' };
+        const coordText = node.Polygon.outerBoundaryIs.LinearRing[0].coordinates;
+        const coordRing = coordText.split(' ');
+        const coordArray = [];
+        coordRing.forEach(element => {
+          element = element.split(',');
+          coordArray.push([element[0], element[1]]);
+        });
+        temp['coordinates'] = [coordArray];
+        if (node.Polygon.hasOwnProperty('innerBoundaryIs')) {
+          // console.log('innerBoundaryIs!!');
+          const coordText = node.Polygon.innerBoundaryIs.LinearRing[0].coordinates;
+          const coordRing = coordText.split(' ');
+          const coordArray = [];
+          coordRing.forEach(element => {
+            element = element.split(',');
+            coordArray.push([element[0], element[1]]);
+          });
+          temp['coordinates'].push(coordArray);
+        }
+        // console.log('Polygon!', temp);
+      }
+    });
+  }
+
+  getMetaDataKML(kmlPath: string): Promise<any> {
     return new Promise(resolve => {
       const properties = new Set();
       // Bounding box
@@ -101,7 +149,8 @@ export class KMLToGeoPackage {
             property === 'LineString' ||
             property === 'LineRing' ||
             property === 'Polygon' ||
-            property === 'MultiGeomtry'
+            property === 'MultiGeomtry' ||
+            property === 'Model'
           ) {
           } else {
             properties.add(property);
@@ -129,6 +178,29 @@ export class KMLToGeoPackage {
       });
     });
   }
+  async createOrOpenGeoPackage(
+    geopackage: GeoPackage | string,
+    options: KMLConverterOptions,
+    progressCallback?: Function,
+  ): Promise<GeoPackage> {
+    if (typeof geopackage === 'object') {
+      if (progressCallback) await progressCallback({ status: 'Opening GeoPackage' });
+      return geopackage;
+    } else {
+      let stats: fs.Stats;
+      try {
+        stats = fs.statSync(geopackage);
+      } catch (e) {}
+      if (stats && !options.append) {
+        console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+        throw new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+      } else if (stats) {
+        console.log('open geopackage');
+        return GeoPackageAPI.open(geopackage);
+      }
+      if (progressCallback) await progressCallback({ status: 'Creating GeoPackage' });
+      console.log('Create new geopackage', geopackage);
+      return GeoPackageAPI.create(geopackage);
+    }
+  }
 }
-// const test = new KMLToGeoPackage();
-// test.convertKMLToGeoPackage('', '');
