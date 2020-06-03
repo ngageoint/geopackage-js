@@ -12,6 +12,7 @@ import bbox from '@turf/bbox';
 // import bbox from '@turf/bbox';
 
 import xmlStream from 'xml-stream';
+import { notDeepEqual } from 'assert';
 
 export interface KMLConverterOptions {
   append?: boolean;
@@ -62,6 +63,7 @@ export class KMLToGeoPackage {
         columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
         index++;
       }
+      // console.log(columns);
       await this.createOrOpenGeoPackage(geopackage, { append: true })
         .then(async value => {
           const featureDao = await value.createFeatureTable(
@@ -104,17 +106,19 @@ export class KMLToGeoPackage {
     const xml = new xmlStream(stream);
     xml.collect('LinearRing');
     xml.on('endElement: Placemark', (node: any) => {
-      // console.log(node);
+      let isGeom = false;
+      let geometryData = {};
       if (node.hasOwnProperty('Polygon')) {
-        const temp = { type: 'Polygon' };
+        isGeom = true;
+        geometryData = { type: 'Polygon' };
         const coordText = node.Polygon.outerBoundaryIs.LinearRing[0].coordinates;
         const coordRing = coordText.split(' ');
         const coordArray = [];
         coordRing.forEach(element => {
           element = element.split(',');
-          coordArray.push([element[0], element[1]]);
+          coordArray.push([Number(element[0]), Number(element[1])]);
         });
-        temp['coordinates'] = [coordArray];
+        geometryData['coordinates'] = [coordArray];
         if (node.Polygon.hasOwnProperty('innerBoundaryIs')) {
           // console.log('innerBoundaryIs!!');
           const coordText = node.Polygon.innerBoundaryIs.LinearRing[0].coordinates;
@@ -124,10 +128,44 @@ export class KMLToGeoPackage {
             element = element.split(',');
             coordArray.push([element[0], element[1]]);
           });
-          temp['coordinates'].push(coordArray);
+          geometryData['coordinates'].push(coordArray);
         }
         // console.log('Polygon!', temp);
       }
+      if (node.hasOwnProperty('Point')) {
+        isGeom = true;
+        const coordPoint = node.Point.coordinates.split(',');
+        geometryData = { type: 'Point' };
+        geometryData['coordinates'] = [Number(coordPoint[0]), Number(coordPoint[1])];
+        // console.log(coordPoint);
+      }
+      if (node.hasOwnProperty('LineString')) {
+        isGeom = true;
+        const coordPoints = node.LineString.coordinates.split(' ');
+        geometryData = { type: 'LineString' };
+        const coordArray = [];
+        coordPoints.forEach(element => {
+          element = element.split(',');
+          coordArray.push([Number(element[0]), Number(element[1])]);
+        });
+        geometryData['coordinates'] = coordArray;
+      }
+      const props = {};
+      for (const prop in node) {
+        if (typeof node[prop] === 'string') {
+          props[prop] = node[prop];
+        } else if (typeof node[prop] === 'object') {
+          props[prop] = JSON.stringify(node[prop]);
+        } else if (typeof node[prop] === 'number') {
+          props[prop] = node[prop];
+        }
+      }
+      const feature: any = {
+        type: 'Feature',
+        geometry: geometryData,
+        properties: props,
+      };
+      if (isGeom) geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
     });
   }
 
@@ -147,7 +185,6 @@ export class KMLToGeoPackage {
           if (
             property === 'Point' ||
             property === 'LineString' ||
-            property === 'LineRing' ||
             property === 'Polygon' ||
             property === 'MultiGeomtry' ||
             property === 'Model'
