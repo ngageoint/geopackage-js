@@ -222,6 +222,43 @@
         </Placemark>
       </Document>
       <Placemark>
+      <MultiGeometry>
+        <Polygon>
+        <altitudeMode>absolute</altitudeMode>
+        <outerBoundaryIs>
+        <LinearRing>
+        <coordinates>
+        37.53604909910388,55.75168185832652,285.185979283664
+        37.53453032649647,55.75184990251844,285.185979283664
+        37.53450920435704,55.75185219338564,285.6859782706089
+        37.53604744350758,55.75168199544795,285.6859782706089
+        37.53604909910388,55.75168185832652,285.185979283664
+        </coordinates>
+        </LinearRing>
+        </outerBoundaryIs>
+        </Polygon>
+        <Polygon>
+        <altitudeMode>absolute</altitudeMode>
+        <outerBoundaryIs>
+        <LinearRing>
+        <coordinates>
+        37.53604909910388,55.75168185832652,285.185979283664
+        37.53604744350758,55.75168199544795,285.6859782706089
+        37.53604727784002,55.75168200338794,285.6859782706089
+        37.53604893342639,55.75168186619818,285.185979283664
+        37.53604909910388,55.75168185832652,285.185979283664
+        </coordinates>
+        </LinearRing>
+        </outerBoundaryIs>
+        </Polygon>
+        <LineString>
+          <tessellate>1</tessellate>
+          <coordinates> -112.0814237830345,36.10677870477137,0
+            -112.0870267752693,36.0905099328766,0 </coordinates>
+        </LineString>
+        </MultiGeometry>
+      </Placemark>
+      <Placemark>
         <name>Descriptive HTML</name>
         <visibility>0</visibility>
         <description><![CDATA[Click on the blue link!<br><br>

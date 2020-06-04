@@ -6,6 +6,7 @@ import {
   DataTypes,
   BoundingBox,
 } from '@ngageoint/geopackage';
+import _ from 'lodash';
 import fs from 'fs';
 import path from 'path';
 import bbox from '@turf/bbox';
@@ -13,6 +14,8 @@ import bbox from '@turf/bbox';
 
 import xmlStream from 'xml-stream';
 import { notDeepEqual } from 'assert';
+import { FeatureTableStyles } from '@ngageoint/geopackage/built/lib/extension/style/featureTableStyles';
+import { resolve } from 'dns';
 
 export interface KMLConverterOptions {
   append?: boolean;
@@ -32,11 +35,17 @@ export class KMLToGeoPackage {
 
   // };
   boundingBox: BoundingBox;
+  styleMap: Map<string, object>;
+  styleUrlMap: Map<string, number>;
+  styleRowMap: Map<number, any>;
   constructor(private options?: KMLToGeoPackage) {}
 
   async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<Set<string>> {
+    this.styleMap = new Map();
+    this.styleUrlMap = new Map();
+    this.styleRowMap = new Map();
     const props = this.getMetaDataKML(kmlPath);
-    return this.setupTableKML(kmlPath, await props, geopackage, 'test');
+    return this.setupTableKML(kmlPath, await props, geopackage, tableName);
     // return this.properties;
   }
 
@@ -64,109 +73,270 @@ export class KMLToGeoPackage {
         index++;
       }
       // console.log(columns);
-      await this.createOrOpenGeoPackage(geopackage, { append: true })
-        .then(async value => {
-          const featureDao = await value.createFeatureTable(
-            tableName,
-            geometryColumns,
-            columns,
-            this.boundingBox,
-            4326,
-          );
-          this.addDataToTableKML(kmlPath, value, tableName);
-        })
-        .catch(e => {
-          console.log(e.message);
-        });
+      const geopkg = await this.createOrOpenGeoPackage(geopackage, { append: true });
 
-      // for (const key in properties) {
-      //   const prop = properties[key];
-      //   if (prop.name.toLowerCase() !== 'id') {
-      //     columns.push(FeatureColumn.createColumn(index, prop.name, DataTypes.fromName(prop.type), false, null));
-      //     index++;
-      //   } else {
-      //     columns.push(
-      //       FeatureColumn.createColumn(index, '_properties_' + prop.name, DataTypes.fromName(prop.type), false, null),
-      //     );
-      //     index++;
-      //   }
-      // }
-      // console.log(columns);
+      // Boilerplate for creating a style tables (a geopackage extension)
+      await geopkg.createFeatureTable(tableName, geometryColumns, columns, this.boundingBox, 4326);
+      // Create All the tables
+      const defaultStyles = new FeatureTableStyles(geopkg, tableName);
+      await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
+      await defaultStyles
+        .getFeatureStyleExtension()
+        .getRelatedTables()
+        .getOrCreateExtension();
+      await defaultStyles
+        .getFeatureStyleExtension()
+        .getContentsId()
+        .getOrCreateExtension();
+      // Table Wide
+      await defaultStyles.createTableStyleRelationship();
+      await defaultStyles.createTableIconRelationship();
+      // Each feature
+      await defaultStyles.createStyleRelationship();
+      await defaultStyles.createIconRelationship();
+
+      const polygonStyleRow = defaultStyles.getStyleDao().newRow();
+      polygonStyleRow.setColor('FF0000', 1.0);
+      polygonStyleRow.setFillColor('FF0000', 0.2);
+      polygonStyleRow.setWidth(2.0);
+      polygonStyleRow.setName('Table Polygon Style');
+      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(polygonStyleRow);
+
+      const lineStringStyleRow = defaultStyles.getStyleDao().newRow();
+      lineStringStyleRow.setColor('FF0000', 1.0);
+      lineStringStyleRow.setWidth(2.0);
+      lineStringStyleRow.setName('Table Line Style');
+      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(lineStringStyleRow);
+
+      const pointStyleRow = defaultStyles.getStyleDao().newRow();
+      pointStyleRow.setColor('FF0000', 1.0);
+      pointStyleRow.setWidth(2.0);
+      pointStyleRow.setName('Table Point Style');
+      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
+
+      await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
+      await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
+      await defaultStyles.setTableStyle('Point', pointStyleRow);
+      await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
+      await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
+      await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
+
+      // Specific Styles
+      for (const item of this.styleMap) {
+        const newStyle = defaultStyles.getStyleDao().newRow();
+        // console.log(item);
+        if (item[1].hasOwnProperty('LineStyle')) {
+          if (item[1]['LineStyle'].hasOwnProperty('color')) {
+            const abgr = item[1]['LineStyle']['color'];
+            const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+            newStyle.setColor(rgb, a);
+          }
+          if (item[1]['LineStyle'].hasOwnProperty('width')) {
+            newStyle.setWidth(item[1]['LineStyle']['width']);
+          }
+        }
+        if (item[1].hasOwnProperty('PolyStyle')) {
+          if (item[1]['PolyStyle'].hasOwnProperty('color')) {
+            const abgr = item[1]['PolyStyle']['color'];
+            const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+            newStyle.setFillColor(rgb, a);
+          }
+          if (item[1]['PolyStyle'].hasOwnProperty('fill')) {
+            if (!item[1]['PolyStyle']['fill']) {
+              newStyle.setFillOpacity(0);
+            }
+          }
+          if (item[1]['PolyStyle'].hasOwnProperty('outline')) {
+            // No property Currently TODO
+            // newStyle.(item[1]['LineStyle']['outline']);
+          }
+        }
+        newStyle.setName(item[0]);
+        const newStyleId = defaultStyles.getFeatureStyleExtension().getOrInsertStyle(newStyle);
+        // console.log(item[0  ], newStyleId, newStyle);
+        this.styleUrlMap.set('#' + item[0], newStyleId);
+        this.styleRowMap.set(newStyleId, newStyle);
+      }
+      // console.log(this.styleUrlMap);
+      // newStyle.setColor
+      await this.addDataToTableKML(kmlPath, geopkg, defaultStyles, tableName);
       resolve('test');
-      // const stream = fs.createReadStream(kmlPath);
-      // const xml = new xmlStream(stream);
-      // xml.on('endElement: Placemark', node => {
-      //   console.log(node);
-      // });
     });
   }
 
-  addDataToTableKML(kmlPath: string, geopackage: GeoPackage, tableName: string): void {
-    const stream = fs.createReadStream(kmlPath);
-    const xml = new xmlStream(stream);
-    xml.collect('LinearRing');
-    xml.on('endElement: Placemark', (node: any) => {
-      let isGeom = false;
-      let geometryData = {};
-      if (node.hasOwnProperty('Polygon')) {
-        isGeom = true;
-        geometryData = { type: 'Polygon' };
-        const coordText = node.Polygon.outerBoundaryIs.LinearRing[0].coordinates;
+  private abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
+    const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
+    const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
+    // console.log(abgr, rgb, a);
+    return { rgb, a };
+  }
+
+  async addDataToTableKML(kmlPath: string, geopackage: GeoPackage, defaultStyles, tableName: string): Promise<any> {
+    return new Promise(async resolve => {
+      const stream = fs.createReadStream(kmlPath);
+      const xml = new xmlStream(stream);
+      xml.collect('LinearRing');
+      xml.collect('Polygon');
+      xml.collect('Point');
+      xml.collect('LineString');
+      xml.on('endElement: Placemark', (node: any) => {
+        let isGeom = false;
+        let geometryData: any;
+        if (node.hasOwnProperty('Polygon')) {
+          isGeom = true;
+          geometryData = this.handlePolygons(node);
+        } else if (node.hasOwnProperty('Point')) {
+          isGeom = true;
+          geometryData = this.handlePoints(node);
+        } else if (node.hasOwnProperty('LineString')) {
+          isGeom = true;
+          geometryData = this.handleLineStrings(node);
+        } else if (node.hasOwnProperty('MultiGeometry')) {
+          isGeom = false;
+          geometryData = { type: 'GeometryCollection', geometries: [] };
+          if (node.MultiGeometry.hasOwnProperty('Point')) {
+            const temp = this.handlePoints(node.MultiGeometry);
+            geometryData['geometries'].push(temp);
+          }
+          if (node.MultiGeometry.hasOwnProperty('LineString')) {
+            const temp = this.handleLineStrings(node.MultiGeometry);
+            geometryData['geometries'].push(temp);
+          }
+          if (node.MultiGeometry.hasOwnProperty('Polygon')) {
+            const temp = this.handlePolygons(node.MultiGeometry);
+            geometryData['geometries'].push(temp);
+          }
+        }
+        const props = {};
+        for (const prop in node) {
+          if (prop === 'styleUrl') {
+            try {
+              const styleId = this.styleUrlMap.get(node[prop]);
+              const styleRow = this.styleRowMap.get(styleId);
+              // console.log(node[prop], styleId);
+              if (isGeom && styleId && styleRow) {
+                defaultStyles.setStyle(this.styleUrlMap.get(node[prop]), geometryData.type, styleRow);
+              }
+              // console.log(node[prop]);
+            } catch (error) {
+              console.error(error);
+            }
+          }
+          if (prop === 'Style') {
+            // TODO
+            console.error(prop);
+          }
+          if (typeof node[prop] === 'string') {
+            props[prop] = node[prop];
+          } else if (typeof node[prop] === 'object') {
+            props[prop] = JSON.stringify(node[prop]);
+          } else if (typeof node[prop] === 'number') {
+            props[prop] = node[prop];
+          }
+        }
+        const feature: any = {
+          type: 'Feature',
+          geometry: geometryData,
+          properties: props,
+        };
+        if (isGeom) geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
+      });
+      xml.on('end', async (node: any) => {
+        const featureDao = geopackage.getFeatureDao(tableName);
+        const fti = featureDao.featureTableIndex;
+        if (fti) {
+          await fti.index();
+          // if (!_.isNil(fti.tableIndex)) {
+          //   console.log('start indexing');
+          //   console.log("End");
+          // }
+        }
+        resolve();
+      });
+    });
+  }
+
+  private handleLineStrings(node: any): { type: string; coordinates: number[] } {
+    let geometryData;
+    if (node.LineString.length === 1) {
+      geometryData = { type: 'LineString', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiLineString', coordinates: [] };
+    }
+    node.LineString.forEach(element => {
+      const coordPoints = element.coordinates.split(' ');
+      const coordArray = [];
+      coordPoints.forEach(element => {
+        element = element.split(',');
+        coordArray.push([Number(element[0]), Number(element[1])]);
+      });
+      if (node.LineString.length === 1) {
+        geometryData['coordinates'] = coordArray;
+      } else {
+        geometryData['coordinates'].push(coordArray);
+      }
+    });
+    return geometryData;
+  }
+
+  private handlePoints(node: any): { type: string; coordinates: number[] } {
+    let geometryData;
+    if (node.Point.length === 1) {
+      geometryData = { type: 'Point', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiPoint', coordinates: [] };
+    }
+    node.Point.forEach(point => {
+      const coordPoint = point.coordinates.split(',');
+      const coord = [parseFloat(coordPoint[0]), parseFloat(coordPoint[1])];
+      if (node.Point.length === 1) {
+        geometryData['coordinates'] = [parseFloat(coordPoint[0]), parseFloat(coordPoint[1])];
+      } else {
+        geometryData['coordinates'].push(coord);
+      }
+    });
+    return geometryData;
+  }
+
+  private handlePolygons(node: any): { type: string; coordinates: number[] } {
+    let geometryData;
+    if (node.Polygon.length === 1) {
+      geometryData = { type: 'Polygon', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiPolygon', coordinates: [] };
+    }
+    // console.log(typeof node.Polygon);
+    // console.log(node.Polygon[0]);
+    node.Polygon.forEach(element => {
+      const coordText = element.outerBoundaryIs.LinearRing[0].coordinates;
+      // console.log(coordText);
+      const coordRing = coordText.split(' ');
+      const coordArray = [];
+      coordRing.forEach(element => {
+        element = element.split(',');
+        coordArray.push([parseFloat(element[0]), parseFloat(element[1])]);
+      });
+      const temp = [coordArray];
+      // console.log(coordArray);
+      if (node.Polygon.hasOwnProperty('innerBoundaryIs')) {
+        const coordText = element.innerBoundaryIs.LinearRing[0].coordinates;
         const coordRing = coordText.split(' ');
         const coordArray = [];
-        coordRing.forEach(element => {
-          element = element.split(',');
-          coordArray.push([Number(element[0]), Number(element[1])]);
+        coordRing.forEach(elementRing => {
+          elementRing = elementRing.split(',');
+          coordArray.push([parseFloat(elementRing[0]), parseFloat(elementRing[1])]);
         });
-        geometryData['coordinates'] = [coordArray];
-        if (node.Polygon.hasOwnProperty('innerBoundaryIs')) {
-          // console.log('innerBoundaryIs!!');
-          const coordText = node.Polygon.innerBoundaryIs.LinearRing[0].coordinates;
-          const coordRing = coordText.split(' ');
-          const coordArray = [];
-          coordRing.forEach(element => {
-            element = element.split(',');
-            coordArray.push([element[0], element[1]]);
-          });
-          geometryData['coordinates'].push(coordArray);
-        }
-        // console.log('Polygon!', temp);
+        temp.push(coordArray);
       }
-      if (node.hasOwnProperty('Point')) {
-        isGeom = true;
-        const coordPoint = node.Point.coordinates.split(',');
-        geometryData = { type: 'Point' };
-        geometryData['coordinates'] = [Number(coordPoint[0]), Number(coordPoint[1])];
-        // console.log(coordPoint);
+      // console.log(temp);
+      if (node.Polygon.length === 1) {
+        geometryData['coordinates'] = temp;
+      } else {
+        geometryData['coordinates'].push(temp);
       }
-      if (node.hasOwnProperty('LineString')) {
-        isGeom = true;
-        const coordPoints = node.LineString.coordinates.split(' ');
-        geometryData = { type: 'LineString' };
-        const coordArray = [];
-        coordPoints.forEach(element => {
-          element = element.split(',');
-          coordArray.push([Number(element[0]), Number(element[1])]);
-        });
-        geometryData['coordinates'] = coordArray;
-      }
-      const props = {};
-      for (const prop in node) {
-        if (typeof node[prop] === 'string') {
-          props[prop] = node[prop];
-        } else if (typeof node[prop] === 'object') {
-          props[prop] = JSON.stringify(node[prop]);
-        } else if (typeof node[prop] === 'number') {
-          props[prop] = node[prop];
-        }
-      }
-      const feature: any = {
-        type: 'Feature',
-        geometry: geometryData,
-        properties: props,
-      };
-      if (isGeom) geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
     });
+    // console.log(geometryData);
+    return geometryData;
   }
 
   getMetaDataKML(kmlPath: string): Promise<any> {
@@ -178,7 +348,7 @@ export class KMLToGeoPackage {
 
       const stream = fs.createReadStream(kmlPath);
       const xml = new xmlStream(stream);
-
+      xml.collect('Pair');
       xml.on('endElement: Placemark', (node: any) => {
         for (const property in node) {
           // Item to be treated like a Geometry
@@ -189,6 +359,7 @@ export class KMLToGeoPackage {
             property === 'MultiGeomtry' ||
             property === 'Model'
           ) {
+          } else if (property === 'Style') {
           } else {
             properties.add(property);
           }
@@ -209,6 +380,22 @@ export class KMLToGeoPackage {
           if (Number(temp[1]) > maxLon) maxLon = Number(temp[1]);
         });
       });
+      xml.on('endElement: Document>Style', (node: any) => {
+        // console.log(node['$'].id);
+        if (node['$']) {
+          this.styleMap.set(node['$'].id, node);
+        }
+      });
+      // TODO
+      // xml.on('endElement: Document>StyleMap', (node: any) => {
+      //   console.log(node);
+      //   if (node.Pair[0].key === 'normal') {
+
+      //   }
+      //   if (node['$']) {
+      //     this.styleMap.set(node['$'].id, node);
+      //   }
+      // });
       xml.on('end', () => {
         this.boundingBox = new BoundingBox(minLat, maxLat, minLon, maxLon);
         resolve(properties);
