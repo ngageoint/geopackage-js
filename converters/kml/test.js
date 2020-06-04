@@ -16,10 +16,10 @@ const kmlPath = path.join(__dirname, 'KML_Samples.kml');
 test
   .convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
   .then(value => {
-    console.log('Returned ', value);
-    console.log('Test', test.boundingBox);
+    // console.log('Returned ', value);
+    // console.log('Test', test.boundingBox);
   })
   .catch(e => {
     console.log('Error', e.message);
   });
-console.log('Before');
+// console.log('Before');

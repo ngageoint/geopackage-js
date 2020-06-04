@@ -38,12 +38,13 @@ export class KMLToGeoPackage {
   styleMap: Map<string, object>;
   styleUrlMap: Map<string, number>;
   styleRowMap: Map<number, any>;
-  constructor(private options?: KMLToGeoPackage) {}
-
-  async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<Set<string>> {
+  constructor(private options?: KMLToGeoPackage) {
     this.styleMap = new Map();
     this.styleUrlMap = new Map();
     this.styleRowMap = new Map();
+  }
+
+  async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<Set<string>> {
     const props = this.getMetaDataKML(kmlPath);
     return this.setupTableKML(kmlPath, await props, geopackage, tableName);
     // return this.properties;
@@ -72,96 +73,104 @@ export class KMLToGeoPackage {
         columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
         index++;
       }
-      // console.log(columns);
       const geopkg = await this.createOrOpenGeoPackage(geopackage, { append: true });
+      await geopkg.createFeatureTable(tableName, geometryColumns, columns, this.boundingBox, 4326);
 
       // Boilerplate for creating a style tables (a geopackage extension)
-      await geopkg.createFeatureTable(tableName, geometryColumns, columns, this.boundingBox, 4326);
-      // Create All the tables
-      const defaultStyles = new FeatureTableStyles(geopkg, tableName);
-      await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
-      await defaultStyles
-        .getFeatureStyleExtension()
-        .getRelatedTables()
-        .getOrCreateExtension();
-      await defaultStyles
-        .getFeatureStyleExtension()
-        .getContentsId()
-        .getOrCreateExtension();
-      // Table Wide
-      await defaultStyles.createTableStyleRelationship();
-      await defaultStyles.createTableIconRelationship();
-      // Each feature
-      await defaultStyles.createStyleRelationship();
-      await defaultStyles.createIconRelationship();
-
-      const polygonStyleRow = defaultStyles.getStyleDao().newRow();
-      polygonStyleRow.setColor('FF0000', 1.0);
-      polygonStyleRow.setFillColor('FF0000', 0.2);
-      polygonStyleRow.setWidth(2.0);
-      polygonStyleRow.setName('Table Polygon Style');
-      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(polygonStyleRow);
-
-      const lineStringStyleRow = defaultStyles.getStyleDao().newRow();
-      lineStringStyleRow.setColor('FF0000', 1.0);
-      lineStringStyleRow.setWidth(2.0);
-      lineStringStyleRow.setName('Table Line Style');
-      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(lineStringStyleRow);
-
-      const pointStyleRow = defaultStyles.getStyleDao().newRow();
-      pointStyleRow.setColor('FF0000', 1.0);
-      pointStyleRow.setWidth(2.0);
-      pointStyleRow.setName('Table Point Style');
-      defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
-
-      await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
-      await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
-      await defaultStyles.setTableStyle('Point', pointStyleRow);
-      await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
-      await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
-      await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
-
-      // Specific Styles
-      for (const item of this.styleMap) {
-        const newStyle = defaultStyles.getStyleDao().newRow();
-        // console.log(item);
-        if (item[1].hasOwnProperty('LineStyle')) {
-          if (item[1]['LineStyle'].hasOwnProperty('color')) {
-            const abgr = item[1]['LineStyle']['color'];
-            const { rgb, a } = this.abgrStringToColorOpacity(abgr);
-            newStyle.setColor(rgb, a);
-          }
-          if (item[1]['LineStyle'].hasOwnProperty('width')) {
-            newStyle.setWidth(item[1]['LineStyle']['width']);
-          }
-        }
-        if (item[1].hasOwnProperty('PolyStyle')) {
-          if (item[1]['PolyStyle'].hasOwnProperty('color')) {
-            const abgr = item[1]['PolyStyle']['color'];
-            const { rgb, a } = this.abgrStringToColorOpacity(abgr);
-            newStyle.setFillColor(rgb, a);
-          }
-          if (item[1]['PolyStyle'].hasOwnProperty('fill')) {
-            if (!item[1]['PolyStyle']['fill']) {
-              newStyle.setFillOpacity(0);
-            }
-          }
-          if (item[1]['PolyStyle'].hasOwnProperty('outline')) {
-            // No property Currently TODO
-            // newStyle.(item[1]['LineStyle']['outline']);
-          }
-        }
-        newStyle.setName(item[0]);
-        const newStyleId = defaultStyles.getFeatureStyleExtension().getOrInsertStyle(newStyle);
-        // console.log(item[0  ], newStyleId, newStyle);
-        this.styleUrlMap.set('#' + item[0], newStyleId);
-        this.styleRowMap.set(newStyleId, newStyle);
-      }
-      // console.log(this.styleUrlMap);
-      // newStyle.setColor
-      await this.addDataToTableKML(kmlPath, geopkg, defaultStyles, tableName);
+      // Create Default Styles
+      const defaultStyles = await this.setUpDefaultStyles(geopkg, tableName);
+      console.log(typeof defaultStyles);
+      // Specific Styles SetUp
+      this.setUpSpecificStyles(defaultStyles);
+      // Geometry and Style Insertion
+      await this.addKMLDataToGeoPackage(kmlPath, geopkg, defaultStyles, tableName);
       resolve('test');
     });
+  }
+
+  private setUpSpecificStyles(defaultStyles: any): any {
+    for (const item of this.styleMap) {
+      const newStyle = defaultStyles.getStyleDao().newRow();
+      if (item[1].hasOwnProperty('LineStyle')) {
+        if (item[1]['LineStyle'].hasOwnProperty('color')) {
+          const abgr = item[1]['LineStyle']['color'];
+          const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+          newStyle.setColor(rgb, a);
+        }
+        if (item[1]['LineStyle'].hasOwnProperty('width')) {
+          newStyle.setWidth(item[1]['LineStyle']['width']);
+        }
+      }
+
+      if (item[1].hasOwnProperty('PolyStyle')) {
+        if (item[1]['PolyStyle'].hasOwnProperty('color')) {
+          const abgr = item[1]['PolyStyle']['color'];
+          const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+          newStyle.setFillColor(rgb, a);
+        }
+        if (item[1]['PolyStyle'].hasOwnProperty('fill')) {
+          if (!item[1]['PolyStyle']['fill']) {
+            newStyle.setFillOpacity(0);
+          }
+        }
+        if (item[1]['PolyStyle'].hasOwnProperty('outline')) {
+          // No property Currently TODO
+          // newStyle.(item[1]['LineStyle']['outline']);
+        }
+      }
+      newStyle.setName(item[0]);
+
+      const newStyleId = defaultStyles.getFeatureStyleExtension().getOrInsertStyle(newStyle);
+      this.styleUrlMap.set('#' + item[0], newStyleId);
+      this.styleRowMap.set(newStyleId, newStyle);
+    }
+  }
+
+  private async setUpDefaultStyles(geopkg: GeoPackage, tableName: string): Promise<any> {
+    const defaultStyles = new FeatureTableStyles(geopkg, tableName);
+    await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
+    await defaultStyles
+      .getFeatureStyleExtension()
+      .getRelatedTables()
+      .getOrCreateExtension();
+    await defaultStyles
+      .getFeatureStyleExtension()
+      .getContentsId()
+      .getOrCreateExtension();
+    // Tablewide
+    await defaultStyles.createTableStyleRelationship();
+    await defaultStyles.createTableIconRelationship();
+    // Each feature
+    await defaultStyles.createStyleRelationship();
+    await defaultStyles.createIconRelationship();
+
+    const polygonStyleRow = defaultStyles.getStyleDao().newRow();
+    polygonStyleRow.setColor('FF0000', 1.0);
+    polygonStyleRow.setFillColor('FF0000', 0.2);
+    polygonStyleRow.setWidth(2.0);
+    polygonStyleRow.setName('Table Polygon Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(polygonStyleRow);
+
+    const lineStringStyleRow = defaultStyles.getStyleDao().newRow();
+    lineStringStyleRow.setColor('FF0000', 1.0);
+    lineStringStyleRow.setWidth(2.0);
+    lineStringStyleRow.setName('Table Line Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(lineStringStyleRow);
+
+    const pointStyleRow = defaultStyles.getStyleDao().newRow();
+    pointStyleRow.setColor('FF0000', 1.0);
+    pointStyleRow.setWidth(2.0);
+    pointStyleRow.setName('Table Point Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
+
+    await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
+    await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
+    await defaultStyles.setTableStyle('Point', pointStyleRow);
+    await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
+    await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
+    await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
+
+    return defaultStyles;
   }
 
   private abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
@@ -171,7 +180,12 @@ export class KMLToGeoPackage {
     return { rgb, a };
   }
 
-  async addDataToTableKML(kmlPath: string, geopackage: GeoPackage, defaultStyles, tableName: string): Promise<any> {
+  async addKMLDataToGeoPackage(
+    kmlPath: string,
+    geopackage: GeoPackage,
+    defaultStyles,
+    tableName: string,
+  ): Promise<any> {
     return new Promise(async resolve => {
       const stream = fs.createReadStream(kmlPath);
       const xml = new xmlStream(stream);
@@ -192,7 +206,7 @@ export class KMLToGeoPackage {
           isGeom = true;
           geometryData = this.handleLineStrings(node);
         } else if (node.hasOwnProperty('MultiGeometry')) {
-          isGeom = false;
+          isGeom = true;
           geometryData = { type: 'GeometryCollection', geometries: [] };
           if (node.MultiGeometry.hasOwnProperty('Point')) {
             const temp = this.handlePoints(node.MultiGeometry);
@@ -213,11 +227,9 @@ export class KMLToGeoPackage {
             try {
               const styleId = this.styleUrlMap.get(node[prop]);
               const styleRow = this.styleRowMap.get(styleId);
-              // console.log(node[prop], styleId);
               if (isGeom && styleId && styleRow) {
                 defaultStyles.setStyle(this.styleUrlMap.get(node[prop]), geometryData.type, styleRow);
               }
-              // console.log(node[prop]);
             } catch (error) {
               console.error(error);
             }
