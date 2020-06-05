@@ -62,7 +62,7 @@ export class KMLToGeoPackage {
    * Takes in KML and the properties of the KML and creates a table in the geopackage floder.
    * @param kmlPath file directory path to the KML file to be converted
    * @param properties columns name gotten from getMetaDataKML
-   * @param geopackage file name or Geopackage object
+   * @param geopackage file name or GeoPackage object
    * @param tableName name the Database table will be called
    * @returns Promise<GeoPackage>
    */
@@ -105,7 +105,7 @@ export class KMLToGeoPackage {
   /**
    * Inserts style information from the KML in the GeoPackage.
    * @param kmlPath Path to file
-   * @param geopkg Geopackage Object
+   * @param geopkg GeoPackage Object
    * @param tableName Name of Main Table
    */
   setUpStyleKML(kmlPath: string, geopkg: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
@@ -114,14 +114,14 @@ export class KMLToGeoPackage {
       // Create Default Styles
       const defaultStyles = await this.setUpDefaultStyles(geopkg, tableName);
       // Specific Styles SetUp
-      this.setUpSpecificStyles(defaultStyles, this.styleMap);
+      this.addSpecificStyles(defaultStyles, this.styleMap);
 
       resolve(defaultStyles);
     });
   }
 
   /**
-   * Reads the KML file and extracts Geomertic data and matches styles with the Geometric data.
+   * Reads the KML file and extracts Geometric data and matches styles with the Geometric data.
    * @param kmlPath Path to KML file
    * @param geopackage GeoPackage Object
    * @param defaultStyles Feature Style Object
@@ -141,7 +141,7 @@ export class KMLToGeoPackage {
       kml.collect('Point');
       kml.collect('LineString');
 
-      // Think about spliting up in kml.on
+      // Think about splitting up in kml.on
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;
         let geometryData;
@@ -185,7 +185,7 @@ export class KMLToGeoPackage {
           if (prop === KMLTAGS.STYLE_TAG) {
             const tempMap = new Map<string, object>();
             tempMap.set(node.Style['$'].id, node.Style);
-            this.setUpSpecificStyles(defaultStyles, tempMap);
+            this.addSpecificStyles(defaultStyles, tempMap);
 
             const styleId = this.styleUrlMap.get('#' + node.Style['$'].id);
             styleRow = this.styleRowMap.get(styleId);
@@ -235,7 +235,7 @@ export class KMLToGeoPackage {
       kml.collect('Pair');
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, (node: {}) => {
         for (const property in node) {
-          // TODO:
+          // FIXME(Jared Lincenberg):
           // Item to be treated like a Geometry
           if (
             property === 'Point' ||
@@ -287,6 +287,12 @@ export class KMLToGeoPackage {
     });
   }
 
+  /**
+   * Determines whether to create a new file or open an existing file.
+   * @param geopackage
+   * @param options
+   * @param progressCallback
+   */
   async createOrOpenGeoPackage(
     geopackage: GeoPackage | string,
     options: KMLConverterOptions,
@@ -316,7 +322,11 @@ export class KMLToGeoPackage {
   /*
    * Private Methods
    * */
-
+  /**
+   * Index the table to make searching for points faster.
+   * @param geopackage GeoPackage Object
+   * @param tableName Name of Main table with Geometry
+   */
   private async indexTable(geopackage: GeoPackage, tableName: string): Promise<void> {
     const featureDao = geopackage.getFeatureDao(tableName);
     const fti = featureDao.featureTableIndex;
@@ -328,9 +338,16 @@ export class KMLToGeoPackage {
       // }
     }
   }
-  private setUpSpecificStyles(defaultStyles: FeatureTableStyles, items: Map<string, object>): void {
+
+  /**
+   * Adds styles to the table provided.
+   * Saves id and name in this.styleRowMap and this.styleUrlMap
+   * @param styleTable Feature Style Table
+   * @param items Map of the name of the style and the style itself from the KML
+   */
+  private addSpecificStyles(styleTable: FeatureTableStyles, items: Map<string, object>): void {
     for (const item of items) {
-      const newStyle = defaultStyles.getStyleDao().newRow();
+      const newStyle = styleTable.getStyleDao().newRow();
       newStyle.setName(item[0]);
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
         if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
@@ -360,12 +377,18 @@ export class KMLToGeoPackage {
         }
       }
 
-      const newStyleId = defaultStyles.getFeatureStyleExtension().getOrInsertStyle(newStyle);
+      const newStyleId = styleTable.getFeatureStyleExtension().getOrInsertStyle(newStyle);
       this.styleUrlMap.set('#' + item[0], newStyleId);
       this.styleRowMap.set(newStyleId, newStyle);
     }
   }
 
+  /**
+   * Provides default styles for the Geometry table.
+   * Currently set to Red
+   * @param geopkg GeoPackage
+   * @param tableName Name of the Main Geometry table
+   */
   private async setUpDefaultStyles(geopkg: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
     const defaultStyles = new FeatureTableStyles(geopkg, tableName);
     await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
@@ -378,7 +401,7 @@ export class KMLToGeoPackage {
       .getContentsId()
       .getOrCreateExtension();
 
-    // Tablewide
+    // Table Wide
     await defaultStyles.createTableStyleRelationship();
     await defaultStyles.createTableIconRelationship();
     // Each feature
@@ -413,6 +436,7 @@ export class KMLToGeoPackage {
 
     return defaultStyles;
   }
+
   /**
    * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
    * @param abgr KML Color format aabbggrr alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
@@ -423,6 +447,10 @@ export class KMLToGeoPackage {
     return { rgb, a };
   }
 
+  /**
+   * Takes in a KML Point and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
   private handlePoints(node: { Point }): { type: string; coordinates: number[] } {
     let geometryData;
     if (node[KMLTAGS.GEOMETRY_TAGS.POINT].length === 1) {
@@ -442,6 +470,10 @@ export class KMLToGeoPackage {
     return geometryData;
   }
 
+  /**
+   * Takes in a KML LineString and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
   private handleLineStrings(node: { LineString }): { type: string; coordinates: number[] } {
     let geometryData;
     if (node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].length === 1) {
@@ -465,6 +497,10 @@ export class KMLToGeoPackage {
     return geometryData;
   }
 
+  /**
+   * Takes in a KML Polygon and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
   private handlePolygons(node: { Polygon }): { type: string; coordinates: number[] } {
     let geometryData;
     if ([KMLTAGS.GEOMETRY_TAGS.POLYGON].length === 1) {
