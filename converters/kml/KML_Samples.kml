@@ -550,6 +550,12 @@ Simple Tables:<br>
         <name>Absolute Extruded</name>
         <visibility>0</visibility>
         <description>Transparent green wall with yellow outlines</description>
+        <Style id = "test">
+          <LineStyle>
+          <color>ffffffff</color>
+          </LineStyle>
+          <width>1</width>
+        </Style> 
         <LookAt>
           <longitude>-112.2643334742529</longitude>
           <latitude>36.08563154742419</latitude>
@@ -558,7 +564,7 @@ Simple Tables:<br>
           <tilt>44.61038665812578</tilt>
           <range>4451.842204068102</range>
         </LookAt>
-        <styleUrl>#yellowLineGreenPoly</styleUrl>
+        
         <LineString>
           <extrude>1</extrude>
           <tessellate>1</tessellate>
