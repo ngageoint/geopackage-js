@@ -30,8 +30,10 @@ export class KMLToGeoPackage {
   styleMap: Map<string, object>;
   styleUrlMap: Map<string, number>;
   styleRowMap: Map<number, any>;
+  styleMapPair: Map<string, string>;
   constructor(private optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
+    this.styleMapPair = new Map();
     this.styleMap = new Map();
     this.styleUrlMap = new Map();
     this.styleRowMap = new Map();
@@ -48,10 +50,10 @@ export class KMLToGeoPackage {
 
     const geopkg = await this.setUpTableKML(kmlPath, props, geopackage, tableName);
 
-    const defualtStyles = await this.setUpStyleKML(kmlPath, geopkg, tableName);
+    const defaultStyles = await this.setUpStyleKML(kmlPath, geopkg, tableName);
 
     // Geometry and Style Insertion
-    await this.addKMLDataToGeoPackage(kmlPath, geopkg, defualtStyles, tableName);
+    await this.addKMLDataToGeoPackage(kmlPath, geopkg, defaultStyles, tableName);
     if (this.options.indexTable) {
       await this.indexTable(geopackage, tableName);
     }
@@ -175,8 +177,14 @@ export class KMLToGeoPackage {
         for (const prop in node) {
           if (prop === KMLTAGS.STYLE_URL_TAG) {
             try {
-              const styleId = this.styleUrlMap.get(node[prop]);
-              styleRow = this.styleRowMap.get(styleId);
+              let styleId = this.styleUrlMap.get(node[prop]);
+              if (styleId !== undefined) {
+                styleRow = this.styleRowMap.get(styleId);
+              } else {
+                const normalStyle = this.styleMapPair.get(node[prop]);
+                styleId = this.styleUrlMap.get(normalStyle);
+                styleRow = this.styleRowMap.get(styleId);
+              }
             } catch (error) {
               console.error(error);
             }
@@ -188,6 +196,15 @@ export class KMLToGeoPackage {
             this.addSpecificStyles(defaultStyles, tempMap);
 
             const styleId = this.styleUrlMap.get('#' + node.Style['$'].id);
+            styleRow = this.styleRowMap.get(styleId);
+          }
+
+          if (prop === KMLTAGS.STYLE_MAP_TAG) {
+            console.log(node);
+            console.log('Style', this.styleMapPair);
+            const normalStyle = this.styleMapPair.get(node['$'].id);
+
+            const styleId = this.styleUrlMap.get(normalStyle);
             styleRow = this.styleRowMap.get(styleId);
           }
 
@@ -241,7 +258,7 @@ export class KMLToGeoPackage {
             property === 'Point' ||
             property === 'LineString' ||
             property === 'Polygon' ||
-            property === 'MultiGeomtry' ||
+            property === 'MultiGeometry' ||
             property === 'Model'
           ) {
           } else if (property === 'Style') {
@@ -270,16 +287,13 @@ export class KMLToGeoPackage {
           this.styleMap.set(node['$'].id, node);
         }
       });
-      // TODO
-      // kml.on('endElement: Document>StyleMap', (node: any) => {
-      //   console.log(node);
-      //   if (node.Pair[0].key === 'normal') {
-
-      //   }
-      //   if (node['$']) {
-      //     this.styleMap.set(node['$'].id, node);
-      //   }
-      // });
+      kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_MAP_TAG, node => {
+        node.Pair.forEach((item: { key: string; styleUrl: string }) => {
+          if (item.key === 'normal') {
+            this.styleMapPair.set('#' + node['$'].id, item.styleUrl);
+          }
+        });
+      });
       kml.on('end', () => {
         this.boundingBox = new BoundingBox(minLat, maxLat, minLon, maxLon);
         resolve(properties);
@@ -439,7 +453,7 @@ export class KMLToGeoPackage {
 
   /**
    * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
-   * @param abgr KML Color format aabbggrr alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
+   * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
    */
   private abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
     const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
