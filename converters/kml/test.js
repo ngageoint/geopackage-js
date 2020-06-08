@@ -12,14 +12,16 @@ const path = require('path');
 
 const test = new KMLToGeoPackage();
 // let tempGeo = new GeoPackage.GeoPackage();
-const kmlPath = path.join(__dirname, 'KML_Samples.kml');
-test
-  .convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
-  .then(value => {
-    // console.log('Returned ', value);
-    // console.log('Test', test.boundingBox);
-  })
-  .catch(e => {
-    console.log('Error', e.message);
-  });
+// let kmlPath = path.join(__dirname, 'KML_Samples.kml');
+// test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
+//   .then(value => {
+//     // console.log('Returned ', value);
+//     // console.log('Test', test.boundingBox);
+//   })
+//   .catch(e => {
+//     console.log('Error', e.message);
+//   });
 // console.log('Before');
+
+kmlPath = path.join(__dirname, 'nepal.kmz');
+test.convertKMZToGeoPackage(kmlPath, './temp.gpkg', 'nepal');

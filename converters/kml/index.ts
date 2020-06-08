@@ -13,6 +13,14 @@ import _ from 'lodash';
 import xmlStream from 'xml-stream';
 import * as KMLTAGS from './KMLTags.js';
 
+import JSZip from 'jszip';
+import mkdirp from 'mkdirp';
+import path from 'path';
+import http from 'http';
+import { imageSize } from 'image-size';
+import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
+import { resolve } from 'dns';
+
 export interface KMLConverterOptions {
   kmlPath?: string;
   append?: boolean;
@@ -31,12 +39,57 @@ export class KMLToGeoPackage {
   styleUrlMap: Map<string, number>;
   styleRowMap: Map<number, any>;
   styleMapPair: Map<string, string>;
+  iconMap: Map<string, object>;
+  iconUrlMap: Map<string, number>;
+  iconRowMap: Map<number, any>;
+  iconMapPair: Map<string, string>;
   constructor(private optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
     this.styleMapPair = new Map();
     this.styleMap = new Map();
     this.styleUrlMap = new Map();
     this.styleRowMap = new Map();
+    this.iconMap = new Map();
+    this.iconUrlMap = new Map();
+    this.iconRowMap = new Map();
+    this.iconMapPair = new Map();
+  }
+
+  async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage, tableName: string): Promise<any>  {
+    const dataPath = fs.readFileSync(kmzPath);
+    const zip = await JSZip.loadAsync(dataPath);
+    let kmlPath = 'doc.kml';
+    let gp;
+    await new Promise(async resolve => {
+      for (const key in zip.files) {
+        await new Promise(async resolve => {
+          if (zip.files.hasOwnProperty(key)) {
+            const path1 = __dirname + '/tmp/' + key;
+            kmlPath = zip.files[key].name.endsWith('.kml') ? zip.files[key].name : kmlPath;
+            await mkdirp(path.dirname(path1), function(err) {
+              if (err) console.error(err);
+              zip
+                .file(key)
+                .nodeStream()
+                .pipe(
+                  fs.createWriteStream(path1, {
+                    flags: 'w',
+                  }),
+                )
+                .on('finish', () => {
+                  console.log(key, 'written');
+                  resolve();
+                });
+            });
+          }
+        });
+      }
+      resolve();
+    }).then(async () => {
+      gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName);
+    });
+    // clean up stuff
+    return gp;
   }
 
   /**
@@ -47,13 +100,12 @@ export class KMLToGeoPackage {
    */
   async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<GeoPackage> {
     const props = await this.getMetaDataKML(kmlPath);
-
     const geopkg = await this.setUpTableKML(kmlPath, props, geopackage, tableName);
-
     const defaultStyles = await this.setUpStyleKML(kmlPath, geopkg, tableName);
 
     // Geometry and Style Insertion
     await this.addKMLDataToGeoPackage(kmlPath, geopkg, defaultStyles, tableName);
+
     if (this.options.indexTable) {
       await this.indexTable(geopackage, tableName);
     }
@@ -117,7 +169,7 @@ export class KMLToGeoPackage {
       const defaultStyles = await this.setUpDefaultStyles(geopkg, tableName);
       // Specific Styles SetUp
       this.addSpecificStyles(defaultStyles, this.styleMap);
-
+      await this.addSpecificIcons(defaultStyles, this.iconMap);
       resolve(defaultStyles);
     });
   }
@@ -136,13 +188,13 @@ export class KMLToGeoPackage {
     tableName: string,
   ): Promise<void> {
     return new Promise(async resolve => {
+      console.log(this.iconMap, this.iconUrlMap);
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
       kml.collect('LinearRing');
       kml.collect('Polygon');
       kml.collect('Point');
       kml.collect('LineString');
-
       // Think about splitting up in kml.on
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;
@@ -174,10 +226,12 @@ export class KMLToGeoPackage {
         }
         const props = {};
         let styleRow: StyleRow;
+        let iconRow: IconRow;
         for (const prop in node) {
           if (prop === KMLTAGS.STYLE_URL_TAG) {
             try {
               let styleId = this.styleUrlMap.get(node[prop]);
+              let iconId = this.iconUrlMap.get(node[prop]);
               if (styleId !== undefined) {
                 styleRow = this.styleRowMap.get(styleId);
               } else {
@@ -185,18 +239,33 @@ export class KMLToGeoPackage {
                 styleId = this.styleUrlMap.get(normalStyle);
                 styleRow = this.styleRowMap.get(styleId);
               }
+              if (iconId !== undefined) {
+                iconRow = this.iconRowMap.get(iconId);
+              } else {
+                const normalStyle = this.iconMapPair.get(node[prop]);
+                console.log(normalStyle);
+                iconId = this.iconUrlMap.get(normalStyle);
+                // console.log(this.iconUrlMap.get(normalStyle), normalStyle);
+                iconRow = this.iconRowMap.get(iconId);
+                // console.log(iconRow);
+              }
+              // console.log(iconRow, node[prop]);
             } catch (error) {
               console.error(error);
             }
           }
 
           if (prop === KMLTAGS.STYLE_TAG) {
+            console.log(node[prop], node.Style);
             const tempMap = new Map<string, object>();
-            tempMap.set(node.Style['$'].id, node.Style);
+            tempMap.set(node.name, node.Style);
             this.addSpecificStyles(defaultStyles, tempMap);
-
-            const styleId = this.styleUrlMap.get('#' + node.Style['$'].id);
+            this.addSpecificIcons(defaultStyles, tempMap);
+            const styleId = this.styleUrlMap.get('#' + node.name);
             styleRow = this.styleRowMap.get(styleId);
+            console.log(styleId);
+            const iconId = this.iconUrlMap.get('#' + node.name);
+            iconRow = this.iconRowMap.get(iconId);
           }
 
           if (prop === KMLTAGS.STYLE_MAP_TAG) {
@@ -227,6 +296,9 @@ export class KMLToGeoPackage {
           featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
           if (!_.isNil(styleRow)) {
             defaultStyles.setStyle(featureID, geometryData.type, styleRow);
+          }
+          if (!_.isNil(iconRow)) {
+            defaultStyles.setIcon(featureID, geometryData.type, iconRow);
           }
         }
       });
@@ -283,14 +355,22 @@ export class KMLToGeoPackage {
         });
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_TAG, (node: {}) => {
-        if (node['$']) {
+        // console.log(node);
+        if (
+          node.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE) ||
+          node.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)
+        ) {
           this.styleMap.set(node['$'].id, node);
+        }
+        if (node.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+          this.iconMap.set(node['$'].id, node);
         }
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_MAP_TAG, node => {
         node.Pair.forEach((item: { key: string; styleUrl: string }) => {
           if (item.key === 'normal') {
             this.styleMapPair.set('#' + node['$'].id, item.styleUrl);
+            this.iconMapPair.set('#' + node['$'].id, item.styleUrl);
           }
         });
       });
@@ -352,7 +432,70 @@ export class KMLToGeoPackage {
       // }
     }
   }
-
+  private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const newIcon = styleTable.getIconDao().newRow();
+      newIcon.name = item[0];
+      if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+        const iconStyle = item[1][KMLTAGS.STYLE_TYPES.ICON_STYLE];
+        const iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
+        if (iconStyle[KMLTAGS.ICON_TAG]) {
+          if (iconLocation.startsWith('http')) {
+            http.get(iconLocation, response => {
+              if (response.statusCode === 200) {
+                const file = fs.createWriteStream(__dirname + '/' + path.basename(iconLocation));
+                response.pipe(file);
+                file.on('finish', () => {
+                  file.close();
+                  const data = fs.readFileSync(__dirname + '/' + path.basename(iconLocation)).toString('base64');
+                  const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
+                  newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
+                  const dim = imageSize(newIcon.data);
+                  newIcon.width = dim.width;
+                  newIcon.height = dim.height;
+                  newIcon.contentType = 'image' + '/' + dim.type;
+                  newIcon.anchorU = 0;
+                  newIcon.anchorV = 0;
+                  const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
+                  this.iconUrlMap.set('#' + item[0], newIconId);
+                  this.iconRowMap.set(newIconId, newIcon);
+                  resolve();
+                });
+              } else {
+                console.error('Status Code', response.statusCode);
+                reject();
+              }
+            });
+          } else {
+            console.log('FROM DISK');
+            const fileName = __dirname + '/tmp' + '/' + iconLocation;
+            console.log(fileName);
+            const data = fs.readFileSync(fileName).toString('base64');
+            const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
+            newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
+            const dim = imageSize(newIcon.data);
+            newIcon.width = dim.width;
+            newIcon.height = dim.height;
+            newIcon.contentType = 'image' + '/' + dim.type;
+            newIcon.anchorU = 0;
+            newIcon.anchorV = 0;
+            const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
+            this.iconUrlMap.set('#' + item[0], newIconId);
+            this.iconRowMap.set(newIconId, newIcon);
+            resolve();
+          }
+        }
+      }
+    });
+  }
+  private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
+    return new Promise(async resolve => {
+      for (const item of items) {
+        await this.addSpecificIcon(styleTable, item);
+      }
+      resolve();
+    });
+  }
   /**
    * Adds styles to the table provided.
    * Saves id and name in this.styleRowMap and this.styleUrlMap
@@ -361,9 +504,12 @@ export class KMLToGeoPackage {
    */
   private addSpecificStyles(styleTable: FeatureTableStyles, items: Map<string, object>): void {
     for (const item of items) {
+      let isStyle = false;
       const newStyle = styleTable.getStyleDao().newRow();
+
       newStyle.setName(item[0]);
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
+        isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
           const abgr = item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['color'];
           const { rgb, a } = this.abgrStringToColorOpacity(abgr);
@@ -373,8 +519,8 @@ export class KMLToGeoPackage {
           newStyle.setWidth(item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['width']);
         }
       }
-
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)) {
+        isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
           const abgr = item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE]['color'];
           const { rgb, a } = this.abgrStringToColorOpacity(abgr);
@@ -390,10 +536,11 @@ export class KMLToGeoPackage {
           // newStyle.(item[1]['LineStyle']['outline']);
         }
       }
-
-      const newStyleId = styleTable.getFeatureStyleExtension().getOrInsertStyle(newStyle);
-      this.styleUrlMap.set('#' + item[0], newStyleId);
-      this.styleRowMap.set(newStyleId, newStyle);
+      if (isStyle) {
+        const newStyleId = styleTable.getFeatureStyleExtension().getOrInsertStyle(newStyle);
+        this.styleUrlMap.set('#' + item[0], newStyleId);
+        this.styleRowMap.set(newStyleId, newStyle);
+      }
     }
   }
 
