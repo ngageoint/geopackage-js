@@ -19,7 +19,6 @@ import path from 'path';
 import http from 'http';
 import { imageSize } from 'image-size';
 import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
-import { resolve } from 'dns';
 
 export interface KMLConverterOptions {
   kmlPath?: string;
@@ -37,11 +36,11 @@ export class KMLToGeoPackage {
   boundingBox: BoundingBox;
   styleMap: Map<string, object>;
   styleUrlMap: Map<string, number>;
-  styleRowMap: Map<number, any>;
+  styleRowMap: Map<number, StyleRow>;
   styleMapPair: Map<string, string>;
   iconMap: Map<string, object>;
   iconUrlMap: Map<string, number>;
-  iconRowMap: Map<number, any>;
+  iconRowMap: Map<number, IconRow>;
   iconMapPair: Map<string, string>;
   constructor(private optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
@@ -55,24 +54,24 @@ export class KMLToGeoPackage {
     this.iconMapPair = new Map();
   }
 
-  async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage, tableName: string): Promise<any>  {
+  async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage, tableName: string): Promise<any> {
     const dataPath = fs.readFileSync(kmzPath);
     const zip = await JSZip.loadAsync(dataPath);
-    let kmlPath = 'doc.kml';
-    let gp;
+    let kmlPath: string;
+    let gp: GeoPackage;
     await new Promise(async resolve => {
       for (const key in zip.files) {
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
-            const path1 = __dirname + '/tmp/' + key;
+            const fileDestination = __dirname + '/tmp/' + key;
             kmlPath = zip.files[key].name.endsWith('.kml') ? zip.files[key].name : kmlPath;
-            await mkdirp(path.dirname(path1), function(err) {
+            await mkdirp(path.dirname(fileDestination), function(err) {
               if (err) console.error(err);
               zip
                 .file(key)
                 .nodeStream()
                 .pipe(
-                  fs.createWriteStream(path1, {
+                  fs.createWriteStream(fileDestination, {
                     flags: 'w',
                   }),
                 )
@@ -87,6 +86,7 @@ export class KMLToGeoPackage {
       resolve();
     }).then(async () => {
       gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName);
+      //if no kml
     });
     // clean up stuff
     return gp;
@@ -188,7 +188,6 @@ export class KMLToGeoPackage {
     tableName: string,
   ): Promise<void> {
     return new Promise(async resolve => {
-      console.log(this.iconMap, this.iconUrlMap);
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
       kml.collect('LinearRing');
@@ -243,7 +242,7 @@ export class KMLToGeoPackage {
                 iconRow = this.iconRowMap.get(iconId);
               } else {
                 const normalStyle = this.iconMapPair.get(node[prop]);
-                console.log(normalStyle);
+                // console.log(normalStyle);
                 iconId = this.iconUrlMap.get(normalStyle);
                 // console.log(this.iconUrlMap.get(normalStyle), normalStyle);
                 iconRow = this.iconRowMap.get(iconId);
@@ -256,23 +255,20 @@ export class KMLToGeoPackage {
           }
 
           if (prop === KMLTAGS.STYLE_TAG) {
-            console.log(node[prop], node.Style);
+            // console.log(node[prop], node.Style);
             const tempMap = new Map<string, object>();
             tempMap.set(node.name, node.Style);
             this.addSpecificStyles(defaultStyles, tempMap);
             this.addSpecificIcons(defaultStyles, tempMap);
             const styleId = this.styleUrlMap.get('#' + node.name);
             styleRow = this.styleRowMap.get(styleId);
-            console.log(styleId);
+            // console.log(styleId);
             const iconId = this.iconUrlMap.get('#' + node.name);
             iconRow = this.iconRowMap.get(iconId);
           }
 
           if (prop === KMLTAGS.STYLE_MAP_TAG) {
-            console.log(node);
-            console.log('Style', this.styleMapPair);
             const normalStyle = this.styleMapPair.get(node['$'].id);
-
             const styleId = this.styleUrlMap.get(normalStyle);
             styleRow = this.styleRowMap.get(styleId);
           }
@@ -316,25 +312,24 @@ export class KMLToGeoPackage {
     return new Promise(resolve => {
       const properties = new Set<string>();
       // Bounding box
-      let minLat: number, minLon: number;
-      let maxLat: number, maxLon: number;
+      let minLat: number, minLon: number, maxLat: number, maxLon: number;
 
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
       kml.collect('Pair');
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, (node: {}) => {
         for (const property in node) {
-          // FIXME(Jared Lincenberg):
           // Item to be treated like a Geometry
           if (
-            property === 'Point' ||
-            property === 'LineString' ||
-            property === 'Polygon' ||
-            property === 'MultiGeometry' ||
-            property === 'Model'
+            !(
+              property === 'Point' ||
+              property === 'LineString' ||
+              property === 'Polygon' ||
+              property === 'MultiGeometry' ||
+              property === 'Model' ||
+              property === 'Style'
+            )
           ) {
-          } else if (property === 'Style') {
-          } else {
             properties.add(property);
           }
         }
@@ -414,8 +409,9 @@ export class KMLToGeoPackage {
   }
 
   /*
-   * Private Methods
-   * */
+   * Private/Helper Methods
+   */
+
   /**
    * Index the table to make searching for points faster.
    * @param geopackage GeoPackage Object
@@ -426,12 +422,42 @@ export class KMLToGeoPackage {
     const fti = featureDao.featureTableIndex;
     if (fti) {
       await fti.index();
-      // if (!_.isNil(fti.tableIndex)) {
-      //   console.log('start indexing');
-      //   console.log("End");
-      // }
     }
   }
+
+  /**
+   * Converts Item into a data URL and adds it and information about to the database.
+   * @param iconLocation Used to find the extension type
+   * @param data base64 string of the image data
+   * @param newIcon Row for the new Icon
+   * @param styleTable Main styleTable in the database
+   * @param id Id from KML
+   */
+  private imageDataToDataBase(
+    iconLocation: string,
+    data: string,
+    newIcon: IconRow,
+    styleTable: FeatureTableStyles,
+    id: string,
+  ): void {
+    const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
+    newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
+    const dim = imageSize(newIcon.data);
+    newIcon.width = dim.width;
+    newIcon.height = dim.height;
+    newIcon.contentType = 'image/' + dim.type;
+    newIcon.anchorU = 0;
+    newIcon.anchorV = 0;
+    const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
+    this.iconUrlMap.set('#' + id, newIconId);
+    this.iconRowMap.set(newIconId, newIcon);
+  }
+
+  /**
+   * Adds an Icon into the Database
+   * @param styleTable Database Object for the style
+   * @param item The id from KML and the object data from KML
+   */
   private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
     return new Promise((resolve, reject) => {
       const newIcon = styleTable.getIconDao().newRow();
@@ -439,55 +465,40 @@ export class KMLToGeoPackage {
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
         const iconStyle = item[1][KMLTAGS.STYLE_TYPES.ICON_STYLE];
         const iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-        if (iconStyle[KMLTAGS.ICON_TAG]) {
-          if (iconLocation.startsWith('http')) {
-            http.get(iconLocation, response => {
-              if (response.statusCode === 200) {
-                const file = fs.createWriteStream(__dirname + '/' + path.basename(iconLocation));
-                response.pipe(file);
-                file.on('finish', () => {
-                  file.close();
-                  const data = fs.readFileSync(__dirname + '/' + path.basename(iconLocation)).toString('base64');
-                  const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
-                  newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
-                  const dim = imageSize(newIcon.data);
-                  newIcon.width = dim.width;
-                  newIcon.height = dim.height;
-                  newIcon.contentType = 'image' + '/' + dim.type;
-                  newIcon.anchorU = 0;
-                  newIcon.anchorV = 0;
-                  const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
-                  this.iconUrlMap.set('#' + item[0], newIconId);
-                  this.iconRowMap.set(newIconId, newIcon);
-                  resolve();
-                });
-              } else {
-                console.error('Status Code', response.statusCode);
-                reject();
-              }
-            });
-          } else {
-            console.log('FROM DISK');
-            const fileName = __dirname + '/tmp' + '/' + iconLocation;
-            console.log(fileName);
-            const data = fs.readFileSync(fileName).toString('base64');
-            const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
-            newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
-            const dim = imageSize(newIcon.data);
-            newIcon.width = dim.width;
-            newIcon.height = dim.height;
-            newIcon.contentType = 'image' + '/' + dim.type;
-            newIcon.anchorU = 0;
-            newIcon.anchorV = 0;
-            const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
-            this.iconUrlMap.set('#' + item[0], newIconId);
-            this.iconRowMap.set(newIconId, newIcon);
-            resolve();
-          }
+        if (iconLocation.startsWith('http')) {
+          http.get(iconLocation, response => {
+            if (response.statusCode === 200) {
+              // const file = fs.createWriteStream(__dirname + '/' + path.basename(iconLocation));
+              // response.pipe(file);
+              let imgBuf = Buffer.alloc(0);
+              response.on('data', chunk => {
+                imgBuf = Buffer.concat([imgBuf, chunk]);
+              });
+              response.on('end', () => {
+                const data = imgBuf.toString('base64');
+                this.imageDataToDataBase(iconLocation, data, newIcon, styleTable, item[0]);
+                resolve();
+              });
+            } else {
+              console.error('Status Code', response.statusCode);
+              reject();
+            }
+          });
+        } else {
+          const fileName = __dirname + '/tmp/' + iconLocation;
+          const data = fs.readFileSync(fileName).toString('base64');
+          this.imageDataToDataBase(iconLocation, data, newIcon, styleTable, item[0]);
+          resolve();
         }
       }
     });
   }
+
+  /**
+   * Loops through provided map of names of icons and object data of the icons.
+   * @param styleTable Feature Table Style
+   * @param items icons to add to the style table
+   */
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
       for (const item of items) {
@@ -496,6 +507,7 @@ export class KMLToGeoPackage {
       resolve();
     });
   }
+
   /**
    * Adds styles to the table provided.
    * Saves id and name in this.styleRowMap and this.styleUrlMap

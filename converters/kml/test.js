@@ -12,8 +12,8 @@ const path = require('path');
 
 const test = new KMLToGeoPackage();
 // let tempGeo = new GeoPackage.GeoPackage();
-// let kmlPath = path.join(__dirname, 'KML_Samples.kml');
-// test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
+let kmlPath = path.join(__dirname, 'KML_Samples.kml');
+test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
 //   .then(value => {
 //     // console.log('Returned ', value);
 //     // console.log('Test', test.boundingBox);
@@ -23,5 +23,5 @@ const test = new KMLToGeoPackage();
 //   });
 // console.log('Before');
 
-kmlPath = path.join(__dirname, 'nepal.kmz');
-test.convertKMZToGeoPackage(kmlPath, './temp.gpkg', 'nepal');
+// kmlPath = path.join(__dirname, 'nepal.kmz');
+// test.convertKMZToGeoPackage(kmlPath, './temp.gpkg', 'nepal');
