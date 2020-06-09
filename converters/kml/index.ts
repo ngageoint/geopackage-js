@@ -44,6 +44,7 @@ export class KMLToGeoPackage {
   iconMapPair: Map<string, string>;
   constructor(private optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
+    // Icon and Style Map are used to help fill out cross reference tables in the Geopackage Database
     this.styleMapPair = new Map();
     this.styleMap = new Map();
     this.styleUrlMap = new Map();
@@ -54,6 +55,12 @@ export class KMLToGeoPackage {
     this.iconMapPair = new Map();
   }
 
+  /**
+   * Unzips and stores data from a KMZ file in a newly created tmp directory.
+   * @param kmzPath Path to the KMZ file (Which the zipped version of a KML)
+   * @param geopackage  String or name of Geopackage to use
+   * @param tableName  Name of the main Geometry Table
+   */
   async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage, tableName: string): Promise<any> {
     const dataPath = fs.readFileSync(kmzPath);
     const zip = await JSZip.loadAsync(dataPath);
@@ -195,6 +202,7 @@ export class KMLToGeoPackage {
       kml.collect('Point');
       kml.collect('LineString');
       // Think about splitting up in kml.on
+      // kml.
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;
         let geometryData;
@@ -350,7 +358,6 @@ export class KMLToGeoPackage {
         });
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_TAG, (node: {}) => {
-        // console.log(node);
         if (
           node.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE) ||
           node.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)
@@ -518,8 +525,9 @@ export class KMLToGeoPackage {
     for (const item of items) {
       let isStyle = false;
       const newStyle = styleTable.getStyleDao().newRow();
-
       newStyle.setName(item[0]);
+
+      // Styling for Lines
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
         isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
@@ -531,6 +539,8 @@ export class KMLToGeoPackage {
           newStyle.setWidth(item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['width']);
         }
       }
+
+      // Styling for Polygons
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)) {
         isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
@@ -548,6 +558,8 @@ export class KMLToGeoPackage {
           // newStyle.(item[1]['LineStyle']['outline']);
         }
       }
+
+      // Add Style to Geopackage
       if (isStyle) {
         const newStyleId = styleTable.getFeatureStyleExtension().getOrInsertStyle(newStyle);
         this.styleUrlMap.set('#' + item[0], newStyleId);
@@ -556,6 +568,9 @@ export class KMLToGeoPackage {
     }
   }
 
+  // private async setUpDefaultIcon(geopkg: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
+
+  // }
   /**
    * Provides default styles for the Geometry table.
    * Currently set to Red
@@ -691,7 +706,7 @@ export class KMLToGeoPackage {
       });
 
       const temp = [coordArray];
-      if (node.Polygon.hasOwnProperty('innerBoundaryIs')) {
+      if (node[KMLTAGS.GEOMETRY_TAGS.POLYGON].hasOwnProperty('innerBoundaryIs')) {
         const coordText = element.innerBoundaryIs.LinearRing[0].coordinates;
         const coordRing = coordText.split(' ');
         const coordArray = [];
