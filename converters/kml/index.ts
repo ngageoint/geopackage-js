@@ -263,13 +263,13 @@ export class KMLToGeoPackage {
 
         await loadImage(__dirname + '/tmp/' + node.Icon.href).then(
           image => {
-            let dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 0);
+            let dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 0, kmlBBox);
             dataUrlsNoScale.then(buffers => {
               // console.log(buffers);
               for (const key in buffers) {
                 if (buffers.hasOwnProperty(key)) {
-                  const ij = key.split(',');
-                  geopackage.addTile(buffers[key], node.name, naturalScale, parseInt(ij[1]), parseInt(ij[0]));
+                  const zxy = key.split(',');
+                  geopackage.addTile(buffers[key], node.name, parseInt(zxy[0]), parseInt(zxy[2]), parseInt(zxy[1]));
                 }
               }
             });
