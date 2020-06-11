@@ -5,6 +5,8 @@ import {
   GeometryColumns,
   GeoPackage,
   GeoPackageAPI,
+  TileScaling,
+  TileScalingType,
 } from '@ngageoint/geopackage';
 import { FeatureTableStyles } from '@ngageoint/geopackage/built/lib/extension/style/featureTableStyles';
 import { StyleRow } from '@ngageoint/geopackage/built/lib/extension/style/styleRow';
@@ -12,6 +14,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import xmlStream from 'xml-stream';
 import * as KMLTAGS from './KMLTags.js';
+import { KMLUtilities } from './kmlUtilities';
 
 import JSZip from 'jszip';
 import mkdirp from 'mkdirp';
@@ -19,6 +22,7 @@ import path from 'path';
 import http from 'http';
 import { imageSize } from 'image-size';
 import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
+import { Image, Canvas, createCanvas, loadImage } from 'canvas';
 
 export interface KMLConverterOptions {
   kmlPath?: string;
@@ -202,7 +206,100 @@ export class KMLToGeoPackage {
       kml.collect('Point');
       kml.collect('LineString');
       // Think about splitting up in kml.on
-      // kml.
+      // kml.on('endElement : ' + KMLTAGS.PLACEMARK_TAG + ' ' + KMLTAGS.GEOMETRY_TAGS.POINT, node => {
+      //   const geometryData = this.handlePoints(node);
+      //   const feature: any = {
+      //     type: 'Feature',
+      //     geometry: geometryData,
+      //     properties: props,
+      //   };
+      //   featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
+      // });
+      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
+        const kmlBBox = new BoundingBox(
+          node.LatLonBox.west,
+          node.LatLonBox.east,
+          node.LatLonBox.south,
+          node.LatLonBox.north,
+        );
+        console.log(kmlBBox);
+        const webMercatorBBox = kmlBBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
+        console.log(webMercatorBBox);
+        const contentsSrsId = 4326;
+        const tileMatrixSetSrsId = 3857;
+        geopackage.createStandardWebMercatorTileTable(
+          node.name,
+          this.boundingBox,
+          contentsSrsId,
+          webMercatorBBox,
+          tileMatrixSetSrsId,
+          0,
+          20,
+        );
+        const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(node.Icon.href).catch(error => {
+          console.error(error);
+          return 'ERROR';
+        });
+        if (dataUrl === 'ERROR') {
+          return;
+        }
+        const data = Buffer.from(dataUrl.split(',')[1], 'base64');
+        const dim = imageSize(data);
+        console.log(typeof dim);
+        const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, dim);
+        console.log(naturalScale);
+        console.log(dim.width, dim.height);
+        const tileScalingExt = geopackage.getTileScalingExtension(node.name);
+        await tileScalingExt.getOrCreateExtension();
+        const ts = new TileScaling();
+        ts.scaling_type = TileScalingType.IN_OUT;
+        ts.zoom_in = 4;
+        ts.zoom_out = 4;
+        console.log(ts);
+        tileScalingExt.createOrUpdate(ts);
+        const p2 = KMLUtilities.getNearestPowerOfTwoUpper(dim);
+        const canvas = createCanvas(p2, p2);
+        const ctx = canvas.getContext('2d');
+
+        await loadImage(__dirname + '/tmp/' + node.Icon.href).then(
+          image => {
+            let dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 0);
+            dataUrlsNoScale.then(buffers => {
+              // console.log(buffers);
+              for (const key in buffers) {
+                if (buffers.hasOwnProperty(key)) {
+                  const ij = key.split(',');
+                  geopackage.addTile(buffers[key], node.name, naturalScale, parseInt(ij[1]), parseInt(ij[0]));
+                }
+              }
+            });
+            // dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 2);
+            // dataUrlsNoScale.then(buffers => {
+            //   // console.log(buffers);
+            //   for (const key in buffers) {
+            //     if (buffers.hasOwnProperty(key)) {
+            //       const ij = key.split(',');
+            //       geopackage.addTile(buffers[key], node.name, naturalScale - 2, parseInt(ij[1]), parseInt(ij[0]));
+            //     }
+            //   }
+            // });
+            // dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 4);
+            // dataUrlsNoScale.then(buffers => {
+            //   // console.log(buffers);
+            //   for (const key in buffers) {
+            //     if (buffers.hasOwnProperty(key)) {
+            //       const ij = key.split(',');
+            //       geopackage.addTile(buffers[key], node.name, naturalScale - 4, parseInt(ij[1]), parseInt(ij[0]));
+            //     }
+            //   }
+            // });
+          },
+          () => {
+            console.error('Rejected');
+          },
+        );
+        // console.log(ctx);
+      });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;
         let geometryData;
@@ -263,14 +360,12 @@ export class KMLToGeoPackage {
           }
 
           if (prop === KMLTAGS.STYLE_TAG) {
-            // console.log(node[prop], node.Style);
             const tempMap = new Map<string, object>();
             tempMap.set(node.name, node.Style);
             this.addSpecificStyles(defaultStyles, tempMap);
             this.addSpecificIcons(defaultStyles, tempMap);
             const styleId = this.styleUrlMap.get('#' + node.name);
             styleRow = this.styleRowMap.get(styleId);
-            // console.log(styleId);
             const iconId = this.iconUrlMap.get('#' + node.name);
             iconRow = this.iconRowMap.get(iconId);
           }
@@ -298,12 +393,12 @@ export class KMLToGeoPackage {
         let featureID: number;
         if (isGeom) {
           featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
-          if (!_.isNil(styleRow)) {
-            defaultStyles.setStyle(featureID, geometryData.type, styleRow);
-          }
-          if (!_.isNil(iconRow)) {
-            defaultStyles.setIcon(featureID, geometryData.type, iconRow);
-          }
+        }
+        if (!_.isNil(styleRow)) {
+          defaultStyles.setStyle(featureID, geometryData.type, styleRow);
+        }
+        if (!_.isNil(iconRow)) {
+          defaultStyles.setIcon(featureID, geometryData.type, iconRow);
         }
       });
       kml.on('end', async () => {
@@ -356,6 +451,9 @@ export class KMLToGeoPackage {
           if (Number(temp[1]) < minLon) minLon = Number(temp[1]);
           if (Number(temp[1]) > maxLon) maxLon = Number(temp[1]);
         });
+      });
+      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, (node: {}) => {
+        console.log(node);
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_TAG, (node: {}) => {
         if (
@@ -442,12 +540,11 @@ export class KMLToGeoPackage {
    */
   private imageDataToDataBase(
     iconLocation: string,
-    data: string,
+    dataUrl: string,
     newIcon: IconRow,
     styleTable: FeatureTableStyles,
     id: string,
   ): void {
-    const dataUrl = 'data:image/' + path.extname(iconLocation).substring(1) + ';base64,' + data;
     newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
     const dim = imageSize(newIcon.data);
     newIcon.width = dim.width;
@@ -466,37 +563,21 @@ export class KMLToGeoPackage {
    * @param item The id from KML and the object data from KML
    */
   private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const newIcon = styleTable.getIconDao().newRow();
       newIcon.name = item[0];
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
         const iconStyle = item[1][KMLTAGS.STYLE_TYPES.ICON_STYLE];
         const iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-        if (iconLocation.startsWith('http')) {
-          http.get(iconLocation, response => {
-            if (response.statusCode === 200) {
-              // const file = fs.createWriteStream(__dirname + '/' + path.basename(iconLocation));
-              // response.pipe(file);
-              let imgBuf = Buffer.alloc(0);
-              response.on('data', chunk => {
-                imgBuf = Buffer.concat([imgBuf, chunk]);
-              });
-              response.on('end', () => {
-                const data = imgBuf.toString('base64');
-                this.imageDataToDataBase(iconLocation, data, newIcon, styleTable, item[0]);
-                resolve();
-              });
-            } else {
-              console.error('Status Code', response.statusCode);
-              reject();
-            }
-          });
-        } else {
-          const fileName = __dirname + '/tmp/' + iconLocation;
-          const data = fs.readFileSync(fileName).toString('base64');
-          this.imageDataToDataBase(iconLocation, data, newIcon, styleTable, item[0]);
-          resolve();
+        const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(iconLocation).catch(error => {
+          console.error(error);
+          return 'ERROR';
+        });
+        if (dataUrl === 'ERROR') {
+          reject();
         }
+        this.imageDataToDataBase(iconLocation, dataUrl, newIcon, styleTable, item[0]);
+        resolve();
       }
     });
   }
