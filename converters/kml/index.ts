@@ -60,7 +60,7 @@ export class KMLToGeoPackage {
   }
 
   /**
-   * Unzips and stores data from a KMZ file in a newly created tmp directory.
+   * Unzips and stores data from a KMZ file in the current directory.
    * @param kmzPath Path to the KMZ file (Which the zipped version of a KML)
    * @param geopackage  String or name of Geopackage to use
    * @param tableName  Name of the main Geometry Table
@@ -74,7 +74,7 @@ export class KMLToGeoPackage {
       for (const key in zip.files) {
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
-            const fileDestination = __dirname + '/tmp/' + key;
+            const fileDestination = __dirname + '/' + key;
             kmlPath = zip.files[key].name.endsWith('.kml') ? zip.files[key].name : kmlPath;
             await mkdirp(path.dirname(fileDestination), function(err) {
               if (err) console.error(err);
@@ -217,54 +217,48 @@ export class KMLToGeoPackage {
       // });
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
         const kmlBBox = new BoundingBox(
-          node.LatLonBox.west,
-          node.LatLonBox.east,
-          node.LatLonBox.south,
-          node.LatLonBox.north,
+          parseFloat(node.LatLonBox.west),
+          parseFloat(node.LatLonBox.east),
+          parseFloat(node.LatLonBox.south),
+          parseFloat(node.LatLonBox.north),
         );
         console.log(kmlBBox);
-        const webMercatorBBox = kmlBBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-        console.log(webMercatorBBox);
+
+        const matrixSetBounds = new BoundingBox(
+          -20037508.342789244,
+          20037508.342789244,
+          -20037508.342789244,
+          20037508.342789244,
+        );
+
         const contentsSrsId = 4326;
         const tileMatrixSetSrsId = 3857;
         geopackage.createStandardWebMercatorTileTable(
           node.name,
-          this.boundingBox,
+          kmlBBox,
           contentsSrsId,
-          webMercatorBBox,
+          matrixSetBounds,
           tileMatrixSetSrsId,
           0,
           20,
         );
-        const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(node.Icon.href).catch(error => {
-          console.error(error);
-          return 'ERROR';
-        });
-        if (dataUrl === 'ERROR') {
-          return;
-        }
-        const data = Buffer.from(dataUrl.split(',')[1], 'base64');
-        const dim = imageSize(data);
-        console.log(typeof dim);
-        const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, dim);
-        console.log(naturalScale);
-        console.log(dim.width, dim.height);
         const tileScalingExt = geopackage.getTileScalingExtension(node.name);
         await tileScalingExt.getOrCreateExtension();
         const ts = new TileScaling();
         ts.scaling_type = TileScalingType.IN_OUT;
-        ts.zoom_in = 4;
-        ts.zoom_out = 4;
-        console.log(ts);
+        ts.zoom_in = 2;
+        ts.zoom_out = 2;
+        // console.log(ts);
         tileScalingExt.createOrUpdate(ts);
-        const p2 = KMLUtilities.getNearestPowerOfTwoUpper(dim);
-        const canvas = createCanvas(p2, p2);
-        const ctx = canvas.getContext('2d');
 
-        await loadImage(__dirname + '/tmp/' + node.Icon.href).then(
+        const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : __dirname + '/' + node.Icon.href;
+        await loadImage(imageLocation).then(
           image => {
-            let dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 0, kmlBBox);
-            dataUrlsNoScale.then(buffers => {
+            const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, image);
+            const zoomLevels = _.range(naturalScale % 2 ? 1 : 0, naturalScale + 2, 2);
+            console.log(zoomLevels);
+            const imageBuffers = KMLUtilities.getZoomImages(image, zoomLevels, kmlBBox);
+            imageBuffers.then(buffers => {
               // console.log(buffers);
               for (const key in buffers) {
                 if (buffers.hasOwnProperty(key)) {
@@ -273,32 +267,11 @@ export class KMLToGeoPackage {
                 }
               }
             });
-            // dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 2);
-            // dataUrlsNoScale.then(buffers => {
-            //   // console.log(buffers);
-            //   for (const key in buffers) {
-            //     if (buffers.hasOwnProperty(key)) {
-            //       const ij = key.split(',');
-            //       geopackage.addTile(buffers[key], node.name, naturalScale - 2, parseInt(ij[1]), parseInt(ij[0]));
-            //     }
-            //   }
-            // });
-            // dataUrlsNoScale = KMLUtilities.getZoomImages(canvas, image, dim, naturalScale, 4);
-            // dataUrlsNoScale.then(buffers => {
-            //   // console.log(buffers);
-            //   for (const key in buffers) {
-            //     if (buffers.hasOwnProperty(key)) {
-            //       const ij = key.split(',');
-            //       geopackage.addTile(buffers[key], node.name, naturalScale - 4, parseInt(ij[1]), parseInt(ij[0]));
-            //     }
-            //   }
-            // });
           },
           () => {
             console.error('Rejected');
           },
         );
-        // console.log(ctx);
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;

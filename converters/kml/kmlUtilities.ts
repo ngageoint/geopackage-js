@@ -5,32 +5,11 @@ import path from 'path';
 import { BoundingBox } from '@ngageoint/geopackage';
 import { imageSize } from 'image-size';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
-import { Canvas, Image } from 'canvas';
+import { Canvas, Image, createCanvas } from 'canvas';
+import { start } from 'repl';
 
-export const TILE_SIZE_PX = 256;
-export const ZoomLevelWidthLong = [
-  360,
-  180,
-  90,
-  45,
-  22.5,
-  11.25,
-  5.625,
-  2.813,
-  1.406,
-  0.703,
-  0.352,
-  0.176,
-  0.088,
-  0.044,
-  0.022,
-  0.011,
-  0.005,
-  0.003,
-  0.001,
-  0.0005,
-  0.00025,
-];
+export const TILE_SIZE_IN_PIXELS = 256;
+
 export class KMLUtilities {
   // Taken from Map Cache Electron
   static tile2lon(x: number, z: number): number {
@@ -54,8 +33,9 @@ export class KMLUtilities {
   }
   // Taken from Map Cache Electron
   static calculateXTileRange(bbox: BoundingBox, z: any): { min: number; max: number } {
-    const west = KMLUtilities.long2tile(bbox.minLongitude, z);
-    const east = KMLUtilities.long2tile(bbox.maxLongitude, z);
+    const west = KMLUtilities.long2tile(bbox.maxLongitude, z);
+    const east = KMLUtilities.long2tile(bbox.minLongitude, z);
+    // console.log('east', east, typeof bbox.maxLongitude, z, west);
     return {
       min: Math.max(0, Math.min(west, east)),
       max: Math.max(0, Math.max(west, east)),
@@ -65,6 +45,7 @@ export class KMLUtilities {
   static calculateYTileRange(bbox: BoundingBox, z: any): { min: number; max: number; current: number } {
     const south = KMLUtilities.lat2tile(bbox.minLatitude, z);
     const north = KMLUtilities.lat2tile(bbox.maxLatitude, z);
+    // console.log(south, north);
     return {
       min: Math.max(0, Math.min(south, north)),
       max: Math.max(0, Math.max(south, north)),
@@ -80,11 +61,11 @@ export class KMLUtilities {
     let stop = false;
     for (let i = 0; i < zoomLevels.length && !stop; i++) {
       const z = zoomLevels[i];
-      console.log(z);
+      // console.log(z);
       const yRange = KMLUtilities.calculateYTileRange(extent, z);
-      console.log(yRange);
+      // console.log(yRange);
       const xRange = KMLUtilities.calculateXTileRange(extent, z);
-      console.log(xRange);
+      // console.log(xRange);
       for (let x = xRange.min; x <= xRange.max && !stop; x++) {
         for (let y = yRange.min; y <= yRange.max && !stop; y++) {
           stop = await tileCallback({ z, x, y });
@@ -92,35 +73,12 @@ export class KMLUtilities {
       }
     }
   }
-  static getZoomLevelResolutionPixelsPerMeter(z: number): number {
-    const zoomLevelResolutionsPixelsPerMeter = [
-      156412,
-      78206,
-      39103,
-      19551,
-      9776,
-      4888,
-      2444,
-      1222,
-      610.984,
-      305.492,
-      152.746,
-      76.373,
-      38.187,
-      19.093,
-      9.547,
-      4.773,
-      2.387,
-      1.193,
-      0.596,
-      0.298,
-    ];
-    return zoomLevelResolutionsPixelsPerMeter[z];
-  }
-  // static getZoomLevelResoluiton
-  static tileBboxCalculator(x, y, z): { north: number; east: number; south: number; west: number } {
-    x = Number(x);
-    y = Number(y);
+  // Taken From Map Cache Electron
+  static tileBboxCalculator(
+    x: number,
+    y: number,
+    z: number,
+  ): { north: number; east: number; south: number; west: number } {
     const tileBounds = {
       north: KMLUtilities.tile2lat(y, z),
       east: KMLUtilities.tile2lon(x + 1, z),
@@ -130,96 +88,100 @@ export class KMLUtilities {
 
     return tileBounds;
   }
-  
-  public static async getZoomImages(
-    canvas: Canvas,
-    image: Image,
-    imageDim: ISizeCalculationResult,
-    naturalScale: number,
-    scaleFactor: number,
-    bbox: BoundingBox,
-  ): Promise<any> {
-    const pixelsPerLat = (bbox.maxLatitude - bbox.minLatitude) / imageDim.height;
-    const pixelsPerLon = (bbox.maxLongitude - bbox.minLongitude) / imageDim.width;
-    console.log(pixelsPerLat, pixelsPerLon);
-    const bufferImages = {};
-    canvas.width = 256;
-    canvas.height = 256;
+
+  /**
+   * Takes in an image and breaks it up into 256x256 tile with appropriate scaling based on the give zoomLevels.
+   * @param image node-canvas image object
+   * @param zoomLevels Array of zoom level that image tile will be created for
+   * @param bbox Image Bounding Box with Lat-Lon
+   * @returns Object of buffer Images, were the key is zoomLevelNumber,x,y
+   */
+  public static async getZoomImages(image: Image, zoomLevels: number[], imageBbox: BoundingBox): Promise<{}> {
+    // Set up Canvas to handle the drawing of images.
+    const canvas = createCanvas(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
     const context = canvas.getContext('2d');
+
+    // Calculate the resolution of the image compared to the Bounding Box
+    const pixelsPerLat = (imageBbox.maxLatitude - imageBbox.minLatitude) / image.height;
+    const pixelsPerLon = (imageBbox.maxLongitude - imageBbox.minLongitude) / image.width;
+
+    // Create object where resultant image buffer will be stored
+    const bufferedImages = {};
+
+    // Handles getting the correct Map tiles
     await KMLUtilities.iterateAllTilesInExtentForZoomLevels(
-      bbox,
-      [2, 4, 6, 8, 10, 12, 13],
+      imageBbox,
+      zoomLevels,
       async (zxy: { z: any; x: number; y: number }): Promise<boolean> => {
-        console.log('zoom:', zxy.z, 'x:', zxy.x, 'y:', zxy.y);
+        // Clears Canvas
+        context.clearRect(0, 0, TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
+
+        // Gets the Lat - Lon Bounding box for the Map Tile
         const tileBox = this.tileBboxCalculator(zxy.x, zxy.y, zxy.z);
-        const startHeight = (bbox.maxLatitude - tileBox.north) / pixelsPerLat;
-        const startWidth = (bbox.maxLongitude - tileBox.west) / pixelsPerLon;
-        const sizeHeight = (tileBox.north - tileBox.south) / pixelsPerLat;
-        const sizeWidth = (tileBox.west - tileBox.east) / pixelsPerLat;
-        console.log(startWidth, startHeight, sizeWidth, sizeHeight);
-        // console.log(this.tileBboxCalculator(zxy.x, zxy.y, zxy.z));
+
+        /*
+         * Code below Calculates the section of the image that corresponds to the current Map Tile
+         */
+        // Calculates distance between the topLeft corner of the image to the topLeft corner of the Map Tile
+        const leftSideImageToLeftSideTile = imageBbox.minLongitude - tileBox.west;
+        const topSideImageToTopSideTile = imageBbox.maxLatitude - tileBox.north;
+
+        // Calculates where to start the selection (in the Top Left).
+        const distanceLeftPixels = Math.max(0, -leftSideImageToLeftSideTile / pixelsPerLon);
+        const distanceDownPixels = Math.max(0, topSideImageToTopSideTile / pixelsPerLat);
+
+        // Calculates the intersection of the Image and the Map Tile
+        const horizontalIntersect =
+          Math.min(imageBbox.maxLongitude, tileBox.east) - Math.max(imageBbox.minLongitude, tileBox.west);
+        const verticalIntersect =
+          Math.min(imageBbox.maxLatitude, tileBox.north) - Math.max(imageBbox.minLatitude, tileBox.south);
+
+        // Convert overlap in pixel values
+        const horizontalImageIntersectPixels = horizontalIntersect / pixelsPerLon;
+        const verticalImageIntersectPixels = verticalIntersect / pixelsPerLat;
+        // console.log(distanceLeftPixels, distanceDownPixels, horizontalImageIntersectPixels, verticalImageIntersectPixels);
+
+        /*
+         * Code below Calculates the size of the section above is on the Canvas. Proportion on Canvas
+         */
+
+        // Calculate where the section of the image should start being drawn.
+        const startLeftCanvasPos = Math.max(
+          0,
+          (TILE_SIZE_IN_PIXELS * (imageBbox.minLongitude - tileBox.west)) / (tileBox.east - tileBox.west),
+        );
+        const startTopCanvasPos = Math.max(
+          0,
+          (TILE_SIZE_IN_PIXELS * -(imageBbox.maxLatitude - tileBox.north)) / (tileBox.north - tileBox.south),
+        );
+
+        // Calculates the how big the image will be on the canvas
+        const horizontalCanvasDistance = TILE_SIZE_IN_PIXELS * (horizontalIntersect / (tileBox.east - tileBox.west));
+        const verticalCanvasDistance = TILE_SIZE_IN_PIXELS * (verticalIntersect / (tileBox.north - tileBox.south));
+        // console.log('Project Pos', zxy.z, horizontalCanvasDistance, verticalCanvasDistance, startLeftCanvasPos, startTopCanvasPos);
 
         context.drawImage(
           image,
           // area of Image
-          startWidth,
-          startHeight,
-          sizeWidth,
-          sizeHeight,
+          distanceLeftPixels,
+          distanceDownPixels,
+          horizontalImageIntersectPixels,
+          verticalImageIntersectPixels,
           // area on Canvas
-          0,
-          0,
-          TILE_SIZE_PX,
-          TILE_SIZE_PX,
+          startLeftCanvasPos,
+          startTopCanvasPos,
+          horizontalCanvasDistance,
+          verticalCanvasDistance,
         );
-        const bufImage = canvas.toBuffer('image/png');
-        const urlImage = canvas.toDataURL('image/png');
-        console.error(urlImage, '\n');
+        const bufferedImage = canvas.toBuffer('image/png');
+        // const urlImage = canvas.toDataURL('image/png');
+        // console.error(urlImage, '\n');
         const name = '' + zxy.z + ',' + zxy.x + ',' + zxy.y;
-        bufferImages[name] = bufImage;
-        context.clearRect(0, 0, TILE_SIZE_PX, TILE_SIZE_PX);
+        bufferedImages[name] = bufferedImage;
         return false;
       },
     );
-    const scale = Math.pow(2, scaleFactor);
-
-    // for (let i = 0; i < Math.ceil(imageDim.width / (TILE_SIZE_PX * scale)); i++) {
-    //   for (let j = 0; j < Math.ceil(imageDim.height / (TILE_SIZE_PX * scale)); j++) {
-    //     let widthSize = TILE_SIZE_PX * scale;
-    //     let heightSize = TILE_SIZE_PX * scale;
-    //     if ((i + 1) * TILE_SIZE_PX * scale > imageDim.width) {
-    //       widthSize = imageDim.width - i * TILE_SIZE_PX * scale;
-    //     }
-    //     if ((j + 1) * TILE_SIZE_PX * scale > imageDim.height) {
-    //       heightSize = imageDim.height - j * TILE_SIZE_PX * scale;
-    //     }
-    //     // console.log(widthSize, heightSize, Math.floor(widthSize / scale), Math.floor(heightSize / scale));
-    //     context.drawImage(
-    //       image,
-    //       // area of Image
-    //       i * TILE_SIZE_PX * scale,
-    //       j * TILE_SIZE_PX * scale,
-    //       widthSize,
-    //       heightSize,
-    //       // area on Canvas
-    //       0,
-    //       0,
-    //       Math.floor(widthSize / scale),
-    //       Math.floor(heightSize / scale),
-    //     );
-    //     // console.log(i, j, i * TILE_SIZE_PX * scale, j * TILE_SIZE_PX * scale, scaleFactor);
-    //     const bufImage = canvas.toBuffer('image/png');
-    //     // fs.writeFile(__dirname + '/temp' + i + '_' + j + '.png', bufImage, 'binary', err => {
-    //     //   if (err) throw err;
-    //     //   console.log('Done?');
-    //     // });
-    //     const dataUrlImage = await canvas.toDataURL('image/png');
-    //     const name = '' + i + ',' + j;
-    //     bufferImages[name] = bufImage;
-    //     context.clearRect(0, 0, TILE_SIZE_PX, TILE_SIZE_PX);
-    //  }
-    // }
-    return bufferImages;
+    return bufferedImages;
   }
   public static getNearestPowerOfTwoUpper(imageDim: ISizeCalculationResult): number {
     return Math.pow(2, Math.ceil(Math.log2(Math.max(imageDim.width, imageDim.height))));
@@ -229,10 +191,10 @@ export class KMLUtilities {
    *  360 / 2^x = y°
    * @param bbox Must be in EPS: 4326
    */
-  public static getNaturalScale(bbox: BoundingBox, imageDim: ISizeCalculationResult): number {
+  public static getNaturalScale(bbox: BoundingBox, imageDim: Image): number {
     const widthHeight = this.getWidthAndHeightFromBBox(bbox);
     const tileWidthInDegrees = (256 * widthHeight.width) / imageDim.width;
-    console.log(widthHeight.width, tileWidthInDegrees);
+    // console.log(widthHeight.width, tileWidthInDegrees);
     return Math.floor(Math.log2(360 / tileWidthInDegrees));
   }
   public static getWidthAndHeightFromBBox(bbox: BoundingBox): { width: number; height: number } {
@@ -256,7 +218,7 @@ export class KMLUtilities {
               resolve(dataUrl);
             });
           } else {
-            console.error('Status Code', response);
+            console.error('Status Code ', response);
             reject('Status Code ' + response.statusCode + ': ' + response.statusMessage);
           }
         });
@@ -273,12 +235,12 @@ export class KMLUtilities {
               resolve(dataUrl);
             });
           } else {
-            console.error('Status Code', response);
+            console.error('Status Code ', response);
             reject('Status Code ' + response.statusCode + ': ' + response.statusMessage);
           }
         });
       } else {
-        const fileName = __dirname + '/tmp/' + href;
+        const fileName = __dirname + '/' + href;
         console.log(fileName);
         const data = fs.readFileSync(fileName).toString('base64');
         const dataUrl = 'data:image/' + path.extname(href).substring(1) + ';base64,' + data;
