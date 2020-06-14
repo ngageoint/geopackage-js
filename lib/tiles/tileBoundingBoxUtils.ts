@@ -95,16 +95,14 @@ export class TileBoundingBoxUtils {
     const ypercentageMax = yoffsetMax / finalTileHeight;
 
     const finalTilePixelsPerUnitWidth = totalWidth / finalTileWidth;
-    const widthInFinalTileUnits = Math.round(
-      (geoPackageTileBoundingBox.maxLongitude - geoPackageTileBoundingBox.minLongitude) * finalTilePixelsPerUnitWidth,
-    );
+    const widthInFinalTileUnits =
+      (geoPackageTileBoundingBox.maxLongitude - geoPackageTileBoundingBox.minLongitude) * finalTilePixelsPerUnitWidth;
     const finalTilePixelsPerUnitHeight = totalHeight / finalTileHeight;
-    const heightInFinalTileUnits = Math.round(
-      (geoPackageTileBoundingBox.maxLatitude - geoPackageTileBoundingBox.minLatitude) * finalTilePixelsPerUnitHeight,
-    );
+    const heightInFinalTileUnits =
+      (geoPackageTileBoundingBox.maxLatitude - geoPackageTileBoundingBox.minLatitude) * finalTilePixelsPerUnitHeight;
 
-    p.yPositionInFinalTileStart = Math.round(ypercentageMax * totalHeight);
-    p.xPositionInFinalTileStart = Math.round(xpercentageMin * totalWidth);
+    p.yPositionInFinalTileStart = ypercentageMax * totalHeight;
+    p.xPositionInFinalTileStart = xpercentageMin * totalWidth;
     p.dx = p.xPositionInFinalTileStart;
     p.dy = p.yPositionInFinalTileStart;
     p.sx = 0;
@@ -177,7 +175,7 @@ export class TileBoundingBoxUtils {
     const x1 = Math.max(boundingBoxA.minLongitude, boundingBoxB.minLongitude);
     const y1 = Math.max(boundingBoxA.minLatitude, boundingBoxB.minLatitude);
     const x2 = Math.min(boundingBoxA.maxLongitude, boundingBoxB.maxLongitude);
-    const y2 = Math.min(boundingBoxA.maxLatitude,  boundingBoxB.maxLatitude);
+    const y2 = Math.min(boundingBoxA.maxLatitude, boundingBoxB.maxLatitude);
     if (x1 > x2 || y1 > y2) {
       return null;
     }
@@ -292,11 +290,7 @@ export class TileBoundingBoxUtils {
    *  @param {Boolean} [max]
    *  @return tile row
    */
-  static getRowWithTotalBoundingBox(
-    webMercatorTotalBox: BoundingBox,
-    matrixHeight: number,
-    latitude: number,
-  ): number {
+  static getRowWithTotalBoundingBox(webMercatorTotalBox: BoundingBox, matrixHeight: number, latitude: number): number {
     const minY = webMercatorTotalBox.minLatitude;
     const maxY = webMercatorTotalBox.maxLatitude;
 
@@ -505,7 +499,7 @@ export class TileBoundingBoxUtils {
     return this.toleranceDistance(zoom, Math.max(pixelWidth, pixelHeight));
   }
 
-  static getFloatRoundedRectangle(width: number, height: number, boundingBox: BoundingBox, boundingBoxSection: any ) {
+  static getFloatRoundedRectangle(width: number, height: number, boundingBox: BoundingBox, boundingBoxSection: any) {
     const left = Math.round(TileBoundingBoxUtils.getXPixel(width, boundingBox, boundingBoxSection.minLongitude));
     const right = Math.round(TileBoundingBoxUtils.getXPixel(width, boundingBox, boundingBoxSection.maxLongitude));
     const top = Math.round(TileBoundingBoxUtils.getYPixel(height, boundingBox, boundingBoxSection.maxLatitude));
