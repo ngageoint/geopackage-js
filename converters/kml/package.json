@@ -27,8 +27,10 @@
   "dependencies": {
     "@ngageoint/geopackage": "3.0.0-beta.9",
     "@turf/bbox": "^4.3.0",
+    "@turf/turf": "^5.1.6",
     "JSONStream": "^1.3.3",
     "fs": "0.0.1-security",
+    "jimp": "^0.13.0",
     "jszip": "^3.4.0",
     "lodash": "^4.17.15",
     "xml-stream": "^0.4.5"

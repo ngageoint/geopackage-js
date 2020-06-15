@@ -3,11 +3,10 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { BoundingBox } from '@ngageoint/geopackage';
-import { imageSize } from 'image-size';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
-import { Canvas, Image, createCanvas } from 'canvas';
-import { start } from 'repl';
-
+import { Image, createCanvas } from 'canvas';
+import Jimp from 'jimp';
+import * as turf from '@turf/turf';
 export const TILE_SIZE_IN_PIXELS = 256;
 
 export class KMLUtilities {
@@ -87,6 +86,26 @@ export class KMLUtilities {
     };
 
     return tileBounds;
+  }
+
+  /**
+   * Uses turf to rotate a bounding box.
+   * @param bbox GeoPackage Bounding Box
+   * @param rotation Rotation in degrees North clockwise negative
+   * @returns GeoPackage Bounding Box Rotated by given number of degrees
+   */
+  public static getKmlBBoxRotation(bbox: BoundingBox, rotation: number): BoundingBox {
+    // Convert to geoJson polygon format which turf can read.
+    // turf rotates and returns a geoJson polygon
+    const rotatedPoly = turf.transformRotate(bbox.toGeoJSON().geometry, rotation);
+    // Coverts the geoJson polygon to a geoJson bbox
+    const rotatedBBox = turf.bbox(rotatedPoly);
+    // Converts geoJson bbox into a Geopackage js bounding box.
+    const rotMaxLongitude = rotatedBBox[2];
+    const rotMinLongitude = rotatedBBox[0];
+    const rotMaxLatitude = rotatedBBox[3];
+    const rotMinLatitude = rotatedBBox[1];
+    return new BoundingBox(rotMinLongitude, rotMaxLongitude, rotMinLatitude, rotMaxLatitude);
   }
 
   /**
@@ -241,7 +260,7 @@ export class KMLUtilities {
         });
       } else {
         const fileName = __dirname + '/' + href;
-        console.log(fileName);
+        // console.log(fileName);
         const data = fs.readFileSync(fileName).toString('base64');
         const dataUrl = 'data:image/' + path.extname(href).substring(1) + ';base64,' + data;
         resolve(dataUrl);

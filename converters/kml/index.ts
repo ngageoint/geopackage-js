@@ -19,10 +19,10 @@ import { KMLUtilities } from './kmlUtilities';
 import JSZip from 'jszip';
 import mkdirp from 'mkdirp';
 import path from 'path';
-import http from 'http';
 import { imageSize } from 'image-size';
 import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
-import { Image, Canvas, createCanvas, loadImage } from 'canvas';
+import { loadImage } from 'canvas';
+import Jimp from 'jimp';
 
 export interface KMLConverterOptions {
   kmlPath?: string;
@@ -87,7 +87,7 @@ export class KMLToGeoPackage {
                   }),
                 )
                 .on('finish', () => {
-                  console.log(key, 'written');
+                  console.log(key, 'was written to', __dirname + '/' + key);
                   resolve();
                 });
             });
@@ -205,24 +205,21 @@ export class KMLToGeoPackage {
       kml.collect('Polygon');
       kml.collect('Point');
       kml.collect('LineString');
-      // Think about splitting up in kml.on
-      // kml.on('endElement : ' + KMLTAGS.PLACEMARK_TAG + ' ' + KMLTAGS.GEOMETRY_TAGS.POINT, node => {
-      //   const geometryData = this.handlePoints(node);
-      //   const feature: any = {
-      //     type: 'Feature',
-      //     geometry: geometryData,
-      //     properties: props,
-      //   };
-      //   featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
-      // });
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
-        const kmlBBox = new BoundingBox(
+        let kmlBBox = new BoundingBox(
           parseFloat(node.LatLonBox.west),
           parseFloat(node.LatLonBox.east),
           parseFloat(node.LatLonBox.south),
           parseFloat(node.LatLonBox.north),
         );
-        console.log(kmlBBox);
+
+        let rotation = 0;
+        if (node.LatLonBox.hasOwnProperty('rotation')) {
+          rotation = parseFloat(node.LatLonBox.rotation);
+          kmlBBox = KMLUtilities.getKmlBBoxRotation(kmlBBox, rotation);
+          // console.log('Should have rotated', kmlBBox, 'by', parseFloat(node.LatLonBox.rotation), 'and is now', temp);
+          // kmlBBox = temp;
+        }
 
         const matrixSetBounds = new BoundingBox(
           -20037508.342789244,
@@ -242,24 +239,26 @@ export class KMLToGeoPackage {
           0,
           20,
         );
+
         const tileScalingExt = geopackage.getTileScalingExtension(node.name);
         await tileScalingExt.getOrCreateExtension();
         const ts = new TileScaling();
         ts.scaling_type = TileScalingType.IN_OUT;
         ts.zoom_in = 2;
         ts.zoom_out = 2;
-        // console.log(ts);
         tileScalingExt.createOrUpdate(ts);
 
         const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : __dirname + '/' + node.Icon.href;
-        await loadImage(imageLocation).then(
+        const img = await Jimp.read(imageLocation);
+        img.rotate(rotation);
+        await loadImage(await img.getBufferAsync(Jimp.MIME_PNG)).then(
           image => {
             const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, image);
             const zoomLevels = _.range(naturalScale % 2 ? 1 : 0, naturalScale + 2, 2);
-            console.log(zoomLevels);
+            console.log('Creating Zoom Levels: ', zoomLevels);
             const imageBuffers = KMLUtilities.getZoomImages(image, zoomLevels, kmlBBox);
             imageBuffers.then(buffers => {
-              // console.log(buffers);
+              console.log('Adding zoom tile to DataBase');
               for (const key in buffers) {
                 if (buffers.hasOwnProperty(key)) {
                   const zxy = key.split(',');
@@ -424,9 +423,6 @@ export class KMLToGeoPackage {
           if (Number(temp[1]) < minLon) minLon = Number(temp[1]);
           if (Number(temp[1]) > maxLon) maxLon = Number(temp[1]);
         });
-      });
-      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, (node: {}) => {
-        console.log(node);
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_TAG, (node: {}) => {
         if (
