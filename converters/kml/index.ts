@@ -7,8 +7,8 @@ import {
   GeoPackageAPI,
   TileScaling,
   TileScalingType,
+  FeatureTableStyles,
 } from '@ngageoint/geopackage';
-import { FeatureTableStyles } from '@ngageoint/geopackage/built/lib/extension/style/featureTableStyles';
 import { StyleRow } from '@ngageoint/geopackage/built/lib/extension/style/styleRow';
 import fs from 'fs';
 import _ from 'lodash';
@@ -87,7 +87,7 @@ export class KMLToGeoPackage {
                   }),
                 )
                 .on('finish', () => {
-                  console.log(key, 'was written to', __dirname + '/' + key);
+                  // console.log(key, 'was written to', __dirname + '/' + key);
                   resolve();
                 });
             });
@@ -117,7 +117,7 @@ export class KMLToGeoPackage {
     // Geometry and Style Insertion
     await this.addKMLDataToGeoPackage(kmlPath, geopkg, defaultStyles, tableName);
 
-    if (this.options.indexTable) {
+    if (this.options.indexTable && props.size !== 0) {
       await this.indexTable(geopackage, tableName);
     }
     return geopackage;
@@ -138,31 +138,33 @@ export class KMLToGeoPackage {
     tableName: string,
   ): Promise<GeoPackage> {
     return new Promise(async resolve => {
-      const geometryColumns = new GeometryColumns();
-      geometryColumns.table_name = tableName;
-      geometryColumns.column_name = 'geometry';
-      geometryColumns.geometry_type_name = 'GEOMETRY';
-      geometryColumns.z = 2;
-      geometryColumns.m = 2;
-
-      const columns = [];
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
-      let index = 2;
-
-      for (const prop of properties) {
-        columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
-        index++;
-      }
       const geopkg = await this.createOrOpenGeoPackage(geopackage, { append: true });
-      await geopkg.createFeatureTable(
-        tableName,
-        geometryColumns,
-        columns,
-        this.boundingBox,
-        this.options.hasOwnProperty('srsNumber') ? this.options.srsNumber : 4326,
-      );
+      // console.log('There are: ', properties.size, 'properties');
+      if (properties.size !== 0) {
+        const geometryColumns = new GeometryColumns();
+        geometryColumns.table_name = tableName;
+        geometryColumns.column_name = 'geometry';
+        geometryColumns.geometry_type_name = 'GEOMETRY';
+        geometryColumns.z = 2;
+        geometryColumns.m = 2;
 
+        const columns = [];
+        columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+        columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+        let index = 2;
+
+        for (const prop of properties) {
+          columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
+          index++;
+        }
+        await geopkg.createFeatureTable(
+          tableName,
+          geometryColumns,
+          columns,
+          this.boundingBox,
+          this.options.hasOwnProperty('srsNumber') ? this.options.srsNumber : 4326,
+        );
+      }
       resolve(geopkg);
     });
   }
@@ -177,16 +179,20 @@ export class KMLToGeoPackage {
     return new Promise(async resolve => {
       // Boilerplate for creating a style tables (a geopackage extension)
       // Create Default Styles
-      const defaultStyles = await this.setUpDefaultStyles(geopkg, tableName);
-      // Specific Styles SetUp
-      this.addSpecificStyles(defaultStyles, this.styleMap);
-      await this.addSpecificIcons(defaultStyles, this.iconMap);
-      resolve(defaultStyles);
+      if (this.styleMap.size !== 0 || this.iconMap.size !== 0) {
+        const defaultStyles = await this.setUpDefaultStyles(geopkg, tableName);
+        // Specific Styles SetUp
+        if (this.styleMap.size !== 0) this.addSpecificStyles(defaultStyles, this.styleMap);
+        if (this.iconMap.size !== 0) await this.addSpecificIcons(defaultStyles, this.iconMap);
+        resolve(defaultStyles);
+      }
+      resolve(null);
     });
   }
 
   /**
    * Reads the KML file and extracts Geometric data and matches styles with the Geometric data.
+   * Also read the Ground Overlays.
    * @param kmlPath Path to KML file
    * @param geopackage GeoPackage Object
    * @param defaultStyles Feature Style Object
@@ -217,8 +223,6 @@ export class KMLToGeoPackage {
         if (node.LatLonBox.hasOwnProperty('rotation')) {
           rotation = parseFloat(node.LatLonBox.rotation);
           kmlBBox = KMLUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-          // console.log('Should have rotated', kmlBBox, 'by', parseFloat(node.LatLonBox.rotation), 'and is now', temp);
-          // kmlBBox = temp;
         }
 
         const matrixSetBounds = new BoundingBox(
@@ -254,11 +258,12 @@ export class KMLToGeoPackage {
         await loadImage(await img.getBufferAsync(Jimp.MIME_PNG)).then(
           image => {
             const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, image);
-            const zoomLevels = _.range(naturalScale % 2 ? 1 : 0, naturalScale + 2, 2);
-            console.log('Creating Zoom Levels: ', zoomLevels);
+            // const zoomLevels = _.range(naturalScale % 2 ? 1 : 0, naturalScale + 2, 2);
+            const zoomLevels = KMLUtilities.getZoomLevels(kmlBBox, naturalScale);
+            // console.log('Creating Zoom Levels: ', zoomLevels);
             const imageBuffers = KMLUtilities.getZoomImages(image, zoomLevels, kmlBBox);
             imageBuffers.then(buffers => {
-              console.log('Adding zoom tile to DataBase');
+              // console.log('Adding zoom tile to DataBase');
               for (const key in buffers) {
                 if (buffers.hasOwnProperty(key)) {
                   const zxy = key.split(',');
@@ -319,13 +324,9 @@ export class KMLToGeoPackage {
                 iconRow = this.iconRowMap.get(iconId);
               } else {
                 const normalStyle = this.iconMapPair.get(node[prop]);
-                // console.log(normalStyle);
                 iconId = this.iconUrlMap.get(normalStyle);
-                // console.log(this.iconUrlMap.get(normalStyle), normalStyle);
                 iconRow = this.iconRowMap.get(iconId);
-                // console.log(iconRow);
               }
-              // console.log(iconRow, node[prop]);
             } catch (error) {
               console.error(error);
             }
@@ -507,13 +508,7 @@ export class KMLToGeoPackage {
    * @param styleTable Main styleTable in the database
    * @param id Id from KML
    */
-  private imageDataToDataBase(
-    iconLocation: string,
-    dataUrl: string,
-    newIcon: IconRow,
-    styleTable: FeatureTableStyles,
-    id: string,
-  ): void {
+  private imageDataToDataBase(dataUrl: string, newIcon: IconRow, styleTable: FeatureTableStyles, id: string): void {
     newIcon.data = Buffer.from(dataUrl.split(',')[1], 'base64');
     const dim = imageSize(newIcon.data);
     newIcon.width = dim.width;
@@ -537,15 +532,21 @@ export class KMLToGeoPackage {
       newIcon.name = item[0];
       if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
         const iconStyle = item[1][KMLTAGS.STYLE_TYPES.ICON_STYLE];
-        const iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-        const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(iconLocation).catch(error => {
-          console.error(error);
-          return 'ERROR';
+        let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
+        // const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(iconLocation).catch(error => {
+        //   console.error(error);
+        //   reject();
+        //   return 'ERROR';
+        // });
+        iconLocation = iconLocation.startsWith('http') ? iconLocation : __dirname + '/' + iconLocation;
+        const dataUrl = await Jimp.read(iconLocation).then(img => {
+          if (iconStyle.hasOwnProperty('scale')) {
+            img.scale(parseFloat(iconStyle.scale));
+          }
+          // console.log(img.getBase64Async(img.getMIME()));
+          return img.getBase64Async(img.getMIME());
         });
-        if (dataUrl === 'ERROR') {
-          reject();
-        }
-        this.imageDataToDataBase(iconLocation, dataUrl, newIcon, styleTable, item[0]);
+        this.imageDataToDataBase(dataUrl, newIcon, styleTable, item[0]);
         resolve();
       }
     });
@@ -582,7 +583,7 @@ export class KMLToGeoPackage {
         isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
           const abgr = item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['color'];
-          const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+          const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setColor(rgb, a);
         }
         if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('width')) {
@@ -595,7 +596,7 @@ export class KMLToGeoPackage {
         isStyle = true;
         if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
           const abgr = item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE]['color'];
-          const { rgb, a } = this.abgrStringToColorOpacity(abgr);
+          const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setFillColor(rgb, a);
         }
         if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('fill')) {
@@ -673,15 +674,5 @@ export class KMLToGeoPackage {
     await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
 
     return defaultStyles;
-  }
-
-  /**
-   * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
-   * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
-   */
-  private abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
-    const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
-    const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
-    return { rgb, a };
   }
 }

@@ -3,7 +3,6 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import { BoundingBox } from '@ngageoint/geopackage';
-import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { Image, createCanvas } from 'canvas';
 import * as turf from '@turf/turf';
 import * as KMLTAGS from './KMLTags.js';
@@ -51,7 +50,14 @@ export class KMLUtilities {
       current: Math.max(0, Math.min(south, north)),
     };
   }
+
   // Taken from Map Cache Electron
+  /**
+   * Calls function for each tile needed.
+   * @param extent Bounding Box
+   * @param zoomLevels Array of Zoom Levels
+   * @param tileCallback Function that will be called for every tile
+   */
   static async iterateAllTilesInExtentForZoomLevels(
     extent: BoundingBox,
     zoomLevels: number[],
@@ -60,11 +66,8 @@ export class KMLUtilities {
     let stop = false;
     for (let i = 0; i < zoomLevels.length && !stop; i++) {
       const z = zoomLevels[i];
-      // console.log(z);
       const yRange = KMLUtilities.calculateYTileRange(extent, z);
-      // console.log(yRange);
       const xRange = KMLUtilities.calculateXTileRange(extent, z);
-      // console.log(xRange);
       for (let x = xRange.min; x <= xRange.max && !stop; x++) {
         for (let y = yRange.min; y <= yRange.max && !stop; y++) {
           stop = await tileCallback({ z, x, y });
@@ -72,6 +75,7 @@ export class KMLUtilities {
       }
     }
   }
+
   // Taken From Map Cache Electron
   static tileBboxCalculator(
     x: number,
@@ -101,10 +105,11 @@ export class KMLUtilities {
     // Coverts the geoJson polygon to a geoJson bbox
     const rotatedBBox = turf.bbox(rotatedPoly);
     // Converts geoJson bbox into a Geopackage js bounding box.
-    const rotMaxLongitude = rotatedBBox[2];
     const rotMinLongitude = rotatedBBox[0];
-    const rotMaxLatitude = rotatedBBox[3];
     const rotMinLatitude = rotatedBBox[1];
+    const rotMaxLongitude = rotatedBBox[2];
+    const rotMaxLatitude = rotatedBBox[3];
+
     return new BoundingBox(rotMinLongitude, rotMaxLongitude, rotMinLatitude, rotMaxLatitude);
   }
 
@@ -202,13 +207,11 @@ export class KMLUtilities {
     );
     return bufferedImages;
   }
-  public static getNearestPowerOfTwoUpper(imageDim: ISizeCalculationResult): number {
-    return Math.pow(2, Math.ceil(Math.log2(Math.max(imageDim.width, imageDim.height))));
-  }
+
   /**
    * Returns floored scale.
    *  360 / 2^x = y°
-   * @param bbox Must be in EPS: 4326
+   * @param bbox ç
    */
   public static getNaturalScale(bbox: BoundingBox, imageDim: Image): number {
     const widthHeight = this.getWidthAndHeightFromBBox(bbox);
@@ -216,12 +219,45 @@ export class KMLUtilities {
     // console.log(widthHeight.width, tileWidthInDegrees);
     return Math.floor(Math.log2(360 / tileWidthInDegrees));
   }
+
+  /**
+   * Creates a list of zoom level where the number of filled tiles changes.
+   * @param bbox Bounding box after rotation
+   * @param naturalScale Zoom level closest to one to one in terms of pixels
+   * @returns A list of zoom levels
+   */
+  public static getZoomLevels(bbox: BoundingBox, naturalScale: number): number[] {
+    const levels = [];
+    let z = naturalScale;
+    let ySize: number;
+    let xSize: number;
+    do {
+      const yRange = KMLUtilities.calculateYTileRange(bbox, z);
+      const xRange = KMLUtilities.calculateXTileRange(bbox, z);
+      ySize = yRange.max - yRange.min + 1;
+      xSize = xRange.max - xRange.min + 1;
+      levels.push(z);
+      // console.log('getZoomLevels', yRange.max, yRange.min, xRange.max, xRange.min, xSize, ySize, z, levels);
+      z -= 2;
+    } while (xSize * ySize !== 1 && z >= 2);
+    return levels;
+  }
+
+  /**
+   * Get height and width of a bounding box
+   * @param bbox geopackage bounding box.
+   */
   public static getWidthAndHeightFromBBox(bbox: BoundingBox): { width: number; height: number } {
     return {
       height: Math.abs(bbox.maxLatitude - bbox.minLatitude),
       width: Math.abs(bbox.maxLongitude - bbox.minLongitude),
     };
   }
+
+  /**
+   * Queries for image or load it from disk
+   * @param href KML href tag in an icon tag
+   */
   public static getImageDataUrlFromKMLHref(href: string): Promise<string> {
     return new Promise((resolve, reject) => {
       if (href.startsWith('https')) {
@@ -266,6 +302,15 @@ export class KMLUtilities {
         resolve(dataUrl);
       }
     });
+  }
+  /**
+   * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
+   * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
+   */
+  public static abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
+    const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
+    const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
+    return { rgb, a };
   }
   /**
    * Takes in a KML Point and returns a GeoJSON formatted object.
