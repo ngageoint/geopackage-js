@@ -12,7 +12,7 @@ const path = require('path');
 
 const test = new KMLToGeoPackage();
 // let tempGeo = new GeoPackage.GeoPackage();
-let kmlPath = path.join(__dirname, 'KML_Samples.kml');
+let kmlPath = path.join(__dirname, 'rot.kml');
 test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'nepal')
 //   .then(value => {
 //     // console.log('Returned ', value);

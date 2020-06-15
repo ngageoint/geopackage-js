@@ -5,8 +5,8 @@ import path from 'path';
 import { BoundingBox } from '@ngageoint/geopackage';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { Image, createCanvas } from 'canvas';
-import Jimp from 'jimp';
 import * as turf from '@turf/turf';
+import * as KMLTAGS from './KMLTags.js';
 export const TILE_SIZE_IN_PIXELS = 256;
 
 export class KMLUtilities {
@@ -266,5 +266,93 @@ export class KMLUtilities {
         resolve(dataUrl);
       }
     });
+  }
+  /**
+   * Takes in a KML Point and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
+  public static kmlPointToGeoJson(node: { Point }): { type: string; coordinates: number[] } {
+    let geometryData;
+    if (node[KMLTAGS.GEOMETRY_TAGS.POINT].length === 1) {
+      geometryData = { type: 'Point', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiPoint', coordinates: [] };
+    }
+    node[KMLTAGS.GEOMETRY_TAGS.POINT].forEach(point => {
+      const coordPoint = point.coordinates.split(',');
+      const coord = [parseFloat(coordPoint[0]), parseFloat(coordPoint[1])];
+      if (node.Point.length === 1) {
+        geometryData['coordinates'] = [parseFloat(coordPoint[0]), parseFloat(coordPoint[1])];
+      } else {
+        geometryData['coordinates'].push(coord);
+      }
+    });
+    return geometryData;
+  }
+  /**
+   * Takes in a KML LineString and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
+  public static kmlLineStringToGeoJson(node: { LineString }): { type: string; coordinates: number[] } {
+    let geometryData;
+    if (node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].length === 1) {
+      geometryData = { type: 'LineString', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiLineString', coordinates: [] };
+    }
+    node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].forEach(element => {
+      const coordPoints = element.coordinates.split(' ');
+      const coordArray = [];
+      coordPoints.forEach(element => {
+        element = element.split(',');
+        coordArray.push([Number(element[0]), Number(element[1])]);
+      });
+      if (node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].length === 1) {
+        geometryData['coordinates'] = coordArray;
+      } else {
+        geometryData['coordinates'].push(coordArray);
+      }
+    });
+    return geometryData;
+  }
+  /**
+   * Takes in a KML Polygon and returns a GeoJSON formatted object.
+   * @param node The data from xmlStream with the selector of Placemark.
+   */
+  public static kmlPolygonToGeoJson(node: { Polygon }): { type: string; coordinates: number[] } {
+    let geometryData;
+    if ([KMLTAGS.GEOMETRY_TAGS.POLYGON].length === 1) {
+      geometryData = { type: 'Polygon', coordinates: [] };
+    } else {
+      geometryData = { type: 'MultiPolygon', coordinates: [] };
+    }
+    node[KMLTAGS.GEOMETRY_TAGS.POLYGON].forEach(element => {
+      const coordText = element.outerBoundaryIs.LinearRing[0].coordinates;
+      const coordRing = coordText.split(' ');
+      const coordArray = [];
+      coordRing.forEach(element => {
+        element = element.split(',');
+        coordArray.push([parseFloat(element[0]), parseFloat(element[1])]);
+      });
+
+      const temp = [coordArray];
+      if (node[KMLTAGS.GEOMETRY_TAGS.POLYGON].hasOwnProperty('innerBoundaryIs')) {
+        const coordText = element.innerBoundaryIs.LinearRing[0].coordinates;
+        const coordRing = coordText.split(' ');
+        const coordArray = [];
+        coordRing.forEach(elementRing => {
+          elementRing = elementRing.split(',');
+          coordArray.push([parseFloat(elementRing[0]), parseFloat(elementRing[1])]);
+        });
+        temp.push(coordArray);
+      }
+
+      if (node[KMLTAGS.GEOMETRY_TAGS.POLYGON].length === 1) {
+        geometryData['coordinates'] = temp;
+      } else {
+        geometryData['coordinates'].push(temp);
+      }
+    });
+    return geometryData;
   }
 }
