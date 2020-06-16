@@ -23,6 +23,7 @@ import { imageSize } from 'image-size';
 import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
 import { loadImage } from 'canvas';
 import Jimp from 'jimp';
+import { GeoSpatialUtilities } from './geoSpatialUtilities.js';
 
 export interface KMLConverterOptions {
   kmlPath?: string;
@@ -74,7 +75,7 @@ export class KMLToGeoPackage {
       for (const key in zip.files) {
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
-            const fileDestination = __dirname + '/' + key;
+            const fileDestination = path.join(__dirname, key);
             kmlPath = zip.files[key].name.endsWith('.kml') ? zip.files[key].name : kmlPath;
             await mkdirp(path.dirname(fileDestination), function(err) {
               if (err) console.error(err);
@@ -212,18 +213,13 @@ export class KMLToGeoPackage {
       kml.collect('Point');
       kml.collect('LineString');
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
+        const imageName = node.name;
         let kmlBBox = new BoundingBox(
           parseFloat(node.LatLonBox.west),
           parseFloat(node.LatLonBox.east),
           parseFloat(node.LatLonBox.south),
           parseFloat(node.LatLonBox.north),
         );
-
-        let rotation = 0;
-        if (node.LatLonBox.hasOwnProperty('rotation')) {
-          rotation = parseFloat(node.LatLonBox.rotation);
-          kmlBBox = KMLUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-        }
 
         const matrixSetBounds = new BoundingBox(
           -20037508.342789244,
@@ -235,7 +231,7 @@ export class KMLToGeoPackage {
         const contentsSrsId = 4326;
         const tileMatrixSetSrsId = 3857;
         geopackage.createStandardWebMercatorTileTable(
-          node.name,
+          imageName,
           kmlBBox,
           contentsSrsId,
           matrixSetBounds,
@@ -244,7 +240,7 @@ export class KMLToGeoPackage {
           20,
         );
 
-        const tileScalingExt = geopackage.getTileScalingExtension(node.name);
+        const tileScalingExt = geopackage.getTileScalingExtension(imageName);
         await tileScalingExt.getOrCreateExtension();
         const ts = new TileScaling();
         ts.scaling_type = TileScalingType.IN_OUT;
@@ -252,25 +248,21 @@ export class KMLToGeoPackage {
         ts.zoom_out = 2;
         tileScalingExt.createOrUpdate(ts);
 
-        const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : __dirname + '/' + node.Icon.href;
+        const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
         const img = await Jimp.read(imageLocation);
-        img.rotate(rotation);
-        await loadImage(await img.getBufferAsync(Jimp.MIME_PNG)).then(
+        let rotation = 0;
+        if (node.LatLonBox.hasOwnProperty('rotation')) {
+          rotation = parseFloat(node.LatLonBox.rotation);
+          kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
+          img.rotate(rotation);
+        }
+        // Convert img to a buffered PNG image
+        const imageBuffer = await img.getBufferAsync(Jimp.MIME_PNG);
+        await loadImage(imageBuffer).then(
           image => {
-            const naturalScale = KMLUtilities.getNaturalScale(kmlBBox, image);
-            // const zoomLevels = _.range(naturalScale % 2 ? 1 : 0, naturalScale + 2, 2);
-            const zoomLevels = KMLUtilities.getZoomLevels(kmlBBox, naturalScale);
-            // console.log('Creating Zoom Levels: ', zoomLevels);
-            const imageBuffers = KMLUtilities.getZoomImages(image, zoomLevels, kmlBBox);
-            imageBuffers.then(buffers => {
-              // console.log('Adding zoom tile to DataBase');
-              for (const key in buffers) {
-                if (buffers.hasOwnProperty(key)) {
-                  const zxy = key.split(',');
-                  geopackage.addTile(buffers[key], node.name, parseInt(zxy[0]), parseInt(zxy[2]), parseInt(zxy[1]));
-                }
-              }
-            });
+            const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, image.width);
+            const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
+            GeoSpatialUtilities.getZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName);
           },
           () => {
             console.error('Rejected');
@@ -280,32 +272,48 @@ export class KMLToGeoPackage {
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isGeom = false;
         let geometryData;
+        let props = {};
         if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POLYGON)) {
           isGeom = true;
           geometryData = KMLUtilities.kmlPolygonToGeoJson(node);
+          props = KMLUtilities.getKmlInnerFieldsValue(node[KMLTAGS.GEOMETRY_TAGS.POLYGON], props);
         } else if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POINT)) {
           isGeom = true;
           geometryData = KMLUtilities.kmlPointToGeoJson(node);
+          props = KMLUtilities.getKmlInnerFieldsValue(node[KMLTAGS.GEOMETRY_TAGS.POINT], props);
         } else if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
           isGeom = true;
           geometryData = KMLUtilities.kmlLineStringToGeoJson(node);
+          props = KMLUtilities.getKmlInnerFieldsValue(node[KMLTAGS.GEOMETRY_TAGS.LINESTRING], props);
         } else if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
           isGeom = true;
           geometryData = { type: 'GeometryCollection', geometries: [] };
           if (node.MultiGeometry.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POINT)) {
             const temp = KMLUtilities.kmlPointToGeoJson(node.MultiGeometry);
+            props = KMLUtilities.getKmlInnerFieldsValue(
+              node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][KMLTAGS.GEOMETRY_TAGS.POINT],
+              props,
+            );
             geometryData['geometries'].push(temp);
           }
           if (node.MultiGeometry.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
             const temp = KMLUtilities.kmlLineStringToGeoJson(node.MultiGeometry);
+            props = KMLUtilities.getKmlInnerFieldsValue(
+              node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][KMLTAGS.GEOMETRY_TAGS.LINESTRING],
+              props,
+            );
             geometryData['geometries'].push(temp);
           }
           if (node.MultiGeometry.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POLYGON)) {
             const temp = KMLUtilities.kmlPolygonToGeoJson(node.MultiGeometry);
+            props = KMLUtilities.getKmlInnerFieldsValue(
+              node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][KMLTAGS.GEOMETRY_TAGS.POLYGON],
+              props,
+            );
             geometryData['geometries'].push(temp);
           }
         }
-        const props = {};
+        props = KMLUtilities.propsToStrings(props);
         let styleRow: StyleRow;
         let iconRow: IconRow;
         for (const prop in node) {
@@ -348,7 +356,31 @@ export class KMLToGeoPackage {
             const styleId = this.styleUrlMap.get(normalStyle);
             styleRow = this.styleRowMap.get(styleId);
           }
-
+          // if (
+          //   _.findKey(KMLTAGS.GEOMETRY_TAGS, o => {
+          //     return o === prop;
+          //   })
+          // ) {
+          //   for (const numProp in node[prop]) {
+          //     console.log(prop, node[prop])
+          //     for (const subProp in node[prop][numProp]) {
+          //       console.log('subProp', typeof subProp, subProp, node[prop][numProp][subProp]);
+          //       if (
+          //         _.findIndex(KMLTAGS.ITEMS_TO_IGNORE, o => {
+          //           return o === subProp;
+          //         }) === -1
+          //       ) {
+          //         props[subProp] = node[prop][numProp][subProp];
+          //       } else if (subProp === KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+          //         for (const subNumProp in node[prop][numProp][subProp]) {
+          //           for (const subSubProp in node[prop][numProp][subProp][subNumProp]) {
+          //             console.log(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY, subSubProp);
+          //           }
+          //         }
+          //       }
+          //     }
+          //   }
+          // } else 
           if (typeof node[prop] === 'string') {
             props[prop] = node[prop];
           } else if (typeof node[prop] === 'object') {
@@ -357,12 +389,13 @@ export class KMLToGeoPackage {
             props[prop] = node[prop];
           }
         }
-
+        
         const feature: any = {
           type: 'Feature',
           geometry: geometryData,
           properties: props,
         };
+        // console.log(feature);
         let featureID: number;
         if (isGeom) {
           featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
@@ -397,32 +430,48 @@ export class KMLToGeoPackage {
         for (const property in node) {
           // Item to be treated like a Geometry
           if (
-            !(
-              property === 'Point' ||
-              property === 'LineString' ||
-              property === 'Polygon' ||
-              property === 'MultiGeometry' ||
-              property === 'Model' ||
-              property === 'Style'
-            )
+            _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
+              return o === property;
+            }) !== -1
           ) {
+            // console.log('node[property]', node[property]);
+            for (const subProperty in node[property]) {
+              if (
+                _.findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
+                  return o === subProperty;
+                }) === -1
+              ) {
+                properties.add(subProperty);
+                // console.log(subProperty);
+              }
+            }
+          }
+          // if (
+          //   _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
+          //     return o === property;
+          //   }) !== -1
+          // ) {
+          // } 
+          else {
             properties.add(property);
+            // console.log(property);
           }
         }
+        // console.log(properties);
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG + ' ' + KMLTAGS.COORDINATES_TAG, (node: { $text: string }) => {
         const rows = node.$text.split(/\s/);
         rows.forEach((element: string) => {
-          const temp = element.split(',');
-          if (minLat === undefined) minLat = Number(temp[0]);
-          if (minLon === undefined) minLon = Number(temp[1]);
-          if (maxLat === undefined) maxLat = Number(temp[0]);
-          if (maxLon === undefined) maxLon = Number(temp[1]);
+          const temp = element.split(',').map(s => Number(s));
+          if (minLat === undefined) minLat = temp[0];
+          if (minLon === undefined) minLon = temp[1];
+          if (maxLat === undefined) maxLat = temp[0];
+          if (maxLon === undefined) maxLon = temp[1];
 
-          if (Number(temp[0]) < minLat) minLat = Number(temp[0]);
-          if (Number(temp[0]) > maxLat) maxLat = Number(temp[0]);
-          if (Number(temp[1]) < minLon) minLon = Number(temp[1]);
-          if (Number(temp[1]) > maxLon) maxLon = Number(temp[1]);
+          if (temp[0] < minLat) minLat = temp[0];
+          if (temp[0] > maxLat) maxLat = temp[0];
+          if (temp[1] < minLon) minLon = temp[1];
+          if (temp[1] > maxLon) maxLon = temp[1];
         });
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_TAG, (node: {}) => {
@@ -529,16 +578,12 @@ export class KMLToGeoPackage {
   private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
     return new Promise(async (resolve, reject) => {
       const newIcon = styleTable.getIconDao().newRow();
+      const kmlStyle = item[1];
       newIcon.name = item[0];
-      if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
-        const iconStyle = item[1][KMLTAGS.STYLE_TYPES.ICON_STYLE];
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+        const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPES.ICON_STYLE];
         let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-        // const dataUrl = await KMLUtilities.getImageDataUrlFromKMLHref(iconLocation).catch(error => {
-        //   console.error(error);
-        //   reject();
-        //   return 'ERROR';
-        // });
-        iconLocation = iconLocation.startsWith('http') ? iconLocation : __dirname + '/' + iconLocation;
+        iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
         const dataUrl = await Jimp.read(iconLocation).then(img => {
           if (iconStyle.hasOwnProperty('scale')) {
             img.scale(parseFloat(iconStyle.scale));
@@ -575,36 +620,38 @@ export class KMLToGeoPackage {
   private addSpecificStyles(styleTable: FeatureTableStyles, items: Map<string, object>): void {
     for (const item of items) {
       let isStyle = false;
+      const styleName = item[0];
+      const kmlStyle = item[1];
       const newStyle = styleTable.getStyleDao().newRow();
-      newStyle.setName(item[0]);
+      newStyle.setName(styleName);
 
       // Styling for Lines
-      if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
         isStyle = true;
-        if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
-          const abgr = item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE]['color'];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setColor(rgb, a);
         }
-        if (item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('width')) {
-          newStyle.setWidth(item[1][KMLTAGS.STYLE_TYPES.LINE_STYLE]['width']);
+        if (kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('width')) {
+          newStyle.setWidth(kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE]['width']);
         }
       }
 
       // Styling for Polygons
-      if (item[1].hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)) {
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)) {
         isStyle = true;
-        if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
-          const abgr = item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]['color'];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setFillColor(rgb, a);
         }
-        if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('fill')) {
-          if (!item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE]['fill']) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('fill')) {
+          if (!kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]['fill']) {
             newStyle.setFillOpacity(0);
           }
         }
-        if (item[1][KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('outline')) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('outline')) {
           // No property Currently TODO
           // newStyle.(item[1]['LineStyle']['outline']);
         }
@@ -613,7 +660,7 @@ export class KMLToGeoPackage {
       // Add Style to Geopackage
       if (isStyle) {
         const newStyleId = styleTable.getFeatureStyleExtension().getOrInsertStyle(newStyle);
-        this.styleUrlMap.set('#' + item[0], newStyleId);
+        this.styleUrlMap.set('#' + styleName, newStyleId);
         this.styleRowMap.set(newStyleId, newStyle);
       }
     }

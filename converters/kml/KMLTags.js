@@ -11,7 +11,11 @@ export const GEOMETRY_TAGS = {
   LINESTRING: 'LineString',
   POLYGON: 'Polygon',
   MULTIGEOMETRY: 'MultiGeometry',
+  MODEL: 'Model',
 };
+export const OUTER_BOUNDARY_TAG = 'outerBoundaryIs';
+
+export const INNER_BOUNDARY_TAG = 'innerBoundaryIs';
 
 export const COORDINATES_TAG = 'coordinates';
 
@@ -34,3 +38,21 @@ export const DOCUMENT_TAG = 'Document';
 export const PAIR_TAG = 'Pair';
 
 export const GROUND_OVERLAY_TAG = 'GroundOverlay';
+
+export const ALTITUDE_MODE_TAG = 'altitudeMode';
+
+export const ITEM_TO_SEARCH_WITHIN = [
+  GEOMETRY_TAGS.LINESTRING,
+  GEOMETRY_TAGS.POINT,
+  GEOMETRY_TAGS.POLYGON,
+  GEOMETRY_TAGS.MULTIGEOMETRY,
+  GEOMETRY_TAGS.MODEL,
+  STYLE_TAG,
+];
+
+export const INNER_ITEMS_TO_IGNORE = [
+  GEOMETRY_TAGS.MULTIGEOMETRY,
+  COORDINATES_TAG,
+  OUTER_BOUNDARY_TAG,
+  INNER_BOUNDARY_TAG,
+];
