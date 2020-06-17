@@ -146,7 +146,7 @@ export class GeoSpatialUtilities {
     imageBbox: BoundingBox,
     geopackage: GeoPackage,
     imageName: string,
-  ): Promise<{}> {
+  ): Promise<void> {
     // Set up Canvas to handle the drawing of images.
     const canvas = createCanvas(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
     const context = canvas.getContext('2d');
@@ -154,9 +154,6 @@ export class GeoSpatialUtilities {
     // Calculate the resolution of the image compared to the Bounding Box
     const pixelHeightInDegrees = (imageBbox.maxLatitude - imageBbox.minLatitude) / image.height;
     const pixelWidthInDegrees = (imageBbox.maxLongitude - imageBbox.minLongitude) / image.width;
-
-    // Create object where resultant image buffer will be stored
-    const bufferedImages = {};
 
     // Handles getting the correct Map tiles
     await GeoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(
@@ -177,8 +174,8 @@ export class GeoSpatialUtilities {
         const topSideImageToTopSideTile = imageBbox.maxLatitude - tileBox.north;
 
         // Calculates where to start the selection (in the Top Left).
-        const distanceLeftPixels = Math.max(0, -leftSideImageToLeftSideTile / pixelWidthInDegrees);
-        const distanceDownPixels = Math.max(0, topSideImageToTopSideTile / pixelHeightInDegrees);
+        const horizontalStartingPixelOnOriginalImage = Math.max(0, -leftSideImageToLeftSideTile / pixelWidthInDegrees);
+        const verticalStartingPixelOnOriginalImage = Math.max(0, topSideImageToTopSideTile / pixelHeightInDegrees);
 
         // Calculates the intersection of the Image and the Map Tile
         const horizontalIntersect =
@@ -189,7 +186,7 @@ export class GeoSpatialUtilities {
         // Convert overlap in pixel values
         const horizontalImageIntersectPixels = horizontalIntersect / pixelWidthInDegrees;
         const verticalImageIntersectPixels = verticalIntersect / pixelHeightInDegrees;
-        // console.log(distanceLeftPixels, distanceDownPixels, horizontalImageIntersectPixels, verticalImageIntersectPixels);
+        // console.log(horizontalStartingPixelOnOriginalImage, verticalStartingPixelOnOriginalImage, horizontalImageIntersectPixels, verticalImageIntersectPixels);
 
         /*
          * Code below Calculates the size of the section above is on the Canvas. Proportion on Canvas
@@ -213,8 +210,8 @@ export class GeoSpatialUtilities {
         context.drawImage(
           image,
           // area of Image
-          distanceLeftPixels,
-          distanceDownPixels,
+          horizontalStartingPixelOnOriginalImage,
+          verticalStartingPixelOnOriginalImage,
           horizontalImageIntersectPixels,
           verticalImageIntersectPixels,
           // area on Canvas
@@ -228,7 +225,6 @@ export class GeoSpatialUtilities {
         return false;
       },
     );
-    return bufferedImages;
   }
 
   /**

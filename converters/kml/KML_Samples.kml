@@ -9,6 +9,8 @@
         <Icon>
           <href>http://maps.google.com/mapfiles/kml/pal4/icon28.png</href>
         </Icon>
+        <hotSpot x="0.1" y="0.6" xunits="fraction" yunits="fraction">
+        </hotSpot>
       </IconStyle>
     </Style>
     <Style id="globeIcon">

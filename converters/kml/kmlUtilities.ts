@@ -23,7 +23,6 @@ export class KMLUtilities {
     node.forEach(element => {
       for (const subProp in element) {
         props.push(subProp);
-
       }
     });
     console.log(props);
@@ -54,18 +53,30 @@ export class KMLUtilities {
     }
     return props;
   }
+  public static kmlToGeoJSon(node): any {
+    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POLYGON)) {
+      return KMLUtilities.kmlPolygonToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.POLYGON]);
+    }
+    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POINT)) {
+      return KMLUtilities.kmlPointToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.POINT]);
+    }
+    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
+      return KMLUtilities.kmlLineStringToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.LINESTRING]);
+    }
+    return null;
+  }
   /**
    * Takes in a KML Point and returns a GeoJSON formatted object.
    * @param node The data from xmlStream with the selector of Placemark.
    */
-  public static kmlPointToGeoJson(node: { Point }): { type: string; coordinates: number[] } {
+  public static kmlPointToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     let geometryData;
-    if (node[KMLTAGS.GEOMETRY_TAGS.POINT].length === 1) {
+    if (node.length === 1) {
       geometryData = { type: 'Point', coordinates: [] };
     } else {
       geometryData = { type: 'MultiPoint', coordinates: [] };
     }
-    node[KMLTAGS.GEOMETRY_TAGS.POINT].forEach(point => {
+    node.forEach(point => {
       const coordPoint = point.coordinates.split(',').map(s => parseFloat(s));
       let coordinate: number[];
       if (coordPoint.length === 3) {
@@ -73,7 +84,7 @@ export class KMLUtilities {
       } else {
         coordinate = [coordPoint[0], coordPoint[1]];
       }
-      if (node.Point.length === 1) {
+      if (node.length === 1) {
         geometryData['coordinates'] = coordinate;
       } else {
         geometryData['coordinates'].push(coordinate);
@@ -86,14 +97,14 @@ export class KMLUtilities {
    * Takes in a KML LineString and returns a GeoJSON formatted object.
    * @param node The data from xmlStream with the selector of Placemark.
    */
-  public static kmlLineStringToGeoJson(node: { LineString }): { type: string; coordinates: number[] } {
+  public static kmlLineStringToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     let geometryData;
-    if (node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].length === 1) {
+    if (node.length === 1) {
       geometryData = { type: 'LineString', coordinates: [] };
     } else {
       geometryData = { type: 'MultiLineString', coordinates: [] };
     }
-    node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].forEach(element => {
+    node.forEach(element => {
       const coordPoints = element.coordinates.split(' ');
       const coordArray = [];
       coordPoints.forEach(element => {
@@ -104,7 +115,7 @@ export class KMLUtilities {
           coordArray.push([element[0], element[1]]);
         }
       });
-      if (node[KMLTAGS.GEOMETRY_TAGS.LINESTRING].length === 1) {
+      if (node.length === 1) {
         geometryData['coordinates'] = coordArray;
       } else {
         geometryData['coordinates'].push(coordArray);
@@ -117,14 +128,14 @@ export class KMLUtilities {
    * Takes in a KML Polygon and returns a GeoJSON formatted object.
    * @param node The data from xmlStream with the selector of Placemark.
    */
-  public static kmlPolygonToGeoJson(node: { Polygon }): { type: string; coordinates: number[] } {
+  public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[] } {
     let geometryData;
-    if ([KMLTAGS.GEOMETRY_TAGS.POLYGON].length === 1) {
+    if (node.length === 1) {
       geometryData = { type: 'Polygon', coordinates: [] };
     } else {
       geometryData = { type: 'MultiPolygon', coordinates: [] };
     }
-    node[KMLTAGS.GEOMETRY_TAGS.POLYGON].forEach(element => {
+    node.forEach(element => {
       const coordText = element.outerBoundaryIs.LinearRing[0].coordinates;
       const coordRing = coordText.split(' ');
       const coordArray = [];
@@ -138,10 +149,11 @@ export class KMLUtilities {
       });
 
       const temp = [coordArray];
-      if (node[KMLTAGS.GEOMETRY_TAGS.POLYGON].hasOwnProperty('innerBoundaryIs')) {
+      if (node.hasOwnProperty('innerBoundaryIs')) {
         const coordText = element.innerBoundaryIs.LinearRing[0].coordinates;
         const coordRing = coordText.split(' ');
         const coordArray = [];
+        console.log(coordRing);
         coordRing.forEach(elementRing => {
           elementRing = elementRing.split(',').map(s => parseFloat(s));
           if (elementRing.length === 3) {
@@ -153,7 +165,7 @@ export class KMLUtilities {
         temp.push(coordArray);
       }
 
-      if (node[KMLTAGS.GEOMETRY_TAGS.POLYGON].length === 1) {
+      if (node.length === 1) {
         geometryData['coordinates'] = temp;
       } else {
         geometryData['coordinates'].push(temp);
