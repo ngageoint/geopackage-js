@@ -113,32 +113,30 @@ export class BoundingBox {
         this.maxLongitude = Math.min(this.maxLongitude, 180.0);
       }
 
-      // if they are both strings, let proj4 do it
-      if (!this.isConverter(to) && !this.isConverter(from)) {
-        const min = proj4(from, to, [this.minLongitude, this.minLatitude]);
-        const max = proj4(from, to, [this.maxLongitude, this.maxLatitude]);
-        const projected = new BoundingBox(min[0], max[0], min[1], max[1]);
-        return projected;
+      let toConverter: proj4.Converter;
+      if (this.isConverter(to)) {
+        toConverter = to;
+      } else {
+        toConverter = proj4(to);
       }
-      // if they are both projections to from.inverse then to.forward
-      else {
-        let toConverter: proj4.Converter;
-        if (this.isConverter(to)) {
-          toConverter = to;
-        } else {
-          toConverter = proj4(to);
-        }
-        let fromConverter: proj4.Converter;
-        if (this.isConverter(from)) {
-          fromConverter = from;
-        } else {
-          fromConverter = proj4(from);
-        }
-        const min = toConverter.forward(fromConverter.inverse([this.minLongitude, this.minLatitude]));
-        const max = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.maxLatitude]));
-        const projected = new BoundingBox(min[0], max[0], min[1], max[1]);
-        return projected;
+      let fromConverter: proj4.Converter;
+      if (this.isConverter(from)) {
+        fromConverter = from;
+      } else {
+        fromConverter = proj4(from);
       }
+      const sw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.minLatitude]));
+      const ne = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.maxLatitude]));
+      const se = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.minLatitude]));
+      const nw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.maxLatitude]));
+
+      const projected = new BoundingBox(
+        Math.min(sw[0], nw[0]),
+        Math.max(ne[0], se[0]),
+        Math.min(sw[1], se[1]),
+        Math.max(ne[1], se[1]),
+      );
+      return projected;
     }
     return this;
   }

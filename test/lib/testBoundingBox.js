@@ -1,5 +1,7 @@
 var BoundingBox = require('../../lib/boundingBox').BoundingBox;
+var TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils;
 
+var proj4 = require('proj4')
 var should = require('chai').should();
 
 describe('BoundingBox tests', function() {
@@ -77,5 +79,25 @@ describe('BoundingBox tests', function() {
     var bb = new BoundingBox(-1252344.2714243277,2504688.5428486555,0,3757032.814272983);
     var projected = bb.projectBoundingBox('EPSG:3857', 'EPSG:4326');
   });
+
+  it('should convert with a projection and bbox where the minimum corner moves', function() {
+    let webMercatorBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(38006, 49249, 17);
+    let projection = proj4('PROJCS["NAD83 / Pennsylvania South",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["latitude_of_origin",39.3333333333333],PARAMETER["central_meridian",-77.75],PARAMETER["standard_parallel_1",40.9666666666667],PARAMETER["standard_parallel_2",39.9333333333333],PARAMETER["false_easting",600000],PARAMETER["false_northing",0],UNIT["metre",1],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32129"]]');
+    let projectionBox = webMercatorBox.projectBoundingBox('EPSG:3857', projection);
+    projectionBox.minLongitude.should.be.equal(780341.5525948266)
+    projectionBox.maxLongitude.should.be.equal(780578.9297426236)
+    projectionBox.minLatitude.should.be.equal(162413.15481310617)
+    projectionBox.maxLatitude.should.be.equal(162649.66124618147)
+  })
+
+  it('should convert with a projection and bbox where the minimum corner moves with string projection', function() {
+    let webMercatorBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(38006, 49249, 17);
+    let projection = 'PROJCS["NAD83 / Pennsylvania South",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["latitude_of_origin",39.3333333333333],PARAMETER["central_meridian",-77.75],PARAMETER["standard_parallel_1",40.9666666666667],PARAMETER["standard_parallel_2",39.9333333333333],PARAMETER["false_easting",600000],PARAMETER["false_northing",0],UNIT["metre",1],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32129"]]';
+    let projectionBox = webMercatorBox.projectBoundingBox('EPSG:3857', projection);
+    projectionBox.minLongitude.should.be.equal(780341.5525948266)
+    projectionBox.maxLongitude.should.be.equal(780578.9297426236)
+    projectionBox.minLatitude.should.be.equal(162413.15481310617)
+    projectionBox.maxLatitude.should.be.equal(162649.66124618147)
+  })
 
 });
