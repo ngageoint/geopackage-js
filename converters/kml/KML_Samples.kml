@@ -224,6 +224,7 @@
         </Placemark>
       </Document>
       <Placemark>
+      <name>MultiGeometry</name>
       <MultiGeometry>
         <Polygon>
         <altitudeMode>absolute</altitudeMode>

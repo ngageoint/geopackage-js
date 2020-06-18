@@ -8,6 +8,8 @@ import {
   TileScaling,
   TileScalingType,
   FeatureTableStyles,
+  UserColumn,
+  UserMappingTable,
 } from '@ngageoint/geopackage';
 import { StyleRow } from '@ngageoint/geopackage/built/lib/extension/style/styleRow';
 import fs from 'fs';
@@ -24,6 +26,8 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { loadImage } from 'canvas';
 import Jimp from 'jimp';
 import { GeoSpatialUtilities } from './geoSpatialUtilities.js';
+import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
+import { SimpleAttributesTable } from '@ngageoint/geopackage/built/lib/extension/relatedTables/simpleAttributesTable';
 
 export interface KMLConverterOptions {
   kmlPath?: string;
@@ -206,8 +210,22 @@ export class KMLToGeoPackage {
     tableName: string,
   ): Promise<void> {
     return new Promise(async resolve => {
+      const multiGeometryTableName = 'multi_geometry';
+      const multiGeometryMapName = multiGeometryTableName + '_' + tableName;
+      geopackage.createSimpleAttributesTable(multiGeometryTableName, [
+        { name: 'number_of_geometries', dataType: 'INT' },
+      ]);
+      const multiGeometryMap = UserMappingTable.create(multiGeometryMapName);
+
+      const rte = new RelatedTablesExtension(geopackage);
+      const relationShip = RelatedTablesExtension.RelationshipBuilder()
+        .setBaseTableName(tableName)
+        .setRelatedTableName(multiGeometryTableName)
+        .setUserMappingTable(multiGeometryMap);
+      await rte.addSimpleAttributesRelationship(relationShip);
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
+      // geopackage.createExtensionTable().
       kml.collect('LinearRing');
       kml.collect('Polygon');
       kml.collect('Point');
@@ -270,16 +288,21 @@ export class KMLToGeoPackage {
         );
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
+        let isMultiGeometry = false;
+        const geometryIds = [];
         const newNode = [];
         if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
-          // console.log('MG', node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]);
+          isMultiGeometry = true;
           for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
+            const item = new Object();
+            for (const prop in node) {
+              if (prop != KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+                item[prop] = node[prop];
+              }
+            }
             if (node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY].hasOwnProperty(key)) {
               const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
-              // console.log('for', shapeType);
               shapeType.forEach(shape => {
-                // console.log(key);
-                const item = new Object();
                 item[key] = [shape];
                 newNode.push(item);
               });
@@ -288,11 +311,8 @@ export class KMLToGeoPackage {
         } else {
           newNode.push(node);
         }
-        // console.log('NEW NODE', newNode);
         do {
-          // let geometryData;
           node = newNode.pop();
-          // console.log(node);
           let props = {};
           props = KMLUtilities.propsToStrings(props);
           let styleRow: StyleRow;
@@ -378,8 +398,20 @@ export class KMLToGeoPackage {
             if (!_.isNil(iconRow)) {
               defaultStyles.setIcon(featureID, geometryData.type, iconRow);
             }
+            geometryIds.push(featureID);
           }
         } while (newNode.length !== 0);
+        if (isMultiGeometry) {
+          const len = geometryIds.length;
+          const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, { number_of_geometries: len });
+          const userMappingDao = rte.getMappingDao(multiGeometryMapName);
+          for (const id of geometryIds) {
+            const userMappingRow = userMappingDao.newRow();
+            userMappingRow.baseId = parseInt(id);
+            userMappingRow.relatedId = multiGeometryId;
+            userMappingDao.create(userMappingRow);
+          }
+        }
       });
       kml.on('end', async () => {
         resolve();
