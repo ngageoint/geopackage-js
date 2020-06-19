@@ -134,6 +134,14 @@ export class TileBoundingBoxUtils {
     const tilesPerSide = TileBoundingBoxUtils.tilesPerSideWithZoom(zoom);
     const tileSize = TileBoundingBoxUtils.tileSizeWithTilesPerSide(tilesPerSide);
 
+    // correct the x number to be between 0 and tilesPerSide
+    while (x < 0) {
+      x = x + tilesPerSide;
+    }
+    while (x >= tilesPerSide) {
+      x = x - tilesPerSide;
+    }
+
     let meterBuffer = 0;
     if (options && options.buffer && options.tileSize) {
       const pixelBuffer = options.buffer;
