@@ -5,23 +5,51 @@ export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
 export class GeoSpatialUtilities {
-  // Taken from Map Cache Electron
-  static tile2lon(x: number, z: number): number {
-    return (x / Math.pow(2, z)) * 360 - 180;
+  /**
+   * Finds the Longitude of a tile
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param x x coordinate
+   * @param zoom zoom level
+   */
+  static tile2lon(x: number, zoom: number): number {
+    return (x / Math.pow(2, zoom)) * 360 - 180;
   }
 
-  // Taken from Map Cache Electron
-  static tile2lat(y: number, z: number): number {
-    const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z);
+  /**
+   * Finds the Latitude of a tile
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param y y coordinate
+   * @param zoom Zoom level
+   */
+  static tile2lat(y: number, zoom: number): number {
+    const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, zoom);
     return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 
-  // Taken from Map Cache Electron
+  /**
+   * Finds the x position of a tile
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param lon longitude in degrees
+   * @param z Zoom level
+   */
   static long2tile(lon: number, zoom: number): number {
     return Math.min(Math.pow(2, zoom) - 1, Math.floor(((lon + 180) / 360) * Math.pow(2, zoom)));
   }
 
-  // Taken from Map Cache Electron
+  /**
+   * Finds the y position of a tile
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param lat Latitude in degrees
+   * @param z Zoom level
+   */
   static lat2tile(lat: number, zoom: number): number {
     if (lat < WEB_MERCATOR_MIN_LAT_RANGE) {
       lat = WEB_MERCATOR_MIN_LAT_RANGE;
@@ -34,10 +62,17 @@ export class GeoSpatialUtilities {
     );
   }
 
-  // Taken from Map Cache Electron
-  static calculateXTileRange(bbox: BoundingBox, z: any): { min: number; max: number } {
-    const west = this.long2tile(bbox.maxLongitude, z);
-    const east = this.long2tile(bbox.minLongitude, z);
+  /**
+   * Calculates the ranges of tile need for a given longitude range.
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param bbox Geopackage Bounding box
+   * @param zoom zoom level
+   */
+  static calculateXTileRange(bbox: BoundingBox, zoom: any): { min: number; max: number } {
+    const west = this.long2tile(bbox.maxLongitude, zoom);
+    const east = this.long2tile(bbox.minLongitude, zoom);
     // console.log('east', east, typeof bbox.maxLongitude, z, west);
     return {
       min: Math.max(0, Math.min(west, east)),
@@ -67,7 +102,7 @@ export class GeoSpatialUtilities {
   static async iterateAllTilesInExtentForZoomLevels(
     extent: BoundingBox,
     zoomLevels: number[],
-    tileCallback: (arg0: { z: any; x: number; y: number }) => Promise<boolean>,
+    tileCallback: (arg0: { z: number; x: number; y: number }) => Promise<boolean>,
   ): Promise<void> {
     let stop = false;
     for (let i = 0; i < zoomLevels.length && !stop; i++) {
@@ -83,18 +118,20 @@ export class GeoSpatialUtilities {
     }
   }
 
-  // Taken From Map Cache Electron
-  static tileBboxCalculator(
-    x: number,
-    y: number,
-    z: number,
-  ): { north: number; east: number; south: number; west: number } {
-    return {
-      north: this.tile2lat(y, z),
-      east: this.tile2lon(x + 1, z),
-      south: this.tile2lat(y + 1, z),
-      west: this.tile2lon(x, z),
-    };
+  /**
+   * Converts tiles to a geopackage Bounding box.
+   * @param x x tile position
+   * @param y y tile position
+   * @param zoom zoom level
+   * @returns Geopackage Bounding box.
+   */
+  static tileBboxCalculator(x: number, y: number, zoom: number): BoundingBox {
+    return new BoundingBox(
+      this.tile2lon(x, zoom), // West / MinLongitude
+      this.tile2lon(x + 1, zoom), // East / MaxLongitude
+      this.tile2lat(y + 1, zoom), // South / MinLatitude
+      this.tile2lat(y, zoom), // North / MaxLatitude
+    );
   }
 
   /**
@@ -142,7 +179,13 @@ export class GeoSpatialUtilities {
     };
   }
 
-
+  /**
+   * Converts the Min/Max Latitude and Longitude into EPSG:3857 (Web Mercator)
+   *
+   * @param currentProjection EPSG:#### string of the current projection
+   * @param bbox Geopackage Bounding Box
+   * @returns New Geopackage Bounding Box with the transformed coordinates.
+   */
   public static getWebMercatorBoundingBox(currentProjection: string, bbox: BoundingBox): BoundingBox {
     proj4.defs(currentProjection, proj4Defs[currentProjection]);
     proj4.defs(

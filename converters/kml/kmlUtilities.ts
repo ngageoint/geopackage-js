@@ -20,6 +20,12 @@ export class KMLUtilities {
       throw error;
     }
   }
+
+  /**
+   * Converts KML Ground Overlay into appropriate tile sets.
+   * @param node Ground Overlay KML node
+   * @param geopackage Geopackage
+   */
   public static async handleGroundOverLay(node: any, geopackage: GeoPackage): Promise<void> {
     const imageName = node.name;
     let kmlBBox = KMLUtilities.getLatLonBBox(node);
@@ -51,20 +57,29 @@ export class KMLUtilities {
     // ts.zoom_out = 2;
     tileScalingExt.createOrUpdate(ts);
 
+    // Determines whether the image is local or online.
     const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
+
+    // Reads in Image (stored as bitmap)
     let img = await Jimp.read(imageLocation);
-    let rotation = 0;
+
     if (node.LatLonBox.hasOwnProperty('rotation')) {
-      rotation = parseFloat(node.LatLonBox.rotation);
+      const rotation = parseFloat(node.LatLonBox.rotation);
       kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
       img.rotate(rotation);
     }
+
     [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
-    // Convert img to a buffered PNG image
+
     const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
     ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
+  /**
+   * Converts node that contains a LatLonBox tag into a geopackage Bounding box
+   * @param node node from KML
+   * @returns Geopackage Bounding box.
+   */
   static getLatLonBBox(node: any): BoundingBox {
     return new BoundingBox(
       parseFloat(node.LatLonBox.west), // minLongitude
@@ -74,43 +89,11 @@ export class KMLUtilities {
     );
   }
 
-  public static getKmlInnerFields(node): any[] {
-    console.log('getKMLInnerFields:', node);
-    const props = [];
-    node.forEach(element => {
-      for (const subProp in element) {
-        props.push(subProp);
-      }
-    });
-    console.log(props);
-    return props;
-  }
-  public static getKmlInnerFieldsValue(node, props): {} {
-    node.forEach(element => {
-      for (const subProp in element) {
-        if (
-          _.findKey(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
-            return o === subProp;
-          }) === undefined
-        ) {
-          if (_.isNil(props[subProp])) {
-            props[subProp] = [element[subProp]];
-          } else {
-            props[subProp].push(element[subProp]);
-          }
-        }
-      }
-    });
-    console.log(props);
-    return props;
-  }
-  public static propsToStrings(props): {} {
-    for (const prop in props) {
-      props[prop] = props[prop].toString();
-    }
-    return props;
-  }
-  public static kmlToGeoJSon(node): any {
+  /**
+   * Converts kml geometries (Point, LineString, and Polygon) into GeoJSON features
+   * @param node KML Placemark node
+   */
+  public static kmlToGeoJSON(node): any {
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POLYGON)) {
       return KMLUtilities.kmlPolygonToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.POLYGON]);
     }

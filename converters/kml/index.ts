@@ -5,33 +5,35 @@ import {
   GeometryColumns,
   GeoPackage,
   GeoPackageAPI,
-  TileScaling,
-  TileScalingType,
   FeatureTableStyles,
-  UserColumn,
   UserMappingTable,
 } from '@ngageoint/geopackage';
 
 import { StyleRow } from '@ngageoint/geopackage/built/lib/extension/style/styleRow';
+import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
+import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
+
+// Read KML
 import fs from 'fs';
-import _ from 'lodash';
 import xmlStream from 'xml-stream';
+import path from 'path';
+
+// Read KMZ
+import JSZip from 'jszip';
+import mkdirp from 'mkdirp';
+
+// Utilities
+import _ from 'lodash';
+
+// Handle images
+import { imageSize } from 'image-size';
+import Jimp from 'jimp';
+import axios from 'axios';
+
+// Utilities and Tags
 import * as KMLTAGS from './KMLTags.js';
 import { KMLUtilities } from './kmlUtilities';
 
-import JSZip from 'jszip';
-import mkdirp from 'mkdirp';
-import path from 'path';
-import { imageSize } from 'image-size';
-import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
-import { loadImage } from 'canvas';
-import Jimp from 'jimp';
-import { GeoSpatialUtilities } from './geoSpatialUtilities.js';
-import * as geo from './geoSpatialUtilities';
-import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
-import { SimpleAttributesTable } from '@ngageoint/geopackage/built/lib/extension/relatedTables/simpleAttributesTable';
-import axios from 'axios';
-import { ProjectImage } from './testTile';
 export interface KMLConverterOptions {
   kmlPath?: string;
   append?: boolean;
@@ -54,7 +56,7 @@ export class KMLToGeoPackage {
   iconUrlMap: Map<string, number>;
   iconRowMap: Map<number, IconRow>;
   iconMapPair: Map<string, string>;
-  constructor(private optionsUser: KMLConverterOptions = {}) {
+  constructor(optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
     // Icon and Style Map are used to help fill out cross reference tables in the Geopackage Database
     this.styleMapPair = new Map();
@@ -123,9 +125,9 @@ export class KMLToGeoPackage {
     geopackage: GeoPackage | string,
     tableName: string,
   ): Promise<GeoPackage> {
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, geopackage);
-    geopackage = await this.setUpTableKML(kmlPath, props, BoundingBox, geopackage, tableName);
-    const defaultStyles = await this.setUpStyleKML(kmlPath, geopackage, tableName);
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath);
+    geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName);
+    const defaultStyles = await this.setUpStyleKML(geopackage, tableName);
 
     // Geometry and Style Insertion
     await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName);
@@ -145,7 +147,6 @@ export class KMLToGeoPackage {
    * @returns Promise<GeoPackage>
    */
   async setUpTableKML(
-    kmlPath: string,
     properties: Set<string>,
     boundingBox: BoundingBox,
     geopackage: GeoPackage | string,
@@ -189,7 +190,7 @@ export class KMLToGeoPackage {
    * @param geopkg GeoPackage Object
    * @param tableName Name of Main Table
    */
-  setUpStyleKML(kmlPath: string, geopkg: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
+  setUpStyleKML(geopkg: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
     return new Promise(async resolve => {
       // Boilerplate for creating a style tables (a geopackage extension)
       // Create Default Styles
@@ -273,7 +274,7 @@ export class KMLToGeoPackage {
    * Runs through KML and finds name for Columns and Style information
    * @param kmlPath Path to KML file
    */
-  getMetaDataKML(kmlPath: string, geopackage: GeoPackage | string): Promise<{ props: Set<string>; bbox: BoundingBox }> {
+  getMetaDataKML(kmlPath: string): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
       const properties = new Set<string>();
       // Bounding box
@@ -282,9 +283,9 @@ export class KMLToGeoPackage {
       // setInterval(() => {
       //   console.log('ONs', kmlOnsRunning);
       // }, 1);
+      let totalOnFunc = 0;
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
-      let totalOnFunc = 0;
       kml.collect('Pair');
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.LINESTRING);
@@ -524,8 +525,7 @@ export class KMLToGeoPackage {
     geopackage: GeoPackage,
     tableName: string,
   ): number {
-    let props = {};
-    props = KMLUtilities.propsToStrings(props);
+    const props = {};
     let styleRow: StyleRow;
     let iconRow: IconRow;
     for (const prop in node) {
@@ -591,7 +591,7 @@ export class KMLToGeoPackage {
         }
       }
     }
-    const geometryData = KMLUtilities.kmlToGeoJSon(node);
+    const geometryData = KMLUtilities.kmlToGeoJSON(node);
     const isGeom = !_.isNil(geometryData);
 
     const feature: any = {
@@ -661,7 +661,7 @@ export class KMLToGeoPackage {
    * @param item The id from KML and the object data from KML
    */
   private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       // console.log(item)
       const newIcon = styleTable.getIconDao().newRow();
       const kmlStyle = item[1];

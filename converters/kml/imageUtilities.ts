@@ -8,11 +8,12 @@ export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
 
 export class ImageUtilities {
   /**
-   * Takes in an image and breaks it up into 256x256 tile with appropriate scaling based on the give zoomLevels.
-   * @param image node-canvas image object
+   * ## Creates Image Tiles for given zoomLevels
+   *
+   * Determines the size of pixels and create tiles set based off zoom levels.
+   * @param image Jimp image Object
    * @param zoomLevels Array of zoom level that image tile will be created for
-   * @param bbox Image Bounding Box with Lat-Lon
-   * @returns Object of buffer Images, were the key is zoomLevelNumber,x,y
+   * @param bbox Images Bounding Box (Geopackage) with Lat-Lon
    */
   public static async getZoomImages(
     image: Jimp,
@@ -37,9 +38,8 @@ export class ImageUtilities {
     await GeoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(
       imageBBox,
       zoomLevels,
-      async (zxy: { z: any; x: number; y: number }): Promise<boolean> => {
-        const tileBox = GeoSpatialUtilities.tileBboxCalculator(zxy.x, zxy.y, zxy.z);
-        const tileBBox = new BoundingBox(tileBox.west, tileBox.east, tileBox.south, tileBox.north);
+      async (zxy: { z: number; x: number; y: number }): Promise<boolean> => {
+        const tileBBox = GeoSpatialUtilities.tileBboxCalculator(zxy.x, zxy.y, zxy.z);
         const tileWebMercatorBoundingBox = GeoSpatialUtilities.getWebMercatorBoundingBox('EPSG:4326', tileBBox);
         const tilePixelHeightInMeters =
           (tileWebMercatorBoundingBox.maxLatitude - tileWebMercatorBoundingBox.minLatitude) / TILE_SIZE_IN_PIXELS;
@@ -67,6 +67,11 @@ export class ImageUtilities {
       },
     );
   }
+  /**
+   * Crops image if the bounding is larger than Web Mercator bounds.
+   * @param kmlBBox Geopackage Bounding Box in EPSG:4326
+   * @param img Jimp image.
+   */
   public static async truncateImage(kmlBBox: BoundingBox, img: Jimp): Promise<[BoundingBox, Jimp]> {
     if (kmlBBox.maxLatitude > WEB_MERCATOR_MAX_LAT_RANGE) {
       const latHeight = kmlBBox.maxLatitude - kmlBBox.minLatitude;
