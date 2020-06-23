@@ -36,7 +36,10 @@ export class GeoPackageTileRetriever {
         this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
         this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
       }
-      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox(this.tileDao.projection, 'EPSG:3857');
+      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox(
+        this.tileDao.projection,
+        'EPSG:3857',
+      );
       return this.setWebMercatorBoundingBox;
     }
   }
@@ -105,12 +108,7 @@ export class GeoPackageTileRetriever {
     return this.getTileWithBounds(targetBoundingBox, targetProjection, canvas);
   }
 
-  async getTileWithBounds(
-    targetBoundingBox: BoundingBox,
-    targetProjection: string,
-    canvas?: any,
-  ): Promise<any> {
-
+  async getTileWithBounds(targetBoundingBox: BoundingBox, targetProjection: string, canvas?: any): Promise<any> {
     const projectedBoundingBox = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
 
     const tileMatrices = this.getTileMatrices(projectedBoundingBox);
@@ -133,11 +131,26 @@ export class GeoPackageTileRetriever {
       const iterator = this.retrieveTileResults(projectedBoundingBox, tileMatrix);
       for (const tile of iterator) {
         // Get the bounding box of the tile
-        const tileBoundingBox = TileBoundingBoxUtils.getTileBoundingBox(this.tileDao.tileMatrixSet.boundingBox, tileMatrix, tile.tileColumn, tile.row);
+        const tileBoundingBox = TileBoundingBoxUtils.getTileBoundingBox(
+          this.tileDao.tileMatrixSet.boundingBox,
+          tileMatrix,
+          tile.tileColumn,
+          tile.row,
+        );
         const overlap = TileBoundingBoxUtils.intersection(projectedBoundingBox, tileBoundingBox);
         if (overlap != null) {
-          const src = TileBoundingBoxUtils.getFloatRoundedRectangle(tileMatrix.tile_width, tileMatrix.tile_height, tileBoundingBox, overlap)
-          const dest = TileBoundingBoxUtils.getFloatRoundedRectangle(this.width, this.height, projectedBoundingBox, overlap)
+          const src = TileBoundingBoxUtils.getFloatRoundedRectangle(
+            tileMatrix.tile_width,
+            tileMatrix.tile_height,
+            tileBoundingBox,
+            overlap,
+          );
+          const dest = TileBoundingBoxUtils.getFloatRoundedRectangle(
+            this.width,
+            this.height,
+            projectedBoundingBox,
+            overlap,
+          );
           if (src.isValid && dest.isValid) {
             await creator.addTile(tile.tileData, tile.tileColumn, tile.row);
             tileFound = true;
@@ -175,7 +188,10 @@ export class GeoPackageTileRetriever {
   getTileMatrices(projectedRequestBoundingBox: BoundingBox): TileMatrix[] {
     const tileMatrices = [];
     // Check if the request overlaps the tile matrix set
-    if (this.tileDao.tileMatrices.length !== 0 && TileBoundingBoxUtils.intersects(projectedRequestBoundingBox, this.tileDao.tileMatrixSet.boundingBox)) {
+    if (
+      this.tileDao.tileMatrices.length !== 0 &&
+      TileBoundingBoxUtils.intersects(projectedRequestBoundingBox, this.tileDao.tileMatrixSet.boundingBox)
+    ) {
       // Get the tile distance
       const distanceWidth = projectedRequestBoundingBox.maxLongitude - projectedRequestBoundingBox.minLongitude;
       const distanceHeight = projectedRequestBoundingBox.maxLatitude - projectedRequestBoundingBox.minLatitude;
@@ -198,7 +214,8 @@ export class GeoPackageTileRetriever {
           // Find zoom in levels
           const zoomInLevels = [];
           if (this.scaling.isZoomIn()) {
-            const zoomIn = this.scaling.zoom_in != null ? requestZoomLevel + this.scaling.zoom_in : this.tileDao.maxZoom;
+            const zoomIn =
+              this.scaling.zoom_in != null ? requestZoomLevel + this.scaling.zoom_in : this.tileDao.maxZoom;
             for (let zoomLevel = requestZoomLevel + 1; zoomLevel <= zoomIn; zoomLevel++) {
               zoomInLevels.push(zoomLevel);
             }
@@ -206,7 +223,8 @@ export class GeoPackageTileRetriever {
           // Find zoom out levels
           const zoomOutLevels = [];
           if (this.scaling.isZoomOut()) {
-            const zoomOut = this.scaling.zoom_out != null ? requestZoomLevel - this.scaling.zoom_out : this.tileDao.minZoom;
+            const zoomOut =
+              this.scaling.zoom_out != null ? requestZoomLevel - this.scaling.zoom_out : this.tileDao.minZoom;
             for (let zoomLevel = requestZoomLevel - 1; zoomLevel >= zoomOut; zoomLevel--) {
               zoomOutLevels.push(zoomLevel);
             }
@@ -259,7 +277,7 @@ export class GeoPackageTileRetriever {
                 }
                 break;
               default:
-                throw new Error("Unsupported TileScalingType: " + type);
+                throw new Error('Unsupported TileScalingType: ' + type);
             }
           }
         } else {
@@ -276,7 +294,6 @@ export class GeoPackageTileRetriever {
             tileMatrices.push(tileMatrix);
           }
         });
-
       }
     }
 

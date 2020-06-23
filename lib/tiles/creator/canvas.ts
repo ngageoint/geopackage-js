@@ -59,7 +59,6 @@ export class CanvasTileCreator extends TileCreator {
     // eslint-disable-next-line no-undef
     const base64Data = btoa(binary);
     return new Promise((resolve: Function) => {
-      this.chunks = [];
       this.image.onload = (): void => {
         this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
         resolve(this.tileContext.drawImage(this.image, 0, 0));
@@ -102,54 +101,69 @@ export class CanvasTileCreator extends TileCreator {
     return this.canvas.toDataURL();
   }
   async reproject(tileData: any, tilePieceBoundingBox: any): Promise<void> {
-    const ctx = this.ctx;
-    const piecePosition = TileUtilities.getPiecePosition(
-      tilePieceBoundingBox,
-      this.tileBoundingBox,
-      this.height,
-      this.width,
-      this.projectionTo,
-      this.projectionFrom,
-      this.projectionFromDefinition,
-      this.tileHeightUnitsPerPixel,
-      this.tileWidthUnitsPerPixel,
-      this.tileMatrix.pixel_x_size,
-      this.tileMatrix.pixel_y_size,
-    );
-    const job = {
-      tileBoundingBox: JSON.stringify(this.tileBoundingBox),
-      tileWidthUnitsPerPixel: this.tileWidthUnitsPerPixel,
-      tileHeightUnitsPerPixel: this.tileHeightUnitsPerPixel,
-      projectionTo: this.projectionTo,
-      projectionFrom: this.projectionFrom,
-      projectionFromDefinition: this.projectionFromDefinition,
-      tileWidth: this.tileMatrix.tile_width,
-      tileHeight: this.tileMatrix.tile_height,
-      pixelYSize: this.tileMatrix.pixel_y_size,
-      pixelXSize: this.tileMatrix.pixel_x_size,
-      height: this.height,
-      width: this.width,
-      tilePieceBoundingBox: JSON.stringify(tilePieceBoundingBox),
-      imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data
-        .buffer,
-    };
-    return new Promise(resolve => {
-      try {
-        const work = require('webworkify');
-        const worker = work(require('./tileWorker.js'));
-        worker.onmessage = (e: { data: any }): void => {
-          resolve(CanvasTileCreator.workerDone(e.data, piecePosition, ctx));
-        };
-        worker.postMessage(job, [
-          this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
-        ]);
-      } catch (e) {
-        const worker = ProjectTile;
-        worker(job, function(err: any, data: any) {
-          resolve(CanvasTileCreator.workerDone(data, piecePosition, ctx));
-        });
-      }
-    });
+    const useWorker = false;
+    if (useWorker) {
+      console.log('Using a web worker');
+      const ctx = this.ctx;
+      const piecePosition = TileUtilities.getPiecePosition(
+        tilePieceBoundingBox,
+        this.tileBoundingBox,
+        this.height,
+        this.width,
+        this.projectionTo,
+        this.projectionFrom,
+        this.projectionFromDefinition,
+        this.tileHeightUnitsPerPixel,
+        this.tileWidthUnitsPerPixel,
+        this.tileMatrix.pixel_x_size,
+        this.tileMatrix.pixel_y_size,
+      );
+      const job = {
+        imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data
+          .buffer,
+        height: this.height,
+        width: this.width,
+        projectionTo: this.projectionTo,
+        projectionFrom: this.projectionFrom,
+        projectionFromDefinition: this.projectionFromDefinition,
+        maxLatitude: this.tileBoundingBox.maxLatitude,
+        minLongitude: this.tileBoundingBox.minLongitude,
+        tileWidthUnitsPerPixel: this.tileWidthUnitsPerPixel,
+        tileHeightUnitsPerPixel: this.tileHeightUnitsPerPixel,
+        tilePieceBoundingBox: JSON.stringify(tilePieceBoundingBox),
+        pixel_y_size: this.tileMatrix.pixel_y_size,
+        pixel_x_size: this.tileMatrix.pixel_x_size,
+        tile_width: this.tileMatrix.tile_width,
+        tile_height: this.tileMatrix.tile_height,
+      };
+      return new Promise(resolve => {
+        try {
+          const work = require('webworkify');
+          const worker = work(require('./tileWorker.js'));
+          worker.onmessage = (e: { data: any }): void => {
+            this.canvas
+              .getContext('2d')
+              .putImageData(new ImageData(new Uint8ClampedArray(e.data.imageData), this.height, this.width), 0, 0);
+            resolve();
+            // resolve(CanvasTileCreator.workerDone(e.data, piecePosition, ctx));
+          };
+          worker.postMessage(job, [
+            this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
+          ]);
+        } catch (e) {
+          const worker = ProjectTile;
+          worker(job, (err: any, data: any) => {
+            this.canvas.getContext('2d').putImageData(new ImageData(data, this.height, this.width), 0, 0);
+            resolve();
+            // resolve(CanvasTileCreator.workerDone(data, piecePosition, ctx));
+          });
+        }
+      });
+    } else {
+      console.log('No web worker');
+      await super.reproject(tileData, tilePieceBoundingBox);
+      this.canvas.getContext('2d').putImageData(new ImageData(this.imageData, this.height, this.width), 0, 0);
+    }
   }
   static workerDone(data: any, piecePosition: any, ctx: any): void {
     if (data.message === 'done') {

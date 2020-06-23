@@ -340,4 +340,26 @@ describe('TileBoundingBoxUtils tests', function() {
     tileBox.minLatitude.should.equal(0);
     tileBox.maxLatitude.should.equal(4095);
   });
+
+  it('should return a correct web mercator bounding box even if x is negative', function() {
+    const x = -1
+    const y = 1
+    const z = 2
+    const webMercatorBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+    webMercatorBox.minLongitude.should.equal(10018754.17139462)
+    webMercatorBox.maxLongitude.should.equal(20037508.342789244)
+    webMercatorBox.minLatitude.should.equal(0)
+    webMercatorBox.maxLatitude.should.equal(10018754.171394622)
+  });
+
+  it('should return a correct web mercator bounding box even if x is greater than tiles per side', function() {
+    const x = 7
+    const y = 1
+    const z = 2
+    const webMercatorBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
+    webMercatorBox.minLongitude.should.equal(10018754.17139462)
+    webMercatorBox.maxLongitude.should.equal(20037508.342789244)
+    webMercatorBox.minLatitude.should.equal(0)
+    webMercatorBox.maxLatitude.should.equal(10018754.171394622)
+  });
 });
