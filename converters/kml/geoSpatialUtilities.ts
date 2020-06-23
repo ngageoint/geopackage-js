@@ -1,7 +1,11 @@
 import * as turf from '@turf/turf';
-import { BoundingBox, GeoPackage } from '@ngageoint/geopackage';
+import { BoundingBox, GeoPackage, proj4Defs } from '@ngageoint/geopackage';
 import { Image, createCanvas } from 'canvas';
+import proj4 from 'proj4';
+import { KMLUtilities } from './kmlUtilities';
 export const TILE_SIZE_IN_PIXELS = 256;
+export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
+export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
 export class GeoSpatialUtilities {
   // Taken from Map Cache Electron
   static tile2lon(x: number, z: number): number {
@@ -21,6 +25,11 @@ export class GeoSpatialUtilities {
 
   // Taken from Map Cache Electron
   static lat2tile(lat: number, zoom: number): number {
+    if (lat < WEB_MERCATOR_MIN_LAT_RANGE) {
+      lat = WEB_MERCATOR_MIN_LAT_RANGE;
+    } else if (lat > WEB_MERCATOR_MAX_LAT_RANGE) {
+      lat = WEB_MERCATOR_MAX_LAT_RANGE;
+    }
     return Math.floor(
       ((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) *
         Math.pow(2, zoom),
@@ -66,6 +75,7 @@ export class GeoSpatialUtilities {
     for (let i = 0; i < zoomLevels.length && !stop; i++) {
       const z = zoomLevels[i];
       const yRange = this.calculateYTileRange(extent, z);
+      // console.log(yRange);
       const xRange = this.calculateXTileRange(extent, z);
       for (let x = xRange.min; x <= xRange.max && !stop; x++) {
         for (let y = yRange.min; y <= yRange.max && !stop; y++) {
@@ -133,100 +143,27 @@ export class GeoSpatialUtilities {
       width: Math.abs(bbox.maxLongitude - bbox.minLongitude),
     };
   }
-  /**
-   * Takes in an image and breaks it up into 256x256 tile with appropriate scaling based on the give zoomLevels.
-   * @param image node-canvas image object
-   * @param zoomLevels Array of zoom level that image tile will be created for
-   * @param bbox Image Bounding Box with Lat-Lon
-   * @returns Object of buffer Images, were the key is zoomLevelNumber,x,y
-   */
-  public static async getZoomImages(
-    image: Image,
-    zoomLevels: number[],
-    imageBbox: BoundingBox,
-    geopackage: GeoPackage,
-    imageName: string,
-  ): Promise<void> {
-    // Set up Canvas to handle the drawing of images.
-    const canvas = createCanvas(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
-    const context = canvas.getContext('2d');
 
-    // Calculate the resolution of the image compared to the Bounding Box
-    const pixelHeightInDegrees = (imageBbox.maxLatitude - imageBbox.minLatitude) / image.height;
-    const pixelWidthInDegrees = (imageBbox.maxLongitude - imageBbox.minLongitude) / image.width;
 
-    // Handles getting the correct Map tiles
-    await GeoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(
-      imageBbox,
-      zoomLevels,
-      async (zxy: { z: any; x: number; y: number }): Promise<boolean> => {
-        // Clears Canvas
-        context.clearRect(0, 0, TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
-
-        // Gets the Lat - Lon Bounding box for the Map Tile
-        const tileBox = GeoSpatialUtilities.tileBboxCalculator(zxy.x, zxy.y, zxy.z);
-
-        /*
-         * Code below Calculates the section of the image that corresponds to the current Map Tile
-         */
-        // Calculates distance between the topLeft corner of the image to the topLeft corner of the Map Tile
-        const leftSideImageToLeftSideTile = imageBbox.minLongitude - tileBox.west;
-        const topSideImageToTopSideTile = imageBbox.maxLatitude - tileBox.north;
-
-        // Calculates where to start the selection (in the Top Left).
-        const horizontalStartingPixelOnOriginalImage = Math.max(0, -leftSideImageToLeftSideTile / pixelWidthInDegrees);
-        const verticalStartingPixelOnOriginalImage = Math.max(0, topSideImageToTopSideTile / pixelHeightInDegrees);
-
-        // Calculates the intersection of the Image and the Map Tile
-        const horizontalIntersect =
-          Math.min(imageBbox.maxLongitude, tileBox.east) - Math.max(imageBbox.minLongitude, tileBox.west);
-        const verticalIntersect =
-          Math.min(imageBbox.maxLatitude, tileBox.north) - Math.max(imageBbox.minLatitude, tileBox.south);
-
-        // Convert overlap in pixel values
-        const horizontalImageIntersectPixels = horizontalIntersect / pixelWidthInDegrees;
-        const verticalImageIntersectPixels = verticalIntersect / pixelHeightInDegrees;
-        // console.log(horizontalStartingPixelOnOriginalImage, verticalStartingPixelOnOriginalImage, horizontalImageIntersectPixels, verticalImageIntersectPixels);
-
-        /*
-         * Code below Calculates the size of the section above is on the Canvas. Proportion on Canvas
-         */
-
-        // Calculate where the section of the image should start being drawn.
-        const startLeftCanvasPos = Math.max(
-          0,
-          (TILE_SIZE_IN_PIXELS * (imageBbox.minLongitude - tileBox.west)) / (tileBox.east - tileBox.west),
-        );
-        const startTopCanvasPos = Math.max(
-          0,
-          (TILE_SIZE_IN_PIXELS * -(imageBbox.maxLatitude - tileBox.north)) / (tileBox.north - tileBox.south),
-        );
-
-        // Calculates the how big the image will be on the canvas
-        const horizontalCanvasDistance = TILE_SIZE_IN_PIXELS * (horizontalIntersect / (tileBox.east - tileBox.west));
-        const verticalCanvasDistance = TILE_SIZE_IN_PIXELS * (verticalIntersect / (tileBox.north - tileBox.south));
-        // console.log('Project Pos', zxy.z, horizontalCanvasDistance, verticalCanvasDistance, startLeftCanvasPos, startTopCanvasPos);
-
-        context.drawImage(
-          image,
-          // area of Image
-          horizontalStartingPixelOnOriginalImage,
-          verticalStartingPixelOnOriginalImage,
-          horizontalImageIntersectPixels,
-          verticalImageIntersectPixels,
-          // area on Canvas
-          startLeftCanvasPos,
-          startTopCanvasPos,
-          horizontalCanvasDistance,
-          verticalCanvasDistance,
-        );
-        const bufferedImage = canvas.toBuffer('image/png');
-        geopackage.addTile(bufferedImage, imageName, zxy.z, zxy.y, zxy.x);
-        return false;
-      },
+  public static getWebMercatorBoundingBox(currentProjection: string, bbox: BoundingBox): BoundingBox {
+    proj4.defs(currentProjection, proj4Defs[currentProjection]);
+    proj4.defs(
+      'EPSG:3857',
+      '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs',
     );
+    const converter = proj4('EPSG:4326', 'EPSG:3857');
+    const temp = new BoundingBox(bbox);
+    if (temp.minLatitude < WEB_MERCATOR_MIN_LAT_RANGE) {
+      temp.minLatitude = WEB_MERCATOR_MIN_LAT_RANGE;
+    }
+    if (temp.maxLatitude > WEB_MERCATOR_MAX_LAT_RANGE) {
+      temp.maxLatitude = WEB_MERCATOR_MAX_LAT_RANGE;
+    }
+    [temp.minLongitude, temp.minLatitude] = converter.forward([temp.minLongitude, temp.minLatitude]);
+    [temp.maxLongitude, temp.maxLatitude] = converter.forward([temp.maxLongitude, temp.maxLatitude]);
+    // console.log(temp);
+    return temp;
   }
-
   /**
    * Creates a list of zoom level where the number of filled tiles changes.
    * @param bbox Bounding box after rotation

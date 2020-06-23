@@ -12,8 +12,8 @@ const path = require('path');
 
 const test = new KMLToGeoPackage();
 // let tempGeo = new GeoPackage.GeoPackage();
-let kmlPath = path.join(__dirname, 'KML_Samples.kml');
-test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'sample')
+// let kmlPath = path.join(__dirname, 'KML_Samples.kml');
+// test.convertKMLToGeoPackage(kmlPath, './temp.gpkg', 'sample')
 
-// kmlPath = path.join(__dirname, 'nepal.kmz');
-// test.convertKMZToGeoPackage(kmlPath, './temp.gpkg', 'nepal');
+let kmlPath = path.join(__dirname, 'nepal.kmz');
+test.convertKMZToGeoPackage(kmlPath, './temp.gpkg', 'nepal');

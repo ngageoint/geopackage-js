@@ -1,7 +1,13 @@
 import * as KMLTAGS from './KMLTags.js';
 import { error } from 'console';
 import _ from 'lodash';
-
+import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoint/geopackage';
+import Jimp from 'jimp';
+import { GeoSpatialUtilities } from './geoSpatialUtilities';
+import { ImageUtilities } from './imageUtilities';
+import { loadImage } from 'canvas';
+import * as geo from './geoSpatialUtilities';
+import path from 'path';
 export class KMLUtilities {
   /**
    * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
@@ -15,6 +21,61 @@ export class KMLUtilities {
     } else {
       throw error;
     }
+  }
+  public static async handleGroundOverLay(node: any, geopackage: GeoPackage): Promise<void> {
+    const imageName = node.name;
+    let kmlBBox = KMLUtilities.getLatLonBBox(node);
+
+    const matrixSetBounds = new BoundingBox(
+      -20037508.342789244,
+      20037508.342789244,
+      -20037508.342789244,
+      20037508.342789244,
+    );
+
+    const contentsSrsId = 4326;
+    const tileMatrixSetSrsId = 3857;
+    geopackage.createStandardWebMercatorTileTable(
+      imageName,
+      kmlBBox,
+      contentsSrsId,
+      matrixSetBounds,
+      tileMatrixSetSrsId,
+      0,
+      20,
+    );
+
+    const tileScalingExt = geopackage.getTileScalingExtension(imageName);
+    await tileScalingExt.getOrCreateExtension();
+    const ts = new TileScaling();
+    ts.scaling_type = TileScalingType.IN_OUT;
+    ts.zoom_in = 2;
+    // ts.zoom_out = 2;
+    tileScalingExt.createOrUpdate(ts);
+
+    const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
+    console.log(imageLocation);
+    let img = await Jimp.read(imageLocation);
+    let rotation = 0;
+    if (node.LatLonBox.hasOwnProperty('rotation')) {
+      rotation = parseFloat(node.LatLonBox.rotation);
+      kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
+      img.rotate(rotation);
+    }
+    [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
+    // Convert img to a buffered PNG image
+    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
+    const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
+    console.log(naturalScale, zoomLevels, kmlBBox);
+    ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
+  }
+  static getLatLonBBox(node: any): BoundingBox {
+    return new BoundingBox(
+      parseFloat(node.LatLonBox.west), // minLongitude
+      parseFloat(node.LatLonBox.east), // maxLongitude
+      parseFloat(node.LatLonBox.south), // minLatitude
+      parseFloat(node.LatLonBox.north), // maxLatitude
+    );
   }
 
   public static getKmlInnerFields(node): any[] {

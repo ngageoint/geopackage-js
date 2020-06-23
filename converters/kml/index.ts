@@ -11,6 +11,7 @@ import {
   UserColumn,
   UserMappingTable,
 } from '@ngageoint/geopackage';
+
 import { StyleRow } from '@ngageoint/geopackage/built/lib/extension/style/styleRow';
 import fs from 'fs';
 import _ from 'lodash';
@@ -26,9 +27,11 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { loadImage } from 'canvas';
 import Jimp from 'jimp';
 import { GeoSpatialUtilities } from './geoSpatialUtilities.js';
+import * as geo from './geoSpatialUtilities';
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 import { SimpleAttributesTable } from '@ngageoint/geopackage/built/lib/extension/relatedTables/simpleAttributesTable';
-
+import axios from 'axios';
+import { ProjectImage } from './testTile';
 export interface KMLConverterOptions {
   kmlPath?: string;
   append?: boolean;
@@ -42,6 +45,7 @@ export interface KMLConverterOptions {
  */
 export class KMLToGeoPackage {
   private options?: KMLConverterOptions;
+  hasMultiGeometry: boolean;
   styleMap: Map<string, object>;
   styleUrlMap: Map<string, number>;
   styleRowMap: Map<number, StyleRow>;
@@ -61,6 +65,7 @@ export class KMLToGeoPackage {
     this.iconUrlMap = new Map();
     this.iconRowMap = new Map();
     this.iconMapPair = new Map();
+    this.hasMultiGeometry = false;
   }
 
   /**
@@ -113,8 +118,13 @@ export class KMLToGeoPackage {
    * @param geopackage String or name of Geopackage to use
    * @param tableName Name of table with geometry
    */
-  async convertKMLToGeoPackage(kmlPath: string, geopackage: GeoPackage, tableName: string): Promise<GeoPackage> {
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath);
+  async convertKMLToGeoPackage(
+    kmlPath: string,
+    geopackage: GeoPackage | string,
+    tableName: string,
+  ): Promise<GeoPackage> {
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, geopackage);
+    // console.log(BoundingBox);
     geopackage = await this.setUpTableKML(kmlPath, props, BoundingBox, geopackage, tableName);
     const defaultStyles = await this.setUpStyleKML(kmlPath, geopackage, tableName);
 
@@ -139,7 +149,7 @@ export class KMLToGeoPackage {
     kmlPath: string,
     properties: Set<string>,
     boundingBox: BoundingBox,
-    geopackage: GeoPackage,
+    geopackage: GeoPackage | string,
     tableName: string,
   ): Promise<GeoPackage> {
     return new Promise(async resolve => {
@@ -212,17 +222,18 @@ export class KMLToGeoPackage {
     return new Promise(async resolve => {
       const multiGeometryTableName = 'multi_geometry';
       const multiGeometryMapName = multiGeometryTableName + '_' + tableName;
-      geopackage.createSimpleAttributesTable(multiGeometryTableName, [
-        { name: 'number_of_geometries', dataType: 'INT' },
-      ]);
-      const multiGeometryMap = UserMappingTable.create(multiGeometryMapName);
-
       const rte = new RelatedTablesExtension(geopackage);
-      const relationShip = RelatedTablesExtension.RelationshipBuilder()
-        .setBaseTableName(tableName)
-        .setRelatedTableName(multiGeometryTableName)
-        .setUserMappingTable(multiGeometryMap);
-      await rte.addSimpleAttributesRelationship(relationShip);
+      const multiGeometryMap = UserMappingTable.create(multiGeometryMapName);
+      if (this.hasMultiGeometry) {
+        geopackage.createSimpleAttributesTable(multiGeometryTableName, [
+          { name: 'number_of_geometries', dataType: 'INT' },
+        ]);
+        const relationShip = RelatedTablesExtension.RelationshipBuilder()
+          .setBaseTableName(tableName)
+          .setRelatedTableName(multiGeometryTableName)
+          .setUserMappingTable(multiGeometryMap);
+        await rte.addSimpleAttributesRelationship(relationShip);
+      }
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
       // geopackage.createExtensionTable().
@@ -231,61 +242,7 @@ export class KMLToGeoPackage {
       kml.collect('Point');
       kml.collect('LineString');
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
-        const imageName = node.name;
-        let kmlBBox = new BoundingBox(
-          parseFloat(node.LatLonBox.west),
-          parseFloat(node.LatLonBox.east),
-          parseFloat(node.LatLonBox.south),
-          parseFloat(node.LatLonBox.north),
-        );
-
-        const matrixSetBounds = new BoundingBox(
-          -20037508.342789244,
-          20037508.342789244,
-          -20037508.342789244,
-          20037508.342789244,
-        );
-
-        const contentsSrsId = 4326;
-        const tileMatrixSetSrsId = 3857;
-        geopackage.createStandardWebMercatorTileTable(
-          imageName,
-          kmlBBox,
-          contentsSrsId,
-          matrixSetBounds,
-          tileMatrixSetSrsId,
-          0,
-          20,
-        );
-
-        const tileScalingExt = geopackage.getTileScalingExtension(imageName);
-        await tileScalingExt.getOrCreateExtension();
-        const ts = new TileScaling();
-        ts.scaling_type = TileScalingType.IN_OUT;
-        ts.zoom_in = 2;
-        ts.zoom_out = 2;
-        tileScalingExt.createOrUpdate(ts);
-
-        const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
-        const img = await Jimp.read(imageLocation);
-        let rotation = 0;
-        if (node.LatLonBox.hasOwnProperty('rotation')) {
-          rotation = parseFloat(node.LatLonBox.rotation);
-          kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-          img.rotate(rotation);
-        }
-        // Convert img to a buffered PNG image
-        const imageBuffer = await img.getBufferAsync(Jimp.MIME_PNG);
-        await loadImage(imageBuffer).then(
-          image => {
-            const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, image.width);
-            const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
-            GeoSpatialUtilities.getZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName);
-          },
-          () => {
-            console.error('Rejected');
-          },
-        );
+        await KMLUtilities.handleGroundOverLay(node, geopackage);
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isMultiGeometry = false;
@@ -401,7 +358,7 @@ export class KMLToGeoPackage {
             geometryIds.push(featureID);
           }
         } while (newNode.length !== 0);
-        if (isMultiGeometry) {
+        if (isMultiGeometry && this.hasMultiGeometry) {
           const len = geometryIds.length;
           const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, { number_of_geometries: len });
           const userMappingDao = rte.getMappingDao(multiGeometryMapName);
@@ -419,23 +376,55 @@ export class KMLToGeoPackage {
     });
   }
 
+
+
   /**
    * Runs through KML and finds name for Columns and Style information
    * @param kmlPath Path to KML file
    */
-  getMetaDataKML(kmlPath: string): Promise<{ props: Set<string>; bbox: BoundingBox }> {
-    return new Promise(resolve => {
+  getMetaDataKML(kmlPath: string, geopackage: GeoPackage | string): Promise<{ props: Set<string>; bbox: BoundingBox }> {
+    return new Promise(async resolve => {
       const properties = new Set<string>();
       // Bounding box
       let minLat: number, minLon: number, maxLat: number, maxLon: number;
-
+      let kmlOnsRunning = 0;
+      // setInterval(() => {
+      //   console.log('ONs', kmlOnsRunning);
+      // }, 1);
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream);
+      let totalOnFunc = 0;
       kml.collect('Pair');
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.LINESTRING);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POLYGON);
+      // kml.on('endElement: NetworkLink', async (node: any) => {
+      //   kmlOnsRunning++;
+      //   console.log('nwl', kmlOnsRunning);
+      //   if (node.hasOwnProperty('Link')) {
+      //     await axios
+      //       .get(node.Link.href.toString())
+      //       .then(async response => {
+      //         console.log(response.statusText);
+      //         const pathW = fs.createWriteStream(path.join(__dirname, '/link.kml'));
+      //         pathW.write(response.data);
+      //         this.options.append = true;
+      //         const linkedFile = new KMLToGeoPackage();
+      //         console.log('made nwl', kmlOnsRunning);
+      //         await linkedFile.convertKMLToGeoPackage(path.join(__dirname, '/link.kml'), './temp1.gpkg', 'link');
+      //         console.log('done nwl', kmlOnsRunning);
+      //         kmlOnsRunning--;
+      //       })
+      //       .catch(error => console.error(error));
+      //   }
+      //   console.log('nwl', kmlOnsRunning);
+      //   console.log(node);
+      // });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, (node: {}) => {
+        totalOnFunc++;
+        kmlOnsRunning++;
+        // console.log('prop', kmlOnsRunning);
+        // console.log(node);
         for (const property in node) {
           // Item to be treated like a Geometry
           if (
@@ -457,6 +446,7 @@ export class KMLToGeoPackage {
               }
             });
           } else if (property === KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+            this.hasMultiGeometry = true;
             for (const subProperty in node[property]) {
               // console.log(subProperty);
               node[property][subProperty].forEach(element => {
@@ -478,8 +468,13 @@ export class KMLToGeoPackage {
           }
         }
         // console.log(properties);
+        kmlOnsRunning--;
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG + ' ' + KMLTAGS.COORDINATES_TAG, (node: { $text: string }) => {
+        totalOnFunc++;
+        kmlOnsRunning++;
+        // console.log('coord', kmlOnsRunning, totalOnFunc);
+        // console.log('coordST', kmlOnsRunning);
         const rows = node.$text.split(/\s/);
         rows.forEach((element: string) => {
           const temp = element.split(',').map(s => Number(s));
@@ -493,8 +488,12 @@ export class KMLToGeoPackage {
           if (temp[1] < minLon) minLon = temp[1];
           if (temp[1] > maxLon) maxLon = temp[1];
         });
+        kmlOnsRunning--;
+        // kml.resume();
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + ' ' + KMLTAGS.STYLE_TAG, (node: {}) => {
+        totalOnFunc++;
+        kmlOnsRunning++;
         if (
           node.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE) ||
           node.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)
@@ -504,16 +503,28 @@ export class KMLToGeoPackage {
         if (node.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
           this.iconMap.set(node['$'].id, node);
         }
+        kmlOnsRunning--;
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_MAP_TAG, node => {
+        totalOnFunc++;
+        kmlOnsRunning++;
+        // console.log('endElement', kmlOnsRunning, kml._fa);
         node.Pair.forEach((item: { key: string; styleUrl: string }) => {
           if (item.key === 'normal') {
             this.styleMapPair.set('#' + node['$'].id, item.styleUrl);
             this.iconMapPair.set('#' + node['$'].id, item.styleUrl);
           }
         });
+        kmlOnsRunning--;
       });
-      kml.on('end', () => {
+      kml.on('end', async () => {
+        totalOnFunc++;
+        // console.log('end', kmlOnsRunning, totalOnFunc);
+        // console.log(properties, minLat, maxLat, minLon, maxLon);
+        while (kmlOnsRunning > 0) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          // console.log('end', kmlOnsRunning);
+        }
         resolve({ props: properties, bbox: new BoundingBox(minLat, maxLat, minLon, maxLon) });
       });
     });
@@ -624,10 +635,10 @@ export class KMLToGeoPackage {
                 aU = parseFloat(hotSpot['x']);
                 break;
               case 'pixels':
-                aU = parseFloat(hotSpot['x']) / img.getWidth();
+                aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
                 break;
               case 'insetPixels':
-                aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
+                aU = parseFloat(hotSpot['x']) / img.getWidth();
               default:
                 break;
             }
@@ -636,10 +647,10 @@ export class KMLToGeoPackage {
                 aV = parseFloat(hotSpot['y']);
                 break;
               case 'pixels':
-                aV = parseFloat(hotSpot['y']) / img.getHeight();
+                aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
                 break;
               case 'insetPixels':
-                aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
+                aV = parseFloat(hotSpot['y']) / img.getHeight();
               default:
                 break;
             }
@@ -708,7 +719,7 @@ export class KMLToGeoPackage {
           }
         }
         if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('outline')) {
-          console.log(kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]);
+          // console.log(kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]);
           // No property Currently TODO
           // newStyle.(item[1]['LineStyle']['outline']);
         }
