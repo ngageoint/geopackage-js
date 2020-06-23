@@ -8,6 +8,8 @@ import { TileMatrix } from './tileMatrix';
 import { Contents } from '../../core/contents/contents';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { DBValue } from '../../db/dbAdapter';
+import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder';
+import { TileColumn } from '../user/tileColumn';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -63,5 +65,12 @@ export class TileMatrixDao extends Dao<TileMatrix> {
   }
   getTileMatrixSet(tileMatrix: TileMatrix): TileMatrixSet {
     return this.geoPackage.tileMatrixSetDao.queryForId(tileMatrix.table_name);
+  }
+  tileCount(tileMatrix: TileMatrix): number {
+    const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, tileMatrix.zoom_level);
+    const whereArgs = this.buildWhereArgs([tileMatrix.zoom_level]);
+    const query = SqliteQueryBuilder.buildCount("'" + tileMatrix.table_name + "'", where);
+    const result = this.connection.get(query, whereArgs);
+    return result?.count;
   }
 }
