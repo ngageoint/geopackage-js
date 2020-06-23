@@ -243,12 +243,11 @@ export class SqliteQueryBuilder {
       }
     } else {
       for (const prop in object) {
-        if (!first) {
-          update += ', ';
-        }
-        first = false;
-
         if (Object.prototype.hasOwnProperty.call(object, prop)) {
+          if (!first) {
+            update += ', ';
+          }
+          first = false;
           update += '"' + prop + '"=';
           update += '$' + SqliteQueryBuilder.fixColumnName(prop);
         }
