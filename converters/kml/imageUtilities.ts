@@ -1,7 +1,5 @@
 import { BoundingBox, GeoPackage, proj4Defs } from '@ngageoint/geopackage';
-import { Image, createCanvas, loadImage } from 'canvas';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
-import path from 'path';
 import Jimp from 'jimp';
 import proj4 from 'proj4';
 export const TILE_SIZE_IN_PIXELS = 256;
@@ -23,22 +21,12 @@ export class ImageUtilities {
     geopackage: GeoPackage,
     imageName: string,
   ): Promise<void> {
-    // // Set up Canvas to handle the drawing of images.
-    // const canvas = createCanvas(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS);
-    // const context = canvas.getContext('2d');
-
     // Calculate the resolution of the image compared to the Bounding Box
     const imageHeight = image.getHeight();
     const imageWidth = image.getWidth();
     const pixelHeightInDegrees = (imageBBox.maxLatitude - imageBBox.minLatitude) / imageHeight;
     const pixelWidthInDegrees = (imageBBox.maxLongitude - imageBBox.minLongitude) / imageWidth;
 
-    // const webMercatorBoundingBox = GeoSpatialUtilities.getWebMercatorBoundingBox('EPSG:4326', imageBBox);
-    // const pixelHeightInMeters =
-    //   (webMercatorBoundingBox.maxLatitude - webMercatorBoundingBox.minLatitude) / imageHeight;
-    // const pixelWidthInMeters =
-    //   (webMercatorBoundingBox.maxLongitude - webMercatorBoundingBox.minLongitude) / imageWidth;
-    // const fullImage = await loadImage(await image.getBufferAsync(Jimp.MIME_PNG));
     proj4.defs('EPSG:4326', '+proj=longlat +datum=WGS84 +no_defs ');
     proj4.defs(
       'EPSG:3857',
@@ -46,7 +34,6 @@ export class ImageUtilities {
     );
     const converter = proj4('EPSG:4326', 'EPSG:3857');
     // Handles getting the correct Map tiles
-    // console.time('zoomlevels');
     await GeoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(
       imageBBox,
       zoomLevels,
@@ -79,7 +66,6 @@ export class ImageUtilities {
         return false;
       },
     );
-    // console.timeEnd('zoomlevels');
   }
   public static async truncateImage(kmlBBox: BoundingBox, img: Jimp): Promise<[BoundingBox, Jimp]> {
     if (kmlBBox.maxLatitude > WEB_MERCATOR_MAX_LAT_RANGE) {

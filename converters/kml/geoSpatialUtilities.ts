@@ -1,8 +1,6 @@
 import * as turf from '@turf/turf';
 import { BoundingBox, GeoPackage, proj4Defs } from '@ngageoint/geopackage';
-import { Image, createCanvas } from 'canvas';
 import proj4 from 'proj4';
-import { KMLUtilities } from './kmlUtilities';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
@@ -101,7 +99,7 @@ export class GeoSpatialUtilities {
 
   /**
    * Uses turf to rotate a bounding box.
-   * @param bbox GeoPackage Bounding Box ESPG:4326
+   * @param bbox GeoPackage Bounding Box EPSG:4326
    * @param rotation Rotation in degrees North clockwise negative
    * @returns GeoPackage Bounding Box Rotated by given number of degrees
    */

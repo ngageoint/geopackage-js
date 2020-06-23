@@ -5,8 +5,6 @@ import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoin
 import Jimp from 'jimp';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
-import { loadImage } from 'canvas';
-import * as geo from './geoSpatialUtilities';
 import path from 'path';
 export class KMLUtilities {
   /**
@@ -54,7 +52,6 @@ export class KMLUtilities {
     tileScalingExt.createOrUpdate(ts);
 
     const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
-    console.log(imageLocation);
     let img = await Jimp.read(imageLocation);
     let rotation = 0;
     if (node.LatLonBox.hasOwnProperty('rotation')) {
@@ -66,7 +63,6 @@ export class KMLUtilities {
     // Convert img to a buffered PNG image
     const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
-    console.log(naturalScale, zoomLevels, kmlBBox);
     ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
   static getLatLonBBox(node: any): BoundingBox {
