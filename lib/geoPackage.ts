@@ -72,6 +72,8 @@ import { SimpleAttributesTable } from './extension/relatedTables/simpleAttribute
 import { TileRow } from './tiles/user/tileRow';
 import { FeatureTiles } from './tiles/features';
 import { GeoPackageTileRetriever } from './tiles/retriever';
+import { TileScaling } from './extension/scale/tileScaling';
+import { TileScalingType } from './extension/scale/tileScalingType';
 
 type ColumnMap = {
   [key: string]: {
@@ -287,7 +289,11 @@ export class GeoPackage {
     );
     results.forEach(function(result) {
       const tm = tileMatrixDao.createObject(result);
-      tileMatrices.push(tm);
+      // verify first that there are actual tiles at this zoom level due to QGIS doing weird things and
+      // creating tile matrix entries for zoom levels that have no tiles
+      if (tileMatrixDao.tileCount(tm)) {
+        tileMatrices.push(tm);
+      }
     });
     const tableReader = new TileTableReader(table);
     const tileTable = tableReader.readTileTable(this);
@@ -1711,10 +1717,61 @@ export class GeoPackage {
     const tileDao = this.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height);
     if (this.getTileScalingExtension(table).has()) {
-      const tileScaling = this.getTileScalingExtension(table).dao.queryForTableName(table)
+      const tileScaling = this.getTileScalingExtension(table).dao.queryForTableName(table);
       if (tileScaling) {
-        retriever.setScaling(tileScaling)
+        retriever.setScaling(tileScaling);
       }
+    }
+    if (!canvas) {
+      return retriever.getTile(x, y, z);
+    } else {
+      return retriever.drawTileIn(x, y, z, canvas);
+    }
+  }
+
+  /**
+   * Get the standard 3857 XYZ tile from the GeoPackage.  If a canvas is provided, the tile will be drawn in the canvas
+   * @param  {string}   table      name of the table containing the tiles
+   * @param  {Number}   x          x index of the tile
+   * @param  {Number}   y          y index of the tile
+   * @param  {Number}   z          zoom level of the tile
+   * @param  {Number}   width      width of the resulting tile
+   * @param  {Number}   height     height of the resulting tile
+   * @param  {any}   canvas     canvas element to draw the tile into
+   */
+  async xyzTileScaled(
+    table: string,
+    x: number,
+    y: number,
+    z: number,
+    width = 256,
+    height = 256,
+    canvas?: any,
+    zoomIn?: 2,
+    zoomOut?: 2,
+  ): Promise<any> {
+    width = Number(width);
+    height = Number(height);
+    const tileDao = this.getTileDao(table);
+    const retriever = new GeoPackageTileRetriever(tileDao, width, height);
+    // if (!this.getTileScalingExtension(table).has()) {
+    await this.getTileScalingExtension(table).getOrCreateExtension();
+    // }
+    const tileScaling = this.getTileScalingExtension(table).dao.queryForTableName(table);
+    if (tileScaling) {
+      retriever.setScaling(tileScaling);
+    } else {
+      // } else {
+      const tileScaling = new TileScaling();
+      tileScaling.zoom_in = zoomIn;
+      tileScaling.zoom_out = zoomOut;
+      tileScaling.table_name = table;
+      tileScaling.scaling_type = TileScalingType.CLOSEST_IN_OUT;
+      const tileScalingExtension = this.getTileScalingExtension(table);
+      // await tileScalingExtension.getOrCreateExtension();
+      tileScalingExtension.createOrUpdate(tileScaling);
+
+      retriever.setScaling(tileScaling);
     }
     if (!canvas) {
       return retriever.getTile(x, y, z);
