@@ -492,9 +492,9 @@ window.toggleLayer = function(layerType, table) {
     });
     const tileDao = geoPackage.getTileDao(table);
     // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
-    var maxZoom = tileDao.maxWebMapZoom;
-    var minZoom = tileDao.minWebMapZoom;
-    const tableLayer = new L.GridLayer({ noWrap: true });
+    const maxZoom = tileDao.maxWebMapZoom;
+    const minZoom = tileDao.minWebMapZoom;
+    const tableLayer = new L.GridLayer({ noWrap: true, pane: 'tilePane' });
     tableLayer.createTile = function(tilePoint) {
       const canvas = L.DomUtil.create('canvas');
       const size = this.getTileSize();
@@ -544,7 +544,7 @@ window.toggleLayer = function(layerType, table) {
           .html(message);
       })
       .then(function(indexed) {
-        const tableLayer = new L.GridLayer({ noWrap: true, minZoom: minZoom, maxZoom: maxZoom });
+        const tableLayer = new L.GridLayer({ noWrap: true, pane: 'overlayPane' });
         tableLayer.createTile = function(tilePoint, done) {
           const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
           const size = this.getTileSize();
