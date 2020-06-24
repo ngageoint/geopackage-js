@@ -1754,9 +1754,7 @@ export class GeoPackage {
     height = Number(height);
     const tileDao = this.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height);
-    // if (!this.getTileScalingExtension(table).has()) {
     await this.getTileScalingExtension(table).getOrCreateExtension();
-    // }
     const tileScaling = this.getTileScalingExtension(table).dao.queryForTableName(table);
     if (tileScaling) {
       retriever.setScaling(tileScaling);
