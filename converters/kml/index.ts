@@ -89,7 +89,7 @@ export class KMLToGeoPackage {
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
             const fileDestination = path.join(__dirname, key);
-            console.log('fileDest', fileDestination);
+            // console.log('fileDest', fileDestination);
             kmlPath = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlPath;
             await mkdirp(path.dirname(fileDestination), function(err) {
               if (err) console.error(err);
@@ -115,7 +115,7 @@ export class KMLToGeoPackage {
       }
       resolve();
     }).then(async () => {
-      console.log('then ', kmlPath);
+      // console.log('then ', kmlPath);
       gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName);
     });
     return gp;
@@ -267,8 +267,12 @@ export class KMLToGeoPackage {
       kml.collect('Polygon');
       kml.collect('Point');
       kml.collect('LineString');
-      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
-        await KMLUtilities.handleGroundOverLay(node, geopackage);
+      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, node => {
+        KMLUtilities.handleGroundOverLay(node, geopackage)
+          .then(() => {
+            console.log('DONE');
+          })
+          .catch(err => console.log('error:', err));
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         let isMultiGeometry = false;

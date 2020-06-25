@@ -27,7 +27,7 @@ export class KMLUtilities {
    * @param node Ground Overlay KML node
    * @param geopackage Geopackage
    */
-  public static handleGroundOverLay(node: any, geopackage: GeoPackage): void {
+  public static async handleGroundOverLay(node: any, geopackage: GeoPackage): Promise<void> {
     const imageName = node.name;
     let kmlBBox = KMLUtilities.getLatLonBBox(node);
 
@@ -51,31 +51,31 @@ export class KMLUtilities {
     );
 
     const tileScalingExt = geopackage.getTileScalingExtension(imageName);
-    tileScalingExt.getOrCreateExtension();
+    await tileScalingExt.getOrCreateExtension();
     const ts = new TileScaling();
     ts.scaling_type = TileScalingType.IN_OUT;
     ts.zoom_in = 2;
-    ts.zoom_out = 2;
+    // ts.zoom_out = 2;
     console.log(ts, imageName);
     tileScalingExt.createOrUpdate(ts);
-    console.log('sogi');
+    console.log('create or Update Tile Scaling')
     // Determines whether the image is local or online.
     const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
     console.log(imageLocation);
     // Reads in Image (stored as bitmap)
-    Jimp.read(imageLocation).then(async (img: Jimp) => {
-      if (node.LatLonBox.hasOwnProperty('rotation')) {
-        const rotation = parseFloat(node.LatLonBox.rotation);
-        kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-        img.rotate(rotation);
-      }
+    let img = await Jimp.read(imageLocation);
 
-      [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
+    if (node.LatLonBox.hasOwnProperty('rotation')) {
+      const rotation = parseFloat(node.LatLonBox.rotation);
+      kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
+      img.rotate(rotation);
+    }
 
-      const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
-      const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
-      ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
-    });
+    [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
+
+    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
+    const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
+    ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
 
   /**
