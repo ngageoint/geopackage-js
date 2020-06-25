@@ -6,6 +6,7 @@ import Jimp from 'jimp';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
 import path from 'path';
+
 export class KMLUtilities {
   /**
    * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
@@ -75,6 +76,7 @@ export class KMLUtilities {
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
     ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
+
   /**
    * Converts node that contains a LatLonBox tag into a geopackage Bounding box
    * @param node node from KML
@@ -110,25 +112,19 @@ export class KMLUtilities {
    * @param node The data from xmlStream with the selector of Placemark.
    */
   public static kmlPointToGeoJson(node: any[]): { type: string; coordinates: number[] } {
-    let geometryData;
-    if (node.length === 1) {
-      geometryData = { type: 'Point', coordinates: [] };
-    } else {
-      geometryData = { type: 'MultiPoint', coordinates: [] };
-    }
+    const geometryData = { type: 'Point', coordinates: [] };
     node.forEach(point => {
-      const coordPoint = point.coordinates.split(',').map(s => parseFloat(s));
+      const coordPoint = point.coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
+        .join(' ')
+        .split(',')
+        .map((s: string) => parseFloat(s));
       let coordinate: number[];
       if (coordPoint.length === 3) {
         coordinate = [coordPoint[0], coordPoint[1], coordPoint[2]];
       } else {
         coordinate = [coordPoint[0], coordPoint[1]];
       }
-      if (node.length === 1) {
-        geometryData['coordinates'] = coordinate;
-      } else {
-        geometryData['coordinates'].push(coordinate);
-      }
+      geometryData['coordinates'] = coordinate;
     });
     return geometryData;
   }
@@ -138,28 +134,19 @@ export class KMLUtilities {
    * @param node The data from xmlStream with the selector of Placemark.
    */
   public static kmlLineStringToGeoJson(node: any[]): { type: string; coordinates: number[] } {
-    let geometryData;
-    if (node.length === 1) {
-      geometryData = { type: 'LineString', coordinates: [] };
-    } else {
-      geometryData = { type: 'MultiLineString', coordinates: [] };
-    }
+    const geometryData = { type: 'LineString', coordinates: [] };
     node.forEach(element => {
-      const coordPoints = element.coordinates.split(' ');
+      const coordPoints = element.coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR].join(' ').split(/\s/);
       const coordArray = [];
-      coordPoints.forEach(element => {
-        element = element.split(',').map(s => parseFloat(s));
-        if (element.length === 3) {
-          coordArray.push([element[0], element[1], element[2]]);
+      coordPoints.forEach((element: string) => {
+        const coords = element.split(',').map(s => parseFloat(s));
+        if (coords.length === 3) {
+          coordArray.push([coords[0], coords[1], coords[2]]);
         } else {
-          coordArray.push([element[0], element[1]]);
+          coordArray.push([coords[0], coords[1]]);
         }
       });
-      if (node.length === 1) {
-        geometryData['coordinates'] = coordArray;
-      } else {
-        geometryData['coordinates'].push(coordArray);
-      }
+      geometryData['coordinates'] = coordArray;
     });
     return geometryData;
   }
@@ -169,47 +156,43 @@ export class KMLUtilities {
    * @param node The data from xmlStream with the selector of Placemark.
    */
   public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[] } {
-    let geometryData;
-    if (node.length === 1) {
-      geometryData = { type: 'Polygon', coordinates: [] };
-    } else {
-      geometryData = { type: 'MultiPolygon', coordinates: [] };
-    }
+    const geometryData = { type: 'Polygon', coordinates: [] };
     node.forEach(element => {
-      const coordText = element.outerBoundaryIs.LinearRing[0].coordinates;
-      const coordRing = coordText.split(' ');
+      const coordRing = element.outerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
+        .join(' ')
+        .split(/\s/);
       const coordArray = [];
-      coordRing.forEach(element => {
-        element = element.split(',').map(s => parseFloat(s));
-        if (element.length === 3) {
-          coordArray.push([element[0], element[1], element[2]]);
+      coordRing.forEach((element: string) => {
+        const coords = element.split(',').map(s => parseFloat(s));
+        // if (element.length > 3) {
+        //   console.log(coordTextRaw, element);
+        //   // console.log(coordText);
+        // }
+        if (coords.length === 3) {
+          coordArray.push([coords[0], coords[1], coords[2]]);
         } else {
-          coordArray.push([element[0], element[1]]);
+          coordArray.push([coords[0], coords[1]]);
         }
       });
 
       const temp = [coordArray];
       if (node.hasOwnProperty('innerBoundaryIs')) {
-        const coordText = element.innerBoundaryIs.LinearRing[0].coordinates;
-        const coordRing = coordText.split(' ');
+        const coordRing = element.innerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
+          .join(' ')
+          .split(' ');
         const coordArray = [];
         console.log(coordRing);
-        coordRing.forEach(elementRing => {
-          elementRing = elementRing.split(',').map(s => parseFloat(s));
-          if (elementRing.length === 3) {
-            coordArray.push([elementRing[0], elementRing[1], elementRing[2]]);
+        coordRing.forEach((elementRing: string) => {
+          const coords = elementRing.split(',').map(s => parseFloat(s));
+          if (coords.length === 3) {
+            coordArray.push([coords[0], coords[1], coords[2]]);
           } else {
-            coordArray.push([elementRing[0], elementRing[1]]);
+            coordArray.push([coords[0], coords[1]]);
           }
         });
         temp.push(coordArray);
       }
-
-      if (node.length === 1) {
-        geometryData['coordinates'] = temp;
-      } else {
-        geometryData['coordinates'].push(temp);
-      }
+      geometryData['coordinates'] = temp;
     });
     return geometryData;
   }

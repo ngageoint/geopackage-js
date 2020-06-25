@@ -260,6 +260,12 @@ export const ALTITUDE_MODE_TAG = 'altitudeMode';
  */
 export const NETWORK_LINK = 'NetworkLink';
 
+export const XML_STREAM_TEXT_SELECTOR = '$text';
+
+export const XML_STREAM_CHILDREN_SELECTOR = '$children';
+
+export const XML_STREAM_NAME_SELECTOR = '$name';
+
 export const ITEM_TO_SEARCH_WITHIN = [GEOMETRY_TAGS.LINESTRING, GEOMETRY_TAGS.POINT, GEOMETRY_TAGS.POLYGON];
 
 export const INNER_ITEMS_TO_IGNORE = [COORDINATES_TAG, OUTER_BOUNDARY_TAG, INNER_BOUNDARY_TAG];

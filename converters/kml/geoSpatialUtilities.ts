@@ -1,9 +1,10 @@
 import * as turf from '@turf/turf';
-import { BoundingBox, GeoPackage, proj4Defs } from '@ngageoint/geopackage';
+import { BoundingBox, proj4Defs } from '@ngageoint/geopackage';
 import proj4 from 'proj4';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
+
 export class GeoSpatialUtilities {
   /**
    * Finds the Longitude of a tile
@@ -80,7 +81,14 @@ export class GeoSpatialUtilities {
     };
   }
 
-  // Taken from Map Cache Electron
+  /**
+   * Calculates the ranges of tile need for a given latitude range.
+   *
+   * Taken from Map Cache Electron
+   *
+   * @param bbox Geopackage Bounding box
+   * @param zoom zoom level
+   */
   static calculateYTileRange(bbox: BoundingBox, z: any): { min: number; max: number; current: number } {
     const south = this.lat2tile(bbox.minLatitude, z);
     const north = this.lat2tile(bbox.maxLatitude, z);
@@ -205,6 +213,7 @@ export class GeoSpatialUtilities {
     // console.log(temp);
     return temp;
   }
+
   /**
    * Creates a list of zoom level where the number of filled tiles changes.
    * @param bbox Bounding box after rotation
