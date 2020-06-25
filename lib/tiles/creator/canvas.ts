@@ -101,7 +101,7 @@ export class CanvasTileCreator extends TileCreator {
     return this.canvas.toDataURL();
   }
   async reproject(tileData: any, tilePieceBoundingBox: any): Promise<void> {
-    const useWorker = false;
+    const useWorker = true;
     if (useWorker) {
       console.log('Using a web worker');
       const ctx = this.ctx;
@@ -119,8 +119,8 @@ export class CanvasTileCreator extends TileCreator {
         this.tileMatrix.pixel_y_size,
       );
       const job = {
-        imageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data
-          .buffer,
+        sourceImageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height)
+          .data.buffer,
         height: this.height,
         width: this.width,
         projectionTo: this.projectionTo,
@@ -131,6 +131,7 @@ export class CanvasTileCreator extends TileCreator {
         tileWidthUnitsPerPixel: this.tileWidthUnitsPerPixel,
         tileHeightUnitsPerPixel: this.tileHeightUnitsPerPixel,
         tilePieceBoundingBox: JSON.stringify(tilePieceBoundingBox),
+        tileBoundingBox: JSON.stringify(this.tileBoundingBox),
         pixel_y_size: this.tileMatrix.pixel_y_size,
         pixel_x_size: this.tileMatrix.pixel_x_size,
         tile_width: this.tileMatrix.tile_width,
@@ -141,11 +142,15 @@ export class CanvasTileCreator extends TileCreator {
           const work = require('webworkify');
           const worker = work(require('./tileWorker.js'));
           worker.onmessage = (e: { data: any }): void => {
-            this.canvas
+            const tmpCanvas = document.createElement('canvas');
+            tmpCanvas.width = this.width;
+            tmpCanvas.height = this.height;
+            tmpCanvas
               .getContext('2d')
               .putImageData(new ImageData(new Uint8ClampedArray(e.data.imageData), this.height, this.width), 0, 0);
+
+            this.canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
             resolve();
-            // resolve(CanvasTileCreator.workerDone(e.data, piecePosition, ctx));
           };
           worker.postMessage(job, [
             this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
@@ -155,7 +160,6 @@ export class CanvasTileCreator extends TileCreator {
           worker(job, (err: any, data: any) => {
             this.canvas.getContext('2d').putImageData(new ImageData(data, this.height, this.width), 0, 0);
             resolve();
-            // resolve(CanvasTileCreator.workerDone(data, piecePosition, ctx));
           });
         }
       });
@@ -163,23 +167,6 @@ export class CanvasTileCreator extends TileCreator {
       console.log('No web worker');
       await super.reproject(tileData, tilePieceBoundingBox);
       this.canvas.getContext('2d').putImageData(new ImageData(this.imageData, this.height, this.width), 0, 0);
-    }
-  }
-  static workerDone(data: any, piecePosition: any, ctx: any): void {
-    if (data.message === 'done') {
-      const imageData = new Uint8ClampedArray(data.imageData);
-      const offsetX = piecePosition.startX;
-      const offsetY = piecePosition.startY;
-      const finalWidth = data.finalWidth;
-      const finalHeight = data.finalHeight;
-
-      // eslint-disable-next-line no-undef
-      const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = finalWidth;
-      tmpCanvas.height = finalHeight;
-      tmpCanvas.getContext('2d').putImageData(new ImageData(imageData, finalWidth, finalHeight), 0, 0);
-
-      ctx.drawImage(tmpCanvas, offsetX, offsetY);
     }
   }
 }

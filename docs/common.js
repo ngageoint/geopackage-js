@@ -492,22 +492,34 @@ window.toggleLayer = function(layerType, table) {
     });
     const tileDao = geoPackage.getTileDao(table);
     // these are not the correct zooms for the map.  Need to convert the GP zooms to leaflet zooms
-    var maxZoom = tileDao.maxWebMapZoom;
-    var minZoom = tileDao.minWebMapZoom;
-    const tableLayer = new L.GridLayer({ noWrap: true, minZoom: minZoom, maxZoom: maxZoom });
-    tableLayer.createTile = function(tilePoint, done) {
-      const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+    const maxZoom = tileDao.maxWebMapZoom;
+    const minZoom = tileDao.minWebMapZoom;
+    const tableLayer = new L.GridLayer({ noWrap: true, pane: 'tilePane' });
+    tableLayer.createTile = function(tilePoint) {
+      const canvas = L.DomUtil.create('canvas');
       const size = this.getTileSize();
       canvas.width = size.x;
       canvas.height = size.y;
+
+      const div = L.DomUtil.create('div', 'leaflet-tile');
+      const progressDiv = L.DomUtil.create('div', 'progress-grid-positioner');
+      progressDiv.innerHTML =
+        '<div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>';
+      div.appendChild(canvas);
+
+      div.appendChild(progressDiv);
+
       setTimeout(function() {
         console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        geoPackage.xyzTile(table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas).then(function() {
-          console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          done(null, canvas);
-        });
+        geoPackage
+          .xyzTileScaled(table, tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, 5, 5)
+          .then(function() {
+            console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+            div.removeChild(progressDiv);
+            // done(null, canvas);
+          });
       }, 0);
-      return canvas;
+      return div;
     };
     map.addLayer(tableLayer);
     tableLayer.bringToFront();
@@ -532,7 +544,7 @@ window.toggleLayer = function(layerType, table) {
           .html(message);
       })
       .then(function(indexed) {
-        const tableLayer = new L.GridLayer({ noWrap: true, minZoom: minZoom, maxZoom: maxZoom });
+        const tableLayer = new L.GridLayer({ noWrap: true, pane: 'overlayPane' });
         tableLayer.createTile = function(tilePoint, done) {
           const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
           const size = this.getTileSize();
