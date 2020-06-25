@@ -14,7 +14,7 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 
 // Read KML
-import fs from 'fs';
+import fs, { PathLike } from 'fs';
 import xmlStream from 'xml-stream';
 import path from 'path';
 
@@ -36,7 +36,7 @@ import { KMLUtilities } from './kmlUtilities';
 import { bbox } from '@turf/turf';
 
 export interface KMLConverterOptions {
-  kmlPath?: string;
+  kmlPath?: PathLike;
   append?: boolean;
   geoPackage?: GeoPackage | string;
   srsNumber?: number | 4326;
@@ -73,41 +73,49 @@ export class KMLToGeoPackage {
 
   /**
    * Unzips and stores data from a KMZ file in the current directory.
-   * @param kmzPath Path to the KMZ file (Which the zipped version of a KML)
+   * @param kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
    * @param geopackage  String or name of Geopackage to use
    * @param tableName  Name of the main Geometry Table
    */
   async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage, tableName: string): Promise<any> {
+    console.log(kmzPath);
     const dataPath = fs.readFileSync(kmzPath);
     const zip = await JSZip.loadAsync(dataPath);
-    let kmlPath: string;
+    let kmlPath: PathLike;
     let gp: GeoPackage;
     await new Promise(async resolve => {
       for (const key in zip.files) {
+        console.log(key);
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
             const fileDestination = path.join(__dirname, key);
-            kmlPath = zip.files[key].name.endsWith('.kml') ? zip.files[key].name : kmlPath;
+            console.log('fileDest', fileDestination);
+            kmlPath = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlPath;
             await mkdirp(path.dirname(fileDestination), function(err) {
               if (err) console.error(err);
-              zip
-                .file(key)
-                .nodeStream()
-                .pipe(
-                  fs.createWriteStream(fileDestination, {
-                    flags: 'w',
-                  }),
-                )
-                .on('finish', () => {
-                  // console.log(key, 'was written to', __dirname + '/' + key);
-                  resolve();
-                });
+              const file = zip.file(key);
+              if (!_.isNil(file)) {
+                file
+                  .nodeStream()
+                  .pipe(
+                    fs.createWriteStream(fileDestination, {
+                      flags: 'w',
+                    }),
+                  )
+                  .on('finish', () => {
+                    // console.log(key, 'was written to', __dirname + '/' + key);
+                    resolve();
+                  });
+              } else {
+                resolve();
+              }
             });
           }
         });
       }
       resolve();
     }).then(async () => {
+      console.log('then ', kmlPath);
       gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName);
     });
     return gp;
@@ -120,7 +128,7 @@ export class KMLToGeoPackage {
    * @param tableName Name of table with geometry
    */
   async convertKMLToGeoPackage(
-    kmlPath: string,
+    kmlPath: PathLike,
     geopackage: GeoPackage | string,
     tableName: string,
   ): Promise<GeoPackage> {
@@ -136,25 +144,25 @@ export class KMLToGeoPackage {
     }
     return geopackage;
   }
-  async convertKMLLinkToGeoPackage(
-    kmlPath: string,
-    geopackage: GeoPackage | string,
-    tableName: string,
-  ): Promise<GeoPackage> {
-    console.log(kmlPath);
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath);
-    console.log(props, bbox);
-    geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName);
-    const defaultStyles = await this.setUpStyleKML(geopackage, tableName);
+  // async convertKMLLinkToGeoPackage(
+  //   kmlPath: string,
+  //   geopackage: GeoPackage | string,
+  //   tableName: string,
+  // ): Promise<GeoPackage> {
+  //   console.log(kmlPath);
+  //   const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath);
+  //   console.log(props, bbox);
+  //   geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName);
+  //   const defaultStyles = await this.setUpStyleKML(geopackage, tableName);
 
-    // Geometry and Style Insertion
-    await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName);
+  //   // Geometry and Style Insertion
+  //   await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName);
 
-    if (this.options.indexTable && props.size !== 0) {
-      await this.indexTable(geopackage, tableName);
-    }
-    return geopackage;
-  }
+  //   if (this.options.indexTable && props.size !== 0) {
+  //     await this.indexTable(geopackage, tableName);
+  //   }
+  //   return geopackage;
+  // }
 
   /**
    * Takes in KML and the properties of the KML and creates a table in the geopackage floder.
@@ -232,7 +240,7 @@ export class KMLToGeoPackage {
    * @param tableName Name of Main table for Geometry
    */
   async addKMLDataToGeoPackage(
-    kmlPath: string,
+    kmlPath: PathLike,
     geopackage: GeoPackage,
     defaultStyles: FeatureTableStyles,
     tableName: string,
@@ -292,7 +300,7 @@ export class KMLToGeoPackage {
    * Runs through KML and finds name for Columns and Style information
    * @param kmlPath Path to KML file
    */
-  getMetaDataKML(kmlPath: string): Promise<{ props: Set<string>; bbox: BoundingBox }> {
+  getMetaDataKML(kmlPath: PathLike): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
       const properties = new Set<string>();
       // Bounding box
@@ -644,11 +652,12 @@ export class KMLToGeoPackage {
 
   /**
    * Converts Item into a data URL and adds it and information about to the database.
-   * @param iconLocation Used to find the extension type
-   * @param data base64 string of the image data
-   * @param newIcon Row for the new Icon
-   * @param styleTable Main styleTable in the database
-   * @param id Id from KML
+   * @param dataUrl
+   * @param newIcon
+   * @param styleTable
+   * @param id
+   * @param anchorU
+   * @param anchorV
    */
   private imageDataToDataBase(
     dataUrl: string,
@@ -685,42 +694,44 @@ export class KMLToGeoPackage {
         let aU = 0.5;
         let aV = 0.5;
         const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPES.ICON_STYLE];
-        let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-        iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
-        const dataUrl = await Jimp.read(iconLocation).then(img => {
-          if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {
-            img.scale(parseFloat(iconStyle[KMLTAGS.SCALE_TAG]));
-          }
-          if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
-            const hotSpot = iconStyle[KMLTAGS.HOTSPOT_TAG]['$'];
-            switch (hotSpot['xunits']) {
-              case 'fraction':
-                aU = parseFloat(hotSpot['x']);
-                break;
-              case 'pixels':
-                aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
-                break;
-              case 'insetPixels':
-                aU = parseFloat(hotSpot['x']) / img.getWidth();
-              default:
-                break;
+        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
+          let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
+          iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
+          const dataUrl = await Jimp.read(iconLocation).then(img => {
+            if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {
+              img.scale(parseFloat(iconStyle[KMLTAGS.SCALE_TAG]));
             }
-            switch (hotSpot['yunits']) {
-              case 'fraction':
-                aV = parseFloat(hotSpot['y']);
-                break;
-              case 'pixels':
-                aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
-                break;
-              case 'insetPixels':
-                aV = parseFloat(hotSpot['y']) / img.getHeight();
-              default:
-                break;
+            if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
+              const hotSpot = iconStyle[KMLTAGS.HOTSPOT_TAG]['$'];
+              switch (hotSpot['xunits']) {
+                case 'fraction':
+                  aU = parseFloat(hotSpot['x']);
+                  break;
+                case 'pixels':
+                  aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
+                  break;
+                case 'insetPixels':
+                  aU = parseFloat(hotSpot['x']) / img.getWidth();
+                default:
+                  break;
+              }
+              switch (hotSpot['yunits']) {
+                case 'fraction':
+                  aV = parseFloat(hotSpot['y']);
+                  break;
+                case 'pixels':
+                  aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
+                  break;
+                case 'insetPixels':
+                  aV = parseFloat(hotSpot['y']) / img.getHeight();
+                default:
+                  break;
+              }
             }
-          }
-          return img.getBase64Async(img.getMIME());
-        });
-        this.imageDataToDataBase(dataUrl, newIcon, styleTable, item[0], aU, aV);
+            return img.getBase64Async(img.getMIME());
+          });
+          this.imageDataToDataBase(dataUrl, newIcon, styleTable, item[0], aU, aV);
+        }
         resolve();
       }
     });
