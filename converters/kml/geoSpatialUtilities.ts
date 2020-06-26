@@ -222,9 +222,14 @@ export class GeoSpatialUtilities {
    */
   public static getZoomLevels(bbox: BoundingBox, naturalScale: number): number[] {
     const levels = [];
-    let z = naturalScale;
+    let z = Math.round(naturalScale);
     let ySize: number;
     let xSize: number;
+    if (naturalScale < 0) {
+      z = 0;
+    } else if (naturalScale > 20) {
+      z = 20;
+    }
     do {
       const yRange = GeoSpatialUtilities.calculateYTileRange(bbox, z);
       const xRange = GeoSpatialUtilities.calculateXTileRange(bbox, z);

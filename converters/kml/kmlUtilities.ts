@@ -18,6 +18,7 @@ export class KMLUtilities {
       const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
       return { rgb, a };
     } else {
+      console.error('Invalid Color');
       throw error;
     }
   }
@@ -56,14 +57,14 @@ export class KMLUtilities {
     ts.scaling_type = TileScalingType.IN_OUT;
     ts.zoom_in = 2;
     // ts.zoom_out = 2;
-    console.log(ts, imageName);
     tileScalingExt.createOrUpdate(ts);
-    console.log('create or Update Tile Scaling')
     // Determines whether the image is local or online.
     const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
-    console.log(imageLocation);
     // Reads in Image (stored as bitmap)
-    let img = await Jimp.read(imageLocation);
+    let img = await Jimp.read(imageLocation).catch(err => {
+      console.error('Image not founding', err);
+      throw err;
+    });
 
     if (node.LatLonBox.hasOwnProperty('rotation')) {
       const rotation = parseFloat(node.LatLonBox.rotation);
@@ -75,7 +76,7 @@ export class KMLUtilities {
 
     const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
-    ImageUtilities.getZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
+    ImageUtilities.insertZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
 
   /**
@@ -106,6 +107,7 @@ export class KMLUtilities {
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
       return KMLUtilities.kmlLineStringToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.LINESTRING]);
     }
+    console.error('Placemark geometry feature not supported:', node);
     return null;
   }
   /**
@@ -122,8 +124,11 @@ export class KMLUtilities {
       let coordinate: number[];
       if (coordPoint.length === 3) {
         coordinate = [coordPoint[0], coordPoint[1], coordPoint[2]];
-      } else {
+      } else if (coordPoint.length === 2) {
         coordinate = [coordPoint[0], coordPoint[1]];
+      } else {
+        console.error('Invalid Point: Coordinates must have a length of 2 or 3. You gave: ', coordPoint.length);
+        return null;
       }
       geometryData['coordinates'] = coordinate;
     });
@@ -143,8 +148,11 @@ export class KMLUtilities {
         const coords = element.split(',').map(s => parseFloat(s));
         if (coords.length === 3) {
           coordArray.push([coords[0], coords[1], coords[2]]);
-        } else {
+        } else if (coords.length === 2) {
           coordArray.push([coords[0], coords[1]]);
+        } else {
+          console.error('Invalid Line String: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+          return null;
         }
       });
       geometryData['coordinates'] = coordArray;
@@ -165,14 +173,13 @@ export class KMLUtilities {
       const coordArray = [];
       coordRing.forEach((element: string) => {
         const coords = element.split(',').map(s => parseFloat(s));
-        // if (element.length > 3) {
-        //   console.log(coordTextRaw, element);
-        //   // console.log(coordText);
-        // }
         if (coords.length === 3) {
           coordArray.push([coords[0], coords[1], coords[2]]);
-        } else {
+        } else if (coords.length === 2) {
           coordArray.push([coords[0], coords[1]]);
+        } else {
+          console.error('Invalid Outer Boundary: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+          return null;
         }
       });
 
@@ -187,8 +194,11 @@ export class KMLUtilities {
           const coords = elementRing.split(',').map(s => parseFloat(s));
           if (coords.length === 3) {
             coordArray.push([coords[0], coords[1], coords[2]]);
-          } else {
+          } else if (coords.length == 2) {
             coordArray.push([coords[0], coords[1]]);
+          } else {
+            console.error('Invalid InnerBoundary: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+            return null;
           }
         });
         temp.push(coordArray);

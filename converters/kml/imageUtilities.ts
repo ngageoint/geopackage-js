@@ -15,7 +15,7 @@ export class ImageUtilities {
    * @param zoomLevels Array of zoom level that image tile will be created for
    * @param bbox Images Bounding Box (Geopackage) with Lat-Lon
    */
-  public static async getZoomImages(
+  public static async insertZoomImages(
     image: Jimp,
     zoomLevels: number[],
     imageBBox: BoundingBox,
@@ -45,8 +45,9 @@ export class ImageUtilities {
           (tileWebMercatorBoundingBox.maxLatitude - tileWebMercatorBoundingBox.minLatitude) / TILE_SIZE_IN_PIXELS;
         const tilePixelWidthInMeters =
           (tileWebMercatorBoundingBox.maxLongitude - tileWebMercatorBoundingBox.minLongitude) / TILE_SIZE_IN_PIXELS;
-        // console.log(tileWebMercatorBoundingBox);
-        const transFormedImage = new Jimp(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS, 0x0);
+
+        // Create clear tile with transparent pixels
+        const transformedImage = new Jimp(TILE_SIZE_IN_PIXELS, TILE_SIZE_IN_PIXELS, 0x0);
         for (let x = 0, width = TILE_SIZE_IN_PIXELS; x < width; x++) {
           for (let y = 0, height = TILE_SIZE_IN_PIXELS; y < height; y++) {
             const longLat = converter.inverse([
@@ -58,11 +59,11 @@ export class ImageUtilities {
             const yPixel = imageHeight - (longLat[1] - imageBBox.minLatitude) / pixelHeightInDegrees;
             if (xPixel >= 0 && imageWidth >= xPixel && yPixel >= 0 && imageHeight >= yPixel) {
               const color = image.getPixelColor(xPixel, yPixel);
-              transFormedImage.setPixelColor(color, x, y);
+              transformedImage.setPixelColor(color, x, y);
             }
           }
         }
-        geopackage.addTile(await transFormedImage.getBufferAsync(Jimp.MIME_PNG), imageName, zxy.z, zxy.y, zxy.x);
+        geopackage.addTile(await transformedImage.getBufferAsync(Jimp.MIME_PNG), imageName, zxy.z, zxy.y, zxy.x);
         return false;
       },
     );
