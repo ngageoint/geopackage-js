@@ -14,7 +14,7 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 
 // Read KML
-import fs, { PathLike, link } from 'fs';
+import fs, { PathLike } from 'fs';
 import xmlStream from 'xml-stream';
 import path from 'path';
 
@@ -33,7 +33,6 @@ import axios from 'axios';
 // Utilities and Tags
 import * as KMLTAGS from './KMLTags.js';
 import { KMLUtilities } from './kmlUtilities';
-import { bbox } from '@turf/turf';
 
 export interface KMLConverterOptions {
   kmlPath?: PathLike;
@@ -72,38 +71,64 @@ export class KMLToGeoPackage {
     this.hasMultiGeometry = false;
     this.hasStyles = false;
   }
+
+  /**
+   * Determines what convert function to call based on the files extension.
+   * @param kmlOrKmzPath Path to .kml, .kmz, and .zip to be converted into a geopackage file.
+   * @param geopackage String or instance of the Geopackage to use.
+   * @param tableName Name of Main Geometry table
+   * @callback progressCallback Passed the current status of the function.
+   */
   async convertKMLOrKMZToGeopackage(
     kmlOrKmzPath: string,
     geopackage: GeoPackage | string,
     tableName: string,
+    progressCallback?: Function,
   ): Promise<GeoPackage> {
     const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
     if (fileExt === '.kml') {
-      return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName);
+      if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
+      return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
     }
     if (fileExt === '.kmz') {
-      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName);
+      if (progressCallback)
+        await progressCallback({ status: 'Converting a KMZ file to GeoPackage', file: kmlOrKmzPath });
+      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
     }
     if (fileExt === 'zip') {
+      if (progressCallback) {
+        await progressCallback({
+          status: 'Converting ' + kmlOrKmzPath + ' a Zip file treated as a KMZ to a GeoPackage',
+        });
+      }
       console.log('Warning: .zip extension is assume to be a kmz file. If it is unexpected behaviors may occur.');
-      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName);
+      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
     }
+    if (progressCallback) await progressCallback({ status: 'Invalid File Extension. Throwing Error' });
     throw new Error('Invalid File Extension.');
   }
+
   /**
    * Unzips and stores data from a KMZ file in the current directory.
    * @param kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
    * @param geopackage  String or name of Geopackage to use
    * @param tableName  Name of the main Geometry Table
+   * @callback progressCallback Passed the current status of the function.
    */
-  async convertKMZToGeoPackage(kmzPath: string, geopackage: GeoPackage | string, tableName: string): Promise<any> {
+  async convertKMZToGeoPackage(
+    kmzPath: string,
+    geopackage: GeoPackage | string,
+    tableName: string,
+    progressCallback?: Function,
+  ): Promise<any> {
     const dataPath = fs.readFileSync(kmzPath);
-    const zip = await JSZip.loadAsync(dataPath).catch(err => {
+    const zip = await JSZip.loadAsync(dataPath).catch(() => {
       throw new Error('Invalid KMZ / ZIP file');
     });
     let kmlPath: PathLike;
     let gp: GeoPackage;
     await new Promise(async resolve => {
+      if (progressCallback) await progressCallback({ status: 'Extracting files form KMZ' });
       for (const key in zip.files) {
         await new Promise(async resolve => {
           if (zip.files.hasOwnProperty(key)) {
@@ -131,6 +156,7 @@ export class KMLToGeoPackage {
             });
           }
         }).catch(err => {
+          if (progressCallback) progressCallback({ status: 'KMZ -> KML extraction was not successful.', error: err });
           console.error('KMZ -> KML extraction was not successful');
           throw err;
         });
@@ -138,9 +164,11 @@ export class KMLToGeoPackage {
       resolve();
     })
       .then(async () => {
-        gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName);
+        if (progressCallback) progressCallback({ status: 'Converting kmz to a Geopackage', file: kmlPath });
+        gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName, progressCallback);
       })
       .catch(err => {
+        if (progressCallback) progressCallback({ status: 'KMZ -> KML extraction was not successful.', error: err });
         console.error('KMZ -> KML extraction was not successful');
         throw err;
       });
@@ -152,20 +180,31 @@ export class KMLToGeoPackage {
    * @param kmlPath Path to KML file
    * @param geopackage String or name of Geopackage to use
    * @param tableName Name of table with geometry
+   * @callback progressCallback Passed the current status of the function.
    */
   async convertKMLToGeoPackage(
     kmlPath: PathLike,
     geopackage: GeoPackage | string,
     tableName: string,
+    progressCallback?: Function,
   ): Promise<GeoPackage> {
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath);
-    geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName);
+    if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlPath });
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, progressCallback);
+    if (progressCallback)
+      progressCallback({
+        status: 'Setting Up Geometry table',
+        data: 'with props: ' + props.toString() + ', Bounding Box: ' + BoundingBox.toString(),
+      });
+    geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName, progressCallback);
+    if (progressCallback) progressCallback({ status: 'Setting Up Style and Icon Tables' });
     const defaultStyles = await this.setUpStyleKML(geopackage, tableName);
 
     // Geometry and Style Insertion
-    await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName);
+    if (progressCallback) progressCallback({ status: 'Adding Data to the Geopackage' });
+    await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName, progressCallback);
 
     if (this.options.indexTable && props.size !== 0) {
+      if (progressCallback) progressCallback({ status: 'Indexing the Geopackage' });
       await this.indexTable(geopackage, tableName);
     }
     return geopackage;
@@ -177,6 +216,7 @@ export class KMLToGeoPackage {
    * @param properties columns name gotten from getMetaDataKML
    * @param geopackage file name or GeoPackage object
    * @param tableName name the Database table will be called
+   * @callback progressCallback Passed the current status of the function.
    * @returns Promise<GeoPackage>
    */
   async setUpTableKML(
@@ -184,9 +224,11 @@ export class KMLToGeoPackage {
     boundingBox: BoundingBox,
     geopackage: GeoPackage | string,
     tableName: string,
+    progressCallback?: Function,
   ): Promise<GeoPackage> {
     return new Promise(async resolve => {
-      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
+      if (progressCallback) progressCallback({ status: 'Creating or Opening GeoPackage' });
+      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options, progressCallback);
       if (properties.size !== 0) {
         const geometryColumns = new GeometryColumns();
         geometryColumns.table_name = tableName;
@@ -204,6 +246,7 @@ export class KMLToGeoPackage {
           columns.push(FeatureColumn.createColumn(index, prop, DataTypes.fromName('TEXT'), false, null));
           index++;
         }
+        if (progressCallback) progressCallback({ status: 'Creating Geometry Table' });
         await geopackage.createFeatureTable(
           tableName,
           geometryColumns,
@@ -221,14 +264,17 @@ export class KMLToGeoPackage {
    * @param kmlPath Path to file
    * @param geopackage GeoPackage Object
    * @param tableName Name of Main Table
+   * @callback progressCallback Passed the current status of the function.
    */
-  setUpStyleKML(geopackage: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
+  setUpStyleKML(geopackage: GeoPackage, tableName: string, progressCallback?: Function): Promise<FeatureTableStyles> {
     return new Promise(async resolve => {
       // Boilerplate for creating a style tables (a geopackage extension)
       // Create Default Styles
       if (this.hasStyles) {
-        const defaultStyles = await this.setUpDefaultStylesAndIcons(geopackage, tableName);
+        if (progressCallback) progressCallback({ status: 'Creating Default KML Styles and Icons.' });
+        const defaultStyles = await this.setUpKMLDefaultStylesAndIcons(geopackage, tableName, progressCallback);
         // Specific Styles SetUp
+        if (progressCallback) progressCallback({ status: 'Adding Styles and Icon if they exist.' });
         if (this.styleMap.size !== 0) this.addSpecificStyles(defaultStyles, this.styleMap);
         if (this.iconMap.size !== 0) await this.addSpecificIcons(defaultStyles, this.iconMap);
         resolve(defaultStyles);
@@ -250,13 +296,16 @@ export class KMLToGeoPackage {
     geopackage: GeoPackage,
     defaultStyles: FeatureTableStyles,
     tableName: string,
+    progressCallback?: Function,
   ): Promise<void> {
     return new Promise(async resolve => {
+      if (progressCallback) progressCallback({ status: 'Setting up Multi Geometry table.' });
       const multiGeometryTableName = 'multi_geometry';
       const multiGeometryMapName = multiGeometryTableName + '_' + tableName;
       const relatedTableExtension = new RelatedTablesExtension(geopackage);
       const multiGeometryMap = UserMappingTable.create(multiGeometryMapName);
       if (this.hasMultiGeometry) {
+        if (progressCallback) progressCallback({ status: 'Creating MultiGeometry Tables' });
         geopackage.createSimpleAttributesTable(multiGeometryTableName, [
           { name: 'number_of_geometries', dataType: 'INT' },
         ]);
@@ -266,9 +315,10 @@ export class KMLToGeoPackage {
           .setUserMappingTable(multiGeometryMap);
         await relatedTableExtension.addSimpleAttributesRelationship(relationShip);
       }
+      if (progressCallback) progressCallback({ status: 'Setting Up XML-Stream', file: kmlPath });
       const stream = fs.createReadStream(kmlPath);
       const kml = new xmlStream(stream, 'UTF-8');
-      kml.preserve('coordinates');
+      kml.preserve('coordinates', true);
       kml.collect('LinearRing');
       kml.collect('Polygon');
       kml.collect('Point');
@@ -276,11 +326,13 @@ export class KMLToGeoPackage {
       kml.collect('Data');
       kml.collect('value');
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, node => {
-        KMLUtilities.handleGroundOverLay(node, geopackage).catch(err =>
-          console.log('Error not able to Handle Ground Overlay :', err),
+        if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
+        KMLUtilities.handleGroundOverLay(node, geopackage, progressCallback).catch(err =>
+          console.error('Error not able to Handle Ground Overlay :', err),
         );
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
+        if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
         let isMultiGeometry = false;
         const geometryIds = [];
         const geometryNodes = this.setUpGeometryNodes(node);
@@ -302,6 +354,7 @@ export class KMLToGeoPackage {
         }
       });
       kml.on('end', () => {
+        if (progressCallback) progressCallback({ status: 'Finished adding data to the Geopackage' });
         resolve();
       });
     });
@@ -311,8 +364,10 @@ export class KMLToGeoPackage {
    * Runs through KML and finds name for Columns and Style information
    * @param kmlPath Path to KML file
    */
-  getMetaDataKML(kmlPath: PathLike): Promise<{ props: Set<string>; bbox: BoundingBox }> {
+  getMetaDataKML(kmlPath: PathLike, progressCallback?: Function): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
+      if (progressCallback)
+        progressCallback({ status: 'Setting up XML-Stream to find Meta-data about the KML file', file: kmlPath });
       const properties = new Set<string>();
       // Bounding box
       let minLat: number, minLon: number, maxLat: number, maxLon: number;
@@ -320,7 +375,7 @@ export class KMLToGeoPackage {
       const stream = fs.createReadStream(kmlPath);
       // console.log(stream);
       const kml = new xmlStream(stream);
-      kml.preserve(KMLTAGS.COORDINATES_TAG);
+      kml.preserve(KMLTAGS.COORDINATES_TAG, true);
       kml.collect(KMLTAGS.PAIR_TAG);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.LINESTRING);
@@ -333,6 +388,13 @@ export class KMLToGeoPackage {
         // console.log(node)
         if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
           const linkType = node.hasOwnProperty('Link') ? 'Link' : 'Url';
+          if (progressCallback) {
+            progressCallback({
+              status: 'Handling Network Link Tag. Adds an addition KML file',
+              file: node[linkType].href,
+              data: node,
+            });
+          }
           if (node[linkType].href.toString().startsWith('http')) {
             await axios
               .get(node[linkType].href.toString())
@@ -358,12 +420,12 @@ export class KMLToGeoPackage {
         }
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, (node: {}) => {
-        // console.log('PLACEMARK', node);
-        // if (node.hasOwnProperty('name')) {
-        //   if (node['name'] === 'Liege') {
-        //     console.log(node[KMLTAGS.GEOMETRY_TAGS.POLYGON][0][KMLTAGS.OUTER_BOUNDARY_TAG]['LinearRing']);
-        //   }
-        // }
+        if (progressCallback) {
+          progressCallback({
+            status: 'Handling Placemark Tag. Adds an addition KML file',
+            data: node,
+          });
+        }
         kmlOnsRunning++;
         for (const property in node) {
           // Item to be treated like a Geometry
@@ -464,6 +526,11 @@ export class KMLToGeoPackage {
         while (kmlOnsRunning > 0) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
+        if (progressCallback) {
+          progressCallback({
+            status: 'Finished Reading KML File.',
+          });
+        }
         resolve({ props: properties, bbox: new BoundingBox(minLat, maxLat, minLon, maxLon) });
       });
     });
@@ -509,8 +576,14 @@ export class KMLToGeoPackage {
    * Creates a list of node that need to be processed.
    * @param node Placemark Node from kml via xml-stream
    */
-  private setUpGeometryNodes(node: any): any[] {
+  private setUpGeometryNodes(node: any, progressCallback?: Function): any[] {
     const nodes = [];
+    if (progressCallback) {
+      progressCallback({
+        status: 'Handling Geometry and MultiGeometry',
+        data: node,
+      });
+    }
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
       for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
         const item = new Object();
@@ -573,12 +646,13 @@ export class KMLToGeoPackage {
     defaultStyles: FeatureTableStyles,
     geopackage: GeoPackage,
     tableName: string,
+    progressCallback?: Function,
   ): number {
     const props = {};
     let styleRow: StyleRow;
     let iconRow: IconRow;
     for (const prop in node) {
-      console.log(prop);
+      // console.log(prop);
       if (prop === KMLTAGS.STYLE_URL_TAG) {
         try {
           let styleId = this.styleUrlMap.get(node[prop]);
@@ -601,7 +675,7 @@ export class KMLToGeoPackage {
           console.error('Error in mapping style or icons', error);
         }
       } else if (prop === KMLTAGS.STYLE_TAG) {
-        try{
+        try {
           const tempMap = new Map<string, object>();
           tempMap.set(node.name, node.Style);
           this.addSpecificStyles(defaultStyles, tempMap);
@@ -664,6 +738,10 @@ export class KMLToGeoPackage {
       if (!_.isNil(iconRow)) {
         defaultStyles.setIcon(featureID, geometryData.type, iconRow);
       }
+    } else {
+      // console.log(feature);
+      // featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
+      // console.log('featureID', featureID);
     }
 
     return featureID;
@@ -791,7 +869,7 @@ export class KMLToGeoPackage {
    * @param items icons to add to the style table
    */
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async resolve => {
       for (const item of items) {
         await this.addSpecificIcon(styleTable, item);
       }
@@ -851,7 +929,7 @@ export class KMLToGeoPackage {
         this.styleUrlMap.set('#' + styleName, newStyleId);
         this.styleRowMap.set(newStyleId, newStyle);
       }
-      console.log(isStyle);
+      // console.log(isStyle);
     }
   }
 
@@ -862,7 +940,12 @@ export class KMLToGeoPackage {
    * @param geopackage GeoPackage
    * @param tableName Name of the Main Geometry table
    */
-  private async setUpDefaultStylesAndIcons(geopackage: GeoPackage, tableName: string): Promise<FeatureTableStyles> {
+  private async setUpKMLDefaultStylesAndIcons(
+    geopackage: GeoPackage,
+    tableName: string,
+    progressCallback?: Function,
+  ): Promise<FeatureTableStyles> {
+    if (progressCallback) progressCallback({ status: 'Creating Style and Icon tables.' });
     const defaultStyles = new FeatureTableStyles(geopackage, tableName);
     await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
     await defaultStyles
@@ -881,6 +964,7 @@ export class KMLToGeoPackage {
     await defaultStyles.createStyleRelationship();
     await defaultStyles.createIconRelationship();
 
+    if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
     const defaultIcon = defaultStyles.getIconDao().newRow();
     defaultIcon.name = 'ylw-pushpin';
     defaultIcon.anchorU = 0.5;

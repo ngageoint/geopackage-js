@@ -28,7 +28,12 @@ export class KMLUtilities {
    * @param node Ground Overlay KML node
    * @param geopackage Geopackage
    */
-  public static async handleGroundOverLay(node: any, geopackage: GeoPackage): Promise<void> {
+  public static async handleGroundOverLay(
+    node: any,
+    geopackage: GeoPackage,
+    progressCallback?: Function,
+  ): Promise<void> {
+    if (progressCallback) progressCallback({ status: 'Setting Up Web Mercator Tile Table' });
     const imageName = node.name;
     let kmlBBox = KMLUtilities.getLatLonBBox(node);
 
@@ -51,6 +56,7 @@ export class KMLUtilities {
       20,
     );
 
+    if (progressCallback) progressCallback({ status: 'Setting Up tile Scaling Extension' });
     const tileScalingExt = geopackage.getTileScalingExtension(imageName);
     await tileScalingExt.getOrCreateExtension();
     const ts = new TileScaling();
@@ -58,6 +64,7 @@ export class KMLUtilities {
     ts.zoom_in = 2;
     // ts.zoom_out = 2;
     tileScalingExt.createOrUpdate(ts);
+    if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
     // Determines whether the image is local or online.
     const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
     // Reads in Image (stored as bitmap)
@@ -67,15 +74,20 @@ export class KMLUtilities {
     });
 
     if (node.LatLonBox.hasOwnProperty('rotation')) {
+      if (progressCallback) progressCallback({ status: 'Rotating Ground Overlay' });
       const rotation = parseFloat(node.LatLonBox.rotation);
       kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
       img.rotate(rotation);
     }
 
+    if (progressCallback) progressCallback({ status: 'Making 4326 Image fit 3857 bounding Box.' });
     [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
 
     const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
+
+    if (progressCallback)
+      progressCallback({ status: 'Inserting Zoomed and transformed images into Geopackage database.' });
     ImageUtilities.insertZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
 
@@ -117,8 +129,7 @@ export class KMLUtilities {
   public static kmlPointToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     const geometryData = { type: 'Point', coordinates: [] };
     node.forEach(point => {
-      const coordPoint = point.coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
-        .join(' ')
+      const coordPoint = point.coordinates[KMLTAGS.XML_STREAM_TEXT_SELECTOR]
         .split(',')
         .map((s: string) => parseFloat(s));
       let coordinate: number[];
@@ -127,7 +138,11 @@ export class KMLUtilities {
       } else if (coordPoint.length === 2) {
         coordinate = [coordPoint[0], coordPoint[1]];
       } else {
-        console.error('Invalid Point: Coordinates must have a length of 2 or 3. You gave: ', coordPoint.length);
+        console.error(
+          'Invalid Point: Coordinates must have a length of 2 or 3. You gave: ',
+          coordPoint.length,
+          point.coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR],
+        );
         return null;
       }
       geometryData['coordinates'] = coordinate;
@@ -142,16 +157,21 @@ export class KMLUtilities {
   public static kmlLineStringToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     const geometryData = { type: 'LineString', coordinates: [] };
     node.forEach(element => {
-      const coordPoints = element.coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR].join(' ').split(/\s/);
+      const coordPoints = element.coordinates[KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(/\s+/);
       const coordArray = [];
       coordPoints.forEach((element: string) => {
         const coords = element.split(',').map(s => parseFloat(s));
-        if (coords.length === 3) {
+        if (coords.length === 1 && isNaN(coords[0])) {
+        } else if (coords.length === 3) {
           coordArray.push([coords[0], coords[1], coords[2]]);
         } else if (coords.length === 2) {
           coordArray.push([coords[0], coords[1]]);
         } else {
-          console.error('Invalid Line String: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+          console.error(
+            'Invalid Line String: Coordinates must have a length of 2 or 3. You gave: ',
+            coords.length,
+            coords,
+          );
           return null;
         }
       });
@@ -167,29 +187,33 @@ export class KMLUtilities {
   public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[] } {
     const geometryData = { type: 'Polygon', coordinates: [] };
     node.forEach(element => {
-      const coordRing = element.outerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
-        .join(' ')
-        .split(/\s/);
+      const coordRing = element.outerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(
+        /\s+/,
+      );
       const coordArray = [];
-      coordRing.forEach((element: string) => {
-        const coords = element.split(',').map(s => parseFloat(s));
-        if (coords.length === 3) {
+      coordRing.forEach((elementRing: string) => {
+        const coords = elementRing.split(',').map(s => parseFloat(s));
+        if (coords.length === 1 && isNaN(coords[0])) {
+        } else if (coords.length === 3) {
           coordArray.push([coords[0], coords[1], coords[2]]);
         } else if (coords.length === 2) {
           coordArray.push([coords[0], coords[1]]);
         } else {
-          console.error('Invalid Outer Boundary: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+          console.error(
+            'Invalid Outer Boundary: Coordinates must have a length of 2 or 3. You gave: ',
+            coords.length,
+            coords,
+          );
           return null;
         }
       });
 
       const temp = [coordArray];
       if (node.hasOwnProperty('innerBoundaryIs')) {
-        const coordRing = element.innerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR]
-          .join(' ')
-          .split(' ');
+        const coordRing = element.innerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR].split(
+          /\s+/,
+        );
         const coordArray = [];
-        console.log(coordRing);
         coordRing.forEach((elementRing: string) => {
           const coords = elementRing.split(',').map(s => parseFloat(s));
           if (coords.length === 3) {
@@ -197,7 +221,12 @@ export class KMLUtilities {
           } else if (coords.length == 2) {
             coordArray.push([coords[0], coords[1]]);
           } else {
-            console.error('Invalid InnerBoundary: Coordinates must have a length of 2 or 3. You gave: ', coords.length);
+            console.error(
+              'Invalid InnerBoundary: Coordinates must have a length of 2 or 3. You gave: ',
+              coords.length,
+              elementRing,
+              node,
+            );
             return null;
           }
         });
