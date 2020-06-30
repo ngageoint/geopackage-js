@@ -4,7 +4,7 @@
     "postinstall": "browserify index.js --exclude sqlite3 --exclude lwip --exclude inquirer -o leaflet-geopackage.js"
   },
   "dependencies": {
-    "@ngageoint/leaflet-geopackage": "3.0.x",
+    "@ngageoint/leaflet-geopackage": "3.0",
     "browserify": "^14.1.0"
   }
 }

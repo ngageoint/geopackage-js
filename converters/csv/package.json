@@ -1,6 +1,6 @@
 {
   "name": "csv-to-geopackage",
-  "version": "3.0.x",
+  "version": "3.0",
   "description": "GeoJSON to GeoPackage converter",
   "keywords": [
     "NGA",
