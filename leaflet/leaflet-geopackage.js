@@ -175,7 +175,7 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
     xhr.responseType = 'arraybuffer';
     xhr.onload = function(e) {
       const uInt8Array = new Uint8Array(this.response);
-      GeoPackageAPI.openGeoPackageByteArray(uInt8Array, function(err, gp) {
+      GeoPackageAPI.open(uInt8Array).then(function(gp) {
         console.timeEnd('Loading GeoPackage ' + layer.options.geoPackageUrl);
         layer.geoPackageLoaded = true;
         layer.geoPackage = gp;
