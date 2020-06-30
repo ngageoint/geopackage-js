@@ -189,7 +189,7 @@ export class KMLToGeoPackage {
     progressCallback?: Function,
   ): Promise<GeoPackage> {
     if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlPath });
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, progressCallback);
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath,geopackage, progressCallback);
     if (progressCallback)
       progressCallback({
         status: 'Setting Up Geometry table',
@@ -364,7 +364,11 @@ export class KMLToGeoPackage {
    * Runs through KML and finds name for Columns and Style information
    * @param kmlPath Path to KML file
    */
-  getMetaDataKML(kmlPath: PathLike, progressCallback?: Function): Promise<{ props: Set<string>; bbox: BoundingBox }> {
+  getMetaDataKML(
+    kmlPath: PathLike,
+    geopackage: GeoPackage | string,
+    progressCallback?: Function,
+  ): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
       if (progressCallback)
         progressCallback({ status: 'Setting up XML-Stream to find Meta-data about the KML file', file: kmlPath });
@@ -374,7 +378,7 @@ export class KMLToGeoPackage {
       let kmlOnsRunning = 0;
       const stream = fs.createReadStream(kmlPath);
       // console.log(stream);
-      const kml = new xmlStream(stream);
+      const kml = new xmlStream(stream, 'UTF-8');
       kml.preserve(KMLTAGS.COORDINATES_TAG, true);
       kml.collect(KMLTAGS.PAIR_TAG);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
@@ -405,14 +409,14 @@ export class KMLToGeoPackage {
                 const linkedFile = new KMLToGeoPackage({ append: true });
                 await linkedFile.convertKMLOrKMZToGeopackage(
                   fileName,
-                  './temp.gpkg',
+                  geopackage,
                   path.basename(fileName, path.extname(fileName)),
                 );
                 kmlOnsRunning--;
               })
               .catch(error => console.error(error));
           } else {
-            console.error(node[linkType].href.toString(), 'is not supported.');
+            console.error(node[linkType].href.toString(), 'locator is not supported.');
           }
           // Need to add handling for other files
         } else {
@@ -740,7 +744,7 @@ export class KMLToGeoPackage {
       }
     } else {
       // console.log(feature);
-      // featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
+      featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
       // console.log('featureID', featureID);
     }
 
