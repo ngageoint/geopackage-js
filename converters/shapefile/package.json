@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/shapefile-to-geopackage",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "description": "Shapefile to GeoPackage converter",
   "keywords": [
     "NGA",
@@ -23,7 +23,7 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "3.0.0-beta.3",
+    "@ngageoint/geopackage": "3.0.0",
     "jszip": "3.3.0",
     "proj4": "2.6.1",
     "reproject": "1.2.5",
