@@ -22,7 +22,7 @@
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "3.0"
+    "@ngageoint/geopackage": "3.0.0"
   },
   "no": {
     "brfs": "^1.4.3",

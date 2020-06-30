@@ -181,7 +181,7 @@ L.GeoPackageFeatureLayer = L.GeoJSON.extend({
         layer.geoPackage = gp;
         geoPackageCache[layer.options.geoPackageUrl] = layer.options.noCache || gp;
         const results = layer.geoPackage.iterateGeoJSONFeatures(layer.options.layerName);
-        for (const geoJson of results) {
+        for (let geoJson of results) {
           geoJson = {
             type: 'Feature',
             geometry: geoJson.geometry,

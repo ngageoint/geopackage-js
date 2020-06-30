@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/leaflet-geopackage",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Load a GeoPackage layer.",
   "main": "leaflet-geopackage.js",
   "keywords": [
