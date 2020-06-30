@@ -9,6 +9,7 @@ import {
 import fs from 'fs';
 import path from 'path';
 import bbox from '@turf/bbox';
+import _ from 'lodash';
 
 export interface GeoJSONConverterOptions {
   append?: boolean;
@@ -86,24 +87,32 @@ export class GeoJSONToGeoPackage {
       const feature = geoJson.features[i];
       this.addFeatureProperties(feature, properties);
       let splitType = '';
-      if (feature.geometry.type === 'MultiPolygon') {
-        splitType = 'Polygon';
-      } else if (feature.geometry.type === 'MultiLineString') {
-        splitType = 'LineString';
+      if (feature.geometry !== null) {
+        if (feature.geometry.type === 'MultiPolygon') {
+          splitType = 'Polygon';
+        } else if (feature.geometry.type === 'MultiLineString') {
+          splitType = 'LineString';
+        } else {
+          correctedGeoJson.features.push(feature);
+          continue;
+        }
+        // split if necessary
+        for (let c = 0; c < feature.geometry.coordinates.length; c++) {
+          const coords = feature.geometry.coordinates[c];
+          correctedGeoJson.features.push({
+            type: 'Feature',
+            properties: feature.properties,
+            geometry: {
+              type: splitType,
+              coordinates: coords,
+            },
+          });
+        }
       } else {
-        correctedGeoJson.features.push(feature);
-        continue;
-      }
-      // split if necessary
-      for (let c = 0; c < feature.geometry.coordinates.length; c++) {
-        const coords = feature.geometry.coordinates[c];
         correctedGeoJson.features.push({
           type: 'Feature',
           properties: feature.properties,
-          geometry: {
-            type: splitType,
-            coordinates: coords,
-          },
+          geometry: null,
         });
       }
     }

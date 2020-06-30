@@ -378,4 +378,19 @@ describe('GeoJSON to GeoPackage tests', function() {
       });
     });
   });
+
+  it('should convert geoJSON with null geometries', function (){
+    try {
+      fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'nullGeometry.gpkg'));
+    } catch (e) {}
+    const converter = new GeoJSONToGeoPackage();
+    // console.log(path.join(__dirname, 'fixtures', 'nullGeometry.json'));
+    return converter.convert({geoJson: path.join(__dirname, 'fixtures', 'nullGeometry.geojson'), geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'nullGeometry.gpkg')},(t) => console.log(t))
+    .then(function(geopackage) {
+      should.exist(geopackage);
+      var tables = geopackage.getFeatureTables();
+      tables.length.should.be.equal(1);
+      tables[0].should.be.equal('nullGeometry');
+    });
+  });
 });

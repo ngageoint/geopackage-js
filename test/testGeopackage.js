@@ -542,7 +542,83 @@ describe('GeoPackageAPI tests', function() {
           count.should.be.equal(2);
         });
     });
+    it('should create a feature table with a null geometry', function() {
+      const columns = [];
 
+      const tableName = 'features';
+
+      const geometryColumns = new GeometryColumns();
+      geometryColumns.table_name = tableName;
+      geometryColumns.column_name = 'geometry';
+      geometryColumns.geometry_type_name = 'GEOMETRY';
+      geometryColumns.z = 0;
+      geometryColumns.m = 0;
+
+      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(
+        FeatureColumn.createColumn(7, 'test_text_limited.test', DataTypes.TEXT, false, null, 5),
+      );
+      columns.push(
+        FeatureColumn.createColumn(8, 'test_blob_limited.test', DataTypes.BLOB, false, null, 7),
+      );
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+      columns.push(FeatureColumn.createColumn(2, 'test_text.test', DataTypes.TEXT, false, ''));
+      columns.push(FeatureColumn.createColumn(3, 'test_real.test', DataTypes.REAL, false, null));
+      columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
+      columns.push(FeatureColumn.createColumn(5, 'test_blob.test', DataTypes.BLOB, false, null));
+      columns.push(FeatureColumn.createColumn(6, 'test_integer.test', DataTypes.INTEGER, false, ''));
+
+      return geopackage.createFeatureTable(tableName, geometryColumns, columns)
+        .then(function(featureDao) {
+          should.exist(featureDao);
+          const exists = geopackage.hasFeatureTable(tableName);
+          exists.should.be.equal(true);
+          const results = geopackage.getFeatureTables();
+          results.length.should.be.equal(1);
+          results[0].should.be.equal(tableName);
+          return geopackage.addGeoJSONFeatureToGeoPackage(
+            {
+              type: 'Feature',
+              properties: {
+                'test_text_limited.test': 'test',
+              },
+              geometry: null,
+            },
+            tableName,
+          );
+        })
+        .then(function(id) {
+          id.should.be.equal(1);
+          return geopackage.addGeoJSONFeatureToGeoPackage(
+            {
+              type: 'Feature',
+              properties: {
+                'test_text_limited.test': 'test',
+              },
+              geometry: null
+            },
+            tableName,
+          );
+        })
+        .then(function(id) {
+          id.should.be.equal(2);
+          return geopackage.getFeature(tableName, 2);
+        })
+        .then(function(feature) {
+          should.exist(feature);
+          feature.id.should.be.equal(2);
+          should.exist(feature.geometry);
+          return geopackage.iterateGeoJSONFeatures(tableName);
+        })
+        .then(function(each) {
+          let count = 0;
+          // @ts-ignore
+          for (const row of each) {
+            count++;
+          }
+          count.should.be.equal(2);
+        });
+    });
     it('should create a tile table', function() {
       // @ts-ignore
       const columns = [];
