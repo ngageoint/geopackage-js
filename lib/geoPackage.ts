@@ -636,8 +636,13 @@ export class GeoPackage {
     }
 
     const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
-    const geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
-    geometryData.setGeometry(geometry);
+    if (featureGeometry !== null) {
+      const geometry = wkx.Geometry.parseGeoJSON(featureGeometry);
+      geometryData.setGeometry(geometry);
+    } else {
+      const temp = wkx.Geometry.parse('POINT EMPTY');
+      geometryData.setGeometry(temp);
+    }
     featureRow.geometry = geometryData;
     for (const propertyKey in feature.properties) {
       if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
