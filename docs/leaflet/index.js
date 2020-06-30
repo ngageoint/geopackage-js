@@ -9,8 +9,8 @@ const osm = L.tileLayer('https://osm-{s}.gs.mil/tiles/default_pc/{z}/{x}/{y}.png
 osm.addTo(map);
 
 const tileLayer = L.geoPackageTileLayer({
-  geoPackageUrl: './4326.gpkg',
-  layerName: 'Slate_Canvas_tiles',
+  geoPackageUrl: 'https://ngageoint.github.io/GeoPackage/examples/rivers.gpkg',
+  layerName: 'rivers_tiles',
 }).addTo(map);
 
 tileLayer.on('load', function() {
