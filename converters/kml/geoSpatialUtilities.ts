@@ -1,6 +1,7 @@
 import * as turf from '@turf/turf';
 import { BoundingBox, proj4Defs } from '@ngageoint/geopackage';
 import proj4 from 'proj4';
+import _ from 'lodash';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
@@ -240,5 +241,35 @@ export class GeoSpatialUtilities {
       z -= 2;
     } while (xSize * ySize !== 1 && z > 0);
     return levels;
+  }
+  /**
+   * Expand the bounds to include provided latitude and longitude value.
+   * @param boundingBox Bounding Box to be expanded
+   * @param latitude Line of latitude to be included the bounding box
+   * @param longitude Line of longitude to be included the bounding box
+   * @param copyBoundingBox Copy the object and return that or mutate and return the original object.
+   */
+  public static expandBoundingBoxToIncludeLatLonPoint(
+    boundingBox: BoundingBox,
+    latitude?: number,
+    longitude?: number,
+    copyBoundingBox = false,
+  ): BoundingBox {
+    if (copyBoundingBox) {
+      boundingBox = new BoundingBox(boundingBox);
+    }
+    if (!_.isNil(latitude)) {
+      if (_.isNil(boundingBox.minLatitude)) boundingBox.minLatitude = latitude;
+      if (_.isNil(boundingBox.maxLatitude)) boundingBox.maxLatitude = latitude;
+      if (latitude < boundingBox.minLatitude) boundingBox.minLatitude = latitude;
+      if (latitude > boundingBox.maxLatitude) boundingBox.maxLatitude = latitude;
+    }
+    if (!_.isNil(longitude)) {
+      if (_.isNil(boundingBox.minLongitude)) boundingBox.minLongitude = longitude;
+      if (_.isNil(boundingBox.maxLongitude)) boundingBox.maxLongitude = longitude;
+      if (longitude < boundingBox.minLongitude) boundingBox.minLongitude = longitude;
+      if (longitude > boundingBox.maxLongitude) boundingBox.maxLongitude = longitude;
+    }
+    return boundingBox;
   }
 }

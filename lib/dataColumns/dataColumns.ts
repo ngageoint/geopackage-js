@@ -35,7 +35,7 @@ export class DataColumns {
   title?: string;
 
   /**
-   * A human-readable description for the table_name contente
+   * A human-readable description for the table_name contents
    * @member {string}
    */
   description?: string;

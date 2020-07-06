@@ -391,6 +391,32 @@ window.loadGeoPackage = function(files) {
         },
       );
     }
+    // if file is KML or KMZ file
+    else if (
+      f.name.lastIndexOf('kml') > f.name.lastIndexOf('.') ||
+      f.name.lastIndexOf('kmz') > f.name.lastIndexOf('.')
+    ) {
+      if (window.Piwik) {
+        Piwik.getAsyncTracker().trackEvent('GeoPackage', 'load', 'File Size', array.byteLength);
+      }
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'GeoPackage',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength,
+      });
+      const convert = new KMLToGeoPackage();
+      convert.convertKMLOrKMZToGeopackage(
+        path.basename(f.name),
+        path.basename(f.name) + '.gpkg',
+        path.basename(f.name),
+      ).then(function(gp) {
+        geoPackage = gp;
+        clearInfo();
+        readGeoPackage(gp);
+      });
+    }
   };
   r.readAsArrayBuffer(f);
 };
@@ -820,7 +846,7 @@ window.onload = function() {
 function determineUrlAndType() {
   const urlString = window.location.href;
   const url = new URL(urlString);
-  const types = ['data', 'gpkg', 'shapefile', 'shapefilezip', 'mbtiles', 'geojson'];
+  const types = ['data', 'gpkg', 'shapefile', 'shapefilezip', 'mbtiles', 'geojson', 'kml', 'kmz'];
 
   for (let i = 0; i < types.length; i++) {
     const type = types[i];

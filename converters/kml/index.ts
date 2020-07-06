@@ -33,10 +33,12 @@ import axios from 'axios';
 // Utilities and Tags
 import * as KMLTAGS from './KMLTags.js';
 import { KMLUtilities } from './kmlUtilities';
+import { GeoSpatialUtilities } from './geoSpatialUtilities';
 
 export interface KMLConverterOptions {
   kmlPath?: PathLike;
   append?: boolean;
+  preserverFolders?: boolean;
   geoPackage?: GeoPackage | string;
   srsNumber?: number | 4326;
   tableName?: string;
@@ -57,6 +59,8 @@ export class KMLToGeoPackage {
   iconUrlMap: Map<string, number>;
   iconRowMap: Map<number, IconRow>;
   iconMapPair: Map<string, string>;
+  properties: Set<string>;
+
   constructor(optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
     // Icon and Style Map are used to help fill out cross reference tables in the Geopackage Database
@@ -70,6 +74,7 @@ export class KMLToGeoPackage {
     this.iconMapPair = new Map();
     this.hasMultiGeometry = false;
     this.hasStyles = false;
+    this.properties = new Set();
   }
 
   /**
@@ -189,7 +194,8 @@ export class KMLToGeoPackage {
     progressCallback?: Function,
   ): Promise<GeoPackage> {
     if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlPath });
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath,geopackage, progressCallback);
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, geopackage, progressCallback);
+    this.properties = props;
     if (progressCallback)
       progressCallback({
         status: 'Setting Up Geometry table',
@@ -325,13 +331,15 @@ export class KMLToGeoPackage {
       kml.collect('LineString');
       kml.collect('Data');
       kml.collect('value');
+      // kml.collect('Folder');
+      // kml.collect('Placemark');
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, node => {
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
         KMLUtilities.handleGroundOverLay(node, geopackage, progressCallback).catch(err =>
           console.error('Error not able to Handle Ground Overlay :', err),
         );
       });
-      kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
+      const handlePlacemark = (node): void => {
         if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
         let isMultiGeometry = false;
         const geometryIds = [];
@@ -352,7 +360,19 @@ export class KMLToGeoPackage {
             multiGeometryMapName,
           );
         }
+      };
+      kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
+        // this.setUpTableKML(this.properties, , geopackage, node.name);
+        handlePlacemark(node);
       });
+
+      // kml.on('endElement: Folder', node => {
+      //   if (node.hasOwnProperty(KMLTAGS.PLACEMARK_TAG)) {
+      //     node[KMLTAGS.PLACEMARK_TAG].forEach(placemark => {
+      //       handlePlacemark(placemark);
+      //     });
+      //   }
+      // });
       kml.on('end', () => {
         if (progressCallback) progressCallback({ status: 'Finished adding data to the Geopackage' });
         resolve();
@@ -374,8 +394,9 @@ export class KMLToGeoPackage {
         progressCallback({ status: 'Setting up XML-Stream to find Meta-data about the KML file', file: kmlPath });
       const properties = new Set<string>();
       // Bounding box
-      let minLat: number, minLon: number, maxLat: number, maxLon: number;
+      const boundingBox = new BoundingBox(null);
       let kmlOnsRunning = 0;
+      // const folderPos = [{minLon: null, maxLon: null, minLat: null, maxLat: null}];
       const stream = fs.createReadStream(kmlPath);
       // console.log(stream);
       const kml = new xmlStream(stream, 'UTF-8');
@@ -386,7 +407,15 @@ export class KMLToGeoPackage {
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POLYGON);
       kml.collect('Data');
       kml.collect('value');
+      kml.collect('Placemark');
+      // kml.collect('Folder');
       // console.log(kml);
+      // kml.on('startElement: Folder', node =>{
+      //   folderPos.push({minLon: null, maxLon: null, minLat: null, maxLat: null});
+      // });
+      // kml.on('endElement: Folder', node =>{
+      //   const getBoundingBox = folderPos.pop();
+      // });
       kml.on('endElement: ' + KMLTAGS.NETWORK_LINK, async (node: any) => {
         kmlOnsRunning++;
         // console.log(node)
@@ -475,18 +504,10 @@ export class KMLToGeoPackage {
         kmlOnsRunning++;
         if (!_.isEmpty(node)) {
           try {
-            const rows = node[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR].join(' ').split(/\s/);
+            const rows = node[KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(/\s+/);
             rows.forEach((element: string) => {
               const temp = element.split(',').map(s => Number(s));
-              if (minLat === undefined) minLat = temp[0];
-              if (minLon === undefined) minLon = temp[1];
-              if (maxLat === undefined) maxLat = temp[0];
-              if (maxLon === undefined) maxLon = temp[1];
-
-              if (temp[0] < minLat) minLat = temp[0];
-              if (temp[0] > maxLat) maxLat = temp[0];
-              if (temp[1] < minLon) minLon = temp[1];
-              if (temp[1] > maxLon) maxLon = temp[1];
+              GeoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(boundingBox, temp[0], temp[1]);
             });
           } catch (error) {
             console.error('Something went wrong when reading coordinates:', error);
@@ -535,7 +556,7 @@ export class KMLToGeoPackage {
             status: 'Finished Reading KML File.',
           });
         }
-        resolve({ props: properties, bbox: new BoundingBox(minLat, maxLat, minLon, maxLon) });
+        resolve({ props: properties, bbox: boundingBox });
       });
     });
   }

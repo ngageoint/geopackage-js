@@ -2,7 +2,6 @@ import * as KMLTAGS from './KMLTags.js';
 import { error } from 'console';
 import _ from 'lodash';
 import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoint/geopackage';
-import Jimp from 'jimp';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
 import path from 'path';
@@ -13,13 +12,13 @@ export class KMLUtilities {
    * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
    */
   public static abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
-    if (abgr.length === 8) {
+    if (abgr.match(/^[0-9A-Fa-f]{8}$/)) {
       const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
       const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
       return { rgb, a };
     } else {
-      console.error('Invalid Color');
-      throw error;
+      // console.error('Invalid Color');
+      throw new Error('Invalid Color');
     }
   }
 
@@ -64,14 +63,10 @@ export class KMLUtilities {
     ts.zoom_in = 2;
     // ts.zoom_out = 2;
     tileScalingExt.createOrUpdate(ts);
+
     if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
     // Determines whether the image is local or online.
-    const imageLocation = node.Icon.href.startsWith('http') ? node.Icon.href : path.join(__dirname, node.Icon.href);
-    // Reads in Image (stored as bitmap)
-    let img = await Jimp.read(imageLocation).catch(err => {
-      console.error('Image not founding', err);
-      throw err;
-    });
+    let img = await ImageUtilities.getJimpImage(node.Icon.href);
 
     if (node.LatLonBox.hasOwnProperty('rotation')) {
       if (progressCallback) progressCallback({ status: 'Rotating Ground Overlay' });
@@ -87,7 +82,10 @@ export class KMLUtilities {
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
 
     if (progressCallback)
-      progressCallback({ status: 'Inserting Zoomed and transformed images into Geopackage database.' });
+      progressCallback({
+        status: 'Inserting Zoomed and transformed images into Geopackage database.',
+        data: { naturalScale: naturalScale, zoomLevels: zoomLevels },
+      });
     ImageUtilities.insertZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
   }
 
@@ -119,7 +117,7 @@ export class KMLUtilities {
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
       return KMLUtilities.kmlLineStringToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.LINESTRING]);
     }
-    console.error('Placemark geometry feature not supported:', node);
+    // console.error('Placemark geometry feature not supported:', node);
     return null;
   }
   /**
@@ -184,7 +182,7 @@ export class KMLUtilities {
    * Takes in a KML Polygon and returns a GeoJSON formatted object.
    * @param node The data from xmlStream with the selector of Placemark.
    */
-  public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[] } {
+  public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[][][] } {
     const geometryData = { type: 'Polygon', coordinates: [] };
     node.forEach(element => {
       const coordRing = element.outerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(
