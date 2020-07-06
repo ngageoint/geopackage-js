@@ -3,7 +3,7 @@ const Promise = require('promise-polyfill');
 if (!window.Promise) {
   window.Promise = Promise;
 }
-var async = require('async'),
+const async = require('async'),
   reproject = require('reproject'),
   L = require('leaflet'),
   $ = require('jquery'),
@@ -12,7 +12,7 @@ var async = require('async'),
   Mustache = require('mustache'),
   fileType = require('file-type'),
   FileSaver = require('file-saver'),
-  path = require('path');
+  path = require('path'),
   fs = require('fs');
 
 window.proj4 = proj4;

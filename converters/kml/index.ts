@@ -27,7 +27,7 @@ import _ from 'lodash';
 
 // Handle images
 import { imageSize } from 'image-size';
-import Jimp from 'jimp';
+import Jimp from 'jimp/browser/lib/jimp';
 import axios from 'axios';
 
 // Utilities and Tags
