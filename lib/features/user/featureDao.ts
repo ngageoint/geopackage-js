@@ -180,8 +180,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
             try {
-              geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-              geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+              const reporjectedGeometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+              geometry = FeatureDao.verifyFeature(reporjectedGeometry, projectedBoundingBox);
             } catch (e) {
               console.log('Error parsing Geometry', e);
             }
@@ -250,8 +250,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           while (!nextRow.done && !geometry) {
             featureRow = thisgetRow(nextRow.value);
             try {
-              geometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
-              geometry = FeatureDao.verifyFeature(geometry, projectedBoundingBox);
+              const reporjectedGeometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
+              geometry = FeatureDao.verifyFeature(reporjectedGeometry, projectedBoundingBox);
             } catch (e) {
               console.log('Error parsing Geometry', e);
             }
