@@ -39,7 +39,7 @@
     "create": "npm install --no-optional && npm run typedoc --options typedoc.json",
     "postinstall": "npm run build",
     "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
-    "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -o gp.js",
+    "build": "browserify index.js --standalone gp --exclude better-sqlite3 --exclude inquirer --exclude canvas -p [ tsify --noImplicitAny ] -o gp.js",
     "clean": "rm -rf ./node_modules",
     "tsc": "rm -rf ./built && tsc",
     "typedoc": "rm -rf ./api-docs; typedoc --tsconfig ../tsconfig.json --mode file --out api-docs ../index.ts"
