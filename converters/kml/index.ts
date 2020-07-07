@@ -14,8 +14,8 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 
 // Read KML
-import fs, { PathLike } from 'fs';
-import xmlStream from 'xml-stream';
+import fs, { PathLike } from 'browserify-fs';
+import { XmlStream } from 'xml-stream';
 import path from 'path';
 
 // Read KMZ
@@ -27,13 +27,17 @@ import _ from 'lodash';
 
 // Handle images
 import { imageSize } from 'image-size';
-import Jimp from 'jimp/browser/lib/jimp';
+import Jimp from 'jimp';
 import axios from 'axios';
 
 // Utilities and Tags
 import * as KMLTAGS from './KMLTags.js';
 import { KMLUtilities } from './kmlUtilities';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
+import { Stream, Readable } from 'stream';
+
+import { isBrowser, isNode } from 'browser-or-node';
+import { ImageUtilities } from './imageUtilities.js';
 
 export interface KMLConverterOptions {
   kmlPath?: PathLike;
@@ -51,6 +55,7 @@ export class KMLToGeoPackage {
   private options?: KMLConverterOptions;
   hasStyles: boolean;
   hasMultiGeometry: boolean;
+  zipFileMap: Map<string, any>;
   styleMap: Map<string, object>;
   styleUrlMap: Map<string, number>;
   styleRowMap: Map<number, StyleRow>;
@@ -88,17 +93,26 @@ export class KMLToGeoPackage {
     kmlOrKmzPath: string,
     geopackage: GeoPackage | string,
     tableName: string,
+    kmlOrKmzData?: Uint8Array,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
     const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
     if (fileExt === '.kml') {
       if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
-      return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      if (isNode) {
+        return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      } else if (isBrowser) {
+        return this.convertKMLToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
+      }
     }
     if (fileExt === '.kmz') {
       if (progressCallback)
         await progressCallback({ status: 'Converting a KMZ file to GeoPackage', file: kmlOrKmzPath });
-      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      if (isNode) {
+        return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      } else if (isBrowser) {
+        return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
+      }
     }
     if (fileExt === 'zip') {
       if (progressCallback) {
@@ -107,12 +121,15 @@ export class KMLToGeoPackage {
         });
       }
       console.log('Warning: .zip extension is assume to be a kmz file. If it is unexpected behaviors may occur.');
-      return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      if (isNode) {
+        return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      } else if (isBrowser) {
+        return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
+      }
     }
     if (progressCallback) await progressCallback({ status: 'Invalid File Extension. Throwing Error' });
     throw new Error('Invalid File Extension.');
   }
-
   /**
    * Unzips and stores data from a KMZ file in the current directory.
    * @param kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
@@ -121,44 +138,61 @@ export class KMLToGeoPackage {
    * @callback progressCallback Passed the current status of the function.
    */
   async convertKMZToGeoPackage(
-    kmzPath: string,
+    kmzData: PathLike | Uint8Array,
     geopackage: GeoPackage | string,
     tableName: string,
     progressCallback?: Function,
   ): Promise<any> {
-    const dataPath = fs.readFileSync(kmzPath);
-    const zip = await JSZip.loadAsync(dataPath).catch(() => {
+    let data: PathLike | Uint8Array;
+    if (kmzData instanceof Uint8Array) {
+      data = kmzData;
+    } else {
+      data = fs.readFileSync(kmzData);
+    }
+    const zip = await JSZip.loadAsync(data).catch(() => {
       throw new Error('Invalid KMZ / ZIP file');
     });
-    let kmlPath: PathLike;
+    let kmlData: PathLike | Uint8Array;
     let gp: GeoPackage;
     await new Promise(async resolve => {
       if (progressCallback) await progressCallback({ status: 'Extracting files form KMZ' });
       for (const key in zip.files) {
-        await new Promise(async resolve => {
+        await new Promise(async (resolve, reject) => {
           if (zip.files.hasOwnProperty(key)) {
-            const fileDestination = path.join(__dirname, key);
-            // console.log('fileDest', fileDestination);
-            kmlPath = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlPath;
-            await mkdirp(path.dirname(fileDestination), function(err) {
-              if (err) console.error('mkdirp was not able to be made', err);
-              const file = zip.file(key);
-              if (!_.isNil(file)) {
-                file
-                  .nodeStream()
-                  .pipe(
-                    fs.createWriteStream(fileDestination, {
-                      flags: 'w',
-                    }),
-                  )
-                  .on('finish', () => {
-                    // console.log(key, 'was written to', __dirname + '/' + key);
+            if (isNode) {
+              const fileDestination = path.join(__dirname, key);
+              // console.log('fileDest', fileDestination);
+              kmlData = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlData;
+              await mkdirp(path.dirname(fileDestination))
+                .then(() => {
+                  const file = zip.file(key);
+                  if (!_.isNil(file)) {
+                    file
+                      .nodeStream()
+                      .pipe(
+                        fs.createWriteStream(fileDestination, {
+                          flags: 'w',
+                        }),
+                      )
+                      .on('finish', () => {
+                        // console.log(key, 'was written to', __dirname + '/' + key);
+                        resolve();
+                      });
+                  } else {
                     resolve();
-                  });
+                  }
+                })
+                .catch(err => {
+                  console.error('mkdirp was not able to be made', err);
+                  reject();
+                });
+            } else if (isBrowser) {
+              if (key.endsWith('.kml')) {
+                kmlData = await zip.files[key].async('uint8array');
               } else {
-                resolve();
+                this.zipFileMap.set(key, await zip.files[key].async('base64'));
               }
-            });
+            }
           }
         }).catch(err => {
           if (progressCallback) progressCallback({ status: 'KMZ -> KML extraction was not successful.', error: err });
@@ -169,8 +203,8 @@ export class KMLToGeoPackage {
       resolve();
     })
       .then(async () => {
-        if (progressCallback) progressCallback({ status: 'Converting kmz to a Geopackage', file: kmlPath });
-        gp = await this.convertKMLToGeoPackage(kmlPath, geopackage, tableName, progressCallback);
+        if (progressCallback) progressCallback({ status: 'Converting kmz to a Geopackage', file: kmlData });
+        gp = await this.convertKMLToGeoPackage(kmlData, geopackage, tableName, progressCallback);
       })
       .catch(err => {
         if (progressCallback) progressCallback({ status: 'KMZ -> KML extraction was not successful.', error: err });
@@ -188,13 +222,13 @@ export class KMLToGeoPackage {
    * @callback progressCallback Passed the current status of the function.
    */
   async convertKMLToGeoPackage(
-    kmlPath: PathLike,
+    kmlData: PathLike | Uint8Array,
     geopackage: GeoPackage | string,
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlPath });
-    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlPath, geopackage, progressCallback);
+    if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlData });
+    const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlData, geopackage, progressCallback);
     this.properties = props;
     if (progressCallback)
       progressCallback({
@@ -207,7 +241,7 @@ export class KMLToGeoPackage {
 
     // Geometry and Style Insertion
     if (progressCallback) progressCallback({ status: 'Adding Data to the Geopackage' });
-    await this.addKMLDataToGeoPackage(kmlPath, geopackage, defaultStyles, tableName, progressCallback);
+    await this.addKMLDataToGeoPackage(kmlData, geopackage, defaultStyles, tableName, progressCallback);
 
     if (this.options.indexTable && props.size !== 0) {
       if (progressCallback) progressCallback({ status: 'Indexing the Geopackage' });
@@ -298,7 +332,7 @@ export class KMLToGeoPackage {
    * @param tableName Name of Main table for Geometry
    */
   async addKMLDataToGeoPackage(
-    kmlPath: PathLike,
+    kmlData: PathLike | Uint8Array,
     geopackage: GeoPackage,
     defaultStyles: FeatureTableStyles,
     tableName: string,
@@ -321,9 +355,15 @@ export class KMLToGeoPackage {
           .setUserMappingTable(multiGeometryMap);
         await relatedTableExtension.addSimpleAttributesRelationship(relationShip);
       }
-      if (progressCallback) progressCallback({ status: 'Setting Up XML-Stream', file: kmlPath });
-      const stream = fs.createReadStream(kmlPath);
-      const kml = new xmlStream(stream, 'UTF-8');
+      let stream: Readable | fs.ReadStream;
+      if (kmlData instanceof Uint8Array) {
+        stream = new Stream.Readable({ objectMode: true });
+        stream.push(kmlData);
+      } else {
+        if (progressCallback) progressCallback({ status: 'Setting Up XML-Stream', file: kmlData });
+        stream = fs.createReadStream(kmlData);
+      }
+      const kml = new XmlStream(stream, 'UTF-8');
       kml.preserve('coordinates', true);
       kml.collect('LinearRing');
       kml.collect('Polygon');
@@ -333,9 +373,17 @@ export class KMLToGeoPackage {
       kml.collect('value');
       // kml.collect('Folder');
       // kml.collect('Placemark');
-      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, node => {
+      kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
-        KMLUtilities.handleGroundOverLay(node, geopackage, progressCallback).catch(err =>
+        let image: Jimp;
+        if (isNode) {
+          if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
+          // Determines whether the image is local or online.
+          image = await ImageUtilities.getJimpImage(node.Icon.href);
+        } else if (isBrowser) {
+          image = await ImageUtilities.getJimpImage(node.Icon.href, this.zipFileMap);
+        }
+        KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
           console.error('Error not able to Handle Ground Overlay :', err),
         );
       });
@@ -382,24 +430,32 @@ export class KMLToGeoPackage {
 
   /**
    * Runs through KML and finds name for Columns and Style information
-   * @param kmlPath Path to KML file
+   * @param kmlData Path to KML file
    */
   getMetaDataKML(
-    kmlPath: PathLike,
+    kmlData: PathLike | Uint8Array,
     geopackage: GeoPackage | string,
     progressCallback?: Function,
   ): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
       if (progressCallback)
-        progressCallback({ status: 'Setting up XML-Stream to find Meta-data about the KML file', file: kmlPath });
+        progressCallback({ status: 'Setting up XML-Stream to find Meta-data about the KML file', file: kmlData });
       const properties = new Set<string>();
       // Bounding box
       const boundingBox = new BoundingBox(null);
       let kmlOnsRunning = 0;
       // const folderPos = [{minLon: null, maxLon: null, minLat: null, maxLat: null}];
-      const stream = fs.createReadStream(kmlPath);
+      let stream: Readable | fs.ReadStream;
+      if (kmlData instanceof Uint8Array) {
+        console.log('Uint');
+        stream = fs.createReadStream(Buffer.from(kmlData));
+        // stream.push(kmlData);
+      } else {
+        console.log(kmlData);
+        stream = fs.createReadStream(kmlData);
+      }
       // console.log(stream);
-      const kml = new xmlStream(stream, 'UTF-8');
+      const kml = new XmlStream(stream, 'UTF-8');
       kml.preserve(KMLTAGS.COORDINATES_TAG, true);
       kml.collect(KMLTAGS.PAIR_TAG);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);

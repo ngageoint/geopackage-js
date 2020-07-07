@@ -407,14 +407,17 @@ window.loadGeoPackage = function(files) {
         eventValue: array.byteLength,
       });
       const convert = new KMLToGeoPackage();
-      convert.convertKMLOrKMZToGeopackage(
-        path.basename(f.name),
-        path.basename(f.name) + '.gpkg',
-        path.basename(f.name),
-      ).then(function(gp) {
-        geoPackage = gp;
-        clearInfo();
-        readGeoPackage(gp);
+      convert
+        .convertKMLOrKMZToGeopackage(
+          path.basename(f.name),
+          path.basename(f.name) + '.gpkg',
+          path.basename(f.name),
+          array,
+        )
+        .then(function(gp) {
+          geoPackage = gp;
+          clearInfo();
+          readGeoPackage(gp);
       });
     }
   };

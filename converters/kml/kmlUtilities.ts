@@ -5,6 +5,8 @@ import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoin
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
 import path from 'path';
+import { HexBase64BinaryEncoding } from 'crypto';
+import Jimp from 'jimp/*';
 
 export class KMLUtilities {
   /**
@@ -30,6 +32,7 @@ export class KMLUtilities {
   public static async handleGroundOverLay(
     node: any,
     geopackage: GeoPackage,
+    image: Jimp,
     progressCallback?: Function,
   ): Promise<void> {
     if (progressCallback) progressCallback({ status: 'Setting Up Web Mercator Tile Table' });
@@ -64,21 +67,17 @@ export class KMLUtilities {
     // ts.zoom_out = 2;
     tileScalingExt.createOrUpdate(ts);
 
-    if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
-    // Determines whether the image is local or online.
-    let img = await ImageUtilities.getJimpImage(node.Icon.href);
-
     if (node.LatLonBox.hasOwnProperty('rotation')) {
       if (progressCallback) progressCallback({ status: 'Rotating Ground Overlay' });
       const rotation = parseFloat(node.LatLonBox.rotation);
       kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-      img.rotate(rotation);
+      image.rotate(rotation);
     }
 
     if (progressCallback) progressCallback({ status: 'Making 4326 Image fit 3857 bounding Box.' });
-    [kmlBBox, img] = await ImageUtilities.truncateImage(kmlBBox, img);
+    [kmlBBox, image] = await ImageUtilities.truncateImage(kmlBBox, image);
 
-    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, img.getWidth());
+    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, image.getWidth());
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
 
     if (progressCallback)
@@ -86,7 +85,7 @@ export class KMLUtilities {
         status: 'Inserting Zoomed and transformed images into Geopackage database.',
         data: { naturalScale: naturalScale, zoomLevels: zoomLevels },
       });
-    ImageUtilities.insertZoomImages(img, zoomLevels, kmlBBox, geopackage, imageName);
+    ImageUtilities.insertZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName);
   }
 
   /**

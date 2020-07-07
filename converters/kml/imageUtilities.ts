@@ -3,6 +3,8 @@ import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import Jimp from 'jimp';
 import proj4 from 'proj4';
 import path from 'path';
+import { isNode, isBrowser } from 'browser-or-node';
+import { zip } from 'lodash';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
@@ -69,8 +71,14 @@ export class ImageUtilities {
       },
     );
   }
-  public static async getJimpImage(uri: string): Promise<Jimp> {
-    const imageLocation = uri.startsWith('http') ? uri : path.join(__dirname, uri);
+  public static async getJimpImage(uri: string, zipMap?: Map<string, any>): Promise<Jimp> {
+    let imageLocation;
+    if (isNode) {
+      imageLocation = uri.startsWith('http') ? uri : path.join(__dirname, uri);
+    } else if (isBrowser) {
+      imageLocation = uri.startsWith('http') ? uri : new Buffer(zipMap.get(uri), 'base64');
+    }
+    
     // Reads in Image (stored as bitmap)
     const img = await Jimp.read(imageLocation).catch(err => {
       console.error('Image not founding', err);
