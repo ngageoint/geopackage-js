@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+const KMLToGeoPackage = require('./index');
+const path = require('path');
+
+console.log('KML to GeoPackage Converter');
+
+const KMLFile = path.resolve(process.cwd(), process.argv[2]);
+const geoPackageFile = path.resolve(process.cwd(), process.argv[3]);
+
+console.log('Converting %s to %s', KMLFile, geoPackageFile);
+
+KMLToGeoPackage.convertKMLOrKMZToGeopackage(KMLFile, geoPackageFile, path.basename(KMLFile)).then(function(result) {
+  console.log('File conversion complete');
+  console.log('Converted %s to %s', KMLFile, geoPackageFile);
+});
