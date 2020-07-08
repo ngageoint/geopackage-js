@@ -1,10 +1,9 @@
-import { BoundingBox, GeoPackage, proj4Defs } from '@ngageoint/geopackage';
+import { BoundingBox, GeoPackage } from '@ngageoint/geopackage';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import Jimp from 'jimp';
 import proj4 from 'proj4';
 import path from 'path';
 import { isNode, isBrowser } from 'browser-or-node';
-import { zip } from 'lodash';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;

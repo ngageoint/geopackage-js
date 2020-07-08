@@ -1,11 +1,8 @@
 import * as KMLTAGS from './KMLTags.js';
-import { error } from 'console';
 import _ from 'lodash';
 import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoint/geopackage';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
-import path from 'path';
-import { HexBase64BinaryEncoding } from 'crypto';
 import Jimp from 'jimp/*';
 
 export class KMLUtilities {

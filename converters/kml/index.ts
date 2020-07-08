@@ -14,8 +14,8 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 
 // Read KML
-import fs, { PathLike } from 'browserify-fs';
-import { XmlStream } from 'xml-stream';
+import fs, { PathLike } from 'fs';
+import XmlStream from 'xml-stream';
 import path from 'path';
 
 // Read KMZ
@@ -34,19 +34,21 @@ import axios from 'axios';
 import * as KMLTAGS from './KMLTags.js';
 import { KMLUtilities } from './kmlUtilities';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
-import { Stream, Readable } from 'stream';
+import Streamer from 'stream';
 
 import { isBrowser, isNode } from 'browser-or-node';
-import { ImageUtilities } from './imageUtilities.js';
+import { ImageUtilities } from './imageUtilities';
 
 export interface KMLConverterOptions {
-  kmlPath?: PathLike;
+  kmlOrKmzPath?: PathLike;
+  kmlOrKmzData?: any;
+  isKMZ?: boolean | false;
+  mainTableName?: string;
   append?: boolean;
   preserverFolders?: boolean;
   geoPackage?: GeoPackage | string;
   srsNumber?: number | 4326;
-  tableName?: string;
-  indexTable?: boolean;
+  indexTable?: boolean | true;
 }
 /**
  * Convert KML file to GeoPackages.
@@ -81,6 +83,15 @@ export class KMLToGeoPackage {
     this.hasStyles = false;
     this.properties = new Set();
   }
+  async convert(options?: KMLConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
+    const clonedOptions = { ...this.options, ...options };
+    const tableName = clonedOptions.mainTableName;
+    const geopackage = clonedOptions.geoPackage || undefined;
+    const kmlOrKmzPath = clonedOptions.kmlOrKmzPath || undefined;
+    const isKMZ = clonedOptions.isKMZ;
+    const kmlOrKmzData = clonedOptions.kmlOrKmzData;
+    return this.convertKMLOrKMZToGeopackage(kmlOrKmzPath, isKMZ, geopackage, tableName, kmlOrKmzData, progressCallback);
+  }
 
   /**
    * Determines what convert function to call based on the files extension.
@@ -90,14 +101,18 @@ export class KMLToGeoPackage {
    * @callback progressCallback Passed the current status of the function.
    */
   async convertKMLOrKMZToGeopackage(
-    kmlOrKmzPath: string,
-    geopackage: GeoPackage | string,
-    tableName: string,
+    kmlOrKmzPath: PathLike,
+    isKMZ?: boolean | false,
+    geopackage?: GeoPackage | string,
+    tableName?: string,
     kmlOrKmzData?: Uint8Array,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
-    if (fileExt === '.kml') {
+    // const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
+    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
+    }
+    if (!isKMZ) {
       if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
       if (isNode) {
         return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
@@ -105,7 +120,7 @@ export class KMLToGeoPackage {
         return this.convertKMLToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
       }
     }
-    if (fileExt === '.kmz') {
+    if (isKMZ) {
       if (progressCallback)
         await progressCallback({ status: 'Converting a KMZ file to GeoPackage', file: kmlOrKmzPath });
       if (isNode) {
@@ -114,19 +129,19 @@ export class KMLToGeoPackage {
         return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
       }
     }
-    if (fileExt === 'zip') {
-      if (progressCallback) {
-        await progressCallback({
-          status: 'Converting ' + kmlOrKmzPath + ' a Zip file treated as a KMZ to a GeoPackage',
-        });
-      }
-      console.log('Warning: .zip extension is assume to be a kmz file. If it is unexpected behaviors may occur.');
-      if (isNode) {
-        return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
-      } else if (isBrowser) {
-        return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
-      }
-    }
+    // if (fileExt === 'zip') {
+    //   if (progressCallback) {
+    //     await progressCallback({
+    //       status: 'Converting ' + kmlOrKmzPath + ' a Zip file treated as a KMZ to a GeoPackage',
+    //     });
+    //   }
+    //   console.log('Warning: .zip extension is assume to be a kmz file. If it is unexpected behaviors may occur.');
+    //   if (isNode) {
+    //     return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+    //   } else if (isBrowser) {
+    //     return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
+    //   }
+    // }
     if (progressCallback) await progressCallback({ status: 'Invalid File Extension. Throwing Error' });
     throw new Error('Invalid File Extension.');
   }
@@ -143,6 +158,9 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<any> {
+    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
+    }
     let data: PathLike | Uint8Array;
     if (kmzData instanceof Uint8Array) {
       data = kmzData;
@@ -227,6 +245,9 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
+    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
+    }
     if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlData });
     const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlData, geopackage, progressCallback);
     this.properties = props;
@@ -235,7 +256,7 @@ export class KMLToGeoPackage {
         status: 'Setting Up Geometry table',
         data: 'with props: ' + props.toString() + ', Bounding Box: ' + BoundingBox.toString(),
       });
-    geopackage = await this.setUpTableKML(props, BoundingBox, geopackage, tableName, progressCallback);
+    geopackage = await this.setUpTableKML(tableName, geopackage, props, BoundingBox, progressCallback);
     if (progressCallback) progressCallback({ status: 'Setting Up Style and Icon Tables' });
     const defaultStyles = await this.setUpStyleKML(geopackage, tableName);
 
@@ -260,15 +281,13 @@ export class KMLToGeoPackage {
    * @returns Promise<GeoPackage>
    */
   async setUpTableKML(
+    tableName: string,
+    geopackage: GeoPackage,
     properties: Set<string>,
     boundingBox: BoundingBox,
-    geopackage: GeoPackage | string,
-    tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
     return new Promise(async resolve => {
-      if (progressCallback) progressCallback({ status: 'Creating or Opening GeoPackage' });
-      geopackage = await this.createOrOpenGeoPackage(geopackage, this.options, progressCallback);
       if (properties.size !== 0) {
         const geometryColumns = new GeometryColumns();
         geometryColumns.table_name = tableName;
@@ -355,12 +374,14 @@ export class KMLToGeoPackage {
           .setUserMappingTable(multiGeometryMap);
         await relatedTableExtension.addSimpleAttributesRelationship(relationShip);
       }
-      let stream: Readable | fs.ReadStream;
+      let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
-        stream = new Stream.Readable({ objectMode: true });
+        console.log('Uint');
+        stream = new Streamer.Duplex();
         stream.push(kmlData);
+        stream.push(null);
       } else {
-        if (progressCallback) progressCallback({ status: 'Setting Up XML-Stream', file: kmlData });
+        console.log(kmlData);
         stream = fs.createReadStream(kmlData);
       }
       const kml = new XmlStream(stream, 'UTF-8');
@@ -375,17 +396,19 @@ export class KMLToGeoPackage {
       // kml.collect('Placemark');
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
-        let image: Jimp;
+        let image: Jimp | void;
         if (isNode) {
           if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
           // Determines whether the image is local or online.
-          image = await ImageUtilities.getJimpImage(node.Icon.href);
+          image = await ImageUtilities.getJimpImage(node.Icon.href).catch(err => console.error(err));
         } else if (isBrowser) {
-          image = await ImageUtilities.getJimpImage(node.Icon.href, this.zipFileMap);
+          image = await ImageUtilities.getJimpImage(node.Icon.href, this.zipFileMap).catch(err => console.error(err));
         }
-        KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
-          console.error('Error not able to Handle Ground Overlay :', err),
-        );
+        if (image) {
+          KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
+            console.error('Error not able to Handle Ground Overlay :', err),
+          );
+        }
       });
       const handlePlacemark = (node): void => {
         if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
@@ -434,7 +457,7 @@ export class KMLToGeoPackage {
    */
   getMetaDataKML(
     kmlData: PathLike | Uint8Array,
-    geopackage: GeoPackage | string,
+    geopackage: GeoPackage,
     progressCallback?: Function,
   ): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {
@@ -445,11 +468,12 @@ export class KMLToGeoPackage {
       const boundingBox = new BoundingBox(null);
       let kmlOnsRunning = 0;
       // const folderPos = [{minLon: null, maxLon: null, minLat: null, maxLat: null}];
-      let stream: Readable | fs.ReadStream;
+      let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
         console.log('Uint');
-        stream = fs.createReadStream(Buffer.from(kmlData));
-        // stream.push(kmlData);
+        stream = new Streamer.Duplex();
+        stream.push(kmlData);
+        stream.push(null);
       } else {
         console.log(kmlData);
         stream = fs.createReadStream(kmlData);
@@ -494,12 +518,15 @@ export class KMLToGeoPackage {
                 const linkedFile = new KMLToGeoPackage({ append: true });
                 await linkedFile.convertKMLOrKMZToGeopackage(
                   fileName,
+                  false,
                   geopackage,
                   path.basename(fileName, path.extname(fileName)),
                 );
                 kmlOnsRunning--;
               })
-              .catch(error => console.error(error));
+              .catch(error => {
+                console.error(error);
+              });
           } else {
             console.error(node[linkType].href.toString(), 'locator is not supported.');
           }
@@ -937,6 +964,7 @@ export class KMLToGeoPackage {
             })
             .catch(error => {
               console.error('Image not found', error);
+              reject();
             });
         }
         resolve();
@@ -952,7 +980,7 @@ export class KMLToGeoPackage {
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
       for (const item of items) {
-        await this.addSpecificIcon(styleTable, item);
+        await this.addSpecificIcon(styleTable, item).catch(err => {});
       }
       resolve();
     });
@@ -1047,16 +1075,23 @@ export class KMLToGeoPackage {
 
     if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
     const defaultIcon = defaultStyles.getIconDao().newRow();
-    defaultIcon.name = 'ylw-pushpin';
-    defaultIcon.anchorU = 0.5;
-    defaultIcon.anchorV = 0.5;
-    defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png').then(img => {
-      defaultIcon.width = img.getWidth();
-      defaultIcon.height = img.getHeight();
-      defaultIcon.contentType = Jimp.MIME_PNG;
-      return img.getBufferAsync(Jimp.MIME_PNG);
-    });
-    defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
+    try {
+      defaultIcon.name = 'ylw-pushpin';
+      defaultIcon.anchorU = 0.5;
+      defaultIcon.anchorV = 0.5;
+      defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png')
+        .then(img => {
+          defaultIcon.width = img.getWidth();
+          defaultIcon.height = img.getHeight();
+          defaultIcon.contentType = Jimp.MIME_PNG;
+          return img.getBufferAsync(Jimp.MIME_PNG);
+        })
+        .catch(err => {
+          console.error(err);
+          throw err;
+        });
+      defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
+    } catch (err) {};
 
     await defaultStyles.setTableIcon('Point', defaultIcon);
     const polygonStyleRow = defaultStyles.getStyleDao().newRow();

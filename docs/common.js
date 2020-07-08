@@ -392,10 +392,33 @@ window.loadGeoPackage = function(files) {
       );
     }
     // if file is KML or KMZ file
-    else if (
-      f.name.lastIndexOf('kml') > f.name.lastIndexOf('.') ||
-      f.name.lastIndexOf('kmz') > f.name.lastIndexOf('.')
-    ) {
+    else if (f.name.lastIndexOf('kml') > f.name.lastIndexOf('.')) {
+      if (window.Piwik) {
+        Piwik.getAsyncTracker().trackEvent('GeoPackage', 'load', 'File Size', array.byteLength);
+      }
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'GeoPackage',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength,
+      });
+      const convert = new KMLToGeoPackage();
+
+      convert
+        .convert({
+          kmlOrKmzPath: path.basename(f.name),
+          kmlOrKmzData: array,
+          isKMZ: false,
+          mainTableName: path.basename(f.name, path.extname(f.name)),
+          // geoPackage: path.basename(f.name, path.extname(f.name)) + '.gpkg',
+        })
+        .then(function(gp) {
+          geoPackage = gp;
+          clearInfo();
+          readGeoPackage(gp);
+        });
+    } else if (f.name.lastIndexOf('kmz') > f.name.lastIndexOf('.')) {
       if (window.Piwik) {
         Piwik.getAsyncTracker().trackEvent('GeoPackage', 'load', 'File Size', array.byteLength);
       }
@@ -408,17 +431,19 @@ window.loadGeoPackage = function(files) {
       });
       const convert = new KMLToGeoPackage();
       convert
-        .convertKMLOrKMZToGeopackage(
-          path.basename(f.name),
-          path.basename(f.name) + '.gpkg',
-          path.basename(f.name),
-          array,
-        )
+        .convert({
+          kmlOrKmzPath: path.basename(f.name),
+          kmlOrKmzData: array,
+          isKMZ: true,
+          mainTableName: path.basename(f.name, path.extname(f.name)),
+          // geoPackage: path.basename(f.name, path.extname(f.name)) + '.gpkg',
+        })
         .then(function(gp) {
+          console.log(gp);
           geoPackage = gp;
           clearInfo();
           readGeoPackage(gp);
-      });
+        });
     }
   };
   r.readAsArrayBuffer(f);

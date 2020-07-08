@@ -2,6 +2,7 @@ const GeoPackage = require('@ngageoint/geopackage');
 const KMLToGeoPackage = require('../index').KMLToGeoPackage;
 const geoSpatialUtilities = require('../geoSpatialUtilities').GeoSpatialUtilities;
 const kmlUtilities = require('../kmlUtilities').KMLUtilities;
+const imageUtilities = require('../imageUtilities').ImageUtilities;
 // const geoSpatialUti
 const path = require('path');
 const fs = require('fs');
@@ -17,7 +18,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_Samples_Edited_Path = path.join(__dirname, 'fixtures', 'KML_Samples_Edited.kml');
         const KML_Samples_Edited_Converter = new KMLToGeoPackage({append: true});
         const geometryTableName = 'kmlSamples';
-        const kmlGeopackage = KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
+        const kmlGeopackage = KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, false, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
         return kmlGeopackage.then((geopackage) => {
             // Feature Table exists
             should.exist(geopackage);
@@ -54,7 +55,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_Network_Link = new KMLToGeoPackage({append: true});
         const geometryTableName = '3D Image Locations';
         // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName);
+        const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName);
         const geopackage = await kmlGeopackage;
         should.exist(geopackage);
        
@@ -67,7 +68,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_GroundOverlay = new KMLToGeoPackage({append: true});
         const geometryTableName = 'Air Traffic';
         // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_GroundOverlay.convertKMLOrKMZToGeopackage(KML, path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'), geometryTableName);
+        const kmlGeopackage = KML_GroundOverlay.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'), geometryTableName);
         const geopackage = await kmlGeopackage;
         should.exist(geopackage);
     })
