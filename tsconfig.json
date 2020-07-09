@@ -27,6 +27,6 @@
   "exclude": [
       "./lib/wkb",
       "built/**/*",
-      "./test",
+      "./test"
   ]
 }

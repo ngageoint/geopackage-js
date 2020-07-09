@@ -72,7 +72,11 @@ export class RTreeIndex extends BaseExtension {
       totalCount: this.featureCount,
       layer: this.tableName,
     });
-    this.loadRTreeIndex();
+    try {
+      this.loadRTreeIndex();
+    } catch (e) {
+      console.log('ERROR CREATING RTREE INDEX', e);
+    }
     this.createAllTriggers();
     return this.getRTreeIndexExtension();
   }
@@ -282,24 +286,43 @@ export class RTreeIndex extends BaseExtension {
     return changes === 6;
   }
   loadRTreeIndex(): boolean {
+    console.log(
+      'minx',
+      this.connection.get(
+        'SELECT ' +
+          this.primaryKeyColumn +
+          ', ST_MinX(' +
+          this.columnName +
+          '), ST_MaxX(' +
+          this.columnName +
+          '), ST_MinY(' +
+          this.columnName +
+          '), ST_MaxY(' +
+          this.columnName +
+          ') FROM "' +
+          this.tableName +
+          '"',
+      ),
+    );
     return (
       this.connection.run(
         'INSERT OR REPLACE INTO "rtree_' +
-        this.tableName +
-        '_' +
-        this.columnName +
-        '" SELECT ' +
-        this.primaryKeyColumn +
-        ', st_minx(' +
-        this.columnName +
-        '), st_maxx(' +
-        this.columnName +
-        '), st_miny(' +
-        this.columnName +
-        '), st_maxy(' +
-        this.columnName +
-        ') FROM "' +
-        this.tableName + '"',
+          this.tableName +
+          '_' +
+          this.columnName +
+          '" SELECT ' +
+          this.primaryKeyColumn +
+          ', ST_MinX(' +
+          this.columnName +
+          '), ST_MaxX(' +
+          this.columnName +
+          '), ST_MinY(' +
+          this.columnName +
+          '), ST_MaxY(' +
+          this.columnName +
+          ') FROM "' +
+          this.tableName +
+          '"',
       ).changes === 1
     );
   }
@@ -307,10 +330,10 @@ export class RTreeIndex extends BaseExtension {
     return (
       this.connection.run(
         'CREATE VIRTUAL TABLE "rtree_' +
-        this.tableName +
-        '_' +
-        this.columnName +
-        '" USING rtree(id, minx, maxx, miny, maxy)',
+          this.tableName +
+          '_' +
+          this.columnName +
+          '" USING rtree(id, minx, maxx, miny, maxy)',
       ).changes === 1
     );
   }
@@ -328,6 +351,9 @@ export class RTreeIndex extends BaseExtension {
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
       }
+      if (envelope.minX === Infinity) {
+        return null;
+      }
       return envelope.minX;
     });
   }
@@ -337,6 +363,9 @@ export class RTreeIndex extends BaseExtension {
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+      }
+      if (envelope.minY === Infinity) {
+        return null;
       }
       return envelope.minY;
     });
@@ -348,6 +377,9 @@ export class RTreeIndex extends BaseExtension {
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
       }
+      if (envelope.maxX === -Infinity) {
+        return null;
+      }
       return envelope.maxX;
     });
   }
@@ -357,6 +389,9 @@ export class RTreeIndex extends BaseExtension {
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+      }
+      if (envelope.maxY === -Infinity) {
+        return null;
       }
       return envelope.maxY;
     });

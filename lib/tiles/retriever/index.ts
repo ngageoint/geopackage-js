@@ -186,7 +186,7 @@ export class GeoPackageTileRetriever {
    * @return tile matrices
    */
   getTileMatrices(projectedRequestBoundingBox: BoundingBox): TileMatrix[] {
-    const tileMatrices = [];
+    const tileMatrices: TileMatrix[] = [];
     // Check if the request overlaps the tile matrix set
     if (
       this.tileDao.tileMatrices.length !== 0 &&
@@ -207,12 +207,12 @@ export class GeoPackageTileRetriever {
       }
       // If there is a matching zoom level
       if (requestZoomLevel != null) {
-        let zoomLevels = [];
+        let zoomLevels: number[] = [];
         // If options are configured, build the possible zoom levels in
         // order to request
         if (this.scaling != null && this.scaling.scaling_type != null) {
           // Find zoom in levels
-          const zoomInLevels = [];
+          const zoomInLevels: number[] = [];
           if (this.scaling.isZoomIn()) {
             const zoomIn =
               this.scaling.zoom_in != null ? requestZoomLevel + this.scaling.zoom_in : this.tileDao.maxZoom;

@@ -85,7 +85,7 @@ export class DataColumnsDao extends Dao<DataColumns> {
     const values = [tableName, columnName];
     let dataColumn;
     for (const row of this.queryWhere(where, values)) {
-      dataColumn = row;
+      dataColumn = this.createObject(row);
     }
     return dataColumn;
   }
