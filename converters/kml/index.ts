@@ -399,7 +399,9 @@ export class KMLToGeoPackage {
       kml.collect('value');
       // kml.collect('Folder');
       // kml.collect('Placemark');
+      let asyncProcessesRunning = 0;
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
+        asyncProcessesRunning++;
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
         let image: Jimp | void;
         console.log(node.Icon.href);
@@ -416,6 +418,7 @@ export class KMLToGeoPackage {
             console.error('Error not able to Handle Ground Overlay :', err),
           );
         }
+        asyncProcessesRunning--;
       });
       const handlePlacemark = (node): void => {
         if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
@@ -451,7 +454,11 @@ export class KMLToGeoPackage {
       //     });
       //   }
       // });
-      kml.on('end', () => {
+      kml.on('end', async () => {
+        while (asyncProcessesRunning > 0) {
+          if (progressCallback) progressCallback({ status: 'Waiting on Async Functions' });
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
         if (progressCallback) progressCallback({ status: 'Finished adding data to the Geopackage' });
         resolve();
       });

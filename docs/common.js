@@ -443,7 +443,7 @@ window.loadGeoPackage = function(files) {
           a => console.log(a),
         )
         .then(function(gp) {
-          console.log(gp);
+          console.log('Done', gp);
           geoPackage = gp;
           clearInfo();
           readGeoPackage(gp);
