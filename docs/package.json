@@ -27,6 +27,7 @@
   "devDependencies": {
     "browserify": "^14.1.0",
     "browserify-css": "^0.9.1",
+    "tsify": "^4.0.2",
     "typedoc": "^0.15.4",
     "typescript": "3.7.5"
   },
