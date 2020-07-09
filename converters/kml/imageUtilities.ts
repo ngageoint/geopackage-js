@@ -23,6 +23,7 @@ export class ImageUtilities {
     imageBBox: BoundingBox,
     geopackage: GeoPackage,
     imageName: string,
+    progressCallback?: Function,
   ): Promise<void> {
     // Calculate the resolution of the image compared to the Bounding Box
     const imageHeight = image.getHeight();
@@ -36,6 +37,10 @@ export class ImageUtilities {
       '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs',
     );
     const converter = proj4('EPSG:4326', 'EPSG:3857');
+    if (progressCallback)
+      progressCallback({
+        status: 'Handling zooms',
+      });
     // Handles getting the correct Map tiles
     await GeoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(
       imageBBox,
@@ -75,9 +80,8 @@ export class ImageUtilities {
     if (isNode) {
       imageLocation = uri.startsWith('http') ? uri : path.join(__dirname, uri);
     } else if (isBrowser) {
-      imageLocation = uri.startsWith('http') ? uri : new Buffer(zipMap.get(uri), 'base64');
+      imageLocation = uri.startsWith('http') ? uri : Buffer.from(zipMap.get(uri), 'base64');
     }
-    
     // Reads in Image (stored as bitmap)
     const img = await Jimp.read(imageLocation).catch(err => {
       console.error('Image not founding', err);

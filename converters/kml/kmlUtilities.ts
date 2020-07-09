@@ -82,7 +82,11 @@ export class KMLUtilities {
         status: 'Inserting Zoomed and transformed images into Geopackage database.',
         data: { naturalScale: naturalScale, zoomLevels: zoomLevels },
       });
-    ImageUtilities.insertZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName);
+    ImageUtilities.insertZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName, progressCallback);
+    if (progressCallback)
+      progressCallback({
+        status: 'Inserted images.',
+      });
   }
 
   /**

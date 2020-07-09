@@ -48,7 +48,7 @@ export interface KMLConverterOptions {
   preserverFolders?: boolean;
   geoPackage?: GeoPackage | string;
   srsNumber?: number | 4326;
-  indexTable?: boolean | true;
+  indexTable?: boolean;
 }
 /**
  * Convert KML file to GeoPackages.
@@ -71,6 +71,7 @@ export class KMLToGeoPackage {
   constructor(optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
     // Icon and Style Map are used to help fill out cross reference tables in the Geopackage Database
+    this.zipFileMap = new Map();
     this.styleMapPair = new Map();
     this.styleMap = new Map();
     this.styleUrlMap = new Map();
@@ -102,7 +103,7 @@ export class KMLToGeoPackage {
    */
   async convertKMLOrKMZToGeopackage(
     kmlOrKmzPath: PathLike,
-    isKMZ?: boolean | false,
+    isKMZ?: boolean,
     geopackage?: GeoPackage | string,
     tableName?: string,
     kmlOrKmzData?: Uint8Array,
@@ -174,7 +175,9 @@ export class KMLToGeoPackage {
     let gp: GeoPackage;
     await new Promise(async resolve => {
       if (progressCallback) await progressCallback({ status: 'Extracting files form KMZ' });
+      // console.log(zip.files);
       for (const key in zip.files) {
+        // console.log(key, zip.files);
         await new Promise(async (resolve, reject) => {
           if (zip.files.hasOwnProperty(key)) {
             if (isNode) {
@@ -210,6 +213,8 @@ export class KMLToGeoPackage {
               } else {
                 this.zipFileMap.set(key, await zip.files[key].async('base64'));
               }
+              // console.log(kmlData, this.zipFileMap);
+              resolve();
             }
           }
         }).catch(err => {
@@ -397,6 +402,7 @@ export class KMLToGeoPackage {
       kml.on('endElement: ' + KMLTAGS.GROUND_OVERLAY_TAG, async node => {
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
         let image: Jimp | void;
+        console.log(node.Icon.href);
         if (isNode) {
           if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
           // Determines whether the image is local or online.
@@ -404,6 +410,7 @@ export class KMLToGeoPackage {
         } else if (isBrowser) {
           image = await ImageUtilities.getJimpImage(node.Icon.href, this.zipFileMap).catch(err => console.error(err));
         }
+        console.log(image);
         if (image) {
           KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
             console.error('Error not able to Handle Ground Overlay :', err),
@@ -606,6 +613,9 @@ export class KMLToGeoPackage {
         ) {
           try {
             this.styleMap.set(node['$'].id, node);
+          } catch (err) {
+            console.error(err);
+            console.log(node);
           } finally {
             this.hasStyles = true;
           }

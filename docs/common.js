@@ -430,14 +430,18 @@ window.loadGeoPackage = function(files) {
         eventValue: array.byteLength,
       });
       const convert = new KMLToGeoPackage();
+      console.log('kmz', f);
       convert
-        .convert({
-          kmlOrKmzPath: path.basename(f.name),
-          kmlOrKmzData: array,
-          isKMZ: true,
-          mainTableName: path.basename(f.name, path.extname(f.name)),
-          // geoPackage: path.basename(f.name, path.extname(f.name)) + '.gpkg',
-        })
+        .convert(
+          {
+            kmlOrKmzPath: path.basename(f.name),
+            kmlOrKmzData: array,
+            isKMZ: true,
+            mainTableName: path.basename(f.name, path.extname(f.name)),
+            // geoPackage: path.basename(f.name, path.extname(f.name)) + '.gpkg',
+          },
+          a => console.log(a),
+        )
         .then(function(gp) {
           console.log(gp);
           geoPackage = gp;
