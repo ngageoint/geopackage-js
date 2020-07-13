@@ -988,14 +988,14 @@ window.zoomToTile = function(
 const highlightLayer = L.geoJson([], {
   style: function(feature) {
     return {
-      color: '#F00',
+      color: '#FF0000',
       weight: 3,
       opacity: 1,
     };
   },
 
   onEachFeature: function(feature, layer) {
-    const string = '';
+    let string = '';
     for (const key in feature.properties) {
       const columnMap = tableInfos[feature.properties.tableName].columnMap;
       string = '';
@@ -1018,38 +1018,41 @@ const highlightLayer = L.geoJson([], {
     layer.bindPopup(string);
   },
   coordsToLatLng: function(coords) {
-    // if (coords[0] < 0) {
-    //   coords[0] = coords[0] + 360;
-    // }
-    return L.GeoJSON.coordsToLatLng(coords);
+    if (_.isFinite(coords[0]) && _.isFinite(coords[1])) {
+      return L.GeoJSON.coordsToLatLng(coords);
+    }
+    return L.GeoJSON.coordsToLatLng([0, 0]);
   },
 });
 
 window.highlightTile = function(minLongitude, minLatitude, maxLongitude, maxLatitude, projection) {
-  const sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
-  const ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
-  const poly = {
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [sw[0], sw[1]],
-          [sw[0], ne[1]],
-          [ne[0], ne[1]],
-          [ne[0], sw[1]],
-          [sw[0], sw[1]],
+  if (minLongitude && minLatitude && maxLatitude && maxLongitude) {
+    const sw = proj4(projection, 'EPSG:4326', [minLongitude, minLatitude]);
+    const ne = proj4(projection, 'EPSG:4326', [maxLongitude, maxLatitude]);
+    const poly = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [sw[0], sw[1]],
+            [sw[0], ne[1]],
+            [ne[0], ne[1]],
+            [ne[0], sw[1]],
+            [sw[0], sw[1]],
+          ],
         ],
-      ],
-    },
-  };
+      },
+    };
 
-  highlightLayer.clearLayers();
-  highlightLayer.addData(poly);
-  highlightLayer.bringToFront();
+    highlightLayer.clearLayers();
+    highlightLayer.addData(poly);
+    highlightLayer.bringToFront();
+  }
 };
 
 window.loadFeatures = function(tableName, featuresElement) {
+  // tableName = tableName.replace(/\s/, '_');
   const featuresTableTemplate = $('#all-features-template').html();
   Mustache.parse(featuresTableTemplate);
 
@@ -1062,7 +1065,7 @@ window.loadFeatures = function(tableName, featuresElement) {
     columns: tableInfos[tableName].columns,
     srs: tableInfos[tableName].srs,
     geometryColumns: tableInfos[tableName].geometryColumns,
-    tableName: tableName,
+    tableName: tableName.replace(/\s/g, '_'),
     features: [],
   };
   const sanitizedColumns = [];
@@ -1077,16 +1080,16 @@ window.loadFeatures = function(tableName, featuresElement) {
   features.columns = sanitizedColumns;
   featuresElement.append(Mustache.render(featuresTableTemplate, features));
 
-  const featuresTable = featuresElement.find('#' + tableName + '-feature-table');
+  const featuresTable = featuresElement.find('#' + tableName.replace(/\s/g, '_') + '-feature-table');
 
   const each = geoPackage.iterateGeoJSONFeatures(tableName);
   const promise = Promise.resolve();
   for (const row of each) {
     const feature = row;
-    feature.tableName = tableName;
+    feature.tableName = tableName; //tableName.replace(/\s/g, '_');
     feature.values = [];
 
-    for (const i = 0; i < features.columns.length; i++) {
+    for (let i = 0; i < features.columns.length; i++) {
       let value = feature.properties[features.columns[i].name];
 
       if (features.columns[i].displayName) {
@@ -1107,7 +1110,11 @@ window.loadFeatures = function(tableName, featuresElement) {
         feature.values.push(value.toString());
       }
     }
+    console.log(feature);
+    // console.log(featureTemplate)
+
     featuresTable.append(Mustache.render(featureTemplate, feature));
+    console.log(featuresTable);
   }
   return features;
 };
@@ -1115,6 +1122,7 @@ window.loadFeatures = function(tableName, featuresElement) {
 map.addLayer(highlightLayer);
 
 window.highlightFeature = function(featureId, tableName) {
+  // tableName = tableName.replace('_', ' ');
   const geoJson = geoPackage.getFeature(tableName, featureId);
   geoJson.properties.tableName = tableName;
   highlightLayer.clearLayers();
@@ -1136,7 +1144,7 @@ const featureLayer = L.geoJson([], {
     };
   },
   onEachFeature: function(feature, layer) {
-    const string = '';
+    let string = '';
     for (const key in feature.properties) {
       const columnMap = tableInfos[feature.properties.tableName].columnMap;
       string = '';

@@ -12,7 +12,8 @@ const async = require('async'),
   fileType = require('file-type'),
   FileSaver = require('file-saver'),
   path = require('path'),
-  fs = require('fs');
+  fs = require('fs'),
+  _ = require('lodash');
 
 window.proj4 = proj4;
 window.async = async;
@@ -24,6 +25,7 @@ window.Mustache = Mustache;
 window.FileSaver = FileSaver;
 window.path = path;
 window.fs = fs;
+window._ = _;
 
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
