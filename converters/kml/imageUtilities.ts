@@ -75,10 +75,10 @@ export class ImageUtilities {
       },
     );
   }
-  public static async getJimpImage(uri: string, zipMap?: Map<string, any>): Promise<Jimp> {
+  public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp> {
     let imageLocation;
     if (isNode) {
-      imageLocation = uri.startsWith('http') ? uri : path.join(__dirname, uri);
+      imageLocation = uri.startsWith('http') ? uri : path.join(dir, uri);
     } else if (isBrowser) {
       imageLocation = uri.startsWith('http') ? uri : Buffer.from(zipMap.get(uri), 'base64');
     }

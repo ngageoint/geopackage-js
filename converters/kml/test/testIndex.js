@@ -10,6 +10,8 @@ const { AssertionError, assert } = require('chai');
 const should = require('chai').should();
 const _ = require('lodash');
 
+const bboxWorld = new GeoPackage.BoundingBox(-180, 180, -90, 90);
+
 describe('KML and KMZ to Geopackage Tests', function() {
     it ('should convert KML Samples Edited to a GeoPackage', function() {
         try {
@@ -37,15 +39,15 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const attributeTables = geopackage.getAttributesTables();
             should.exist(attributeTables);
             attributeTables.length.should.be.equal(3);
-        })
-    });
-    it ('should reject file with incorrect file extensions', function () {
-        const wrongNamesTest = new KMLToGeoPackage({append: true});
-        const wrongNames = ['noExtension', 'noPeriod_kml', 'invalidExtension.idk', 'invalidCharacterExtension,kml', 'invalidSpacing.km l', 'invalidCharacter.kÂL', 'kml.invalidOrder', 'doubleExtension.kml.km1', 'ra.n,d!om!.!kml'];
-        wrongNames.forEach(wrongName => {
-            wrongNamesTest.convertKMLOrKMZToGeopackage(wrongName).then(()=>{should.fail()}).catch((e)=>{should.exist(e)})
         });
     });
+    // it ('should reject file with incorrect file extensions', function () {
+    //     const wrongNamesTest = new KMLToGeoPackage({append: true});
+    //     const wrongNames = ['noExtension', 'noPeriod_kml', 'invalidExtension.idk', 'invalidCharacterExtension,kml', 'invalidSpacing.km l', 'invalidCharacter.kÂL', 'kml.invalidOrder', 'doubleExtension.kml.km1', 'ra.n,d!om!.!kml'];
+    //     wrongNames.forEach(wrongName => {
+    //         wrongNamesTest.convertKMLOrKMZToGeopackage(wrongName).then(()=>{should.fail()}).catch((e)=>{should.exist(e)})
+    //     });
+    // });
     it ('should handle a file with a network Link', async function() {
         this.enableTimeouts(false);
         try {
@@ -58,9 +60,30 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName);
         const geopackage = await kmlGeopackage;
         should.exist(geopackage);
-       
+
+        // Has Correct Tables
+        const tables = geopackage.getTables();
+        _.findIndex(tables.features, (a) => {console.log(a === '3DMeshLocations'); return a === '3DMeshLocations'}).should.not.be.equal(-1);
+        _.size(tables.attributes).should.be.equal(3);
+        _.size(tables.tiles).should.be.equal(0);
+
+        // Has Correct Meta data about features
+        const features = geopackage.getTableContents('3DMeshLocations');
+        features.min_y.should.be.equal(-158.12911);
+        features.max_y.should.be.equal(174.8913);
+        features.min_x.should.be.equal(-43.63739);
+        features.max_x.should.be.equal(69.72088);
+        features.srs_id.should.be.equal(4326);
+
+        // Has correct Number of Features
+        const featureDao = geopackage.getFeatureDao(features);
+        featureDao.count().should.be.equal(6477);
+
+        const multiGeomDao = geopackage.getAttributeDao('multi_geometry');
+        multiGeomDao.count().should.be.equal(182);  
     });
     it ('should handle Large GroundOverlays', async function() {
+        this.enableTimeouts(false);
         try {
             fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'));
         } catch (e) {}
@@ -68,10 +91,39 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_GroundOverlay = new KMLToGeoPackage({append: true});
         const geometryTableName = 'Air Traffic';
         // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_GroundOverlay.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'), geometryTableName);
+        const kmlGeopackage = KML_GroundOverlay.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'), geometryTableName, null, (obj) => {should.exist(obj)});
         const geopackage = await kmlGeopackage;
         should.exist(geopackage);
-    })
+
+        const tileDao = geopackage.getTileDao('Air Traffic');
+        tileDao.count().should.be.equal(272);
+        // console.log(tileDao.boundingBox, geoSpatialUtilities.getWebMercatorBoundingBox('ESPG:4326', bboxWorld))
+        // assert.isTrue(_.isEqual(tileDao.boundingBox, geoSpatialUtilities.getWebMercatorBoundingBox('ESPG:4326', bboxWorld)));
+        // _.findIndex(tables.features, (a) => {console.log(a === '3DMeshLocations'); return a === '3DMeshLocations'}).should.not.be.equal(-1);
+        // _.size(tables.attributes).should.be.equal(3);
+        // _.size(tables.tiles).should.be.equal(0);
+    });
+    it ('should call progress call backs when defined', function () {
+        try {
+            fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'All_the_Water_in_the_World.gpkg'));
+        } catch (e) {}
+        const waterKml = path.join(__dirname, 'fixtures', 'All\ the\ Water\ in\ the\ World.kmz');
+        const waterKmlConverter = new KMLToGeoPackage({append: true});
+        const options = {
+            kmlOrKmzPath: waterKml,
+            isKMZ: waterKml.lastIndexOf('kmz') > waterKml.lastIndexOf('.'),
+            mainTableName: path.basename(waterKml, path.extname(waterKml)),
+            geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'All_the_Water_in_the_World.gpkg'),
+          }
+        // console.log(options)
+        const kmzGeopackage = waterKmlConverter.convert(options, (obj) => {should.exist(obj)});
+        should.exist(kmzGeopackage)
+        kmzGeopackage.then((gp)=>{
+            should.exist(gp)
+        });
+        
+        
+    });
     // describe('Image Utilities Should work', function () {
 
 
@@ -303,7 +355,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         })
     });
     describe('geoSpatial Utilities should work', function () {
-        it('should find the natural scale and zoom level of images', function() {
+        it ('should find the natural scale and zoom level of images', function() {
             const bbox1 = new GeoPackage.BoundingBox(25, 26, 34, 35);
             geoSpatialUtilities.getNaturalScale(bbox1, 2000).should.be.equal(11);
             geoSpatialUtilities.getZoomLevels(bbox1, 11).length.should.be.equal(4);
@@ -316,12 +368,20 @@ describe('KML and KMZ to Geopackage Tests', function() {
             zoomLevel2[1].should.be.equal(8);
             zoomLevel2[2].should.be.equal(6);
             
-            const bbox3 = new GeoPackage.BoundingBox(-180, 180, -90, 90);
-            geoSpatialUtilities.getNaturalScale(bbox3, 4096).should.be.equal(4);
-            geoSpatialUtilities.getZoomLevels(bbox3, 4).length.should.be.equal(2);
+            
+            geoSpatialUtilities.getNaturalScale(bboxWorld, 4096).should.be.equal(4);
+            geoSpatialUtilities.getZoomLevels(bboxWorld, 4).length.should.be.equal(2);
+
+            // Out of bounds zoom levels
+            geoSpatialUtilities.getZoomLevels(bbox1, 21).length.should.be.equal(8);
+            geoSpatialUtilities.getZoomLevels(bboxWorld, -2).length.should.be.equal(1);
+
+            // Very large image
+            geoSpatialUtilities.getNaturalScale(bboxWorld, 409600).should.be.equal(10);
 
         });
         it ('should properly expand geopackage Bounding Boxes.', function () {
+            // Basic Operations
             const bbox1 = new GeoPackage.BoundingBox(null);
             const lat = 45, lon = 45;
             const bbox1eq = new GeoPackage.BoundingBox(45,45,45,45);
@@ -330,12 +390,41 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const bbox2eq = new GeoPackage.BoundingBox(-45,45,45,50);
             geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, 50, -45);
             assert.isTrue(_.isEqual(bbox1, bbox2eq));
+
+            // Copy over Bounding Box
             const bbox3eq = new GeoPackage.BoundingBox(-45, 50, 45, 55);
             const bbox2 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, 55, 50, true);
             assert.isTrue(_.isEqual(bbox2, bbox3eq));
             assert.isTrue(!_.isEqual(bbox1, bbox3eq));
-            
+            const bbox4eq = new GeoPackage.BoundingBox(-50, 45, -55, 50);
+            const bbox2 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, -55, -50, true);
+            assert.isTrue(_.isEqual(bbox2, bbox4eq));
+            assert.isTrue(!_.isEqual(bbox1, bbox4eq));
+
+            // Null and Single lat or long testing
+            const bboxTest = new GeoPackage.BoundingBox(null, 0, -5, 5);
+            geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bboxTest, -55);
+            const bboxTestEq =  new GeoPackage.BoundingBox(null, 0, -55, 5);
+            assert.isTrue(_.isEqual(bboxTest, bboxTestEq));
+            geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bboxTest, null, 90);
+            const bboxTestEq2 =  new GeoPackage.BoundingBox(0, 90, -55, 5);
+            assert.isTrue(_.isEqual(bboxTest, bboxTestEq2));
         }); 
+        it ('should convert tile to Longitude and Latitude', function() {
+            let tileX = 0;
+            let tileY = 0;
+            let long = geoSpatialUtilities.long2tile(tileX, 0);
+            let lat = geoSpatialUtilities.lat2tile(tileY, 0);
+            long.should.be.equal(0);
+            lat.should.be.equal(0);
+            tileX = 1;
+            tileY = 1;
+            let long = geoSpatialUtilities.long2tile(tileX, 1);
+            let lat = geoSpatialUtilities.lat2tile(tileY, 1);
+            long.should.be.equal(1);
+            lat.should.be.equal(0);
+
+        });
 
     });
 });

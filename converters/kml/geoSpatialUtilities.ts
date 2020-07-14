@@ -165,16 +165,17 @@ export class GeoSpatialUtilities {
   }
 
   /**
-   * Returns floored scale.
-   *  360 / 2^x = y°
+   * Returns the floor of the zoom level where 1 image pixel equals 1 tile pixel.
+   *  floor(log_2((360 * imageWidth) / (bbox_width * tile_size)))
    * @param bbox Must be in EPSG:4326
    * @param imageWidth Must be in Pixels
    */
   public static getNaturalScale(bbox: BoundingBox, imageWidth: number): number {
     const widthHeight = this.getWidthAndHeightFromBBox(bbox);
-    const tileWidthInDegrees = (256 * widthHeight.width) / imageWidth;
+    // const tilesNeeded = imageWidth / TILE_SIZE_IN_PIXELS;
+    // const tileWidthInDegrees = widthHeight.width / tilesNeeded;
     // console.log(widthHeight.width, tileWidthInDegrees);
-    return Math.floor(Math.log2(360 / tileWidthInDegrees));
+    return Math.floor(Math.log2((360 * imageWidth) / (widthHeight.width * TILE_SIZE_IN_PIXELS)));
   }
 
   /**
@@ -259,14 +260,38 @@ export class GeoSpatialUtilities {
       boundingBox = new BoundingBox(boundingBox);
     }
     if (!_.isNil(latitude)) {
-      if (_.isNil(boundingBox.minLatitude)) boundingBox.minLatitude = latitude;
-      if (_.isNil(boundingBox.maxLatitude)) boundingBox.maxLatitude = latitude;
+      if (_.isNil(boundingBox.minLatitude)) {
+        if (_.isNil(boundingBox.maxLatitude)) {
+          boundingBox.minLatitude = latitude;
+        } else {
+          boundingBox.minLatitude = boundingBox.maxLatitude;
+        }
+      }
+      if (_.isNil(boundingBox.maxLatitude)) {
+        if (_.isNil(boundingBox.minLatitude)) {
+          boundingBox.maxLatitude = latitude;
+        } else {
+          boundingBox.maxLatitude = boundingBox.minLatitude;
+        }
+      }
       if (latitude < boundingBox.minLatitude) boundingBox.minLatitude = latitude;
       if (latitude > boundingBox.maxLatitude) boundingBox.maxLatitude = latitude;
     }
     if (!_.isNil(longitude)) {
-      if (_.isNil(boundingBox.minLongitude)) boundingBox.minLongitude = longitude;
-      if (_.isNil(boundingBox.maxLongitude)) boundingBox.maxLongitude = longitude;
+      if (_.isNil(boundingBox.minLongitude)) {
+        if (_.isNil(boundingBox.maxLongitude)) {
+          boundingBox.minLongitude = longitude;
+        } else {
+          boundingBox.minLongitude = boundingBox.maxLongitude;
+        }
+      }
+      if (_.isNil(boundingBox.maxLongitude)) {
+        if (_.isNil(boundingBox.minLongitude)) {
+          boundingBox.maxLongitude = longitude;
+        } else {
+          boundingBox.maxLongitude = boundingBox.minLongitude;
+        }
+      }
       if (longitude < boundingBox.minLongitude) boundingBox.minLongitude = longitude;
       if (longitude > boundingBox.maxLongitude) boundingBox.maxLongitude = longitude;
     }

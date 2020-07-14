@@ -106,13 +106,14 @@ export class KMLToGeoPackage {
     isKMZ?: boolean,
     geopackage?: GeoPackage | string,
     tableName?: string,
-    kmlOrKmzData?: Uint8Array,
+    kmlOrKmzData?: Uint8Array | null,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
     // const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
+    console.log(geopackage);
     if (!isKMZ) {
       if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
       if (isNode) {
@@ -181,32 +182,31 @@ export class KMLToGeoPackage {
         await new Promise(async (resolve, reject) => {
           if (zip.files.hasOwnProperty(key)) {
             if (isNode) {
-              const fileDestination = path.join(__dirname, key);
-              // console.log('fileDest', fileDestination);
+              const fileDestination = path.join(path.dirname(kmzData.toString()), key);
               kmlData = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlData;
-              await mkdirp(path.dirname(fileDestination))
-                .then(() => {
-                  const file = zip.file(key);
-                  if (!_.isNil(file)) {
-                    file
-                      .nodeStream()
-                      .pipe(
-                        fs.createWriteStream(fileDestination, {
-                          flags: 'w',
-                        }),
-                      )
-                      .on('finish', () => {
-                        // console.log(key, 'was written to', __dirname + '/' + key);
-                        resolve();
-                      });
-                  } else {
-                    resolve();
-                  }
-                })
-                .catch(err => {
+              const dir = mkdirp(path.dirname(fileDestination));
+              if (!_.isNil(dir)) {
+                await dir.catch(err => {
                   console.error('mkdirp was not able to be made', err);
                   reject();
                 });
+              }
+              const file = zip.file(key);
+              if (!_.isNil(file)) {
+                file
+                  .nodeStream()
+                  .pipe(
+                    fs.createWriteStream(fileDestination, {
+                      flags: 'w',
+                    }),
+                  )
+                  .on('finish', () => {
+                    // console.log(key, 'was written to', __dirname + '/' + key);
+                    resolve();
+                  });
+              } else {
+                resolve();
+              }
             } else if (isBrowser) {
               if (key.endsWith('.kml')) {
                 kmlData = await zip.files[key].async('uint8array');
@@ -250,6 +250,7 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
+    console.log(geopackage);
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
@@ -404,15 +405,19 @@ export class KMLToGeoPackage {
         asyncProcessesRunning++;
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
         let image: Jimp | void;
-        console.log(node.Icon.href);
+        // console.log(node.Icon.href);
         if (isNode) {
           if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
           // Determines whether the image is local or online.
-          image = await ImageUtilities.getJimpImage(node.Icon.href).catch(err => console.error(err));
+          image = await ImageUtilities.getJimpImage(node.Icon.href, path.dirname(kmlData.toString())).catch(err =>
+            console.error(err),
+          );
         } else if (isBrowser) {
-          image = await ImageUtilities.getJimpImage(node.Icon.href, this.zipFileMap).catch(err => console.error(err));
+          image = await ImageUtilities.getJimpImage(node.Icon.href, null, this.zipFileMap).catch(err =>
+            console.error(err),
+          );
         }
-        console.log(image);
+        // console.log(image);
         if (image) {
           KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
             console.error('Error not able to Handle Ground Overlay :', err),
@@ -1108,7 +1113,7 @@ export class KMLToGeoPackage {
           throw err;
         });
       defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
-    } catch (err) {};
+    } catch (err) {}
 
     await defaultStyles.setTableIcon('Point', defaultIcon);
     const polygonStyleRow = defaultStyles.getStyleDao().newRow();
