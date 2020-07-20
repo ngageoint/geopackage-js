@@ -94,8 +94,8 @@ export class KMLToGeoPackage {
     const geopackage = clonedOptions.geoPackage || undefined;
     const tableName = clonedOptions.mainTableName;
     const kmlOrKmzData = clonedOptions.kmlOrKmzData;
-    console.log(geopackage)
-    console.log(kmlOrKmzPath);
+    // console.log(geopackage)
+    // console.log(kmlOrKmzPath);
     return this.convertKMLOrKMZToGeopackage(kmlOrKmzPath, isKMZ, geopackage, tableName, kmlOrKmzData, progressCallback);
   }
 
@@ -505,16 +505,16 @@ export class KMLToGeoPackage {
       // });
       kml.on('endElement: ' + KMLTAGS.NETWORK_LINK, async (node: any) => {
         kmlOnsRunning++;
-        // console.log(node)
         if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
           const linkType = node.hasOwnProperty('Link') ? 'Link' : 'Url';
           if (progressCallback) {
             progressCallback({
-              status: 'Handling Network Link Tag. Adds an addition KML file',
+              status: 'Handling Network Link Tag. Handling Meta Data',
               file: node[linkType].href,
               data: node,
             });
           }
+          // TODO: Handle Browser Case.
           if (node[linkType].href.toString().startsWith('http')) {
             await axios
               .get(node[linkType].href.toString())
@@ -753,6 +753,12 @@ export class KMLToGeoPackage {
           console.error('Error in Style Map:', err);
         }
       }
+      // if (!_.isNil(iconRow) && _.isNil(iconRow.data)) {
+      //   console.log('iconRow', iconRow);
+      // }
+      // if (_.isNil(iconRow)) {
+      //   console.log('iconRow', iconRow);
+      // }
 
       const element = _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
         return o === prop;
@@ -792,8 +798,8 @@ export class KMLToGeoPackage {
       if (!_.isNil(styleRow)) {
         defaultStyles.setStyle(featureID, geometryData.type, styleRow);
       }
-      if (!_.isNil(iconRow)) {
-        defaultStyles.setIcon(featureID, geometryData.type, iconRow);
+      if (!_.isNil(iconRow) && !_.isNil(iconRow.data)) {
+        defaultStyles.setIcon(featureID, geometryData.type, iconRow).catch(e => console.error(e));
       }
     } else {
       // console.log(feature);
@@ -825,11 +831,18 @@ export class KMLToGeoPackage {
    */
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
+      // console.log('adding items', items);
       for (const item of items) {
-        const { id: id, newIcon: icon } = await KMLUtilities.addSpecificIcon(styleTable, item);
-        this.iconUrlMap.set('#' + item[0], id);
-        this.iconRowMap.set(id, icon);
+        const { id: id, newIcon: icon } = await KMLUtilities.addSpecificIcon(styleTable, item).catch(e => {
+          console.error(e);
+          return { id: -1, newIcon: null };
+        });
+        if (id >= 0 && !_.isNil(icon)) {
+          this.iconUrlMap.set('#' + item[0], id);
+          this.iconRowMap.set(id, icon);
+        }
       }
+      // console.log('KEYS', _.mapKeys(this.iconMap), this.iconMap, items);
       resolve();
     });
   }

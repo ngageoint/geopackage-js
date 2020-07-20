@@ -3,17 +3,19 @@ const KMLToGeoPackage = require('../index').KMLToGeoPackage;
 const geoSpatialUtilities = require('../geoSpatialUtilities').GeoSpatialUtilities;
 const kmlUtilities = require('../kmlUtilities').KMLUtilities;
 const imageUtilities = require('../imageUtilities').ImageUtilities;
-// const geoSpatialUti
+
 const path = require('path');
 const fs = require('fs');
 const { AssertionError, assert } = require('chai');
 const should = require('chai').should();
 const _ = require('lodash');
 
+let emptyGeopackage;
+
 const bboxWorld = new GeoPackage.BoundingBox(-180, 180, -90, 90);
 
 describe('KML and KMZ to Geopackage Tests', function() {
-    it ('should convert KML Samples Edited to a GeoPackage', function() {
+    it ('should convert KML Samples Edited to a GeoPackage', async function() {
         try {
             fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'));
         } catch (e) {}
@@ -21,25 +23,22 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_Samples_Edited_Converter = new KMLToGeoPackage({append: true});
         const geometryTableName = 'kmlSamples';
         const kmlGeopackage = KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, false, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
-        return kmlGeopackage.then((geopackage) => {
-            // Feature Table exists
-            should.exist(geopackage);
-            const tableData = geopackage.getFeatureTables();
-            tableData.length.should.be.equal(1);
-            tableData[0].should.be.equal(geometryTableName);
-            const featureDao = geopackage.getFeatureDao(geometryTableName);
-            featureDao.getCount().should.be.equal(23)
-
-            // Tile Table Exists
-            const tileMatrixTable = geopackage.getTileTables()
-            should.exist(tileMatrixTable);
-            tileMatrixTable.length.should.be.equal(1);
-
-            // Attribute table Exists.
-            const attributeTables = geopackage.getAttributesTables();
-            should.exist(attributeTables);
-            attributeTables.length.should.be.equal(3);
-        });
+        const geopackage = await kmlGeopackage;
+        // Feature Table exists
+        should.exist(geopackage);
+        const tableData = geopackage.getFeatureTables();
+        tableData.length.should.be.equal(1);
+        tableData[0].should.be.equal(geometryTableName);
+        const featureDao = geopackage.getFeatureDao(geometryTableName);
+        featureDao.getCount().should.be.equal(23);
+        // Tile Table Exists
+        const tileMatrixTable = geopackage.getTileTables();
+        should.exist(tileMatrixTable);
+        tileMatrixTable.length.should.be.equal(1);
+        // Attribute table Exists.
+        const attributeTables = geopackage.getAttributesTables();
+        should.exist(attributeTables);
+        attributeTables.length.should.be.equal(3);
     });
     // it ('should reject file with incorrect file extensions', function () {
     //     const wrongNamesTest = new KMLToGeoPackage({append: true});
@@ -57,7 +56,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_Network_Link = new KMLToGeoPackage({append: true});
         const geometryTableName = '3D Image Locations';
         // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName);
+        const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName, null, a => {console.log(a.status)});
         const geopackage = await kmlGeopackage;
         should.exist(geopackage);
 
@@ -124,11 +123,14 @@ describe('KML and KMZ to Geopackage Tests', function() {
         
         
     });
-    // describe('Image Utilities Should work', function () {
-
-
-    // })
     describe('KML Utilities Should work', function () {
+        beforeEach( function() {
+            try {
+                fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'temp.gpkg'));
+            } catch (e) {}
+            let gpkgPath = path.join(__dirname, 'fixtures', 'tmp', 'temp.gpkg');
+            emptyGeopackage = new GeoPackage.GeoPackageAPI.create(gpkgPath);
+        });
         it('should handle abgr to rgb a color conversions', function() {
             let color1, opacity1;
             const {rgb: color1, a: opacity1} = kmlUtilities.abgrStringToColorOpacity('FFFFFFFF')
@@ -349,10 +351,22 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const geoJSONPolygonEq = {"type":"Polygon","coordinates":[[[-122.0848938459612,37.42257124044786,17],[-122.0849580979198,37.42211922626856,17],[-122.0847469573047,37.42207183952619,17],[-122.0845725380962,37.42209006729676,17],[-122.0845954886723,37.42215932700895,17],[-122.0838521118269,37.42227278564371,17],[-122.083792243335,37.42203539112084,17],[-122.0835076656616,37.42209006957106,17],[-122.0834709464152,37.42200987395161,17],[-122.0831221085748,37.4221046494946,17],[-122.0829247374572,37.42226503990386,17],[-122.0829339169385,37.42231242843094,17],[-122.0833837359737,37.42225046087618,17],[-122.0833607854248,37.42234159228745,17],[-122.0834204551642,37.42237075460644,17],[-122.083659133885,37.42251292011001,17],[-122.0839758438952,37.42265873093781,17],[-122.0842374743331,37.42265143972521,17],[-122.0845036949503,37.4226514386435,17],[-122.0848020460801,37.42261133916315,17],[-122.0847882750515,37.42256395055121,17],[-122.0848938459612,37.42257124044786,17]]]};
             // console.log(JSON.stringify(geoJSONPolygon))
             assert.isTrue(_.isEqual(geoJSONPolygon, geoJSONPolygonEq));
-        })
+        });
         it ('should correct handle all KML geometry parses.', function (){
 
-        })
+        });
+        it ('should setUp Geometry Nodes', function() {
+
+        });
+        it ('should write Multi Geometries', function() {
+
+        });
+        it ('should add a specific Icon to the database', function() {
+
+        });
+        it ('should insert an Icon into the geopackage', function() {
+
+        });
     });
     describe('geoSpatial Utilities should work', function () {
         it ('should find the natural scale and zoom level of images', function() {
@@ -425,7 +439,21 @@ describe('KML and KMZ to Geopackage Tests', function() {
             lat.should.be.equal(0);
 
         });
+        it ('should iterateAllTilesInExtentForZoomLevels correctly', function() {
 
+        });
+
+    });
+    describe('image Utilities Should work', function(){
+        it ('should insertZoomImages', function() {
+
+        });
+        it ('should getJimpImage', function () {
+
+        });
+        it ('should truncate Images', function(){
+
+        });
     });
 });
 

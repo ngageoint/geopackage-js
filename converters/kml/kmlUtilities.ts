@@ -335,6 +335,9 @@ export class KMLUtilities {
     anchorV = 0.5,
   ): Promise<number> {
     newIcon.data = await jimpImage.getBufferAsync(jimpImage.getMIME());
+    if (_.isNil(newIcon.data)) {
+      console.error('NULL', newIcon);
+    }
     newIcon.width = jimpImage.getWidth();
     newIcon.height = jimpImage.getHeight();
     newIcon.contentType = jimpImage.getMIME();
@@ -356,7 +359,7 @@ export class KMLUtilities {
       const newIcon = styleTable.getIconDao().newRow();
       const kmlStyle = item[1];
       newIcon.name = item[0];
-      let id = -1;
+      let id = -2;
       if (_.isNil(kmlStyle)) {
         console.error('kml Style Undefined');
         reject();
@@ -377,7 +380,13 @@ export class KMLUtilities {
         if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
           let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
           iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
-          const img: Jimp = await Jimp.read(iconLocation);
+          const img: Jimp = await Jimp.read(iconLocation).catch(err => {
+            console.error('Image Reading Error', err);
+            throw err;
+          });
+          if (_.isNil(img)) {
+            reject();
+          }
           if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {
             img.scale(parseFloat(iconStyle[KMLTAGS.SCALE_TAG]));
           }
@@ -390,13 +399,22 @@ export class KMLUtilities {
             cropX = parseInt(iconTag['gx:x']);
           }
           if (iconTag.hasOwnProperty('gx:y')) {
-            cropY = cropY - parseInt(iconTag['gx:y']);
+            cropY = cropH - parseInt(iconTag['gx:y']);
           }
           if (iconTag.hasOwnProperty('gx:w')) {
             cropW = parseInt(iconTag['gx:w']);
           }
           if (iconTag.hasOwnProperty('gx:h')) {
             cropH = parseInt(iconTag['gx:h']);
+          }
+          console.log(cropX, cropY, cropW, cropH);
+          if (cropX > img.getWidth()) {
+            cropX = 0;
+            console.error('Pallet X position not valid');
+          }
+          if (cropY < 0) {
+            cropY = 0;
+            console.error('Pallet Y position not valid');
           }
           img.crop(cropX, cropY, cropW, cropH);
           if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
@@ -425,12 +443,15 @@ export class KMLUtilities {
               default:
                 break;
             }
-            id = await KMLUtilities.insertIconImageData(img, newIcon, styleTable, aU, aV);
           }
+          id = await KMLUtilities.insertIconImageData(img, newIcon, styleTable, aU, aV).catch(e => {
+            console.error('error', e);
+            return -1;
+          });
         }
         resolve({ id: id, newIcon: newIcon });
       }
-      reject(id);
+      reject();
     });
   }
 
