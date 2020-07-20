@@ -544,6 +544,7 @@ window.loadGeoPackage = function(files) {
           kmlOrKmzData: array,
           isKMZ: f.name.lastIndexOf('kmz') > f.name.lastIndexOf('.'),
           mainTableName: path.basename(f.name, path.extname(f.name)),
+          indexTable: true,
           // geoPackage: path.basename(f.name, path.extname(f.name)) + '.gpkg',
         })
         .then(function(gp) {

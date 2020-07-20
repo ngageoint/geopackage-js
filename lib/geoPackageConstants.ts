@@ -16,7 +16,7 @@ export class GeoPackageConstants {
   public static readonly GEOPACKAGE_EXTENSION_AUTHOR: string = GeoPackageConstants.GEOPACKAGE_EXTENSION;
   /** @constant {string} GEOMETRY_EXTENSION_PREFIX Geometry extension prefix */
   public static readonly GEOMETRY_EXTENSION_PREFIX: string = 'geom';
-  /** @constant {string} GEOPACKAGE_GEOMETRY_MAGIX_NUMBER Expected magic number */
+  /** @constant {string} GEOPACKAGE_GEOMETRY_MAGIC_NUMBER Expected magic number */
   public static readonly GEOPACKAGE_GEOMETRY_MAGIC_NUMBER: string = 'GP';
   /** @constant {string} GEOPACKAGE_GEOMETRY_VERSION_1 Expected version 1 value */
   public static readonly GEOPACKAGE_GEOMETRY_VERSION_1: number = 0;

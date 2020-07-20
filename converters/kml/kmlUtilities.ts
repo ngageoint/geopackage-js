@@ -1,9 +1,12 @@
 import * as KMLTAGS from './KMLTags.js';
 import _ from 'lodash';
-import { BoundingBox, GeoPackage, TileScaling, TileScalingType } from '@ngageoint/geopackage';
+import { BoundingBox, GeoPackage, TileScaling, TileScalingType, FeatureTableStyles } from '@ngageoint/geopackage';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
-import Jimp from 'jimp/*';
+import Jimp from 'jimp';
+import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
+import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
+import path from 'path';
 
 export class KMLUtilities {
   /**
@@ -11,12 +14,12 @@ export class KMLUtilities {
    * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
    */
   public static abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
+    // Valid Color and Hex number
     if (abgr.match(/^[0-9A-Fa-f]{8}$/)) {
       const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
       const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
       return { rgb, a };
     } else {
-      // console.error('Invalid Color');
       throw new Error('Invalid Color');
     }
   }
@@ -233,5 +236,265 @@ export class KMLUtilities {
       geometryData['coordinates'] = temp;
     });
     return geometryData;
+  }
+  /**
+   * Provides default styles and Icons for the Geometry table.
+   * Currently set to White to match google earth.
+   * Icon set to yellow pushpin google earth default.
+   * @param geopackage GeoPackage
+   * @param tableName Name of the Main Geometry table
+   */
+  public static async setUpKMLDefaultStylesAndIcons(
+    geopackage: GeoPackage,
+    tableName: string,
+    progressCallback?: Function,
+  ): Promise<FeatureTableStyles> {
+    if (progressCallback) progressCallback({ status: 'Creating Style and Icon tables.' });
+    const defaultStyles = new FeatureTableStyles(geopackage, tableName);
+    await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
+    await defaultStyles
+      .getFeatureStyleExtension()
+      .getRelatedTables()
+      .getOrCreateExtension();
+    await defaultStyles
+      .getFeatureStyleExtension()
+      .getContentsId()
+      .getOrCreateExtension();
+
+    // Table Wide
+    await defaultStyles.createTableStyleRelationship();
+    await defaultStyles.createTableIconRelationship();
+    // Each feature
+    await defaultStyles.createStyleRelationship();
+    await defaultStyles.createIconRelationship();
+
+    if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
+    const defaultIcon = defaultStyles.getIconDao().newRow();
+    try {
+      defaultIcon.name = 'ylw-pushpin';
+      defaultIcon.anchorU = 0.5;
+      defaultIcon.anchorV = 0.5;
+      defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png')
+        .then(img => {
+          defaultIcon.width = img.getWidth();
+          defaultIcon.height = img.getHeight();
+          defaultIcon.contentType = Jimp.MIME_PNG;
+          return img.getBufferAsync(Jimp.MIME_PNG);
+        })
+        .catch(err => {
+          console.error(err);
+          throw err;
+        });
+      defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
+    } catch (err) {
+      console.log(err);
+    }
+
+    await defaultStyles.setTableIcon('Point', defaultIcon);
+    const polygonStyleRow = defaultStyles.getStyleDao().newRow();
+    polygonStyleRow.setColor('FFFFFF', 1.0);
+    polygonStyleRow.setFillColor('FFFFFF', 1.0);
+    polygonStyleRow.setWidth(2.0);
+    polygonStyleRow.setName('Table Polygon Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(polygonStyleRow);
+
+    const lineStringStyleRow = defaultStyles.getStyleDao().newRow();
+    lineStringStyleRow.setColor('FFFFFF', 1.0);
+    lineStringStyleRow.setWidth(2.0);
+    lineStringStyleRow.setName('Table Line Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(lineStringStyleRow);
+
+    const pointStyleRow = defaultStyles.getStyleDao().newRow();
+    pointStyleRow.setColor('FFFFFF', 1.0);
+    pointStyleRow.setWidth(2.0);
+    pointStyleRow.setName('Table Point Style');
+    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
+
+    await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
+    await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
+    await defaultStyles.setTableStyle('Point', pointStyleRow);
+    await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
+    await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
+    await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
+
+    return defaultStyles;
+  }
+  /**
+   * Converts Item into a data URL and adds it and information about to the database.
+   * @param dataUrl
+   * @param newIcon
+   * @param styleTable
+   * @param anchorU
+   * @param anchorV
+   */
+  public static async insertIconImageData(
+    jimpImage: Jimp,
+    newIcon: IconRow,
+    styleTable: FeatureTableStyles,
+    anchorU = 0.5,
+    anchorV = 0.5,
+  ): Promise<number> {
+    newIcon.data = await jimpImage.getBufferAsync(jimpImage.getMIME());
+    newIcon.width = jimpImage.getWidth();
+    newIcon.height = jimpImage.getHeight();
+    newIcon.contentType = jimpImage.getMIME();
+    newIcon.anchorU = anchorU;
+    newIcon.anchorV = anchorV;
+    return styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
+  }
+  /**
+   * Adds an Icon into the Database
+   * @param styleTable Database Object for the style
+   * @param item The id from KML and the object data from KML
+   */
+  public static async addSpecificIcon(
+    styleTable: FeatureTableStyles,
+    item: [string, object],
+  ): Promise<{ id: number; newIcon: IconRow }> {
+    return new Promise(async (resolve, reject) => {
+      // console.log(item)
+      const newIcon = styleTable.getIconDao().newRow();
+      const kmlStyle = item[1];
+      newIcon.name = item[0];
+      let id = -1;
+      if (_.isNil(kmlStyle)) {
+        console.error('kml Style Undefined');
+        reject();
+      }
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+        let aU = 0.5;
+        let aV = 0.5;
+        const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPES.ICON_STYLE];
+        if (_.isNil(iconStyle)) {
+          console.error('Icon Style Undefined');
+          reject();
+        }
+        if (_.isNil(iconStyle[KMLTAGS.ICON_TAG])) {
+          console.error('Icon Tag Undefined');
+          reject();
+          return;
+        }
+        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
+          let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
+          iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
+          const img: Jimp = await Jimp.read(iconLocation);
+          if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {
+            img.scale(parseFloat(iconStyle[KMLTAGS.SCALE_TAG]));
+          }
+          const iconTag = iconStyle[KMLTAGS.ICON_TAG];
+          let cropX = 0;
+          let cropY = 0;
+          let cropH = img.getHeight();
+          let cropW = img.getWidth();
+          if (iconTag.hasOwnProperty('gx:x')) {
+            cropX = parseInt(iconTag['gx:x']);
+          }
+          if (iconTag.hasOwnProperty('gx:y')) {
+            cropY = cropY - parseInt(iconTag['gx:y']);
+          }
+          if (iconTag.hasOwnProperty('gx:w')) {
+            cropW = parseInt(iconTag['gx:w']);
+          }
+          if (iconTag.hasOwnProperty('gx:h')) {
+            cropH = parseInt(iconTag['gx:h']);
+          }
+          img.crop(cropX, cropY, cropW, cropH);
+          if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
+            const hotSpot = iconStyle[KMLTAGS.HOTSPOT_TAG]['$'];
+            switch (hotSpot['xunits']) {
+              case 'fraction':
+                aU = parseFloat(hotSpot['x']);
+                break;
+              case 'pixels':
+                aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
+                break;
+              case 'insetPixels':
+                aU = parseFloat(hotSpot['x']) / img.getWidth();
+              default:
+                break;
+            }
+            switch (hotSpot['yunits']) {
+              case 'fraction':
+                aV = 1 - parseFloat(hotSpot['y']);
+                break;
+              case 'pixels':
+                aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
+                break;
+              case 'insetPixels':
+                aV = parseFloat(hotSpot['y']) / img.getHeight();
+              default:
+                break;
+            }
+            id = await KMLUtilities.insertIconImageData(img, newIcon, styleTable, aU, aV);
+          }
+        }
+        resolve({ id: id, newIcon: newIcon });
+      }
+      reject(id);
+    });
+  }
+
+  /**
+   * Creates a list of node that need to be processed.
+   * @param node Placemark Node from kml via xml-stream
+   */
+  public static setUpGeometryNodes(node: any, progressCallback?: Function): any[] {
+    const nodes = [];
+    if (progressCallback) {
+      progressCallback({
+        status: 'Handling Geometry and MultiGeometry',
+        data: node,
+      });
+    }
+    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
+      for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
+        const item = {};
+        for (const prop in node) {
+          if (prop != KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+            item[prop] = node[prop];
+          }
+        }
+        if (node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY].hasOwnProperty(key)) {
+          const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
+          shapeType.forEach(shape => {
+            item[key] = [shape];
+            // console.log('item', item);
+            nodes.push({ ...item });
+          });
+        }
+      }
+    } else if (!_.isNil(node)) {
+      nodes.push(node);
+    } else {
+      console.error('Placemark node is Nil.');
+    }
+    return nodes;
+  }
+
+  /**
+   * Writes and maps MultiGeometries into the database
+   * @param geometryIds List of Ids for the item in the Multi geometry
+   * @param geopackage Geopackage Database
+   * @param multiGeometryTableName Name on the table that stores the id of the MultiGeometry
+   * @param relatedTableExtension Used to connect tables.
+   * @param multiGeometryMapName Cross reference table (map) between the Geometry table and the MultiGeometry Table
+   */
+  public static writeMultiGeometry(
+    geometryIds: any[],
+    geopackage: GeoPackage,
+    multiGeometryTableName: string,
+    relatedTableExtension: RelatedTablesExtension,
+    multiGeometryMapName: string,
+  ): void {
+    const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, {
+      number_of_geometries: geometryIds.length,
+    });
+    const userMappingDao = relatedTableExtension.getMappingDao(multiGeometryMapName);
+    for (const id of geometryIds) {
+      const userMappingRow = userMappingDao.newRow();
+      userMappingRow.baseId = parseInt(id);
+      userMappingRow.relatedId = multiGeometryId;
+      userMappingDao.create(userMappingRow);
+    }
   }
 }

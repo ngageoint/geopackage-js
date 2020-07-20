@@ -26,7 +26,6 @@ import mkdirp from 'mkdirp';
 import _ from 'lodash';
 
 // Handle images
-import { imageSize } from 'image-size';
 import Jimp from 'jimp';
 import axios from 'axios';
 
@@ -41,7 +40,7 @@ import { ImageUtilities } from './imageUtilities';
 
 export interface KMLConverterOptions {
   kmlOrKmzPath?: PathLike;
-  kmlOrKmzData?: any;
+  kmlOrKmzData?: Uint8Array;
   isKMZ?: boolean | false;
   mainTableName?: string;
   append?: boolean;
@@ -67,6 +66,8 @@ export class KMLToGeoPackage {
   iconRowMap: Map<number, IconRow>;
   iconMapPair: Map<string, string>;
   properties: Set<string>;
+  numberOfPlacemarks: number;
+  numberOfGroundOverLays: number;
 
   constructor(optionsUser: KMLConverterOptions = {}) {
     this.options = optionsUser;
@@ -83,14 +84,18 @@ export class KMLToGeoPackage {
     this.hasMultiGeometry = false;
     this.hasStyles = false;
     this.properties = new Set();
+    this.numberOfPlacemarks = 0;
+    this.numberOfGroundOverLays = 0;
   }
   async convert(options?: KMLConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
-    const clonedOptions = { ...this.options, ...options };
-    const tableName = clonedOptions.mainTableName;
-    const geopackage = clonedOptions.geoPackage || undefined;
+    const clonedOptions = { ...options };
     const kmlOrKmzPath = clonedOptions.kmlOrKmzPath || undefined;
-    const isKMZ = clonedOptions.isKMZ;
+    const isKMZ = clonedOptions.isKMZ || false;
+    const geopackage = clonedOptions.geoPackage || undefined;
+    const tableName = clonedOptions.mainTableName;
     const kmlOrKmzData = clonedOptions.kmlOrKmzData;
+    console.log(geopackage)
+    console.log(kmlOrKmzPath);
     return this.convertKMLOrKMZToGeopackage(kmlOrKmzPath, isKMZ, geopackage, tableName, kmlOrKmzData, progressCallback);
   }
 
@@ -109,11 +114,10 @@ export class KMLToGeoPackage {
     kmlOrKmzData?: Uint8Array | null,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    // const fileExt = path.extname(kmlOrKmzPath).toLowerCase();
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
-    console.log(geopackage);
+    // console.log(geopackage);
     if (!isKMZ) {
       if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
       if (isNode) {
@@ -131,19 +135,7 @@ export class KMLToGeoPackage {
         return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
       }
     }
-    // if (fileExt === 'zip') {
-    //   if (progressCallback) {
-    //     await progressCallback({
-    //       status: 'Converting ' + kmlOrKmzPath + ' a Zip file treated as a KMZ to a GeoPackage',
-    //     });
-    //   }
-    //   console.log('Warning: .zip extension is assume to be a kmz file. If it is unexpected behaviors may occur.');
-    //   if (isNode) {
-    //     return this.convertKMZToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
-    //   } else if (isBrowser) {
-    //     return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
-    //   }
-    // }
+
     if (progressCallback) await progressCallback({ status: 'Invalid File Extension. Throwing Error' });
     throw new Error('Invalid File Extension.');
   }
@@ -250,7 +242,7 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    console.log(geopackage);
+    // console.log(geopackage);
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
@@ -279,10 +271,10 @@ export class KMLToGeoPackage {
 
   /**
    * Takes in KML and the properties of the KML and creates a table in the geopackage folder.
-   * @param kmlPath file directory path to the KML file to be converted
-   * @param properties columns name gotten from getMetaDataKML
-   * @param geopackage file name or GeoPackage object
    * @param tableName name the Database table will be called
+   * @param geopackage file name or GeoPackage object
+   * @param properties columns name gotten from getMetaDataKML
+   * @param boundingBox
    * @callback progressCallback Passed the current status of the function.
    * @returns Promise<GeoPackage>
    */
@@ -333,11 +325,9 @@ export class KMLToGeoPackage {
    */
   setUpStyleKML(geopackage: GeoPackage, tableName: string, progressCallback?: Function): Promise<FeatureTableStyles> {
     return new Promise(async resolve => {
-      // Boilerplate for creating a style tables (a geopackage extension)
-      // Create Default Styles
       if (this.hasStyles) {
         if (progressCallback) progressCallback({ status: 'Creating Default KML Styles and Icons.' });
-        const defaultStyles = await this.setUpKMLDefaultStylesAndIcons(geopackage, tableName, progressCallback);
+        const defaultStyles = await KMLUtilities.setUpKMLDefaultStylesAndIcons(geopackage, tableName, progressCallback);
         // Specific Styles SetUp
         if (progressCallback) progressCallback({ status: 'Adding Styles and Icon if they exist.' });
         if (this.styleMap.size !== 0) this.addSpecificStyles(defaultStyles, this.styleMap);
@@ -382,12 +372,12 @@ export class KMLToGeoPackage {
       }
       let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
-        console.log('Uint');
+        // console.log('Uint');
         stream = new Streamer.Duplex();
         stream.push(kmlData);
         stream.push(null);
       } else {
-        console.log(kmlData);
+        // console.log(kmlData);
         stream = fs.createReadStream(kmlData);
       }
       const kml = new XmlStream(stream, 'UTF-8');
@@ -429,16 +419,15 @@ export class KMLToGeoPackage {
         if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
         let isMultiGeometry = false;
         const geometryIds = [];
-        const geometryNodes = this.setUpGeometryNodes(node);
+        const geometryNodes = KMLUtilities.setUpGeometryNodes(node);
         if (geometryNodes.length > 1) isMultiGeometry = true;
         do {
-          node = geometryNodes.pop();
-          // console.log(node)
-          const geometryId = this.getPropertiesAndGeometryValues(node, defaultStyles, geopackage, tableName);
+          const currentNode = geometryNodes.pop();
+          const geometryId = this.addPropertiesAndGeometryValues(currentNode, defaultStyles, geopackage, tableName);
           if (geometryId !== -1) geometryIds.push(geometryId);
         } while (geometryNodes.length !== 0);
         if (isMultiGeometry && this.hasMultiGeometry) {
-          this.writeMultiGeometry(
+          KMLUtilities.writeMultiGeometry(
             geometryIds,
             geopackage,
             multiGeometryTableName,
@@ -489,12 +478,11 @@ export class KMLToGeoPackage {
       // const folderPos = [{minLon: null, maxLon: null, minLat: null, maxLat: null}];
       let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
-        console.log('Uint');
         stream = new Streamer.Duplex();
         stream.push(kmlData);
         stream.push(null);
       } else {
-        console.log(kmlData);
+        // console.log(kmlData);
         stream = fs.createReadStream(kmlData);
       }
       // console.log(stream);
@@ -555,6 +543,7 @@ export class KMLToGeoPackage {
         }
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, (node: {}) => {
+        this.numberOfPlacemarks++;
         if (progressCallback) {
           progressCallback({
             status: 'Handling Placemark Tag. Adds an addition KML file',
@@ -627,7 +616,7 @@ export class KMLToGeoPackage {
             this.styleMap.set(node['$'].id, node);
           } catch (err) {
             console.error(err);
-            console.log(node);
+            // console.log(node);
           } finally {
             this.hasStyles = true;
           }
@@ -703,75 +692,13 @@ export class KMLToGeoPackage {
    */
 
   /**
-   * Creates a list of node that need to be processed.
-   * @param node Placemark Node from kml via xml-stream
-   */
-  private setUpGeometryNodes(node: any, progressCallback?: Function): any[] {
-    const nodes = [];
-    if (progressCallback) {
-      progressCallback({
-        status: 'Handling Geometry and MultiGeometry',
-        data: node,
-      });
-    }
-    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
-      for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
-        const item = new Object();
-        for (const prop in node) {
-          if (prop != KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
-            item[prop] = node[prop];
-          }
-        }
-        if (node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY].hasOwnProperty(key)) {
-          const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
-          shapeType.forEach(shape => {
-            item[key] = [shape];
-            nodes.push(item);
-          });
-        }
-      }
-    } else if (!_.isNil(node)) {
-      nodes.push(node);
-    } else {
-      console.error('Placemark node is Nil.');
-    }
-    return nodes;
-  }
-
-  /**
-   * Writes and maps MultiGeometries into the database
-   * @param geometryIds List of Ids for the item in the Multi geometry
-   * @param geopackage Geopackage Database
-   * @param multiGeometryTableName Name on the table that stores the id of the MultiGeometry
-   * @param relatedTableExtension Used to connect tables.
-   * @param multiGeometryMapName Cross reference table (map) between the Geometry table and the MultiGeometry Table
-   */
-  private writeMultiGeometry(
-    geometryIds: any[],
-    geopackage: GeoPackage,
-    multiGeometryTableName: string,
-    relatedTableExtension: RelatedTablesExtension,
-    multiGeometryMapName: string,
-  ): void {
-    const len = geometryIds.length;
-    const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, { number_of_geometries: len });
-    const userMappingDao = relatedTableExtension.getMappingDao(multiGeometryMapName);
-    for (const id of geometryIds) {
-      const userMappingRow = userMappingDao.newRow();
-      userMappingRow.baseId = parseInt(id);
-      userMappingRow.relatedId = multiGeometryId;
-      userMappingDao.create(userMappingRow);
-    }
-  }
-
-  /**
    * Adds style and geometries to the geopackage.
    * @param node node from kml by xml-stream
    * @param defaultStyles style table
    * @param geopackage Geopackage information will be entered into
    * @param tableName name of geometry table
    */
-  private getPropertiesAndGeometryValues(
+  private addPropertiesAndGeometryValues(
     node: any,
     defaultStyles: FeatureTableStyles,
     geopackage: GeoPackage,
@@ -883,115 +810,12 @@ export class KMLToGeoPackage {
    * @param tableName Name of Main table with Geometry
    */
   private async indexTable(geopackage: GeoPackage, tableName: string): Promise<void> {
-    const featureDao = geopackage.getFeatureDao(tableName);
-    const fti = featureDao.featureTableIndex;
-    if (fti) {
-      await fti.index();
-    }
-  }
-
-  /**
-   * Converts Item into a data URL and adds it and information about to the database.
-   * @param dataUrl
-   * @param newIcon
-   * @param styleTable
-   * @param id
-   * @param anchorU
-   * @param anchorV
-   */
-  private imageDataToDataBase(
-    imageBuffer: Buffer,
-    newIcon: IconRow,
-    styleTable: FeatureTableStyles,
-    id: string,
-    anchorU = 0.5,
-    anchorV = 0.5,
-  ): void {
-    newIcon.data = imageBuffer;
-    const dim = imageSize(newIcon.data);
-    newIcon.width = dim.width;
-    newIcon.height = dim.height;
-    newIcon.contentType = 'image/' + dim.type;
-    newIcon.anchorU = anchorU;
-    newIcon.anchorV = anchorV;
-    const newIconId = styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
-    this.iconUrlMap.set('#' + id, newIconId);
-    this.iconRowMap.set(newIconId, newIcon);
-  }
-
-  /**
-   * Adds an Icon into the Database
-   * @param styleTable Database Object for the style
-   * @param item The id from KML and the object data from KML
-   */
-  private async addSpecificIcon(styleTable: FeatureTableStyles, item: [string, object]): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      // console.log(item)
-      const newIcon = styleTable.getIconDao().newRow();
-      const kmlStyle = item[1];
-      newIcon.name = item[0];
-      if (_.isNil(kmlStyle)) {
-        console.error('kml Style Undefined');
-        reject();
-      }
-      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
-        let aU = 0.5;
-        let aV = 0.5;
-        const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPES.ICON_STYLE];
-        if (_.isNil(iconStyle)) {
-          console.error('Icon Style Undefined');
-          reject();
-        }
-        if (_.isNil(iconStyle[KMLTAGS.ICON_TAG])) {
-          console.error('Icon Tag Undefined');
-          reject();
-          return;
-        }
-        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
-          let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-          iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
-          await Jimp.read(iconLocation)
-            .then(async img => {
-              if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {
-                img.scale(parseFloat(iconStyle[KMLTAGS.SCALE_TAG]));
-              }
-              if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
-                const hotSpot = iconStyle[KMLTAGS.HOTSPOT_TAG]['$'];
-                switch (hotSpot['xunits']) {
-                  case 'fraction':
-                    aU = parseFloat(hotSpot['x']);
-                    break;
-                  case 'pixels':
-                    aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
-                    break;
-                  case 'insetPixels':
-                    aU = parseFloat(hotSpot['x']) / img.getWidth();
-                  default:
-                    break;
-                }
-                switch (hotSpot['yunits']) {
-                  case 'fraction':
-                    aV = 1 - parseFloat(hotSpot['y']);
-                    break;
-                  case 'pixels':
-                    aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
-                    break;
-                  case 'insetPixels':
-                    aV = parseFloat(hotSpot['y']) / img.getHeight();
-                  default:
-                    break;
-                }
-              }
-              this.imageDataToDataBase(await img.getBufferAsync(img.getMIME()), newIcon, styleTable, item[0], aU, aV);
-            })
-            .catch(error => {
-              console.error('Image not found', error);
-              reject();
-            });
-        }
-        resolve();
-      }
-    });
+    geopackage.indexFeatureTable(tableName);
+    // const featureDao = geopackage.getFeatureDao(tableName);
+    // const fti = featureDao.featureTableIndex;
+    // if (fti) {
+    //   await fti.index();
+    // }
   }
 
   /**
@@ -1002,7 +826,9 @@ export class KMLToGeoPackage {
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
       for (const item of items) {
-        await this.addSpecificIcon(styleTable, item).catch(err => {});
+        const { id: id, newIcon: icon } = await KMLUtilities.addSpecificIcon(styleTable, item);
+        this.iconUrlMap.set('#' + item[0], id);
+        this.iconRowMap.set(id, icon);
       }
       resolve();
     });
@@ -1062,86 +888,5 @@ export class KMLToGeoPackage {
       }
       // console.log(isStyle);
     }
-  }
-
-  /**
-   * Provides default styles and Icons for the Geometry table.
-   * Currently set to White to match google earth.
-   * Icon set to yellow pushpin google earth default.
-   * @param geopackage GeoPackage
-   * @param tableName Name of the Main Geometry table
-   */
-  private async setUpKMLDefaultStylesAndIcons(
-    geopackage: GeoPackage,
-    tableName: string,
-    progressCallback?: Function,
-  ): Promise<FeatureTableStyles> {
-    if (progressCallback) progressCallback({ status: 'Creating Style and Icon tables.' });
-    const defaultStyles = new FeatureTableStyles(geopackage, tableName);
-    await defaultStyles.getFeatureStyleExtension().getOrCreateExtension(tableName);
-    await defaultStyles
-      .getFeatureStyleExtension()
-      .getRelatedTables()
-      .getOrCreateExtension();
-    await defaultStyles
-      .getFeatureStyleExtension()
-      .getContentsId()
-      .getOrCreateExtension();
-
-    // Table Wide
-    await defaultStyles.createTableStyleRelationship();
-    await defaultStyles.createTableIconRelationship();
-    // Each feature
-    await defaultStyles.createStyleRelationship();
-    await defaultStyles.createIconRelationship();
-
-    if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
-    const defaultIcon = defaultStyles.getIconDao().newRow();
-    try {
-      defaultIcon.name = 'ylw-pushpin';
-      defaultIcon.anchorU = 0.5;
-      defaultIcon.anchorV = 0.5;
-      defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png')
-        .then(img => {
-          defaultIcon.width = img.getWidth();
-          defaultIcon.height = img.getHeight();
-          defaultIcon.contentType = Jimp.MIME_PNG;
-          return img.getBufferAsync(Jimp.MIME_PNG);
-        })
-        .catch(err => {
-          console.error(err);
-          throw err;
-        });
-      defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
-    } catch (err) {}
-
-    await defaultStyles.setTableIcon('Point', defaultIcon);
-    const polygonStyleRow = defaultStyles.getStyleDao().newRow();
-    polygonStyleRow.setColor('FFFFFF', 1.0);
-    polygonStyleRow.setFillColor('FFFFFF', 1.0);
-    polygonStyleRow.setWidth(2.0);
-    polygonStyleRow.setName('Table Polygon Style');
-    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(polygonStyleRow);
-
-    const lineStringStyleRow = defaultStyles.getStyleDao().newRow();
-    lineStringStyleRow.setColor('FFFFFF', 1.0);
-    lineStringStyleRow.setWidth(2.0);
-    lineStringStyleRow.setName('Table Line Style');
-    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(lineStringStyleRow);
-
-    const pointStyleRow = defaultStyles.getStyleDao().newRow();
-    pointStyleRow.setColor('FFFFFF', 1.0);
-    pointStyleRow.setWidth(2.0);
-    pointStyleRow.setName('Table Point Style');
-    defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
-
-    await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
-    await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
-    await defaultStyles.setTableStyle('Point', pointStyleRow);
-    await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
-    await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
-    await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
-
-    return defaultStyles;
   }
 }

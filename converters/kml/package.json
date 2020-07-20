@@ -79,7 +79,10 @@
     "index.ts",
     "test.js",
     "cli",
-    "lib"
+    "lib",
+    "geoSpatialUtilities.ts",
+    "imageUtilities.ts",
+    "kmlUtilities.ts"
   ],
   "scripts": {
     "test": "npm run clean-built && nyc mocha -r ts-node/register",
