@@ -8,14 +8,27 @@ export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
 
+/**
+ *
+ *
+ * @export
+ * @class ImageUtilities
+ */
 export class ImageUtilities {
   /**
    * ## Creates Image Tiles for given zoomLevels
    *
    * Determines the size of pixels and create tiles set based off zoom levels.
-   * @param image Jimp image Object
-   * @param zoomLevels Array of zoom level that image tile will be created for
-   * @param bbox Images Bounding Box (Geopackage) with Lat-Lon
+   *
+   * @static
+   * @param {Jimp} image Jimp image Object
+   * @param {number[]} zoomLevels Array of zoom level that image tile will be created for.
+   * @param {BoundingBox} imageBBox Images Bounding Box (Geopackage) with Lat-Lon
+   * @param {GeoPackage} geopackage GeoPackage where zoom images will be inserted into
+   * @param {string} imageName
+   * @param {Function} [progressCallback]
+   * @returns {Promise<void>}
+   * @memberof ImageUtilities
    */
   public static async insertZoomImages(
     image: Jimp,
@@ -75,6 +88,16 @@ export class ImageUtilities {
       },
     );
   }
+  /**
+   *
+   *
+   * @static
+   * @param {string} uri
+   * @param {string} [dir]
+   * @param {Map<string, any>} [zipMap]
+   * @returns {Promise<Jimp>}
+   * @memberof ImageUtilities
+   */
   public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp> {
     let imageLocation;
     if (isNode) {
@@ -92,8 +115,12 @@ export class ImageUtilities {
 
   /**
    * Crops image if the bounding is larger than Web Mercator bounds.
-   * @param kmlBBox Geopackage Bounding Box in EPSG:4326
-   * @param img Jimp image.
+   *
+   * @static
+   * @param {BoundingBox} kmlBBox Geopackage Bounding Box in EPSG:4326
+   * @param {Jimp} img Jimp image.
+   * @returns {Promise<[BoundingBox, Jimp]>}
+   * @memberof ImageUtilities
    */
   public static async truncateImage(kmlBBox: BoundingBox, img: Jimp): Promise<[BoundingBox, Jimp]> {
     if (kmlBBox.maxLatitude > WEB_MERCATOR_MAX_LAT_RANGE) {

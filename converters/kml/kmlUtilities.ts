@@ -8,10 +8,20 @@ import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow
 import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 import path from 'path';
 
+/**
+ * Function directly related the processing of parsed kml data
+ *
+ * @export
+ * @class KMLUtilities
+ */
 export class KMLUtilities {
   /**
    * Converts the KML Color format into rgb 000000 - FFFFFF and opacity 0.0 - 1.0
-   * @param abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
+   *
+   * @static
+   * @param {string} abgr KML Color format AABBGGRR alpha (00-FF) blue (00-FF) green (00-FF) red (00-FF)
+   * @returns {{ rgb: string; a: number }}
+   * @memberof KMLUtilities
    */
   public static abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
     // Valid Color and Hex number
@@ -26,8 +36,14 @@ export class KMLUtilities {
 
   /**
    * Converts KML Ground Overlay into appropriate tile sets.
-   * @param node Ground Overlay KML node
-   * @param geopackage Geopackage
+   *
+   * @static
+   * @param {*} node Ground Overlay KML node
+   * @param {GeoPackage} geopackage
+   * @param {Jimp} image
+   * @param {Function} [progressCallback]
+   * @returns {Promise<void>}
+   * @memberof KMLUtilities
    */
   public static async handleGroundOverLay(
     node: any,
@@ -94,8 +110,11 @@ export class KMLUtilities {
 
   /**
    * Converts node that contains a LatLonBox tag into a geopackage Bounding box
-   * @param node node from KML
-   * @returns Geopackage Bounding box.
+   *
+   * @static
+   * @param {*} node node from KML
+   * @returns {BoundingBox} Geopackage Bounding box.
+   * @memberof KMLUtilities
    */
   static getLatLonBBox(node: any): BoundingBox {
     return new BoundingBox(
@@ -106,9 +125,14 @@ export class KMLUtilities {
     );
   }
 
+
   /**
    * Converts kml geometries (Point, LineString, and Polygon) into GeoJSON features
-   * @param node KML Placemark node
+   *
+   * @static
+   * @param {*} node KML parsed Placemark node
+   * @returns {*}
+   * @memberof KMLUtilities
    */
   public static kmlToGeoJSON(node): any {
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.POLYGON)) {
@@ -123,9 +147,14 @@ export class KMLUtilities {
     // console.error('Placemark geometry feature not supported:', node);
     return null;
   }
+
   /**
-   * Takes in a KML Point and returns a GeoJSON formatted object.
-   * @param node The data from xmlStream with the selector of Placemark.
+   * Takes in a KML parsed Point and returns a GeoJSON formatted object.
+   *
+   * @static
+   * @param {any[]} node The data from xmlStream with the selector of Placemark.
+   * @returns {{ type: string; coordinates: number[] }}
+   * @memberof KMLUtilities
    */
   public static kmlPointToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     const geometryData = { type: 'Point', coordinates: [] };
@@ -152,8 +181,12 @@ export class KMLUtilities {
   }
 
   /**
-   * Takes in a KML LineString and returns a GeoJSON formatted object.
-   * @param node The data from xmlStream with the selector of Placemark.
+   * Takes in a KML parsed LineString and returns a GeoJSON formatted object.
+   *
+   * @static
+   * @param {any[]} node The data from xmlStream with the selector of Placemark.
+   * @returns {{ type: string; coordinates: number[] }}
+   * @memberof KMLUtilities
    */
   public static kmlLineStringToGeoJson(node: any[]): { type: string; coordinates: number[] } {
     const geometryData = { type: 'LineString', coordinates: [] };
@@ -182,8 +215,12 @@ export class KMLUtilities {
   }
 
   /**
-   * Takes in a KML Polygon and returns a GeoJSON formatted object.
-   * @param node The data from xmlStream with the selector of Placemark.
+   * Takes in a KML parsed Polygon and returns a GeoJSON formatted object.
+   *
+   * @static
+   * @param {Array<any>} node The data from xmlStream with the selector of Placemark.
+   * @returns {{ type: string; coordinates: number[][][] }}
+   * @memberof KMLUtilities
    */
   public static kmlPolygonToGeoJson(node: Array<any>): { type: string; coordinates: number[][][] } {
     const geometryData = { type: 'Polygon', coordinates: [] };
@@ -237,12 +274,18 @@ export class KMLUtilities {
     });
     return geometryData;
   }
+
   /**
    * Provides default styles and Icons for the Geometry table.
    * Currently set to White to match google earth.
    * Icon set to yellow pushpin google earth default.
-   * @param geopackage GeoPackage
-   * @param tableName Name of the Main Geometry table
+   *
+   * @static
+   * @param {GeoPackage} geopackage
+   * @param {string} tableName Name of the Main Geometry table
+   * @param {Function} [progressCallback]
+   * @returns {Promise<FeatureTableStyles>}
+   * @memberof KMLUtilities
    */
   public static async setUpKMLDefaultStylesAndIcons(
     geopackage: GeoPackage,
@@ -287,7 +330,7 @@ export class KMLUtilities {
         });
       defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
 
     await defaultStyles.setTableIcon('Point', defaultIcon);
@@ -407,7 +450,7 @@ export class KMLUtilities {
           if (iconTag.hasOwnProperty('gx:h')) {
             cropH = parseInt(iconTag['gx:h']);
           }
-          console.log(cropX, cropY, cropW, cropH);
+          // console.log(cropX, cropY, cropW, cropH);
           if (cropX > img.getWidth()) {
             cropX = 0;
             console.error('Pallet X position not valid');

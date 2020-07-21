@@ -12,8 +12,11 @@ export class GeoSpatialUtilities {
    *
    * Taken from Map Cache Electron
    *
-   * @param x x coordinate
-   * @param zoom zoom level
+   * @static
+   * @param {number} x x tile coordinate
+   * @param {number} zoom zoom level
+   * @returns {number}
+   * @memberof GeoSpatialUtilities
    */
   static tile2lon(x: number, zoom: number): number {
     return (x / Math.pow(2, zoom)) * 360 - 180;
@@ -24,8 +27,11 @@ export class GeoSpatialUtilities {
    *
    * Taken from Map Cache Electron
    *
-   * @param y y coordinate
-   * @param zoom Zoom level
+   * @static
+   * @param {number} y y tile coordinate
+   * @param {number} zoom Zoom level
+   * @returns {number}
+   * @memberof GeoSpatialUtilities
    */
   static tile2lat(y: number, zoom: number): number {
     const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, zoom);

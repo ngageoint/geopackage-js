@@ -16,11 +16,7 @@ const options = {
 };
 console.log('Converting %s to %s', options, geoPackageFile);
 
-new KMLToGeoPackage()
-  .convert(options, a => {
-    console.log(a.status);
-  })
-  .then(function(result) {
-    console.log('File conversion complete');
-    console.log('Converted %s to %s', options, geoPackageFile);
-  });
+new KMLToGeoPackage().convert(options).then(function(result) {
+  console.log('File conversion complete');
+  console.log('Converted %s to %s', options, geoPackageFile);
+});

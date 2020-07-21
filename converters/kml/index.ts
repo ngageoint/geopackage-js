@@ -87,6 +87,12 @@ export class KMLToGeoPackage {
     this.numberOfPlacemarks = 0;
     this.numberOfGroundOverLays = 0;
   }
+  /**
+   * Converts KML and KMZ to GeoPackages.
+   *
+   * @param {KMLConverterOptions} options
+   * @param {Function} progressCallback 
+   */
   async convert(options?: KMLConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
     const clonedOptions = { ...options };
     const kmlOrKmzPath = clonedOptions.kmlOrKmzPath || undefined;
@@ -94,8 +100,6 @@ export class KMLToGeoPackage {
     const geopackage = clonedOptions.geoPackage || undefined;
     const tableName = clonedOptions.mainTableName;
     const kmlOrKmzData = clonedOptions.kmlOrKmzData;
-    // console.log(geopackage)
-    // console.log(kmlOrKmzPath);
     return this.convertKMLOrKMZToGeopackage(kmlOrKmzPath, isKMZ, geopackage, tableName, kmlOrKmzData, progressCallback);
   }
 
@@ -141,7 +145,7 @@ export class KMLToGeoPackage {
   }
   /**
    * Unzips and stores data from a KMZ file in the current directory.
-   * @param kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
+   * @param {(PathLike | Uint8Array)} kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
    * @param geopackage  String or name of Geopackage to use
    * @param tableName  Name of the main Geometry Table
    * @callback progressCallback Passed the current status of the function.
@@ -271,12 +275,13 @@ export class KMLToGeoPackage {
 
   /**
    * Takes in KML and the properties of the KML and creates a table in the geopackage folder.
-   * @param tableName name the Database table will be called
-   * @param geopackage file name or GeoPackage object
-   * @param properties columns name gotten from getMetaDataKML
-   * @param boundingBox
+   *
+   * @param {string} tableName name the Database table will be called
+   * @param {GeoPackage} geopackage file name or GeoPackage object
+   * @param {Set<string>} properties columns name gotten from getMetaDataKML
+   * @param {BoundingBox} boundingBox
    * @callback progressCallback Passed the current status of the function.
-   * @returns Promise<GeoPackage>
+   * @returns {Promise<GeoPackage>} Promise of a GeoPackage
    */
   async setUpTableKML(
     tableName: string,
@@ -341,10 +346,11 @@ export class KMLToGeoPackage {
   /**
    * Reads the KML file and extracts Geometric data and matches styles with the Geometric data.
    * Also read the Ground Overlays.
-   * @param kmlPath Path to KML file
-   * @param geopackage GeoPackage Object
-   * @param defaultStyles Feature Style Object
-   * @param tableName Name of Main table for Geometry
+   * @param {(PathLike|Uint8Array)} kmlPath Path to KML file
+   * @param {GeoPackage} geopackage GeoPackage Object
+   * @param {FeatureTableStyles} defaultStyles Feature Style Object
+   * @param {string} tableName Name of Main table for Geometry
+   * @callback progressCallback
    */
   async addKMLDataToGeoPackage(
     kmlData: PathLike | Uint8Array,
@@ -460,8 +466,10 @@ export class KMLToGeoPackage {
   }
 
   /**
-   * Runs through KML and finds name for Columns and Style information
-   * @param kmlData Path to KML file
+   * Runs through KML and finds name for Columns and Style information. Handles Networks Links. Handles Bounding Boxes
+   * @param kmlData Path to KML File or Uint8 array
+   * @param {GeoPackage} geopackage
+   * @param progressCallback
    */
   getMetaDataKML(
     kmlData: PathLike | Uint8Array,
