@@ -1,4 +1,4 @@
-import * as KMLTAGS from './KMLTags.js';
+import * as KMLTAGS from './KMLTags';
 import _ from 'lodash';
 import { BoundingBox, GeoPackage, TileScaling, TileScalingType, FeatureTableStyles } from '@ngageoint/geopackage';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';

@@ -30,7 +30,7 @@ import Jimp from 'jimp';
 import axios from 'axios';
 
 // Utilities and Tags
-import * as KMLTAGS from './KMLTags.js';
+import * as KMLTAGS from './KMLTags';
 import { KMLUtilities } from './kmlUtilities';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import Streamer from 'stream';
@@ -481,7 +481,7 @@ export class KMLToGeoPackage {
       kml.collect('Data');
       kml.collect('value');
       kml.collect('Placemark');
-      kml.on('endElement: ' + KMLTAGS.NETWORK_LINK, async (node: any) => {
+      kml.on('endElement: ' + KMLTAGS.NETWORK_LINK_TAG, async (node: any) => {
         kmlOnsRunning++;
         if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
           const linkType = node.hasOwnProperty('Link') ? 'Link' : 'Url';
