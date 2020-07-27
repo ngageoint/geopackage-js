@@ -81,7 +81,6 @@ export class GeoSpatialUtilities {
   static calculateXTileRange(bbox: BoundingBox, zoom: any): { min: number; max: number } {
     const west = this.long2tile(bbox.maxLongitude, zoom);
     const east = this.long2tile(bbox.minLongitude, zoom);
-    // console.log('east', east, typeof bbox.maxLongitude, z, west);
     return {
       min: Math.max(0, Math.min(west, east)),
       max: Math.max(0, Math.max(west, east)),
@@ -99,7 +98,6 @@ export class GeoSpatialUtilities {
   static calculateYTileRange(bbox: BoundingBox, z: any): { min: number; max: number; current: number } {
     const south = this.lat2tile(bbox.minLatitude, z);
     const north = this.lat2tile(bbox.maxLatitude, z);
-    // console.log(south, north);
     return {
       min: Math.max(0, Math.min(south, north)),
       max: Math.max(0, Math.max(south, north)),
@@ -123,7 +121,6 @@ export class GeoSpatialUtilities {
     for (let i = 0; i < zoomLevels.length && !stop; i++) {
       const z = zoomLevels[i];
       const yRange = this.calculateYTileRange(extent, z);
-      // console.log(yRange);
       const xRange = this.calculateXTileRange(extent, z);
       for (let x = xRange.min; x <= xRange.max && !stop; x++) {
         for (let y = yRange.min; y <= yRange.max && !stop; y++) {
@@ -178,9 +175,6 @@ export class GeoSpatialUtilities {
    */
   public static getNaturalScale(bbox: BoundingBox, imageWidth: number): number {
     const widthHeight = this.getWidthAndHeightFromBBox(bbox);
-    // const tilesNeeded = imageWidth / TILE_SIZE_IN_PIXELS;
-    // const tileWidthInDegrees = widthHeight.width / tilesNeeded;
-    // console.log(widthHeight.width, tileWidthInDegrees);
     return Math.floor(Math.log2((360 * imageWidth) / (widthHeight.width * TILE_SIZE_IN_PIXELS)));
   }
 
@@ -218,7 +212,6 @@ export class GeoSpatialUtilities {
     }
     [temp.minLongitude, temp.minLatitude] = converter.forward([temp.minLongitude, temp.minLatitude]);
     [temp.maxLongitude, temp.maxLatitude] = converter.forward([temp.maxLongitude, temp.maxLatitude]);
-    // console.log(temp);
     return temp;
   }
 
@@ -244,7 +237,6 @@ export class GeoSpatialUtilities {
       ySize = yRange.max - yRange.min + 1;
       xSize = xRange.max - xRange.min + 1;
       levels.push(z);
-      // console.log('getZoomLevels', yRange.max, yRange.min, xRange.max, xRange.min, xSize, ySize, z, levels);
       z -= 2;
     } while (xSize * ySize !== 1 && z > 0);
     return levels;

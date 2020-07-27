@@ -74,7 +74,6 @@ export class ImageUtilities {
               tileWebMercatorBoundingBox.minLongitude + x * tilePixelWidthInMeters,
               tileWebMercatorBoundingBox.maxLatitude - y * tilePixelHeightInMeters,
             ]);
-            // console.log(longLat, (longLat[0] - imageBBox.minLongitude))
             const xPixel = (longLat[0] - imageBBox.minLongitude) / pixelWidthInDegrees;
             const yPixel = imageHeight - (longLat[1] - imageBBox.minLatitude) / pixelHeightInDegrees;
             if (xPixel >= 0 && imageWidth >= xPixel && yPixel >= 0 && imageHeight >= yPixel) {
@@ -128,7 +127,6 @@ export class ImageUtilities {
       const upperBoundHeight = WEB_MERCATOR_MAX_LAT_RANGE - kmlBBox.minLatitude;
       const ratio = upperBoundHeight / latHeight;
       const y = (1 - ratio) * img.getHeight();
-      // console.log(img.getHeight() - y, y, ratio, upperBoundHeight, latHeight);
       img.crop(0, y, img.getWidth(), img.getHeight() - y);
       kmlBBox.maxLatitude = WEB_MERCATOR_MAX_LAT_RANGE;
     }
@@ -137,7 +135,6 @@ export class ImageUtilities {
       const lowerBoundHeight = WEB_MERCATOR_MIN_LAT_RANGE - kmlBBox.minLatitude;
       const ratio = lowerBoundHeight / latHeight;
       const y = (1 - ratio) * img.getHeight();
-      // console.log(img.getHeight() - y, y, ratio, lowerBoundHeight, latHeight);
       img.crop(0, 0, img.getWidth(), y);
       kmlBBox.minLatitude = WEB_MERCATOR_MIN_LAT_RANGE;
     }

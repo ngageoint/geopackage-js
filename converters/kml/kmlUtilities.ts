@@ -144,7 +144,6 @@ export class KMLUtilities {
     if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.LINESTRING)) {
       return KMLUtilities.kmlLineStringToGeoJson(node[KMLTAGS.GEOMETRY_TAGS.LINESTRING]);
     }
-    // console.error('Placemark geometry feature not supported:', node);
     return null;
   }
 
@@ -398,7 +397,6 @@ export class KMLUtilities {
     item: [string, object],
   ): Promise<{ id: number; newIcon: IconRow }> {
     return new Promise(async (resolve, reject) => {
-      // console.log(item)
       const newIcon = styleTable.getIconDao().newRow();
       const kmlStyle = item[1];
       newIcon.name = item[0];
@@ -407,10 +405,10 @@ export class KMLUtilities {
         console.error('kml Style Undefined');
         reject();
       }
-      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.ICON_STYLE)) {
         let aU = 0.5;
         let aV = 0.5;
-        const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPES.ICON_STYLE];
+        const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.ICON_STYLE];
         if (_.isNil(iconStyle)) {
           console.error('Icon Style Undefined');
           reject();
@@ -450,7 +448,6 @@ export class KMLUtilities {
           if (iconTag.hasOwnProperty('gx:h')) {
             cropH = parseInt(iconTag['gx:h']);
           }
-          // console.log(cropX, cropY, cropW, cropH);
           if (cropX > img.getWidth()) {
             cropX = 0;
             console.error('Pallet X position not valid');
@@ -522,7 +519,6 @@ export class KMLUtilities {
           const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
           shapeType.forEach(shape => {
             item[key] = [shape];
-            // console.log('item', item);
             nodes.push({ ...item });
           });
         }

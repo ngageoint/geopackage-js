@@ -197,7 +197,6 @@ export class KMLToGeoPackage {
                     }),
                   )
                   .on('finish', () => {
-                    // console.log(key, 'was written to', __dirname + '/' + key);
                     resolve();
                   });
               } else {
@@ -209,7 +208,6 @@ export class KMLToGeoPackage {
               } else {
                 this.zipFileMap.set(key, await zip.files[key].async('base64'));
               }
-              // console.log(kmlData, this.zipFileMap);
               resolve();
             }
           }
@@ -246,7 +244,6 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    // console.log(geopackage);
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
@@ -378,12 +375,10 @@ export class KMLToGeoPackage {
       }
       let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
-        // console.log('Uint');
         stream = new Streamer.Duplex();
         stream.push(kmlData);
         stream.push(null);
       } else {
-        // console.log(kmlData);
         stream = fs.createReadStream(kmlData);
       }
       const kml = new XmlStream(stream, 'UTF-8');
@@ -401,7 +396,6 @@ export class KMLToGeoPackage {
         asyncProcessesRunning++;
         if (progressCallback) progressCallback({ status: 'Handling GroundOverlay Tag.', data: node });
         let image: Jimp | void;
-        // console.log(node.Icon.href);
         if (isNode) {
           if (progressCallback) progressCallback({ status: 'Moving Ground Overlay image into Memory' });
           // Determines whether the image is local or online.
@@ -413,7 +407,6 @@ export class KMLToGeoPackage {
             console.error(err),
           );
         }
-        // console.log(image);
         if (image) {
           KMLUtilities.handleGroundOverLay(node, geopackage, image, progressCallback).catch(err =>
             console.error('Error not able to Handle Ground Overlay :', err),
@@ -421,7 +414,7 @@ export class KMLToGeoPackage {
         }
         asyncProcessesRunning--;
       });
-      const handlePlacemark = (node): void => {
+      kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
         if (progressCallback) progressCallback({ status: 'Handling Placemark Tag.', data: node });
         let isMultiGeometry = false;
         const geometryIds = [];
@@ -441,19 +434,7 @@ export class KMLToGeoPackage {
             multiGeometryMapName,
           );
         }
-      };
-      kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG, node => {
-        // this.setUpTableKML(this.properties, , geopackage, node.name);
-        handlePlacemark(node);
       });
-
-      // kml.on('endElement: Folder', node => {
-      //   if (node.hasOwnProperty(KMLTAGS.PLACEMARK_TAG)) {
-      //     node[KMLTAGS.PLACEMARK_TAG].forEach(placemark => {
-      //       handlePlacemark(placemark);
-      //     });
-      //   }
-      // });
       kml.on('end', async () => {
         while (asyncProcessesRunning > 0) {
           if (progressCallback) progressCallback({ status: 'Waiting on Async Functions' });
@@ -483,17 +464,14 @@ export class KMLToGeoPackage {
       // Bounding box
       const boundingBox = new BoundingBox(null);
       let kmlOnsRunning = 0;
-      // const folderPos = [{minLon: null, maxLon: null, minLat: null, maxLat: null}];
       let stream: Streamer.Duplex | fs.ReadStream;
       if (kmlData instanceof Uint8Array) {
         stream = new Streamer.Duplex();
         stream.push(kmlData);
         stream.push(null);
       } else {
-        // console.log(kmlData);
         stream = fs.createReadStream(kmlData);
       }
-      // console.log(stream);
       const kml = new XmlStream(stream, 'UTF-8');
       kml.preserve(KMLTAGS.COORDINATES_TAG, true);
       kml.collect(KMLTAGS.PAIR_TAG);
@@ -503,14 +481,6 @@ export class KMLToGeoPackage {
       kml.collect('Data');
       kml.collect('value');
       kml.collect('Placemark');
-      // kml.collect('Folder');
-      // console.log(kml);
-      // kml.on('startElement: Folder', node =>{
-      //   folderPos.push({minLon: null, maxLon: null, minLat: null, maxLat: null});
-      // });
-      // kml.on('endElement: Folder', node =>{
-      //   const getBoundingBox = folderPos.pop();
-      // });
       kml.on('endElement: ' + KMLTAGS.NETWORK_LINK, async (node: any) => {
         kmlOnsRunning++;
         if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
@@ -566,7 +536,6 @@ export class KMLToGeoPackage {
               return o === property;
             }) !== -1
           ) {
-            // console.log('node[property]', node[property]);
             node[property].forEach(element => {
               for (const subProperty in element) {
                 if (
@@ -617,19 +586,18 @@ export class KMLToGeoPackage {
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + ' ' + KMLTAGS.STYLE_TAG, (node: {}) => {
         kmlOnsRunning++;
         if (
-          node.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE) ||
-          node.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)
+          node.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE) ||
+          node.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE)
         ) {
           try {
             this.styleMap.set(node['$'].id, node);
           } catch (err) {
             console.error(err);
-            // console.log(node);
           } finally {
             this.hasStyles = true;
           }
         }
-        if (node.hasOwnProperty(KMLTAGS.STYLE_TYPES.ICON_STYLE)) {
+        if (node.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.ICON_STYLE)) {
           try {
             this.iconMap.set(node['$'].id, node);
           } finally {
@@ -640,7 +608,6 @@ export class KMLToGeoPackage {
       });
       kml.on('endElement: ' + KMLTAGS.DOCUMENT_TAG + '>' + KMLTAGS.STYLE_MAP_TAG, node => {
         kmlOnsRunning++;
-        // console.log('endElement', kmlOnsRunning, kml._fa);
         node.Pair.forEach((item: { key: string; styleUrl: string }) => {
           if (item.key === 'normal') {
             this.styleMapPair.set('#' + node['$'].id, item.styleUrl);
@@ -717,7 +684,6 @@ export class KMLToGeoPackage {
     let styleRow: StyleRow;
     let iconRow: IconRow;
     for (const prop in node) {
-      // console.log(prop);
       if (prop === KMLTAGS.STYLE_URL_TAG) {
         try {
           let styleId = this.styleUrlMap.get(node[prop]);
@@ -761,12 +727,6 @@ export class KMLToGeoPackage {
           console.error('Error in Style Map:', err);
         }
       }
-      // if (!_.isNil(iconRow) && _.isNil(iconRow.data)) {
-      //   console.log('iconRow', iconRow);
-      // }
-      // if (_.isNil(iconRow)) {
-      //   console.log('iconRow', iconRow);
-      // }
 
       const element = _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
         return o === prop;
@@ -810,9 +770,7 @@ export class KMLToGeoPackage {
         defaultStyles.setIcon(featureID, geometryData.type, iconRow).catch(e => console.error(e));
       }
     } else {
-      // console.log(feature);
       featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
-      // console.log('featureID', featureID);
     }
 
     return featureID;
@@ -825,11 +783,6 @@ export class KMLToGeoPackage {
    */
   private async indexTable(geopackage: GeoPackage, tableName: string): Promise<void> {
     geopackage.indexFeatureTable(tableName);
-    // const featureDao = geopackage.getFeatureDao(tableName);
-    // const fti = featureDao.featureTableIndex;
-    // if (fti) {
-    //   await fti.index();
-    // }
   }
 
   /**
@@ -839,7 +792,6 @@ export class KMLToGeoPackage {
    */
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
-      // console.log('adding items', items);
       for (const item of items) {
         const { id: id, newIcon: icon } = await KMLUtilities.addSpecificIcon(styleTable, item).catch(e => {
           console.error(e);
@@ -850,7 +802,6 @@ export class KMLToGeoPackage {
           this.iconRowMap.set(id, icon);
         }
       }
-      // console.log('KEYS', _.mapKeys(this.iconMap), this.iconMap, items);
       resolve();
     });
   }
@@ -869,32 +820,32 @@ export class KMLToGeoPackage {
       const newStyle = styleTable.getStyleDao().newRow();
       newStyle.setName(styleName);
       // Styling for Lines
-      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.LINE_STYLE)) {
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE)) {
         isStyle = true;
-        if (kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('color')) {
-          const abgr = kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty('color')) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE]['color'];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setColor(rgb, a);
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE].hasOwnProperty('width')) {
-          newStyle.setWidth(kmlStyle[KMLTAGS.STYLE_TYPES.LINE_STYLE]['width']);
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty('width')) {
+          newStyle.setWidth(kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE]['width']);
         }
       }
 
       // Styling for Polygons
-      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPES.POLY_STYLE)) {
+      if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE)) {
         isStyle = true;
-        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('color')) {
-          const abgr = kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('color')) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE]['color'];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setFillColor(rgb, a);
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('fill')) {
-          if (!kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]['fill']) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('fill')) {
+          if (!kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE]['fill']) {
             newStyle.setFillOpacity(0);
           }
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE].hasOwnProperty('outline')) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('outline')) {
           // console.log(kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]);
           // No property Currently TODO
           // newStyle.(item[1]['LineStyle']['outline']);
@@ -907,7 +858,6 @@ export class KMLToGeoPackage {
         this.styleUrlMap.set('#' + styleName, newStyleId);
         this.styleRowMap.set(newStyleId, newStyle);
       }
-      // console.log(isStyle);
     }
   }
 }

@@ -23,6 +23,7 @@
     "proj4": "2.4.3",
     "promise-polyfill": "^6.0.2",
     "reproject": "^1.1.1",
+    "simple-server": "^1.1.1",
     "tsify": "^4.0.2",
     "webworkify": "^1.5.0"
   },
