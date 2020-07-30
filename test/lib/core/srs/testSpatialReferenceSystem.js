@@ -1,4 +1,4 @@
-var SpatialReferenceSystem = require('../../../../lib/core/srs/spatialReferenceSystem').SpatialReferenceSystem
+var SpatialReferenceSystem = require('@ngageoint/geopackage/lib/core/srs/spatialReferenceSystem').SpatialReferenceSystem
   , should = require('chai').should()
   , path = require('path');
 

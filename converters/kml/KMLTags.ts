@@ -1,14 +1,11 @@
 /**
- * Subset of Tags that a KML File can have.
+ * Tags of KML
  * Defined as const to prevent spelling/capitalization issues.
- */
-
-/**
+ *
  * Notes:
  * If a Tag's name starts with a capital letter then it can have tags within it.
  * If a Tag's name starts with a lower case letter then it can only have a primitive type within it.
  */
-// TAGS
 
 // High Level Descriptions
 
@@ -111,6 +108,11 @@ export const GROUND_OVERLAY_TAG = 'GroundOverlay';
  * https://developers.google.com/kml/documentation/kmlreference#icon
  */
 export const ICON_TAG = 'Icon';
+
+/**
+ * 
+ */
+export const ICON_STYLE_TAG = 'IconStyle';
 
 /**
  * The root element of a KML file. This element is required.
@@ -334,7 +336,7 @@ export const COOKIE_TAG = 'cookie';
 export const COORDINATES_TAG = 'coordinates';
 export const CREATE_TAG = 'Create';
 export const DATA_TAG = 'Data';
-export const DELETE_TAG = 'Delete'
+export const DELETE_TAG = 'Delete';
 export const DESCRIPTION_TAG = 'description';
 export const DISPLAY_MODE_TAG = 'displayMode';
 export const DISPLAY_NAME_TAG = 'displayName';
@@ -344,6 +346,7 @@ export const END_TAG = 'end';
 export const EXPIRES_TAG = 'expires';
 export const EXTENDED_DATA_TAG = 'ExtendedData';
 export const EXTRUDE_TAG = 'extrude';
+export const FILL_TAG = 'fill';
 export const FLY_TO_VIEW_TAG = 'flyToView';
 export const GEOM_COLOR_TAG = 'geomColor';
 export const GRID_ORIGIN_TAG = 'gridOrigin';
@@ -361,6 +364,7 @@ export const LAT_LON_BOX_TAG = 'LatLonBox';
 export const LATITUDE_TAG = 'latitude';
 export const LEFT_FOV_TAG = 'leftFov';
 export const LEVEL_OF_DETAIL_TAG = 'Lod';
+export const LINEAR_RING_TAG = 'linearRing';
 export const LINK_DESCRIPTION_TAG = 'linkDescription';
 export const LINK_NAME_TAG = 'linkName';
 export const LINK_SNIPPET_TAG = 'linkSnippet';
@@ -385,6 +389,7 @@ export const OPEN_TAG = 'open';
 export const OPTION_TAG = 'option';
 export const ORIENTATION_TAG = 'Orientation';
 export const OUTER_BOUNDARY_TAG = 'outerBoundaryIs';
+export const OUTLINE_TAG = 'outline';
 export const PAIR_TAG = 'Pair';
 export const PHONE_NUMBER_TAG = 'phoneNumber';
 export const REFRESH_INTERVAL_TAG = 'viewRefreshMode';
@@ -421,7 +426,7 @@ export const WIDTH_TAG = 'width';
 export const XAL_ADDRESS_DETAILS_TAG = 'xal:AddressDetails';
 
 // Redefined
-export const LIST_STYLE_BG_COLOR = BG_COLOR_TAG;
+export const LIST_STYLE_BG_COLOR_TAG = BG_COLOR_TAG;
 export const LOD_TAG = LEVEL_OF_DETAIL_TAG;
 
 // Google Extended Descriptions
@@ -449,7 +454,6 @@ export const GX_FLY_TO_TAG = 'gx:FlyTo';
 export const GX_FLY_TO_MODE_TAG = 'gx:FlyToMode';
 export const GX_H_TAG = 'gx:h';
 export const GX_HORIZ_FOV_TAG = 'gx:horizFov';
-export const GX_HORIZONTAL_FOV_TAG = GX_HORIZ_FOV_TAG;
 export const GX_LABEL_VISIBILITY_TAG = 'gx:labelVisibility';
 export const GX_LAT_LON_QUAD_TAG = 'gx:LatLonQuad';
 export const GX_MULTI_TRACK_TAG = 'gx:MultiTrack';
@@ -467,6 +471,8 @@ export const GX_W_TAG = 'gx:w';
 export const GX_WAIT_TAG = 'gx:wait';
 export const GX_X_TAG = 'gx:x';
 export const GX_Y_TAG = 'gx:y';
+
+export const GX_HORIZONTAL_FOV_TAG = GX_HORIZ_FOV_TAG;
 
 // Descriptors
 
@@ -520,6 +526,11 @@ export enum OPTIONS_NAME {
 export enum COLOR_MODES {
   normal = 'normal',
   random = 'random',
+}
+export enum HOTSPOT_POSITIONING_MODE {
+  fraction = 'fraction',
+  pixels = 'pixels',
+  insetPixels = 'insetPixels',
 }
 
 /**
@@ -636,14 +647,14 @@ export const FEATURE_CHILDREN_TAGS = {
   open: OPEN_TAG,
   /**
    * KML 2.2 supports new elements for including data about the author and related website in your KML file. This information is displayed in geo search results, both in Earth browsers such as Google Earth, and in other applications such as Google Maps. The ascription elements used in KML are as follows:
-
-atom:author element - parent element for atom:name
-atom:name element - the name of the author
-atom:link element - contains the href attribute
-href attribute - URL of the web page containing the KML/KMZ file
-These elements are defined in the Atom Syndication Format. The complete specification is found at http://atompub.org. (see the sample that follows).
-
-The <atom:author> element is the parent element for <atom:name>, which specifies the author of the KML feature.
+   *
+   * atom:author element - parent element for atom:name
+   * atom:name element - the name of the author
+   * atom:link element - contains the href attribute
+   * href attribute - URL of the web page containing the KML/KMZ file
+   * These elements are defined in the Atom Syndication Format. The complete specification is found at http://atompub.org. (see the sample that follows).
+   *
+   * The <atom:author> element is the parent element for <atom:name>, which specifies the author of the KML feature.
    */
   'atom:author': ATOM_AUTHOR_TAG,
   /**
@@ -669,96 +680,93 @@ The <atom:author> element is the parent element for <atom:name>, which specifies
   Snippet: SNIPPET_TAG,
   /**
    * User-supplied content that appears in the description balloon.
-
-The supported content for the <description> element changed from Google Earth 4.3 to 5.0. Specific information for each version is listed out below, followed by information common to both.
-
-Google Earth 5.0
-
-Google Earth 5.0 (and later) supports plain text content, as well as full HTML and JavaScript, within description balloons. Contents of the description tag are rendered by the WebKit open source web browser engine, and are displayed as they would be in any WebKit-based browser.
-
-General restrictions
-
-Links to local files are generally not allowed. This prevents malicious code from damaging your system or accessing your data. Should you wish to allow access to your local filesystem, select Preferences > Allow access to local files and personal data. Links to image files on the local filesystem are always allowed, if contained within an <img> tag.
-
-Content that has been compressed into a KMZ file can be accessed, even if on the local filesystem.
-
-Cookies are enabled, but for the purposes of the same-origin policy, local content does not share a domain with any other content (including other local content).
-
-HTML
-
-HTML is mostly rendered as it would be in any WebKit browser.
-
-Targets are ignored when included in HTML written directly into the KML; all such links are opened as if the target is set to _blank. Any specified targets are ignored.
-
-HTML that is contained in an iFrame, however, or dynamically generated with JavaScript or DHTML, will use target="_self" as the default. Other targets can be specified and are supported.
-
-The contents of KMZ files, local anchor links, and ;flyto methods cannot be targeted from HTML contained within an iFrame.
-
-If the user specifies width="100%" for the width of an iFrame, then the iFrame's width will be dependent on all the other content in the balloon—it should essentially be ignored while calculating layout size. This rule applies to any other block element inside the balloon as well.
-
-JavaScript
-
-Most JavaScript is supported. Dialog boxes can not be created - functions such as alert() and prompt() will not be displayed. They will, however, be written to the system console, as will other errors and exceptions.
-
-CSS
-
-CSS is allowed. As with CSS in a regular web browser, CSS can be used to style text, page elements, and to control the size and appearance of the description balloon.
-
-Google Earth 4.3
-
-The <description> element supports plain text as well as a subset of HTML formatting elements, including tables (see KML example below). It does not support other web-based technology, such as dynamic page markup (PHP, JSP, ASP), scripting languages (VBScript, Javascript), nor application languages (Java, Python). In Google Earth release 4.2, video is supported. (See Example below.)
-
-Common information
-
-If your description contains no HTML markup, Google Earth attempts to format it, replacing newlines with <br> and wrapping URLs with anchor tags. A valid URL string for the World Wide Web is automatically converted to a hyperlink to that URL (e.g., http://www.google.com). Consequently, you do not need to surround a URL with the <a href="http://.."></a> tags in order to achieve a simple link.
-
-When using HTML to create a hyperlink around a specific word, or when including images in the HTML, you must use HTML entity references or the CDATA element to escape angle brackets, apostrophes, and other special characters. The CDATA element tells the XML parser to ignore special characters used within the brackets. This element takes the form of:
-
-<![CDATA[
-  special characters here
-]]> 
-
-If you prefer not to use the CDATA element, you can use entity references to replace all the special characters.
-
-<description>
-  <![CDATA[
-This is an image
-<img src="icon.jpg">
-  ]]>
-</description>
-
-Other Behavior Specified Through Use of the <a> Element
-
-KML supports the use of two attributes within the <a> element: href and type.
-
-The anchor element <a> contains an href attribute that specifies a URL.
-
-If the href is a KML file and has a .kml or .kmz file extension, Google Earth loads that file directly when the user clicks it. If the URL ends with an extension not known to Google Earth (for example, .html), the URL is sent to the browser.
-
-The href can be a fragment URL (that is, a URL with a # sign followed by a KML identifier). When the user clicks a link that includes a fragment URL, by default the browser flies to the Feature whose ID matches the fragment. If the Feature has a LookAt or Camera element, the Feature is viewed from the specified viewpoint.
-
-The behavior can be further specified by appending one of the following three strings to the fragment URL:
-
-;flyto (default) - fly to the Feature
-;balloon - open the Feature's balloon but do not fly to the Feature
-;balloonFlyto - open the Feature's balloon and fly to the Feature
-For example, the following code indicates to open the file CraftsFairs.kml, fly to the Placemark whose ID is "Albuquerque," and open its balloon:
-
-<description>
-  <![CDATA[ 
-    <a href="http://myServer.com/CraftsFairs.kml#Albuquerque;balloonFlyto">
-      One of the Best Art Shows in the West</a>
-  ]]>
-</description> 
-
-The type attribute is used within the <a> element when the href does not end in .kml or .kmz, but the reference needs to be interpreted in the context of KML. Specify the following:
-
-type="application/vnd.google-earth.kml+xml" 
-
-For example, the following URL uses the type attribute to notify Google Earth that it should attempt to load the file, even though the file extension is .php:
-
-<a href="myserver.com/cgi-bin/generate-kml.php#placemark123"
-   type="application/vnd.google-earth.kml+xml">
+   *
+   * The supported content for the <description> element changed from Google Earth 4.3 to 5.0. Specific information for each version is listed out below, followed by information common to both.
+   *
+   * Google Earth 5.0
+   *
+   * Google Earth 5.0 (and later) supports plain text content, as well as full HTML and JavaScript, within description balloons. Contents of the description tag are rendered by the WebKit open source web browser engine, and are displayed as they would be in any WebKit-based browser.
+   *
+   * General restrictions
+   *
+   * Links to local files are generally not allowed. This prevents malicious code from damaging your system or accessing your data. Should you wish to allow access to your local filesystem, select Preferences > Allow access to local files and personal data. Links to image files on the local filesystem are always allowed, if contained within an <img> tag.
+   *
+   * Content that has been compressed into a KMZ file can be accessed, even if on the local filesystem.
+   *
+   * Cookies are enabled, but for the purposes of the same-origin policy, local content does not share a domain with any other content (including other local content).
+   *
+   * HTML
+   *
+   * HTML is mostly rendered as it would be in any WebKit browser.
+   *
+   * Targets are ignored when included in HTML written directly into the KML; all such links are opened as if the target is set to _blank. Any specified targets are ignored.
+   *
+   * HTML that is contained in an iFrame, however, or dynamically generated with JavaScript or HTML, will use target="_self" as the default. Other targets can be specified and are supported.
+   *
+   * The contents of KMZ files, local anchor links, and ;flyto methods cannot be targeted from HTML contained within an iFrame.
+   *
+   * If the user specifies width="100%" for the width of an iFrame, then the iFrame's width will be dependent on all the other content in the balloon—it should essentially be ignored while calculating layout size. This rule applies to any other block element inside the balloon as well.
+   *
+   * JavaScript
+   *
+   * Most JavaScript is supported. Dialog boxes can not be created - functions such as alert() and prompt() will not be displayed. They will, however, be written to the system console, as will other errors and exceptions.
+   *
+   * CSS
+   *
+   * CSS is allowed. As with CSS in a regular web browser, CSS can be used to style text, page elements, and to control the size and appearance of the description balloon.
+   *
+   * Google Earth 4.3
+   *
+   * The <description> element supports plain text as well as a subset of HTML formatting elements, including tables (see KML example below). It does not support other web-based technology, such as dynamic page markup (PHP, JSP, ASP), scripting languages (VBScript, Javascript), nor application languages (Java, Python). In Google Earth release 4.2, video is supported. (See Example below.)
+   *
+   * Common information
+   *
+   * If your description contains no HTML markup, Google Earth attempts to format it, replacing newlines with <br> and wrapping URLs with anchor tags. A valid URL string for the World Wide Web is automatically converted to a hyperlink to that URL (e.g., http://www.google.com). Consequently, you do not need to surround a URL with the <a href="http://.."></a> tags in order to achieve a simple link.
+   *
+   * When using HTML to create a hyperlink around a specific word, or when including images in the HTML, you must use HTML entity references or the CDATA element to escape angle brackets, apostrophes, and other special characters. The CDATA element tells the XML parser to ignore special characters used within the brackets. This element takes the form of:
+   * <![CDATA[special characters here]]>
+   *
+   * If you prefer not to use the CDATA element, you can use entity references to replace all the special characters.
+   *
+   * <description>
+   * <![CDATA[
+   * This is an image
+   * <img src="icon.jpg">
+   * ]]>
+   * </description>
+   *
+   * Other Behavior Specified Through Use of the <a> Element
+   *
+   * KML supports the use of two attributes within the <a> element: href and type.
+   *
+   * The anchor element <a> contains an href attribute that specifies a URL.
+   *
+   * If the href is a KML file and has a .kml or .kmz file extension, Google Earth loads that file directly when the user clicks it. If the URL ends with an extension not known to Google Earth (for example, .html), the URL is sent to the browser.
+   *
+   * The href can be a fragment URL (that is, a URL with a # sign followed by a KML identifier). When the user clicks a link that includes a fragment URL, by default the browser flies to the Feature whose ID matches the fragment. If the Feature has a LookAt or Camera element, the Feature is viewed from the specified viewpoint.
+   *
+   * The behavior can be further specified by appending one of the following three strings to the fragment URL:
+   *
+   * ;flyto (default) - fly to the Feature
+   * ;balloon - open the Feature's balloon but do not fly to the Feature
+   * ;balloonFlyto - open the Feature's balloon and fly to the Feature
+   *
+   * For example, the following code indicates to open the file CraftsFairs.kml, fly to the Placemark whose ID is "Albuquerque," and open its balloon:
+   *
+   * <description>
+   *  <![CDATA[
+   *    <a href="http://myServer.com/CraftsFairs.kml#Albuquerque;balloonFlyto">
+   *      One of the Best Art Shows in the West</a>
+   *  ]]>
+   * </description>
+   *
+   * The type attribute is used within the <a> element when the href does not end in .kml or .kmz, but the reference needs to be interpreted in the context of KML. Specify the following:
+   *
+   * type="application/vnd.google-earth.kml+xml"
+   *
+   * For example, the following URL uses the type attribute to notify Google Earth that it should attempt to load the file, even though the file extension is .php:
+   *
+   * <a href="myserver.com/cgi-bin/generate-kml.php#placemark123" type="application/vnd.google-earth.kml+xml">
    */
   description: DESCRIPTION_TAG,
   /**
@@ -793,12 +801,12 @@ For example, the following URL uses the type attribute to notify Google Earth th
 
 /**
  * A Document is a container for features and styles. This element is required if your KML file uses shared styles. It is recommended that you use shared styles, which require the following steps:
-
-Define all Styles in a Document. Assign a unique ID to each Style.
-Within a given Feature or StyleMap, reference the Style's ID using a <styleUrl> element.
-Note that shared styles are not inherited by the Features in the Document.
-
-Each Feature must explicitly reference the styles it uses in a <styleUrl> element. For a Style that applies to a Document (such as ListStyle), the Document itself must explicitly reference the <styleUrl>. For example:
+ *
+ * Define all Styles in a Document. Assign a unique ID to each Style.
+ * Within a given Feature or StyleMap, reference the Style's ID using a <styleUrl> element.
+ * Note that shared styles are not inherited by the Features in the Document.
+ *
+ * Each Feature must explicitly reference the styles it uses in a <styleUrl> element. For a Style that applies to a Document (such as ListStyle), the Document itself must explicitly reference the <styleUrl>. For example:
  */
 export const DOCUMENT_CHILDREN_TAGS = {
   inheritedFeatureElements: FEATURE_CHILDREN_TAGS,
@@ -935,8 +943,8 @@ export const GEOMETRY_TAGS = {
   POINT: POINT_TAG,
   LINESTRING: LINE_STRING_TAG,
   POLYGON: POLYGON_TAG,
-  MULTIGEOMETRY: 'MultiGeometry',
-  MODEL: 'Model',
+  MULTIGEOMETRY: MULTI_GEOMETRY_TAG,
+  MODEL: MODEL_TAG,
 };
 
 /**
@@ -1114,7 +1122,7 @@ export const STYLE_TYPE_TAGS = {
    */
   BALLOON_STYLE: BALLOON_STYLE_TAG,
 
-  ICON_STYLE: ICON_TAG,
+  ICON_STYLE: ICON_STYLE_TAG,
 
   /**
    * Not Currently supported

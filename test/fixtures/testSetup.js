@@ -1,12 +1,10 @@
 // @ts-nocheck
-import { GeoPackageAPI } from '../..';
-import {GeoPackage} from '../../lib/geoPackage';
-import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
+import { GeoPackageAPI, GeoPackage, GeoPackageConnection } from '@ngageoint/geopackage';
 
 var fs = require('fs-extra')
   , path = require('path')
   , crypto = require('crypto')
-  , ImageUtils = require('../../lib/tiles/imageUtils').ImageUtils;
+  , ImageUtils = require('@ngageoint/geopackage/lib/tiles/imageUtils').ImageUtils;
 
 module.exports.createTempName = function() {
   return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';

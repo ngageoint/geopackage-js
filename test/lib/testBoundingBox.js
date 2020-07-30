@@ -1,5 +1,5 @@
-var BoundingBox = require('../../lib/boundingBox').BoundingBox;
-var TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils;
+var BoundingBox = require('@ngageoint/geopackage').BoundingBox;
+var TileBoundingBoxUtils = require('@ngageoint/geopackage').TileBoundingBoxUtils;
 
 var proj4 = require('proj4')
 var should = require('chai').should();

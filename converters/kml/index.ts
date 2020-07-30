@@ -91,7 +91,7 @@ export class KMLToGeoPackage {
    * Converts KML and KMZ to GeoPackages.
    *
    * @param {KMLConverterOptions} options
-   * @param {Function} progressCallback 
+   * @param {Function} progressCallback
    */
   async convert(options?: KMLConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
     const clonedOptions = { ...options };
@@ -382,13 +382,13 @@ export class KMLToGeoPackage {
         stream = fs.createReadStream(kmlData);
       }
       const kml = new XmlStream(stream, 'UTF-8');
-      kml.preserve('coordinates', true);
-      kml.collect('LinearRing');
-      kml.collect('Polygon');
-      kml.collect('Point');
-      kml.collect('LineString');
-      kml.collect('Data');
-      kml.collect('value');
+      kml.preserve(KMLTAGS.COORDINATES_TAG, true);
+      kml.collect(KMLTAGS.LINEAR_RING_TAG);
+      kml.collect(KMLTAGS.POLYGON_TAG);
+      kml.collect(KMLTAGS.POINT_TAG);
+      kml.collect(KMLTAGS.LINE_STRING_TAG);
+      kml.collect(KMLTAGS.DATA_TAG);
+      kml.collect(KMLTAGS.VALUE_TAG);
       // kml.collect('Folder');
       // kml.collect('Placemark');
       let asyncProcessesRunning = 0;
@@ -475,16 +475,16 @@ export class KMLToGeoPackage {
       const kml = new XmlStream(stream, 'UTF-8');
       kml.preserve(KMLTAGS.COORDINATES_TAG, true);
       kml.collect(KMLTAGS.PAIR_TAG);
-      kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
-      kml.collect(KMLTAGS.GEOMETRY_TAGS.LINESTRING);
-      kml.collect(KMLTAGS.GEOMETRY_TAGS.POLYGON);
-      kml.collect('Data');
-      kml.collect('value');
-      kml.collect('Placemark');
+      kml.collect(KMLTAGS.POINT_TAG);
+      kml.collect(KMLTAGS.LINE_STRING_TAG);
+      kml.collect(KMLTAGS.POLYGON_TAG);
+      kml.collect(KMLTAGS.DATA_TAG);
+      kml.collect(KMLTAGS.VALUE_TAG);
+      kml.collect(KMLTAGS.PLACEMARK_TAG);
       kml.on('endElement: ' + KMLTAGS.NETWORK_LINK_TAG, async (node: any) => {
         kmlOnsRunning++;
-        if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
-          const linkType = node.hasOwnProperty('Link') ? 'Link' : 'Url';
+        if (node.hasOwnProperty(KMLTAGS.LINK_TAG) || node.hasOwnProperty(KMLTAGS.URL_TAG)) {
+          const linkType = node.hasOwnProperty(KMLTAGS.LINK_TAG) ? KMLTAGS.LINK_TAG : KMLTAGS.URL_TAG;
           if (progressCallback) {
             progressCallback({
               status: 'Handling Network Link Tag. Handling Meta Data',
@@ -547,7 +547,7 @@ export class KMLToGeoPackage {
                 }
               }
             });
-          } else if (property === KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+          } else if (property === KMLTAGS.MULTI_GEOMETRY_TAG) {
             this.hasMultiGeometry = true;
             for (const subProperty in node[property]) {
               node[property][subProperty].forEach(element => {
@@ -822,30 +822,30 @@ export class KMLToGeoPackage {
       // Styling for Lines
       if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE)) {
         isStyle = true;
-        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty('color')) {
-          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty(KMLTAGS.COLOR_TAG)) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE][KMLTAGS.COLOR_TAG];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setColor(rgb, a);
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty('width')) {
-          newStyle.setWidth(kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE]['width']);
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE].hasOwnProperty(KMLTAGS.WIDTH_TAG)) {
+          newStyle.setWidth(kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.LINE_STYLE][KMLTAGS.WIDTH_TAG]);
         }
       }
 
       // Styling for Polygons
       if (kmlStyle.hasOwnProperty(KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE)) {
         isStyle = true;
-        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('color')) {
-          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE]['color'];
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty(KMLTAGS.COLOR_TAG)) {
+          const abgr = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE][KMLTAGS.COLOR_TAG];
           const { rgb, a } = KMLUtilities.abgrStringToColorOpacity(abgr);
           newStyle.setFillColor(rgb, a);
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('fill')) {
-          if (!kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE]['fill']) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty(KMLTAGS.FILL_TAG)) {
+          if (!kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE][KMLTAGS.FILL_TAG]) {
             newStyle.setFillOpacity(0);
           }
         }
-        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty('outline')) {
+        if (kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.POLY_STYLE].hasOwnProperty(KMLTAGS.OUTLINE_TAG)) {
           // console.log(kmlStyle[KMLTAGS.STYLE_TYPES.POLY_STYLE]);
           // No property Currently TODO
           // newStyle.(item[1]['LineStyle']['outline']);

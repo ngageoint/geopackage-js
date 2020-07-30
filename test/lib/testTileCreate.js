@@ -2,8 +2,8 @@ import { default as testSetup } from '../fixtures/testSetup'
 
 const
   Verification = require('../fixtures/verification')
-  , TileTable = require('../../lib/tiles/user/tileTable').TileTable
-  , BoundingBox = require('../../lib/boundingBox').BoundingBox
+  , TileTable = require('@ngageoint/geopackage/lib/tiles/user/tileTable').TileTable
+  , BoundingBox = require('@ngageoint/geopackage/lib/boundingBox').BoundingBox
   , path = require('path')
   , should = require('chai').should();
 

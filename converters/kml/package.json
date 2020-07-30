@@ -40,7 +40,7 @@
     "iconv": "^3.0.0",
     "jimp": "^0.14.0",
     "jszip": "^3.5.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "request": "^2.88.2",
     "sqlite3": "^4.2.0",
     "xml-stream": "git://github.com/JaredLincenberg/xml-stream.git"
