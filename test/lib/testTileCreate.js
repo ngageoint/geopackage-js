@@ -3,6 +3,8 @@ import { BoundingBox, TileTable } from '@ngageoint/geopackage';
 
 const
   Verification = require('../fixtures/verification')
+  , TileTable = require('../../lib/tiles/user/tileTable').TileTable
+  , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , path = require('path')
   , should = require('chai').should();
 

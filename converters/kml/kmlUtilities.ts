@@ -125,6 +125,7 @@ export class KMLUtilities {
     );
   }
 
+
   /**
    * Converts kml geometries (Point, LineString, and Polygon) into GeoJSON features
    *
@@ -315,7 +316,6 @@ export class KMLUtilities {
       defaultIcon.name = 'ylw-pushpin';
       defaultIcon.anchorU = 0.5;
       defaultIcon.anchorV = 0.5;
-      // defaultIcon.data = await Jimp.read(path.join(__dirname, 'images', 'ylw-pushpin.png'))
       defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png')
         .then(img => {
           defaultIcon.width = img.getWidth();
@@ -418,11 +418,8 @@ export class KMLUtilities {
           reject();
           return;
         }
-        if (
-          iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty(KMLTAGS.HREF_TAG) &&
-          !_.isNil(iconStyle[KMLTAGS.ICON_TAG][KMLTAGS.HREF_TAG])
-        ) {
-          let iconLocation = iconStyle[KMLTAGS.ICON_TAG][KMLTAGS.HREF_TAG];
+        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
+          let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
           iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
           const img: Jimp = await Jimp.read(iconLocation).catch(err => {
             console.error('Image Reading Error', err);
@@ -439,17 +436,17 @@ export class KMLUtilities {
           let cropY = 0;
           let cropH = img.getHeight();
           let cropW = img.getWidth();
-          if (iconTag.hasOwnProperty(KMLTAGS.GX_X_TAG)) {
-            cropX = parseInt(iconTag[KMLTAGS.GX_X_TAG]);
+          if (iconTag.hasOwnProperty('gx:x')) {
+            cropX = parseInt(iconTag['gx:x']);
           }
-          if (iconTag.hasOwnProperty(KMLTAGS.GX_Y_TAG)) {
-            cropY = cropH - parseInt(iconTag[KMLTAGS.GX_Y_TAG]);
+          if (iconTag.hasOwnProperty('gx:y')) {
+            cropY = cropH - parseInt(iconTag['gx:y']);
           }
-          if (iconTag.hasOwnProperty(KMLTAGS.GX_W_TAG)) {
-            cropW = parseInt(iconTag[KMLTAGS.GX_W_TAG]);
+          if (iconTag.hasOwnProperty('gx:w')) {
+            cropW = parseInt(iconTag['gx:w']);
           }
-          if (iconTag.hasOwnProperty(KMLTAGS.GX_H_TAG)) {
-            cropH = parseInt(iconTag[KMLTAGS.GX_H_TAG]);
+          if (iconTag.hasOwnProperty('gx:h')) {
+            cropH = parseInt(iconTag['gx:h']);
           }
           if (cropX > img.getWidth()) {
             cropX = 0;
@@ -462,27 +459,27 @@ export class KMLUtilities {
           img.crop(cropX, cropY, cropW, cropH);
           if (iconStyle.hasOwnProperty(KMLTAGS.HOTSPOT_TAG)) {
             const hotSpot = iconStyle[KMLTAGS.HOTSPOT_TAG]['$'];
-            switch (hotSpot[KMLTAGS.X_UNITS_DESCRIPTOR]) {
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.fraction:
-                aU = parseFloat(hotSpot[KMLTAGS.X_COMPONENT_DESCRIPTOR]);
+            switch (hotSpot['xunits']) {
+              case 'fraction':
+                aU = parseFloat(hotSpot['x']);
                 break;
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.pixels:
-                aU = 1 - parseFloat(hotSpot[KMLTAGS.X_COMPONENT_DESCRIPTOR]) / img.getWidth();
+              case 'pixels':
+                aU = 1 - parseFloat(hotSpot['x']) / img.getWidth();
                 break;
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.insetPixels:
-                aU = parseFloat(hotSpot[KMLTAGS.X_COMPONENT_DESCRIPTOR]) / img.getWidth();
+              case 'insetPixels':
+                aU = parseFloat(hotSpot['x']) / img.getWidth();
               default:
                 break;
             }
-            switch (hotSpot[KMLTAGS.Y_UNITS_DESCRIPTOR]) {
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.fraction:
-                aV = 1 - parseFloat(hotSpot[KMLTAGS.Y_COMPONENT_DESCRIPTOR]);
+            switch (hotSpot['yunits']) {
+              case 'fraction':
+                aV = 1 - parseFloat(hotSpot['y']);
                 break;
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.pixels:
-                aV = 1 - parseFloat(hotSpot[KMLTAGS.Y_COMPONENT_DESCRIPTOR]) / img.getHeight();
+              case 'pixels':
+                aV = 1 - parseFloat(hotSpot['y']) / img.getHeight();
                 break;
-              case KMLTAGS.HOTSPOT_POSITIONING_MODE.insetPixels:
-                aV = parseFloat(hotSpot[KMLTAGS.Y_COMPONENT_DESCRIPTOR]) / img.getHeight();
+              case 'insetPixels':
+                aV = parseFloat(hotSpot['y']) / img.getHeight();
               default:
                 break;
             }

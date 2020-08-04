@@ -1,4 +1,5 @@
-import { BoundingBox, TileBoundingBoxUtils } from '@ngageoint/geopackage';
+var BoundingBox = require('../../lib/boundingBox').BoundingBox;
+var TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils;
 
 var proj4 = require('proj4')
 

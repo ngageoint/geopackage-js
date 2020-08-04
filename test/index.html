@@ -2,18 +2,18 @@
 <head>
   <meta charset="utf-8">
   <title>Mocha Tests</title>
-  <link href="./node_modules/mocha/mocha.css" rel="stylesheet" />
+  <link href="../node_modules/mocha/mocha.css" rel="stylesheet" />
 </head>
 <body>
   <div id="mocha"></div>
 
-  <script src="./node_modules/mocha/mocha.js"></script>
+  <script src="../node_modules/mocha/mocha.js"></script>
 
   <script>
     mocha.setup('bdd');
   </script>
 
-  <script src="./bundle/test.bundle.js"></script>
+  <script src="../bundle/test.bundle.js"></script>
   <script>
   console.log('navigator.userAgent', navigator.userAgent);
     mocha.run();

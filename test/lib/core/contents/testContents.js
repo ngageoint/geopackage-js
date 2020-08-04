@@ -1,8 +1,11 @@
-import { GeoPackageAPI, ContentsDao, Contents, TileMatrix } from '@ngageoint/geopackage'
+import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
+import {ContentsDao} from '../../../../lib/core/contents/contentsDao';
 
 // var GeoPackageAPI = require('../../../..')
-var TestUtils = require('../../../fixtures/testUtils')
+var Contents = require('../../../../lib/core/contents/contents').Contents
+  , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
+  , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
   , path = require('path');
 

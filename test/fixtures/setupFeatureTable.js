@@ -1,7 +1,7 @@
-var FeatureColumn = require('@ngageoint/geopackage').FeatureColumn
-  , GeometryColumns = require('@ngageoint/geopackage').GeometryColumns
-  , FeatureTable = require('@ngageoint/geopackage').FeatureTable
-  , DataTypes = require('@ngageoint/geopackage').DataTypes;
+var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
+  , GeometryColumns = require('../../lib/features/columns/geometryColumns').GeometryColumns
+  , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
+  , DataTypes = require('../../lib/db/dataTypes').DataTypes;
 
 module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryType) {
   var columns = [];
