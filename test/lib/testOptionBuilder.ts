@@ -1,4 +1,4 @@
-import { OptionBuilder } from "../../lib/optionBuilder";
+import { OptionBuilder } from '@ngageoint/geopackage';
 
 describe('Option Builder Tests', function() {
     it('should set and get a value', function() {

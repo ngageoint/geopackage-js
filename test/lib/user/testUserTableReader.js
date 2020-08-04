@@ -1,8 +1,6 @@
-import { default as testSetup } from '../../fixtures/testSetup'
-
-var UserTableReader = require('../../../lib/user/userTableReader').UserTableReader
-  , UserDao = require('../../../lib/user/userDao').UserDao
-  , path = require('path')
+import { default as testSetup } from '../../fixtures/testSetup';
+import { UserDao, UserTableReader } from '@ngageoint/geopackage';
+var path = require('path')
   , should = require('chai').should();
 
 describe('UserTableReader tests', function() {

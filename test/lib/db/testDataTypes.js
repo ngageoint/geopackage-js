@@ -1,4 +1,4 @@
-var DataTypes = require('@ngageoint/geopackage').DataTypes;
+import { DataTypes } from '@ngageoint/geopackage';
 
 var should = require('chai').should();
 

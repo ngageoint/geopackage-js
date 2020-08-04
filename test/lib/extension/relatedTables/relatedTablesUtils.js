@@ -1,10 +1,6 @@
-var DataTypes = require('@ngageoint/geopackage').DataTypes
-  , UserColumn = require('@ngageoint/geopackage').UserColumn
-  , DublinCoreType = require('@ngageoint/geopackage').DublinCoreType
-  , DublinCoreMetadata = require('@ngageoint/geopackage').DublinCoreMetadata
-  , SimpleAttributesTable = require('@ngageoint/geopackage').SimpleAttributesTable
-  , should = require('chai').should();
+import { DataTypes, DublinCoreMetadata, DublinCoreType, SimpleAttributesTable, UserColumn } from '@ngageoint/geopackage';
 
+var should = require('chai').should();
 
 module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   var columns = [];

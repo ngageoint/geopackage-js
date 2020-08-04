@@ -1,8 +1,7 @@
-import { GeoPackageAPI } from '../..'
 import { default as testSetup } from '../fixtures/testSetup'
+import { GeoPackageAPI } from '@ngageoint/geopackage';
 
-var should = require('chai').should()
-  , path = require('path');
+var should = require('chai').should();
 
 describe('GeoPackageAPI Create tests', function() {
 

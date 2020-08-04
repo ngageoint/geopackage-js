@@ -1,17 +1,8 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import { BoundingBox, ContentsDao, DataTypes, RelatedTablesExtension, UserMappingTable } from '@ngageoint/geopackage';
 
-var DataType = require('../../../../lib/db/dataTypes').DataTypes
-  , Verification = require('../../../fixtures/verification')
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
-  , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow').MediaRow
-  // , testSetup = require('../../../fixtures/testSetup')
-  , RelatedTablesUtils = require('./relatedTablesUtils')
-  , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
+var RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
-  , wkx = require('wkx')
   , path = require('path');
 
 describe('Related Tile tests', function() {

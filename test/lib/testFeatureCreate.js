@@ -1,21 +1,10 @@
-import { GeoPackageAPI } from '../../.'
 import { default as testSetup } from '../fixtures/testSetup'
+import { BoundingBox, DataColumns, DataColumnsDao, DataTypes, FeatureColumn, FeatureTable, FeatureTableReader, GeometryData, WKB } from '@ngageoint/geopackage';
 
-var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
-  , DataColumns = require('../../lib/dataColumns/dataColumns').DataColumns
-  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
-  , Verification = require('../fixtures/verification')
-  , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
+var Verification = require('../fixtures/verification')
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
-  , BoundingBox = require('../../lib/boundingBox').BoundingBox
-  , DataTypes = require('../../lib/db/dataTypes').DataTypes
-  , GeometryData = require('../../lib/geom/geometryData').GeometryData
-  , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
-  // , testSetup = require('../fixtures/testSetup')
-  , should = require('chai').should()
-  , wkb = require('../../lib/wkb/index').WKB
+  , wkb = WKB
   , wkx = require('wkx')
-  , path = require('path');
 
 describe('GeoPackage Feature table create tests', function() {
   var testGeoPackage;

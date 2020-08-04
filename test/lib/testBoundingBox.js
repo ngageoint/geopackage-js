@@ -1,8 +1,6 @@
-var BoundingBox = require('@ngageoint/geopackage').BoundingBox;
-var TileBoundingBoxUtils = require('@ngageoint/geopackage').TileBoundingBoxUtils;
+import { BoundingBox, TileBoundingBoxUtils } from '@ngageoint/geopackage';
 
 var proj4 = require('proj4')
-var should = require('chai').should();
 
 describe('BoundingBox tests', function() {
 

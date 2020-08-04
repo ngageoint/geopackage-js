@@ -1,11 +1,6 @@
-import {UserTable} from '../../../../lib/user/userTable';
-import {UserColumn} from '../../../../lib/user/userColumn';
-import {UserRow} from '../../../../lib/user/userRow';
-import { DataTypes } from '../../../../lib/db/dataTypes';
+import { DataTypes, DublinCoreMetadata, DublinCoreType, UserColumn, UserRow, UserTable } from '@ngageoint/geopackage';
 
-var DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
-  , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
-  , should = require('chai').should();
+var should = require('chai').should();
 
 describe('Dublin Core tests', function() {
 

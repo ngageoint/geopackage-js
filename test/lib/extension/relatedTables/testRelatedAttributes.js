@@ -1,11 +1,7 @@
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
-import {UserMappingTable} from '../../../../lib/extension/relatedTables/userMappingTable';
+import { DataType, RelatedTablesExtension, UserMappingTable } from '@ngageoint/geopackage';
 
-var DataType = require('../../../../lib/db/dataTypes').DataTypes
-  // , testSetup = require('../../../fixtures/testSetup')
-  , RelatedTablesUtils = require('./relatedTablesUtils')
+var RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , path = require('path');
 
