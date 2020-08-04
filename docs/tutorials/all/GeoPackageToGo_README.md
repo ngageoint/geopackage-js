@@ -8,7 +8,7 @@ Map tiles from [OpenStreetMap](https://www.openstreetmap.org/).
 
 This example page opens a GeoPackage with local landmarks, pizza restaurants, vectors of the parks, and OpenStreetMap tiles from St. Louis and displays them on a Leaflet map.
 
-Want to learn more? See the API [documentation](http://ngageoint.github.io/geopackage-js/jsdoc/module-geoPackage-GeoPackage.html).
+Want to learn more? See the API [documentation](https://ngageoint.github.io/geopackage-js/api-docs/).
 
 ### Run
 
