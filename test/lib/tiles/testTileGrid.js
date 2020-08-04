@@ -1,5 +1,4 @@
-var TileGrid = require('../../../lib/tiles/tileGrid').TileGrid
-  , should = require('chai').should();
+import { TileGrid } from '@ngageoint/geopackage';
 
 describe('TileGrid tests', function() {
 

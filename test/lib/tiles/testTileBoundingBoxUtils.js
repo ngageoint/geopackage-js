@@ -1,7 +1,4 @@
-const
-  TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
-  , TileUtils = require('../../../lib/tiles/creator/tileUtilities')
-  , BoundingBox = require('../../../lib/boundingBox').BoundingBox;
+import { BoundingBox, TileBoundingBoxUtils, TileUtilities } from '@ngageoint/geopackage';
 
 require('chai').should();
 
@@ -63,7 +60,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var tileWidthUnitsPerPixel = 19567.879241005125;
     var pixelXSize = 19567.87924100512;
     var pixelYSize = 19567.87924100512;
-    var piecePosition = TileUtils.getPiecePosition(tilePieceBoundingBox, tileBoundingBox, height, width, projectionTo, projectionFrom, projectionFromDefinition, tileHeightUnitsPerPixel, tileWidthUnitsPerPixel, pixelXSize, pixelYSize);
+    var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, tileBoundingBox, height, width, projectionTo, projectionFrom, projectionFromDefinition, tileHeightUnitsPerPixel, tileWidthUnitsPerPixel, pixelXSize, pixelYSize);
     var finalWidth = (piecePosition.endX - piecePosition.startX);
     finalWidth.should.be.gt(0);
     done();

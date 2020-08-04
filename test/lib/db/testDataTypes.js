@@ -1,4 +1,4 @@
-var DataTypes = require('../../../lib/db/dataTypes').DataTypes;
+var DataTypes = require('@ngageoint/geopackage').DataTypes;
 
 var should = require('chai').should();
 

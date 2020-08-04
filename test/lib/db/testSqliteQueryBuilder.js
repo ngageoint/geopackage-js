@@ -1,4 +1,4 @@
-var QueryBuilder = require('../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
+var QueryBuilder = require('@ngageoint/geopackage').SqliteQueryBuilder
   , should = require('chai').should();
 
 describe('SqliteQueryBuilder tests', function() {

@@ -1,8 +1,7 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../fixtures/testSetup';
+import { TileDao } from '@ngageoint/geopackage';
 
-var TileDao = require('../../../lib/tiles/user/tileDao').TileDao
-  // , testSetup = require('../../fixtures/testSetup')
-  , should = require('chai').should()
+var should = require('chai').should()
   , path = require('path');
 
 describe('TileDao tests', function() {

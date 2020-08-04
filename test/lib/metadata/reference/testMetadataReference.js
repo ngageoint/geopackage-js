@@ -1,12 +1,7 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../fixtures/testSetup';
+import { GeoPackage, Metadata, MetadataReference, TableCreator  } from '@ngageoint/geopackage';
 
-var fs = require('fs-extra')
-  , should = require('chai').should()
-  , path = require('path')
-  , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').MetadataReference
-  , Metadata = require('../../../../lib/metadata/metadata').Metadata
-  , GeoPackage = require('../../../../lib/geoPackage')
-  , TableCreator = require('../../../../lib/db/tableCreator').TableCreator
+var should = require('chai').should()
   , Verification = require('../../../fixtures/verification');
 
 describe('Metadata Reference tests', function() {

@@ -1,8 +1,5 @@
-
-var TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
-  , TileMatrixSet = require('../../../lib/tiles/matrixset/tileMatrixSet').TileMatrixSet
-  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
-  , testSetup = require('../../fixtures/testSetup').default
+import { TileMatrixSetDao, BoundingBox} from '@ngageoint/geopackage';
+var testSetup = require('../../fixtures/testSetup').default
   , should = require('chai').should()
   , path = require('path');
 

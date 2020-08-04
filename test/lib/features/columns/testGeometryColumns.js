@@ -1,8 +1,8 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
+var GeometryColumnsDao = require('@ngageoint/geopackage').GeometryColumnsDao
   // @ts-ignore
-  , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
+  , GeoPackageConnection = require('@ngageoint/geopackage').GeoPackageConnection
   , should = require('chai').should()
   , path = require('path');
 

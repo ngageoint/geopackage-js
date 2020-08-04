@@ -1,11 +1,8 @@
-import {GeoPackage} from '../../../lib/geoPackage';
+import {GeoPackage, Metadata, MetadataDao} from '@ngageoint/geopackage';
 
 var fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path')
-  // , GeoPackage = require('../../../lib/geoPackage')
-  , Metadata = require('../../../lib/metadata/metadata').Metadata
-  , MetadataDao = require('../../../lib/metadata/metadataDao').MetadataDao;
 
 describe('Metadata tests', function() {
 

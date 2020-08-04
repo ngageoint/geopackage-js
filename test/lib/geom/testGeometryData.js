@@ -1,5 +1,5 @@
 // @ts-nocheck
-var GeometryData = require('../../../lib/geom/geometryData').GeometryData;
+var GeometryData = require('@ngageoint/geopackage').GeometryData;
 
 var wkx = require('wkx')
   , should = require('chai').should();

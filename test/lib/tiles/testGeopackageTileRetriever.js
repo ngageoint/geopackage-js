@@ -1,11 +1,8 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../fixtures/testSetup';
+import { BoundingBox, GeoPackageTileRetriever} from '@ngageoint/geopackage';
+import { assert } from 'console';
 
-var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
-  // , GeoPackageAPI = require('../../..')
-  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
-  // , testSetup = require('../../fixtures/testSetup')
-  , proj4 = require('proj4')
-  , fs = require('fs-extra')
+var proj4 = require('proj4')
   , should = require('chai').should()
   , path = require('path');
 
@@ -23,6 +20,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(riversfilename);
+      console.log(result)
       filename = result.path;
       geoPackage = result.geopackage;
       tileDao = geoPackage.getTileDao('TILESosmds');
@@ -52,19 +50,9 @@ describe('GeoPackage Tile Retriever tests', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(2,1,2)
       .then(function(tile) {
+        console.log(tile)
         testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
-        });
-      });
-    });
-
-    it('should get the web mercator x: 2, y: 1, z: 2 tile', function(done) {
-      this.timeout(30000);
-      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.getWebMercatorTile(2,1,2)
-      .then(function(tile) {
-        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+          console.log('compared', equal)
           equal.should.be.equal(true);
           done();
         });

@@ -1,7 +1,5 @@
-var FeaturePaint = require('../../../../lib/tiles/features/featurePaint').FeaturePaint
-  , Paint = require('../../../../lib/tiles/features/paint').Paint
-  , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
-  , should = require('chai').should();
+import { FeatureDrawType, FeaturePaint, Paint } from '@ngageoint/geopackage';
+var should = require('chai').should();
 
 describe('FeaturePaint Tests', function() {
   it('should test FeaturePaint', function() {

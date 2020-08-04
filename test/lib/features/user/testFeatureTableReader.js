@@ -1,8 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader
-  , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
-  // , GeoPackageAPI = require('../../../../.')
+var FeatureTableReader = require('@ngageoint/geopackage').FeatureTableReader
+  , GeometryColumnsDao = require('@ngageoint/geopackage').GeometryColumnsDao
   , path = require('path')
   , should = require('chai').should();
 

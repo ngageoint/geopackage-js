@@ -1,18 +1,9 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-
+import {BoundingBox, DataTypes, FeatureColumn, FeatureDao, GeometryData, MediaTable } from '@ngageoint/geopackage';
 // @ts-ignore
 // @ts-ignore
-var FeatureDao = require('../../../../lib/features/user/featureDao').FeatureDao
-  , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
-  , DataTypes = require('../../../../lib/db/dataTypes').DataTypes
-  // , GeoPackageAPI = require('../../../../index.js')
-  , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
-  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
-  // , testSetup = require('../../../fixtures/testSetup')
-  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+var SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
   , wkx = require('wkx')
   // @ts-ignore
   // @ts-ignore

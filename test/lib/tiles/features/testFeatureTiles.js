@@ -1,16 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { default as GeoPackageUtils } from '../../../geopackageUtils'
+import { DataTypes, FeatureColumn, FeatureTilePointIcon, FeatureTiles, GeometryData, ImageUtils, NumberFeaturesTile, ShadedFeaturesTile } from '@ngageoint/geopackage';
 
-var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
-  , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
-  , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
-  , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
-  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
-  , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
-  , DataTypes = require('../../../../lib/db/dataTypes').DataTypes
-  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
-  , fs = require('fs-extra')
+var fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path')
   , wkx = require('wkx');

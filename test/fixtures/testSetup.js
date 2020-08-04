@@ -1,22 +1,21 @@
 // @ts-nocheck
-import { GeoPackageAPI, GeoPackage, GeoPackageConnection } from '@ngageoint/geopackage';
+import { GeoPackage, GeoPackageAPI, GeoPackageConnection, ImageUtils } from '@ngageoint/geopackage';
 
 var fs = require('fs-extra')
   , path = require('path')
   , crypto = require('crypto')
-  , ImageUtils = require('@ngageoint/geopackage/lib/tiles/imageUtils').ImageUtils;
 
 module.exports.createTempName = function() {
   return 'gp_'+crypto.randomBytes(4).readUInt32LE(0)+'.gpkg';
 };
 
-module.exports.copyGeopackage = function(orignal) {
+module.exports.copyGeopackage = function(original) {
   var copy = path.join(__dirname, 'tmp', module.exports.createTempName());
 
   return new Promise(function(resolve, reject) {
     if (typeof(process) !== 'undefined' && process.version) {
       var fsExtra = require('fs-extra');
-      fsExtra.copy(orignal, copy, function(err) {
+      fsExtra.copy(original, copy, function(err) {
         resolve(copy);
       });
     } else {
@@ -40,21 +39,28 @@ module.exports.createGeoPackage = async function(gppath) {
     await fs.open(gppath, 'w');
     return await GeoPackageAPI.create(gppath)
   }
+  else {
+    return await GeoPackageAPI.create();
+  }
 };
 
 module.exports.createBareGeoPackage = async function(gppath) {
   if (typeof(process) !== 'undefined' && process.version) {
     await fs.mkdirp(path.dirname(gppath))
     await fs.open(gppath, 'w');
-    let connection = await GeoPackageConnection.connect(gppath)
+    let connection = await GeoPackageConnection.connect(gppath);
     return new GeoPackage(path.basename(gppath), gppath, connection);
+  }
+  else {
+    let connection = await GeoPackageConnection.connect();
+    return new GeoPackage('geopackage', undefined, connection);
   }
 };
 
 module.exports.deleteGeoPackage = async function(gppath) {
   if (typeof(process) !== 'undefined' && process.version) {
     try {
-    await fs.unlink(gppath);
+      await fs.unlink(gppath);
     } catch (e) {}
   }
 };
@@ -83,6 +89,7 @@ global.loadTile = module.exports.loadTile = async function(tilePath) {
 };
 
 module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
+  console.log('diff');
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
 };
 
@@ -189,8 +196,9 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         var image2 = new Image();
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
-
+          console.log('equal', ctx2)
           var equal = module.exports.diffCanvasesContexts(ctx, ctx2, width, height);
+          
           if (!equal) {
             var h1Tags = document.getElementsByTagName('h1');
             var h2Tags = document.getElementsByTagName('li');

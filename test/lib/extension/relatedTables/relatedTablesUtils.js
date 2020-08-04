@@ -1,8 +1,8 @@
-var DataTypes = require('../../../../lib/db/dataTypes').DataTypes
-  , UserColumn = require('../../../../lib/user/userColumn').UserColumn
-  , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
-  , DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
+var DataTypes = require('@ngageoint/geopackage').DataTypes
+  , UserColumn = require('@ngageoint/geopackage').UserColumn
+  , DublinCoreType = require('@ngageoint/geopackage').DublinCoreType
+  , DublinCoreMetadata = require('@ngageoint/geopackage').DublinCoreMetadata
+  , SimpleAttributesTable = require('@ngageoint/geopackage').SimpleAttributesTable
   , should = require('chai').should();
 
 

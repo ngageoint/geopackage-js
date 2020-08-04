@@ -1,10 +1,8 @@
 import { default as testSetup } from '../../fixtures/testSetup'
-import { TableCreator } from '../../../lib/db/tableCreator'
+import { TableCreator, TileTable, WKB } from '@ngageoint/geopackage'
 
-var TileTable = require('../../../lib/tiles/user/tileTable').TileTable
-  , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
+var SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
-  , wkb = require('../../../lib/wkb/index').WKB
   , should = require('chai').should()
   , path = require('path');
 
@@ -164,7 +162,7 @@ describe('TableCreator tests', function() {
   });
 
   it('should create a user feature table', function(done) {
-    var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom', wkb.typeMap.wkt.Point);
+    var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom', WKB.typeMap.wkt.Point);
     var tc = new TableCreator(geopackage);
     var result = tc.createUserTable(featureTable);
     Verification.verifyTableExists(geopackage, 'test_features').should.be.equal(true);

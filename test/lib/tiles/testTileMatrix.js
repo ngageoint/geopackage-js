@@ -1,7 +1,5 @@
-
-var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
-  , TileMatrix = require('../../../lib/tiles/matrix/tileMatrix').TileMatrix
-  , testSetup = require('../../fixtures/testSetup').default
+import { TileMatrixDao } from '@ngageoint/geopackage';
+var testSetup = require('../../fixtures/testSetup').default
   , should = require('chai').should()
   , path = require('path');
 
