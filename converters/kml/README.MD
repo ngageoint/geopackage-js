@@ -34,7 +34,7 @@ Using a Xml streaming library to read the kml file and convert the hierarchal da
 - [ ] StyleMaps
   - currently only captures normal style
 - [ ] Region
-- [ ] gx:x, gx:y, gx:h and gx:w
+- [x] gx:x, gx:y, gx:h and gx:w
 
 ---
 ### Does not support and no plans to support currently

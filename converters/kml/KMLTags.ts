@@ -102,6 +102,8 @@ export const FOLDER_TAG = 'Folder';
  */
 export const GROUND_OVERLAY_TAG = 'GroundOverlay';
 
+export const ICON_STYLE_TAG = 'IconStyle';
+
 /**
  * ### Defines an image associated with an Icon style or overlay.
  *
@@ -1114,7 +1116,7 @@ export const STYLE_TYPE_TAGS = {
    */
   BALLOON_STYLE: BALLOON_STYLE_TAG,
 
-  ICON_STYLE: ICON_TAG,
+  ICON_STYLE: ICON_STYLE_TAG,
 
   /**
    * Not Currently supported

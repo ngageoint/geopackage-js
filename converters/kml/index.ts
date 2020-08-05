@@ -172,9 +172,7 @@ export class KMLToGeoPackage {
     let gp: GeoPackage;
     await new Promise(async resolve => {
       if (progressCallback) await progressCallback({ status: 'Extracting files form KMZ' });
-      // console.log(zip.files);
       for (const key in zip.files) {
-        // console.log(key, zip.files);
         await new Promise(async (resolve, reject) => {
           if (zip.files.hasOwnProperty(key)) {
             if (isNode) {
@@ -478,9 +476,9 @@ export class KMLToGeoPackage {
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POINT);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.LINESTRING);
       kml.collect(KMLTAGS.GEOMETRY_TAGS.POLYGON);
-      kml.collect('Data');
-      kml.collect('value');
-      kml.collect('Placemark');
+      kml.collect(KMLTAGS.DATA_TAG);
+      kml.collect(KMLTAGS.VALUE_TAG);
+      kml.collect(KMLTAGS.PLACEMARK_TAG);
       kml.on('endElement: ' + KMLTAGS.NETWORK_LINK_TAG, async (node: any) => {
         kmlOnsRunning++;
         if (node.hasOwnProperty('Link') || node.hasOwnProperty('Url')) {
@@ -708,12 +706,12 @@ export class KMLToGeoPackage {
       } else if (prop === KMLTAGS.STYLE_TAG) {
         try {
           const tempMap = new Map<string, object>();
-          tempMap.set(node.name, node.Style);
+          tempMap.set(node[KMLTAGS.NAME_TAG], node[KMLTAGS.STYLE_TAG]);
           this.addSpecificStyles(defaultStyles, tempMap);
           this.addSpecificIcons(defaultStyles, tempMap);
-          const styleId = this.styleUrlMap.get('#' + node.name);
+          const styleId = this.styleUrlMap.get('#' + node[KMLTAGS.NAME_TAG]);
           styleRow = this.styleRowMap.get(styleId);
-          const iconId = this.iconUrlMap.get('#' + node.name);
+          const iconId = this.iconUrlMap.get('#' + node[KMLTAGS.NAME_TAG]);
           iconRow = this.iconRowMap.get(iconId);
         } catch (err) {
           console.error('Error in mapping local style tags:', err);

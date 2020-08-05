@@ -125,7 +125,6 @@ export class KMLUtilities {
     );
   }
 
-
   /**
    * Converts kml geometries (Point, LineString, and Polygon) into GeoJSON features
    *
@@ -313,10 +312,13 @@ export class KMLUtilities {
     if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
     const defaultIcon = defaultStyles.getIconDao().newRow();
     try {
-      defaultIcon.name = 'ylw-pushpin';
+      defaultIcon.name = 'black_marker';
       defaultIcon.anchorU = 0.5;
-      defaultIcon.anchorV = 0.5;
-      defaultIcon.data = await Jimp.read('http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png')
+      defaultIcon.anchorV = 0;
+      const defaultImage =
+        'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAk9JREFUaAXtmb1KxEAUhf3BQhtrtbMUbESwEhYLBVGsfBNfQER8BmsfQC0ttFAQQbBWwVIrC9FKRfR8sCkcMzs3uzNJFnPgsJmZO+fcuZkku9mBgQZNBf53BQYjL39OehviojglTorgSXwUL8Rj8UasFTaVzZ34bSSxzKkc08rgSrQm7sYxF41K0JLrs+gmVbSNBlqloiW3D7Fosr54tNAsBZzyGJV3F4NmKduplz3vJu220U4K7hyuaex20rtTkVtltwvDIwl4SFmTOlfsujjRJsf0WefjFR3bUrQksKu4oRx3+hizaOAVHWdSDJlT5bzks2QYIyakg1d0WPY/WyUEYkILSHIdvBmM2fMhEBNaAF4mdDrdrsCw25GwbfYqsgCelCHMhwI0bomxeBmsfoecqhk69VygnYrCGDEhHbxM6GTmCly7HTltfsjsiHm69DFGTAgWr5DGn/EV9YQql41T5V4eZHhFx4gUX8QsyVSfeOBlQt6p9k381MChbzBiPx54JcGCVFNVPtPFIym4wDKz2J9JLl63GqsJF4B2KbiUS+zqo1kaluQUewFolgrL12vrIpN8fQ5VY1YBMV6toIFWJdiTq7XKvjg0KsOonB9EX3KhfuaiUSmW5R5K1DfO3FpgX1n4kvT1M6c2GFMmt6IvWbefWObUCrzLeRfdZN02MUne+8SoxpZhAcTUFvxldSS6Vc/ajMX+Wyt6McaleJ+zCPoY6wvMKMtXMas8x/T1FdaU7VebHCeB+QVSF+5sGSp/Ih50Mb+Z0lSgqYChAj/TCV35EewaiAAAAABJRU5ErkJggg==';
+      const bufferImg = Buffer.from(defaultImage, 'base64');
+      defaultIcon.data = await Jimp.read(bufferImg)
         .then(img => {
           defaultIcon.width = img.getWidth();
           defaultIcon.height = img.getHeight();
