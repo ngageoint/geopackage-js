@@ -15,7 +15,7 @@ import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extensio
 
 // Read KML
 import fs, { PathLike } from 'fs';
-import XmlStream from 'xml-stream';
+import XmlStream from 'xml-stream-saxjs';
 import path from 'path';
 
 // Read KMZ

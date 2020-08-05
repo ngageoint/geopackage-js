@@ -43,7 +43,7 @@
     "lodash": "^4.17.15",
     "request": "^2.88.2",
     "sqlite3": "^4.2.0",
-    "xml-stream": "git://github.com/JaredLincenberg/xml-stream.git"
+    "xml-stream-saxjs": "^0.4.6"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "0.1.3",
