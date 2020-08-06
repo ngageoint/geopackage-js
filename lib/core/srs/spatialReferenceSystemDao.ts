@@ -85,7 +85,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
   getByOrganizationAndCoordSysId(organization: string, organizationCoordSysId: number): SpatialReferenceSystem {
     const cv = new ColumnValues();
     cv.addColumn('organization', organization);
-    cv.addColumn('organization_coordsys_id', organizationCoordsysId);
+    cv.addColumn('organization_coordsys_id', organizationCoordSysId);
     const results: Record<string, DBValue>[] = this.queryForAll(this.buildWhere(cv), this.buildWhereArgs(cv));
     if (results && results.length) {
       return this.createObject(results[0]);
@@ -180,7 +180,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {Number} id of the created row
    */
   createWebMercator(): number {
-    let srs = this.getByOrganizationAndCoordsysId('EPSG', 3857);
+    let srs = this.getByOrganizationAndCoordSysId('EPSG', 3857);
     if (srs) {
       return srs.srs_id;
     }
