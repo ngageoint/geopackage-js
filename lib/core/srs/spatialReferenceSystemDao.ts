@@ -83,10 +83,10 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
   }
 
   getByOrganizationAndCoordsysId(organization: string, organization_coordsys_id: number): SpatialReferenceSystem {
-    let cv = new ColumnValues();
-    cv.addColumn("organization", organization);
-    cv.addColumn("organization_coordsys_id", organization_coordsys_id);
-    let results: Record<string, DBValue>[] = this.queryForAll(this.buildWhere(cv), this.buildWhereArgs(cv));
+    const cv = new ColumnValues();
+    cv.addColumn('organization', organization);
+    cv.addColumn('organization_coordsys_id', organization_coordsys_id);
+    const results: Record<string, DBValue>[] = this.queryForAll(this.buildWhere(cv), this.buildWhereArgs(cv));
     if (results && results.length) {
       return this.createObject(results[0]);
     }
