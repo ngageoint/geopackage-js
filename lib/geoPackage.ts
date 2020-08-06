@@ -932,12 +932,12 @@ export class GeoPackage {
   ): Promise<TileMatrixSet> {
     if (contentsSrsId !== 3857) {
       const srsDao = new SpatialReferenceSystemDao(this);
-      const from = srsDao.getByOrganizationAndCoordsysId('EPSG', contentsSrsId).projection;
+      const from = srsDao.getByOrganizationAndCoordSysId('EPSG', contentsSrsId).projection;
       contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, 'EPSG:3857');
     }
     if (tileMatrixSetSrsId !== 3857) {
       const srsDao = new SpatialReferenceSystemDao(this);
-      const from = srsDao.getByOrganizationAndCoordsysId('EPSG', contentsSrsId).projection;
+      const from = srsDao.getByOrganizationAndCoordSysId('EPSG', contentsSrsId).projection;
       tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, 'EPSG:3857');
     }
     const tileMatrixSet = await this.createTileTableWithTableName(
