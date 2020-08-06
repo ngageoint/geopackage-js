@@ -930,6 +930,12 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = 256,
   ): Promise<TileMatrixSet> {
+    if (contentsSrsId !== 3857) {
+      contentsBoundingBox = contentsBoundingBox.projectBoundingBox('EPSG:' + contentsSrsId, 'EPSG:3857');
+    }
+    if (tileMatrixSetSrsId !== 3857) {
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox('EPSG:' + tileMatrixSetSrsId, 'EPSG:3857');
+    }
     const tileMatrixSet = await this.createTileTableWithTableName(
       tableName,
       contentsBoundingBox,
@@ -940,7 +946,61 @@ export class GeoPackage {
     this.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, tileSize);
     return tileMatrixSet;
   }
-
+  /**
+   * Create the [tables and rows](https://www.geopackage.org/spec121/index.html#tiles)
+   * necessary to store tiles according to the ubiquitous [XYZ web/slippy-map tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) scheme.
+   * The extent for the [contents table]{@link module:core/contents~Contents} row,
+   * `contentsBoundingBox`, is [informational only](https://www.geopackage.org/spec121/index.html#gpkg_contents_cols),
+   * and need not match the [tile matrix set]{@link module:tiles/matrixset~TileMatrixSet}
+   * extent, `tileMatrixSetBoundingBox`, which should be the precise bounding box
+   * used to calculate the tile row and column coordinates of all tiles in the
+   * tile set.  The two SRS ID parameters, `contentsSrsId` and `tileMatrixSetSrsId`,
+   * must match, however.  See {@link module:tiles/matrixset~TileMatrixSet} for
+   * more information about how GeoPackage consumers use the bouding boxes for a
+   * tile set.
+   *
+   * @param {string} tableName the name of the table that will store the tiles
+   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link module:core/contents~Contents} table row for the tile matrix set
+   * @param {SRSRef} contentsSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}; must match `tileMatrixSetSrsId`
+   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link module:tiles/matrixset~TileMatrixSet} table row
+   * @param {SRSRef} tileMatrixSetSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}
+   *   for the [tile matrix set](https://www.geopackage.org/spec121/index.html#_tile_matrix_set) table; must match `contentsSrsId`
+   * @param {Set<number>} zoomLevels create tile of all resolutions in the set.
+   * @param tileSize the width and height in pixels of the tile images; defaults to 256
+   * @returns {Promise} a `Promise` that resolves with the created {@link module:tiles/matrixset~TileMatrixSet} object, or rejects with an `Error`
+   *
+   * @todo make `tileMatrixSetSrsId` optional because it always has to be the same anyway
+   */
+  async createStandardWebMercatorTileTableWithZoomLevels(
+    tableName: string,
+    contentsBoundingBox: BoundingBox,
+    contentsSrsId: number,
+    tileMatrixSetBoundingBox: BoundingBox,
+    tileMatrixSetSrsId: number,
+    zoomLevels: Set<number>,
+    tileSize = 256,
+  ): Promise<TileMatrixSet> {
+    if (contentsSrsId !== 3857) {
+      contentsBoundingBox = contentsBoundingBox.projectBoundingBox('EPSG:' + contentsSrsId, 'EPSG:3857');
+    }
+    if (tileMatrixSetSrsId !== 3857) {
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox('EPSG:' + tileMatrixSetSrsId, 'EPSG:3857');
+    }
+    const tileMatrixSet = await this.createTileTableWithTableName(
+      tableName,
+      contentsBoundingBox,
+      contentsSrsId,
+      tileMatrixSetBoundingBox,
+      tileMatrixSetSrsId,
+    );
+    this.createStandardWebMercatorTileMatrixWithZoomLevels(
+      tileMatrixSetBoundingBox,
+      tileMatrixSet,
+      zoomLevels,
+      tileSize,
+    );
+    return tileMatrixSet;
+  }
   /**
    * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
    * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
@@ -963,25 +1023,70 @@ export class GeoPackage {
     tileSize = tileSize || 256;
     const tileMatrixDao = this.tileMatrixDao;
     for (let zoom = minZoom; zoom <= maxZoom; zoom++) {
-      const box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoom);
-      const matrixWidth = box.maxLongitude - box.minLongitude + 1;
-      const matrixHeight = box.maxLatitude - box.minLatitude + 1;
-      const pixelXSize =
-        (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
-      const pixelYSize =
-        (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
-      const tileMatrix = new TileMatrix();
-      tileMatrix.table_name = tileMatrixSet.table_name;
-      tileMatrix.zoom_level = zoom;
-      tileMatrix.matrix_width = matrixWidth;
-      tileMatrix.matrix_height = matrixHeight;
-      tileMatrix.tile_width = tileSize;
-      tileMatrix.tile_height = tileSize;
-      tileMatrix.pixel_x_size = pixelXSize;
-      tileMatrix.pixel_y_size = pixelYSize;
-      tileMatrixDao.create(tileMatrix);
+      this.createTileMatrixRow(epsg3857TileBoundingBox, tileMatrixSet, tileMatrixDao, zoom, tileSize);
     }
     return this;
+  }
+  /**
+   * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
+   * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
+   * for every item in the set zoomLevels.
+   *
+   * @param {BoundingBox} epsg3857TileBoundingBox
+   * @param {TileMatrixSet} tileMatrixSet
+   * @param {Set<number>} zoomLevels
+   * @param {number} [tileSize=256] optional tile size in pixels
+   * @returns {module:geoPackage~GeoPackage} `this` `GeoPackage`
+   */
+  createStandardWebMercatorTileMatrixWithZoomLevels(
+    epsg3857TileBoundingBox: BoundingBox,
+    tileMatrixSet: TileMatrixSet,
+    zoomLevels: Set<number>,
+    tileSize = 256,
+  ): GeoPackage {
+    tileSize = tileSize || 256;
+    const tileMatrixDao = this.tileMatrixDao;
+    zoomLevels.forEach(zoomLevel => {
+      this.createTileMatrixRow(epsg3857TileBoundingBox, tileMatrixSet, tileMatrixDao, zoomLevel, tileSize);
+    });
+    return this;
+  }
+
+  /**
+   * Adds row to tileMatrixDao
+   *
+   * @param {BoundingBox} epsg3857TileBoundingBox
+   * @param {TileMatrixSet} tileMatrixSet
+   * @param {TileMatrixDao} tileMatrixDao
+   * @param {number} zoomLevel
+   * @param {number} [tileSize=256]
+   * @returns {number}
+   * @memberof GeoPackage
+   */
+  createTileMatrixRow(
+    epsg3857TileBoundingBox: BoundingBox,
+    tileMatrixSet: TileMatrixSet,
+    tileMatrixDao: TileMatrixDao,
+    zoomLevel: number,
+    tileSize = 256,
+  ): number {
+    const box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoomLevel);
+    const matrixWidth = box.maxLongitude - box.minLongitude + 1;
+    const matrixHeight = box.maxLatitude - box.minLatitude + 1;
+    const pixelXSize =
+      (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
+    const pixelYSize =
+      (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
+    const tileMatrix = new TileMatrix();
+    tileMatrix.table_name = tileMatrixSet.table_name;
+    tileMatrix.zoom_level = zoomLevel;
+    tileMatrix.matrix_width = matrixWidth;
+    tileMatrix.matrix_height = matrixHeight;
+    tileMatrix.tile_width = tileSize;
+    tileMatrix.tile_height = tileSize;
+    tileMatrix.pixel_x_size = pixelXSize;
+    tileMatrix.pixel_y_size = pixelYSize;
+    return tileMatrixDao.create(tileMatrix);
   }
   /**
    * Adds a tile to the GeoPackage
