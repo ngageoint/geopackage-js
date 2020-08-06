@@ -930,22 +930,24 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = 256,
   ): Promise<TileMatrixSet> {
-    if (contentsSrsId !== 3857) {
+    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
+
+    if (contentsSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
-      const from = srsDao.getByOrganizationAndCoordSysId('EPSG', contentsSrsId).projection;
+      const from = srsDao.getBySrsId(contentsSrsId).projection;
       contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, 'EPSG:3857');
     }
-    if (tileMatrixSetSrsId !== 3857) {
+    if (tileMatrixSetSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
-      const from = srsDao.getByOrganizationAndCoordSysId('EPSG', contentsSrsId).projection;
+      const from = srsDao.getBySrsId(tileMatrixSetSrsId).projection;
       tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, 'EPSG:3857');
     }
     const tileMatrixSet = await this.createTileTableWithTableName(
       tableName,
       contentsBoundingBox,
-      contentsSrsId,
+      webMercatorSrsId,
       tileMatrixSetBoundingBox,
-      tileMatrixSetSrsId,
+      webMercatorSrsId,
     );
     this.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, tileSize);
     return tileMatrixSet;
@@ -976,12 +978,13 @@ export class GeoPackage {
     zoomLevels: Set<number>,
     tileSize = 256,
   ): Promise<TileMatrixSet> {
+    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
     const tileMatrixSet = await this.createTileTableWithTableName(
       tableName,
       contentsBoundingBox,
-      3857,
+      webMercatorSrsId,
       tileMatrixSetBoundingBox,
-      3857,
+      webMercatorSrsId,
     );
     this.createStandardWebMercatorTileMatrixWithZoomLevels(
       tileMatrixSetBoundingBox,
