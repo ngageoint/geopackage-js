@@ -91,7 +91,7 @@ export class KMLToGeoPackage {
    * Converts KML and KMZ to GeoPackages.
    *
    * @param {KMLConverterOptions} options
-   * @param {Function} progressCallback 
+   * @param {Function} progressCallback
    */
   async convert(options?: KMLConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
     const clonedOptions = { ...options };
@@ -121,7 +121,6 @@ export class KMLToGeoPackage {
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
-    // console.log(geopackage);
     if (!isKMZ) {
       if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
       if (isNode) {

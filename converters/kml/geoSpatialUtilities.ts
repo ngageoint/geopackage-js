@@ -221,8 +221,8 @@ export class GeoSpatialUtilities {
    * @param naturalScale Zoom level closest to one to one in terms of pixels
    * @returns A list of zoom levels
    */
-  public static getZoomLevels(bbox: BoundingBox, naturalScale: number): number[] {
-    const levels = [];
+  public static getZoomLevels(bbox: BoundingBox, naturalScale: number): Set<number> {
+    const levels = new Set<number>();
     let z = Math.round(naturalScale);
     let ySize: number;
     let xSize: number;
@@ -236,7 +236,7 @@ export class GeoSpatialUtilities {
       const xRange = GeoSpatialUtilities.calculateXTileRange(bbox, z);
       ySize = yRange.max - yRange.min + 1;
       xSize = xRange.max - xRange.min + 1;
-      levels.push(z);
+      levels.add(z);
       z -= 2;
     } while (xSize * ySize !== 1 && z > 0);
     return levels;

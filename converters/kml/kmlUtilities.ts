@@ -51,27 +51,32 @@ export class KMLUtilities {
     image: Jimp,
     progressCallback?: Function,
   ): Promise<void> {
-    if (progressCallback) progressCallback({ status: 'Setting Up Web Mercator Tile Table' });
-    const imageName = node.name;
+    const imageName = node[KMLTAGS.NAME_TAG];
     let kmlBBox = KMLUtilities.getLatLonBBox(node);
 
-    const matrixSetBounds = new BoundingBox(
-      -20037508.342789244,
-      20037508.342789244,
-      -20037508.342789244,
-      20037508.342789244,
-    );
+    if (node.LatLonBox.hasOwnProperty('rotation')) {
+      if (progressCallback) progressCallback({ status: 'Rotating Ground Overlay' });
+      const rotation = parseFloat(node.LatLonBox.rotation);
+      kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
+      image.rotate(rotation);
+    }
+    const kmlBBoxWebMercator = kmlBBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
 
-    const contentsSrsId = 4326;
+    const kmlContentsSrsId = 3857;
     const tileMatrixSetSrsId = 3857;
-    geopackage.createStandardWebMercatorTileTable(
+
+    if (progressCallback) progressCallback({ status: 'Making 4326 Image fit 3857 bounding Box.' });
+    [kmlBBox, image] = await ImageUtilities.truncateImage(kmlBBox, image);
+
+    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, image.getWidth());
+    const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
+
+    if (progressCallback) progressCallback({ status: 'Setting Up Web Mercator Tile Table' });
+    geopackage.createStandardWebMercatorTileTableWithZoomLevels(
       imageName,
-      kmlBBox,
-      contentsSrsId,
-      matrixSetBounds,
-      tileMatrixSetSrsId,
-      0,
-      20,
+      kmlBBoxWebMercator,
+      kmlBBoxWebMercator,
+      zoomLevels,
     );
 
     if (progressCallback) progressCallback({ status: 'Setting Up tile Scaling Extension' });
@@ -80,28 +85,15 @@ export class KMLUtilities {
     const ts = new TileScaling();
     ts.scaling_type = TileScalingType.IN_OUT;
     ts.zoom_in = 2;
-    // ts.zoom_out = 2;
+    ts.zoom_out = 2;
     tileScalingExt.createOrUpdate(ts);
-
-    if (node.LatLonBox.hasOwnProperty('rotation')) {
-      if (progressCallback) progressCallback({ status: 'Rotating Ground Overlay' });
-      const rotation = parseFloat(node.LatLonBox.rotation);
-      kmlBBox = GeoSpatialUtilities.getKmlBBoxRotation(kmlBBox, rotation);
-      image.rotate(rotation);
-    }
-
-    if (progressCallback) progressCallback({ status: 'Making 4326 Image fit 3857 bounding Box.' });
-    [kmlBBox, image] = await ImageUtilities.truncateImage(kmlBBox, image);
-
-    const naturalScale = GeoSpatialUtilities.getNaturalScale(kmlBBox, image.getWidth());
-    const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
-
     if (progressCallback)
       progressCallback({
         status: 'Inserting Zoomed and transformed images into Geopackage database.',
         data: { naturalScale: naturalScale, zoomLevels: zoomLevels },
       });
-    ImageUtilities.insertZoomImages(image, zoomLevels, kmlBBox, geopackage, imageName, progressCallback);
+    ImageUtilities.insertZoomImages(image, Array.from(zoomLevels), kmlBBox, geopackage, imageName, progressCallback);
+
     if (progressCallback)
       progressCallback({
         status: 'Inserted images.',

@@ -1,6 +1,8 @@
 const GeoPackage = require('@ngageoint/geopackage');
 const KMLToGeoPackage = require('../index').KMLToGeoPackage;
 const geoSpatialUtilities = require('../geoSpatialUtilities').GeoSpatialUtilities;
+const WEB_MERCATOR_MIN_LAT_RANGE = require('../geoSpatialUtilities').WEB_MERCATOR_MIN_LAT_RANGE;
+const WEB_MERCATOR_MAX_LAT_RANGE = require('../geoSpatialUtilities').WEB_MERCATOR_MAX_LAT_RANGE;
 const kmlUtilities = require('../kmlUtilities').KMLUtilities;
 const imageUtilities = require('../imageUtilities').ImageUtilities;
 
@@ -276,7 +278,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
                 if(e instanceof AssertionError){
                     should.fail()
                 }
-                should.exist(e,)
+                should.exist(e)
             }
         });
         it ('should convert KML parsed lineString to geoJSON Linestring', function () {
@@ -428,29 +430,51 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const bboxTestEq2 =  new GeoPackage.BoundingBox(0, 90, -55, 5);
             assert.isTrue(_.isEqual(bboxTest, bboxTestEq2));
         }); 
-        it ('should convert tile to Longitude and Latitude', function() {
+        it.only ('should convert tiles to Longitude and Latitude', function() {
             let tileX = 0;
             let tileY = 0;
-            let long = geoSpatialUtilities.long2tile(tileX, 0);
-            let lat = geoSpatialUtilities.lat2tile(tileY, 0);
-            long.should.be.equal(0);
-            lat.should.be.equal(0);
+            let long = geoSpatialUtilities.tile2lon(tileX, 0);
+            let lat = geoSpatialUtilities.tile2lat(tileY, 0);
+            long.should.be.equal(-180);
+            lat.should.be.equal(WEB_MERCATOR_MAX_LAT_RANGE);
             tileX = 1;
             tileY = 1;
-            let long = geoSpatialUtilities.long2tile(tileX, 1);
-            let lat = geoSpatialUtilities.lat2tile(tileY, 1);
-            long.should.be.equal(1);
+            let long = geoSpatialUtilities.tile2lon(tileX, 1);
+            let lat = geoSpatialUtilities.tile2lat(tileY, 1);
+            long.should.be.equal(0);
             lat.should.be.equal(0);
+            tileX = 2;
+            tileY = 2;
+            geoSpatialUtilities.tile2lon(tileX, 3).should.be.equal(-90);
+            geoSpatialUtilities.tile2lat(tileY, 3).should.be.equal(66.51326044311186);
+            tileX = 245;
+            tileY = 254;
+            geoSpatialUtilities.tile2lon(tileX, 17).should.be.equal(-179.32708740234375);
+            geoSpatialUtilities.tile2lat(tileY, 17).should.be.equal(84.9905798636361);
 
         });
         it ('should iterateAllTilesInExtentForZoomLevels correctly', function() {
-
+            geoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(bboxWorld, [0], (zxy) => {
+                zxy.z.should.be.equal(0);
+            });
+            let timesCalled = 0;
+            geoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(bboxWorld, [0, 1], (zxy) => {
+                timesCalled ++;
+            }).then(()=>{
+                timesCalled.should.be.equal(1 + 4);
+            });
+            let timesCalled2 = 0
+            geoSpatialUtilities.iterateAllTilesInExtentForZoomLevels(bboxWorld, [0, 2, 4], (zxy) => {
+                timesCalled2 ++;
+            }).then(()=>{
+                timesCalled2.should.be.equal(1 + 16 + 256);
+            });
         });
 
     });
     describe('image Utilities Should work', function(){
         it ('should insertZoomImages', function() {
-
+            
         });
         it ('should getJimpImage', function () {
 
