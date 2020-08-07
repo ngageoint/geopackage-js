@@ -22,6 +22,7 @@ after(function() {
 describe('KML and KMZ to Geopackage Tests', function() {
     
     it ('should convert KML Samples Edited to a GeoPackage', async function() {
+        this.timeout(30000);
         try {
             fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'));
         } catch (e) {}
@@ -46,13 +47,6 @@ describe('KML and KMZ to Geopackage Tests', function() {
         should.exist(attributeTables);
         attributeTables.length.should.be.equal(3);
     });
-    // it ('should reject file with incorrect file extensions', function () {
-    //     const wrongNamesTest = new KMLToGeoPackage({append: true});
-    //     const wrongNames = ['noExtension', 'noPeriod_kml', 'invalidExtension.idk', 'invalidCharacterExtension,kml', 'invalidSpacing.km l', 'invalidCharacter.kÂL', 'kml.invalidOrder', 'doubleExtension.kml.km1', 'ra.n,d!om!.!kml'];
-    //     wrongNames.forEach(wrongName => {
-    //         wrongNamesTest.convertKMLOrKMZToGeopackage(wrongName).then(()=>{should.fail()}).catch((e)=>{should.exist(e)})
-    //     });
-    // });
     it ('should handle a file with a network Link', async function() {
         this.enableTimeouts(false);
         try {
@@ -358,21 +352,25 @@ describe('KML and KMZ to Geopackage Tests', function() {
             // console.log(JSON.stringify(geoJSONPolygon))
             assert.isTrue(_.isEqual(geoJSONPolygon, geoJSONPolygonEq));
         });
-        it ('should correct handle all KML geometry parses.', function (){
-
-        });
         it ('should setUp Geometry Nodes', function() {
+            const multiGeometryNode = {"name":"MultiGeometry","MultiGeometry":{"Polygon":[{"altitudeMode":"absolute","outerBoundaryIs":{"LinearRing":[{"coordinates":{"$children":["\n        37.53604909910388,55.75168185832652,285.185979283664\n        37.53453032649647,55.75184990251844,285.185979283664\n        37.53450920435704,55.75185219338564,285.6859782706089\n        37.53604744350758,55.75168199544795,285.6859782706089\n        37.53604909910388,55.75168185832652,285.185979283664\n        "],"$text":"\n        37.53604909910388,55.75168185832652,285.185979283664\n        37.53453032649647,55.75184990251844,285.185979283664\n        37.53450920435704,55.75185219338564,285.6859782706089\n        37.53604744350758,55.75168199544795,285.6859782706089\n        37.53604909910388,55.75168185832652,285.185979283664\n        ","$name":"coordinates"}}]}},{"altitudeMode":"absolute","outerBoundaryIs":{"LinearRing":[{"coordinates":{"$children":["\n        37.53604909910388,55.75168185832652,285.185979283664\n        37.53604744350758,55.75168199544795,285.6859782706089\n        37.53604727784002,55.75168200338794,285.6859782706089\n        37.53604893342639,55.75168186619818,285.185979283664\n        37.53604909910388,55.75168185832652,285.185979283664\n        "],"$text":"\n        37.53604909910388,55.75168185832652,285.185979283664\n        37.53604744350758,55.75168199544795,285.6859782706089\n        37.53604727784002,55.75168200338794,285.6859782706089\n        37.53604893342639,55.75168186619818,285.185979283664\n        37.53604909910388,55.75168185832652,285.185979283664\n        ","$name":"coordinates"}}]}}],"LineString":[{"altitudeMode":"absolute","tessellate":"1","coordinates":{"$children":[" -112.0814237830345,36.10677870477137,0\n            -112.0870267752693,36.0905099328766,0 "],"$text":" -112.0814237830345,36.10677870477137,0\n            -112.0870267752693,36.0905099328766,0 ","$name":"coordinates"}}]}};
+            const geomNode = kmlUtilities.setUpGeometryNodes(multiGeometryNode);
+            geomNode.length.should.be.equal(3);
+            assert(typeof geomNode === 'object')
+            const geometryNode = {"name":"Relative Extruded","visibility":"0","LookAt":{"longitude":"-112.3351587892382","latitude":"36.14979247129029","altitude":"0","heading":"-55.42811560891606","tilt":"56.10280503739589","range":"401.0997279712519"},"styleUrl":"#transYellowPoly","Polygon":[{"extrude":"1","tessellate":"1","altitudeMode":"relativeToGround","outerBoundaryIs":{"LinearRing":[{"coordinates":{"$children":[" -112.3348783983763,36.1514008468736,100\n                  -112.3372535345629,36.14888517553886,100\n                  -112.3356068927954,36.14781612679284,100\n                  -112.3350034807972,36.14846469024177,100\n                  -112.3358353861232,36.1489624162954,100\n                  -112.3345888301373,36.15026229372507,100\n                  -112.3337937856278,36.14978096026463,100\n                  -112.3331798208424,36.1504472788618,100\n                  -112.3348783983763,36.1514008468736,100 "],"$text":" -112.3348783983763,36.1514008468736,100\n                  -112.3372535345629,36.14888517553886,100\n                  -112.3356068927954,36.14781612679284,100\n                  -112.3350034807972,36.14846469024177,100\n                  -112.3358353861232,36.1489624162954,100\n                  -112.3345888301373,36.15026229372507,100\n                  -112.3337937856278,36.14978096026463,100\n                  -112.3331798208424,36.1504472788618,100\n                  -112.3348783983763,36.1514008468736,100 ","$name":"coordinates"}}]}}]};
+            const geomNode2 = kmlUtilities.setUpGeometryNodes(geometryNode);
+            geomNode2.length.should.be.equal(1);
 
         });
-        it ('should write Multi Geometries', function() {
+        // it ('should write Multi Geometries', function() {
 
-        });
-        it ('should add a specific Icon to the database', function() {
+        // });
+        // it ('should add a specific Icon to the database', function() {
 
-        });
-        it ('should insert an Icon into the geopackage', function() {
+        // });
+        // it ('should insert an Icon into the geopackage', function() {
 
-        });
+        // });
     });
     describe('geoSpatial Utilities should work', function () {
         it ('should find the natural scale and zoom level of images', function() {
@@ -472,15 +470,15 @@ describe('KML and KMZ to Geopackage Tests', function() {
         });
 
     });
-    describe('image Utilities Should work', function(){
-        it ('should insertZoomImages', function() {
+    // describe('image Utilities Should work', function(){
+    //     it ('should insertZoomImages', function() {
             
-        });
-        it ('should getJimpImage', function () {
+    //     });
+    //     it ('should getJimpImage', function () {
 
-        });
-        it ('should truncate Images', function(){
+    //     });
+    //     it ('should truncate Images', function(){
 
-        });
-    });
+    //     });
+    // });
 });
