@@ -176,7 +176,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       });
     });
 
-    it.only('should get the x: 8, y: 12, z: 5 tile from the GeoPackage api', function(done) {
+    it('should get the x: 8, y: 12, z: 5 tile from the GeoPackage api', function(done) {
       this.timeout(30000);
       console.time('Generating non indexed tiles');
       geoPackage.getFeatureTileFromXYZ('FEATURESriversds', 8, 12, 5, 256, 256)
