@@ -1,7 +1,11 @@
-import {GeoPackage, GeoPackageConnection, GeoPackageTileRetriever} from '@ngageoint/geopackage'
+import {GeoPackage} from '../../lib/geoPackage'
+import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
 
-var should = require('chai').should()
-  , path = require('path');
+var GeoPackageTileRetriever = require('../../lib/tiles/retriever').GeoPackageTileRetriever
+  , proj4 = require('proj4')
+  , should = require('chai').should()
+  , path = require('path')
+  , fs = require('fs-extra');
 
 describe('GeoPackage tests', function() {
   it('should get the feature table names', function(done) {

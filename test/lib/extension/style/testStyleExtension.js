@@ -1,11 +1,25 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import { ContentsIdDao, FeatureStyle, FeatureStyleExtension, FeatureStyles, FeatureTableStyles, GeometryData, Icons, IconTable, ImageUtils, StyleMappingTable, Styles, StyleTable } from '@ngageoint/geopackage';
 
-var should = require('chai').should()
+import { default as testSetup } from '../../../fixtures/testSetup'
+import {FeatureStyleExtension} from '../../../../lib/extension/style'
+
+var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
+  , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').StyleMappingTable
+  , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
+  , Styles = require('../../../../lib/extension/style/styles').Styles
+  , Icons = require('../../../../lib/extension/style/icons').Icons
+  , FeatureStyles = require('../../../../lib/extension/style/featureStyles').FeatureStyles
+  , FeatureStyle = require('../../../../lib/extension/style/featureStyle').FeatureStyle
+  , IconTable = require('../../../../lib/extension/style/iconTable').IconTable
+  , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').ContentsIdDao
+  // , testSetup = require('../../../fixtures/testSetup')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
+  , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
   // , GeoPackageAPI = require('../../../../lib/api')
-  , wkx = require('wkx');
+  , wkx = require('wkx')
+  , fs = require('fs-extra')
+  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData;
 
 describe('StyleExtension Tests', function() {
   var testGeoPackage;

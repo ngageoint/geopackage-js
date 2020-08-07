@@ -1,10 +1,15 @@
+
+import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 
-import { RelatedTablesExtension, UserMappingTable } from '@ngageoint/geopackage';
-
-var RelatedTablesUtils = require('./relatedTablesUtils')
+var Verification = require('../../../fixtures/verification')
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
+  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  // , testSetup = require('../../../fixtures/testSetup')
+  , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
+  , wkx = require('wkx')
   , path = require('path');
 
 describe('Related Tables tests', function() {

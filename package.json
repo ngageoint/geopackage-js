@@ -12,7 +12,8 @@
     "url": "https://www.nga.mil"
   },
   "contributors": [
-    "Daniel Barela <daniel.barela@gmail.com>"
+    "Daniel Barela <daniel.barela@gmail.com>",
+    "Jared Lincenberg <jaredlincenberg@gmail.com>" 
   ],
   "homepage": "http://ngageoint.github.io/geopackage-js/",
   "repository": {

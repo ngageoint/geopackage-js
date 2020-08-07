@@ -1,6 +1,11 @@
-import { FeatureDrawType, FeaturePaintCache, Paint, StyleRow, StyleTable } from '@ngageoint/geopackage';
 
-var should = require('chai').should();
+import { StyleRow } from '../../../../lib/extension/style/styleRow';
+import { StyleTable } from '../../../../lib/extension/style/styleTable';
+
+var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
+  , Paint = require('../../../../lib/tiles/features/paint').Paint
+  , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
+  , should = require('chai').should();
 
 describe('FeaturePaintCache Tests', function() {
   it('should create paint cache', function() {

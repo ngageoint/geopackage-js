@@ -1,5 +1,9 @@
-import {GeoPackage, GeoPackageConnection, GeoPackageTileRetriever} from '@ngageoint/geopackage';
+import {GeoPackage} from '../../../lib/geoPackage';
+import {GeoPackageConnection} from '../../../lib/db/geoPackageConnection'
+var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever;
 
+var path = require('path')
+  , should = require('chai').should();
 var path = require('path')
   , should = require('chai').should();
 

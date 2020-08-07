@@ -1,5 +1,13 @@
+import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { BoundingBox, FeatureTableIndex, RTreeIndex, RTreeIndexDao } from '@ngageoint/geopackage';
+import {RTreeIndex} from '../../../../lib/extension/rtree/rtreeIndex'
+import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex'
+import {RTreeIndexDao} from '../../../../lib/extension/rtree/rtreeIndexDao'
+
+var BoundingBox = require('../../../../lib/boundingBox').BoundingBox
+  // , testSetup = require('../../../fixtures/testSetup')
+  , should = require('chai').should()
+  , path = require('path');
 
 var path = require('path');
 

@@ -1,8 +1,12 @@
-import { default as testSetup } from '../../fixtures/testSetup';
-import { BoundingBox, GeoPackageTileRetriever} from '@ngageoint/geopackage';
-import { assert } from 'console';
 
-var proj4 = require('proj4')
+import { default as testSetup } from '../../fixtures/testSetup'
+
+var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
+  // , GeoPackageAPI = require('../../..')
+  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
+  // , testSetup = require('../../fixtures/testSetup')
+  , proj4 = require('proj4')
+  , fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path');
 

@@ -1,4 +1,4 @@
-import { DataTypes } from '@ngageoint/geopackage';
+var DataTypes = require('../../../lib/db/dataTypes').DataTypes;
 
 var should = require('chai').should();
 

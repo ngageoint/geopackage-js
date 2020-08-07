@@ -1,6 +1,9 @@
-import {GeoPackage, GeoPackageConnection, GeoPackageValidate} from '@ngageoint/geopackage'
+import {GeoPackage} from '../../../lib/geoPackage'
+import {GeoPackageConnection} from '../../../lib/db/geoPackageConnection'
 
-var path = require('path');
+var GeoPackageValidate = require('../../../lib/validate/geoPackageValidate').GeoPackageValidate
+  , should = require('chai').should()
+  , path = require('path');
 
 describe('GeoPackage Validate tests', function() {
 

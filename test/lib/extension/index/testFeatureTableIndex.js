@@ -1,7 +1,15 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import { FeatureTableIndex, SqliteQueryBuilder } from '@ngageoint/geopackage';
 
-var should = require('chai').should()
+import { GeoPackageAPI } from '../../../..'
+import { default as testSetup } from '../../../fixtures/testSetup'
+import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex';
+
+
+var GeoPackage = require('../../../../lib/geoPackage')
+  , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
+  , Verification = require('../../../fixtures/verification')
+  // , testSetup = require('../../../fixtures/testSetup')
+  , should = require('chai').should()
+  , fs = require('fs-extra')
   , path = require('path');
 
 describe('GeoPackage Feature Table Index Extension tests', function() {
@@ -136,7 +144,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var whereString = 'table_name = ? and geom_id = ?';
       var whereArgs = [ 'rivers', 315 ];
 
-      var query = SqliteQueryBuilder.buildQuery(false, "'nga_geometry_index'", undefined, whereString);
+      var query = sqliteQueryBuilder.buildQuery(false, "'nga_geometry_index'", undefined, whereString);
       var result = geoPackage.database.get(query, whereArgs);
       should.exist(result);
       done();

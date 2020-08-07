@@ -1,8 +1,14 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { FeatureTableStyles, IconCache, ImageUtils } from '@ngageoint/geopackage';
 
-var should = require('chai').should()
-  , path = require('path');
+var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
+  , IconCache = require('../../../../lib/extension/style/iconCache').IconCache
+  // , testSetup = require('../../../fixtures/testSetup')
+  , should = require('chai').should()
+  , path = require('path')
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
+  // , GeoPackageAPI = require('../../../../lib/api')
+  // @ts-ignore
+  , fs = require('fs-extra');
 
 describe('IconCache Tests', function() {
   var testGeoPackage;

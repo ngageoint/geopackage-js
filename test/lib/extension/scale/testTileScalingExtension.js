@@ -1,9 +1,10 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { GeoPackageTileRetriever, TileScaling, TileScalingType } from '@ngageoint/geopackage';
-
+import { TileScaling } from '../../../../lib/extension/scale/tileScaling';
+import { TileScalingType } from '../../../../lib/extension/scale/tileScalingType';
 var should = require('chai').should();
 
-var path = require('path');
+var GeoPackageTileRetriever = require('../../../../lib/tiles/retriever').GeoPackageTileRetriever
+  , path = require('path');
 
 var isLinux = process.platform === 'linux';
 

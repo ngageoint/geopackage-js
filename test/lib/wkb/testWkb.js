@@ -1,4 +1,6 @@
-import { WKB } from '@ngageoint/geopackage';
+var WKB = require('../../../lib/wkb').WKB;
+var wkx = require('wkx');
+var should = require('chai').should();
 
 describe('WKB tests', function() {
 

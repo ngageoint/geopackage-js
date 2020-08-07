@@ -1,4 +1,4 @@
-import { GeometryData } from '@ngageoint/geopackage';
+var GeometryData = require('../../../lib/geom/geometryData').GeometryData;
 
 var wkx = require('wkx')
   , should = require('chai').should();

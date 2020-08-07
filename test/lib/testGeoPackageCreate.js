@@ -1,10 +1,15 @@
-import { default as testSetup } from '../fixtures/testSetup'
-import { TileTable, WKB } from '@ngageoint/geopackage';
 
-var Verification = require('../fixtures/verification')
+import { default as testSetup } from '../fixtures/testSetup'
+
+var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
+  , GeoPackage = require('../../lib/geoPackage')
+  , Verification = require('../fixtures/verification')
+  , TileTable = require('../../lib/tiles/user/tileTable').TileTable
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , should = require('chai').should()
-  , wkb = WKB;
+  , wkx = require('wkx')
+  , wkb = require('../../lib/wkb').WKB
+  , path = require('path');
 
 describe('GeoPackage create tests', function() {
 

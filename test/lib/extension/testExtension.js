@@ -1,4 +1,5 @@
-import { Extension } from '@ngageoint/geopackage';
+
+import { Extension } from "../../../lib/extension/extension";
 
 describe('GeoPackage Extension tests', function() {
 

@@ -1,4 +1,4 @@
-import { QueryBuilder } from '@ngageoint/geopackage';
+var QueryBuilder = require('../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder;
 
 describe('SqliteQueryBuilder tests', function() {
 

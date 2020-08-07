@@ -1,4 +1,8 @@
-import { BoundingBox, TileBoundingBoxUtils, TileUtilities } from '@ngageoint/geopackage';
+
+const
+  TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
+  , TileUtilities = require('../../../lib/tiles/creator/tileUtilities')
+  , BoundingBox = require('../../../lib/boundingBox').BoundingBox;
 
 require('chai').should();
 

@@ -1,5 +1,5 @@
+
 import { default as testSetup } from '../fixtures/testSetup'
-import { BoundingBox, TileTable } from '@ngageoint/geopackage';
 
 const
   Verification = require('../fixtures/verification')

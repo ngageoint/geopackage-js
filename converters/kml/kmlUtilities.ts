@@ -61,10 +61,7 @@ export class KMLUtilities {
       image.rotate(rotation);
     }
     const kmlBBoxWebMercator = kmlBBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-
-    const kmlContentsSrsId = 3857;
-    const tileMatrixSetSrsId = 3857;
-
+    
     if (progressCallback) progressCallback({ status: 'Making 4326 Image fit 3857 bounding Box.' });
     [kmlBBox, image] = await ImageUtilities.truncateImage(kmlBBox, image);
 

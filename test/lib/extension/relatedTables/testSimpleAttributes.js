@@ -1,9 +1,15 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { ContentsDao, DataTypes, RelatedTablesExtension, SimpleAttributesTable, UserMappingTable } from '@ngageoint/geopackage';
+import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 
-var DataType = DataTypes
+var DataType = require('../../../../lib/db/dataTypes').DataTypes
+  , Verification = require('../../../fixtures/verification')
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
+  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
+  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
+  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
+  , wkx = require('wkx')
   , path = require('path');
 
 describe('Related Simple Attributes tests', function() {
