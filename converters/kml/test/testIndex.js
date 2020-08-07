@@ -378,23 +378,23 @@ describe('KML and KMZ to Geopackage Tests', function() {
         it ('should find the natural scale and zoom level of images', function() {
             const bbox1 = new GeoPackage.BoundingBox(25, 26, 34, 35);
             geoSpatialUtilities.getNaturalScale(bbox1, 2000).should.be.equal(11);
-            geoSpatialUtilities.getZoomLevels(bbox1, 11).length.should.be.equal(4);
+            geoSpatialUtilities.getZoomLevels(bbox1, 11).size.should.be.equal(4);
             
             const bbox2 = new GeoPackage.BoundingBox(14.60128369746704, 15.35832653742206, 37.46543388598137, 37.91904192681665);
             geoSpatialUtilities.getNaturalScale(bbox2, 558).should.be.equal(10);
             const zoomLevel2 = geoSpatialUtilities.getZoomLevels(bbox1, 10)
-            zoomLevel2.length.should.be.equal(3);
-            zoomLevel2[0].should.be.equal(10);
-            zoomLevel2[1].should.be.equal(8);
-            zoomLevel2[2].should.be.equal(6);
+            zoomLevel2.size.should.be.equal(3);
+            zoomLevel2.has(10).should.be.equal(true);
+            zoomLevel2.has(8).should.be.equal(true);
+            zoomLevel2.has(6).should.be.equal(true);
             
             
             geoSpatialUtilities.getNaturalScale(bboxWorld, 4096).should.be.equal(4);
-            geoSpatialUtilities.getZoomLevels(bboxWorld, 4).length.should.be.equal(2);
+            geoSpatialUtilities.getZoomLevels(bboxWorld, 4).size.should.be.equal(2);
 
             // Out of bounds zoom levels
-            geoSpatialUtilities.getZoomLevels(bbox1, 21).length.should.be.equal(8);
-            geoSpatialUtilities.getZoomLevels(bboxWorld, -2).length.should.be.equal(1);
+            geoSpatialUtilities.getZoomLevels(bbox1, 21).size.should.be.equal(8);
+            geoSpatialUtilities.getZoomLevels(bboxWorld, -2).size.should.be.equal(1);
 
             // Very large image
             geoSpatialUtilities.getNaturalScale(bboxWorld, 409600).should.be.equal(10);
@@ -430,7 +430,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const bboxTestEq2 =  new GeoPackage.BoundingBox(0, 90, -55, 5);
             assert.isTrue(_.isEqual(bboxTest, bboxTestEq2));
         }); 
-        it.only ('should convert tiles to Longitude and Latitude', function() {
+        it ('should convert tiles to Longitude and Latitude', function() {
             let tileX = 0;
             let tileY = 0;
             let long = geoSpatialUtilities.tile2lon(tileX, 0);

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-var SpatialReferenceSystem = require('@ngageoint/geopackage').SpatialReferenceSystem
-=======
 var SpatialReferenceSystem = require('../../../../lib/core/srs/spatialReferenceSystem').SpatialReferenceSystem
->>>>>>> parent of a51734f5... In progress debugging Browser tests.
   , should = require('chai').should()
   , path = require('path');
 
