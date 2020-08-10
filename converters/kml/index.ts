@@ -121,14 +121,6 @@ export class KMLToGeoPackage {
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
-    if (!isKMZ) {
-      if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
-      if (isNode) {
-        return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
-      } else if (isBrowser) {
-        return this.convertKMLToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
-      }
-    }
     if (isKMZ) {
       if (progressCallback)
         await progressCallback({ status: 'Converting a KMZ file to GeoPackage', file: kmlOrKmzPath });
@@ -137,11 +129,16 @@ export class KMLToGeoPackage {
       } else if (isBrowser) {
         return this.convertKMZToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
       }
+    } else {
+      if (progressCallback) await progressCallback({ status: 'Converting KML file to GeoPackage' });
+      if (isNode) {
+        return this.convertKMLToGeoPackage(kmlOrKmzPath, geopackage, tableName, progressCallback);
+      } else if (isBrowser) {
+        return this.convertKMLToGeoPackage(kmlOrKmzData, geopackage, tableName, progressCallback);
+      }
     }
-
-    if (progressCallback) await progressCallback({ status: 'Invalid File Extension. Throwing Error' });
-    throw new Error('Invalid File Extension.');
   }
+
   /**
    * Unzips and stores data from a KMZ file in the current directory.
    * @param {(PathLike | Uint8Array)} kmzPath PathLike to the KMZ file (Which the zipped version of a KML)

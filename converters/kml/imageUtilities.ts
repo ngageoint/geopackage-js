@@ -113,7 +113,7 @@ export class ImageUtilities {
   }
 
   /**
-   * Crops image if the bounding is larger than Web Mercator bounds.
+   * Crops image if the bounding is larger than Web Mercator bounds. 
    *
    * @static
    * @param {BoundingBox} kmlBBox Geopackage Bounding Box in EPSG:4326

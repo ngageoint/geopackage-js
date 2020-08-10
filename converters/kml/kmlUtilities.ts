@@ -234,8 +234,9 @@ export class KMLUtilities {
       });
 
       const temp = [coordArray];
-      if (node.hasOwnProperty('innerBoundaryIs')) {
-        const coordRing = element.innerBoundaryIs.LinearRing[0].coordinates[KMLTAGS.XML_STREAM_CHILDREN_SELECTOR].split(
+
+      if (element.hasOwnProperty(KMLTAGS.INNER_BOUNDARY_TAG)) {
+        const coordRing = element[KMLTAGS.INNER_BOUNDARY_TAG][KMLTAGS.LINEAR_RING_TAG][0][KMLTAGS.COORDINATES_TAG][KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(
           /\s+/,
         );
         const coordArray = [];
@@ -245,7 +246,8 @@ export class KMLUtilities {
             coordArray.push([coords[0], coords[1], coords[2]]);
           } else if (coords.length == 2) {
             coordArray.push([coords[0], coords[1]]);
-          } else {
+          } else if(coords.length === 1 && coords[0] === NaN) {} 
+          else {
             console.error(
               'Invalid InnerBoundary: Coordinates must have a length of 2 or 3. You gave: ',
               coords.length,

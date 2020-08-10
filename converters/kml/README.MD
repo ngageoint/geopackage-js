@@ -1,6 +1,6 @@
 ## KML and KMZ files to Geopackage files
 
-Using a Xml streaming library to read the kml file and convert the hierarchal data into relational data that geopackages can store.
+Using a Xml streaming library to read the kml file and convert the hierarchal data into relational data that GeoPackages can store.
 ---
 ### Currently Supports
 - Placemark tags with and without coordinates

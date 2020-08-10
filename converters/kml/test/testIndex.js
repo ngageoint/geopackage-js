@@ -11,6 +11,8 @@ const fs = require('fs');
 const { AssertionError, assert } = require('chai');
 const should = require('chai').should();
 const _ = require('lodash');
+const Jimp = require('jimp');
+const { ImageUtilities } = require('../imageUtilities');
 
 let emptyGeopackage;
 
@@ -20,7 +22,13 @@ after(function() {
     fs.rmdirSync(path.join(__dirname, 'fixtures', 'tmp'), {recursive: true});
 });
 describe('KML and KMZ to Geopackage Tests', function() {
-    
+    // const 
+    beforeEach (function() {
+
+    });
+    afterEach (function () {
+
+    });
     it ('should convert KML Samples Edited to a GeoPackage', async function() {
         this.timeout(30000);
         try {
@@ -42,6 +50,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const tileMatrixTable = geopackage.getTileTables();
         should.exist(tileMatrixTable);
         tileMatrixTable.length.should.be.equal(1);
+
         // Attribute table Exists.
         const attributeTables = geopackage.getAttributesTables();
         should.exist(attributeTables);
@@ -80,6 +89,9 @@ describe('KML and KMZ to Geopackage Tests', function() {
 
         const multiGeomDao = geopackage.getAttributeDao('multi_geometry');
         multiGeomDao.count().should.be.equal(182);  
+        geopackage.close()
+        fs.unlinkSync(path.join(__dirname, '..', '3DMeshLocations.kml'));
+        // done();
     });
     it ('should handle Large GroundOverlays', async function() {
         this.enableTimeouts(false);
@@ -102,7 +114,8 @@ describe('KML and KMZ to Geopackage Tests', function() {
         // _.size(tables.attributes).should.be.equal(3);
         // _.size(tables.tiles).should.be.equal(0);
     });
-    it ('should call progress call backs when defined', function () {
+    it ('should call progress call backs when defined', async function () {
+        this.enableTimeouts(false);
         try {
             fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'All_the_Water_in_the_World.gpkg'));
         } catch (e) {}
@@ -114,14 +127,10 @@ describe('KML and KMZ to Geopackage Tests', function() {
             mainTableName: path.basename(waterKml, path.extname(waterKml)),
             geoPackage: path.join(__dirname, 'fixtures', 'tmp', 'All_the_Water_in_the_World.gpkg'),
           }
-        // console.log(options)
-        const kmzGeopackage = waterKmlConverter.convert(options, (obj) => {should.exist(obj)});
-        should.exist(kmzGeopackage)
-        kmzGeopackage.then((gp)=>{
-            should.exist(gp)
+        let gp = await waterKmlConverter.convert(options, (obj) => {
+            should.exist(obj);
         });
-        
-        
+        should.exist(gp);
     });
     describe('KML Utilities Should work', function () {
         beforeEach( function() {
@@ -132,27 +141,22 @@ describe('KML and KMZ to Geopackage Tests', function() {
             emptyGeopackage = new GeoPackage.GeoPackageAPI.create(gpkgPath);
         });
         it('should handle abgr to rgb a color conversions', function() {
-            let color1, opacity1;
             const {rgb: color1, a: opacity1} = kmlUtilities.abgrStringToColorOpacity('FFFFFFFF')
             color1.should.be.equal('FFFFFF');
             opacity1.should.be.equal(1);
 
-            let color2, opacity2;
             const {rgb: color2, a: opacity2} = kmlUtilities.abgrStringToColorOpacity('00FFFFFF')
             color2.should.be.equal('FFFFFF');
             opacity2.should.be.equal(0);
 
-            let color3, opacity3;
             const {rgb: color3, a: opacity3} = kmlUtilities.abgrStringToColorOpacity('99AABBCC')
             color3.should.be.equal('CCBBAA');
             opacity3.should.be.equal(0x99/255);
 
-            let color4, opacity4;
             const {rgb: color4, a: opacity4} = kmlUtilities.abgrStringToColorOpacity('9eAAbbcC')
             color4.should.be.equal('cCbbAA');
             opacity4.should.be.equal(0x9e/255);
 
-            let color5, opacity5;
             const {rgb: color5, a: opacity5} = kmlUtilities.abgrStringToColorOpacity('1aA12bcC')
             color5.should.be.equal('cC2bA1');
             opacity5.should.be.equal(0x1a/255);
@@ -411,12 +415,12 @@ describe('KML and KMZ to Geopackage Tests', function() {
 
             // Copy over Bounding Box
             const bbox3eq = new GeoPackage.BoundingBox(-45, 50, 45, 55);
-            const bbox2 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, 55, 50, true);
-            assert.isTrue(_.isEqual(bbox2, bbox3eq));
+            const bbox3 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, 55, 50, true);
+            assert.isTrue(_.isEqual(bbox3, bbox3eq));
             assert.isTrue(!_.isEqual(bbox1, bbox3eq));
             const bbox4eq = new GeoPackage.BoundingBox(-50, 45, -55, 50);
-            const bbox2 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, -55, -50, true);
-            assert.isTrue(_.isEqual(bbox2, bbox4eq));
+            const bbox4 = geoSpatialUtilities.expandBoundingBoxToIncludeLatLonPoint(bbox1, -55, -50, true);
+            assert.isTrue(_.isEqual(bbox4, bbox4eq));
             assert.isTrue(!_.isEqual(bbox1, bbox4eq));
 
             // Null and Single lat or long testing
@@ -437,8 +441,8 @@ describe('KML and KMZ to Geopackage Tests', function() {
             lat.should.be.equal(WEB_MERCATOR_MAX_LAT_RANGE);
             tileX = 1;
             tileY = 1;
-            let long = geoSpatialUtilities.tile2lon(tileX, 1);
-            let lat = geoSpatialUtilities.tile2lat(tileY, 1);
+            long = geoSpatialUtilities.tile2lon(tileX, 1);
+            lat = geoSpatialUtilities.tile2lat(tileY, 1);
             long.should.be.equal(0);
             lat.should.be.equal(0);
             tileX = 2;
@@ -468,17 +472,22 @@ describe('KML and KMZ to Geopackage Tests', function() {
                 timesCalled2.should.be.equal(1 + 16 + 256);
             });
         });
+        it ('should handle Polygon with Inner Boundary', function () {
+            
+        }) 
 
     });
-    // describe('image Utilities Should work', function(){
-    //     it ('should insertZoomImages', function() {
-            
-    //     });
-    //     it ('should getJimpImage', function () {
-
-    //     });
-    //     it ('should truncate Images', function(){
-
-    //     });
-    // });
+    describe('image Utilities Should work', function(){
+        it ('should truncate Images', function(){
+            const image = Jimp.read(path.join(__dirname, 'fixtures', 'Air Traffic Earth.jpg'));
+            image.then((image) => {
+                const originalHeight = image.getHeight(); 
+                ImageUtilities.truncateImage(bboxWorld, image);
+                const newHeight = image.getHeight();
+                // console.log(originalHeight, newHeight)
+                // console.log(bboxWorld);
+                assert.isTrue(originalHeight > newHeight);
+            });    
+        });
+    });
 });

@@ -322,8 +322,8 @@ export const TIME_STAMP_TAG = 'TimeStamp';
 export const URL_TAG = 'Url';
 
 // Usage Level Descriptions
-export const ADDRESS_TAG = 'address';
 export const ADDRESS_DETAILS_TAG = 'AddressDetails';
+export const ADDRESS_TAG = 'address';
 export const ATOM_AUTHOR_TAG = 'atom:author';
 export const ATOM_LINK_TAG = 'atom:link';
 export const BEGIN_TAG = 'begin';
@@ -363,6 +363,7 @@ export const LAT_LON_BOX_TAG = 'LatLonBox';
 export const LATITUDE_TAG = 'latitude';
 export const LEFT_FOV_TAG = 'leftFov';
 export const LEVEL_OF_DETAIL_TAG = 'Lod';
+export const LINEAR_RING_TAG = 'LinearRing'
 export const LINK_DESCRIPTION_TAG = 'linkDescription';
 export const LINK_NAME_TAG = 'linkName';
 export const LINK_SNIPPET_TAG = 'linkSnippet';
