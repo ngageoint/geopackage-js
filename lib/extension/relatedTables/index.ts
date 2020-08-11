@@ -244,7 +244,7 @@ export class RelatedTablesExtension extends BaseExtension {
     ) {
       return;
     }
-    console.log('created mapping table for ' + userMappingTable.getTableName() + ': ' + this.createUserMappingTable(userMappingTable));
+    this.createUserMappingTable(userMappingTable);
     const mappingTableRelations = this.extendedRelationDao.queryByMappingTableName(extendedRelation.mapping_table_name);
     if (mappingTableRelations.length) {
       return mappingTableRelations[0];

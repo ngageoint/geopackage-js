@@ -1,6 +1,7 @@
 import { Dao } from '../../dao/dao';
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
+import { ColumnValues } from '../../dao/columnValues';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao
@@ -78,6 +79,16 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
       srs.description = results.description as string;
     }
     return srs;
+  }
+
+  getByOrganizationAndCoordSysId(organization: string, organizationCoordSysId: number): SpatialReferenceSystem {
+    const cv = new ColumnValues();
+    cv.addColumn('organization', organization);
+    cv.addColumn('organization_coordsys_id', organizationCoordSysId);
+    const results: Record<string, DBValue>[] = this.queryForAll(this.buildWhere(cv), this.buildWhereArgs(cv));
+    if (results && results.length) {
+      return this.createObject(results[0]);
+    }
   }
   /**
    * Get the Spatial Reference System for the provided id
@@ -168,7 +179,7 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {Number} id of the created row
    */
   createWebMercator(): number {
-    let srs = this.getBySrsId(3857);
+    let srs = this.getByOrganizationAndCoordSysId('EPSG', 3857);
     if (srs) {
       return srs.srs_id;
     }

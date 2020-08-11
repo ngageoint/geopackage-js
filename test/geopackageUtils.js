@@ -460,11 +460,10 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       return rows.reduce(function(sequence, row) {
         return sequence.then(function() {
           const featureRow = featureDao.getRow(row);
-          geopackage.linkMedia('geometry2', featureRow.id, 'media', ngaRowId).then(function() {
-            const relationships = geopackage.getLinkedMedia('geometry2', featureRow.id);
-            relationships.length.should.be.equal(1);
-            relationships[0].id.should.be.equal(ngaRowId);
-          });
+          geopackage.linkMedia('geometry2', featureRow.id, 'media', ngaRowId);
+          const relationships = geopackage.getLinkedMedia('geometry2', featureRow.id);
+          relationships.length.should.be.equal(1);
+          relationships[0].id.should.be.equal(ngaRowId);
         });
       }, Promise.resolve());
     })

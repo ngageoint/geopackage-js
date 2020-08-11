@@ -28,19 +28,19 @@ describe('Create GeoPackage samples', function() {
       console.log('Create GeoPackage');
 
       return GeoPackageAPI.create(testGeoPackage)
-      .then(function(gp) {
+      .then(async function(gp) {
         console.log('Created GeoPackage');
         GeoPackageUtils.createCRSWKTExtension(gp);
         GeoPackageUtils.createFeatures(gp);
         GeoPackageUtils.createSchemaExtension(gp);
-        GeoPackageUtils.createGeometryIndexExtension(gp);
+        await GeoPackageUtils.createGeometryIndexExtension(gp);
         GeoPackageUtils.createFeatureTileLinkExtension(gp);
         GeoPackageUtils.createNonLinearGeometryTypesExtension(gp);
-        GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
+        await GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
         GeoPackageUtils.createRelatedTablesMediaExtension(gp);
         GeoPackageUtils.createRelatedTablesFeaturesExtension(gp);
-        GeoPackageUtils.createTiles(gp);
-        GeoPackageUtils.createWebPExtension(gp);
+        await GeoPackageUtils.createTiles(gp);
+        await GeoPackageUtils.createWebPExtension(gp);
         GeoPackageUtils.createAttributes(gp);
         GeoPackageUtils.createRelatedTablesSimpleAttributesExtension(gp);
         GeoPackageUtils.createMetadataExtension(gp);

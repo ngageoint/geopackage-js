@@ -125,7 +125,11 @@ export class RTreeIndex extends BaseExtension {
       totalCount: this.featureCount,
       layer: this.tableName,
     });
-    this.loadRTreeIndex(this.tableName, this.columnName, this.primaryKeyColumn);
+    try {
+      this.loadRTreeIndex(this.tableName, this.columnName, this.primaryKeyColumn);
+    } catch (e) {
+      console.log('ERROR CREATING RTREE INDEX', e);
+    }
     this.createAllTriggers(this.tableName, this.columnName, this.primaryKeyColumn);
     return this.getRTreeIndexExtension();
   }
@@ -381,6 +385,9 @@ export class RTreeIndex extends BaseExtension {
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
       }
+      if (envelope.minX === Infinity) {
+        return null;
+      }
       return envelope.minX;
     });
   }
@@ -390,6 +397,9 @@ export class RTreeIndex extends BaseExtension {
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+      }
+      if (envelope.minY === Infinity) {
+        return null;
       }
       return envelope.minY;
     });
@@ -401,6 +411,9 @@ export class RTreeIndex extends BaseExtension {
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
       }
+      if (envelope.maxX === -Infinity) {
+        return null;
+      }
       return envelope.maxX;
     });
   }
@@ -410,6 +423,9 @@ export class RTreeIndex extends BaseExtension {
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
+      }
+      if (envelope.maxY === -Infinity) {
+        return null;
       }
       return envelope.maxY;
     });
