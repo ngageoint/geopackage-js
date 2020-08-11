@@ -89,4 +89,11 @@ export class DataColumnsDao extends Dao<DataColumns> {
     }
     return dataColumn;
   }
+
+  deleteByTableName(table: string): number {
+    let where = '';
+    where += this.buildWhereWithFieldAndValue(DataColumnsDao.COLUMN_TABLE_NAME, table);
+    const whereArgs = this.buildWhereArgs(table);
+    return this.deleteWhere(where, whereArgs);
+  }
 }

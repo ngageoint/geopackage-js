@@ -7,6 +7,7 @@ import { ColumnValues } from './columnValues';
 
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
 import { DBValue } from '../db/dbAdapter';
+import { CoreSQLUtils } from '../db/coreSQLUtils';
 
 /**
  * Base DAO
@@ -66,8 +67,7 @@ export abstract class Dao<T> {
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     const result = this.connection.get(query, whereArgs);
     if (!result) return;
-    const object = this.createObject(result);
-    return object;
+    return this.createObject(result);
   }
 
   queryForSameId(object: T): T {
@@ -97,8 +97,7 @@ export abstract class Dao<T> {
     const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
     const result = this.connection.get(query, whereArgs);
     if (!result) return;
-    const object = this.createObject(result);
-    return object;
+    return this.createObject(result);
   }
 
   /**
@@ -654,6 +653,13 @@ export abstract class Dao<T> {
    */
   dropTable(): boolean {
     return this.connection.dropTable(this.gpkgTableName);
+  }
+
+  /**
+   * Drops this table
+   */
+  dropTableWithTableName(tableName: string) {
+    CoreSQLUtils.dropTable(this.geoPackage.connection, tableName);
   }
 
   /**

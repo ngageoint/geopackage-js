@@ -3,7 +3,7 @@ import { UserRow } from '../../user/userRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 import { DBValue } from '../../db/dbAdapter';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * MediaRow module.
@@ -15,13 +15,13 @@ import { DataTypes } from '../../db/dataTypes';
  * @class
  * @extends UserRow
  * @param  {module:extension/relatedTables~MediaTable} mediaTable  media table
- * @param  {module:db/dataTypes[]} columnTypes  column types
+ * @param  {module:db/geoPackageDataType[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class MediaRow extends UserRow {
   constructor(
     public mediaTable: MediaTable,
-    columnTypes?: { [key: string]: DataTypes },
+    columnTypes?: { [key: string]: GeoPackageDataType },
     values?: Record<string, DBValue>,
   ) {
     super(mediaTable, columnTypes, values);

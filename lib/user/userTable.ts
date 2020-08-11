@@ -1,6 +1,10 @@
 import { UserColumn } from './userColumn';
 
-import { DataTypes } from '../db/dataTypes';
+import { GeoPackageDataType } from '../db/geoPackageDataType';
+import { Constraint } from '../db/table/constraint';
+import { ConstraintType } from '../db/table/constraintType';
+import {Contents} from '../core/contents/contents';
+import { UserColumns } from './userColumns';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -10,60 +14,50 @@ import { DataTypes } from '../db/dataTypes';
  * @param  {module:user/userColumn~UserColumn[]} columns user columns
  * @param  {string[]} [requiredColumns] required columns
  */
-export class UserTable {
+export class UserTable<TColumn extends UserColumn> {
   public static readonly FEATURE_TABLE = 'FEATURE';
   public static readonly TILE_TABLE = 'TILE';
+
   /**
-   * Array of column names
-   * @type {string[]}
+   * Columns
    */
-  columnNames: string[] = [];
+  columns: UserColumns<TColumn>;
+
   /**
-   * Mapping between column names and their index
-   * @type {Object}
+   * Constraints
    */
-  nameToIndex: { [key: string]: number } = {};
-  uniqueConstraints: { columns: UserColumn[] }[] = [];
-  pkIndex: number;
+  constraints: Constraint[] = [];
+  /**
+   * Type Constraints
+   */
+  typedContraints:  Map<ConstraintType, Constraint[]> = new Map<ConstraintType, Constraint[]>();
+
+  /**
+   * Foreign key to Contents
+   */
+  contents: Contents;
 
   /**
    *
-   * @param table_name the name of the table
-   * @param columns array of columns
-   * @param requiredColumns required columns
+   * @param columns
    */
-  constructor(public table_name: string, public columns: UserColumn[], public requiredColumns?: string[]) {
-    // Sort the columns by index
-    this.columns.sort(function(a, b) {
-      return a.index - b.index;
+  constructor(columns: UserColumns<TColumn>) {
+    this.columns = columns;
+    this.constraints = [];
+    this.typedContraints = new Map<ConstraintType, Constraint[]>();
+  }
+
+  copy(): UserTable<TColumn> {
+    const userTableCopy = new UserTable<TColumn>(this.columns.copy());
+    this.constraints.forEach(constraint => {
+      userTableCopy.addConstraint(constraint.copy());
     });
-    for (let i = 0; i < this.columns.length; i++) {
-      const column = this.columns[i];
-      if (column.index !== i) {
-        throw new Error(
-          'Column has wrong index of ' + column.index + ', found at index: ' + i + ', Table Name: ' + this.table_name,
-        );
-      }
-    }
-    for (let i = 0; i < this.columns.length; i++) {
-      const column = this.columns[i];
-      const index = column.index;
-      if (column.primaryKey) {
-        if (this.pkIndex !== undefined) {
-          throw new Error(
-            "More than one primary key column was found for table '" +
-              this.table_name +
-              "'. Index " +
-              this.pkIndex +
-              ' and ' +
-              index,
-          );
-        }
-        this.pkIndex = index;
-      }
-      this.columnNames.push(column.name);
-      this.nameToIndex[column.name] = index;
-    }
+    userTableCopy.contents = this.contents.copy();
+    return userTableCopy;
+  }
+
+  getTableName(): string {
+    return this.columns.getTableName();
   }
 
   get tableType(): string {
@@ -71,61 +65,13 @@ export class UserTable {
   }
 
   /**
-   * Check for duplicate column names
-   * @param  {Number} index         index
-   * @param  {Number} previousIndex previous index
-   * @param  {string} column        column
-   * @throws Throws an error if previous index is not undefined
+   * Get the user columns
+   * @return user columns
    */
-  duplicateCheck(index: number, previousIndex?: number, column?: string): boolean {
-    if (previousIndex !== undefined) {
-      throw new Error(
-        'More than one ' +
-          column +
-          " column was found for table '" +
-          this.table_name +
-          "'. Index " +
-          previousIndex +
-          ' and ' +
-          index,
-      );
-    }
-    return true;
+  getUserColumns(): UserColumns<TColumn> {
+    return this.columns;
   }
-  /**
-   * Check for the expected data type
-   * @param  {module:db/dataTypes~GPKGDataType} expected expected data type
-   * @param  {module:user/userColumn~UserColumn} column   column
-   * @throws Will throw an error if the actual column type does not match the expected column type
-   */
-  typeCheck(expected: DataTypes, column: UserColumn): boolean {
-    const actual = column.dataType;
-    if (!actual || actual !== expected) {
-      throw new Error(
-        'Unexpected ' +
-          column.name +
-          " column data type was found for table '" +
-          this.table_name +
-          "', expected: " +
-          DataTypes.nameFromType(expected) +
-          ', actual: ' +
-          column.dataType,
-      );
-    }
-    return true;
-  }
-  /**
-   * Check for missing columns
-   * @param  {Number} index  index
-   * @param  {string} column column
-   * @throws Will throw an error if no column is found
-   */
-  missingCheck(index: number, column: string): boolean {
-    if (index === undefined || index === null) {
-      throw new Error('No ' + column + " column was found for table '" + this.table_name + "'");
-    }
-    return true;
-  }
+
   /**
    * Get the column index of the column name
    * @param  {string} columnName column name
@@ -133,11 +79,7 @@ export class UserTable {
    * @throws Will throw an error if the column is not found in the table
    */
   getColumnIndex(columnName: string): number {
-    const index = this.nameToIndex[columnName];
-    if (index === undefined || index === null) {
-      throw new Error("Column does not exist in table '" + this.table_name + "', column: " + columnName);
-    }
-    return index;
+    return this.columns.getColumnIndexForColumnName(columnName);
   }
   /**
    * Check if the table has the column
@@ -158,7 +100,7 @@ export class UserTable {
    * @return {string} the column name
    */
   getColumnNameWithIndex(index: number): string {
-    return this.columnNames[index];
+    return this.columns.getColumnName(index);
   }
   /**
    * Get the column from the index
@@ -166,7 +108,7 @@ export class UserTable {
    * @return {module:user/userColumn~UserColumn} column at the index
    */
   getColumnWithIndex(index: number): UserColumn {
-    return this.columns[index];
+    return this.columns.getColumnForIndex(index);
   }
   /**
    * Get column with the column name
@@ -180,36 +122,205 @@ export class UserTable {
    * Get the column count
    * @return {Number} the count of the columns
    */
-  get columnCount(): number {
-    return this.columns.length;
+  getColumnCount(): number {
+    return this.columns.columnCount();
   }
   /**
    * Get the primary key column
    * @return {module:user/userColumn~UserColumn} the primary key column
    */
-  get pkColumn(): UserColumn {
-    return this.columns[this.pkIndex];
+  getPkColumn(): UserColumn {
+    return this.columns.getPkColumn();
   }
+
+  /**
+   * Get the primary key column name
+   * @return primary key column name
+   */
+  getPkColumnName(): string {
+    return this.columns.getPkColumnName();
+  }
+
   /**
    * Get the column index of the id column
    * @return {Number}
    */
-  get idColumnIndex(): number {
-    return this.pkIndex;
+  getIdColumnIndex(): number {
+    return this.columns.getPkColumnIndex();
   }
   /**
    * Get the primary key id column
    * @return {module:user/userColumn~UserColumn}
    */
-  get idColumn(): UserColumn {
-    return this.pkColumn;
+  getIdColumn(): UserColumn {
+    return this.getPkColumn();
   }
+
   /**
-   * Add a unique constraint
-   * @param uniqueConstraint unique constraint to add
-   * @returns number of unique constraints
+   * Add constraint
+   * @param constraint constraint
    */
-  addUniqueConstraint(uniqueConstraint: { columns: UserColumn[] }): number {
-    return this.uniqueConstraints.push(uniqueConstraint);
+  addConstraint(constraint: Constraint) {
+    this.constraints.push(constraint);
+    let typeConstraints = this.typedContraints.get(constraint.type);
+    if (typeConstraints === null || typeConstraints === undefined) {
+      typeConstraints = [];
+      this.typedContraints.set(constraint.type, typeConstraints);
+    }
+    typeConstraints.push(constraint);
   }
+
+  /**
+   * Add constraints
+   * @param constraints constraints
+   */
+  addConstraints(constraints: Constraint[]) {
+    constraints.forEach(constraint => {
+      this.addConstraint(constraint);
+    });
+  }
+
+  /**
+   * Check if has constraints
+   * @return true if has constraints
+   */
+  hasConstraints(): boolean {
+    return this.constraints.length > 0;
+  }
+
+  /**
+   * Get the constraints
+   * @return constraints
+   */
+  getConstraints(): Constraint[] {
+    return this.constraints;
+  }
+
+  /**
+   * Get the constraints of the provided type
+   * @param type  constraint type
+   * @return constraints
+   */
+  getConstraintsByType(type: ConstraintType): Constraint[] {
+    let constraints = this.typedContraints.get(type);
+    if (constraints === null || constraints === undefined) {
+      constraints = [];
+    }
+    return constraints;
+  }
+
+  /**
+   * Clear the constraints
+   * @return cleared constraints
+   */
+  clearConstraints(): Constraint[] {
+    let constraintsCopy = Array.from(this.constraints);
+    this.constraints = [];
+    this.typedContraints.clear();
+    return constraintsCopy;
+  }
+
+  /**
+   * Get the columns with the provided data type
+   * @param type data type
+   * @return columns
+   */
+  columnsOfType(type: GeoPackageDataType): UserColumn[] {
+    return this.columns.columnsOfType(type);
+  }
+
+  /**
+   * Get the contents
+   * @return contents
+   */
+  getContents(): Contents {
+    return this.contents;
+  }
+
+  /**
+   * Set the contents
+   * @param contents contents
+   */
+  setContents(contents: Contents) {
+    this.contents = contents;
+    if (contents !== null && contents !== undefined) {
+      this.validateContents(contents);
+    }
+  }
+
+  /**
+   * Validate that the set contents are valid
+   * @param contents contents
+   */
+  validateContents(contents: Contents) {
+
+  }
+
+  /**
+   * Add a new column
+   * @param column new column
+   */
+  addColumn(column: TColumn) {
+    this.columns.addColumn(column);
+  }
+
+  /**
+   * Rename a column
+   * @param column column
+   * @param newColumnName new column name
+   */
+  renameColumn(column: TColumn, newColumnName: string) {
+    this.columns.renameColumn(column, newColumnName);
+  }
+
+  /**
+   * Rename a column
+   * @param columnName column name
+   * @param newColumnName new column name
+   */
+  renameColumnWithName(columnName: string, newColumnName: string) {
+    this.columns.renameColumnWithName(columnName, newColumnName);
+  }
+
+  /**
+   * Rename a column
+   * @param index column index
+   * @param newColumnName new column name
+   */
+  renameColumnAtIndex(index: number, newColumnName: string) {
+    this.columns.renameColumnWithIndex(index, newColumnName);
+  }
+
+  /**
+   * Drop a column
+   * @param column column to drop
+   */
+  dropColumn(column: TColumn) {
+    this.columns.dropColumn(column);
+  }
+
+  /**
+   * Drop a column
+   * @param columnName column name
+   */
+  dropColumnWithName(columnName: string) {
+    this.columns.dropColumnWithName(columnName);
+  }
+
+  /**
+   * Drop a column
+   * @param index column index
+   */
+  dropColumnWithIndex(index: number) {
+    this.columns.dropColumnWithIndex(index);
+  }
+
+  /**
+   * Alter a column
+   * @param column altered column
+   */
+  alterColumn(column: TColumn) {
+    this.columns.alterColumn(column);
+  }
+
 }

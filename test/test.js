@@ -2,10 +2,11 @@ var polyfill = require('babel-polyfill');
 
 require('chai').should();
 
+require('./lib/db/table/testConstraintParser');
 require('./lib/core/contents/testContents');
 require('./lib/core/srs/testSpatialReferenceSystem');
 require('./lib/dataColumns/testDataColumns');
-require('./lib/db/testDataTypes');
+require('./lib/db/testGeoPackageDataType');
 require('./lib/db/testTableCreator');
 require('./lib/features/columns/testGeometryColumns');
 require('./lib/features/user/testFeatureDao');

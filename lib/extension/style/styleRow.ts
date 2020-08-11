@@ -3,27 +3,27 @@
  * @class StyleRow
  */
 
-import { AttributeRow } from '../../attributes/attributeRow';
+import { AttributesRow } from '../../attributes/attributesRow';
 import { StyleTable } from './styleTable';
 import { UserColumn } from '../../user/userColumn';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * Style Row
  * @extends AttributesRow
  * @param  {module:extension/style.StyleTable} styleTable  style table
- * @param  {module:db/dataTypes[]} columnTypes  column types
+ * @param  {module:db/geoPackageDataType[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
-export class StyleRow extends AttributeRow {
+export class StyleRow extends AttributesRow {
   /**
    * Color hex pattern
    */
   private static readonly colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
   styleTable: StyleTable;
-  constructor(styleTable: StyleTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
+  constructor(styleTable: StyleTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
     super(styleTable, columnTypes, values);
     this.styleTable = styleTable;
   }

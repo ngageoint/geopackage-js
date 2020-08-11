@@ -4,9 +4,8 @@
 import { UserCustomTable } from './userCustomTable';
 import { UserTableReader } from '../userTableReader';
 import { UserCustomColumn } from './userCustomColumn';
-
-import { DataTypes } from '../../db/dataTypes';
-import { DBValue } from '../../db/dbAdapter';
+import { GeoPackage } from '../../geoPackage';
+import { TableColumn } from '../../db/table/tableColumn';
 
 /**
  * User custom table reader
@@ -14,39 +13,26 @@ import { DBValue } from '../../db/dbAdapter';
  * @param  {string} tableName       table name
  * @param  {string[]} requiredColumns required columns
  */
-export class UserCustomTableReader extends UserTableReader {
-  /**
-   * Creates user custom column
-   * @param  {string} tableName       table name
-   * @param  {module:user/userCustom~UserCustomColumn[]} columnList      columns
-   * @param  {string[]} [requiredColumns] required columns
-   * @return {module:user/userCustom~UserCustomTable}
-   */
-  createTable(tableName: string, columnList: UserCustomColumn[], requiredColumns: string[]): UserCustomTable {
-    return new UserCustomTable(tableName, columnList, requiredColumns);
+export class UserCustomTableReader extends UserTableReader<UserCustomColumn, UserCustomTable> {
+  constructor(table_name: string) {
+    super(table_name);
   }
+
+  readUserCustomTable(geoPackage: GeoPackage): UserCustomTable {
+    return this.readTable(geoPackage.database) as UserCustomTable;
+  }
+
   /**
-   * Creates a user custom column
-   * @param {Object} result
-   * @param {Number} index        column index
-   * @param {string} name         column name
-   * @param {module:db/dataTypes~GPKGDataType} type         data type
-   * @param {Number} max max value
-   * @param {Boolean} notNull      not null
-   * @param {Object} defaultValue default value or nil
-   * @param {Boolean} primaryKey primary key
-   * @return {module:user/custom~UserCustomColumn}
+   * @inheritDoc
    */
-  createColumnWithResults(
-    index: number,
-    name: string,
-    type: string,
-    max?: number,
-    notNull?: boolean,
-    defaultValue?: DBValue,
-    primaryKey?: boolean,
-  ): UserCustomColumn {
-    const dataType = DataTypes.fromName(type);
-    return new UserCustomColumn(index, name, dataType, max, notNull, defaultValue, primaryKey);
+  createTable(tableName: string, columns: UserCustomColumn[]): UserCustomTable {
+    return new UserCustomTable(tableName, columns, null);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  createColumn(tableColumn: TableColumn): UserCustomColumn {
+    return new UserCustomColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey);
   }
 }

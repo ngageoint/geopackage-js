@@ -10,14 +10,20 @@ import { DBValue } from '../../db/dbAdapter';
  */
 export class ExtendedRelationDao extends Dao<ExtendedRelation> {
   public static readonly TABLE_NAME: string = 'gpkgext_relations';
-  public static readonly COLUMN_ID: string = ExtendedRelationDao.TABLE_NAME + '.id';
-  public static readonly COLUMN_BASE_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.base_table_name';
-  public static readonly COLUMN_BASE_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.base_primary_column';
-  public static readonly COLUMN_RELATED_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.related_table_name';
-  public static readonly COLUMN_RELATED_PRIMARY_COLUMN: string =
-    ExtendedRelationDao.TABLE_NAME + '.related_primary_column';
-  public static readonly COLUMN_RELATION_NAME: string = ExtendedRelationDao.TABLE_NAME + '.relation_name';
-  public static readonly COLUMN_MAPPING_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.mapping_table_name';
+  public static readonly ID: string = 'id';
+  public static readonly COLUMN_ID: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.ID;
+  public static readonly BASE_TABLE_NAME: string = 'base_table_name';
+  public static readonly COLUMN_BASE_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.BASE_TABLE_NAME;
+  public static readonly BASE_PRIMARY_COLUMN: string = 'base_primary_column';
+  public static readonly COLUMN_BASE_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.BASE_PRIMARY_COLUMN;
+  public static readonly RELATED_TABLE_NAME: string = 'related_table_name';
+  public static readonly COLUMN_RELATED_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.RELATED_TABLE_NAME;
+  public static readonly RELATED_PRIMARY_COLUMN: string = 'related_primary_column';
+  public static readonly COLUMN_RELATED_PRIMARY_COLUMN: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.RELATED_PRIMARY_COLUMN;
+  public static readonly RELATION_NAME: string = 'relation_name';
+  public static readonly COLUMN_RELATION_NAME: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.RELATION_NAME;
+  public static readonly MAPPING_TABLE_NAME: string = 'mapping_table_name';
+  public static readonly COLUMN_MAPPING_TABLE_NAME: string = ExtendedRelationDao.TABLE_NAME + '.' + ExtendedRelationDao.MAPPING_TABLE_NAME;
 
   readonly gpkgTableName: string = ExtendedRelationDao.TABLE_NAME;
   readonly idColumns: string[] = ['id'];
@@ -43,7 +49,7 @@ export class ExtendedRelationDao extends Dao<ExtendedRelation> {
    * Create the necessary tables for this dao
    * @return {Promise}
    */
-  createTable(): Promise<boolean> {
+  createTable(): boolean {
     const tc = this.geoPackage.getTableCreator();
     return tc.createExtendedRelations();
   }

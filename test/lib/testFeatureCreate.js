@@ -1,4 +1,3 @@
-import { GeoPackageAPI } from '../../.'
 import { default as testSetup } from '../fixtures/testSetup'
 
 var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
@@ -8,8 +7,11 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
   , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
-  , DataTypes = require('../../lib/db/dataTypes').DataTypes
+  , GeoPackageDataType = require('../../lib/db/geoPackageDataType').GeoPackageDataType
+  , ConstraintType = require('../../lib/db/table/constraintType').ConstraintType
   , GeometryData = require('../../lib/geom/geometryData').GeometryData
+  , TableInfo = require('../../lib/db/table/tableInfo').TableInfo
+  , GeometryType = require('../../lib/features/user/geometryType').GeometryType
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
   // , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
@@ -34,38 +36,36 @@ describe('GeoPackage Feature table create tests', function() {
   });
 
   it('should create a feature table', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', GeometryType.POINT);
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', DataTypes.TEXT, false, null, 5));
-    columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', DataTypes.BLOB, false, null, 7));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
-    columns.push(FeatureColumn.createColumn(2, 'test_text.test', DataTypes.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(3, 'test_real.test', DataTypes.REAL, false, null));
-    columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
-    columns.push(FeatureColumn.createColumn(5, 'test_blob.test', DataTypes.BLOB, false, null));
-    columns.push(FeatureColumn.createColumn(6, 'test_integer.test', DataTypes.INTEGER, false, ""));
+    columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
+    columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
+    columns.push(FeatureColumn.createColumn(2, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(FeatureColumn.createColumn(3, 'test_real.test', GeoPackageDataType.REAL, false, null));
+    columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(FeatureColumn.createColumn(5, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
+    columns.push(FeatureColumn.createColumn(6, 'test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-    geopackage.createFeatureTable('geom.test', geometryColumns, columns)
-      .then(function(result) {
-        result.should.be.equal(true);
-        Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-        Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-        Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-        Verification.verifyGeometryColumnsForTable(geopackage, tableName).should.be.equal(true);
-      });
+    var result = geopackage.createFeatureTable('geom.test', geometryColumns, columns);
+    result.should.be.equal(true);
+    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+    Verification.verifyGeometryColumnsForTable(geopackage, tableName).should.be.equal(true);
   });
 
   it('should not create a feature table with two geometry columns', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', GeometryType.POINT);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
-    columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', wkb.typeMap.wkt.Point, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
+    columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', GeometryType.POINT, false, null));
     (function() {
       new FeatureTable(tableName, columns);
     }).should.throw();
@@ -76,60 +76,94 @@ describe('GeoPackage Feature table create tests', function() {
     var properties = [];
     properties.push({
       name: 'Name',
-      dataType: DataTypes.nameFromType(DataTypes.TEXT)
+      dataType: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT)
     });
     properties.push({
       name: 'Number',
-      dataType: DataTypes.nameFromType(DataTypes.INTEGER)
+      dataType: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
     });
 
-    return geopackage.createFeatureTableFromProperties('NewTable', properties)
-      .then(function() {
-        var reader = new FeatureTableReader('NewTable');
-        var result = reader.readFeatureTable(geopackage);
-        var columns = result.columns;
+    geopackage.createFeatureTableFromProperties('NewTable', properties);
+    var reader = new FeatureTableReader('NewTable');
+    var result = reader.readFeatureTable(geopackage);
+    var columns = result.getUserColumns().getColumns();
 
-        var plainObject = JSON.parse(JSON.stringify(columns));
+    var plainObject = JSON.parse(JSON.stringify(columns));
 
-        plainObject.should.deep.include.members([{
-          index: 0,
-          name: 'id',
-          dataType: 5,
-          notNull: true,
-          primaryKey: true },
-        { index: 1,
-          name: 'geometry',
-          notNull: false,
-          primaryKey: false,
-          geometryType: 7 },
-        { index: 2,
-          name: 'Name',
-          dataType: 9,
-          notNull: false,
-          primaryKey: false },
-        { index: 3,
-          name: 'Number',
-          dataType: 5,
-          notNull: false,
-          primaryKey: false } ]);
-      });
+    plainObject.should.deep.include.members([
+      {
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: [
+          {
+            name: null,
+            sql: "NOT NULL",
+            type: ConstraintType.NOT_NULL
+          },
+          {
+            name: null,
+            sql: "PRIMARY KEY AUTOINCREMENT",
+            type: ConstraintType.PRIMARY_KEY
+          }
+        ]
+      },
+      {
+        index: 1,
+        name: 'geometry',
+        notNull: false,
+        primaryKey: false,
+        geometryType: GeometryType.GEOMETRY,
+        dataType: GeoPackageDataType.BLOB,
+        max: null,
+        type: GeometryType.nameFromType(GeometryType.GEOMETRY),
+        constraints: []
+      },
+      {
+        index: 2,
+        name: 'Name',
+        dataType: 9,
+        notNull: false,
+        primaryKey: false,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+        constraints: []
+      },
+      {
+        index: 3,
+        name: 'Number',
+        dataType: 5,
+        notNull: false,
+        primaryKey: false,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: []
+      }
+    ]);
   });
 
   it('should create a feature table and read the information about it', function() {
-    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', wkb.typeMap.wkt.Point);
+    var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', GeometryType.POINT);
     var boundingBox = new BoundingBox(-180, 180, -80, 80);
 
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', DataTypes.TEXT, false, null, 5));
-    columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', DataTypes.BLOB, false, null, 7));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', wkb.typeMap.wkt.Point, false, null));
-    columns.push(FeatureColumn.createColumn(2, 'test_text.test', DataTypes.TEXT, false, "default"));
-    columns.push(FeatureColumn.createColumn(3, 'test_real.test', DataTypes.REAL, false, null));
-    columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', DataTypes.BOOLEAN, false, null));
-    columns.push(FeatureColumn.createColumn(5, 'test_blob.test', DataTypes.BLOB, false, null));
-    columns.push(FeatureColumn.createColumn(6, 'test_integer.test', DataTypes.INTEGER, false, 5));
+    columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
+    columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
+    columns.push(FeatureColumn.createColumn(2, 'test_text.test', GeoPackageDataType.TEXT, false, "default"));
+    columns.push(FeatureColumn.createColumn(3, 'test_real.test', GeoPackageDataType.REAL, false, null));
+    columns.push(FeatureColumn.createColumn(4, 'test_boolean.test', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(FeatureColumn.createColumn(5, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
+    columns.push(FeatureColumn.createColumn(6, 'test_integer.test', GeoPackageDataType.INTEGER, false, 5));
 
     var dc = new DataColumns();
     dc.table_name = 'test_features.test';
@@ -140,103 +174,174 @@ describe('GeoPackage Feature table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    return geopackage.createFeatureTable('geom.test', geometryColumns, columns, boundingBox, 4326, [dc])
-      .then(function() {
-        var reader = new FeatureTableReader(tableName);
-        var result = reader.readFeatureTable(geopackage);
-        var columns = result.columns;
+    geopackage.createFeatureTable('geom.test', geometryColumns, columns, boundingBox, 4326, [dc]);
+    var reader = new FeatureTableReader(tableName);
+    var result = reader.readFeatureTable(geopackage);
+    var columns = result.getUserColumns().getColumns();
 
-        var plainObject = JSON.parse(JSON.stringify(columns));
+    var plainObject = JSON.parse(JSON.stringify(columns));
 
-        plainObject.should.deep.include.members([{ index: 0,
-          name: 'id',
-          dataType: 5,
-          notNull: true,
-          primaryKey: true },
-        { index: 1,
-          name: 'geom.test',
-          notNull: false,
-          primaryKey: false,
-          geometryType: 1 },
-        { index: 2,
-          name: 'test_text.test',
-          dataType: 9,
-          notNull: false,
-          defaultValue: "\'default\'",
-          primaryKey: false },
-        { index: 3,
-          name: 'test_real.test',
-          dataType: 8,
-          notNull: false,
-          primaryKey: false },
-        { index: 4,
-          name: 'test_boolean.test',
-          dataType: 0,
-          notNull: false,
-          primaryKey: false },
-        { index: 5,
-          name: 'test_blob.test',
-          dataType: 10,
-          notNull: false,
-          primaryKey: false },
-        { index: 6,
-          name: 'test_integer.test',
-          dataType: 5,
-          notNull: false,
-          defaultValue: '5',
-          primaryKey: false },
-        { index: 7,
-          name: 'test_text_limited.test',
-          dataType: 9,
-          max: 5,
-          notNull: false,
-          primaryKey: false },
-        { index: 8,
-          name: 'test_blob_limited.test',
-          dataType: 10,
-          max: 7,
-          notNull: false,
-          primaryKey: false } ]);
-        var dao = new DataColumnsDao(geopackage);
-        var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
-        dataColumn.should.be.deep.equal({
-          table_name: 'test_features.test',
-          column_name: 'test_text_limited.test',
-          name: 'Test Name',
-          title: 'Test',
-          description: 'Test Description',
-          mime_type: 'text/html',
-          constraint_name: 'test constraint'
-        });
-      });
+    plainObject.should.deep.include.members([
+      {
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: [
+          {
+            name: null,
+            sql: "NOT NULL",
+            type: ConstraintType.NOT_NULL
+          },
+          {
+            name: null,
+            sql: "PRIMARY KEY AUTOINCREMENT",
+            type: ConstraintType.PRIMARY_KEY
+          }
+        ]
+      },
+      {
+        index: 1,
+        name: 'geom.test',
+        notNull: false,
+        primaryKey: false,
+        geometryType: GeometryType.POINT,
+        dataType: GeoPackageDataType.BLOB,
+        max: null,
+        type: GeometryType.nameFromType(GeometryType.POINT),
+        constraints: []
+      },
+      {
+        index: 2,
+        name: 'test_text.test',
+        dataType: 9,
+        notNull: false,
+        defaultValue: "\'default\'",
+        primaryKey: false ,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+        constraints: [
+          {
+            name: null,
+            sql: "DEFAULT 'default'",
+            type: ConstraintType.DEFAULT
+          }
+        ]
+      },
+      {
+        index: 3,
+        name: 'test_real.test',
+        dataType: 8,
+        notNull: false,
+        primaryKey: false,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
+        constraints: []
+      },
+      {
+        index: 4,
+        name: 'test_boolean.test',
+        dataType: 0,
+        notNull: false,
+        primaryKey: false,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
+        constraints: []
+      },
+      {
+        index: 5,
+        name: 'test_blob.test',
+        dataType: 10,
+        notNull: false,
+        primaryKey: false,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
+        constraints: []
+      },
+      {
+        index: 6,
+        name: 'test_integer.test',
+        dataType: 5,
+        notNull: false,
+        defaultValue: '5',
+        primaryKey: false,
+        geometryType: null,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: [
+          {
+            name: null,
+            sql: "DEFAULT 5",
+            type: ConstraintType.DEFAULT
+          }
+        ]
+      },
+      {
+        index: 7,
+        name: 'test_text_limited.test',
+        dataType: 9,
+        max: 5,
+        notNull: false,
+        primaryKey: false,
+        geometryType: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+        constraints: []
+      },
+      {
+        index: 8,
+        name: 'test_blob_limited.test',
+        dataType: 10,
+        max: 7,
+        notNull: false,
+        primaryKey: false,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
+        constraints: []
+      }
+    ]);
+    var dao = new DataColumnsDao(geopackage);
+    var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
+    dataColumn.should.be.deep.equal({
+      table_name: 'test_features.test',
+      column_name: 'test_text_limited.test',
+      name: 'Test Name',
+      title: 'Test',
+      description: 'Test Description',
+      mime_type: 'text/html',
+      constraint_name: 'test constraint'
+    });
   });
 
   describe('GeoPackage feature CRUD tests', function(done) {
 
     beforeEach(function() {
-      var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', wkb.typeMap.wkt.Point);
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', GeometryType.POINT);
       var columns = [];
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-      columns.push(FeatureColumn.createColumn(7, 'test_text_limited', DataTypes.TEXT, false, null, 5));
-      columns.push(FeatureColumn.createColumn(8, 'test_blob_limited', DataTypes.BLOB, false, null, 7));
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkb.typeMap.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumn(2, 'test_text.test', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(3, 'test_real', DataTypes.REAL, false, null));
-      columns.push(FeatureColumn.createColumn(4, 'test_boolean', DataTypes.BOOLEAN, false, null));
-      columns.push(FeatureColumn.createColumn(5, 'test_blob', DataTypes.BLOB, false, null));
-      columns.push(FeatureColumn.createColumn(6, 'test_integer', DataTypes.INTEGER, false, ""));
-      columns.push(FeatureColumn.createColumn(9, 'test space', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(10, 'test-dash', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(7, 'test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
+      columns.push(FeatureColumn.createColumn(8, 'test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
+      columns.push(FeatureColumn.createColumn(2, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(3, 'test_real', GeoPackageDataType.REAL, false, null));
+      columns.push(FeatureColumn.createColumn(4, 'test_boolean', GeoPackageDataType.BOOLEAN, false, null));
+      columns.push(FeatureColumn.createColumn(5, 'test_blob', GeoPackageDataType.BLOB, false, null));
+      columns.push(FeatureColumn.createColumn(6, 'test_integer', GeoPackageDataType.INTEGER, false, null));
+      columns.push(FeatureColumn.createColumn(9, 'test space', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(10, 'test-dash', GeoPackageDataType.TEXT, false, ""));
 
-      return geopackage.createFeatureTable(tableName, geometryColumns, columns)
-        .then(function(result) {
-          var verified = Verification.verifyGeometryColumns(geopackage)
-          && Verification.verifyTableExists(geopackage, tableName)
-          && Verification.verifyContentsForTable(geopackage, tableName)
-          && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
-          verified.should.be.equal(true);
-        });
+      geopackage.createFeatureTable(tableName, geometryColumns, columns);
+      var verified = Verification.verifyGeometryColumns(geopackage)
+        && Verification.verifyTableExists(geopackage, tableName)
+        && Verification.verifyContentsForTable(geopackage, tableName)
+        && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
+      verified.should.be.equal(true);
     });
 
     it('should create a feature', function() {

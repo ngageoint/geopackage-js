@@ -1,8 +1,8 @@
 import { default as testSetup } from '../../fixtures/testSetup'
+import { UserCustomTableReader } from '../../../lib/user/custom/userCustomTableReader';
+import { UserCustomDao } from '../../../lib/user/custom/userCustomDao';
 
-var UserTableReader = require('../../../lib/user/userTableReader').UserTableReader
-  , UserDao = require('../../../lib/user/userDao').UserDao
-  , path = require('path')
+var path = require('path')
   , should = require('chai').should();
 
 describe('UserTableReader tests', function() {
@@ -22,31 +22,31 @@ describe('UserTableReader tests', function() {
   });
 
   it('should read the table', function() {
-    var reader = new UserTableReader('point2d');
+    var reader = new UserCustomTableReader('point2d');
     var table = reader.readTable(geoPackage.database);
-    table.table_name.should.be.equal('point2d');
-    table.columns.length.should.be.equal(8);
-    table.columns[0].name.should.be.equal('fid');
-    table.columns[1].name.should.be.equal('geom');
-    table.columns[2].name.should.be.equal('intfield');
-    table.columns[3].name.should.be.equal('strfield');
-    table.columns[4].name.should.be.equal('realfield');
-    table.columns[5].name.should.be.equal('datetimefield');
-    table.columns[6].name.should.be.equal('datefield');
-    table.columns[7].name.should.be.equal('binaryfield');
+    table.getTableName().should.be.equal('point2d');
+    table.getUserColumns().getColumns().length.should.be.equal(8);
+    table.getUserColumns().getColumns()[0].getName().should.be.equal('fid');
+    table.getUserColumns().getColumns()[1].getName().should.be.equal('geom');
+    table.getUserColumns().getColumns()[2].getName().should.be.equal('intfield');
+    table.getUserColumns().getColumns()[3].getName().should.be.equal('strfield');
+    table.getUserColumns().getColumns()[4].getName().should.be.equal('realfield');
+    table.getUserColumns().getColumns()[5].getName().should.be.equal('datetimefield');
+    table.getUserColumns().getColumns()[6].getName().should.be.equal('datefield');
+    table.getUserColumns().getColumns()[7].getName().should.be.equal('binaryfield');
   });
 
   it('should query the table', function() {
-    var reader = new UserTableReader('point2d');
+    var reader = new UserCustomTableReader('point2d');
     var table = reader.readTable(geoPackage.database);
-    var ud = new UserDao(geoPackage, table);
+    var ud = new UserCustomDao(geoPackage, table);
     var results = ud.queryForAll();
     should.exist(results);
     results.length.should.be.equal(2);
     for (var i = 0; i < results.length; i++) {
       var ur = ud.getRow(results[i]);
       ur.columnCount.should.be.equal(8);
-      var names = ur.columnNames
+      var names = ur.columnNames;
       names.should.include('fid');
       names.should.include('geom');
       names.should.include('intfield');
@@ -64,10 +64,9 @@ describe('UserTableReader tests', function() {
       ur.getColumnWithIndex(0).name.should.be.equal('fid');
       ur.getColumnWithColumnName('fid').name.should.be.equal('fid');
       ur.id.should.be.equal(i+1);
-      ur.pkColumn.name.should.be.equal('fid');
-      ur.getColumnWithIndex(0).getTypeName().should.be.equal('INTEGER');
+      ur.pkColumn.getName().should.be.equal('fid');
+      ur.getColumnWithIndex(0).getType().should.be.equal('INTEGER');
       should.exist(ur.values);
     }
   });
-
 });

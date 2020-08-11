@@ -3,7 +3,7 @@ import {
   GeoPackageAPI,
   FeatureColumn,
   GeometryColumns,
-  DataTypes,
+  GeoPackageDataType,
   BoundingBox,
 } from '@ngageoint/geopackage';
 
@@ -297,11 +297,11 @@ export class CSVToGeoPackage {
     for (const key in properties) {
       const prop = properties[key];
       if (prop.name.toLowerCase() !== 'id') {
-        columns.push(FeatureColumn.createColumn(index, prop.name, DataTypes.fromName(prop.type), false, null));
+        columns.push(FeatureColumn.createColumn(index, prop.name, GeoPackageDataType.fromName(prop.type), false, null));
         index++;
       } else {
         columns.push(
-          FeatureColumn.createColumn(index, '_properties_' + prop.name, DataTypes.fromName(prop.type), false, null),
+          FeatureColumn.createColumn(index, '_properties_' + prop.name, GeoPackageDataType.fromName(prop.type), false, null),
         );
         index++;
       }

@@ -1,7 +1,7 @@
 import { UserMappingTable } from './userMappingTable';
 import { UserRow } from '../../user/userRow';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserColumn } from '../../user/userColumn';
 
 /**
@@ -14,14 +14,14 @@ import { UserColumn } from '../../user/userColumn';
  * @class
  * @extends UserRow
  * @param  {module:extension/relatedTables~UserMappingTable} table user mapping table
- * @param  {module:db/dataTypes[]} columnTypes  column types
+ * @param  {module:db/geoPackageDataType[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  */
 export class UserMappingRow extends UserRow {
   row: UserRow;
   constructor(
     public table: UserMappingTable,
-    columnTypes?: { [key: string]: DataTypes },
+    columnTypes?: { [key: string]: GeoPackageDataType },
     values?: Record<string, DBValue>,
   ) {
     super(table, columnTypes, values);

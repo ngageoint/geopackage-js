@@ -5,7 +5,7 @@
 
 import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserColumn } from '../../user/userColumn';
 
 /**
@@ -38,7 +38,7 @@ export class StyleMappingTable extends UserMappingTable {
    * @return {module:extension/relatedTables~UserMappingTable}
    */
   static create(tableName: string): StyleMappingTable {
-    return new StyleMappingTable(tableName, StyleMappingTable.createColumns());
+    return new StyleMappingTable(tableName, StyleMappingTable.createColumns(), null);
   }
   /**
    * Create the columns
@@ -51,7 +51,7 @@ export class StyleMappingTable extends UserMappingTable {
       UserCustomColumn.createColumn(
         index,
         StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME,
-        DataTypes.TEXT,
+        GeoPackageDataType.TEXT,
         undefined,
         false,
         undefined,

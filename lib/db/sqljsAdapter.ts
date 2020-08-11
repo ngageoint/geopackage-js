@@ -299,4 +299,15 @@ export class SqljsAdapter implements DBAdapter {
     }
     return this.get(sql, whereArgs).count as number;
   }
+
+  transaction(func: Function): void {
+    this.db.exec('BEGIN TRANSACTION');
+    try {
+      func();
+      this.db.exec('COMMIT TRANSACTION');
+    } catch (e) {
+      this.db.exec('ROLLBACK TRANSACTION');
+      throw e;
+    }
+  }
 }

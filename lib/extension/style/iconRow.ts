@@ -3,7 +3,7 @@ import { MediaRow } from '../relatedTables/mediaRow';
 import { ImageUtils } from '../../tiles/imageUtils';
 import { UserColumn } from '../../user/userColumn';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * @memberOf module:extension/style
@@ -14,13 +14,13 @@ import { DataTypes } from '../../db/dataTypes';
  * Icon Row
  * @extends MediaRow
  * @param  {module:extension/style.IconTable} iconTable  icon table
- * @param  {module:db/dataTypes[]} columnTypes  column types
+ * @param  {module:db/geoPackageDataType[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
 export class IconRow extends MediaRow {
   iconTable: IconTable;
-  constructor(iconTable: IconTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
+  constructor(iconTable: IconTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
     super(iconTable, columnTypes, values);
     this.iconTable = iconTable;
   }

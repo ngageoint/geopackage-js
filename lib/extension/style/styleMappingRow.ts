@@ -7,13 +7,13 @@ import { UserMappingRow } from '../relatedTables/userMappingRow';
 import { StyleMappingTable } from './styleMappingTable';
 import { UserColumn } from '../../user/userColumn';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * User Mapping Row containing the values from a single result set row
  * @extends UserMappingRow
  * @param  {module:extension/style.StyleMappingTable} styleMappingTable style mapping table
- * @param  {module:db/dataTypes[]} columnTypes  column types
+ * @param  {module:db/geoPackageDataType[]} columnTypes  column types
  * @param  {module:dao/columnValues~ColumnValues[]} values      values
  * @constructor
  */
@@ -21,7 +21,7 @@ export class StyleMappingRow extends UserMappingRow {
   styleMappingTable: StyleMappingTable;
   constructor(
     styleMappingTable: StyleMappingTable,
-    columnTypes?: { [key: string]: DataTypes },
+    columnTypes?: { [key: string]: GeoPackageDataType },
     values?: Record<string, DBValue>,
   ) {
     super(styleMappingTable, columnTypes, values);

@@ -27,6 +27,11 @@ import { UserRow } from '../../user/userRow';
 import { UserMappingRow } from './userMappingRow';
 import { MediaRow } from './mediaRow';
 import { SimpleAttributesRow } from './simpleAttributesRow';
+import {UserCustomTableReader} from "../../user/custom/userCustomTableReader";
+import {AttributesDao} from "../../attributes/attributesDao";
+import {AttributesRow} from "../../attributes/attributesRow";
+import {FeatureDao} from "../../features/user/featureDao";
+import {TileDao} from "../../tiles/user/tileDao";
 /**
  * Related Tables Extension
  * @param  {module:geoPackage~GeoPackage} geoPackage the GeoPackage object
@@ -49,15 +54,15 @@ export class RelatedTablesExtension extends BaseExtension {
    * Get or create the extension
    * @return {Promise}
    */
-  async getOrCreateExtension(): Promise<Extension> {
-    const extension = await this.getOrCreate(
+  getOrCreateExtension(): Extension {
+    const extension = this.getOrCreate(
       RelatedTablesExtension.EXTENSION_NAME,
       'gpkgext_relations',
       undefined,
       RelatedTablesExtension.EXTENSION_RELATED_TABLES_DEFINITION,
       Extension.READ_WRITE,
     );
-    await this.extendedRelationDao.createTable();
+    this.extendedRelationDao.createTable();
     return extension;
   }
   /**
@@ -65,8 +70,8 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {string} mappingTableName user mapping table
    * @return {Promise}
    */
-  async getOrCreateMappingTable(mappingTableName: string): Promise<Extension> {
-    await this.getOrCreateExtension();
+  getOrCreateMappingTable(mappingTableName: string): Extension {
+    this.getOrCreateExtension();
     return this.getOrCreate(
       RelatedTablesExtension.EXTENSION_NAME,
       mappingTableName,
@@ -80,7 +85,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~UserRelatedTable} userRelatedTable user related table
    */
   setContents(userRelatedTable: UserRelatedTable): boolean {
-    const contents = this.geoPackage.contentsDao.queryForId(userRelatedTable.table_name);
+    const contents = this.geoPackage.contentsDao.queryForId(userRelatedTable.getTableName());
     return userRelatedTable.setContents(contents);
   }
   /**
@@ -89,8 +94,8 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {string[]} requiredColumns required columns
    * @return {module:user/custom~UserCustomDao}
    */
-  getUserDao(tableName: string, requiredColumns?: string[]): UserCustomDao<UserRow> {
-    return UserCustomDao.readTable(this.geoPackage, tableName, requiredColumns);
+  getUserDao(tableName: string): UserCustomDao<UserRow> {
+    return UserCustomDao.readTable(this.geoPackage, tableName);
   }
   /**
    * Gets the UserMappingDao from the mapping table name
@@ -104,7 +109,7 @@ export class RelatedTablesExtension extends BaseExtension {
     } else {
       mappingTableName = tableName;
     }
-    return new UserMappingDao(this.getUserDao(mappingTableName, UserMappingTable.requiredColumns()), this.geoPackage);
+    return new UserMappingDao(this.getUserDao(mappingTableName), this.geoPackage);
   }
   /**
    * Gets all relationships in the GeoPackage with an optional base table name and an optional base id
@@ -141,11 +146,25 @@ export class RelatedTablesExtension extends BaseExtension {
       const mappingRows = this.getMappingRowsForBase(relation.mapping_table_name, baseId);
       relation.mappingRows = mappingRows;
       let userDao: UserDao<UserRow>;
-      // TODO do this for all known types
-      if (relation.relation_name === 'media') {
-        userDao = MediaDao.readTable(this.geoPackage, relation.related_table_name) as UserDao<UserRow>;
-      } else {
-        userDao = UserDao.readTable(this.geoPackage, relation.related_table_name);
+
+      switch (relation.relation_name) {
+        case RelationType.MEDIA.name:
+          userDao = MediaDao.readTable(this.geoPackage, relation.related_table_name);
+          break;
+        case RelationType.ATTRIBUTES.name:
+          userDao = AttributesDao.readTable(this.geoPackage, relation.related_table_name);
+          break;
+        case RelationType.FEATURES.name:
+          userDao = FeatureDao.readTable(this.geoPackage, relation.related_table_name);
+          break;
+        case RelationType.TILES.name:
+          userDao = TileDao.readTable(this.geoPackage, relation.related_table_name);
+          break;
+        case RelationType.SIMPLE_ATTRIBUTES.name:
+          userDao = SimpleAttributesDao.readTable(this.geoPackage, relation.related_table_name);
+          break;
+        default:
+          throw new Error('Relationship Unknown')
       }
       for (let m = 0; m < mappingRows.length; m++) {
         const mappingRow = mappingRows[m];
@@ -173,7 +192,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation | undefined>}
    */
-  async addRelationship(
+  addRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -186,7 +205,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     let extendedRelation = this.extendedRelationDao.createObject();
     let userMappingTable: UserMappingTable;
     if (relationship instanceof ExtendedRelation) {
@@ -206,14 +225,14 @@ export class RelatedTablesExtension extends BaseExtension {
       }
       if (relationship.relatedTable) {
         this.createRelatedTable(relationship.relatedTable);
-        relationship.relatedTableName = relationship.relatedTable.table_name;
+        relationship.relatedTableName = relationship.relatedTable.getTableName();
         relationship.relationName = relationship.relatedTable.relation_name;
       }
       extendedRelation.base_table_name = relationship.baseTableName;
       extendedRelation.base_primary_column = this.getPrimaryKeyColumnName(relationship.baseTableName);
       extendedRelation.related_table_name = relationship.relatedTableName;
       extendedRelation.related_primary_column = this.getPrimaryKeyColumnName(relationship.relatedTableName);
-      extendedRelation.mapping_table_name = userMappingTable.table_name;
+      extendedRelation.mapping_table_name = userMappingTable.getTableName();
       extendedRelation.relation_name = relationship.relationName;
     }
     if (
@@ -225,7 +244,7 @@ export class RelatedTablesExtension extends BaseExtension {
     ) {
       return;
     }
-    await this.createUserMappingTable(userMappingTable);
+    console.log('created mapping table for ' + userMappingTable.getTableName() + ': ' + this.createUserMappingTable(userMappingTable));
     const mappingTableRelations = this.extendedRelationDao.queryByMappingTableName(extendedRelation.mapping_table_name);
     if (mappingTableRelations.length) {
       return mappingTableRelations[0];
@@ -239,9 +258,9 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return {string}
    */
   getPrimaryKeyColumnName(tableName: string): string {
-    const reader = new UserTableReader(tableName);
+    const reader = new UserCustomTableReader(tableName);
     const table = reader.readTable(this.geoPackage.database);
-    return table.pkColumn.name;
+    return table.getPkColumn().getName();
   }
   /**
    * Adds a features relationship between the base feature and related feature
@@ -249,7 +268,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation>}
    */
-  async addFeaturesRelationship(
+  addFeaturesRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -262,7 +281,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     if (relationship instanceof ExtendedRelation) {
       relationship.relation_name = relationship.relation_name || RelationType.FEATURES.name;
     } else {
@@ -276,7 +295,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation>}
    */
-  async addTilesRelationship(
+  addTilesRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -289,7 +308,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     if (relationship instanceof ExtendedRelation) {
       relationship.relation_name = relationship.relation_name || RelationType.TILES.name;
     } else {
@@ -303,7 +322,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation>}
    */
-  async addAttributesRelationship(
+  addAttributesRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -316,7 +335,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     if (relationship instanceof ExtendedRelation) {
       relationship.relation_name = relationship.relation_name || RelationType.ATTRIBUTES.name;
     } else {
@@ -331,7 +350,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation>}
    */
-  async addSimpleAttributesRelationship(
+  addSimpleAttributesRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -344,7 +363,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     if (relationship instanceof ExtendedRelation) {
       relationship.relation_name = relationship.relation_name || RelationType.SIMPLE_ATTRIBUTES.name;
     } else {
@@ -359,7 +378,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {module:extension/relatedTables~Relationship|module:extension/relatedTables~ExtendedRelation} relationship relationship to add
    * @return {Promise<ExtendedRelation>}
    */
-  async addMediaRelationship(
+  addMediaRelationship(
     relationship:
       | ExtendedRelation
       | {
@@ -372,7 +391,7 @@ export class RelatedTablesExtension extends BaseExtension {
           userMappingTable?: UserMappingTable;
           relatedTable?: UserRelatedTable;
         },
-  ): Promise<ExtendedRelation> {
+  ): ExtendedRelation {
     if (relationship instanceof ExtendedRelation) {
       relationship.relation_name = relationship.relation_name || RelationType.MEDIA.name;
     } else {
@@ -451,15 +470,15 @@ export class RelatedTablesExtension extends BaseExtension {
    * @param  {string | UserMappingTable} userMappingTableOrName user mapping table or name
    * @return {Promise<Boolean>}
    */
-  async createUserMappingTable(userMappingTableOrName: UserMappingTable | string): Promise<boolean> {
+  createUserMappingTable(userMappingTableOrName: UserMappingTable | string): boolean {
     let umt;
     if (userMappingTableOrName instanceof UserMappingTable) {
       umt = userMappingTableOrName;
     } else {
       umt = UserMappingTable.create(userMappingTableOrName);
     }
-    await this.getOrCreateMappingTable(umt.table_name);
-    if (!this.geoPackage.isTable(umt.table_name)) {
+    this.getOrCreateMappingTable(umt.getTableName());
+    if (!this.geoPackage.isTable(umt.getTableName())) {
       return !!this.geoPackage.tableCreator.createUserTable(umt);
     }
     return true;
@@ -472,12 +491,12 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return {Boolean} true if the table now exists
    */
   createRelatedTable(relatedTable: UserRelatedTable): boolean {
-    if (!this.geoPackage.isTable(relatedTable.table_name)) {
+    if (!this.geoPackage.isTable(relatedTable.getTableName())) {
       this.geoPackage.tableCreator.createUserTable(relatedTable);
       const contents = new Contents();
-      contents.table_name = relatedTable.table_name;
+      contents.table_name = relatedTable.getTableName();
       contents.data_type = relatedTable.data_type;
-      contents.identifier = relatedTable.table_name;
+      contents.identifier = relatedTable.getTableName();
       this.geoPackage.contentsDao.create(contents);
       const refreshed = this.geoPackage.contentsDao.refresh(contents);
       relatedTable.setContents(refreshed);
@@ -518,28 +537,6 @@ export class RelatedTablesExtension extends BaseExtension {
       return true;
     }
     return true;
-  }
-  /**
-   * Link related Ids
-   * @param  {string} baseTableName    base table name
-   * @param  {Number} baseId           base row id
-   * @param  {string} relatedTableName related table name
-   * @param  {Number} relatedId        related row id
-   * @param  {module:extension/relatedTables~RelationType} relationType     relation type
-   * @return {Promise}
-   */
-  async linkRelatedIds(
-    baseTableName: string,
-    baseId: number,
-    relatedTableName: string,
-    relatedId: number,
-    relationType: RelationType,
-  ): Promise<number> {
-    const baseDao = UserDao.readTable(this.geoPackage, baseTableName);
-    const relatedDao = UserDao.readTable(this.geoPackage, relatedTableName);
-    const baseRow = baseDao.queryForId(baseId);
-    const relatedRow = relatedDao.queryForId(relatedId);
-    return baseDao.linkRelatedRow(baseRow, relatedRow, relationType);
   }
   /**
    * Get the related id mappings for the base id
@@ -596,16 +593,16 @@ export class RelatedTablesExtension extends BaseExtension {
   getMediaDao(tableName: string | MediaTable | ExtendedRelation): MediaDao<MediaRow> {
     let table;
     if (tableName instanceof MediaTable) {
-      table = tableName.table_name;
+      table = tableName.getTableName();
     } else if (tableName instanceof ExtendedRelation) {
       table = tableName.related_table_name;
     } else if (typeof tableName === 'string') {
       table = tableName;
     }
-    const reader = new UserTableReader(table, MediaTable.requiredColumns());
+    const reader = new UserCustomTableReader(table);
     const userTable = reader.readTable(this.geoPackage.database);
-    table = new MediaTable(userTable.table_name, userTable.columns, MediaTable.requiredColumns());
-    table.setContents(this.geoPackage.contentsDao.queryForId(table.table_name));
+    table = new MediaTable(userTable.getTableName(), userTable.getUserColumns().getColumns(), MediaTable.requiredColumns());
+    table.setContents(this.geoPackage.contentsDao.queryForId(userTable.getTableName()));
     return new MediaDao(this.geoPackage, table);
   }
   /**
@@ -623,14 +620,14 @@ export class RelatedTablesExtension extends BaseExtension {
       if (tableName instanceof ExtendedRelation) {
         table = tableName.related_table_name;
       }
-      const reader = new UserTableReader(table, SimpleAttributesTable.requiredColumns());
+      const reader = new UserCustomTableReader(table);
       const userTable = reader.readTable(this.geoPackage.database);
       table = new SimpleAttributesTable(
-        userTable.table_name,
-        userTable.columns,
+        userTable.getTableName(),
+        userTable.getUserColumns().getColumns(),
         SimpleAttributesTable.requiredColumns(),
       );
-      table.setContents(this.geoPackage.contentsDao.queryForId(table.table_name));
+      table.setContents(this.geoPackage.contentsDao.queryForId(table.getTableName()));
     }
     return new SimpleAttributesDao(this.geoPackage, table);
   }
@@ -685,5 +682,17 @@ export class RelatedTablesExtension extends BaseExtension {
       'relationType',
       'relatedTable',
     ]);
+  }
+  removeRelationships(table: string) {
+    try {
+      if (this.extendedRelationDao.isTableExists()) {
+        let extendedRelations = this.extendedRelationDao.getTableRelations(table);
+        extendedRelations.forEach(extendedRelation => {
+          this.removeRelationship(extendedRelation);
+        });
+      }
+    } catch (e) {
+      throw new Error("Failed to remove relationships for table: " + table);
+    }
   }
 }

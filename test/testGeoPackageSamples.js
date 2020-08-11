@@ -1,6 +1,5 @@
 import { GeoPackageAPI } from '../.'
 import { default as GeoPackageUtils } from './geopackageUtils'
-// var GeoPackageUtils = require('./geopackageUtils');
 
 var path = require('path')
   , fs = require('fs-extra');
@@ -31,29 +30,26 @@ describe('Create GeoPackage samples', function() {
       return GeoPackageAPI.create(testGeoPackage)
       .then(function(gp) {
         console.log('Created GeoPackage');
-        return geopackage = gp;
-      })
-      .then(GeoPackageUtils.createCRSWKTExtension)
-      .then(GeoPackageUtils.createFeatures)
-      .then(GeoPackageUtils.createSchemaExtension)
-      .then(GeoPackageUtils.createGeometryIndexExtension)
-      .then(GeoPackageUtils.createFeatureTileLinkExtension)
-      .then(GeoPackageUtils.createNonLinearGeometryTypesExtension)
-      .then(GeoPackageUtils.createRTreeSpatialIndexExtension)
-      .then(GeoPackageUtils.createRelatedTablesMediaExtension)
-      .then(GeoPackageUtils.createRelatedTablesFeaturesExtension)
-      .then(GeoPackageUtils.createTiles)
-      .then(GeoPackageUtils.createWebPExtension)
-      .then(GeoPackageUtils.createAttributes)
-      .then(GeoPackageUtils.createRelatedTablesSimpleAttributesExtension)
-      .then(GeoPackageUtils.createMetadataExtension)
-      .then(GeoPackageUtils.createCoverageDataExtension)
-      .then(GeoPackageUtils.createPropertiesExtension)
-      .then(function() {
-        geopackage.close();
+        GeoPackageUtils.createCRSWKTExtension(gp);
+        GeoPackageUtils.createFeatures(gp);
+        GeoPackageUtils.createSchemaExtension(gp);
+        GeoPackageUtils.createGeometryIndexExtension(gp);
+        GeoPackageUtils.createFeatureTileLinkExtension(gp);
+        GeoPackageUtils.createNonLinearGeometryTypesExtension(gp);
+        GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
+        GeoPackageUtils.createRelatedTablesMediaExtension(gp);
+        GeoPackageUtils.createRelatedTablesFeaturesExtension(gp);
+        GeoPackageUtils.createTiles(gp);
+        GeoPackageUtils.createWebPExtension(gp);
+        GeoPackageUtils.createAttributes(gp);
+        GeoPackageUtils.createRelatedTablesSimpleAttributesExtension(gp);
+        GeoPackageUtils.createMetadataExtension(gp);
+        GeoPackageUtils.createCoverageDataExtension(gp);
+        GeoPackageUtils.createPropertiesExtension(gp);
+        gp.close();
       })
       .catch(function(error) {
-        console.log('error', error);
+        console.log(error);
         false.should.be.equal(true);
       });
     });
@@ -80,16 +76,12 @@ describe('Create GeoPackage samples', function() {
     it('output an attributes GeoPackage', function() {
       this.timeout(60000);
       console.log('Create GeoPackage');
-
       return GeoPackageAPI.create(testGeoPackage)
       .then(function(gp) {
         console.log('Created GeoPackage');
-        return geopackage = gp;
-      })
-      .then(GeoPackageUtils.createCRSWKTExtension)
-      .then(GeoPackageUtils.createAttributes)
-      .then(function() {
-        geopackage.close();
+        GeoPackageUtils.createCRSWKTExtension(gp);
+        GeoPackageUtils.createAttributes(gp);
+        gp.close();
       })
       .catch(function(error) {
         console.log('error', error);

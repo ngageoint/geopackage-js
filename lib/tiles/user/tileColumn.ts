@@ -3,7 +3,7 @@
  */
 
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 
 /**
@@ -22,30 +22,27 @@ export class TileColumn extends UserColumn {
   constructor(
     index: number,
     name: string,
-    dataType: DataTypes,
+    dataType: GeoPackageDataType,
     max?: number,
     notNull?: boolean,
     defaultValue?: DBValue,
     primaryKey?: boolean,
   ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);
-    if (dataType === DataTypes.GEOMETRY) {
-      throw new Error('Data Type is required to create column: ' + name);
-    }
   }
   /**
    * Create an id column
    * @param  {number} index Index
    */
   static createIdColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_ID, DataTypes.INTEGER, null, false, null, true);
+    return new TileColumn(index, TileColumn.COLUMN_ID, GeoPackageDataType.INTEGER, null, false, null, true);
   }
   /**
    * Create a zoom level column
    * @param  {number} index Index
    */
   static createZoomLevelColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_ZOOM_LEVEL, DataTypes.INTEGER, null, true, null, false);
+    return new TileColumn(index, TileColumn.COLUMN_ZOOM_LEVEL, GeoPackageDataType.INTEGER, null, true, null, false);
   }
   /**
    *  Create a tile column column
@@ -53,7 +50,7 @@ export class TileColumn extends UserColumn {
    *  @param {number} index column index
    */
   static createTileColumnColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_TILE_COLUMN, DataTypes.INTEGER, null, true, null, false);
+    return new TileColumn(index, TileColumn.COLUMN_TILE_COLUMN, GeoPackageDataType.INTEGER, null, true, null, false);
   }
   /**
    *  Create a tile row column
@@ -62,7 +59,7 @@ export class TileColumn extends UserColumn {
    *
    */
   static createTileRowColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_TILE_ROW, DataTypes.INTEGER, null, true, null, false);
+    return new TileColumn(index, TileColumn.COLUMN_TILE_ROW, GeoPackageDataType.INTEGER, null, true, null, false);
   }
   /**
    *  Create a tile data column
@@ -70,6 +67,6 @@ export class TileColumn extends UserColumn {
    *  @param {number} index column index
    */
   static createTileDataColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_TILE_DATA, DataTypes.BLOB, null, true, null, false);
+    return new TileColumn(index, TileColumn.COLUMN_TILE_DATA, GeoPackageDataType.BLOB, null, true, null, false);
   }
 }

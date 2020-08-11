@@ -68,4 +68,26 @@ export class Contents {
    * @member {SRSRef}
    */
   srs_id: number;
+
+  /**
+   * Copy function
+   */
+  copy(): Contents {
+    let contents = new Contents();
+    contents.table_name = this.table_name;
+    contents.data_type = this.data_type;
+    contents.identifier = this.identifier;
+    contents.description = this.description;
+    contents.min_x = this.min_x;
+    contents.max_x = this.max_x;
+    contents.min_y = this.min_y;
+    contents.max_y = this.max_y;
+    contents.srs_id = this.srs_id;
+    return contents;
+  }
+
+  getTableName(): string {
+    return this.table_name;
+  }
+
 }

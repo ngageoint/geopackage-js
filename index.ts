@@ -13,7 +13,7 @@ import { FeatureColumn } from './lib/features/user/featureColumn';
 import { UserColumn } from './lib/user/userColumn';
 import { TileColumn } from './lib/tiles/user/tileColumn';
 import { DataColumns } from './lib/dataColumns/dataColumns';
-import { DataTypes } from './lib/db/dataTypes';
+import { GeoPackageDataType } from './lib/db/geoPackageDataType';
 import { SchemaExtension } from './lib/extension/schema';
 import { GeometryColumns } from './lib/features/columns/geometryColumns';
 import { MetadataReference } from './lib/metadata/reference/metadataReference';
@@ -36,6 +36,7 @@ import { ContentsDao } from './lib/core/contents/contentsDao';
 import { TileMatrixSet } from './lib/tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from './lib/tiles/matrix/tileMatrix';
 import { TileBoundingBoxUtils } from './lib/tiles/tileBoundingBoxUtils';
+import { GeometryType } from './lib/features/user/geometryType';
 
 export {
   proj4Defs,
@@ -68,7 +69,7 @@ export {
   NumberFeaturesTile,
   ShadedFeaturesTile,
   BoundingBox,
-  DataTypes,
+  GeoPackageDataType,
   ClosestFeature,
   TileScaling,
   TileScalingType,
@@ -76,4 +77,5 @@ export {
   TileMatrixSet,
   TileMatrix,
   TileBoundingBoxUtils,
+  GeometryType,
 };

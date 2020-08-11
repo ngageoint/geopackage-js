@@ -16,6 +16,7 @@ import { DBValue } from '../../db/dbAdapter';
  */
 export class RTreeIndexDao extends Dao<RTreeIndex> {
   public static readonly TABLE_NAME: string = 'rtree';
+  public static readonly PREFIX: string = 'rtree_';
   public static readonly COLUMN_TABLE_NAME: string = RTreeIndexDao.TABLE_NAME + '.table_name';
   public static readonly COLUMN_GEOM_ID: string = RTreeIndexDao.TABLE_NAME + '.geom_id';
   public static readonly COLUMN_MIN_X: string = RTreeIndexDao.TABLE_NAME + '.minx';

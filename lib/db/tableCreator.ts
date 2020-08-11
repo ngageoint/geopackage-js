@@ -2,9 +2,10 @@ import { SpatialReferenceSystemDao } from '../core/srs/spatialReferenceSystemDao
 
 // eslint-disable-next-line no-unused-vars
 import { UserTable } from '../user/userTable';
-import { DataTypes } from './dataTypes';
 import { GeoPackage } from '../geoPackage';
 import { GeoPackageConnection } from './geoPackageConnection';
+import { UserColumn } from '../user/userColumn';
+import { CoreSQLUtils } from './coreSQLUtils';
 
 type TableCreatorScripts =
   | 'spatial_reference_system'
@@ -40,11 +41,12 @@ export class TableCreator {
   }
   /**
    * Creates all required tables and Spatial Reference Systems, in addition to EPSG:3857
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  async createRequired(): Promise<boolean> {
+  createRequired(): boolean {
     const dao = new SpatialReferenceSystemDao(this.geopackage);
-    await Promise.all([this.createSpatialReferenceSystem(), this.createContents()]);
+    this.createSpatialReferenceSystem()
+    this.createContents();
     // Create the required Spatial Reference Systems (spec Requirement 11)
     dao.createUndefinedGeographic();
     dao.createWgs84();
@@ -55,122 +57,122 @@ export class TableCreator {
   }
   /**
    * Creates the spatial reference system tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createSpatialReferenceSystem(): Promise<boolean> {
+  createSpatialReferenceSystem(): boolean {
     return this.createTable('spatial_reference_system');
   }
   /**
    * Creates the contents tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createContents(): Promise<boolean> {
+  createContents(): boolean {
     return this.createTable('contents');
   }
   /**
    * Creates the geometry columns tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createGeometryColumns(): Promise<boolean> {
+  createGeometryColumns(): boolean {
     return this.createTable('geometry_columns');
   }
   /**
    * Creates the tile matrix set tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createTileMatrixSet(): Promise<boolean> {
+  createTileMatrixSet(): boolean {
     return this.createTable('tile_matrix_set');
   }
   /**
    * Creates the tile matrix tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createTileMatrix(): Promise<boolean> {
+  createTileMatrix(): boolean {
     return this.createTable('tile_matrix');
   }
   /**
    * Creates the data columns tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createDataColumns(): Promise<boolean> {
+  createDataColumns(): boolean {
     return this.createTable('data_columns');
   }
   /**
    * Creates the data column constraints tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createDataColumnConstraints(): Promise<boolean> {
+  createDataColumnConstraints(): boolean {
     return this.createTable('data_column_constraints');
   }
   /**
    * Creates the metadata tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createMetadata(): Promise<boolean> {
+  createMetadata(): boolean {
     return this.createTable('metadata');
   }
   /**
    * Creates the metadata reference tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createMetadataReference(): Promise<boolean> {
+  createMetadataReference(): boolean {
     return this.createTable('metadata_reference');
   }
   /**
    * Creates the extensions tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createExtensions(): Promise<boolean> {
+  createExtensions(): boolean {
     return this.createTable('extensions');
   }
   /**
    * Creates the table index tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createTableIndex(): Promise<boolean> {
+  createTableIndex(): boolean {
     return this.createTable('table_index');
   }
   /**
    * Creates the geometry index tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createGeometryIndex(): Promise<boolean> {
+  createGeometryIndex(): boolean {
     return this.createTable('geometry_index');
   }
   /**
    * Creates the feature tile link tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createFeatureTileLink(): Promise<boolean> {
+  createFeatureTileLink(): boolean {
     return this.createTable('feature_tile_link');
   }
   /**
    * Creates the extended relations tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createExtendedRelations(): Promise<boolean> {
+  createExtendedRelations():boolean {
     return this.createTable('extended_relations');
   }
   /**
    * Creates the contentsId tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createContentsId(): Promise<boolean> {
+  createContentsId():boolean {
     return this.createTable('contents_id');
   }
   /**
    * Creates the tileScaling tables
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  createTileScaling(): Promise<boolean> {
+  createTileScaling(): boolean {
     return this.createTable('tile_scaling');
   }
   /**
    * Creates all tables necessary for the specified table creation script name in the GeoPackage
    * @param  {string} creationScriptName creation scripts to run
-   * @return {Promise<Boolean>}
+   * @return {boolean}
    */
-  async createTable(creationScriptName: TableCreatorScripts): Promise<boolean> {
+  createTable(creationScriptName: TableCreatorScripts): boolean {
     let success = true;
     const scripts = TableCreator.tableCreationScripts[creationScriptName];
     for (let i = 0; i < scripts.length; i++) {
@@ -192,61 +194,28 @@ export class TableCreator {
    * @return {object} the result of {@link module:db/geoPackageConnection~GeoPackageConnection#run}
    * @throws {Error} if the table already exists
    */
-  createUserTable(userTable: UserTable): { lastInsertRowid: number; changes: number } {
+  createUserTable(userTable: UserTable<UserColumn>): { lastInsertRowid: number; changes: number } {
     const connection = this.connection;
-    const result = connection.tableExists(userTable.table_name);
+    const result = connection.tableExists(userTable.getTableName());
     if (result) {
-      throw new Error('Table already exists and cannot be created: ' + userTable.table_name);
+      throw new Error('Table already exists and cannot be created: ' + userTable.getTableName());
     }
-    let check = '';
-    let sql = "create table '" + userTable.table_name + "' (";
-    for (let i = 0; i < userTable.columns.length; i++) {
-      const tc = userTable.columns[i];
-      if (i) {
-        sql += ', ';
-      }
-      sql += "\n'" + tc.name + "' " + tc.getTypeName();
-      if (tc.max !== null && tc.max !== undefined) {
-        sql += '(' + tc.max + ')';
-        if (check.length) {
-          check += ' AND\n';
-        }
-        check += '\tlength("' + tc.name + '") <= ' + tc.max;
-      }
-      if (tc.notNull) {
-        sql += ' not null';
-      }
-      if (tc.primaryKey) {
-        sql += ' primary key autoincrement';
-      }
-      if (tc.defaultValue) {
-        if (tc.dataType === DataTypes.TEXT) {
-          sql += " default '" + tc.defaultValue + "'";
-        } else {
-          sql += ' default ' + tc.defaultValue;
-        }
-      }
-    }
-    for (let i = 0; i < userTable.uniqueConstraints.length; i++) {
-      const uniqueConstraint = userTable.uniqueConstraints[i];
-      sql += ',\n unique (';
-      for (let j = 0; j < uniqueConstraint.columns.length; j++) {
-        const uniqueColumn = uniqueConstraint.columns[j];
-        if (j) {
-          sql += ', ';
-        }
-        sql += uniqueColumn.name;
-      }
-      sql += ')';
-    }
-    if (check.length) {
-      sql += '\nCHECK(\n' + check + '\n)';
-    }
-    sql += '\n);';
+    // Build the create table sql
+    let sql = CoreSQLUtils.createTableSQL(userTable);
+    // Create the table
     return connection.run(sql);
   }
 
-  static readonly tableCreationScripts = {
+  /**
+   * Drop the table if it exists
+   * @param table table name
+   */
+  dropTable(table: string) {
+    CoreSQLUtils.dropTable(this.connection, table);
+  }
+
+
+static readonly tableCreationScripts = {
     spatial_reference_system: [
       'CREATE TABLE gpkg_spatial_ref_sys (' +
         '  srs_name TEXT NOT NULL,' +
@@ -316,32 +285,32 @@ export class TableCreator {
         '  WHERE g.srs_id = s.srs_id',
 
       'CREATE VIEW geometry_columns AS' +
-        '  SELECT' +
-        '    table_name AS f_table_name,' +
-        '    column_name AS f_geometry_column,' +
-        '    (CASE geometry_type_name' +
-        '    	WHEN "GEOMETRY" THEN 0' +
-        '    	WHEN "POINT" THEN 1' +
-        '    	WHEN "LINESTRING" THEN 2' +
-        '    	WHEN "POLYGON" THEN 3' +
-        '    	WHEN "MULTIPOINT" THEN 4' +
-        '    	WHEN "MULTILINESTRING" THEN 5' +
-        '    	WHEN "MULTIPOLYGON" THEN 6' +
-        '    	WHEN "GEOMETRYCOLLECTION" THEN 7' +
-        '    	WHEN "CIRCULARSTRING" THEN 8' +
-        '    	WHEN "COMPOUNDCURVE" THEN 9' +
-        '    	WHEN "CURVEPOLYGON" THEN 10' +
-        '    	WHEN "MULTICURVE" THEN 11' +
-        '    	WHEN "MULTISURFACE" THEN 12' +
-        '    	WHEN "CURVE" THEN 13' +
-        '    	WHEN "SURFACE" THEN 14' +
-        '    	WHEN "POLYHEDRALSURFACE" THEN 15' +
-        '    	WHEN "TIN" THEN 16' +
-        '    	WHEN "TRIANGLE" THEN 17' +
-        '    	ELSE 0 END) AS geometry_type,' +
-        '    2 + (CASE z WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) + (CASE m WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) AS coord_dimension,' +
-        '    srs_id AS srid' +
-        '  FROM gpkg_geometry_columns',
+      '  SELECT' +
+      '    table_name AS f_table_name,' +
+      '    column_name AS f_geometry_column,' +
+      '    (CASE geometry_type_name ' +
+      '      WHEN \'GEOMETRY\' THEN 0 ' +
+      '      WHEN \'POINT\' THEN 1 ' +
+      '      WHEN \'LINESTRING\' THEN 2 ' +
+      '      WHEN \'POLYGON\' THEN 3 ' +
+      '      WHEN \'MULTIPOINT\' THEN 4 ' +
+      '      WHEN \'MULTILINESTRING\' THEN 5 ' +
+      '      WHEN \'MULTIPOLYGON\' THEN 6 ' +
+      '      WHEN \'GEOMETRYCOLLECTION\' THEN 7 ' +
+      '      WHEN \'CIRCULARSTRING\' THEN 8 ' +
+      '      WHEN \'COMPOUNDCURVE\' THEN 9 ' +
+      '      WHEN \'CURVEPOLYGON\' THEN 10 ' +
+      '      WHEN \'MULTICURVE\' THEN 11 ' +
+      '      WHEN \'MULTISURFACE\' THEN 12 ' +
+      '      WHEN \'CURVE\' THEN 13 ' +
+      '      WHEN \'SURFACE\' THEN 14 ' +
+      '      WHEN \'POLYHEDRALSURFACE\' THEN 15 ' +
+      '      WHEN \'TIN\' THEN 16 ' +
+      '      WHEN \'TRIANGLE\' THEN 17 ' +
+      '      ELSE 0 END) AS geometry_type,' +
+      '    2 + (CASE z WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) + (CASE m WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) AS coord_dimension,' +
+      '    srs_id AS srid' +
+      '  FROM gpkg_geometry_columns',
     ],
     tile_matrix_set: [
       'CREATE TABLE gpkg_tile_matrix_set (' +
@@ -449,7 +418,8 @@ export class TableCreator {
         '  mime_type TEXT,' +
         '  constraint_name TEXT,' +
         '  CONSTRAINT pk_gdc PRIMARY KEY (table_name, column_name),' +
-        '  CONSTRAINT fk_gdc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)' +
+        '  CONSTRAINT gdc_tn UNIQUE (table_name, name)' +
+        // '  CONSTRAINT fk_gdc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)' +
         ')',
     ],
     data_column_constraints: [
@@ -467,7 +437,7 @@ export class TableCreator {
     ],
     metadata: [
       'CREATE TABLE gpkg_metadata (' +
-        '  id INTEGER CONSTRAINT m_pk PRIMARY KEY ASC NOT NULL UNIQUE,' +
+        '  id INTEGER CONSTRAINT m_pk PRIMARY KEY ASC NOT NULL,' +
         '  md_scope TEXT NOT NULL DEFAULT "dataset",' +
         '  md_standard_uri TEXT NOT NULL,' +
         '  mime_type TEXT NOT NULL DEFAULT "text/xml",' +

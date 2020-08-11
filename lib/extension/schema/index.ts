@@ -7,6 +7,8 @@
 import { BaseExtension } from '../baseExtension';
 import { Extension } from '../extension';
 import { GeoPackage } from '../../geoPackage';
+import { DataColumnsDao } from '../../dataColumns/dataColumnsDao';
+import { DataColumnConstraintsDao } from '../../dataColumnConstraints/dataColumnConstraintsDao';
 
 export class SchemaExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_schema';
@@ -19,7 +21,27 @@ export class SchemaExtension extends BaseExtension {
     this.extensionName = SchemaExtension.EXTENSION_NAME;
     this.extensionDefinition = SchemaExtension.EXTENSION_SCHEMA_DEFINITION;
   }
-  getOrCreateExtension(): Promise<Extension> {
+  getOrCreateExtension(): Extension {
     return this.getOrCreate(this.extensionName, null, null, this.extensionDefinition, Extension.READ_WRITE);
+  }
+
+  has() {
+    return this.hasExtension(SchemaExtension.EXTENSION_NAME, null, null);
+  }
+
+  removeExtension() {
+    if (this.geoPackage.isTable(DataColumnsDao.TABLE_NAME)) {
+      this.geoPackage.dropTable(DataColumnsDao.TABLE_NAME);
+    }
+    if (this.geoPackage.isTable(DataColumnConstraintsDao.TABLE_NAME)) {
+      this.geoPackage.dropTable(DataColumnConstraintsDao.TABLE_NAME);
+    }
+    try {
+      if (this.extensionsDao.isTableExists()) {
+        this.extensionsDao.deleteByExtension(SchemaExtension.EXTENSION_NAME);
+      }
+    } catch (e) {
+      throw new Error('Failed to delete Schema extension. GeoPackage: ' + this.geoPackage.name);
+    }
   }
 }

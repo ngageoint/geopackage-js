@@ -24,11 +24,9 @@ describe('GeoPackage Extension Dao tests', function() {
 
   it('should create an extensions table', function() {
     var extensionDao = geopackage.extensionDao;
-    return extensionDao.createTable()
-    .then(function(result) {
-      var verified = Verification.verifyExtensions(geopackage);
-      verified.should.be.equal(true);
-    });
+    extensionDao.createTable();
+    var verified = Verification.verifyExtensions(geopackage);
+    verified.should.be.equal(true);
   });
 
 });

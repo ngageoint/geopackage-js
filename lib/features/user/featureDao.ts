@@ -13,7 +13,7 @@ import { FeatureTableIndex } from '../../extension/index/featureTableIndex';
 import { UserDao } from '../../user/userDao';
 import { DataColumnsDao } from '../../dataColumns/dataColumnsDao';
 import { FeatureRow } from './featureRow';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { BoundingBox } from '../../boundingBox';
 import { Feature, GeoJsonObject } from 'geojson';
 import { GeometryColumns } from '../columns/geometryColumns';
@@ -86,7 +86,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @param  {Array} values      values
    * @return {FeatureRow}             feature row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): FeatureRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): FeatureRow {
     return new FeatureRow(this.getFeatureTable(), columnTypes, values);
   }
   /**
@@ -311,8 +311,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     > = {};
     const srs = this.srs;
     const projection = this.projection;
-    this.table.columns.forEach(column => {
-      const dataColumn = this.dataColumnsDao.getDataColumns(this.table.table_name, column.name);
+    this.table.getUserColumns().getColumns().forEach(column => {
+      const dataColumn = this.dataColumnsDao.getDataColumns(this.table.getTableName(), column.name);
       columns.push({
         index: column.index,
         name: column.name,
@@ -320,7 +320,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
         min: column.min,
         notNull: column.notNull,
         primaryKey: column.primaryKey,
-        dataType: column.dataType ? DataTypes.nameFromType(column.dataType) : '',
+        dataType: column.dataType ? GeoPackageDataType.nameFromType(column.dataType) : '',
         displayName: dataColumn && dataColumn.name ? dataColumn.name : column.name,
         dataColumn: dataColumn,
       });
@@ -443,5 +443,9 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
       return geometry;
     }
+  }
+
+  static readTable(geoPackage: GeoPackage, tableName: string): FeatureDao<FeatureRow> {
+    return geoPackage.getFeatureDao(tableName);
   }
 }

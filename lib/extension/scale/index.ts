@@ -28,15 +28,15 @@ export class TileScalingExtension extends BaseExtension {
    * Get or create the tileScaling id extension
    * @return {Promise}
    */
-  async getOrCreateExtension(): Promise<Extension> {
-    const extension = await this.getOrCreate(
+  getOrCreateExtension(): Extension {
+    const extension = this.getOrCreate(
       TileScalingExtension.EXTENSION_NAME,
       this.tableName,
       null,
       TileScalingExtension.EXTENSION_DEFINITION,
       Extension.READ_WRITE,
     );
-    await this.tileScalingDao.createTable();
+    this.tileScalingDao.createTable();
     return extension;
   }
 

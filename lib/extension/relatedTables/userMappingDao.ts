@@ -8,7 +8,7 @@ import { UserMappingRow } from './userMappingRow';
 import { ColumnValues } from '../../dao/columnValues';
 import { UserRow } from '../../user/userRow';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * User Mapping DAO for reading user mapping data tables
@@ -25,7 +25,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
   ) {
     super(
       geoPackage,
-      userMappingTable || new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns),
+      userMappingTable || UserMappingDao.createMappingTable(userCustomDao),
     );
   }
   /**
@@ -33,8 +33,8 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
    * @param  {module:user/custom~UserCustomDao} userCustomDao
    * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
    */
-  createMappingTable(userCustomDao: UserCustomDao<UserRow>): UserMappingTable {
-    return new UserMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
+  static createMappingTable(userCustomDao: UserCustomDao<UserRow>): UserMappingTable {
+    return new UserMappingTable(userCustomDao.table.getTableName(), userCustomDao.table.getUserColumns().getColumns(), UserMappingTable.requiredColumns())
   }
   /**
    * Gets the {module:extension/relatedTables~UserMappingTable}
@@ -45,11 +45,11 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
   }
   /**
    * Create a user mapping row
-   * @param  {module:db/dataTypes[]} columnTypes  column types
+   * @param  {module:db/geoPackageDataType[]} columnTypes  column types
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~UserMappingRow}             user mapping row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): UserMappingRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): UserMappingRow {
     return new UserMappingRow(this.table, columnTypes, values);
   }
   /**

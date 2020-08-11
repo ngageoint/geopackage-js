@@ -37,12 +37,10 @@ describe('GeoPackage Tile table create tests', function() {
     var contentsSrsId = 4326;
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
-    return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
-      .then(function(result) {
-        Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-        Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-        Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-      });
+    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
   });
 
   describe('GeoPackage tile create tile matrix tests', function(done) {
@@ -55,13 +53,10 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.spatialReferenceSystemDao.createWebMercator();
-      return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
-        .then(function(result) {
-          tileMatrixSet = result;
-          Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-          Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-          Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-        });
+      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
     });
 
     it('should create the standard xyz tile matrix for the zoom levels with default tile size of 256', function(){
@@ -148,45 +143,42 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
       geopackage.spatialReferenceSystemDao.createWebMercator();
-      return geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId)
-        .then(function(result) {
-          tileMatrixSet = result;
-          Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-          Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-          Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-          geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
 
-          var zooms = [0, 1, 2, 3];
+      var zooms = [0, 1, 2, 3];
 
-          return zooms.reduce(function(zoomSequence, zoom) {
-            return zoomSequence.then(function() {
-              var xtiles = [];
+      return zooms.reduce(function(zoomSequence, zoom) {
+        return zoomSequence.then(function() {
+          var xtiles = [];
+          var tileCount = Math.pow(2,zoom);
+          for (var i = 0; i < tileCount; i++) {
+            xtiles.push(i);
+          }
+          return xtiles.reduce(function(xSequence, x) {
+            return xSequence.then(function() {
+              var ytiles = [];
               var tileCount = Math.pow(2,zoom);
               for (var i = 0; i < tileCount; i++) {
-                xtiles.push(i);
+                ytiles.push(i);
               }
-              return xtiles.reduce(function(xSequence, x) {
-                return xSequence.then(function() {
-                  var ytiles = [];
-                  var tileCount = Math.pow(2,zoom);
-                  for (var i = 0; i < tileCount; i++) {
-                    ytiles.push(i);
-                  }
-                  return ytiles.reduce(function(ySequence, y) {
-                    return ySequence.then(function() {
-                      return new Promise(async function(resolve, reject) {
-                        // @ts-ignore
-                        let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
-                        console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                        resolve(geopackage.addTile(image, tableName, zoom, y, x));
-                      });
-                    });
-                  }, Promise.resolve());
+              return ytiles.reduce(function(ySequence, y) {
+                return ySequence.then(function() {
+                  return new Promise(async function(resolve, reject) {
+                    // @ts-ignore
+                    let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
+                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
+                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
+                  });
                 });
               }, Promise.resolve());
             });
           }, Promise.resolve());
         });
+      }, Promise.resolve());
     });
 
     it('should delete the tiles', function() {

@@ -51,6 +51,11 @@ export class GeoPackageConnection {
     }
     return this;
   }
+
+  transaction(func: Function): void {
+    this.adapter.transaction(func);
+  }
+
   /**
    * Close the database.
    */

@@ -5,7 +5,7 @@
 
 import { UserTable } from './userTable';
 
-import { DataTypes } from '../db/dataTypes';
+import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbAdapter';
 import { UserColumn } from './userColumn';
 
@@ -17,17 +17,17 @@ export class UserRow {
    * @param values Array of the row values
    */
   constructor(
-    public table: UserTable,
-    public columnTypes?: { [key: string]: DataTypes },
+    public table: UserTable<UserColumn>,
+    public columnTypes?: { [key: string]: GeoPackageDataType },
     public values?: Record<string, DBValue>,
   ) {
     if (!this.columnTypes) {
-      const columnCount = this.table.columnCount;
+      const columnCount = this.table.getColumnCount();
       this.columnTypes = {};
       this.values = {};
       for (let i = 0; i < columnCount; i++) {
-        this.columnTypes[this.table.columnNames[i]] = this.table.columns[i].dataType;
-        this.values[this.table.columnNames[i]] = this.table.columns[i].defaultValue;
+        this.columnTypes[this.table.columns.getColumnName(i)] = this.table.columns.getColumnForIndex(i).dataType;
+        this.values[this.table.columns.getColumnName(i)] = this.table.columns.getColumnForIndex(i).defaultValue;
       }
     }
   }
@@ -37,21 +37,21 @@ export class UserRow {
    * @return {module:user/userColumn~UserColumn}
    */
   get idColumn(): UserColumn {
-    return this.table.idColumn;
+    return this.table.getIdColumn();
   }
   /**
    * Get the column count
    * @return {number} column count
    */
   get columnCount(): number {
-    return this.table.columnCount;
+    return this.table.getColumnCount();
   }
   /**
    * Get the column names
    * @return {Array} column names
    */
   get columnNames(): string[] {
-    return this.table.columnNames;
+    return this.table.columns._columnNames;
   }
   /**
    * Get the column name at the index
@@ -90,9 +90,9 @@ export class UserRow {
     const value = this.values[columnName];
     const dataType = this.getRowColumnTypeWithColumnName(columnName);
     if (value === undefined || value === null) return value;
-    if (dataType === DataTypes.BOOLEAN) {
+    if (dataType === GeoPackageDataType.BOOLEAN) {
       return value === 1 ? true : false;
-    } else if (dataType === DataTypes.BLOB) {
+    } else if (dataType === GeoPackageDataType.BLOB) {
       return Buffer.from(value as Uint8Array);
     }
     return value;
@@ -105,7 +105,7 @@ export class UserRow {
   toObjectValue(index: number, value: DBValue): any {
     const objectValue = value;
     const column = this.getColumnWithIndex(index);
-    if (column.dataType === DataTypes.BOOLEAN && value) {
+    if (column.dataType === GeoPackageDataType.BOOLEAN && value) {
       return value === 1 ? true : false;
     }
     return objectValue;
@@ -117,7 +117,7 @@ export class UserRow {
   toDatabaseValue(columnName: string): DBValue {
     const column = this.getColumnWithColumnName(columnName);
     const value = this.getValueWithColumnName(columnName);
-    if (column.dataType === DataTypes.BOOLEAN) {
+    if (column.dataType === GeoPackageDataType.BOOLEAN) {
       return value === true ? 1 : 0;
     }
     return value;
@@ -159,30 +159,32 @@ export class UserRow {
    * @return {Number} id value
    */
   get id(): number {
+    let id = null;
     if (this.pkColumn) {
-      return this.getValueWithColumnName(this.pkColumn.name);
+      id = this.getValueWithIndex(this.pkColumnIndex);
     }
+    return id;
   }
   /**
    * Set the primary key id value
    * @param {Number} id id
    */
   set id(id: number) {
-    this.values[this.table.pkColumn.name] = id;
+    this.values[this.table.getPkColumnName()] = id;
   }
   /**
    * Get the primary key column Index
    * @return {Number} pk index
    */
   get pkColumnIndex(): number {
-    return this.table.pkIndex;
+    return this.table.getUserColumns().getPkColumnIndex();
   }
   /**
    * Get the primary key column
    * @return {UserColumn} pk column
    */
   get pkColumn(): UserColumn {
-    return this.table.pkColumn;
+    return this.table.getPkColumn();
   }
   /**
    * Set the value at the index
@@ -190,14 +192,14 @@ export class UserRow {
    * @param {object} value value
    */
   setValueWithIndex(index: number, value: any): void {
-    if (index === this.table.pkIndex) {
+    if (index === this.table.getUserColumns().getPkColumnIndex()) {
       throw new Error(
         'Cannot update the primary key of the row.  Table Name: ' +
-          this.table.table_name +
+          this.table.getTableName() +
           ', Index: ' +
           index +
           ', Name: ' +
-          this.table.pkColumn.name,
+          this.table.getPkColumnName(),
       );
     }
     this.setValueWithColumnName(this.getColumnNameWithIndex(index), value);
@@ -217,23 +219,23 @@ export class UserRow {
    */
   setValueWithColumnName(columnName: string, value: any): void {
     const dataType = this.getRowColumnTypeWithColumnName(columnName);
-    if (dataType === DataTypes.BOOLEAN) {
+    if (dataType === GeoPackageDataType.BOOLEAN) {
       value === true ? (this.values[columnName] = 1) : (this.values[columnName] = 0);
-    } else if (dataType === DataTypes.DATE) {
+    } else if (dataType === GeoPackageDataType.DATE) {
       this.values[columnName] = value.toISOString().slice(0, 10);
-    } else if (dataType === DataTypes.DATETIME) {
+    } else if (dataType === GeoPackageDataType.DATETIME) {
       this.values[columnName] = value.toISOString();
     } else {
       this.values[columnName] = value;
     }
   }
   hasIdColumn(): boolean {
-    return this.table.pkIndex !== undefined;
+    return this.table.getUserColumns().getPkColumnIndex() !== undefined;
   }
   hasId(): boolean {
     let hasId = false;
     if (this.hasIdColumn()) {
-      const objectValue = this.getValueWithIndex(this.table.pkIndex);
+      const objectValue = this.getValueWithIndex(this.table.getUserColumns().getPkColumnIndex());
       hasId = objectValue !== null && objectValue !== undefined && typeof objectValue === 'number';
     }
     return hasId;
@@ -242,7 +244,7 @@ export class UserRow {
    * Clears the id so the row can be used as part of an insert or create
    */
   resetId(): void {
-    this.values[this.table.pkColumn.name] = undefined;
+    this.values[this.table.getPkColumnName()] = undefined;
   }
   /**
    * Validate the value and its actual value types against eh column data type class

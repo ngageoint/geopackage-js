@@ -3,8 +3,10 @@
  */
 
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
+import { GeometryType } from './geometryType';
+import { TableColumn  } from '../../db/table/tableColumn';
 
 /**
  * Represents a user feature column
@@ -12,36 +14,21 @@ import { DBValue } from '../../db/dbAdapter';
  * @extends UserColumn
  */
 export class FeatureColumn extends UserColumn {
-  geometryType: any;
+  geometryType: GeometryType;
 
   constructor(
     index: number,
     name: string,
-    dataType: any,
+    dataType: GeoPackageDataType,
     max?: number,
     notNull?: boolean,
     defaultValue?: any,
     primaryKey?: boolean,
-    geometryType?: any,
+    geometryType?: GeometryType,
   ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey);
     this.geometryType = geometryType;
-    if (!geometryType && dataType === DataTypes.GEOMETRY) {
-      throw new Error('Data or Geometry Type is required to create column: ' + name);
-    }
-  }
-  getTypeName(): string {
-    if (this.isGeometry()) {
-      return this.geometryType;
-    }
-    return this.dataType !== undefined && DataTypes.nameFromType(this.dataType);
-  }
-  /**
-   * Determine if this column is a geometry
-   * @return {Boolean} true if a geometry column
-   */
-  isGeometry(): boolean {
-    return this.geometryType !== undefined;
+    this.type = this.getTypeName(name, dataType, geometryType);
   }
   /**
    *  Create a new primary key column
@@ -52,14 +39,14 @@ export class FeatureColumn extends UserColumn {
    *  @return feature column
    */
   static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): FeatureColumn {
-    return new FeatureColumn(index, name, DataTypes.INTEGER, undefined, true, undefined, true);
+    return new FeatureColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true);
   }
   /**
    *  Create a new geometry column
    *
    *  @param {Number} index        column index
    *  @param {string} name         column name
-   *  @param {String} type         geometry type
+   *  @param {GeometryType} type
    *  @param {Boolean} notNull      not null
    *  @param {Object} defaultValue default value or nil
    *
@@ -68,31 +55,89 @@ export class FeatureColumn extends UserColumn {
   static createGeometryColumn(
     index: number,
     name: string,
-    type: string,
+    type: GeometryType,
     notNull: boolean,
     defaultValue?: DBValue,
   ): FeatureColumn {
-    return new FeatureColumn(index, name, type, undefined, notNull, defaultValue, false, type);
+    if ((type === null || type === undefined)) {
+      throw new Error('Geometry Type is required to create column: ' + name);
+    }
+    return new FeatureColumn(index, name, GeoPackageDataType.BLOB, undefined, notNull, defaultValue, false, type);
   }
+
   /**
-   *  Create a new column
-   *
-   *  @param {Number} index        column index
-   *  @param {string} name         column name
-   *  @param {module:db/dataTypes~GPKGDataType} type         data type
-   *  @param {Boolean} notNull      not null
-   *  @param {Object} defaultValue default value or nil
-   *  @param {Number} max max value
-   *  @return feature column
+   * Create a new column
+   * @param index
+   * @param name
+   * @param type
+   * @param notNull
+   * @param defaultValue
+   * @param max
    */
   static createColumn(
     index: number,
     name: string,
-    type: DataTypes,
+    type: GeoPackageDataType,
     notNull = false,
     defaultValue?: DBValue,
     max?: number,
   ): FeatureColumn {
     return new FeatureColumn(index, name, type, max, notNull, defaultValue, false);
   }
+
+  /**
+   * Get the type name from the data and geometry type
+   * @param name column name
+   * @param dataType data type
+   * @param geometryType  geometry type
+   * @return type name
+   */
+  getTypeName(name: string, dataType: GeoPackageDataType, geometryType?: GeometryType): string {
+    let type;
+    if (geometryType !== null && geometryType !== undefined) {
+      type = GeometryType.nameFromType(geometryType);
+    } else {
+      type = super.getTypeName(name, dataType);
+    }
+    return type;
+  }
+
+  /**
+   * Attempt to get the geometry type of the table column
+   * @param tableColumn table column
+   * @return geometry type
+   */
+  static getGeometryTypeFromTableColumn(tableColumn: TableColumn): GeometryType {
+    let geometryType = null;
+    if (tableColumn.isDataType(GeoPackageDataType.BLOB)) {
+      geometryType = GeometryType.fromName(tableColumn.type);
+    }
+    return geometryType;
+  }
+
+  /**
+   * Copy the column
+   * @return copied column
+   */
+  copy(): FeatureColumn {
+    return new FeatureColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.geometryType);
+  }
+
+  /**
+   * Determine if this column is a geometry
+   *
+   * @return true if a geometry column
+   */
+  isGeometry(): boolean {
+    return this.geometryType !== null;
+  }
+
+  /**
+   * When a geometry column, gets the geometry type
+   * @return geometry type
+   */
+  getGeometryType(): GeometryType {
+    return this.geometryType;
+  }
+
 }

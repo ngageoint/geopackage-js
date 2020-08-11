@@ -19,8 +19,8 @@ export class DublinCoreMetadata {
    * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
    * @return {Boolean}
    */
-  public static hasColumn(table: UserTable | UserRow, type: DublinCoreType): boolean {
-    let userTable: UserTable;
+  public static hasColumn(table: UserTable<UserColumn> | UserRow, type: DublinCoreType): boolean {
+    let userTable: UserTable<UserColumn>;
     if (table instanceof UserRow) {
       userTable = table.table;
     } else {
@@ -47,8 +47,8 @@ export class DublinCoreMetadata {
    * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
    * @return {module:user/userColumn~UserColumn}
    */
-  public static getColumn(table: UserTable | UserRow, type: DublinCoreType): UserColumn {
-    let userTable: UserTable;
+  public static getColumn(table: UserTable<UserColumn> | UserRow, type: DublinCoreType): UserColumn {
+    let userTable: UserTable<UserColumn>;
     if (table instanceof UserRow) {
       userTable = table.table;
     } else {

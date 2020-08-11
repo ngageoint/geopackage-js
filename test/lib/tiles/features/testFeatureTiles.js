@@ -1,14 +1,14 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import { default as GeoPackageUtils } from '../../../geopackageUtils'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
+  , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
   , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
-  , DataTypes = require('../../../../lib/db/dataTypes').DataTypes
+  , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
   , fs = require('fs-extra')
   , should = require('chai').should()
@@ -32,16 +32,16 @@ describe('GeoPackage FeatureTiles tests', function() {
       geoPackage = await testSetup.createGeoPackage(filename)
 
       // @ts-ignore
-      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.POINT);
 
       var columns = [];
 
       columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
       // @ts-ignore
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumn(2, 'name', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(3, '_feature_id', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(4, '_properties_id', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
+      columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
 
       var box = {
         "type": "Polygon",
@@ -68,7 +68,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
       var point = {
         "type": "Point",
-        "coordinates": 
+        "coordinates":
         [NaN,NaN]
       };
 
@@ -94,7 +94,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      await geoPackage.createFeatureTable('QueryTest', geometryColumns, columns)
+      await geoPackage.createFeatureTable('QueryTest', geometryColumns, columns);
       featureDao = geoPackage.getFeatureDao('QueryTest');
       createRow(box, 'box', featureDao);
       createRow(line, 'line', featureDao);

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var GeoJSONToGeoPackage = require('./index');
+var { GeoJSONToGeoPackage }= require('./index');
 var path = require('path');
 
 console.log('GeoJSON to GeoPackage Converter');

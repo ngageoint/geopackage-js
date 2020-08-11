@@ -4,6 +4,11 @@
 
 import { UserTable } from '../../user/userTable';
 import { TileColumn } from './tileColumn';
+import { TileColumns } from "./tileColumns";
+import { UniqueConstraint } from '../../db/table/uniqueConstraint';
+import { ConstraintType } from '../../db/table/constraintType';
+import { ContentsDataType } from '../../core/contents/contentsDataType';
+import { Contents } from '../../core/contents/contents';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
@@ -12,75 +17,166 @@ import { TileColumn } from './tileColumn';
  * @param {string} tableName
  * @param {module:tiles/user/tileColumn~TileColumn[]} columns
  */
-export class TileTable extends UserTable {
-  zoomLevelIndex: number;
-  tileColumnIndex: number;
-  tileRowIndex: number;
-  tileDataIndex: number;
+export class TileTable extends UserTable<TileColumn> {
+  /**
+   * Id column name, Requirement 52
+   */
+  static COLUMN_ID = TileColumns.ID;
+
+  /**
+   * Zoom level column name, Requirement 53
+   */
+  static COLUMN_ZOOM_LEVEL = TileColumns.ZOOM_LEVEL;
+
+  /**
+   * Tile column column name, Requirement 54
+   */
+  static COLUMN_TILE_COLUMN = TileColumns.TILE_COLUMN;
+
+  /**
+   * Tile row column name, Requirement 55
+   */
+  static COLUMN_TILE_ROW = TileColumns.TILE_ROW;
+
+  /**
+   * Tile ID column name, implied requirement
+   */
+  static COLUMN_TILE_DATA = TileColumns.TILE_DATA;
+
+  /**
+   * Constructor
+   * @param tableName  table name
+   * @param columns columns
+   */
   constructor(tableName: string, columns: TileColumn[]) {
-    super(tableName, columns);
-    const uniqueColumns = [];
-    for (let i = 0; i < columns.length; i++) {
-      const column = columns[i];
-      const columnName = column.name;
-      const columnIndex = column.index;
-      switch (columnName) {
-        case TileColumn.COLUMN_ZOOM_LEVEL:
-          this.duplicateCheck(columnIndex, this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
-          this.zoomLevelIndex = columnIndex;
-          uniqueColumns.push(column);
-          break;
-        case TileColumn.COLUMN_TILE_COLUMN:
-          this.duplicateCheck(columnIndex, this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
-          this.tileColumnIndex = columnIndex;
-          uniqueColumns.push(column);
-          break;
-        case TileColumn.COLUMN_TILE_ROW:
-          this.duplicateCheck(columnIndex, this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
-          this.tileRowIndex = columnIndex;
-          uniqueColumns.push(column);
-          break;
-        case TileColumn.COLUMN_TILE_DATA:
-          this.duplicateCheck(columnIndex, this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
-          this.tileDataIndex = columnIndex;
-          break;
-      }
-    }
-    this.uniqueConstraints = [{ columns: uniqueColumns }];
-    this.missingCheck(this.zoomLevelIndex, TileColumn.COLUMN_ZOOM_LEVEL);
-    this.zoomLevelIndex = this.zoomLevelIndex;
-    this.missingCheck(this.tileColumnIndex, TileColumn.COLUMN_TILE_COLUMN);
-    this.tileColumnIndex = this.tileColumnIndex;
-    this.missingCheck(this.tileRowIndex, TileColumn.COLUMN_TILE_ROW);
-    this.tileRowIndex = this.tileRowIndex;
-    this.missingCheck(this.tileDataIndex, TileColumn.COLUMN_TILE_DATA);
-    this.tileDataIndex = this.tileDataIndex;
+    super(new TileColumns(tableName, columns, false));
+
+    // Build a unique constraint on zoom level, tile column, and tile data
+    let uniqueConstraint = new UniqueConstraint(ConstraintType.nameFromType(ConstraintType.UNIQUE));
+    uniqueConstraint.add(this.getUserColumns().getZoomLevelColumn());
+    uniqueConstraint.add(this.getUserColumns().getTileColumnColumn());
+    uniqueConstraint.add(this.getUserColumns().getTileRowColumn());
+
+    // Add the unique constraint
+    this.addConstraint(uniqueConstraint);
+
   }
-  get zoomLevelColumn(): TileColumn {
-    return this.getColumnWithIndex(this.zoomLevelIndex);
+
+  /**
+   * {@inheritDoc}
+   */
+  copy(): TileTable {
+    return new TileTable(this.getTableName(), this.columns._columns);
   }
-  get tileColumnColumn(): TileColumn {
-    return this.getColumnWithIndex(this.tileColumnIndex);
+
+  /**
+   * {@inheritDoc}
+   */
+  getDataType(): string {
+    return ContentsDataType.TILES;
   }
-  get rowColumn(): TileColumn {
-    return this.getColumnWithIndex(this.tileRowIndex);
+
+  /**
+   * {@inheritDoc}
+   */
+  getUserColumns(): TileColumns {
+    return super.getUserColumns() as TileColumns;
   }
-  get tileDataColumn(): TileColumn {
-    return this.getColumnWithIndex(this.tileDataIndex);
+
+  /**
+   * {@inheritDoc}
+   */
+  createUserColumns(columns: TileColumn[]): TileColumns {
+    return new TileColumns(this.getTableName(), columns, true);
   }
-  get tableType(): string {
-    return UserTable.TILE_TABLE;
+
+  /**
+   * Get the zoom level column index
+   * @return zoom level index
+   */
+  getZoomLevelColumnIndex(): number {
+    return this.getUserColumns().getZoomLevelIndex();
   }
-  static createRequiredColumns(): TileColumn[] {
-    return TileTable.createRequiredColumnsWithStartingIndex(0);
+
+  /**
+   * Get the zoom level column
+   * @return tile column
+   */
+  getZoomLevelColumn(): TileColumn {
+    return this.getUserColumns().getZoomLevelColumn();
   }
-  static createRequiredColumnsWithStartingIndex(startingIndex: number): TileColumn[] {
-    const columns = [];
+
+  /**
+   * Get the tile column column index
+   * @return tile column index
+   */
+  getTileColumnColumnIndex(): number {
+    return this.getUserColumns().getTileColumnIndex();
+  }
+
+  /**
+   * Get the tile column column
+   * @return tile column
+   */
+  getTileColumnColumn(): TileColumn {
+    return this.getUserColumns().getTileColumnColumn();
+  }
+
+  /**
+   * Get the tile row column index
+   * @return tile row index
+   */
+  getTileRowColumnIndex(): number {
+    return this.getUserColumns().getTileRowIndex();
+  }
+
+  /**
+   * Get the tile row column
+   * @return tile column
+   */
+  getTileRowColumn(): TileColumn {
+    return this.getUserColumns().getTileRowColumn();
+  }
+
+  /**
+   * Get the tile data column index
+   * @return tile data index
+   */
+  getTileDataColumnIndex(): number {
+    return this.getUserColumns().getTileDataIndex();
+  }
+
+  /**
+   * Get the tile data column
+   * @return tile column
+   */
+  getTileDataColumn(): TileColumn {
+    return this.getUserColumns().getTileDataColumn();
+  }
+
+  /**
+   * Create the required table columns, starting at the provided index
+   * @param startingIndex starting index
+   * @return tile columns
+   */
+  static createRequiredColumns(startingIndex: number = 0): TileColumn[]{
+    let columns: TileColumn[] = [];
     columns.push(TileColumn.createIdColumn(startingIndex++));
     columns.push(TileColumn.createZoomLevelColumn(startingIndex++));
     columns.push(TileColumn.createTileColumnColumn(startingIndex++));
     columns.push(TileColumn.createTileRowColumn(startingIndex++));
-    columns.push(TileColumn.createTileDataColumn(startingIndex++));
+    columns.push(TileColumn.createTileDataColumn(startingIndex));
     return columns;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  validateContents(contents: Contents) {
+    // Verify the Contents have a tiles data type
+    let dataType = contents.data_type;
+    if (dataType === null || dataType === undefined || dataType !== ContentsDataType.TILES) {
+      throw new Error('The Contents of a TileTable must have a data type of tiles');
+    }
   }
 }

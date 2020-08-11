@@ -10,7 +10,7 @@ import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { StyleMappingRow } from './styleMappingRow';
 import { UserRow } from '../../user/userRow';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * Style Mapping DAO for reading user mapping data tables
@@ -30,7 +30,7 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
     super(
       userCustomDao,
       geoPackage,
-      styleMappingTable || new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns),
+      styleMappingTable || new StyleMappingTable(userCustomDao.table.getTableName(), userCustomDao.table.getUserColumns().getColumns(), null),
     );
   }
   /**
@@ -39,15 +39,15 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
    * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
    */
   createMappingTable(userCustomDao: UserCustomDao<UserRow>): StyleMappingTable {
-    return new StyleMappingTable(userCustomDao.table.table_name, userCustomDao.table.columns);
+    return new StyleMappingTable(userCustomDao.table.getTableName(), userCustomDao.table.getUserColumns().getColumns(), null);
   }
   /**
    * Create a user mapping row
-   * @param  {module:db/dataTypes[]} columnTypes  column types
+   * @param  {module:db/geoPackageDataType[]} columnTypes  column types
    * @param  {module:dao/columnValues~ColumnValues[]} values values
    * @return {module:extension/style.StyleMappingRow} style mapping row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): StyleMappingRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): StyleMappingRow {
     return new StyleMappingRow(this.table, columnTypes, values);
   }
   /**

@@ -6,7 +6,7 @@
 import { MediaTable } from '../relatedTables/mediaTable';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserColumn } from '../../user/userColumn';
 
 /**
@@ -137,22 +137,22 @@ export class IconTable extends MediaTable {
     const columns = IconTable.createRequiredColumns();
     let index = columns.length;
     columns.push(
-      UserCustomColumn.createColumn(index++, IconTable.COLUMN_NAME, DataTypes.TEXT, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_NAME, GeoPackageDataType.TEXT, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, DataTypes.TEXT, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, IconTable.COLUMN_WIDTH, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_WIDTH, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     return columns;
   }

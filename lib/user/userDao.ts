@@ -1,7 +1,6 @@
 import { Dao } from '../dao/dao';
 import { GeoPackage } from '../geoPackage';
 import { UserMappingTable } from '../extension/relatedTables/userMappingTable';
-import { UserTableReader } from './userTableReader';
 import { MediaTable } from '../extension/relatedTables/mediaTable';
 import { SimpleAttributesTable } from '../extension/relatedTables/simpleAttributesTable';
 import { UserRow } from './userRow';
@@ -12,7 +11,10 @@ import { SimpleAttributesRow } from '../extension/relatedTables/simpleAttributes
 import { FeatureRow } from '../features/user/featureRow';
 import { ExtendedRelation } from '../extension/relatedTables/extendedRelation';
 import { DBValue } from '../db/dbAdapter';
-import { DataTypes } from '../db/dataTypes';
+import { GeoPackageDataType } from '../db/geoPackageDataType';
+import { UserColumn } from './userColumn';
+import { AlterTable } from '../db/alterTable';
+import {CoreSQLUtils} from "../db/coreSQLUtils";
 
 /**
  * Abstract User DAO for reading user tables
@@ -24,18 +26,18 @@ import { DataTypes } from '../db/dataTypes';
 export class UserDao<T extends UserRow> extends Dao<UserRow> {
   table_name: string;
   columns: string[];
-  protected _table: UserTable;
-  constructor(geoPackage: GeoPackage, table: UserTable) {
+  protected _table: UserTable<UserColumn>;
+  protected constructor(geoPackage: GeoPackage, table: UserTable<UserColumn>) {
     super(geoPackage);
     this._table = table;
-    this.table_name = table.table_name;
-    this.gpkgTableName = table.table_name;
-    if (table.pkColumn) {
-      this.idColumns = [table.pkColumn.name];
+    this.table_name = table.getTableName();
+    this.gpkgTableName = table.getTableName();
+    if (table.getPkColumn()) {
+      this.idColumns = [table.getPkColumn().getName()];
     } else {
       this.idColumns = [];
     }
-    this.columns = table.columnNames;
+    this.columns = table.getUserColumns().getColumnNames();
   }
   /**
    * Creates a UserRow
@@ -67,8 +69,8 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
       return results;
     }
     if (!this.table) return undefined;
-    const columns = this.table.columnCount;
-    const columnTypes: { [key: string]: DataTypes } = {};
+    const columns = this.table.getColumnCount();
+    const columnTypes: { [key: string]: GeoPackageDataType } = {};
     for (let i = 0; i < columns; i++) {
       const column = this.table.getColumnWithIndex(i);
       columnTypes[column.name] = column.dataType;
@@ -79,18 +81,19 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * Get the table for this dao
    * @return {module:user/userTable~UserTable}
    */
-  get table(): UserTable {
+  get table(): UserTable<UserColumn> {
     return this._table;
   }
   /**
    * Create a user row
-   * @param  {module:db/dataTypes[]} columnTypes  column types
+   * @param  {module:db/geoPackageDataType[]} columnTypes  column types
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:user/userRow~UserRow}             user row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): UserRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): UserRow {
     return new UserRow(this.table, columnTypes, values);
   }
+
   /**
    * Links related rows together
    * @param  {module:user/userRow~UserRow} userRow             user row
@@ -98,18 +101,18 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param  {string} relationType        relation type
    * @param  {string|UserMappingTable} [mappingTable]        mapping table
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {Promise}
+   * @return {number}
    */
-  async linkRelatedRow(
+  linkRelatedRow(
     userRow: UserRow,
     relatedRow: UserRow,
     relationType: RelationType,
     mappingTable?: string | UserMappingTable,
     mappingColumnValues?: Record<string, any>,
-  ): Promise<number> {
+  ): number {
     const rte = this.geoPackage.relatedTablesExtension;
-    const baseTableName = userRow.table.table_name;
-    const relatedTableName = relatedRow.table.table_name;
+    const baseTableName = userRow.table.getTableName();
+    const relatedTableName = relatedRow.table.getTableName();
     const relationship = rte
       .getRelationshipBuilder()
       .setBaseTableName(baseTableName)
@@ -122,9 +125,9 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
       mappingTableName = mappingTable as string;
     } else {
       relationship.setUserMappingTable(mappingTable);
-      mappingTableName = mappingTable.table_name;
+      mappingTableName = mappingTable.getTableName();
     }
-    await rte.addRelationship(relationship);
+    rte.addRelationship(relationship);
     const userMappingDao = rte.getMappingDao(mappingTableName);
     const userMappingRow = userMappingDao.newRow();
     userMappingRow.baseId = userRow.id;
@@ -140,14 +143,14 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param  {module:features/user/featureRow~FeatureRow} featureRow          feature row
    * @param  {string|UserMappingTable} [mappingTable]        mapping table
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {Promise}
+   * @return {number}
    */
-  async linkFeatureRow(
+  linkFeatureRow(
     userRow: UserRow,
     featureRow: FeatureRow,
     mappingTable?: string | UserMappingTable,
     mappingColumnValues?: Record<string, any>,
-  ): Promise<number> {
+  ): number {
     return this.linkRelatedRow(userRow, featureRow, RelationType.FEATURES, mappingTable, mappingColumnValues);
   }
   /**
@@ -156,14 +159,14 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param  {module:extension/relatedTables~MediaRow} mediaRow          media row
    * @param  {string|UserMappingTable} [mappingTable]        mapping table
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {Promise}
+   * @return {number}
    */
-  async linkMediaRow(
+  linkMediaRow(
     userRow: UserRow,
     mediaRow: MediaRow,
     mappingTable?: string | UserMappingTable,
     mappingColumnValues?: Record<string, any>,
-  ): Promise<number> {
+  ): number {
     return this.linkRelatedRow(userRow, mediaRow, RelationType.MEDIA, mappingTable, mappingColumnValues);
   }
   /**
@@ -172,14 +175,14 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param  {module:extension/relatedTables~SimpleAttributesRow} simpleAttributesRow          simple attributes row
    * @param  {string|UserMappingTable} [mappingTable]        mapping table
    * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {Promise}
+   * @return {number}
    */
   linkSimpleAttributesRow(
     userRow: UserRow,
     simpleAttributesRow: SimpleAttributesRow,
     mappingTable?: string | UserMappingTable,
     mappingColumnValues?: Record<string, any>,
-  ): Promise<number> {
+  ): number {
     return this.linkRelatedRow(
       userRow,
       simpleAttributesRow,
@@ -303,40 +306,97 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
     return rows;
   }
   /**
-   *  Get the approximate zoom level of where the bounding box of the user data fits into the world
-   *
-   *  @return zoom level
-   */
-  getZoomLevel(): number {
-    return 0;
-    // if(self.projection == nil){
-    //     [NSException raise:@"No Projection" format:@"No projection was set which is required to determine the zoom level"];
-    // }
-    // GPKGBoundingBox * boundingBox = [self getBoundingBox];
-    // if([self.projection.epsg intValue] == PROJ_EPSG_WORLD_GEODETIC_SYSTEM){
-    //     boundingBox = [GPKGTileBoundingBoxUtils boundWgs84BoundingBoxWithWebMercatorLimits:boundingBox];
-    // }
-    // GPKGProjectionTransform * webMercatorTransform = [[GPKGProjectionTransform alloc] initWithFromProjection:self.projection andToEpsg:PROJ_EPSG_WEB_MERCATOR];
-    // GPKGBoundingBox * webMercatorBoundingBox = [webMercatorTransform transformWithBoundingBox:boundingBox];
-    // int zoomLevel = [GPKGTileBoundingBoxUtils getZoomLevelWithWebMercatorBoundingBox:webMercatorBoundingBox];
-    // return zoomLevel;
-  }
-  /**
    * Get count of all rows in this table
    * @return {Number}
    */
   getCount(): number {
     return this.connection.count(this.table_name);
   }
+
+  getTableName(): string {
+    return this.table_name;
+  }
+
   /**
-   * Reads the table specified from the geopackage
-   * @param  {module:geoPackage~GeoPackage} geoPackage      geopackage object
-   * @param  {string} tableName       table name
-   * @return {module:user/userDao~UserDao}
+   * Rename column
+   * @param columnName column name
+   * @param newColumnName  new column name
    */
-  static readTable(geoPackage: GeoPackage, tableName: string): UserDao<UserRow> {
-    const reader = new UserTableReader(tableName);
-    const userTable = reader.readTable(geoPackage.database);
-    return new UserDao(geoPackage, userTable);
+  renameColumn(columnName: string, newColumnName: string) {
+    AlterTable.renameColumn(this.connection, this.table_name, columnName, newColumnName);
+    this._table.renameColumnWithName(columnName, newColumnName);
+  }
+
+  /**
+   * Add a new column
+   * @param column new column
+   */
+  addColumn(column: UserColumn) {
+    CoreSQLUtils.addColumn(this.connection, this.table_name, column);
+    this._table.addColumn(column);
+  }
+
+  /**
+   * Drop a colum
+   * @param index column index
+   */
+   dropColumnWithIndex(index: number) {
+    this.dropColumn(this._table.getColumnNameWithIndex(index));
+  }
+
+  /**
+   * Drop a column
+   * @param columnName column name
+   */
+   dropColumn(columnName: string) {
+    AlterTable.dropColumn(this.connection, this.table_name, columnName);
+  }
+
+  /**
+   * Drop columns
+   * @param columns columns
+   */
+   dropColumns(columns: UserColumn[]) {
+    let columnNames = [];
+    columns.forEach(column => {
+      columnNames.push(column.getName());
+    });
+    this.dropColumnNames(columnNames);
+  }
+
+  /**
+   * Drop columns
+   * @param indices column indexes
+   */
+   dropColumnIndexes(indices: number[]) {
+    let columnNames = [];
+    indices.forEach(idx => {
+      columnNames.push(this._table.getColumnNameWithIndex(idx));
+    });
+    this.dropColumnNames(columnNames);
+  }
+
+  /**
+   * Drop columns
+   * @param columnNames column names
+   */
+   dropColumnNames(columnNames: string[]) {
+    AlterTable.dropColumns(this.connection, this.table_name, columnNames);
+  }
+
+  /**
+   * Alter a column
+   * @param column column
+   */
+   alterColumn(column: UserColumn) {
+    AlterTable.alterColumn(this.connection, this.table_name, column);
+  }
+
+  /**
+   * Alter columns
+   * @param columns columns
+   */
+   alterColumns(columns: UserColumn[]) {
+    AlterTable.alterColumns(this.connection, this.table_name, columns);
   }
 }

@@ -26,18 +26,18 @@ describe('FeatureTableReader tests', function() {
   it('should read the table', function() {
     var reader = new FeatureTableReader('point2d');
     var table = reader.readFeatureTable(geoPackage);
-    table.table_name.should.be.equal('point2d');
-    table.columns.length.should.be.equal(8);
-    table.columns[0].name.should.be.equal('fid');
-    table.columns[1].name.should.be.equal('geom');
-    table.columns[2].name.should.be.equal('intfield');
-    table.columns[3].name.should.be.equal('strfield');
-    table.columns[4].name.should.be.equal('realfield');
-    table.columns[5].name.should.be.equal('datetimefield');
-    table.columns[6].name.should.be.equal('datefield');
-    table.columns[7].name.should.be.equal('binaryfield');
+    table.getTableName().should.be.equal('point2d');
+    table.getUserColumns().getColumns().length.should.be.equal(8);
+    table.getUserColumns().getColumns()[0].getName().should.be.equal('fid');
+    table.getUserColumns().getColumns()[1].getName().should.be.equal('geom');
+    table.getUserColumns().getColumns()[2].getName().should.be.equal('intfield');
+    table.getUserColumns().getColumns()[3].getName().should.be.equal('strfield');
+    table.getUserColumns().getColumns()[4].getName().should.be.equal('realfield');
+    table.getUserColumns().getColumns()[5].getName().should.be.equal('datetimefield');
+    table.getUserColumns().getColumns()[6].getName().should.be.equal('datefield');
+    table.getUserColumns().getColumns()[7].getName().should.be.equal('binaryfield');
 
-    table.geometryColumn.name.should.be.equal('geom');
+    table.getGeometryColumn().getName().should.be.equal('geom');
   });
 
   it('should read the table with geometry columns', function() {
@@ -46,18 +46,18 @@ describe('FeatureTableReader tests', function() {
     var reader = new FeatureTableReader(geometryColumns);
 
     var table = reader.readFeatureTable(geoPackage);
-    table.table_name.should.be.equal('point2d');
-    table.columns.length.should.be.equal(8);
-    table.columns[0].name.should.be.equal('fid');
-    table.columns[1].name.should.be.equal('geom');
-    table.columns[2].name.should.be.equal('intfield');
-    table.columns[3].name.should.be.equal('strfield');
-    table.columns[4].name.should.be.equal('realfield');
-    table.columns[5].name.should.be.equal('datetimefield');
-    table.columns[6].name.should.be.equal('datefield');
-    table.columns[7].name.should.be.equal('binaryfield');
+    table.getTableName().should.be.equal('point2d');
+    table.getUserColumns().getColumns().length.should.be.equal(8);
+    table.getUserColumns().getColumns()[0].getName().should.be.equal('fid');
+    table.getUserColumns().getColumns()[1].getName().should.be.equal('geom');
+    table.getUserColumns().getColumns()[2].getName().should.be.equal('intfield');
+    table.getUserColumns().getColumns()[3].getName().should.be.equal('strfield');
+    table.getUserColumns().getColumns()[4].getName().should.be.equal('realfield');
+    table.getUserColumns().getColumns()[5].getName().should.be.equal('datetimefield');
+    table.getUserColumns().getColumns()[6].getName().should.be.equal('datefield');
+    table.getUserColumns().getColumns()[7].getName().should.be.equal('binaryfield');
 
-    table.geometryColumn.name.should.be.equal('geom');
+    table.getGeometryColumn().getName().should.be.equal('geom');
   });
 
 });

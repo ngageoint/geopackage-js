@@ -8,13 +8,13 @@ import { TileScaling } from '../../extension/scale/tileScaling';
 import { TileScalingType } from '../../extension/scale/tileScalingType';
 
 export class GeoPackageTileRetriever {
-  tileDao: TileDao;
+  tileDao: TileDao<TileRow>;
   width: number;
   height: number;
   setWebMercatorBoundingBox: BoundingBox;
   setProjectionBoundingBox: BoundingBox;
   scaling: TileScaling;
-  constructor(tileDao: TileDao, width: number, height: number) {
+  constructor(tileDao: TileDao<TileRow>, width: number, height: number) {
     this.tileDao = tileDao;
     this.tileDao.adjustTileMatrixLengths();
     this.width = width;

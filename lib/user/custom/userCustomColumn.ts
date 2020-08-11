@@ -3,14 +3,14 @@
  */
 
 import { UserColumn } from '../userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 
 /**
  * Create a new user custom columnd
  *  @param {Number} index        column index
  *  @param {string} name         column name
- *  @param {module:db/dataTypes~GPKGDataType} dataType  data type
+ *  @param {module:db/geoPackageDataType~GPKGDataType} dataType  data type
  *  @param {Number} max max value
  *  @param {Boolean} notNull      not null
  *  @param {Object} defaultValue default value or nil
@@ -20,7 +20,7 @@ export class UserCustomColumn extends UserColumn {
   constructor(
     index: number,
     name: string,
-    dataType: DataTypes,
+    dataType: GeoPackageDataType,
     max?: number,
     notNull?: boolean,
     defaultValue?: DBValue,
@@ -37,7 +37,7 @@ export class UserCustomColumn extends UserColumn {
    *
    *  @param {Number} index        column index
    *  @param {string} name         column name
-   *  @param {module:db/dataTypes~GPKGDataType} dataType         data type
+   *  @param {module:db/geoPackageDataType~GPKGDataType} dataType         data type
    *  @param {Number} [max] max value
    *  @param {Boolean} [notNull]      not null
    *  @param {Object} [defaultValue] default value or nil
@@ -47,7 +47,7 @@ export class UserCustomColumn extends UserColumn {
   static createColumn(
     index: number,
     name: string,
-    type: DataTypes,
+    type: GeoPackageDataType,
     notNull = false,
     defaultValue?: DBValue,
     max?: number,

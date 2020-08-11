@@ -74,4 +74,12 @@ export class MetadataReferenceDao extends Dao<MetadataReference> {
     columnValues.addColumn(MetadataReferenceDao.COLUMN_MD_PARENT_ID, parentId);
     return this.queryForFieldValues(columnValues);
   }
+
+
+  deleteByTableName(table: string): number {
+    let where = '';
+    where += this.buildWhereWithFieldAndValue(MetadataReferenceDao.COLUMN_TABLE_NAME, table);
+    const whereArgs = this.buildWhereArgs(table);
+    return this.deleteWhere(where, whereArgs);
+  }
 }

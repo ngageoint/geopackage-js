@@ -1,5 +1,4 @@
 import { Dao } from '../../dao/dao';
-
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
 /**

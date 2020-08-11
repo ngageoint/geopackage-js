@@ -1,4 +1,5 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
+import {Contents} from "../../../../lib/core/contents/contents";
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
   // @ts-ignore
@@ -131,18 +132,18 @@ describe('GeometryColumns tests', function() {
       m: 0
     });
     var contents = gcd.getContents(table);
-    contents.should.be.deep.equal({
-      table_name: 'point2d',
-      data_type: 'features',
-      identifier: 'point2d',
-      description: '',
-      last_change: '2014-08-27T15:36:41.000Z',
-      min_x: 1,
-      min_y: 2,
-      max_x: 1,
-      max_y: 2,
-      srs_id: 0
-    });
+    var expectedContents = new Contents();
+    expectedContents.table_name = 'point2d';
+    expectedContents.data_type = 'features';
+    expectedContents.identifier = 'point2d';
+    expectedContents.description = '';
+    expectedContents.last_change = '2014-08-27T15:36:41.000Z';
+    expectedContents.min_x = 1;
+    expectedContents.min_y = 2;
+    expectedContents.max_x = 1;
+    expectedContents.max_y = 2;
+    expectedContents.srs_id = 0;
+    contents.should.be.deep.equal(expectedContents);
   });
 
   it('should get the projection from the table', function() {

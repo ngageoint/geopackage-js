@@ -4,6 +4,7 @@ import {ContentsDao} from '../../../../lib/core/contents/contentsDao';
 
 // var GeoPackageAPI = require('../../../..')
 var Contents = require('../../../../lib/core/contents/contents').Contents
+  , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
   , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
@@ -33,7 +34,7 @@ describe('Contents tests', function() {
     var contentsDao = geoPackage.contentsDao;
     var contents = contentsDao.createObject();
     contents.table_name = 'testit';
-    contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
+    contents.data_type = ContentsDataType.FEATURES;
     // contents.last_change = new Date().toISOString();
     contentsDao.create(contents);
   });

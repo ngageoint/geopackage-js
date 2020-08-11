@@ -10,6 +10,7 @@ import { TileMatrix } from '../../tiles/matrix/tileMatrix';
 import { SpatialReferenceSystem } from '../srs/spatialReferenceSystem';
 import { BoundingBox } from '../../boundingBox';
 import { DBValue } from '../../db/dbAdapter';
+import { ContentsDataType } from './contentsDataType';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -42,12 +43,6 @@ export class ContentsDao extends Dao<Contents> {
   public static readonly COLUMN_MAX_Y: string = 'max_y';
 
   public static readonly COLUMN_SRS_ID: string = 'srs_id';
-
-  public static readonly GPKG_CDT_FEATURES_NAME: string = 'features';
-
-  public static readonly GPKG_CDT_TILES_NAME: string = 'tiles';
-
-  public static readonly GPKG_CDT_ATTRIBUTES_NAME: string = 'attributes';
 
   readonly gpkgTableName: string = ContentsDao.TABLE_NAME;
 
@@ -181,5 +176,88 @@ export class ContentsDao extends Dao<Contents> {
       tileMatricies.push(gc);
     }
     return tileMatricies;
+  }
+
+  deleteCascadeContents(contents: Contents): number {
+    let count = 0;
+    if (contents !== null && contents !== undefined) {
+      let dataType = ContentsDataType.fromName(contents.data_type);
+      if (dataType !== null && dataType !== undefined) {
+        switch (dataType) {
+          case ContentsDataType.FEATURES:
+            // Delete Geometry Columns
+            let geometryColumnsDao = this.geoPackage.geometryColumnsDao;
+            if (geometryColumnsDao.isTableExists()) {
+              let geometryColumns = this.getGeometryColumns(contents);
+              if (geometryColumns != null) {
+                geometryColumnsDao.deleteByMultiId([geometryColumns.table_name, geometryColumns.column_name]);
+              }
+            }
+            break;
+          case ContentsDataType.TILES:
+          // case GRIDDED_COVERAGE:
+            // Delete Tile Matrix collection
+            let tileMatrixDao = this.geoPackage.tileMatrixDao;
+            if (tileMatrixDao.isTableExists()) {
+              let tileMatrixCollection = this.getTileMatrix(contents);
+              if (tileMatrixCollection.length > 0) {
+                tileMatrixCollection.forEach(tileMatrix => {
+                  tileMatrixDao.deleteByMultiId([tileMatrix.table_name, tileMatrix.zoom_level]);
+                });
+              }
+            }
+            // Delete Tile Matrix Set
+            let tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
+            if (tileMatrixSetDao.isTableExists()) {
+              let tileMatrixSet = this.getTileMatrixSet(contents);
+              if (tileMatrixSet != null) {
+                tileMatrixSetDao.deleteById(tileMatrixSet.table_name);
+              }
+            }
+            break;
+          case ContentsDataType.ATTRIBUTES:
+            this.dropTableWithTableName(contents.table_name);
+            break;
+
+        }
+
+      } else {
+        this.dropTableWithTableName(contents.table_name);
+      }
+
+      count = this.delete(contents);
+    }
+
+    return count;
+  }
+
+  deleteCascade(contents: Contents, userTable: boolean): number {
+    let count = this.deleteCascadeContents(contents);
+    if (userTable) {
+      this.dropTableWithTableName(contents.table_name);
+    }
+    return count;
+  }
+
+  deleteByIdCascade(id: string, userTable: boolean): number {
+    let count = 0;
+    if (id !== null && id !== undefined) {
+      let contents = this.queryForId(id);
+      if (contents !== null && contents !== undefined) {
+        count = this.deleteCascade(contents, userTable);
+      } else if (userTable) {
+        this.dropTableWithTableName(id);
+      }
+    }
+    return count;
+  }
+
+
+deleteTable(table: string) {
+    try {
+      this.deleteByIdCascade(table, true);
+    } catch (e) {
+      throw new Error('Failed to delete table: ' + table);
+    }
   }
 }
