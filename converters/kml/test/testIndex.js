@@ -471,11 +471,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
             }).then(()=>{
                 timesCalled2.should.be.equal(1 + 16 + 256);
             });
-        });
-        it ('should handle Polygon with Inner Boundary', function () {
-            
-        }) 
-
+        }); 
     });
     describe('image Utilities Should work', function(){
         it ('should truncate Images', function(){
