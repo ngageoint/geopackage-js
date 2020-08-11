@@ -448,7 +448,7 @@ export class KMLToGeoPackage {
    */
   getMetaDataKML(
     kmlData: PathLike | Uint8Array,
-    geopackage: GeoPackage,
+    geopackage?: GeoPackage,
     progressCallback?: Function,
   ): Promise<{ props: Set<string>; bbox: BoundingBox }> {
     return new Promise(async resolve => {

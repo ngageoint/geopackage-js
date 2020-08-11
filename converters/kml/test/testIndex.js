@@ -4,7 +4,7 @@ const geoSpatialUtilities = require('../geoSpatialUtilities').GeoSpatialUtilitie
 const WEB_MERCATOR_MIN_LAT_RANGE = require('../geoSpatialUtilities').WEB_MERCATOR_MIN_LAT_RANGE;
 const WEB_MERCATOR_MAX_LAT_RANGE = require('../geoSpatialUtilities').WEB_MERCATOR_MAX_LAT_RANGE;
 const kmlUtilities = require('../kmlUtilities').KMLUtilities;
-const imageUtilities = require('../imageUtilities').ImageUtilities;
+const ImageUtilities = require('../imageUtilities').ImageUtilities;
 
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +12,6 @@ const { AssertionError, assert } = require('chai');
 const should = require('chai').should();
 const _ = require('lodash');
 const Jimp = require('jimp');
-const { ImageUtilities } = require('../imageUtilities');
 
 let emptyGeopackage;
 
@@ -131,6 +130,26 @@ describe('KML and KMZ to Geopackage Tests', function() {
             should.exist(obj);
         });
         should.exist(gp);
+    });
+    describe('should be able to read and find all Meta Data', function() {
+        it ('Find all Properties of a file.', async function() {
+            const obj = new KMLToGeoPackage(null);
+            const { props: Props, bbox: BBox} = await obj.getMetaDataKML(path.join(__dirname, 'fixtures', 'PropsTest.kml'));
+            const compareSet = new Set(['name', 'LookAt', 'altitudeMode', 'tessellate']);
+            assert.isTrue(_.isEqual(Props, compareSet));
+            const compareBBox = new GeoPackage.BoundingBox(36.0905099328766,55.75185219338564,-112.0870267752693,37.53604909910388);
+            assert.isTrue(_.isEqual(BBox, compareBBox));
+        });
+        it ('Find all Properties if a uint8array is given', async function (){
+            const obj = new KMLToGeoPackage(null);
+            const buf = fs.readFileSync(path.join(__dirname, 'fixtures', 'PropsTest.kml'))
+            const { props: Props, bbox: BBox} = await obj.getMetaDataKML(Uint8Array.from(buf));
+            
+            const compareSet = new Set(['name', 'LookAt', 'altitudeMode', 'tessellate']);
+            assert.isTrue(_.isEqual(Props, compareSet));
+            const compareBBox = new GeoPackage.BoundingBox(36.0905099328766,55.75185219338564,-112.0870267752693,37.53604909910388);
+            assert.isTrue(_.isEqual(BBox, compareBBox));
+        })
     });
     describe('KML Utilities Should work', function () {
         beforeEach( function() {
