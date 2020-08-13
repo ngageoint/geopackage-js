@@ -60,7 +60,7 @@ for (const name in defs) {
 
 const osm = L.tileLayer('https://osm-{s}.gs.mil/tiles/default/{z}/{x}/{y}.png', {
   subdomains: '1234',
-  attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong>',
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong>',
 });
 const arcworldmap = L.tileLayer(
   'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png',
