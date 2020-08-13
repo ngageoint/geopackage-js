@@ -81,7 +81,8 @@
     "kmlUtilities.ts"
   ],
   "scripts": {
-    "test": "npm run clean-built && nyc mocha -r ts-node/register",
+    "pretest": "npm run clean-built",
+    "test": "nyc mocha -r ts-node/register",
     "report": "nyc report",
     "tsc": "rm -rf ./built && tsc",
     "prepare": "rm -rf ./built && tsc",

@@ -38,8 +38,9 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const geometryTableName = 'kmlSamples';
         const kmlGeopackage = KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, false, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
         const geopackage = await kmlGeopackage;
-        // Feature Table exists
+        // Geopackage Should exist
         should.exist(geopackage);
+        // Feature Table exists
         const tableData = geopackage.getFeatureTables();
         tableData.length.should.be.equal(1);
         tableData[0].should.be.equal(geometryTableName);
@@ -49,7 +50,6 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const tileMatrixTable = geopackage.getTileTables();
         should.exist(tileMatrixTable);
         tileMatrixTable.length.should.be.equal(1);
-
         // Attribute table Exists.
         const attributeTables = geopackage.getAttributesTables();
         should.exist(attributeTables);
@@ -130,6 +130,12 @@ describe('KML and KMZ to Geopackage Tests', function() {
             should.exist(obj);
         });
         should.exist(gp);
+        try {
+            fs.rmdirSync(path.join(__dirname, 'fixtures', 'files'), {recursive: true});
+            fs.unlinkSync(path.join(__dirname, 'fixtures', 'water.kml'));
+        } catch (e) {
+            console.log(e)
+        }
     });
     describe('should be able to read and find all Meta Data', function() {
         it ('Find all Properties of a file.', async function() {

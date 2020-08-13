@@ -42,7 +42,7 @@ export interface KMLConverterOptions {
   kmlOrKmzPath?: PathLike;
   kmlOrKmzData?: Uint8Array;
   isKMZ?: boolean | false;
-  mainTableName?: string;
+  mainTableName?: string; 
   append?: boolean;
   preserverFolders?: boolean;
   geoPackage?: GeoPackage | string;
@@ -103,12 +103,18 @@ export class KMLToGeoPackage {
     return this.convertKMLOrKMZToGeopackage(kmlOrKmzPath, isKMZ, geopackage, tableName, kmlOrKmzData, progressCallback);
   }
 
+
   /**
-   * Determines what convert function to call based on the files extension.
-   * @param kmlOrKmzPath Path to .kml, .kmz, and .zip to be converted into a geopackage file.
-   * @param geopackage String or instance of the Geopackage to use.
-   * @param tableName Name of Main Geometry table
-   * @callback progressCallback Passed the current status of the function.
+   * Determines the function calls depending on the type of file and the environment it is in
+   *
+   * @param {PathLike} kmlOrKmzPath 
+   * @param {boolean} [isKMZ]
+   * @param {(GeoPackage | string)} [geopackage] String or instance of the Geopackage to use.
+   * @param {string} [tableName] Name of Main Geometry table
+   * @param {(Uint8Array | null)} [kmlOrKmzData]
+   * @param {Function} [progressCallback] Passed the current status of the function.
+   * @returns {Promise<GeoPackage>} Promise of a GeoPackage
+   * @memberof KMLToGeoPackage
    */
   async convertKMLOrKMZToGeopackage(
     kmlOrKmzPath: PathLike,
@@ -140,18 +146,21 @@ export class KMLToGeoPackage {
   }
 
   /**
-   * Unzips and stores data from a KMZ file in the current directory.
-   * @param {(PathLike | Uint8Array)} kmzPath PathLike to the KMZ file (Which the zipped version of a KML)
-   * @param geopackage  String or name of Geopackage to use
-   * @param tableName  Name of the main Geometry Table
-   * @callback progressCallback Passed the current status of the function.
+   * Unzips and stores data from a KMZ file in the current directory or in a Map
+   *
+   * @param {(PathLike | Uint8Array)} kmzData Path to KMZ file or Data of the KMZ file
+   * @param {(GeoPackage | string)} geopackage String or instance of Geopackage to use
+   * @param {string} tableName Name of the main Geometry Table
+   * @param {Function} [progressCallback] Passed the current status of the function.
+   * @returns {Promise<GeoPackage>} Promise of a GeoPackage
+   * @memberof KMLToGeoPackage
    */
   async convertKMZToGeoPackage(
     kmzData: PathLike | Uint8Array,
     geopackage: GeoPackage | string,
     tableName: string,
     progressCallback?: Function,
-  ): Promise<any> {
+  ): Promise<GeoPackage> {
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
@@ -227,10 +236,13 @@ export class KMLToGeoPackage {
 
   /**
    * Takes a KML file and does a 2 pass method to exact the features and styles and inserts those item properly into a geopackage.
-   * @param kmlPath Path to KML file
-   * @param geopackage String or name of Geopackage to use
-   * @param tableName Name of table with geometry
-   * @callback progressCallback Passed the current status of the function.
+   *
+   * @param {(PathLike | Uint8Array)} kmlData Path to KML file or Data of KML file
+   * @param {(GeoPackage | string)} geopackage String name or instance of Geopackage to use
+   * @param {string} tableName  Name of table with geometry
+   * @param {Function} [progressCallback] Passed the current status of the function.
+   * @returns {Promise<GeoPackage>} Promise of a Geopackage
+   * @memberof KMLToGeoPackage
    */
   async convertKMLToGeoPackage(
     kmlData: PathLike | Uint8Array,
@@ -241,6 +253,7 @@ export class KMLToGeoPackage {
     if (typeof geopackage === 'string' || _.isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
+
     if (progressCallback) progressCallback({ status: 'Obtaining Meta-Data about KML', file: kmlData });
     const { props: props, bbox: BoundingBox } = await this.getMetaDataKML(kmlData, geopackage, progressCallback);
     this.properties = props;
@@ -259,7 +272,7 @@ export class KMLToGeoPackage {
 
     if (this.options.indexTable && props.size !== 0) {
       if (progressCallback) progressCallback({ status: 'Indexing the Geopackage' });
-      await this.indexTable(geopackage, tableName);
+      await geopackage.indexFeatureTable(tableName);
     }
     return geopackage;
   }
@@ -314,10 +327,12 @@ export class KMLToGeoPackage {
 
   /**
    * Inserts style information from the KML in the GeoPackage.
-   * @param kmlPath Path to file
-   * @param geopackage GeoPackage Object
-   * @param tableName Name of Main Table
-   * @callback progressCallback Passed the current status of the function.
+   *
+   * @param {GeoPackage} geopackage Geopackage instance of 
+   * @param {string} tableName Name of Main Table
+   * @param {Function} [progressCallback] Passed the current status of the function.
+   * @returns {Promise<FeatureTableStyles>} Promise of a Feature Table of Styles
+   * @memberof KMLToGeoPackage
    */
   setUpStyleKML(geopackage: GeoPackage, tableName: string, progressCallback?: Function): Promise<FeatureTableStyles> {
     return new Promise(async resolve => {
@@ -337,11 +352,14 @@ export class KMLToGeoPackage {
   /**
    * Reads the KML file and extracts Geometric data and matches styles with the Geometric data.
    * Also read the Ground Overlays.
-   * @param {(PathLike|Uint8Array)} kmlPath Path to KML file
-   * @param {GeoPackage} geopackage GeoPackage Object
-   * @param {FeatureTableStyles} defaultStyles Feature Style Object
+   *
+   * @param {(PathLike | Uint8Array)} kmlData Path to KML file or KML Data
+   * @param {GeoPackage} geopackage GeoPackage instance
+   * @param {FeatureTableStyles} defaultStyles Feature Table Style Object
    * @param {string} tableName Name of Main table for Geometry
-   * @callback progressCallback
+   * @param {Function} [progressCallback]
+   * @returns {Promise<void>}
+   * @memberof KMLToGeoPackage
    */
   async addKMLDataToGeoPackage(
     kmlData: PathLike | Uint8Array,
@@ -445,6 +463,15 @@ export class KMLToGeoPackage {
    * @param kmlData Path to KML File or Uint8 array
    * @param {GeoPackage} geopackage
    * @param progressCallback
+   */
+  /**
+   * Runs through KML and finds name for Columns and Style information. Handles Networks Links. Handles Bounding Boxes
+   *
+   * @param {(PathLike | Uint8Array)} kmlData Path to KML File or KML Data
+   * @param {GeoPackage} [geopackage] Geopackage instance; Needed when using Network Links
+   * @param {Function} [progressCallback] 
+   * @returns {Promise<{ props: Set<string>; bbox: BoundingBox }>} Object of the set of property name and the total Bounding Box
+   * @memberof KMLToGeoPackage
    */
   getMetaDataKML(
     kmlData: PathLike | Uint8Array,
@@ -626,9 +653,12 @@ export class KMLToGeoPackage {
 
   /**
    * Determines whether to create a new file or open an existing file.
-   * @param geopackage
-   * @param options
-   * @param progressCallback
+   *
+   * @param {(GeoPackage | string)} geopackage String Name or instance of a GeoPackage
+   * @param {KMLConverterOptions} options 
+   * @param {Function} [progressCallback]
+   * @returns {Promise<GeoPackage>} Promise of a GeoPackage
+   * @memberof KMLUtilities
    */
   async createOrOpenGeoPackage(
     geopackage: GeoPackage | string,
@@ -662,10 +692,15 @@ export class KMLToGeoPackage {
 
   /**
    * Adds style and geometries to the geopackage.
-   * @param node node from kml by xml-stream
-   * @param defaultStyles style table
-   * @param geopackage Geopackage information will be entered into
-   * @param tableName name of geometry table
+   *
+   * @private
+   * @param {*} node node from kml by xml-stream
+   * @param {FeatureTableStyles} defaultStyles style table
+   * @param {GeoPackage} geopackage Geopackage information will be entered into
+   * @param {string} tableName name of geometry table
+   * @param {Function} [progressCallback]
+   * @returns {number} Id of the Feature
+   * @memberof KMLToGeoPackage
    */
   private addPropertiesAndGeometryValues(
     node: any,
@@ -771,18 +806,13 @@ export class KMLToGeoPackage {
   }
 
   /**
-   * Index the table to make searching for points faster.
-   * @param geopackage GeoPackage Object
-   * @param tableName Name of Main table with Geometry
-   */
-  private async indexTable(geopackage: GeoPackage, tableName: string): Promise<void> {
-    geopackage.indexFeatureTable(tableName);
-  }
-
-  /**
    * Loops through provided map of names of icons and object data of the icons.
-   * @param styleTable Feature Table Style
-   * @param items icons to add to the style table
+   *
+   * @private
+   * @param {FeatureTableStyles} styleTable Feature Table Style
+   * @param {Map<string, object>} items icons to add to the style table
+   * @returns {Promise<void>}
+   * @memberof KMLToGeoPackage
    */
   private async addSpecificIcons(styleTable: FeatureTableStyles, items: Map<string, object>): Promise<void> {
     return new Promise(async resolve => {
@@ -803,8 +833,11 @@ export class KMLToGeoPackage {
   /**
    * Adds styles to the table provided.
    * Saves id and name in this.styleRowMap and this.styleUrlMap
-   * @param styleTable Feature Style Table
-   * @param items Map of the name of the style and the style itself from the KML
+   * 
+   * @private
+   * @param {FeatureTableStyles} styleTable Feature Style Table
+   * @param {Map<string, object>} items Map of the name of the style and the style itself from the KML
+   * @memberof KMLToGeoPackage
    */
   private addSpecificStyles(styleTable: FeatureTableStyles, items: Map<string, object>): void {
     for (const item of items) {

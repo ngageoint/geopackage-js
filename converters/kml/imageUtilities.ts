@@ -8,12 +8,7 @@ export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
 
-/**
- *
- *
- * @export
- * @class ImageUtilities
- */
+
 export class ImageUtilities {
   /**
    * ## Creates Image Tiles for given zoomLevels
@@ -88,13 +83,13 @@ export class ImageUtilities {
     );
   }
   /**
-   *
+   * 
    *
    * @static
    * @param {string} uri
    * @param {string} [dir]
    * @param {Map<string, any>} [zipMap]
-   * @returns {Promise<Jimp>}
+   * @returns {Promise<Jimp>} Return a promise of a JIMP image
    * @memberof ImageUtilities
    */
   public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp> {

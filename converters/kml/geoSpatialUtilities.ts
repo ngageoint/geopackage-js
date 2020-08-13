@@ -38,25 +38,32 @@ export class GeoSpatialUtilities {
     return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 
+
   /**
    * Finds the x position of a tile
    *
    * Taken from Map Cache Electron
-   *
-   * @param lon longitude in degrees
-   * @param z Zoom level
+   * 
+   * @static
+   * @param {number} lon longitude in degrees
+   * @param {number} zoom Zoom level
+   * @returns {number}
+   * @memberof GeoSpatialUtilities
    */
   static long2tile(lon: number, zoom: number): number {
     return Math.min(Math.pow(2, zoom) - 1, Math.floor(((lon + 180) / 360) * Math.pow(2, zoom)));
   }
 
+
   /**
    * Finds the y position of a tile
    *
    * Taken from Map Cache Electron
-   *
-   * @param lat Latitude in degrees
-   * @param z Zoom level
+   * @static
+   * @param {number} lat Latitude in degrees
+   * @param {number} zoom Zoom level
+   * @returns {number}
+   * @memberof GeoSpatialUtilities
    */
   static lat2tile(lat: number, zoom: number): number {
     if (lat < WEB_MERCATOR_MIN_LAT_RANGE) {
@@ -75,8 +82,11 @@ export class GeoSpatialUtilities {
    *
    * Taken from Map Cache Electron
    *
-   * @param bbox Geopackage Bounding box
-   * @param zoom zoom level
+   * @static
+   * @param {BoundingBox} bbox Geopackage Bounding box
+   * @param {*} zoom zoom level
+   * @returns {{ min: number; max: number }} Max and Min X Tiles
+   * @memberof GeoSpatialUtilities
    */
   static calculateXTileRange(bbox: BoundingBox, zoom: any): { min: number; max: number } {
     const west = this.long2tile(bbox.maxLongitude, zoom);
@@ -92,12 +102,15 @@ export class GeoSpatialUtilities {
    *
    * Taken from Map Cache Electron
    *
-   * @param bbox Geopackage Bounding box
-   * @param zoom zoom level
+   * @static
+   * @param {BoundingBox} Geopackage Bounding box
+   * @param {*} zoom zoom level
+   * @returns {{ min: number; max: number; current: number }}
+   * @memberof GeoSpatialUtilities
    */
-  static calculateYTileRange(bbox: BoundingBox, z: any): { min: number; max: number; current: number } {
-    const south = this.lat2tile(bbox.minLatitude, z);
-    const north = this.lat2tile(bbox.maxLatitude, z);
+  static calculateYTileRange(bbox: BoundingBox, zoom: any): { min: number; max: number; current: number } {
+    const south = this.lat2tile(bbox.minLatitude, zoom);
+    const north = this.lat2tile(bbox.maxLatitude, zoom);
     return {
       min: Math.max(0, Math.min(south, north)),
       max: Math.max(0, Math.max(south, north)),
@@ -105,12 +118,17 @@ export class GeoSpatialUtilities {
     };
   }
 
-  // Taken from Map Cache Electron
   /**
    * Calls function for each tile needed.
-   * @param extent Bounding Box
-   * @param zoomLevels Array of Zoom Levels
-   * @param tileCallback Function that will be called for every tile
+   *
+   * Taken from Map Cache Electron
+   * 
+   * @static
+   * @param {BoundingBox} extent Bounding Box
+   * @param {number[]} zoomLevels Array of Zoom Levels
+   * @param {(arg0: { z: number; x: number; y: number }) => Promise<boolean>} tileCallback Function that will be called for every tile
+   * @returns {Promise<void>}
+   * @memberof GeoSpatialUtilities
    */
   static async iterateAllTilesInExtentForZoomLevels(
     extent: BoundingBox,
@@ -132,25 +150,31 @@ export class GeoSpatialUtilities {
 
   /**
    * Converts tiles to a geopackage Bounding box.
-   * @param x x tile position
-   * @param y y tile position
-   * @param zoom zoom level
-   * @returns Geopackage Bounding box.
+   *
+   * @static
+   * @param {number} x x tile position
+   * @param {number} y y tile position
+   * @param {number} zoom zoom level
+   * @returns {BoundingBox} Geopackage Bounding box.
+   * @memberof GeoSpatialUtilities 
    */
   static tileBboxCalculator(x: number, y: number, zoom: number): BoundingBox {
     return new BoundingBox(
-      this.tile2lon(x, zoom), // West / MinLongitude
-      this.tile2lon(x + 1, zoom), // East / MaxLongitude
-      this.tile2lat(y + 1, zoom), // South / MinLatitude
-      this.tile2lat(y, zoom), // North / MaxLatitude
+      this.tile2lon(x, zoom), // West -> MinLongitude
+      this.tile2lon(x + 1, zoom), // East -> MaxLongitude
+      this.tile2lat(y + 1, zoom), // South -> MinLatitude
+      this.tile2lat(y, zoom), // North -> MaxLatitude
     );
   }
 
   /**
    * Uses turf to rotate a bounding box.
-   * @param bbox GeoPackage Bounding Box EPSG:4326
-   * @param rotation Rotation in degrees North clockwise negative
-   * @returns GeoPackage Bounding Box Rotated by given number of degrees
+   *
+   * @static
+   * @param {BoundingBox} bbox GeoPackage Bounding Box EPSG:4326
+   * @param {number} rotation Rotation in degrees; clockwise rotations are negative
+   * @returns {BoundingBox} GeoPackage Bounding Box Rotated by given number of degrees
+   * @memberof GeoSpatialUtilities
    */
   public static getKmlBBoxRotation(bbox: BoundingBox, rotation: number): BoundingBox {
     // Convert to geoJson polygon format which turf can read.
@@ -170,8 +194,11 @@ export class GeoSpatialUtilities {
   /**
    * Returns the floor of the zoom level where 1 image pixel equals 1 tile pixel.
    *  floor(log_2((360 * imageWidth) / (bbox_width * tile_size)))
-   * @param bbox Must be in EPSG:4326
-   * @param imageWidth Must be in Pixels
+   * @static
+   * @param {BoundingBox} bbox Must be in EPSG:4326
+   * @param {number} imageWidth Must be in Pixels
+   * @returns {number} zoom level
+   * @memberof GeoSpatialUtilities
    */
   public static getNaturalScale(bbox: BoundingBox, imageWidth: number): number {
     const widthHeight = this.getWidthAndHeightFromBBox(bbox);
@@ -180,7 +207,11 @@ export class GeoSpatialUtilities {
 
   /**
    * Get height and width of a bounding box
-   * @param bbox geopackage bounding box.
+   *
+   * @static
+   * @param {BoundingBox} bbox geopackage bounding box.
+   * @returns {{ width: number; height: number }} Object with width and height
+   * @memberof GeoSpatialUtilities
    */
   public static getWidthAndHeightFromBBox(bbox: BoundingBox): { width: number; height: number } {
     return {
@@ -192,9 +223,11 @@ export class GeoSpatialUtilities {
   /**
    * Converts the Min/Max Latitude and Longitude into EPSG:3857 (Web Mercator)
    *
-   * @param currentProjection EPSG:#### string of the current projection
-   * @param bbox Geopackage Bounding Box
-   * @returns New Geopackage Bounding Box with the transformed coordinates.
+   * @static
+   * @param {string} currentProjection EPSG:#### string of the current projection
+   * @param {BoundingBox} bbox Geopackage Bounding Box
+   * @returns {BoundingBox} New Geopackage Bounding Box with the transformed coordinates.
+   * @memberof GeoSpatialUtilities
    */
   public static getWebMercatorBoundingBox(currentProjection: string, bbox: BoundingBox): BoundingBox {
     proj4.defs(currentProjection, proj4Defs[currentProjection]);
@@ -215,11 +248,15 @@ export class GeoSpatialUtilities {
     return temp;
   }
 
+
   /**
    * Creates a list of zoom level where the number of filled tiles changes.
-   * @param bbox Bounding box after rotation
-   * @param naturalScale Zoom level closest to one to one in terms of pixels
-   * @returns A list of zoom levels
+   *
+   * @static
+   * @param {BoundingBox} bbox Bounding box after rotation
+   * @param {number} naturalScale Zoom level closest to one to one in terms of pixels
+   * @returns {Set<number>} A set of zoom levels
+   * @memberof GeoSpatialUtilities
    */
   public static getZoomLevels(bbox: BoundingBox, naturalScale: number): Set<number> {
     const levels = new Set<number>();
@@ -241,12 +278,17 @@ export class GeoSpatialUtilities {
     } while (xSize * ySize !== 1 && z > 0);
     return levels;
   }
+
   /**
    * Expand the bounds to include provided latitude and longitude value.
-   * @param boundingBox Bounding Box to be expanded
-   * @param latitude Line of latitude to be included the bounding box
-   * @param longitude Line of longitude to be included the bounding box
-   * @param copyBoundingBox Copy the object and return that or mutate and return the original object.
+   *
+   * @static
+   * @param {BoundingBox} boundingBox Bounding Box to be expanded
+   * @param {number} [latitude] Line of latitude to be included the bounding box
+   * @param {number} [longitude] Line of longitude to be included the bounding box
+   * @param {boolean} [copyBoundingBox=false] Copy the object and return that or mutate and return the original object.
+   * @returns {BoundingBox}
+   * @memberof GeoSpatialUtilities
    */
   public static expandBoundingBoxToIncludeLatLonPoint(
     boundingBox: BoundingBox,

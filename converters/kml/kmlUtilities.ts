@@ -265,6 +265,77 @@ export class KMLUtilities {
   }
 
   /**
+   * Creates a list of node that need to be processed.
+   *
+   * @static
+   * @param {*} node Placemark Node from kml via xml-stream
+   * @param {Function} [progressCallback]
+   * @returns {any[]}
+   * @memberof KMLUtilities
+   */
+  public static setUpGeometryNodes(node: any, progressCallback?: Function): any[] {
+    const nodes = [];
+    if (progressCallback) {
+      progressCallback({
+        status: 'Handling Geometry and MultiGeometry',
+        data: node,
+      });
+    }
+    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
+      for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
+        const item = {};
+        for (const prop in node) {
+          if (prop != KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
+            item[prop] = node[prop];
+          }
+        }
+        if (node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY].hasOwnProperty(key)) {
+          const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
+          shapeType.forEach(shape => {
+            item[key] = [shape];
+            nodes.push({ ...item });
+          });
+        }
+      }
+    } else if (!_.isNil(node)) {
+      nodes.push(node);
+    } else {
+      console.error('Placemark node is Nil.');
+    }
+    return nodes;
+  }
+
+  /**
+   * Writes and maps MultiGeometries into the database
+   *
+   * @static
+   * @param {any[]} geometryIds List of Ids for the item in the Multi geometry
+   * @param {GeoPackage} geopackage Geopackage Database
+   * @param {string} multiGeometryTableName Name on the table that stores the id of the MultiGeometry
+   * @param {RelatedTablesExtension} relatedTableExtension Used to connect tables.
+   * @param {string} multiGeometryMapName Cross reference table (map) between the Geometry table and the MultiGeometry Table
+   * @memberof KMLUtilities
+   */
+  public static writeMultiGeometry(
+    geometryIds: any[],
+    geopackage: GeoPackage,
+    multiGeometryTableName: string,
+    relatedTableExtension: RelatedTablesExtension,
+    multiGeometryMapName: string,
+  ): void {
+    const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, {
+      number_of_geometries: geometryIds.length,
+    });
+    const userMappingDao = relatedTableExtension.getMappingDao(multiGeometryMapName);
+    for (const id of geometryIds) {
+      const userMappingRow = userMappingDao.newRow();
+      userMappingRow.baseId = parseInt(id);
+      userMappingRow.relatedId = multiGeometryId;
+      userMappingDao.create(userMappingRow);
+    }
+  }
+
+  /**
    * Provides default styles and Icons for the Geometry table.
    * Currently set to White to match google earth.
    * Icon set to yellow pushpin google earth default.
@@ -303,23 +374,16 @@ export class KMLUtilities {
     if (progressCallback) progressCallback({ status: 'Creating KML Default Styles and Icons.' });
     const defaultIcon = defaultStyles.getIconDao().newRow();
     try {
-      defaultIcon.name = 'black_marker';
+      defaultIcon.name = 'default_black_marker';
       defaultIcon.anchorU = 0.5;
       defaultIcon.anchorV = 0;
       const defaultImage =
         'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAk9JREFUaAXtmb1KxEAUhf3BQhtrtbMUbESwEhYLBVGsfBNfQER8BmsfQC0ttFAQQbBWwVIrC9FKRfR8sCkcMzs3uzNJFnPgsJmZO+fcuZkku9mBgQZNBf53BQYjL39OehviojglTorgSXwUL8Rj8UasFTaVzZ34bSSxzKkc08rgSrQm7sYxF41K0JLrs+gmVbSNBlqloiW3D7Fosr54tNAsBZzyGJV3F4NmKduplz3vJu220U4K7hyuaex20rtTkVtltwvDIwl4SFmTOlfsujjRJsf0WefjFR3bUrQksKu4oRx3+hizaOAVHWdSDJlT5bzks2QYIyakg1d0WPY/WyUEYkILSHIdvBmM2fMhEBNaAF4mdDrdrsCw25GwbfYqsgCelCHMhwI0bomxeBmsfoecqhk69VygnYrCGDEhHbxM6GTmCly7HTltfsjsiHm69DFGTAgWr5DGn/EV9YQql41T5V4eZHhFx4gUX8QsyVSfeOBlQt6p9k381MChbzBiPx54JcGCVFNVPtPFIym4wDKz2J9JLl63GqsJF4B2KbiUS+zqo1kaluQUewFolgrL12vrIpN8fQ5VY1YBMV6toIFWJdiTq7XKvjg0KsOonB9EX3KhfuaiUSmW5R5K1DfO3FpgX1n4kvT1M6c2GFMmt6IvWbefWObUCrzLeRfdZN02MUne+8SoxpZhAcTUFvxldSS6Vc/ajMX+Wyt6McaleJ+zCPoY6wvMKMtXMas8x/T1FdaU7VebHCeB+QVSF+5sGSp/Ih50Mb+Z0lSgqYChAj/TCV35EewaiAAAAABJRU5ErkJggg==';
       const bufferImg = Buffer.from(defaultImage, 'base64');
-      defaultIcon.data = await Jimp.read(bufferImg)
-        .then(img => {
-          defaultIcon.width = img.getWidth();
-          defaultIcon.height = img.getHeight();
-          defaultIcon.contentType = Jimp.MIME_PNG;
-          return img.getBufferAsync(Jimp.MIME_PNG);
-        })
-        .catch(err => {
-          console.error(err);
-          throw err;
-        });
+      defaultIcon.data = bufferImg;
+      defaultIcon.width = 48;
+      defaultIcon.height = 48;
+      defaultIcon.contentType = 'image/png';
       defaultStyles.getFeatureStyleExtension().getOrInsertIcon(defaultIcon);
     } catch (err) {
       console.error(err);
@@ -348,19 +412,24 @@ export class KMLUtilities {
     await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
     await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
     await defaultStyles.setTableStyle('Point', pointStyleRow);
-    await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
-    await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
-    await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
+    // await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
+    // await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
+    // await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
 
     return defaultStyles;
   }
+
   /**
    * Converts Item into a data URL and adds it and information about to the database.
-   * @param dataUrl
-   * @param newIcon
-   * @param styleTable
-   * @param anchorU
-   * @param anchorV
+   *
+   * @static
+   * @param {Jimp} jimpImage
+   * @param {IconRow} newIcon
+   * @param {FeatureTableStyles} styleTable
+   * @param {number} [anchorU=0.5]
+   * @param {number} [anchorV=0.5]
+   * @returns {Promise<number>}
+   * @memberof KMLUtilities
    */
   public static async insertIconImageData(
     jimpImage: Jimp,
@@ -380,10 +449,15 @@ export class KMLUtilities {
     newIcon.anchorV = anchorV;
     return styleTable.getFeatureStyleExtension().getOrInsertIcon(newIcon);
   }
+
   /**
    * Adds an Icon into the Database
-   * @param styleTable Database Object for the style
-   * @param item The id from KML and the object data from KML
+   *
+   * @static
+   * @param {FeatureTableStyles} styleTable Database Object for the style
+   * @param {[string, object]} item The id from KML and the object data from KML
+   * @returns {Promise<{ id: number; newIcon: IconRow }>}
+   * @memberof KMLUtilities
    */
   public static async addSpecificIcon(
     styleTable: FeatureTableStyles,
@@ -486,69 +560,5 @@ export class KMLUtilities {
       }
       reject();
     });
-  }
-
-  /**
-   * Creates a list of node that need to be processed.
-   * @param node Placemark Node from kml via xml-stream
-   */
-  public static setUpGeometryNodes(node: any, progressCallback?: Function): any[] {
-    // console.log(JSON.stringify(node));
-    const nodes = [];
-    if (progressCallback) {
-      progressCallback({
-        status: 'Handling Geometry and MultiGeometry',
-        data: node,
-      });
-    }
-    if (node.hasOwnProperty(KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY)) {
-      for (const key in node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY]) {
-        const item = {};
-        for (const prop in node) {
-          if (prop != KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY) {
-            item[prop] = node[prop];
-          }
-        }
-        if (node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY].hasOwnProperty(key)) {
-          const shapeType = node[KMLTAGS.GEOMETRY_TAGS.MULTIGEOMETRY][key];
-          shapeType.forEach(shape => {
-            item[key] = [shape];
-            nodes.push({ ...item });
-          });
-        }
-      }
-    } else if (!_.isNil(node)) {
-      nodes.push(node);
-    } else {
-      console.error('Placemark node is Nil.');
-    }
-    return nodes;
-  }
-
-  /**
-   * Writes and maps MultiGeometries into the database
-   * @param geometryIds List of Ids for the item in the Multi geometry
-   * @param geopackage Geopackage Database
-   * @param multiGeometryTableName Name on the table that stores the id of the MultiGeometry
-   * @param relatedTableExtension Used to connect tables.
-   * @param multiGeometryMapName Cross reference table (map) between the Geometry table and the MultiGeometry Table
-   */
-  public static writeMultiGeometry(
-    geometryIds: any[],
-    geopackage: GeoPackage,
-    multiGeometryTableName: string,
-    relatedTableExtension: RelatedTablesExtension,
-    multiGeometryMapName: string,
-  ): void {
-    const multiGeometryId = geopackage.addAttributeRow(multiGeometryTableName, {
-      number_of_geometries: geometryIds.length,
-    });
-    const userMappingDao = relatedTableExtension.getMappingDao(multiGeometryMapName);
-    for (const id of geometryIds) {
-      const userMappingRow = userMappingDao.newRow();
-      userMappingRow.baseId = parseInt(id);
-      userMappingRow.relatedId = multiGeometryId;
-      userMappingDao.create(userMappingRow);
-    }
   }
 }
