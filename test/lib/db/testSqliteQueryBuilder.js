@@ -1,5 +1,4 @@
-var QueryBuilder = require('../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
-  , should = require('chai').should();
+var QueryBuilder = require('../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder;
 
 describe('SqliteQueryBuilder tests', function() {
 

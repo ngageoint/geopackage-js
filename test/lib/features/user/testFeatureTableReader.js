@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader

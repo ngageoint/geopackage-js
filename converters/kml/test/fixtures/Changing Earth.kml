@@ -1,0 +1,2577 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document id="root">
+	<name>Changing Earth</name>
+	<snippet></snippet>
+	<Document>
+		<name>data: no need to touch</name>
+		<snippet></snippet>
+		<Style id="splash_n">
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-splash mdl-layout mdl-js-layout">
+      <main class="ef-content ef-content--splash mdl-layout__content fullscreen-bg" style="background-image: url($[image_url]);">
+        <div class="ef-splash-container">
+          <div class="ef-splash-content">
+            <h1 class="ef-splash-content__title ef-content__title--splash">$[name]</h1>
+            <div class="ef-splash-content__description">
+              <p>$[description]</p>
+              <p>
+                <a href="#placemark_0;balloonFlyto" class="u-button--splash mdl-button mdl-button--raised mdl-button--colored mdl-js-button mdl-js-ripple-effect">$[cta_text]</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-content__credit"></div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+		</Style>
+		<Style id="splash_h">
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-splash mdl-layout mdl-js-layout">
+      <main class="ef-content ef-content--splash mdl-layout__content fullscreen-bg" style="background-image: url($[image_url]);">
+        <div class="ef-splash-container">
+          <div class="ef-splash-content">
+            <h1 class="ef-splash-content__title ef-content__title--splash">$[name]</h1>
+            <div class="ef-splash-content__description">
+              <p>$[description]</p>
+              <p>
+                 <a href="#placemark_0;balloonFlyto" class="u-button--splash mdl-button mdl-button--raised mdl-button--colored mdl-js-button mdl-js-ripple-effect">$[cta_text]</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-content__credit"></div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+		</Style>
+	<StyleMap id="splash">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#splash_n</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#splash_h</styleUrl>
+		</Pair>
+	</StyleMap>				
+		<Style id="panel_video_n">
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <figure class="ef-figure">
+          <div class="ef-figure__img-container">
+            <img class="ef-figure__img ef-figure__img-youtube" src="https://i1.ytimg.com/vi/$[video_id]/0.jpg" alt="">
+            <a href="https://www.youtube.com/watch?v=$[video_id]" class="ef-figure__button ef-figure__button--youtube">
+              <div class="youtube-icon"></div>
+            </a>
+          </div>
+        </figure>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+		<Style id="panel_video_h">
+			<IconStyle>
+				<scale>1.4</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <figure class="ef-figure">
+          <div class="ef-figure__img-container">
+            <img class="ef-figure__img ef-figure__img-youtube" src="https://i1.ytimg.com/vi/$[video_id]/0.jpg" alt="">
+            <a href="https://www.youtube.com/watch?v=$[video_id]" class="ef-figure__button ef-figure__button--youtube">
+              <div class="youtube-icon"></div>
+            </a>
+          </div>
+        </figure>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>		
+		<StyleMap id="panel_video">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#panel_video_n</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#panel_video_h</styleUrl>
+			</Pair>
+		</StyleMap>	
+		<Style id="carousel_n">
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <div class="carousel carousel--with-fab">
+          <div class="carousel__buttons carousel__buttons--dark">
+            <a href="#" class="carousel__buttons__button--prev mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE408;</i>
+            </a>
+            <a href="#" class="carousel__buttons__button--next mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE409;</i>
+            </a>
+          </div>
+          <a href="#$[id]_ilb;balloon" class="ef-figure__zoom">
+            <span class="ef-figure__button mdl-button mdl-button--icon mdl-js-button">
+              <i class="ef-figure__icon material-icons">&#xE5D0;</i>
+            </span>
+          </a>
+        </div>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- NOTE: textarea below uses four single-quotes in place of double quotes. They are replaced by the JS code. -->
+    <textarea class="u-hidden" id="image_carousel_json">
+        {''''images'''': [
+            {''''url'''': ''''$[img0_url]'''', ''''caption'''': ''''$[img0_caption]''''},
+            {''''url'''': ''''$[img1_url]'''', ''''caption'''': ''''$[img1_caption]''''},
+            {''''url'''': ''''$[img2_url]'''', ''''caption'''': ''''$[img2_caption]''''},
+            {''''url'''': ''''$[img3_url]'''', ''''caption'''': ''''$[img3_caption]''''},
+            {''''url'''': ''''$[img4_url]'''', ''''caption'''': ''''$[img4_caption]''''},
+            {''''url'''': ''''$[img5_url]'''', ''''caption'''': ''''$[img5_caption]''''},
+            {''''url'''': ''''$[img6_url]'''', ''''caption'''': ''''$[img6_caption]''''},
+            {''''url'''': ''''$[img7_url]'''', ''''caption'''': ''''$[img7_caption]''''},
+            {''''url'''': ''''$[img8_url]'''', ''''caption'''': ''''$[img8_caption]''''}
+        ]}
+    </textarea>        
+      
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+    <script>
+      setTimeout(function() {
+        var carousel = new PanelsCarousel(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+      }.bind(this), 1000);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>		
+		<Style id="carousel_h">
+			<IconStyle>
+				<scale>1.4</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <div class="carousel carousel--with-fab">
+          <div class="carousel__buttons carousel__buttons--dark">
+            <a href="#" class="carousel__buttons__button--prev mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE408;</i>
+            </a>
+            <a href="#" class="carousel__buttons__button--next mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE409;</i>
+            </a>
+          </div>
+          <a href="#$[id]_ilb;balloon" class="ef-figure__zoom">
+            <span class="ef-figure__button mdl-button mdl-button--icon mdl-js-button">
+              <i class="ef-figure__icon material-icons">&#xE5D0;</i>
+            </span>
+          </a>
+        </div>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- NOTE: textarea below uses four single-quotes in place of double quotes. They are replaced by the JS code. -->
+    <textarea class="u-hidden" id="image_carousel_json">
+        {''''images'''': [
+            {''''url'''': ''''$[img0_url]'''', ''''caption'''': ''''$[img0_caption]''''},
+            {''''url'''': ''''$[img1_url]'''', ''''caption'''': ''''$[img1_caption]''''},
+            {''''url'''': ''''$[img2_url]'''', ''''caption'''': ''''$[img2_caption]''''},
+            {''''url'''': ''''$[img3_url]'''', ''''caption'''': ''''$[img3_caption]''''},
+            {''''url'''': ''''$[img4_url]'''', ''''caption'''': ''''$[img4_caption]''''},
+            {''''url'''': ''''$[img5_url]'''', ''''caption'''': ''''$[img5_caption]''''},
+            {''''url'''': ''''$[img6_url]'''', ''''caption'''': ''''$[img6_caption]''''},
+            {''''url'''': ''''$[img7_url]'''', ''''caption'''': ''''$[img7_caption]''''},
+            {''''url'''': ''''$[img8_url]'''', ''''caption'''': ''''$[img8_caption]''''}
+        ]}
+    </textarea>         
+      
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+    <script>
+      setTimeout(function() {
+        var carousel = new PanelsCarousel(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+      }.bind(this), 1000);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>	
+		<StyleMap id="carousel">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#carousel_n</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#carousel_h</styleUrl>
+			</Pair>
+		</StyleMap>	
+		<Style id="carousel_lightbox_n">
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-lightbox mdl-layout mdl-js-layout no-scroll">
+      <main class="ef-lightbox mdl-layout__content">
+        <div class="carousel ef-lightbox__image">
+          <div class="carousel__buttons carousel__buttons--dark">
+            <a href="#" class="carousel__buttons__button--prev mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE408;</i>
+            </a>
+            <a href="#" class="carousel__buttons__button--next mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- NOTE: textarea below uses four single-quotes in place of double quotes. They are replaced by the JS code. -->
+    <textarea class="u-hidden" id="image_carousel_json">
+        {''''images'''': [
+            {''''url'''': ''''$[img0_url]'''', ''''caption'''': ''''$[img0_caption]''''},
+            {''''url'''': ''''$[img1_url]'''', ''''caption'''': ''''$[img1_caption]''''},
+            {''''url'''': ''''$[img2_url]'''', ''''caption'''': ''''$[img2_caption]''''},
+            {''''url'''': ''''$[img3_url]'''', ''''caption'''': ''''$[img3_caption]''''},
+            {''''url'''': ''''$[img4_url]'''', ''''caption'''': ''''$[img4_caption]''''},
+            {''''url'''': ''''$[img5_url]'''', ''''caption'''': ''''$[img5_caption]''''},
+            {''''url'''': ''''$[img6_url]'''', ''''caption'''': ''''$[img6_caption]''''},
+            {''''url'''': ''''$[img7_url]'''', ''''caption'''': ''''$[img7_caption]''''},
+            {''''url'''': ''''$[img8_url]'''', ''''caption'''': ''''$[img8_caption]''''}
+        ]}
+    </textarea>        
+      
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+    <script>
+      setTimeout(function() {
+        console.log(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+        var carousel = new PanelsCarousel(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+      }.bind(this), 1000);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+
+		<Style id="carousel_lightbox_h">
+			<IconStyle>
+				<scale>1.4</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-lightbox mdl-layout mdl-js-layout no-scroll">
+      <main class="ef-lightbox mdl-layout__content">
+        <div class="carousel ef-lightbox__image">
+          <div class="carousel__buttons carousel__buttons--dark">
+            <a href="#" class="carousel__buttons__button--prev mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE408;</i>
+            </a>
+            <a href="#" class="carousel__buttons__button--next mdl-button mdl-button--icon mdl-js-button">
+              <i class="carousel-button__icon material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- NOTE: textarea below uses four single-quotes in place of double quotes. They are replaced by the JS code. -->
+    <textarea class="u-hidden" id="image_carousel_json">
+        {''''images'''': [
+            {''''url'''': ''''$[img0_url]'''', ''''caption'''': ''''$[img0_caption]''''},
+            {''''url'''': ''''$[img1_url]'''', ''''caption'''': ''''$[img1_caption]''''},
+            {''''url'''': ''''$[img2_url]'''', ''''caption'''': ''''$[img2_caption]''''},
+            {''''url'''': ''''$[img3_url]'''', ''''caption'''': ''''$[img3_caption]''''},
+            {''''url'''': ''''$[img4_url]'''', ''''caption'''': ''''$[img4_caption]''''},
+            {''''url'''': ''''$[img5_url]'''', ''''caption'''': ''''$[img5_caption]''''},
+            {''''url'''': ''''$[img6_url]'''', ''''caption'''': ''''$[img6_caption]''''},
+            {''''url'''': ''''$[img7_url]'''', ''''caption'''': ''''$[img7_caption]''''},
+            {''''url'''': ''''$[img8_url]'''', ''''caption'''': ''''$[img8_caption]''''}
+        ]}
+    </textarea>        
+      
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+    <script>
+      setTimeout(function() {
+        console.log(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+        var carousel = new PanelsCarousel(document.getElementById('image_carousel_json').textContent.replace(/"/g,'\\"').replace(/''''/g,'"'));
+      }.bind(this), 1000);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+		<StyleMap id="carousel_lightbox">
+			<Pair>
+				<key>normal</key>
+				<styleUrl>#carousel_lightbox_n</styleUrl>
+			</Pair>
+			<Pair>
+				<key>highlight</key>
+				<styleUrl>#carousel_lightbox_h</styleUrl>
+			</Pair>
+		</StyleMap>			
+		<Style id="lightbox_n">
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-lightbox mdl-layout mdl-js-layout no-scroll">
+      <main class="ef-lightbox mdl-layout__content">
+        <div class="ef-lightbox__image">
+          <figure class="ef-figure ef-figure--with-fab">
+            <div class="ef-figure__img-container">
+              <img class="ef-figure__img" src="$[image_url]">
+            </div>
+            <figcaption class="ef-figure__caption">$[img_caption]</figcaption>
+          </figure>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+		<Style id="lightbox_h">
+			<IconStyle>
+				<scale>1.4</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-full-width theme-dark ef-lightbox mdl-layout mdl-js-layout no-scroll">
+      <main class="ef-lightbox mdl-layout__content">
+        <div class="ef-lightbox__image">
+          <figure class="ef-figure ef-figure--with-fab">
+            <div class="ef-figure__img-container">
+              <img class="ef-figure__img" src="$[image_url]">
+            </div>
+            <figcaption class="ef-figure__caption">$[img_caption]</figcaption>
+          </figure>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>fullscreen</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+	<StyleMap id="lightbox">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#lightBox_n</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#lightBox_h</styleUrl>
+		</Pair>
+	</StyleMap>			
+		<Style id="panel_n">
+			<IconStyle>
+				<scale>1.1</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>0</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <figure class="ef-figure ef-figure--with-fab">
+          <div class="ef-figure__img-container">
+            <img class="ef-figure__img" src="$[image_url]" alt=""> </div>
+          <a href="#$[id]_ilb;balloon" class="ef-figure__zoom">
+            <span class="ef-figure__button mdl-button mdl-button--icon mdl-js-button">
+              <i class="ef-figure__icon material-icons">&#xE5D0;</i>
+            </span>
+          </a>
+        </figure>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+		<Style id="panel_h">
+			<IconStyle>
+				<scale>1.4</scale>
+				<Icon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</Icon>
+				<hotSpot x="0.5" y="0" xunits="fraction" yunits="fraction"/>
+				<gx:scalingMode>fixedScaling</gx:scalingMode>
+			</IconStyle>
+			<LabelStyle>
+				<scale>1.1</scale>
+			</LabelStyle>
+			<BalloonStyle>
+				<text><![CDATA[<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Google Earth 480-wide panel with a YouTube video, dark theme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/tourFont.css" type="text/css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/grey_light_blue.css">
+    <link rel="stylesheet" href="https://storage.googleapis.com/geteachkml4/scripts/earthFeed0115.css" type="text/css">
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/all_js_compiled.js"></script>
+  </head>
+  <body>
+    <div class="ef-container ef-480-width theme-dark ef-panel mdl-layout mdl-js-layout">
+      <main class="ef-content mdl-layout__content">
+        <figure class="ef-figure ef-figure--with-fab">
+          <div class="ef-figure__img-container">
+            <img class="ef-figure__img" src="$[image_url]" alt=""> </div>
+          <a href="#$[id]_ilb;balloon" class="ef-figure__zoom">
+            <span class="ef-figure__button mdl-button mdl-button--icon mdl-js-button">
+              <i class="ef-figure__icon material-icons">&#xE5D0;</i>
+            </span>
+          </a>
+        </figure>
+        <a href="#$[id];flyto" class="ef-container__button ef-container__button--flyto u-button u-button--over-carousel mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect">
+          <svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M42.506 8.25c.106-.027.21-.04.312-.04.78 0 1.39.78 1.115 1.574L36.81 37.502c-.172.5-.638.802-1.125.802-.194 0-.39-.048-.576-.15L25.1 32.7l-6.967 7.028c-.68.7-2.11-.018-2.11-.993v-10.74L4.61 21.75c-.932-.52-.76-1.91.272-2.186L42.506 8.25zM19.05 27.08v7.084l21.3-22.33v-.146L19.05 27.08z"
+              fill="#FFF" fill-rule="evenodd" />
+          </svg>
+        </a>
+        <div class="ef-padding ef-padding--with-fab">
+          <h1 class="ef-content__title">$[name]</h1>
+          <h2 class="ef-content__subhead">$[snippet]</h2>
+        </div>
+        <div class="ef-padding">
+          <div class="ef-content__container">
+            <div class="ef-content__description">
+              <p>$[description]</p>
+            </div>
+          </div>
+        </div>
+        <div class="ef-footer ef-padding ef-480-width">
+          <div class="ef-footer__logo">
+            <a href="http://geteach.com/">
+              <img src="https://storage.googleapis.com/geteachkml4/geteachLogo.png" class="ef-content__logo">
+            </a>
+          </div>
+          <div class="ef-footer__pagination">
+            <a href="#$[previousSiblingId];balloonFlyto" class="ef-footer--prev-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE408;</i>
+            </a>
+            <span class="ef-footer__page">$[containerIndex] / $[containerLength]</span>
+            <a href="#$[nextSiblingId];balloonFlyto" class="ef-footer--next-button mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+              <i class="material-icons">&#xE409;</i>
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js"></script>
+    <script>
+      let remoteScript = document.createElement('script');
+      remoteScript.setAttribute("src", "https://storage.googleapis.com/geteachkml4/scripts/earthfeed008.js");
+      document.body.appendChild(remoteScript);
+    </script>
+  </body>
+</html>]]></text>
+				<bgColor>ff383226</bgColor>
+				<gx:displayMode>panel</gx:displayMode>
+			</BalloonStyle>
+			<ListStyle>
+				<ItemIcon>
+					<href>https://storage.googleapis.com/geteachkml4/scripts/redpoint.png</href>
+				</ItemIcon>
+			</ListStyle>
+		</Style>
+	<StyleMap id="panel">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#panel_n</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#panel_h</styleUrl>
+		</Pair>
+	</StyleMap>
+		<Folder>
+			<name>Start Tour</name>
+			<visibility>1</visibility>
+			<Placemark id="splash_0">
+				<name>Curated by geteach.com: Look Beyond Your Borders</name>
+				<visibility>0</visibility>
+				<snippet>Click Icon around Lat/Lng 0 0</snippet>
+				<description></description>
+				<LookAt>
+					<longitude>0</longitude>
+					<latitude>0</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>20000000</range>
+				</LookAt>
+				<styleUrl>#splash</styleUrl>
+				<ExtendedData>
+					<Data name="image_url">
+						<value>https://storage.googleapis.com/geteachkml4/splashImg2.jpg</value>
+					</Data>
+					<Data name="cta_text">
+						<value>Click to begin tour</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,img9_filename,img9_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<gx:balloonVisibility>1</gx:balloonVisibility>
+				<Point>
+					<coordinates>0,0,0</coordinates>
+				</Point>
+			</Placemark>
+		</Folder>
+		<Folder>
+			<name>Changing Earth Layers</name>
+			<Placemark id="placemark_0">
+				<name>Older, thicker Arctic sea ice declines</name>
+				<snippet>September 1984 - September 2016</snippet>
+				<description><![CDATA[
+						The area covered by Arctic sea ice at least four years old has decreased from 718,000 square miles (1,860,000 square kilometers) in September 1984 to 42,000 square miles (110,000 square kilometers) in September 2016. Ice that has built up over the years tends to be thicker and less vulnerable to melting away than newer ice. In these visualizations of data from buoys, weather stations, satellites and computer models, the age of the ice is indicated by shades ranging from blue-gray for the youngest ice to white for the oldest.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>NASA Earth Observatory.
+				]]></description>
+				<LookAt>
+					<longitude>-62.762354</longitude>
+					<latitude>83.905557</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>4987665</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_yearlySeaIceAge_4k.0000-2048x1536-80-before.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_yearlySeaIceAge_4k.2337-2048x1536-80-after.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-62.762354,83.905557,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_1">
+				<name>Shrinking glaciers in New Zealand</name>
+				<snippet>January 12, 1990 - January 29, 2017</snippet>
+				<description><![CDATA[
+New Zealand contains over 3,000 glaciers, most of which are on the South Island’s Southern Alps. The glaciers have been retreating since 1890, with short periods of small advances. In 2007, scientists at the country’s National Institute of Water and Atmospheric Research (NIWA) attributed this change primarily to global warming. Without substantial climate cooling, they said, the glaciers would not return to their previous sizes. The differences between 1990 and 2017 can be seen in this pair of images, which include the Mueller Glacier, Hooker Glacier and Tasman Glacier, New Zealand’s longest.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>1990 image - Landsat 8 satellite. 2017 image - The Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) onboard Terra satellite. Source: NASA/JPL-Caltech.				
+]]></description>
+				<LookAt>
+					<longitude>170.256882</longitude>
+					<latitude>-43.591575</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>84082.73083695647</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_PIA21509_fig1-2048x1536-80-before-v2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_PIA21509-2048x1536-80-after-v2.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>170.256882,-43.591575,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_2">
+				<name>Shrinking Mýrdalsjökull ice cap, Iceland</name>
+				<snippet>September 16, 1986 - September 20, 2014</snippet>
+				<description><![CDATA[
+More than half of Iceland's numerous ice caps and glaciers lie near or directly over volcanoes. Seen here is Mýrdalsjökull, Iceland's fourth largest ice cap, which covers the Katla volcano at the country's southern tip. In the 2014 image, the depressions at the southwest-central part of Mýrdalsjökull are ice cauldrons caused by geothermal heat from below. Along the northern part of the ice cap, ablation has exposed brown bands of ash from past eruptions. But not all of the changes are associated with volcanic activity. Most of the monitored glaciers have been shrinking since the 1990s, including Sólheimajökull (lower left), which has been retreating as much as 50 meters (164 feet) per year. A parking lot near this glacier is moved almost annually to accommodate tourists.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper onboard Landsat 5 and the Operational Land Imager onboard Landsat 8. Source: NASA Earth Observatory, using data from the U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>-19.161516</longitude>
+					<latitude>63.709541</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>156944.0164981113</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_katlaA.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_katlaB.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-19.161516,63.709541,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_3">
+				<name>Rapid forest loss in Cambodia</name>
+				<snippet>February 20, 1999 - February 5, 2017</snippet>
+				<description><![CDATA[
+According to University of Maryland researchers who used Landsat satellite data, Cambodia had the world’s most accelerated rate of deforestation between 2001 and 2014, losing 5,560 square miles (about 14,400 square kilometers) of forests during that time. The researchers attributed this rate in part to changes in global rubber prices and a surge in land-concession deals. In these images, dark green shows forests and pinkish-tan shows old, small-plot agricultural areas. In the lower left corner of the 2017 image (right), bright green landscapes peppered with darker blocks are crops, and bright green rectangles at the top left are agroforestry areas where rubber or oil palm plantations have emerged.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>First image taken by the Landsat 5 satellite. Second image by Landsat 8. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery: “Cambodia Experiences Rapid Rate of Forest Loss”; U.S. Department of the Interior / USGS and NASA.
+]]></description>
+				<LookAt>
+					<longitude>105.103007</longitude>
+					<latitude>13.098248</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>19979.78989840778</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/Cambodia_02201999_md.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/Cambodia_02052017_md.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>105.103007,13.098248,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_4">
+				<name>Baban Rafi deforestation, Niger</name>
+				<snippet>January 12, 1976 - February 2, 2007</snippet>
+				<description><![CDATA[
+Baban Rafi Forest is the most significant area of woodland in the Maradi Department of Niger, a west African country on the southern edge of the Sahara Desert. Located at the southern extreme of the Sahel, Baban Rafi has areas of both savannah and Sahelian vegetation. These pictures show the loss of a significant fraction of the natural landscape (darker green areas) of the forest to agriculture. Population in this region quadrupled during the 40 years leading up to the 2007 image, and intense demand for agricultural land has led to near-continuous use, with shortened or no fallow period to recover fertility. The remaining woodlands are overly exploited for fuelwood and non-wood forest products.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>United Nations Environment Programme (UNEP). From Africa Atlas of our Changing Environment (2008); Division of Early Warning and Assessment (DEWA), UNEP, Nairobi, Kenya.
+]]></description>
+				<LookAt>
+					<longitude>6.894441</longitude>
+					<latitude>13.305014</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>19979.78989840778</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Baban_Rafi_Forest_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Baban_Rafi_Forest_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>6.894441,13.305014,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_5">
+				<name>Deforestation in Rondonia, Brazil</name>
+				<snippet>June 24, 1984 - August 6, 2011</snippet>
+				<description><![CDATA[
+The Samuel Dam is located along the Jamari River in Rondonia, Brazil. These images show the area in 1984, shortly after construction of the hydroelectric dam began, and in 2011. The reservoir created by the dam flooded the upstream forest and displaced many people. Also evident in the images is the deforestation that has affected much of the region.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor aboard Landsat 5. Source: USGS Landsat Missions Gallery, "Samuel Dam, Rondonia, Brazil," U.S. Department of the Interior / U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>-63.479256</longitude>
+					<latitude>-8.750269</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>30000</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Samuel_Dam_Comb_2Small.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Samuel_Dam_Comb_1Small.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-63.479256,-8.750269,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_6">
+				<name>Urban expansion in Shanghai, China</name>
+				<snippet>April 23, 1984 - July 20, 2016</snippet>
+				<description><![CDATA[
+Shanghai epitomizes China’s urbanization trend over the last four decades. Its population doubled from 12 million in 1982 to 24 million in 2016. Analysis of satellite imagery found that the city’s area ballooned from 119 square miles (308 square kilometers) in 1984 to 503 square miles (1,302 square kilometers) in 2014. As concrete replaced forests and farmland during that period, creating an urban heat island effect, Shanghai saw an 81 percent increase in area affected by higher temperatures. In these images, developed areas appear gray and white; farmland and forests are green; shallow, sediment-filled water is tan.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by Landsat 5 and 8. Source: NASA Earth Observatory.
+]]></description>
+				<LookAt>
+					<longitude>121.5713634574884</longitude>
+					<latitude>31.24896274440908</latitude>
+					<altitude>0</altitude>
+					<heading>-5.523892176764219</heading>
+					<tilt>0</tilt>
+					<range>168084.5522926111</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_shanghai_tm5_1984114_2048x1536-80-before.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_shanghai_oli_2016202_2048x1536-80-after.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>121.571365,31.248964,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_7">
+				<name>Urban expansion in New Delhi, India</name>
+				<snippet>March 14, 1991 - March 2, 2016</snippet>
+				<description><![CDATA[
+Between the times these two images were taken, the population of India’s capital and its suburbs (known collectively as “Delhi”) ballooned from 9.4 million to 25 million. It is now second in population only to Tokyo, which has 38 million people. The United Nations Report on World Urbanization projects that Delhi will have 37 million residents by 2030.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper on board Landsat 5 and the Operational Land Imager onboard Landsat 8. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery; “New Delhi Among Fastest Growing Urban Areas in the World;” U.S. Department of the Interior / USGS and NASA.
+]]></description>
+				<LookAt>
+					<longitude>77.19951210738284</longitude>
+					<latitude>28.60531987075976</latitude>
+					<altitude>0</altitude>
+					<heading>-5.528720134078657</heading>
+					<tilt>0</tilt>
+					<range>63811.54320703876</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_new-delhi-expansion-before-2048x1536-60.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_new-delhi-expansion-after-2048x1536-60.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>77.209591,28.616046,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_8">
+				<name>Binhai New Area growth, China</name>
+				<snippet>July 30, 1992 - April 8, 2012</snippet>
+				<description><![CDATA[
+The Binhai New Area — once home to salt farms, reed marshes and wasteland — has grown into one of China's key economic hubs. Since development began in the 1990s, it has become the home of numerous aerospace, oil, chemical and other manufacturing industries. Plans for coming years include an international airport. The changes over 20 years can be seen in these images acquired in 1992 and 2012. The Binhai New Area is located on the coast of the Bohai Sea Region southeast of China's capital city, Beijing.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>1992 image taken by the Thematic Mapper sensor onboard Landsat 5. 2012 image taken by the Enhanced Thematic Mapper Plus sensor onboard Landsat 7. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery, "Binhai New Area, China," U.S. Department of the Interior / USGS.
+]]></description>
+				<LookAt>
+					<longitude>117.8115438451957</longitude>
+					<latitude>39.00462210658036</latitude>
+					<altitude>0</altitude>
+					<heading>-5.470486970364197</heading>
+					<tilt>0</tilt>
+					<range>133780.579746587</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Binhai_China_Comb_2Small.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Binhai_China_Comb_1Small.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>117.719010,38.994932,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_9">
+				<name>Urban growth in Manila, Philippines</name>
+				<snippet>January 25, 1989 - April 14, 2012</snippet>
+				<description><![CDATA[
+The Philippine capital of Manila is the most densely populated city in the world, with more than 1.6 million inhabitants in 14.8 square miles (38.5 square kilometers). The greater metro area covers 246 square miles (638 square kilometers) and hosts a population of over 11 million. These satellite images illustrate how much the city has expanded in little more than two decades, bringing significant infrastructure and environmental problems. The Pasig River, which cuts through the urban area, is one of the most polluted rivers in the world.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor onboard Landsat 4 and the Enhanced Thematic Mapper Plus sensor onboard Landsat 7. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery, "Manila, Philippines," U.S. Department of the Interior / USGS and NASA.
+]]></description>
+				<LookAt>
+					<longitude>121.0057471256891</longitude>
+					<latitude>14.5927463232017</latitude>
+					<altitude>0</altitude>
+					<heading>-5.465061796926352</heading>
+					<tilt>0</tilt>
+					<range>76406.15037084269</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Urbangrowth_Philippines-A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Urbangrowth_Philippines-B.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>120.984219,14.599512,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_10">
+				<name>Urban growth, San Antonio, Texas</name>
+				<snippet>June 16, 1991 - June 4, 2010</snippet>
+				<description><![CDATA[
+San Antonio has grown faster during the last two decades than all but three other cities in the U.S., nearly doubling from 790,000 people in 1991 to 1.4 million in 2010. Under state law, which allows the city to direct growth and zoning in much of the surrounding unincorporated land, San Antonio has opposed the creation of other nearby municipalities and has preserved agricultural production areas. A series of military bases and airfields, which ring the larger community, have also contributed to the city's growth.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor aboard Landsat 5. Source: USGS Landsat Missions Gallery, "San Antonio, Texas 1991-2010," U.S. Department of the Interior / U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>-98.493428</longitude>
+					<latitude>29.430333</latitude>
+					<altitude>0</altitude>
+					<heading>-5.465061796926352</heading>
+					<tilt>0</tilt>
+					<range>76406.15037084269</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_San_Antonio_Comb_2Small.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_San_Antonio_Comb_1Small.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-98.493428,29.430333,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_11">
+				<name>Three Gorges Dam brings power, concerns to central China</name>
+				<snippet>September 24, 1993 - August 22, 2016</snippet>
+				<description><![CDATA[
+China’s Three Gorges Dam on the Yangtze River became the world’s largest hydroelectric power plant upon its completion in 2012. It has also eased flooding and river navigation and provided water for irrigation. However, construction forced some 1.2 million people to relocate and, according to a 2010 study, triggered about 3,400 earthquakes and numerous landslides from mid-2003 through 2009. Changes in river flow have raised concerns about silt accumulation and biodiversity loss. Important archeological sites and ancient monuments were reportedly inundated as the reservoir filled. Forested areas appear red in these images to represent measurements by infrared sensors.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>1993 image: Landsat 5. 2016 image: Landsat 8. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery; U.S. Department of the Interior / USGS and NASA.
+]]></description>
+				<LookAt>
+					<longitude>111.0022774869442</longitude>
+					<latitude>30.83596529732169</latitude>
+					<altitude>0</altitude>
+					<heading>-5.459905430391144</heading>
+					<tilt>0</tilt>
+					<range>96018.54635352611</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Three_Gorges_Dam_LT5_09241993-2048px-90-before.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Three_Gorges_Dam_L8_08222016-2048px-95-after.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>110.992218,30.836697,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_12">
+				<name>Drying Lake Poopó, Bolivia</name>
+				<snippet>April 12, 2013 - January 15, 2016</snippet>
+				<description><![CDATA[
+Lake Poopó, Bolivia’s second-largest lake and an important fishing resource for local communities, has dried up once again because of drought and diversion of water sources for mining and agriculture. The last time it dried was in 1994, after which it took several years for water to return and even longer for ecosystems to recover. In wet times, the lake has spanned an area approaching 1,200 square miles (3,000 square kilometers). Its shallow depth—typically no more than 9 feet (3 meters)—makes it particularly vulnerable to fluctuations.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Operational Land Imager onboard Landsat 8. Source: NASA Earth Observatory.
+]]></description>
+				<LookAt>
+					<longitude>-67.01570447504194</longitude>
+					<latitude>-18.73881066496866</latitude>
+					<altitude>0</altitude>
+					<heading>-5.46979954966887</heading>
+					<tilt>0</tilt>
+					<range>199134.5698123393</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_lake-poopo-before-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_lake-poopo-after-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-67.046459,-18.794243,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_13">
+				<name>Shrinking Aral Sea, central Asia</name>
+				<snippet>August 25, 2000 - August 19, 2014</snippet>
+				<description><![CDATA[
+The Aral Sea was the fourth largest lake in the world until the 1960s, when the Soviet Union diverted water from the rivers that fed the lake so cotton and other crops could be grown in the arid plains of Kazakhstan, Uzbekistan and Turkmenistan. The black outline shows the approximate coastline of the lake in 1960. By the time of the 2000 image, the Northern Aral Sea had separated from the Southern Aral Sea, which itself had split into eastern and western lobes. A dam built in 2005 helped the northern sea recover much of its water level at the expense of the southern sea. Dry conditions in 2014 caused the southern sea’s eastern lobe to dry up completely for the first time in modern times. The loss of the moderating influence of such a large body of water has made the region’s winters colder and summers hotter and drier.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Moderate Resolution imaging Spectroradiometer (MODIS) onboard NASA’s Terra satellite. Source: NASA’s Earth Observatory
+]]></description>
+				<LookAt>
+					<longitude>59.65258342556247</longitude>
+					<latitude>45.24304850485822</latitude>
+					<altitude>0</altitude>
+					<heading>-5.292660243592672</heading>
+					<tilt>0</tilt>
+					<range>730648.545328591</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_1_Aral_Sea_A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Aral_Sea_B.jpeg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>59.402167,45.066330,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_14">
+				<name>Drought in Lake Powell, Arizona and Utah</name>
+				<snippet>March 25, 1999 - May 13, 2014</snippet>
+				<description><![CDATA[
+Prolonged drought coupled with water withdrawals have caused a dramatic drop in Lake Powell's water level. These images show the northern part of the lake, which is actually a deep, narrow, meandering reservoir that extends from Arizona upstream into southern Utah. The 1999 image shows water levels near full capacity. By May 2014, the lake had dropped to 42 percent of capacity.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Landsat series of satellites. Source: NASA's Earth Observatory
+]]></description>
+				<LookAt>
+					<longitude>-110.3853921515249</longitude>
+					<latitude>37.8675648751378</latitude>
+					<altitude>0</altitude>
+					<heading>-5.278526646482582</heading>
+					<tilt>0</tilt>
+					<range>36702.31689425236</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_lakepowell_A.jpeg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_lakepowell_B.jpeg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-110.408421,37.876357,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_15">
+				<name>Agricultural impact in Aimogasta, Argentina</name>
+				<snippet>June 18, 1975 - March 15, 2008</snippet>
+				<description><![CDATA[
+Aimogasta is a regional center of olive production, trade and tourism. Expansion of the agricultural frontier in this region has led to increased wind and water erosion, salinization, and loss of biodiversity. In the 2008 image, cultivated fields that did not exist in 1975 are visible around Aimogasta, Villa Mazán and El Pajonal (seen as green areas with regular geometric patterns).<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>United Nations Environment Programme (UNEP). From Latin America and the Caribbean Atlas of our Changing Environment (2010).
+]]></description>
+				<LookAt>
+					<longitude>-66.55611602149985</longitude>
+					<latitude>-28.56367874864712</latitude>
+					<altitude>0</altitude>
+					<heading>-5.432525164484929</heading>
+					<tilt>0</tilt>
+					<range>129086.8931131589</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Aimogasta_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Aimogasta_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-66.554212,-28.595158,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_16">
+				<name>Balbina Dam impact, Brazil</name>
+				<snippet>June 1, 1984 / September 1, 1985 - February 18 / August 4, 2007</snippet>
+				<description><![CDATA[
+The Balbina hydroelectric plant, on the Uatumâ River in Amazon State, occupies about a third of the Waimiri-Atroari indigenous territory. The dam's reservoir covers 2,360 square kilometers (911 square miles). More than 100,000 million metric tons of vegetation were flooded to build the dam. It was designed to produce up to 250 megawatts to supply the energy demand of the city of Manaus, but a study shows that it generates less than half that amount.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>United Nations Environment Programme (UNEP). From Latin America and the Caribbean Atlas of our Changing Environment (2010).
+]]></description>
+				<LookAt>
+					<longitude>-59.84511666903715</longitude>
+					<latitude>-1.517279283105568</latitude>
+					<altitude>0</altitude>
+					<heading>-5.421933859170887</heading>
+					<tilt>0</tilt>
+					<range>192782.6193789041</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Balbina_Brazil_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Balbina_Brazil_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-59.483578 ,-1.881148,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_17">
+				<name>Lake Mead shrinkage, Nevada</name>
+				<snippet>December 12, 1982 - August 11, 2010</snippet>
+				<description><![CDATA[
+Lake Mead is one of the largest reservoirs in the world, supplying water to California, Arizona, Nevada and Mexico, including the water-guzzling Las Vegas. Through dam turbines, the lake also provides power to Nevada, southern California and northern Mexico. Since 2000, the water level has been dropping at a fairly steady rate due to lower-than-average snowfall and over a decade of drought, and as of July 2010, the lake was at 38 percent of its capacity. Water supply has been further diminished by the drawing off of water from upstream reservoirs in the upper Colorado River Basin which, historically, has been the source for the Lake Mead Reservoir.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor onboard Landsat 5. Source: U.S. Geological Source: Survey (USGS) Landsat Missions Gallery, "Lake Mead, Nevada," U.S. Department of the Interior / USGS.
+]]></description>
+				<LookAt>
+					<longitude>-114.911241</longitude>
+					<latitude>36.112772</latitude>
+					<altitude>0</altitude>
+					<heading>-5.421933859170887</heading>
+					<tilt>0</tilt>
+					<range>192782.6193789041</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Lake_Mead_A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Lake_Mead_B.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-114.911241,36.112772,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_18">
+				<name>Yacyreta Dam impact, Paraguay</name>
+				<snippet>May 25, 1985 - June 7, 2010</snippet>
+				<description><![CDATA[
+First image May 25, 1985. Second Image June 7, 2010. The Paraguay-Parana River system is the second largest river system in South America — second only to the Amazon. More than 100 million people and some of the rarest species on Earth depend on its waters for survival. The 1985 image shows a section of the river system shortly after construction began on the Yacyreta Dam, a joint hydroelectric project between Paraguay and Argentina. River levels rose dramatically upon completion of the dam, initially displacing 15,000 residents and endangering the homes of 800,000 more. Flooded lands included the habitats of jaguars, giant river otters, maned wolves, giant anteaters, 650 species of birds and more than 10,000 species of plants.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor onboard Landsat 5 and the Enhanced Thematic Mapper Plus onboard Landsat 7. Source: USGS Landsat Missions Gallery, "Parana River Diversion," U.S. Department of the Interior / U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>-56.46247961262612</longitude>
+					<latitude>-27.45336951379602</latitude>
+					<altitude>0</altitude>
+					<heading>-5.610368684244374</heading>
+					<tilt>0</tilt>
+					<range>192769.6287812435</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Parana_River_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Parana_River_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-56.868557,-27.540719,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_19">
+				<name>Open-pit coal mine growth in Powder River Basin, Wyoming</name>
+				<snippet>June 29, 1984 - June 21, 2016</snippet>
+				<description><![CDATA[
+Wyoming’s Powder River Basin hosts the North Antelope Rochelle Complex—largest coal mine in the U.S.—and the Black Thunder Mine. Together, they produced 22 percent of the U.S. coal supply in 2014. These images show the landscape’s change from predominantly agricultural use to open-pit mining. USGS officials estimate that these mines have less than 20 years of economically recoverable coal remaining, after which the companies will be required to reclaim the land.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper onboard Landsat 5 and the Operational Land Imager onboard Landsat 8. Source: U.S. Geological Survey (USGS) Landsat Missions Gallery; “Landsat Reveals Industrial Growth in Powder River Basin”; U.S. Department of the Interior / USGS and NASA.
+]]></description>
+				<LookAt>
+					<longitude>-105.2748008472897</longitude>
+					<latitude>43.64336579727096</latitude>
+					<altitude>0</altitude>
+					<heading>-5.611882139401407</heading>
+					<tilt>0</tilt>
+					<range>48134.9174168273</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_wyoming-coal-mines-before-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_wyoming-coal-mines-after-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-105.272611,43.672203,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_20">
+				<name>Mining impact in Mangystau Province, Kazakhstan</name>
+				<snippet>August 6, 1987 - July 23, 2011</snippet>
+				<description><![CDATA[
+The landscape of Kazakhstan's Mangystau Province, near the Caspian Sea, has changed since oil and gas deposits in the region began to be exploited in the early 1990s. The 2011 image shows production facilities in the desert with settlements built around them. Increased fossil fuel production in this area has raised concerns about the quality and availability of freshwater needed for rural development and public health.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor onboard Landsat 5. Source: USGS Landsat Missions Gallery, "Expanding Oil Production in Mangystau Province, Kazakhstan," U.S. Department of the Interior / U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>51.70930839718547</longitude>
+					<latitude>45.12207839657507</latitude>
+					<altitude>0</altitude>
+					<heading>-7.335354998064066</heading>
+					<tilt>6.230129901248763</tilt>
+					<range>46502.03386256186</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Mangystau_Oil_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Mangystau_Oil_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>51.744284,45.140317,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_21">
+				<name>Surface mining expansion, West Virginia</name>
+				<snippet>June 6, 1987 - June 8, 2011</snippet>
+				<description><![CDATA[
+More than half of the U.S.' electrical power comes from coal burning and a large percentage of that coal comes from West Virginia. Of the nearly 150 million tons of coal extracted each year from the state's mines, an increasing amount (60 million tons in 2009) comes from surface mining and mountaintop removal. Mountaintop removal can have serious impacts on the health of local people — through the pollution of groundwater by mine runoff and exposure to airborne toxins and dust — and on the environment — through permanent loss of critical ecosystems, destruction of forests and loss of streams. Scientific evidence suggests that these impacts are pervasive and irreversible and that efforts to reclaim the disturbed land can't make up for the impacts felt by the mining process.<br><br>Content Source:<a href="https://climate.nasa.gov/images-of-change" target="_blank"> NASA's Images of Change</a><br><br>Images taken by the Thematic Mapper sensor onboard Landsat 5. Source: USGS Landsat Missions Gallery, "West Virginia Surface Mining," U.S. Department of the Interior / U.S. Geological Survey.
+]]></description>
+				<LookAt>
+					<longitude>-81.00715004912877</longitude>
+					<latitude>38.34259199720574</latitude>
+					<altitude>0</altitude>
+					<heading>-7.333783584053012</heading>
+					<tilt>6.445173863974351</tilt>
+					<range>19277.90942393377</range>
+				</LookAt>
+				<styleUrl>#carousel</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_West_Virginia_Comb_2Small.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_West_Virginia_Comb_1Small.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>&amp;nbsp;</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-81.009710,38.342744,0</coordinates>
+				</Point>
+			</Placemark>			
+		</Folder>
+		<Folder>
+			<name>Image_Lightboxes</name>
+			<visibility>0</visibility>
+			<Placemark id="placemark_0_ilb">
+				<name>Older, thicker Arctic sea ice declines</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>24.5727616973939</longitude>
+					<latitude>-17.87160112241117</latitude>
+					<altitude>938.73</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>4987665</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_yearlySeaIceAge_4k.0000-2048x1536-80-before.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>September 1984</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_yearlySeaIceAge_4k.2337-2048x1536-80-after.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>September 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-62.762354,83.905557,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_1_ilb">
+				<name>Shrinking glaciers in New Zealand</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>170.256882</longitude>
+					<latitude>-43.591575</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>84082.73083695647</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_PIA21509_fig1-2048x1536-80-before-v2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>January 12, 1990</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_PIA21509-2048x1536-80-after-v2.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>January 29, 2017</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>170.256882,-43.591575,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_2_ilb">
+				<name>Shrinking Mýrdalsjökull ice cap, Iceland</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-19.161516</longitude>
+					<latitude>63.709541</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>156944.0164981113</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_katlaASmall.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>September 16, 1986</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_katlaBSmall.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>September 20, 2014</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-19.161516,63.709541,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_3_ilb">
+				<name>Rapid forest loss in Cambodia</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>105.103007</longitude>
+					<latitude>13.098248</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>19979.78989840778</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/Cambodia_02201999_md.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>February 20, 1999</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/Cambodia_02052017_md.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>February 5, 2017</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>105.103007,13.098248,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_4_ilb">
+				<name>Baban Rafi deforestation, Niger</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>6.894441</longitude>
+					<latitude>13.305014</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>19979.78989840778</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Baban_Rafi_Forest_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>January 12, 1976</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Baban_Rafi_Forest_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>February 2, 2007</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>6.894441,13.305014,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_5_ilb">
+				<name>Deforestation in Rondonia, Brazil</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-63.479256</longitude>
+					<latitude>-8.750269</latitude>
+					<altitude>0</altitude>
+					<heading>0</heading>
+					<tilt>0</tilt>
+					<range>30000</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Samuel_Dam_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 24, 1984</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Samuel_Dam_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>August 6, 2011</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-63.479256,-8.750269,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_6_ilb">
+				<name>Urban expansion in Shanghai, China</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>121.5713634574884</longitude>
+					<latitude>31.24896274440908</latitude>
+					<altitude>0</altitude>
+					<heading>-5.523892176764219</heading>
+					<tilt>0</tilt>
+					<range>168084.5522926111</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_shanghai_tm5_1984114_2048x1536-80-before.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>April 23, 1984</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_shanghai_oli_2016202_2048x1536-80-after.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>July 20, 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>121.571365,31.248964,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_7_ilb">
+				<name>Urban expansion in New Delhi, India</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>77.19951210738284</longitude>
+					<latitude>28.60531987075976</latitude>
+					<altitude>0</altitude>
+					<heading>-5.528720134078657</heading>
+					<tilt>0</tilt>
+					<range>63811.54320703876</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_new-delhi-expansion-before-2048x1536-60.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>March 14, 1991</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_new-delhi-expansion-after-2048x1536-60.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>March 2, 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>77.209591,28.616046,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_8_ilb">
+				<name>Binhai New Area growth, China</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>117.8115438451957</longitude>
+					<latitude>39.00462210658036</latitude>
+					<altitude>0</altitude>
+					<heading>-5.470486970364197</heading>
+					<tilt>0</tilt>
+					<range>133780.579746587</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Binhai_China_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>July 30, 1992</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Binhai_China_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>April 8, 2012</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>117.719010,38.994932,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_9_ilb">
+				<name>Urban growth in Manila, Philippines</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>121.0057471256891</longitude>
+					<latitude>14.5927463232017</latitude>
+					<altitude>0</altitude>
+					<heading>-5.465061796926352</heading>
+					<tilt>0</tilt>
+					<range>76406.15037084269</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Urbangrowth_Philippines-A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>January 25, 1989</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Urbangrowth_Philippines-B.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>April 14, 2012</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>120.984219,14.599512,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_10_ilb">
+				<name>Urban growth, San Antonio, Texas</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-98.493428</longitude>
+					<latitude>29.430333</latitude>
+					<altitude>0</altitude>
+					<heading>-5.465061796926352</heading>
+					<tilt>0</tilt>
+					<range>76406.15037084269</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_San_Antonio_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 16, 1991</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_San_Antonio_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>June 4, 2010</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-98.493428,29.430333,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_11_ilb">
+				<name>Three Gorges Dam brings power, concerns to central China</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>111.0022774869442</longitude>
+					<latitude>30.83596529732169</latitude>
+					<altitude>0</altitude>
+					<heading>-5.459905430391144</heading>
+					<tilt>0</tilt>
+					<range>96018.54635352611</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Three_Gorges_Dam_LT5_09241993-2048px-90-beforeSmall.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>September 24, 1993</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Three_Gorges_Dam_L8_08222016-2048px-95-afterSmall.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>August 22, 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>110.992218,30.836697,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_12_ilb">
+				<name>Drying Lake Poopó, Bolivia</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-67.01570447504194</longitude>
+					<latitude>-18.73881066496866</latitude>
+					<altitude>0</altitude>
+					<heading>-5.46979954966887</heading>
+					<tilt>0</tilt>
+					<range>199134.5698123393</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_lake-poopo-before-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>April 12, 2013</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_lake-poopo-after-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>January 15, 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-67.046459,-18.794243,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_13_ilb">
+				<name>Shrinking Aral Sea, central Asia</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>59.65258342556247</longitude>
+					<latitude>45.24304850485822</latitude>
+					<altitude>0</altitude>
+					<heading>-5.292660243592672</heading>
+					<tilt>0</tilt>
+					<range>730648.545328591</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_1_Aral_Sea_A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>August 25, 2000</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Aral_Sea_BSmall.jpeg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>August 19, 2014</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>59.402167,45.066330,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_14_ilb">
+				<name>Drought in Lake Powell, Arizona and Utah</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-110.3853921515249</longitude>
+					<latitude>37.8675648751378</latitude>
+					<altitude>0</altitude>
+					<heading>-5.278526646482582</heading>
+					<tilt>0</tilt>
+					<range>36702.31689425236</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_lakepowell_ASmall.jpeg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>March 25, 1999</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_lakepowell_BSmall.jpeg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>May 13, 2014</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-110.408421,37.876357,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_15_ilb">
+				<name>Agricultural impact in Aimogasta, Argentina</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-66.55611602149985</longitude>
+					<latitude>-28.56367874864712</latitude>
+					<altitude>0</altitude>
+					<heading>-5.432525164484929</heading>
+					<tilt>0</tilt>
+					<range>129086.8931131589</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Aimogasta_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 18, 1975</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Aimogasta_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>March 15, 2008</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-66.554212,-28.595158,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_16_ilb">
+				<name>Balbina Dam impact, Brazil</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-59.84511666903715</longitude>
+					<latitude>-1.517279283105568</latitude>
+					<altitude>0</altitude>
+					<heading>-5.421933859170887</heading>
+					<tilt>0</tilt>
+					<range>192782.6193789041</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Balbina_Brazil_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 1, 1984 / September 1, 1985</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Balbina_Brazil_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>February 18 / August 4, 2007</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-59.483578 ,-1.881148,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_17_ilb">
+				<name>Lake Mead shrinkage, Nevada</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-114.911241</longitude>
+					<latitude>36.112772</latitude>
+					<altitude>0</altitude>
+					<heading>-5.421933859170887</heading>
+					<tilt>0</tilt>
+					<range>192782.6193789041</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Lake_Mead_A.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>December 12, 1982</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Lake_Mead_B.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>August 11, 2010</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-114.911241,36.112772,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_18_ilb">
+				<name>Yacyreta Dam impact, Paraguay</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-56.46247961262612</longitude>
+					<latitude>-27.45336951379602</latitude>
+					<altitude>0</altitude>
+					<heading>-5.610368684244374</heading>
+					<tilt>0</tilt>
+					<range>192769.6287812435</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Parana_River_Comb_2Small.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>May 25, 1985</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Parana_River_Comb_1Small.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>June 7, 2010</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-56.868557,-27.540719,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_19_ilb">
+				<name>Open-pit coal mine growth in Powder River Basin, Wyoming</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-105.2748008472897</longitude>
+					<latitude>43.64336579727096</latitude>
+					<altitude>0</altitude>
+					<heading>-5.611882139401407</heading>
+					<tilt>0</tilt>
+					<range>48134.9174168273</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_wyoming-coal-mines-before-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 29, 1984</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_wyoming-coal-mines-after-2048x1536-80.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>June 21, 2016</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-105.272611,43.672203,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_20_ilb">
+				<name>Mining impact in Mangystau Province, Kazakhstan</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>51.70930839718547</longitude>
+					<latitude>45.12207839657507</latitude>
+					<altitude>0</altitude>
+					<heading>-7.335354998064066</heading>
+					<tilt>6.230129901248763</tilt>
+					<range>46502.03386256186</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_Mangystau_Oil_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>August 6, 1987</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_Mangystau_Oil_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>July 23, 2011</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>51.744284,45.140317,0</coordinates>
+				</Point>
+			</Placemark>
+			<Placemark id="placemark_21_ilb">
+				<name>Surface mining expansion, West Virginia</name>
+				<visibility>0</visibility>
+				<snippet></snippet>
+				<LookAt>
+					<longitude>-81.00715004912877</longitude>
+					<latitude>38.34259199720574</latitude>
+					<altitude>0</altitude>
+					<heading>-7.333783584053012</heading>
+					<tilt>6.445173863974351</tilt>
+					<range>19277.90942393377</range>
+				</LookAt>
+				<styleUrl>#carousel_lightbox</styleUrl>
+				<ExtendedData>
+					<Data name="img0_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/1_West_Virginia_Comb_2.jpg</value>
+					</Data>
+					<Data name="img0_caption">
+						<value>June 6, 1987</value>
+					</Data>
+					<Data name="img1_url">
+						<value>https://storage.googleapis.com/geteachchangeearth/2_West_Virginia_Comb_1.jpg</value>
+					</Data>
+					<Data name="img1_caption">
+						<value>June 8, 2011</value>
+					</Data>
+					<Data name="NO_TRANSLATE_FIELDS">
+						<value>logo_url,img_filename,image_url,img0_filename,img0_url,img1_filename,img1_url,img2_filename,img2_url,img3_filename,img3_url,img4_filename,img4_url,img5_filename,img5_url,img6_filename,img6_url,img7_filename,img7_url,img8_filename,img8_url,video_id,cta_link,image_url, logo_url, video_url, video_id, img_url</value>
+					</Data>
+				</ExtendedData>
+				<Point>
+					<coordinates>-81.009710,38.342744,0</coordinates>
+				</Point>
+			</Placemark>				
+		</Folder>
+	</Document>	
+	</Document>
+	</kml>

@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao

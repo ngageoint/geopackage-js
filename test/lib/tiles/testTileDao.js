@@ -1,8 +1,12 @@
+
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var TileDao = require('../../../lib/tiles/user/tileDao').TileDao
   // , testSetup = require('../../fixtures/testSetup')
   , should = require('chai').should()
+  , path = require('path');
+
+var should = require('chai').should()
   , path = require('path');
 
 describe('TileDao tests', function() {

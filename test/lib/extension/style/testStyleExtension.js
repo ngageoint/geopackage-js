@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {FeatureStyleExtension} from '../../../../lib/extension/style'
 

@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var UserTableReader = require('../../../lib/user/userTableReader').UserTableReader

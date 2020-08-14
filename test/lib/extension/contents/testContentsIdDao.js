@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {ContentsDao} from '../../../../lib/core/contents/contentsDao'
 

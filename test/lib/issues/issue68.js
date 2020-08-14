@@ -4,6 +4,8 @@ var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackage
 
 var path = require('path')
   , should = require('chai').should();
+var path = require('path')
+  , should = require('chai').should();
 
 describe('Tests for issue 68', function() {
 

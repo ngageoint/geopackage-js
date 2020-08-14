@@ -9,6 +9,8 @@ var BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   , should = require('chai').should()
   , path = require('path');
 
+var path = require('path');
+
 describe('RTree tests', function() {
 
   describe('Test Existing RTree', function() {
