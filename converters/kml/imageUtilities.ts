@@ -95,9 +95,23 @@ export class ImageUtilities {
   public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp> {
     let imageLocation;
     if (isNode) {
-      imageLocation = uri.startsWith('http') ? uri : path.join(dir, uri);
+      // imageLocation = uri.startsWith('http') ? uri : path.join(dir, uri);
+      if (uri.startsWith('https://')){
+        imageLocation = uri;
+      } else if (uri.startsWith('http://')) {
+        imageLocation = uri.replace('http://','https://');
+      } else {
+        path.join(dir, uri);
+      }
     } else if (isBrowser) {
-      imageLocation = uri.startsWith('http') ? uri : Buffer.from(zipMap.get(uri), 'base64');
+      // imageLocation = uri.startsWith('http') ? uri : Buffer.from(zipMap.get(uri), 'base64');
+      if (uri.startsWith('https://')){
+        imageLocation = uri;
+      } else if (uri.startsWith('http://')) {
+        imageLocation = uri.replace('http://','https://');
+      } else {
+        imageLocation = Buffer.from(zipMap.get(uri), 'base64');
+      }
     }
     // Reads in Image (stored as bitmap)
     const img = await Jimp.read(imageLocation).catch(err => {
