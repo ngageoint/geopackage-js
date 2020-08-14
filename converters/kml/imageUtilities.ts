@@ -92,14 +92,14 @@ export class ImageUtilities {
    * @returns {Promise<Jimp>} Return a promise of a JIMP image
    * @memberof ImageUtilities
    */
-  public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp> {
+  public static async getJimpImage(uri: string, dir?: string, zipMap?: Map<string, any>): Promise<Jimp|void> {
     let imageLocation;
     if (isNode) {
       // imageLocation = uri.startsWith('http') ? uri : path.join(dir, uri);
       if (uri.startsWith('https://')){
         imageLocation = uri;
       } else if (uri.startsWith('http://')) {
-        imageLocation = uri.replace('http://','https://');
+        imageLocation = uri;
       } else {
         path.join(dir, uri);
       }
@@ -108,17 +108,42 @@ export class ImageUtilities {
       if (uri.startsWith('https://')){
         imageLocation = uri;
       } else if (uri.startsWith('http://')) {
-        imageLocation = uri.replace('http://','https://');
+        imageLocation = uri;
       } else {
         imageLocation = Buffer.from(zipMap.get(uri), 'base64');
       }
     }
+    let image: void | Jimp;
     // Reads in Image (stored as bitmap)
-    const img = await Jimp.read(imageLocation).catch(err => {
-      console.error('Image not founding', err);
-      throw err;
-    });
-    return img;
+    // Handles issue with HTTP vs HTTPS
+    try {
+      image = await Jimp.read(imageLocation).then(img=>{
+        return img
+      }).catch(err => {
+        console.error('Image not found', err);
+      });
+    } catch (err) {
+      try{
+        if (uri.startsWith('http://')) {
+          imageLocation = uri.replace('http://', 'https://');
+          image = await Jimp.read(imageLocation).then(img=>{
+            return img
+          }).catch(err => {
+            console.error('Image not found', err);
+          });
+        } else if (uri.startsWith('https://')) {
+          imageLocation = uri.replace('https://', 'http://');
+          image = await Jimp.read(imageLocation).then(img=>{
+            return img
+          }).catch(err => {
+            console.error('Image not found', err);
+          });
+        }
+      } catch(err) {
+        return;
+      }
+    }
+    return image;
   }
 
   /**
