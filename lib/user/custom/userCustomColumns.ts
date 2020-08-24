@@ -47,21 +47,21 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
 
     if (!this.isCustom() && this.requiredColumns !== null && this.requiredColumns.length !== 0) {
       let search = new Set<string>(this.requiredColumns);
-      let found = new Map<string, number>();
+      let found = {};
       // Find the required columns
       this.getColumns().forEach(column => {
         let columnName = column.getName();
         let columnIndex = column.getIndex();
         if (search.has(columnName)) {
-          let previousIndex = found.get(columnName);
+          let previousIndex = found[columnName];
           this.duplicateCheck(columnIndex, previousIndex, columnName);
-          found.set(columnName, columnIndex);
+          found[columnName] = columnIndex;
         }
       });
 
       // Verify the required columns were found
       search.forEach(requiredColumn => {
-        this.missingCheck(found.get(requiredColumn), requiredColumn);
+        this.missingCheck(found[requiredColumn], requiredColumn);
       });
     }
   }

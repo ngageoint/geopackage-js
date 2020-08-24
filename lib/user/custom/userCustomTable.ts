@@ -40,13 +40,6 @@ export class UserCustomTable extends UserTable<UserCustomColumn> {
   }
 
   /**
-   * {@inheritDoc}
-   */
-  createUserColumns(columns: UserCustomColumn[]): UserCustomColumns {
-    return new UserCustomColumns(this.getTableName(), columns, this.getRequiredColumns(), true);
-  }
-
-  /**
    * Get the required columns
    *
    * @return required columns

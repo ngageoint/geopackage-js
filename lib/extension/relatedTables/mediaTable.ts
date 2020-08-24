@@ -96,7 +96,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createIdColumn(index: number, idColumnName: string): UserColumn {
-    return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
+    return UserColumn.createPrimaryKeyColumn(index, idColumnName);
   }
   /**
    * Create the data column

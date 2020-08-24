@@ -540,7 +540,7 @@ export class GeoPackage {
     let attributeColumns: AttributesColumn[] = [];
     let columnNumber = 0;
     let dataColumns = [];
-    attributeColumns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+    attributeColumns.push(UserColumn.createPrimaryKeyColumn(columnNumber++, 'id'));
     for (let i = 0; i < properties.length; i++) {
       const property = properties[i] as {
         name: string;
@@ -585,7 +585,7 @@ export class GeoPackage {
 
     // Check for primary key field
     if (additionalColumns.findIndex(c => c.isPrimaryKey()) === -1) {
-      columns.push(AttributesColumn.createPrimaryKeyColumnWithIndexAndName(AttributesColumn.NO_INDEX, 'id'))
+      columns.push(AttributesColumn.createPrimaryKeyColumn(AttributesColumn.NO_INDEX, 'id'))
     }
 
     additionalColumns.forEach(c => {
@@ -847,7 +847,7 @@ export class GeoPackage {
 
     const columns: UserColumn[] = [];
     let columnNumber = 0;
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(columnNumber++, 'id'));
     columns.push(
       FeatureColumn.createGeometryColumn(
         columnNumber++,
@@ -892,7 +892,7 @@ export class GeoPackage {
       columns = featureColumns as FeatureColumn[];
     } else {
       let columnNumber = 0;
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(columnNumber++, 'id'));
       columns.push(FeatureColumn.createGeometryColumn(columnNumber++, geometryColumn.column_name, GeometryType.GEOMETRY, false, null));
 
       for (let i = 0; featureColumns && i < featureColumns.length; i++) {
@@ -2226,7 +2226,7 @@ export class GeoPackage {
    */
   copyTable (tableName, newTableName, transferContent, extensions) {
     const dataType = this.getTableDataType(tableName);
-    if (dataType != null) {
+    if (dataType !== null && dataType !== undefined) {
       switch (dataType) {
         case ContentsDataType.ATTRIBUTES:
           this.copyAttributeTable(tableName, newTableName, transferContent);

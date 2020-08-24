@@ -3,7 +3,7 @@ import { UserColumn } from './userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { Constraint } from '../db/table/constraint';
 import { ConstraintType } from '../db/table/constraintType';
-import {Contents} from '../core/contents/contents';
+import { Contents } from '../core/contents/contents';
 import { UserColumns } from './userColumns';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
@@ -15,8 +15,15 @@ import { UserColumns } from './userColumns';
  * @param  {string[]} [requiredColumns] required columns
  */
 export class UserTable<TColumn extends UserColumn> {
-  public static readonly FEATURE_TABLE = 'FEATURE';
-  public static readonly TILE_TABLE = 'TILE';
+  /**
+   * Default id autoincrement setting
+   */
+  static DEFAULT_AUTOINCREMENT: boolean = true;
+
+  /**
+   * Default primary key not null setting
+   */
+  static DEFAULT_PK_NOT_NULL: boolean = true;
 
   /**
    * Columns
@@ -52,7 +59,9 @@ export class UserTable<TColumn extends UserColumn> {
     this.constraints.forEach(constraint => {
       userTableCopy.addConstraint(constraint.copy());
     });
-    userTableCopy.contents = this.contents.copy();
+    if (this.contents !== null && this.contents !== undefined) {
+      userTableCopy.contents = this.contents.copy();
+    }
     return userTableCopy;
   }
 

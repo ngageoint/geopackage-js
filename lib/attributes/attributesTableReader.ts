@@ -42,6 +42,6 @@ export class AttributesTableReader extends UserTableReader<AttributesColumn, Att
    * @inheritDoc
    */
   createColumn(tableColumn: TableColumn): AttributesColumn {
-    return new AttributesColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey);
+    return new AttributesColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, tableColumn.autoincrement);
   }
 }

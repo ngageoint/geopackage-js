@@ -5,14 +5,14 @@ import { CoreSQLUtils } from './coreSQLUtils'
 import { UserCustomTable } from '../user/custom/userCustomTable'
 import { TableMapping } from './tableMapping'
 import { UserColumn } from '../user/userColumn'
-import { Constraint } from './table/constraint';
-import { RawConstraint } from './table/rawConstraint';
-import { ConstraintParser } from './table/constraintParser';
-import { SQLiteMaster } from './master/sqliteMaster';
-import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
-import { SQLiteMasterType } from './master/sqliteMasterType';
-import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
-import { RTreeIndexDao } from '../extension/rtree/rtreeIndexDao';
+import { Constraint } from './table/constraint'
+import { RawConstraint } from './table/rawConstraint'
+import { ConstraintParser } from './table/constraintParser'
+import { SQLiteMaster } from './master/sqliteMaster'
+import { SQLiteMasterColumn } from './master/sqliteMasterColumn'
+import { SQLiteMasterType } from './master/sqliteMasterType'
+import { SQLiteMasterQuery } from './master/sqliteMasterQuery'
+import { RTreeIndexDao } from '../extension/rtree/rtreeIndexDao'
 /**
  * Builds and performs alter table statements
  */
@@ -111,10 +111,10 @@ export class AlterTable {
    * @param columnNames column names
    */
   static dropColumnsForUserTable (db: GeoPackageConnection, table: UserTable<UserColumn>, columnNames: Array<string>) {
-    const newTable: UserTable<UserColumn> = table.copy();
+    const newTable: UserTable<UserColumn> = table.copy()
     columnNames.forEach(columnName => {
       newTable.dropColumnWithName(columnName)
-    });
+    })
     // Build the table mapping
     const tableMapping = new TableMapping(newTable.getTableName(), newTable.getTableName(), newTable.getUserColumns().getColumns())
     columnNames.forEach(columnName => {
@@ -172,13 +172,13 @@ export class AlterTable {
 
     columns.forEach(column => {
       newTable.alterColumn(column)
-    });
+    })
 
-    AlterTable.alterTable(db, newTable);
+    AlterTable.alterTable(db, newTable)
 
     columns.forEach(column => {
       table.alterColumn(column)
-    });
+    })
   }
 
   /**
@@ -194,11 +194,8 @@ export class AlterTable {
   /**
    * Alter columns
    * @param db connection
-   * @param tableName
-   *            table name
-   * @param columns
-   *            columns
-   * @param user column type
+   * @param tableName table name
+   * @param columns columns
    */
   static alterColumns(db: GeoPackageConnection, tableName: string, columns: UserColumn[]) {
     const userTable: UserCustomTable = new UserCustomTableReader(tableName).readTable(db)
@@ -207,7 +204,6 @@ export class AlterTable {
 
   /**
    * Copy the table
-   *
    * @param db connection
    * @param table table
    * @param newTableName new table name
@@ -269,30 +265,27 @@ export class AlterTable {
    * Making Other Kinds Of Table Schema Changes:
    * https://www.sqlite.org/lang_altertable.html
    *
-   * @param db
-   *            connection
-   * @param newTable
-   *            new table schema
-   * @param tableMapping
-   *            table mapping
+   * @param db connection
+   * @param newTable new table schema
+   * @param tableMapping table mapping
    */
   static alterTableWithTableMapping(db: GeoPackageConnection, newTable: UserTable<UserColumn>, tableMapping: TableMapping) {
     // Update column constraints
     newTable.getUserColumns().getColumns().forEach((column: UserColumn) => {
-      const columnConstraints = column.clearConstraints();
+      const columnConstraints = column.clearConstraints()
       columnConstraints.forEach((columnConstraint: Constraint) => {
-        const updatedSql = CoreSQLUtils.modifySQL(null, columnConstraint.name, columnConstraint.buildSql(), tableMapping);
-        if (updatedSql != null) {
+        const updatedSql = CoreSQLUtils.modifySQL(null, columnConstraint.name, columnConstraint.buildSql(), tableMapping)
+        if (updatedSql !== null && updatedSql !== undefined) {
           column.addConstraint(new RawConstraint(columnConstraint.type, ConstraintParser.getName(updatedSql), updatedSql))
         }
       })
-    });
+    })
 
     // Update table constraints
     const tableConstraints = newTable.clearConstraints()
     tableConstraints.forEach((tableConstraint: Constraint) => {
       const updatedSql = CoreSQLUtils.modifySQL(null, tableConstraint.name, tableConstraint.buildSql(), tableMapping)
-      if (updatedSql != null) {
+      if (updatedSql !== null && updatedSql !== undefined) {
         newTable.addConstraint(new RawConstraint(tableConstraint.type, tableConstraint.name, updatedSql))
       }
     })
@@ -442,7 +435,7 @@ static alterTableWithSQLAndTableMapping(db: GeoPackageConnection, sql: string, t
     } catch (e) {
       successful = false
     }
-  });
+  })
 
   // 12. Re-enable foreign key constraints
   if (enableForeignKeys) {

@@ -7,7 +7,6 @@ import {GeoPackageDataType} from '../../../lib/db/geoPackageDataType'
 import {Contents} from '../../../lib/core/contents/contents'
 import {ConstraintType} from '../../../lib/db/table/constraintType'
 import {UserCustomTableReader} from '../../../lib/user/custom/userCustomTableReader'
-import {TableInfo} from "../../../lib/db/table/tableInfo";
 
 // var GeoPackageAPI = require('../../../.')
 // var testSetup = require('../../fixtures/testSetup')
@@ -36,7 +35,7 @@ describe('GeoPackage Attribute table create tests', function() {
     geopackage.hasAttributeTable(tableName).should.be.equal(false);
 
     var columns = [];
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(UserColumn.createColumn(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(UserColumn.createColumn(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(UserColumn.createColumn(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
@@ -88,8 +87,13 @@ describe('GeoPackage Attribute table create tests', function() {
         },
         {
           name: null,
-          sql: "PRIMARY KEY AUTOINCREMENT",
+          sql: "PRIMARY KEY",
           type: ConstraintType.PRIMARY_KEY
+        },
+        {
+          name: null,
+          sql: "AUTOINCREMENT",
+          type: ConstraintType.AUTOINCREMENT
         }
       ],
       index: 0,
@@ -98,7 +102,8 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 5,
       max: null,
       notNull: true,
-      primaryKey: true
+      primaryKey: true,
+      autoincrement: true,
     },
     {
       index: 1,
@@ -108,6 +113,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 9,
       notNull: false,
       primaryKey: false,
+      autoincrement: false,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT)
     },
     {
@@ -118,6 +124,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 5,
       notNull: false,
       primaryKey: false,
+      autoincrement: false,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
     }]);
 
@@ -157,6 +164,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 5,
       notNull: true,
       primaryKey: true,
+      autoincrement: true,
       max: null,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
       constraints: [
@@ -167,8 +175,13 @@ describe('GeoPackage Attribute table create tests', function() {
         },
         {
           name: null,
-          sql: "PRIMARY KEY AUTOINCREMENT",
+          sql: "PRIMARY KEY",
           type: ConstraintType.PRIMARY_KEY
+        },
+        {
+          name: null,
+          sql: "AUTOINCREMENT",
+          type: ConstraintType.AUTOINCREMENT
         }
       ]
     },
@@ -178,6 +191,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 10,
       notNull: true,
       primaryKey: false,
+      autoincrement: false,
       max: null,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
       constraints: [
@@ -194,6 +208,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 9,
       notNull: true,
       primaryKey: false,
+      autoincrement: false,
       max: null,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
       constraints: [
@@ -210,6 +225,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 9,
       notNull: false,
       primaryKey: false,
+      autoincrement: false,
       max: null,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
       constraints: []
@@ -220,6 +236,7 @@ describe('GeoPackage Attribute table create tests', function() {
       dataType: 5,
       notNull: false,
       primaryKey: false,
+      autoincrement: false,
       max: null,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
       constraints: []
@@ -251,6 +268,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 5,
         notNull: true,
         primaryKey: true,
+        autoincrement: true,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
         constraints: [
@@ -261,8 +279,13 @@ describe('GeoPackage Attribute table create tests', function() {
           },
           {
             name: null,
-            sql: "PRIMARY KEY AUTOINCREMENT",
+            sql: "PRIMARY KEY",
             type: ConstraintType.PRIMARY_KEY
+          },
+          {
+            name: null,
+            sql: "AUTOINCREMENT",
+            type: ConstraintType.AUTOINCREMENT
           }
         ]
       },
@@ -272,6 +295,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 9,
         notNull: true,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
         constraints: [
@@ -288,6 +312,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 5,
         notNull: true,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
         constraints: [
@@ -304,8 +329,8 @@ describe('GeoPackage Attribute table create tests', function() {
   it('should not allow two primary key columns', function() {
     var columns = [];
 
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(1, 'idagain'));
+    columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(1, 'idagain'));
 
     (function() {
       new AttributesTable(tableName, columns);
@@ -315,8 +340,8 @@ describe('GeoPackage Attribute table create tests', function() {
   it('should not allow missing column indexes', function() {
     var columns = [];
 
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(1, 'id'));
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(2, 'idagain'));
+    columns.push(UserColumn.createPrimaryKeyColumn(1, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(2, 'idagain'));
 
     (function() {
       new AttributesTable(tableName, columns);
@@ -326,7 +351,7 @@ describe('GeoPackage Attribute table create tests', function() {
   it('should fail to create an attribute table with an incorrect contents type', function() {
     var columns = [];
 
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(UserColumn.createColumn(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(UserColumn.createColumn(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(UserColumn.createColumn(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
@@ -346,7 +371,7 @@ describe('GeoPackage Attribute table create tests', function() {
   it('should fail to create an attribute dao with no contents', function() {
     var columns = [];
 
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(UserColumn.createColumn(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(UserColumn.createColumn(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(UserColumn.createColumn(1, 'test_text.test', GeoPackageDataType.TEXT, false, ""));
@@ -366,7 +391,7 @@ describe('GeoPackage Attribute table create tests', function() {
 
     var columns = [];
 
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(UserColumn.createColumn(6, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(UserColumn.createColumn(7, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(UserColumn.createColumn(1, 'test_text.test', GeoPackageDataType.TEXT, false, "default"));
@@ -396,6 +421,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 5,
         notNull: true,
         primaryKey: true,
+        autoincrement: true,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
         constraints: [
@@ -406,8 +432,13 @@ describe('GeoPackage Attribute table create tests', function() {
           },
           {
             name: null,
-            sql: "PRIMARY KEY AUTOINCREMENT",
+            sql: "PRIMARY KEY",
             type: ConstraintType.PRIMARY_KEY
+          },
+          {
+            name: null,
+            sql: "AUTOINCREMENT",
+            type: ConstraintType.AUTOINCREMENT
           }
         ]
       },
@@ -418,6 +449,7 @@ describe('GeoPackage Attribute table create tests', function() {
         notNull: false,
         defaultValue: "\'default\'",
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
         constraints: [{
@@ -432,6 +464,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 8,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
         constraints: []
@@ -442,6 +475,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 0,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
         constraints: []
@@ -452,6 +486,7 @@ describe('GeoPackage Attribute table create tests', function() {
         dataType: 10,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
         constraints: []
@@ -463,6 +498,7 @@ describe('GeoPackage Attribute table create tests', function() {
         notNull: false,
         defaultValue: '5',
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
         constraints: [{
@@ -478,6 +514,7 @@ describe('GeoPackage Attribute table create tests', function() {
         max: 5,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
         constraints: []
       },
@@ -488,6 +525,7 @@ describe('GeoPackage Attribute table create tests', function() {
         max: 7,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
         constraints: []
       }]);
@@ -509,7 +547,7 @@ describe('GeoPackage Attribute table create tests', function() {
     beforeEach(function() {
       var columns = [];
 
-      columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(UserColumn.createPrimaryKeyColumn(0, 'id'));
       columns.push(UserColumn.createColumn(6, 'test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
       columns.push(UserColumn.createColumn(7, 'test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
       columns.push(UserColumn.createColumn(10, 'test_boolean2', GeoPackageDataType.BOOLEAN, false, null));

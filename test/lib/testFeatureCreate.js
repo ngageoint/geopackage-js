@@ -39,7 +39,7 @@ describe('GeoPackage Feature table create tests', function() {
     var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom.test', GeometryType.POINT);
     var columns = [];
 
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
@@ -63,7 +63,7 @@ describe('GeoPackage Feature table create tests', function() {
 
     var columns = [];
 
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
     columns.push(FeatureColumn.createGeometryColumn(2, 'geom2.test', GeometryType.POINT, false, null));
     (function() {
@@ -86,6 +86,7 @@ describe('GeoPackage Feature table create tests', function() {
     geopackage.createFeatureTableFromProperties('NewTable', properties);
     var reader = new FeatureTableReader('NewTable');
     var result = reader.readFeatureTable(geopackage);
+
     var columns = result.getUserColumns().getColumns();
 
     var plainObject = JSON.parse(JSON.stringify(columns));
@@ -97,6 +98,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 5,
         notNull: true,
         primaryKey: true,
+        autoincrement: true,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
@@ -108,8 +110,13 @@ describe('GeoPackage Feature table create tests', function() {
           },
           {
             name: null,
-            sql: "PRIMARY KEY AUTOINCREMENT",
+            sql: "PRIMARY KEY",
             type: ConstraintType.PRIMARY_KEY
+          },
+          {
+            name: null,
+            sql: "AUTOINCREMENT",
+            type: ConstraintType.AUTOINCREMENT
           }
         ]
       },
@@ -118,6 +125,7 @@ describe('GeoPackage Feature table create tests', function() {
         name: 'geometry',
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: GeometryType.GEOMETRY,
         dataType: GeoPackageDataType.BLOB,
         max: null,
@@ -130,6 +138,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 9,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
@@ -141,6 +150,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 5,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
@@ -155,7 +165,7 @@ describe('GeoPackage Feature table create tests', function() {
 
     var columns = [];
 
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
     columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom.test', GeometryType.POINT, false, null));
@@ -188,6 +198,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 5,
         notNull: true,
         primaryKey: true,
+        autoincrement: true,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
@@ -199,8 +210,13 @@ describe('GeoPackage Feature table create tests', function() {
           },
           {
             name: null,
-            sql: "PRIMARY KEY AUTOINCREMENT",
+            sql: "PRIMARY KEY",
             type: ConstraintType.PRIMARY_KEY
+          },
+          {
+            name: null,
+            sql: "AUTOINCREMENT",
+            type: ConstraintType.AUTOINCREMENT
           }
         ]
       },
@@ -209,6 +225,7 @@ describe('GeoPackage Feature table create tests', function() {
         name: 'geom.test',
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: GeometryType.POINT,
         dataType: GeoPackageDataType.BLOB,
         max: null,
@@ -221,7 +238,8 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 9,
         notNull: false,
         defaultValue: "\'default\'",
-        primaryKey: false ,
+        primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
@@ -239,6 +257,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 8,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
@@ -250,6 +269,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 0,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
@@ -261,6 +281,7 @@ describe('GeoPackage Feature table create tests', function() {
         dataType: 10,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
         constraints: []
@@ -272,6 +293,7 @@ describe('GeoPackage Feature table create tests', function() {
         notNull: false,
         defaultValue: '5',
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
@@ -290,6 +312,7 @@ describe('GeoPackage Feature table create tests', function() {
         max: 5,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         geometryType: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
         constraints: []
@@ -301,6 +324,7 @@ describe('GeoPackage Feature table create tests', function() {
         max: 7,
         notNull: false,
         primaryKey: false,
+        autoincrement: false,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
         constraints: []
       }
@@ -324,7 +348,7 @@ describe('GeoPackage Feature table create tests', function() {
       var geometryColumns = SetupFeatureTable.buildGeometryColumns(tableName, 'geom', GeometryType.POINT);
       var columns = [];
 
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
       columns.push(FeatureColumn.createColumn(7, 'test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
       columns.push(FeatureColumn.createColumn(8, 'test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
       columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));

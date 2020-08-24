@@ -26,7 +26,7 @@ export class StyleDao extends AttributesDao<StyleRow> {
    * @param results
    * @returns {module:extension/style.StyleRow}
    */
-  createObject(results: Record<string, DBValue>): StyleRow {
+  createObject(results: Record<string, DBValue> = undefined): StyleRow {
     if (results) {
       return this.getRow(results) as StyleRow;
     }

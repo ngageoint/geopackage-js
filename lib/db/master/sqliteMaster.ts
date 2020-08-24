@@ -1,12 +1,12 @@
 /**
  * SQLite Master table queries (sqlite_master)
  */
-import { SQLiteMasterColumn } from './sqliteMasterColumn';
-import { SQLiteMasterType } from './sqliteMasterType';
-import { TableConstraints } from '../table/tableConstraints';
-import { ConstraintParser } from '../table/constraintParser';
-import { GeoPackageConnection } from '../geoPackageConnection';
-import { SQLiteMasterQuery } from './sqliteMasterQuery';
+import {SQLiteMasterColumn} from './sqliteMasterColumn';
+import {SQLiteMasterType} from './sqliteMasterType';
+import {TableConstraints} from '../table/tableConstraints';
+import {ConstraintParser} from '../table/constraintParser';
+import {GeoPackageConnection} from '../geoPackageConnection';
+import {SQLiteMasterQuery} from './sqliteMasterQuery';
 
 export class SQLiteMaster {
 
@@ -23,7 +23,7 @@ export class SQLiteMaster {
 	/**
 	 * Mapping between result columns and indices
 	 */
-	_columns = new Map<SQLiteMasterColumn, number>();
+	_columns = {};
 
 	/**
 	 * Query result count
@@ -36,16 +36,16 @@ export class SQLiteMaster {
 	 * @param columns query columns
 	 */
 	constructor(results: any[], columns: SQLiteMasterColumn[]) {
-		if (columns !== null && columns !== undefined) {
+		if (columns !== null && columns !== undefined && columns.length > 0) {
 			this._results = results;
 			this._count = results.length;
 			for (let i = 0; i < columns.length; i++) {
-				this._columns.set(columns[i], i);
+				this._columns[SQLiteMasterColumn.nameFromType(columns[i])] = i;
 			}
 		} else {
 			// Count only result
 			this._results = [];
-			this._count = results[0][0];
+			this._count = results[0].cnt;
 		}
 	}
 
@@ -61,8 +61,8 @@ export class SQLiteMaster {
 	 * Get the columns in the result
 	 * @return columns
 	 */
-	columns(): Set<SQLiteMasterColumn>  {
-		return new Set(this._columns.keys());
+	columns(): SQLiteMasterColumn[] {
+		return Object.keys(this._columns).map(key => SQLiteMasterColumn.fromName(key));
 	}
 
 	/**
@@ -122,14 +122,12 @@ export class SQLiteMaster {
 	/**
 	 * Get the value of the column at the row index
 	 *
-	 * @param row
-	 *            row index
-	 * @param column
-	 *            column type
+	 * @param row row index
+	 * @param column column type
 	 * @return value
 	 */
 	getValueForRowAndColumn(row: number, column: SQLiteMasterColumn): any {
-		return this.getValue(this.getRow(row), column);
+		return SQLiteMaster.getValue(this.getRow(row), column);
 	}
 
 	/**
@@ -156,21 +154,8 @@ export class SQLiteMaster {
 	 * @param column column type
 	 * @return value
 	 */
-	getValue(row: any[], column: SQLiteMasterColumn): any {
-		return row[this.getColumnIndex(column)];
-	}
-
-	/**
-	 * Get the column index of the column type
-	 * @param column column type
-	 * @return column index
-	 */
-	getColumnIndex(column: SQLiteMasterColumn): number {
-		let index = this._columns.get(column);
-		if (index == null) {
-			throw new Error('Column does not exist in row values: ' + column);
-		}
-		return index;
+	static getValue(row: any[], column: SQLiteMasterColumn): any {
+		return row[SQLiteMasterColumn.nameFromType(column).toLowerCase()];
 	}
 
 	/**
@@ -190,32 +175,11 @@ export class SQLiteMaster {
 	}
 
 	/**
-	 * Shortcut to build columns into an array
-	 * @param columns columns
-	 * @return columns
-	 */
-	static columnsToArray(...columns: SQLiteMasterColumn[]): SQLiteMasterColumn[] {
-		return columns;
-	}
-
-	/**
-	 * Shortcut to build types into an array
-	 * @param types types
-	 * @return types
-	 */
-	static typesToArray(...types: SQLiteMasterType[]) {
-		return types;
-	}
-
-	/**
 	 * Count the sqlite_master table
 	 *
-	 * @param db
-	 *            connection
-	 * @param types
-	 *            result types
-	 * @param query
-	 *            query
+	 * @param db connection
+	 * @param types result types
+	 * @param query query
 	 * @return count
 	 */
 	static count(db: GeoPackageConnection, types: SQLiteMasterType[], query: SQLiteMasterQuery): number {
@@ -244,7 +208,7 @@ export class SQLiteMaster {
 			}
 
 		} else {
-			sql = sql.concat('count(*)');
+			sql = sql.concat('count(*) as cnt');
 		}
 
 		sql = sql.concat(' FROM ');
@@ -262,7 +226,6 @@ export class SQLiteMaster {
 			}
 
 			if (hasTypes) {
-
 				if (hasQuery) {
 					sql = sql.concat(" AND");
 				}
@@ -279,7 +242,7 @@ export class SQLiteMaster {
 			}
 		}
 
-		let results = db.all(sql.toString(), args);
+		let results = db.all(sql, args);
 		return new SQLiteMaster(results, columns);
 	}
 
@@ -312,7 +275,7 @@ export class SQLiteMaster {
 	 */
 	static queryForConstraints(db: GeoPackageConnection, tableName: string): TableConstraints {
 		let constraints = new TableConstraints();
-		let tableMaster = SQLiteMaster.query(db, null, [SQLiteMasterType.TABLE], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, tableName));
+		let tableMaster = SQLiteMaster.query(db, [SQLiteMasterColumn.TYPE, SQLiteMasterColumn.NAME, SQLiteMasterColumn.TBL_NAME, SQLiteMasterColumn.ROOTPAGE, SQLiteMasterColumn.SQL], [SQLiteMasterType.TABLE], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, tableName));
 		for (let i = 0; i < tableMaster.count(); i++) {
 			constraints.addTableConstraints(tableMaster.getConstraints(i).constraints);
 		}

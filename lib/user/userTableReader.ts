@@ -40,8 +40,7 @@ export abstract class UserTableReader<TColumn extends UserColumn, TTable extends
       let column = this.createColumn(tableColumn);
 
       let columnConstraints = constraints.getColumnConstraints(column.getName());
-      if (columnConstraints != null
-        && columnConstraints.hasConstraints()) {
+      if (columnConstraints !== null && columnConstraints !== undefined && columnConstraints.hasConstraints()) {
         column.clearConstraints();
         column.addConstraints(columnConstraints.constraints);
       }
@@ -58,7 +57,7 @@ export abstract class UserTableReader<TColumn extends UserColumn, TTable extends
    * Creates a user column
    */
   createColumn(tableColumn: TableColumn): TColumn {
-    return new UserColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey) as TColumn;
+    return new UserColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, tableColumn.autoincrement) as TColumn;
   }
 
   /**

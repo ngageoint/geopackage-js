@@ -77,7 +77,7 @@ export class MappedColumn {
    * @return true if the to and from column names are different
    */
   hasNewName(): boolean {
-    return !_.isNil(this._fromColumn) != null && !_.isEqual(this._fromColumn, this._toColumn)
+    return !_.isNil(this._fromColumn) && !_.isEqual(this._fromColumn, this._toColumn)
   }
 
   /**

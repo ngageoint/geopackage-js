@@ -165,7 +165,7 @@ export class CoreSQLUtils {
 
     column.getConstraints().forEach(constraint => {
       sql = sql.concat(' ');
-      sql = sql.concat(constraint.buildSql());
+      sql = sql.concat(column.buildConstraintSql(constraint));
     });
 
     return sql.toString();
@@ -214,7 +214,7 @@ export class CoreSQLUtils {
                   break;
               }
             }
-            if (booleanValue !== null) {
+            if (booleanValue !== null && booleanValue !== undefined) {
               if (booleanValue) {
                 value = '1';
               } else {
@@ -232,7 +232,7 @@ export class CoreSQLUtils {
         }
       }
 
-      if (value == null) {
+      if (value === null || value === undefined) {
         value = defaultValue.toString();
       }
     }
@@ -494,14 +494,14 @@ export class CoreSQLUtils {
    */
   static modifySQL(db: GeoPackageConnection, name: string, sql: string, tableMapping: TableMapping): string {
     let updatedSql = sql;
-    if (name != null && tableMapping.isNewTable()) {
+    if (name !== null && name !== undefined && tableMapping.isNewTable()) {
       let newName = CoreSQLUtils.createName(db, name, tableMapping.fromTable, tableMapping.toTable);
       let updatedName = CoreSQLUtils.replaceName(updatedSql, name, newName);
-      if (updatedName != null) {
+      if (updatedName !== null && updatedName !== undefined) {
         updatedSql = updatedName;
       }
       let updatedTable = CoreSQLUtils.replaceName(updatedSql, tableMapping.fromTable, tableMapping.toTable);
-      if (updatedTable != null) {
+      if (updatedTable !== null && updatedTable !== undefined) {
         updatedSql = updatedTable;
       }
     }
@@ -528,7 +528,7 @@ export class CoreSQLUtils {
       }
     }
 
-    if (updatedSql != null) {
+    if (updatedSql !== null && updatedSql !== undefined) {
       tableMapping.getMappedColumns().forEach(column => {
         if (column.hasNewName()) {
           let updated = CoreSQLUtils.replaceName(updatedSql, column.fromColumn, column.toColumn);

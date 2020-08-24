@@ -6,6 +6,8 @@ import { GeoPackageConnection } from '../geoPackageConnection';
 import { CoreSQLUtils } from '../coreSQLUtils';
 import { GeoPackageDataType } from '../geoPackageDataType';
 import { GeometryType } from '../../features/user/geometryType';
+import { SQLiteMaster } from '../master/sqliteMaster';
+import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 
 export class TableInfo {
 
@@ -182,6 +184,11 @@ export class TableInfo {
       let notNull = result.notnull === 1;
       let defaultValueString = result.dflt_value;
       let primaryKey = result.pk === 1;
+      let autoincrement = false;
+      if (primaryKey) {
+        const autoincrementResult = db.all('SELECT tbl_name FROM ' + SQLiteMaster.TABLE_NAME + ' WHERE ' + SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.TBL_NAME) + '=? AND ' + SQLiteMasterColumn.nameFromType(SQLiteMasterColumn.SQL) + ' LIKE ?', [tableName, '%AUTOINCREMENT%']);
+        autoincrement = autoincrementResult.length === 1;
+      }
 
       // If the type has a max limit on it, pull it off
       let max = null;
@@ -205,7 +212,7 @@ export class TableInfo {
       if (result.dflt_value) {
         defaultValue = result.dflt_value.replace(/\\'/g, '');
       }
-      let tableColumn = new TableColumn(index, name, type, dataType, max, notNull, defaultValueString, defaultValue, primaryKey);
+      let tableColumn = new TableColumn(index, name, type, dataType, max, notNull, defaultValueString, defaultValue, primaryKey, autoincrement);
       tableColumns.push(tableColumn);
     });
 
@@ -235,70 +242,4 @@ export class TableInfo {
     }
     return dataType;
   }
-  //
-  // /**
-  //  * Get the default object value for the string default value and type
-  //  * @param defaultValue default value
-  //  * @param type type
-  //  * @return default value
-  //  */
-  // getDefaultValue(defaultValue: string, type: string): any {
-  //   return this.getDefaultValueForType(defaultValue, this.getDataType(type));
-  // }
-  //
-  // /**
-  //  * Get the default object value for the string default value with the data type
-  //  * @param defaultValue default value
-  //  * @param type data type
-  //  * @return default value
-  //  */
-  // getDefaultValueForType(defaultValue: string, type: GeoPackageDataType): any {
-  //   let value: any = defaultValue;
-  //   if (defaultValue !== null && defaultValue !== undefined && type !== null && type !== undefined && defaultValue.toUpperCase() === TableInfo.DEFAULT_NULL) {
-  //     switch (type) {
-  //       case GeoPackageDataType.TEXT:
-  //         break;
-  //       case GeoPackageDataType.DATE:
-  //       case GeoPackageDataType.DATETIME:
-  //         if (!DateConverter.isFunction(defaultValue)) {
-  //           DateConverter converter = DateConverter.converter(type);
-  //           try {
-  //             value = converter.dateValue(defaultValue);
-  //           } catch (e) {
-  //             console.warn('Invalid ' + type + ' format: ' + defaultValue + ', String value used', e);
-  //           }
-  //         }
-  //         break;
-  //       case GeoPackageDataType.BOOLEAN:
-  //         value = parseInt(defaultValue) === 0;
-  //         break;
-  //       case GeoPackageDataType.TINYINT:
-  //         value = Byte.parseByte(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.SMALLINT:
-  //         value = Short.parseShort(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.MEDIUMINT:
-  //         value = Integer.parseInt(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.INT:
-  //       case GeoPackageDataType.INTEGER:
-  //         value = Long.parseLong(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.FLOAT:
-  //         value = Float.parseFloat(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.DOUBLE:
-  //       case GeoPackageDataType.REAL:
-  //         value = Double.parseDouble(defaultValue);
-  //         break;
-  //       case GeoPackageDataType.BLOB:
-  //         value = defaultValue.getBytes();
-  //         break;
-  //       default:
-  //         throw new Error('Unsupported Data Type ' + type);
-  //     }
-  //   }
-  //   return value;
-  // }
 }

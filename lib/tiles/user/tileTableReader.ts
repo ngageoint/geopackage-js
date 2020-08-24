@@ -33,6 +33,6 @@ export class TileTableReader extends UserTableReader<TileColumn, TileTable> {
    * @inheritDoc
    */
   createColumn(tableColumn: TableColumn): TileColumn {
-    return new TileColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey);
+    return new TileColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, tableColumn.autoincrement);
   }
 }

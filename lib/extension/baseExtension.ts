@@ -87,6 +87,10 @@ export abstract class BaseExtension {
     return !!this.getExtension(extensionName, tableName, columnName).length;
   }
 
+  hasExtensions(extensionName: string): boolean {
+    return this.extensionsDao.queryAllByExtension(extensionName).length !== 0;
+  }
+
   /**
    * Create the extension
    * @param {string} extensionName

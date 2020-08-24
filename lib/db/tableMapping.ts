@@ -51,7 +51,7 @@ export class TableMapping {
     this._fromTable = fromTableName
     this._toTable = toTableName
     columns.forEach(column => {
-      this.addMappedColumn(new MappedColumn(column.name, null, column.defaultValue, column.dataType))
+      this.addMappedColumn(new MappedColumn(column.name, column.name, column.defaultValue, column.dataType))
     })
   }
 

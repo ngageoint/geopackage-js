@@ -7,7 +7,7 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
 module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryType) {
   var columns = [];
 
-  columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+  columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
   columns.push(FeatureColumn.createColumn(7, 'test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
   columns.push(FeatureColumn.createColumn(8, 'test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
   columns.push(FeatureColumn.createGeometryColumn(1, geometryColumn, geometryType, false, null));

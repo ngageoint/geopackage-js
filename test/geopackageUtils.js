@@ -175,7 +175,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
 
   const columns = [];
   let columnNumber = 0;
-  columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+  columns.push(FeatureColumn.createPrimaryKeyColumn(columnNumber++, 'id'));
   columns.push(FeatureColumn.createGeometryColumn(columnNumber++, 'geometry', type, false, null));
   columns.push(
     FeatureColumn.createColumn(columnNumber++, 'text', GeoPackageDataType.TEXT, false, ''),
@@ -650,7 +650,7 @@ GeoPackageUtils.createAttributes = function(geopackage) {
 
   const columns = [];
   let columnNumber = 0;
-  columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(columnNumber++, 'id'));
+  columns.push(UserColumn.createPrimaryKeyColumn(columnNumber++, 'id'));
   columns.push(
     UserColumn.createColumn(columnNumber++, 'text', GeoPackageDataType.TEXT, false, ''),
   );

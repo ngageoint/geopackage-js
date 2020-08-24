@@ -55,10 +55,10 @@ export class NGAExtensions {
    */
   static copyTableExtensions(geoPackage: GeoPackage, table: string, newTable: string) {
     try {
+      NGAExtensions.copyContentsId(geoPackage, table, newTable);
       NGAExtensions.copyFeatureStyle(geoPackage, table, newTable);
       NGAExtensions.copyTileScaling(geoPackage, table, newTable);
       NGAExtensions.copyGeometryIndex(geoPackage, table, newTable);
-      NGAExtensions.copyContentsId(geoPackage, table, newTable);
       // Copy future extensions for the table here
     } catch (e) {
       console.warn('Failed to copy extensions for table: ' + newTable + ', copied from table: ' + table, e);
@@ -273,14 +273,12 @@ export class NGAExtensions {
           let contentsIdExtension = featureStyleExtension.getContentsId();
           let contentsId = contentsIdExtension.getIdByTableName(table);
           let newContentsId = contentsIdExtension.getIdByTableName(newTable);
-          if (contentsId != null && newContentsId != null) {
+          if (contentsId !== null && contentsId !== undefined && newContentsId !== null && newContentsId !== undefined) {
             if (featureStyleExtension.hasTableStyleRelationship(table)) {
               NGAExtensions.copyFeatureTableStyle(featureStyleExtension, FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, table, newTable, contentsId, newContentsId);
             }
             if (featureStyleExtension.hasTableIconRelationship(table)) {
-              NGAExtensions.copyFeatureTableStyle(featureStyleExtension,
-                FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON,
-                table, newTable, contentsId, newContentsId);
+              NGAExtensions.copyFeatureTableStyle(featureStyleExtension, FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, table, newTable, contentsId, newContentsId);
             }
           }
         }
@@ -320,10 +318,10 @@ export class NGAExtensions {
       extension.setTableName(newMappingTableName);
       extensionsDao.create(extension);
       let extendedRelationTableMapping = TableMapping.fromTableInfo(TableInfo.info(geoPackage.connection, ExtendedRelationDao.TABLE_NAME));
-      extendedRelationTableMapping.removeColumn(ExtendedRelationDao.COLUMN_ID);
-      let baseTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME);
+      extendedRelationTableMapping.removeColumn(ExtendedRelationDao.ID);
+      let baseTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationDao.BASE_TABLE_NAME);
       baseTableNameColumn.whereValue = ContentsIdDao.TABLE_NAME;
-      let mappingTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationDao.COLUMN_MAPPING_TABLE_NAME);
+      let mappingTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationDao.MAPPING_TABLE_NAME);
       mappingTableNameColumn.constantValue = newMappingTableName;
       mappingTableNameColumn.whereValue = mappingTableName;
       CoreSQLUtils.transferTableContentForTableMapping(geoPackage.connection, extendedRelationTableMapping);

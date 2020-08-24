@@ -471,7 +471,7 @@ describe('GeoPackageAPI tests', function() {
       geometryColumns.z = 0;
       geometryColumns.m = 0;
 
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
       columns.push(FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5));
       columns.push(FeatureColumn.createColumn(8, 'test_blob_limited.test', GeoPackageDataType.BLOB, false, null, 7));
       columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', GeometryType.GEOMETRY, false, null));
@@ -540,7 +540,7 @@ describe('GeoPackageAPI tests', function() {
       geometryColumns.z = 0;
       geometryColumns.m = 0;
 
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
       columns.push(
         FeatureColumn.createColumn(7, 'test_text_limited.test', GeoPackageDataType.TEXT, false, null, 5),
       );

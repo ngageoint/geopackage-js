@@ -3,8 +3,9 @@ import { default as testSetup } from '../../fixtures/testSetup'
 var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
   , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , GeometryColumns = require('../../../lib/features/columns/geometryColumns').GeometryColumns
-  // , AlterTable = require('../../../lib/db/alterTable').AlterTable
+  , AlterTable = require('../../../lib/db/alterTable').AlterTable
   , TableInfo = require('../../../lib/db/table/tableInfo').TableInfo
+  , CoreSQLUtils = require('../../../lib/db/coreSQLUtils').CoreSQLUtils
   , TableCreator = require('../../../lib/db/tableCreator').TableCreator
   , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../lib/geom/geometryData').GeometryData
@@ -29,7 +30,7 @@ describe('AlterTable tests', function() {
     geopackage = await testSetup.createGeoPackage(testGeoPackage);
     var columns = [];
 
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.GEOMETRY, false, null));
     columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
     columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
@@ -200,5 +201,51 @@ describe('AlterTable tests', function() {
     tableInfo = TableInfo.info(geopackage.connection, tableName);
     should.not.exist(tableInfo.getColumn(columnName));
     should.exist(tableInfo.getColumn(newColumnName));
+  });
+
+  it('should add a column to a feature table', function() {
+    const columnName = 'feature_is_great';
+    var featureDao = geopackage.getFeatureDao(tableName);
+    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false)
+    featureDao.addColumn(column);
+    let tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.exist(tableInfo.getColumn(columnName));
+    featureDao.dropColumn(columnName);
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.not.exist(tableInfo.getColumn(columnName));
+
+    column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false)
+    featureDao.addColumn(column);
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.exist(tableInfo.getColumn(columnName));
+    AlterTable.dropColumnForUserTable(geopackage.connection, featureDao.table, columnName);
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.not.exist(tableInfo.getColumn(columnName));
+  });
+
+  it('should test all drop column functions', function() {
+    const columnName = 'feature_is_great';
+    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false);
+    var tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.not.exist(tableInfo.getColumn(columnName));
+    AlterTable.addColumn(geopackage.connection, tableName, columnName, CoreSQLUtils.columnDefinition(column));
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.exist(tableInfo.getColumn(columnName));
+    AlterTable.dropColumn(geopackage.connection, tableName, columnName);
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    should.not.exist(tableInfo.getColumn(columnName));
+  });
+
+  it('should test all alter column functions', function() {
+    const columnName = 'feature_is_great';
+    var column = FeatureColumn.createColumn(6, columnName, GeoPackageDataType.BOOLEAN, true, false);
+    AlterTable.addColumn(geopackage.connection, tableName, columnName, CoreSQLUtils.columnDefinition(column));
+    var tableInfo = TableInfo.info(geopackage.connection, tableName);
+    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal('0');
+    var columnCopy = column.copy();
+    columnCopy.setDefaultValue(true);
+    AlterTable.alterColumn(geopackage.connection, tableName, columnCopy);
+    tableInfo = TableInfo.info(geopackage.connection, tableName);
+    tableInfo.getColumn(columnName).getDefaultValue().should.be.equal('1');
   });
 });

@@ -607,7 +607,7 @@ export class FeatureTableStyles {
    * Set the feature table style for the geometry type
    *
    * @param {String} geometryType geometry type
-   * @param {module:extension/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setTableStyle(geometryType: string, style: StyleRow): number {

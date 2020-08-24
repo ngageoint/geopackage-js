@@ -88,8 +88,12 @@ export class ExtensionDao extends Dao<Extension> {
   queryByExtensionAndTableNameAndColumnName(extensionName: string, tableName: string, columnName: string): Extension[] {
     const values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
-    values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
-    values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
+    if (tableName !== null && tableName !== undefined) {
+      values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
+    }
+    if (columnName !== null && columnName !== undefined) {
+      values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
+    }
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
       const e = this.createObject(row);

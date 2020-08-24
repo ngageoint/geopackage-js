@@ -246,15 +246,4 @@ export class UserRow {
   resetId(): void {
     this.values[this.table.getPkColumnName()] = undefined;
   }
-  /**
-   * Validate the value and its actual value types against eh column data type class
-   * @param  {UserColumn} column     column
-   * @param  {Object} value      value
-   * @param  {Array} valueTypes value types
-   */
-  // eslint-disable-next-line no-unused-vars
-  validateValueWithColumn(column: UserColumn, value: any, valueTypes: any[]): boolean {
-    // TODO implement validation
-    return true;
-  }
 }

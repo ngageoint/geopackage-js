@@ -53,28 +53,6 @@ export class UserColumns<TColumn extends UserColumn> {
     this._columnNames = [];
   }
 
-  // /**
-  //  * Copy Constructor
-  //  *
-  //  * @param userColumns
-  //  *            user columns
-  //  */
-  // protected UserColumns(UserColumns<TColumn> userColumns) {
-  //   this.tableName = userColumns.tableName;
-  //   this.columnNames = new String[userColumns.columnNames.length];
-  //   System.arraycopy(userColumns.columnNames, 0, this.columnNames, 0,
-  //     this.columnNames.length);
-  //   this.columns = new ArrayList<>();
-  //   for (TColumn column : userColumns.columns) {
-  //   @SuppressWarnings("unchecked")
-  //     TColumn copiedColumn = (TColumn) column.copy();
-  //     this.columns.add(copiedColumn);
-  //   }
-  //   this.nameToIndex = new HashMap<String, Integer>();
-  //   this.nameToIndex.putAll(userColumns.nameToIndex);
-  //   this.pkIndex = userColumns.pkIndex;
-  // }
-
   /**
    * Copy the user columns
    * @return copied user columns
@@ -181,7 +159,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param column column
    */
   duplicateCheck(index: number, previousIndex: number, column: string) {
-    if (previousIndex !== null || previousIndex !== undefined) {
+    if (previousIndex !== null && previousIndex !== undefined) {
       throw new Error('More than one ' + column + ' column was found for table \'' + this._tableName + '\'. Index ' + previousIndex + ' and ' + index);
     }
   }
@@ -441,7 +419,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param index column index
    */
   dropColumnWithIndex(index: number) {
-    this._columns = this._columns.splice(index, 1);
+    this._columns.splice(index, 1);
     this._columns.forEach(column => column.resetIndex());
     this.updateColumns();
   }
@@ -452,8 +430,9 @@ export class UserColumns<TColumn extends UserColumn> {
    */
   alterColumn(column: TColumn) {
     let existingColumn = this.getColumn(column.getName());
-    column.setIndex(existingColumn.getIndex());
-    this._columns[column.getIndex()] = column;
+    const index = existingColumn.getIndex();
+    column.setIndex(index);
+    this._columns[index] = column;
   }
 
 }

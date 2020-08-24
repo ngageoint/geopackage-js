@@ -5,10 +5,12 @@ import _ from 'lodash'
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbAdapter';
 import { Constraint } from '../db/table/constraint';
-import {RawConstraint} from "../db/table/rawConstraint";
-import {ConstraintParser} from "../db/table/constraintParser";
-import {ColumnConstraints} from "../db/table/columnConstraints";
-import {CoreSQLUtils} from "../db/coreSQLUtils";
+import { RawConstraint } from '../db/table/rawConstraint';
+import { ConstraintParser } from '../db/table/constraintParser';
+import { ColumnConstraints } from '../db/table/columnConstraints';
+import { CoreSQLUtils } from '../db/coreSQLUtils';
+import { ConstraintType } from '../db/table/constraintType';
+import { UserTable } from './userTable';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -25,9 +27,9 @@ import {CoreSQLUtils} from "../db/coreSQLUtils";
 export class UserColumn {
   static readonly NO_INDEX = -1;
 
-  min: number;
   constraints: Constraint[] = [];
   type: string;
+  min: number;
   constructor(
     public index: number,
     public name: string,
@@ -36,6 +38,7 @@ export class UserColumn {
     public notNull?: boolean,
     public defaultValue?: DBValue,
     public primaryKey?: boolean,
+    public autoincrement?: boolean,
   ) {
     this.validateMax();
     this.type = this.getTypeName(name, dataType);
@@ -60,6 +63,7 @@ export class UserColumn {
   copy(): UserColumn {
     const userColumnCopy = new UserColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey);
     userColumnCopy.min = this.min;
+    userColumnCopy.constraints = this.constraints.slice();
     return userColumnCopy;
   }
 
@@ -67,7 +71,7 @@ export class UserColumn {
    * Clears the constraints
    */
   clearConstraints() {
-    const constraintsCopy = Array.from(this.constraints);
+    const constraintsCopy = this.constraints.slice();
     this.constraints = [];
     return constraintsCopy;
   }
@@ -77,9 +81,9 @@ export class UserColumn {
   }
 
   setIndex(index: number) {
-    if (!_.isNil(this.index)) {
+    if (this.hasIndex()) {
       if (!_.isEqual(index, this.index)) {
-        throw new Error("User Column with a valid index may not be changed. Column Name: " + this.name + ", Index: " + this.index + ", Attempted Index: " + this.index);
+        throw new Error('User Column with a valid index may not be changed. Column Name: ' + this.name + ', Index: ' + this.index + ', Attempted Index: ' + this.index);
       }
     } else {
       this.index = index;
@@ -165,6 +169,11 @@ export class UserColumn {
    */
   setNotNull(notNull: boolean) {
     this.notNull = notNull;
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.NOT_NULL);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
+    this.addConstraintSql('NOT NULL');
   }
 
   /**
@@ -189,6 +198,11 @@ export class UserColumn {
    */
   setDefaultValue(defaultValue: any) {
     this.defaultValue = defaultValue;
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.DEFAULT);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
+    this.addConstraintSql('DEFAULT ' + CoreSQLUtils.columnDefaultValue(defaultValue, this.getDataType()));
   }
 
   /**
@@ -205,6 +219,11 @@ export class UserColumn {
    */
   setPrimaryKey(primaryKey: boolean) {
     this.primaryKey = primaryKey;
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.PRIMARY_KEY);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
+    this.addConstraintSql('PRIMARY KEY');
   }
 
   /**
@@ -213,6 +232,29 @@ export class UserColumn {
    */
   isPrimaryKey() {
     return this.primaryKey;
+  }
+
+  /**
+   * Set the autoincrement flag
+   * @param autoincrement autoincrement flag
+   */
+  protected setAutoincrement(autoincrement: boolean) {
+    this.autoincrement = autoincrement;
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.AUTOINCREMENT);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
+    if (autoincrement) {
+      this.addConstraintSql('AUTOINCREMENT');
+    }
+  }
+
+  /**
+   * Get the autoincrement flag
+   * @return autoincrement flag
+   */
+  isAutoincrement(): boolean {
+    return this.autoincrement;
   }
 
   /**
@@ -258,11 +300,12 @@ export class UserColumn {
    *
    *  @param {Number} index column index
    *  @param {string} name  column name
+   *  @param {boolean} autoincrement column autoincrement
    *
-   *  @return {module:user/userColumn~UserColumn} created column
+   *  @return {UserColumn} created column
    */
-  static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): UserColumn {
-    return new UserColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true);
+  static createPrimaryKeyColumn(index: number, name: string, autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT): UserColumn {
+    return new UserColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, autoincrement);
   }
 
   /**
@@ -290,9 +333,9 @@ export class UserColumn {
 
   /**
    * Add the default constraints that are enabled (not null, default value,
-   * primary key) from the column properties
+   * primary key, autoincrement) from the column properties
    */
-  addDefaultConstraints() {
+  protected addDefaultConstraints() {
     if (this.isNotNull()) {
       this.addNotNullConstraint();
     }
@@ -301,6 +344,9 @@ export class UserColumn {
     }
     if (this.isPrimaryKey()) {
       this.addPrimaryKeyConstraint();
+      if (this.isAutoincrement()) {
+        this.addAutoincrementConstraint();
+      }
     }
   }
 
@@ -345,7 +391,6 @@ export class UserColumn {
    */
   addNotNullConstraint() {
     this.setNotNull(true);
-    this.addConstraintSql('NOT NULL');
   }
 
   /**
@@ -354,7 +399,6 @@ export class UserColumn {
    */
   addDefaultValueConstraint(defaultValue: any) {
     this.setDefaultValue(defaultValue);
-    this.addConstraintSql('DEFAULT ' + CoreSQLUtils.columnDefaultValue(defaultValue, this.getDataType()));
   }
 
   /**
@@ -362,14 +406,38 @@ export class UserColumn {
    */
   addPrimaryKeyConstraint() {
     this.setPrimaryKey(true);
-    this.addConstraintSql('PRIMARY KEY AUTOINCREMENT');
+  }
+
+  /**
+   * Add an autoincrement constraint
+   */
+  addAutoincrementConstraint() {
+    if (this.isPrimaryKey()) {
+      this.setAutoincrement(true);
+    } else {
+      throw new Error('Autoincrement may only be set on primary key columns');
+    }
   }
 
   /**
    * Add a unique constraint
    */
   addUniqueConstraint() {
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.UNIQUE);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
     this.addConstraintSql('UNIQUE');
+  }
+
+  /**
+   * Removes a unique constraint, if one exists
+   */
+  removeUniqueConstraint() {
+    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.UNIQUE);
+    if (index >= 0) {
+      this.constraints.splice(index, 1);
+    }
   }
 
   getType(): string {
@@ -378,5 +446,21 @@ export class UserColumn {
 
   hasConstraints() {
     return this.constraints.length > 0;
+  }
+
+  /**
+   * Build the SQL for the constraint
+   *
+   * @param constraint
+   *            constraint
+   * @return SQL or null
+   * @since 4.0.0
+   */
+  buildConstraintSql(constraint: Constraint): string {
+    let sql = null;
+    if (UserTable.DEFAULT_PK_NOT_NULL || !this.isPrimaryKey() || constraint.getType() !== ConstraintType.NOT_NULL) {
+      sql = constraint.buildSql();
+    }
+    return sql;
   }
 }

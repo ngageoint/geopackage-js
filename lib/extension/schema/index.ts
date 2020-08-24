@@ -11,22 +11,23 @@ import { DataColumnsDao } from '../../dataColumns/dataColumnsDao';
 import { DataColumnConstraintsDao } from '../../dataColumnConstraints/dataColumnConstraintsDao';
 
 export class SchemaExtension extends BaseExtension {
-  public static readonly EXTENSION_NAME: string = 'gpkg_schema';
   public static readonly EXTENSION_SCHEMA_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_SCHEMA_NAME_NO_AUTHOR: string = 'schema';
+  public static readonly EXTENSION_NAME: string = SchemaExtension.EXTENSION_SCHEMA_AUTHOR + '_' + SchemaExtension.EXTENSION_SCHEMA_NAME_NO_AUTHOR;
   public static readonly EXTENSION_SCHEMA_DEFINITION: string = 'http://www.geopackage.org/spec/#extension_schema';
 
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.extensionName = SchemaExtension.EXTENSION_NAME;
-    this.extensionDefinition = SchemaExtension.EXTENSION_SCHEMA_DEFINITION;
   }
-  getOrCreateExtension(): Extension {
-    return this.getOrCreate(this.extensionName, null, null, this.extensionDefinition, Extension.READ_WRITE);
+  getOrCreateExtension(): Extension[] {
+    let extensions = [];
+    extensions.push(this.getOrCreate(SchemaExtension.EXTENSION_NAME, DataColumnsDao.TABLE_NAME, null, SchemaExtension.EXTENSION_SCHEMA_DEFINITION, Extension.READ_WRITE));
+    extensions.push(this.getOrCreate(SchemaExtension.EXTENSION_NAME, DataColumnConstraintsDao.TABLE_NAME, null, SchemaExtension.EXTENSION_SCHEMA_DEFINITION, Extension.READ_WRITE));
+    return extensions;
   }
 
   has() {
-    return this.hasExtension(SchemaExtension.EXTENSION_NAME, null, null);
+    return this.hasExtensions(SchemaExtension.EXTENSION_NAME);
   }
 
   removeExtension() {
@@ -36,12 +37,8 @@ export class SchemaExtension extends BaseExtension {
     if (this.geoPackage.isTable(DataColumnConstraintsDao.TABLE_NAME)) {
       this.geoPackage.dropTable(DataColumnConstraintsDao.TABLE_NAME);
     }
-    try {
-      if (this.extensionsDao.isTableExists()) {
-        this.extensionsDao.deleteByExtension(SchemaExtension.EXTENSION_NAME);
-      }
-    } catch (e) {
-      throw new Error('Failed to delete Schema extension. GeoPackage: ' + this.geoPackage.name);
+    if (this.extensionsDao.isTableExists()) {
+      this.extensionsDao.deleteByExtension(SchemaExtension.EXTENSION_NAME);
     }
   }
 }

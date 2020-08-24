@@ -99,7 +99,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createIdColumn(index: number, idColumnName: string): UserColumn {
-    return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
+    return UserColumn.createPrimaryKeyColumn(index, idColumnName);
   }
   /**
    * Determine if the column is a simple column

@@ -349,7 +349,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param columnName column name
    */
    dropColumn(columnName: string) {
-    AlterTable.dropColumn(this.connection, this.table_name, columnName);
+    AlterTable.dropColumnForUserTable(this.connection, this.table, columnName);
   }
 
   /**
@@ -381,7 +381,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param columnNames column names
    */
    dropColumnNames(columnNames: string[]) {
-    AlterTable.dropColumns(this.connection, this.table_name, columnNames);
+    AlterTable.dropColumnsForUserTable(this.connection, this.table, columnNames);
   }
 
   /**
@@ -389,7 +389,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param column column
    */
    alterColumn(column: UserColumn) {
-    AlterTable.alterColumn(this.connection, this.table_name, column);
+    AlterTable.alterColumnForTable(this.connection, this.table, column);
   }
 
   /**
@@ -397,6 +397,6 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param columns columns
    */
    alterColumns(columns: UserColumn[]) {
-    AlterTable.alterColumns(this.connection, this.table_name, columns);
+    AlterTable.alterColumnsForTable(this.connection, this.table, columns);
   }
 }

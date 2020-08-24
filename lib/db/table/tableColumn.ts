@@ -51,6 +51,11 @@ export class TableColumn {
   primaryKey: boolean;
 
   /**
+   * Autoincrement flag
+   */
+  autoincrement: boolean;
+
+  /**
    * Constructor
    *
    * @param index column index
@@ -61,9 +66,10 @@ export class TableColumn {
    * @param notNull not null flag
    * @param defaultValueString default value as a string
    * @param defaultValue default value
-   * @param primaryKey  primary key flag
+   * @param primaryKey primary key flag
+   * @param autoincrement autoincrement flag
    */
-  constructor(index: number, name: string, type: string, dataType: GeoPackageDataType, max: number, notNull: boolean, defaultValueString: string, defaultValue: any, primaryKey: boolean) {
+  constructor(index: number, name: string, type: string, dataType: GeoPackageDataType, max: number, notNull: boolean, defaultValueString: string, defaultValue: any, primaryKey: boolean, autoincrement: boolean) {
     this.index = index;
     this.name = name;
     this.type = type;
@@ -73,6 +79,7 @@ export class TableColumn {
     this.defaultValueString = defaultValueString;
     this.defaultValue = defaultValue;
     this.primaryKey = primaryKey;
+    this.autoincrement = autoincrement
   }
 
   /**
@@ -158,5 +165,13 @@ export class TableColumn {
    */
   isPrimaryKey(): boolean {
     return this.primaryKey;
+  }
+
+  /**
+   * Is this an autoincrement column?
+   * @return true if an autoincrement column
+   */
+  isAutoIncrement(): boolean {
+    return this.autoincrement;
   }
 }

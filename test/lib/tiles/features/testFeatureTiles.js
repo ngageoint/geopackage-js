@@ -36,7 +36,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
       var columns = [];
 
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
       // @ts-ignore
       columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
       columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));

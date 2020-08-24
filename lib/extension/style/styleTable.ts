@@ -140,7 +140,7 @@ export class StyleTable extends AttributesTable {
   static createColumns(): UserCustomColumn[] {
     const columns = [];
     let index = 0;
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(index++, StyleTable.COLUMN_ID));
+    columns.push(UserColumn.createPrimaryKeyColumn(index++, StyleTable.COLUMN_ID));
     columns.push(
       UserCustomColumn.createColumn(index++, StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, undefined, false, undefined),
     );

@@ -33,6 +33,11 @@ export enum ConstraintType {
    * Collate column constraint
    */
   COLLATE,
+
+  /**
+   * Autoincrement column constraint
+   */
+  AUTOINCREMENT,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -53,7 +58,7 @@ export namespace ConstraintType {
   /**
    * Column constraints
    */
-  export const COLUMN_CONSTRAINTS = new Set<ConstraintType>([ConstraintType.PRIMARY_KEY, ConstraintType.NOT_NULL, ConstraintType.UNIQUE, ConstraintType.CHECK, ConstraintType.DEFAULT, ConstraintType.COLLATE, ConstraintType.FOREIGN_KEY]);
+  export const COLUMN_CONSTRAINTS = new Set<ConstraintType>([ConstraintType.PRIMARY_KEY, ConstraintType.NOT_NULL, ConstraintType.UNIQUE, ConstraintType.CHECK, ConstraintType.DEFAULT, ConstraintType.COLLATE, ConstraintType.FOREIGN_KEY, ConstraintType.AUTOINCREMENT]);
 
   /**
    * Table constraint parsing lookup values

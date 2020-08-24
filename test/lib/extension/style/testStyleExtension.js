@@ -1,5 +1,4 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {FeatureStyleExtension} from '../../../../lib/extension/style'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').StyleMappingTable
@@ -18,7 +17,8 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   // , GeoPackageAPI = require('../../../../lib/api')
   , wkx = require('wkx')
   , fs = require('fs-extra')
-  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData;
+  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
+  , FeatureStyleExtension = require('../../../../lib/extension/style').FeatureStyleExtension;
 
 describe('StyleExtension Tests', function() {
   var testGeoPackage;

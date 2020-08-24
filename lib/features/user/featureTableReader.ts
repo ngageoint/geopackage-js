@@ -49,6 +49,6 @@ export class FeatureTableReader extends UserTableReader<FeatureColumn, FeatureTa
    * @inheritDoc
    */
   createColumn(tableColumn: TableColumn): FeatureColumn {
-    return new FeatureColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, FeatureColumn.getGeometryTypeFromTableColumn(tableColumn));
+    return new FeatureColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, FeatureColumn.getGeometryTypeFromTableColumn(tableColumn), tableColumn.autoincrement);
   }
 }

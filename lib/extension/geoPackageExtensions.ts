@@ -192,14 +192,9 @@ export class GeoPackageExtensions {
 
   /**
    * Copy the Related Tables extensions for the table
-   *
-   * @param geoPackage
-   *            GeoPackage
-   * @param table
-   *            table name
-   * @param newTable
-   *            new table name
-   * @since 3.3.0
+   * @param geoPackage GeoPackage
+   * @param table table name
+   * @param newTable new table name
    */
   static copyRelatedTables(geoPackage: GeoPackage, table: string, newTable: string) {
     try {

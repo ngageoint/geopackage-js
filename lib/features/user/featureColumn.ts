@@ -7,6 +7,7 @@ import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { GeometryType } from './geometryType';
 import { TableColumn  } from '../../db/table/tableColumn';
+import { UserTable } from '../../user/userTable';
 
 /**
  * Represents a user feature column
@@ -25,8 +26,9 @@ export class FeatureColumn extends UserColumn {
     defaultValue?: any,
     primaryKey?: boolean,
     geometryType?: GeometryType,
+    autoincrement?: boolean,
   ) {
-    super(index, name, dataType, max, notNull, defaultValue, primaryKey);
+    super(index, name, dataType, max, notNull, defaultValue, primaryKey, autoincrement);
     this.geometryType = geometryType;
     this.type = this.getTypeName(name, dataType, geometryType);
   }
@@ -35,11 +37,16 @@ export class FeatureColumn extends UserColumn {
    *
    *  @param {Number} index column index
    *  @param {string} name  column name
+   *  @param {boolean} autoincrement  column name
    *
    *  @return feature column
    */
-  static createPrimaryKeyColumnWithIndexAndName(index: number, name: string): FeatureColumn {
-    return new FeatureColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true);
+  static createPrimaryKeyColumn(
+    index: number,
+    name: string,
+    autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT
+  ): FeatureColumn {
+    return new FeatureColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, undefined, autoincrement);
   }
   /**
    *  Create a new geometry column
@@ -62,7 +69,7 @@ export class FeatureColumn extends UserColumn {
     if ((type === null || type === undefined)) {
       throw new Error('Geometry Type is required to create column: ' + name);
     }
-    return new FeatureColumn(index, name, GeoPackageDataType.BLOB, undefined, notNull, defaultValue, false, type);
+    return new FeatureColumn(index, name, GeoPackageDataType.BLOB, undefined, notNull, defaultValue, false, type, false);
   }
 
   /**
@@ -73,6 +80,7 @@ export class FeatureColumn extends UserColumn {
    * @param notNull
    * @param defaultValue
    * @param max
+   * @param autoincrement
    */
   static createColumn(
     index: number,
@@ -81,8 +89,9 @@ export class FeatureColumn extends UserColumn {
     notNull = false,
     defaultValue?: DBValue,
     max?: number,
+    autoincrement?: boolean,
   ): FeatureColumn {
-    return new FeatureColumn(index, name, type, max, notNull, defaultValue, false);
+    return new FeatureColumn(index, name, type, max, notNull, defaultValue, false, undefined, autoincrement);
   }
 
   /**
@@ -120,7 +129,7 @@ export class FeatureColumn extends UserColumn {
    * @return copied column
    */
   copy(): FeatureColumn {
-    return new FeatureColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.geometryType);
+    return new FeatureColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.geometryType, this.autoincrement);
   }
 
   /**

@@ -33,6 +33,6 @@ export class UserCustomTableReader extends UserTableReader<UserCustomColumn, Use
    * @inheritDoc
    */
   createColumn(tableColumn: TableColumn): UserCustomColumn {
-    return new UserCustomColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey);
+    return new UserCustomColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, tableColumn.autoincrement);
   }
 }
