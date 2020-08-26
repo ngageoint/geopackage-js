@@ -1,3 +1,5 @@
+import { default as testSetup } from '../fixtures/testSetup'
+
 var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
   , DataColumns = require('../../lib/dataColumns/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
@@ -11,7 +13,6 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
   , UserColumn = require('../../lib/user/userColumn').UserColumn
   , GeometryType = require('../../lib/features/user/geometryType').GeometryType
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
-  , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
   , wkx = require('wkx');
 

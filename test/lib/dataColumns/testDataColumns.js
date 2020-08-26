@@ -1,10 +1,11 @@
+import { default as testSetup } from '../../fixtures/testSetup'
+
 var DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').DataColumnConstraints
   , TableCreator = require('../../../lib/db/tableCreator').TableCreator
-  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnConstraintsDao
+  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnsDao
   , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints/dataColumnConstraintsDao').DataColumnConstraintsDao
   , Contents = require('../../../lib/core/contents/contents').Contents
-  , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
   , should = require('chai').should();
 
