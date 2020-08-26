@@ -2,7 +2,7 @@
  * Query on the SQLiteMaster table
  */
 import { SQLiteMasterColumn } from './sqliteMasterColumn';
-import { CoreSQLUtils } from '../coreSQLUtils';
+import { StringUtils } from '../stringUtils';
 
 export class SQLiteMasterQuery {
 
@@ -37,7 +37,7 @@ export class SQLiteMasterQuery {
 	 */
 	add(column: SQLiteMasterColumn, operation: string, value: string) {
 		this.validateAdd();
-		this.queries.push('LOWER(' + CoreSQLUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ') ' + operation + ' LOWER(?)');
+		this.queries.push('LOWER(' + StringUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ') ' + operation + ' LOWER(?)');
 		this.arguments.push(value);
 	}
 
@@ -47,7 +47,7 @@ export class SQLiteMasterQuery {
 	 */
 	addIsNull(column: SQLiteMasterColumn) {
 		this.validateAdd();
-		this.queries.push(CoreSQLUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ' IS NULL');
+		this.queries.push(StringUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ' IS NULL');
 	}
 
 	/**
@@ -56,7 +56,7 @@ export class SQLiteMasterQuery {
 	 */
 	addIsNotNull(column: SQLiteMasterColumn) {
 		this.validateAdd();
-		this.queries.push(CoreSQLUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ' IS NOT NULL');
+		this.queries.push(StringUtils.quoteWrap(SQLiteMasterColumn.nameFromType(column).toLowerCase()) + ' IS NOT NULL');
 	}
 
 	/**

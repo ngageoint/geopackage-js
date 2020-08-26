@@ -3,10 +3,10 @@
  */
 import { TableConstraints } from './tableConstraints';
 import { ColumnConstraints } from './columnConstraints';
-import { CoreSQLUtils } from '../coreSQLUtils';
 import { Constraint } from './constraint';
 import { ConstraintType } from './constraintType';
 import { RawConstraint } from './rawConstraint';
+import { StringUtils } from "../stringUtils";
 
 export class ConstraintParser {
   /**
@@ -105,7 +105,7 @@ export class ConstraintParser {
    */
   static getColumnConstraints(constraintSql: string): ColumnConstraints {
     const parts = constraintSql.trim().split(/\s+/);
-    const columnName = CoreSQLUtils.quoteUnwrap(parts[0]);
+    const columnName = StringUtils.quoteUnwrap(parts[0]);
 
     const constraints = new ColumnConstraints(columnName);
 
@@ -340,7 +340,7 @@ export class ConstraintParser {
     let name = null;
     let matches = ConstraintParser.NAME_PATTERN(constraintSql);
     if (matches !== null && matches.length > ConstraintParser.NAME_PATTERN_NAME_GROUP) {
-      name = CoreSQLUtils.quoteUnwrap(matches[ConstraintParser.NAME_PATTERN_NAME_GROUP]);
+      name = StringUtils.quoteUnwrap(matches[ConstraintParser.NAME_PATTERN_NAME_GROUP]);
     }
     return name;
   }
@@ -354,7 +354,7 @@ export class ConstraintParser {
     let parts = [null, constraintSql];
     const matches = ConstraintParser.CONSTRAINT_PATTERN(constraintSql.trim());
     if (matches !== null && matches.length > ConstraintParser.CONSTRAINT_PATTERN_DEFINITION_GROUP) {
-      let name = CoreSQLUtils.quoteUnwrap(matches[ConstraintParser.CONSTRAINT_PATTERN_NAME_GROUP]);
+      let name = StringUtils.quoteUnwrap(matches[ConstraintParser.CONSTRAINT_PATTERN_NAME_GROUP]);
       if (name !== null && name !== undefined) {
         name = name.trim();
       }

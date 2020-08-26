@@ -1,5 +1,5 @@
 import { ConstraintType } from './constraintType';
-import { CoreSQLUtils } from '../coreSQLUtils';
+import { StringUtils } from '../stringUtils';
 
 export class Constraint {
 
@@ -19,7 +19,7 @@ export class Constraint {
   buildNameSql(): string {
     let sql = '';
     if (this.name !== null && this.name !== undefined) {
-      sql = Constraint.CONSTRAINT + ' ' + CoreSQLUtils.quoteWrap(this.name) + ' ';
+      sql = Constraint.CONSTRAINT + ' ' + StringUtils.quoteWrap(this.name) + ' ';
     }
     return sql;
   }

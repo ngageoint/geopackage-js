@@ -5,7 +5,7 @@
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
-import { UserTable } from '../../user/userTable';
+import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
  * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
@@ -37,7 +37,7 @@ export class TileColumn extends UserColumn {
    * @param  {number} index Index
    * @param  {boolean} autoincrement Autoincrement
    */
-  static createIdColumn(index: number, autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT): TileColumn {
+  static createIdColumn(index: number, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): TileColumn {
     return new TileColumn(index, TileColumn.COLUMN_ID, GeoPackageDataType.INTEGER, null, false, null, true, autoincrement);
   }
   /**

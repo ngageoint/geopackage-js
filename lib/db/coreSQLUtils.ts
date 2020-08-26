@@ -1,11 +1,10 @@
 /**
  * Core SQL Utility methods
  */
+import { StringUtils } from './stringUtils';
 import { UserColumn } from '../user/userColumn';
 import { UserTable } from '../user/userTable';
-import { GeoPackageDataType } from './geoPackageDataType';
 import { GeoPackageConnection } from './geoPackageConnection';
-import { AlterTable } from './alterTable';
 import { TableMapping } from './tableMapping';
 import { TableInfo } from './table/tableInfo';
 import { SQLiteMaster } from './master/sqliteMaster';
@@ -20,90 +19,6 @@ export class CoreSQLUtils {
   static NUMBER_PATTERN = '\\d+';
 
   /**
-   * Wrap the name in double quotes
-   * @param name  name
-   * @return quoted name
-   */
-  static quoteWrap(name: string): string {
-    let quoteName = null;
-    if (name !== null) {
-      if (name.startsWith('"') && name.endsWith('"')) {
-        quoteName = name;
-      } else {
-        quoteName = '"' + name + '"';
-      }
-    }
-    return quoteName;
-  }
-
-  /**
-   * Wrap the names in double quotes
-   * @param names names
-   * @return quoted names
-   */
-  static quoteWrapStringArray(names: string[]): string[] {
-    let quoteNames = null;
-    if (names != null) {
-      quoteNames = new String[names.length];
-      for (let i = 0; i < names.length; i++) {
-        quoteNames[i] = CoreSQLUtils.quoteWrap(names[i]);
-      }
-    }
-    return quoteNames;
-  }
-
-  /**
-   * Remove double quotes from the name
-   * @param name name
-   * @return unquoted name
-   */
-  static quoteUnwrap(name: string): string {
-    let unquotedName = null;
-    if (name != null) {
-      if (name.startsWith('"') && name.endsWith('"')) {
-        unquotedName = name.substring(1, name.length - 1);
-      } else {
-        unquotedName = name;
-      }
-    }
-    return unquotedName;
-  }
-
-  /**
-   * Build the "columns as" query values for the provided columns and "columns
-   * as" values for use in select statements. The columns as size should equal
-   * the number of columns and only provide values at the indices for desired
-   * columns.
-   *
-   * Example: columns = [column1, column2], columnsAs = [null, value] creates
-   * [column1, value as column2]
-   *
-   * @param columns columns array
-   * @param columnsAs columns as values
-   * @return columns with as values
-   */
-  static buildColumnsAs(columns: string[], columnsAs: string[]): string[] {
-    let columnsWithAs = null;
-    if (columnsAs !== null && columnsAs !== undefined) {
-      columnsWithAs = [];
-      for (let i = 0; i < columns.length; i++) {
-        let column = columns[i];
-        let columnsAsValue = columnsAs[i];
-        let columnWithAs = null;
-        if (columnsAsValue !== null && columnsAsValue !== undefined) {
-          columnWithAs = columnsAsValue + ' AS ' + column;
-        } else {
-          columnWithAs = column;
-        }
-        columnsWithAs[i] = columnWithAs;
-      }
-    } else {
-      columnsWithAs = columns;
-    }
-    return columnsWithAs;
-  }
-
-  /**
    * Create the user defined table SQL
    *
    * @param table user table
@@ -115,7 +30,7 @@ export class CoreSQLUtils {
     // Build the create table sql
     let sql = '';
     sql = sql.concat('CREATE TABLE ')
-      .concat(CoreSQLUtils.quoteWrap(table.getTableName()))
+      .concat(StringUtils.quoteWrap(table.getTableName()))
       .concat(' (');
 
     // Add each column to the sql
@@ -146,7 +61,7 @@ export class CoreSQLUtils {
    * @return column SQL
    */
   static columnSQL(column: UserColumn): string {
-    return CoreSQLUtils.quoteWrap(column.getName()) + ' ' + CoreSQLUtils.columnDefinition(column);
+    return StringUtils.quoteWrap(column.getName()) + ' ' + CoreSQLUtils.columnDefinition(column);
   }
 
   /**
@@ -169,84 +84,6 @@ export class CoreSQLUtils {
     });
 
     return sql.toString();
-  }
-
-  /**
-   * Get the column default value as a string
-   * @param column user column
-   * @return default value
-   */
-  static columnDefaultValueForUserColumn(column: UserColumn): string {
-    return CoreSQLUtils.columnDefaultValue(column.getDefaultValue(), column.getDataType());
-  }
-
-  /**
-   * Get the column default value as a string
-   * @param defaultValue default value
-   * @param dataType data type
-   * @return default value
-   */
-  static columnDefaultValue(defaultValue: any, dataType: GeoPackageDataType): string {
-    let value = null;
-
-    if (defaultValue !== null && defaultValue !== undefined) {
-      if (dataType !== null && dataType !== undefined) {
-        switch (dataType) {
-          case GeoPackageDataType.BOOLEAN:
-            let booleanValue = null;
-            if (typeof defaultValue === 'boolean') {
-              booleanValue = defaultValue;
-            } else if (typeof defaultValue === 'string') {;
-              switch (defaultValue) {
-                case '0':
-                  booleanValue = false;
-                  break;
-                case '1':
-                  booleanValue = true;
-                  break;
-                case 'true':
-                  booleanValue = true;
-                  break;
-                case 'false':
-                  booleanValue = false;
-                  break;
-                default:
-                  break;
-              }
-            }
-            if (booleanValue !== null && booleanValue !== undefined) {
-              if (booleanValue) {
-                value = '1';
-              } else {
-                value = '0';
-              }
-            }
-            break;
-          case GeoPackageDataType.TEXT:
-            value = defaultValue.toString();
-            if (!value.startsWith('\'') || !value.endsWith('\'')) {
-              value = '\'' + value + '\'';
-            }
-            break;
-          default:
-        }
-      }
-
-      if (value === null || value === undefined) {
-        value = defaultValue.toString();
-      }
-    }
-    return value;
-  }
-
-  /**
-   * Create SQL for adding a column
-   * @param db connection
-   * @param tableName table name
-   * @param column user column
-   */
-  static addColumn(db: GeoPackageConnection, tableName: string, column: UserColumn) {
-    AlterTable.addColumn(db, tableName, column.getName(), CoreSQLUtils.columnDefinition(column));
   }
 
   /**
@@ -313,7 +150,7 @@ export class CoreSQLUtils {
    * @return foreign key check SQL
    */
   static foreignKeyCheckSQL(tableName: string): string {
-    return 'PRAGMA foreign_key_check' + (tableName !== null && tableName !== undefined ? '(' + CoreSQLUtils.quoteWrap(tableName) + ')' : '');
+    return 'PRAGMA foreign_key_check' + (tableName !== null && tableName !== undefined ? '(' + StringUtils.quoteWrap(tableName) + ')' : '');
   }
 
   /**
@@ -348,7 +185,7 @@ export class CoreSQLUtils {
    * @return drop table SQL
    */
   static dropTableSQL(tableName: string): string {
-    return 'DROP TABLE IF EXISTS ' + CoreSQLUtils.quoteWrap(tableName);
+    return 'DROP TABLE IF EXISTS ' + StringUtils.quoteWrap(tableName);
   }
 
   /**
@@ -367,7 +204,7 @@ export class CoreSQLUtils {
    * @return drop view SQL
    */
   static dropViewSQL(viewName: string): string {
-    return 'DROP VIEW IF EXISTS ' + CoreSQLUtils.quoteWrap(viewName);
+    return 'DROP VIEW IF EXISTS ' + StringUtils.quoteWrap(viewName);
   }
 
   /**
@@ -387,7 +224,7 @@ export class CoreSQLUtils {
    */
   static transferTableContentSQL(tableMapping: TableMapping): string {
     let insert = 'INSERT INTO ';
-    insert = insert.concat(CoreSQLUtils.quoteWrap(tableMapping.toTable));
+    insert = insert.concat(StringUtils.quoteWrap(tableMapping.toTable));
     insert = insert.concat(' (');
     let selectColumns = '';
     let where = '';
@@ -402,7 +239,7 @@ export class CoreSQLUtils {
         insert = insert.concat(', ');
         selectColumns = selectColumns.concat(', ');
       }
-      insert = insert.concat(CoreSQLUtils.quoteWrap(toColumn));
+      insert = insert.concat(StringUtils.quoteWrap(toColumn));
 
       if (column.hasConstantValue()) {
         selectColumns = selectColumns.concat(column.getConstantValueAsString());
@@ -410,7 +247,7 @@ export class CoreSQLUtils {
         if (column.hasDefaultValue()) {
           selectColumns = selectColumns.concat('ifnull(');
         }
-        selectColumns = selectColumns.concat(CoreSQLUtils.quoteWrap(column.fromColumn));
+        selectColumns = selectColumns.concat(StringUtils.quoteWrap(column.fromColumn));
         if (column.hasDefaultValue()) {
           selectColumns = selectColumns.concat(',');
           selectColumns = selectColumns.concat(column.getDefaultValueAsString());
@@ -422,7 +259,7 @@ export class CoreSQLUtils {
         if (where.length > 0) {
           where = where.concat(' AND ');
         }
-        where = where.concat(CoreSQLUtils.quoteWrap(column.fromColumn));
+        where = where.concat(StringUtils.quoteWrap(column.fromColumn));
         where = where.concat(' ');
         where = where.concat(column.whereOperator);
         where = where.concat(' ');
@@ -433,7 +270,7 @@ export class CoreSQLUtils {
     insert = insert.concat(') SELECT ');
     insert = insert.concat(selectColumns);
     insert = insert.concat(' FROM ');
-    insert = insert.concat(CoreSQLUtils.quoteWrap(tableMapping.fromTable));
+    insert = insert.concat(StringUtils.quoteWrap(tableMapping.fromTable));
 
     if (where.length > 0) {
       insert = insert.concat(' WHERE ');

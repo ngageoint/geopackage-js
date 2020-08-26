@@ -1,6 +1,5 @@
 import { GeoPackageDataType } from './geoPackageDataType'
 import _ from 'lodash'
-import { CoreSQLUtils } from './coreSQLUtils';
 /**
  * Mapped column, to a column and potentially from a differently named column
  */
@@ -117,7 +116,7 @@ export class MappedColumn {
    * @return default value as string
    */
   getDefaultValueAsString(): string {
-    return CoreSQLUtils.columnDefaultValue(this._defaultValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._defaultValue, this._dataType)
   }
 
   /**
@@ -165,7 +164,7 @@ export class MappedColumn {
    * @return constant value as string
    */
   getConstantValueAsString(): string {
-    return CoreSQLUtils.columnDefaultValue(this._constantValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._constantValue, this._dataType)
   }
 
   /**
@@ -197,7 +196,7 @@ export class MappedColumn {
    * @return where value as string
    */
   getWhereValueAsString(): string {
-    return CoreSQLUtils.columnDefaultValue(this._whereValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._whereValue, this._dataType)
   }
 
   /**

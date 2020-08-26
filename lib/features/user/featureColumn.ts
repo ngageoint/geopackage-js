@@ -7,7 +7,7 @@ import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { GeometryType } from './geometryType';
 import { TableColumn  } from '../../db/table/tableColumn';
-import { UserTable } from '../../user/userTable';
+import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
  * Represents a user feature column
@@ -44,7 +44,7 @@ export class FeatureColumn extends UserColumn {
   static createPrimaryKeyColumn(
     index: number,
     name: string,
-    autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT
   ): FeatureColumn {
     return new FeatureColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, undefined, autoincrement);
   }

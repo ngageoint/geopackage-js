@@ -4,7 +4,6 @@
  */
 
 import { UserTable } from './userTable';
-
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbAdapter';
 import { UserColumn } from './userColumn';

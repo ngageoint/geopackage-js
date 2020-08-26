@@ -1,11 +1,11 @@
 import { UserColumn } from './userColumn';
-
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { Constraint } from '../db/table/constraint';
 import { ConstraintType } from '../db/table/constraintType';
 import { Contents } from '../core/contents/contents';
 import { UserColumns } from './userColumns';
 import { Constraints } from '../db/table/constraints';
+
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -16,16 +16,6 @@ import { Constraints } from '../db/table/constraints';
  * @param  {string[]} [requiredColumns] required columns
  */
 export class UserTable<TColumn extends UserColumn> {
-  /**
-   * Default id autoincrement setting
-   */
-  static DEFAULT_AUTOINCREMENT: boolean = true;
-
-  /**
-   * Default primary key not null setting
-   */
-  static DEFAULT_PK_NOT_NULL: boolean = true;
-
   /**
    * Columns
    */

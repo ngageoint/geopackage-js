@@ -8,9 +8,8 @@ import { Constraint } from '../db/table/constraint';
 import { RawConstraint } from '../db/table/rawConstraint';
 import { ConstraintParser } from '../db/table/constraintParser';
 import { ColumnConstraints } from '../db/table/columnConstraints';
-import { CoreSQLUtils } from '../db/coreSQLUtils';
 import { ConstraintType } from '../db/table/constraintType';
-import { UserTable } from './userTable';
+import { UserTableDefaults } from './userTableDefaults';
 import { Constraints } from '../db/table/constraints';
 
 /**
@@ -357,7 +356,7 @@ export class UserColumn {
    *
    *  @return {UserColumn} created column
    */
-  static createPrimaryKeyColumn(index: number, name: string, autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT): UserColumn {
+  static createPrimaryKeyColumn(index: number, name: string, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): UserColumn {
     return new UserColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, autoincrement);
   }
 
@@ -483,7 +482,7 @@ export class UserColumn {
    * @param defaultValue default value
    */
   private addDefaultValueConstraint(defaultValue: any) {
-    this.addConstraint(new RawConstraint(ConstraintType.DEFAULT, null, "DEFAULT " + CoreSQLUtils.columnDefaultValue(defaultValue, this.getDataType()), UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER));
+    this.addConstraint(new RawConstraint(ConstraintType.DEFAULT, null, "DEFAULT " + GeoPackageDataType.columnDefaultValue(defaultValue, this.getDataType()), UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER));
   }
 
   /**
@@ -533,7 +532,7 @@ export class UserColumn {
    */
   buildConstraintSql(constraint: Constraint): string {
     let sql = null;
-    if (UserTable.DEFAULT_PK_NOT_NULL || !this.isPrimaryKey() || constraint.getType() !== ConstraintType.NOT_NULL) {
+    if (UserTableDefaults.DEFAULT_PK_NOT_NULL || !this.isPrimaryKey() || constraint.getType() !== ConstraintType.NOT_NULL) {
       sql = constraint.buildSql();
     }
     return sql;

@@ -2,6 +2,7 @@ import { GeoPackageConnection } from './geoPackageConnection'
 import { UserTable } from '../user/userTable'
 import { UserCustomTableReader } from '../user/custom/userCustomTableReader'
 import { CoreSQLUtils } from './coreSQLUtils'
+import { StringUtils } from './stringUtils'
 import { UserCustomTable } from '../user/custom/userCustomTable'
 import { TableMapping } from './tableMapping'
 import { UserColumn } from '../user/userColumn'
@@ -23,7 +24,7 @@ export class AlterTable {
    * @return alter table SQL prefix
    */
   static alterTableSQL (table: string) {
-    return 'ALTER TABLE ' + CoreSQLUtils.quoteWrap(table)
+    return 'ALTER TABLE ' + StringUtils.quoteWrap(table)
   }
 
   /**
@@ -44,7 +45,7 @@ export class AlterTable {
    * @return rename table SQL
    */
   static renameTableSQL (tableName: string, newTableName: string) {
-    return AlterTable.alterTableSQL(tableName) + ' RENAME TO ' + CoreSQLUtils.quoteWrap(newTableName)
+    return AlterTable.alterTableSQL(tableName) + ' RENAME TO ' + StringUtils.quoteWrap(newTableName)
   }
 
   /**
@@ -67,7 +68,7 @@ export class AlterTable {
    * @return rename table SQL
    */
   static renameColumnSQL (tableName: string, columnName: string, newColumnName: string) {
-    return AlterTable.alterTableSQL(tableName) + ' RENAME COLUMN ' + CoreSQLUtils.quoteWrap(columnName) + ' TO ' + CoreSQLUtils.quoteWrap(newColumnName)
+    return AlterTable.alterTableSQL(tableName) + ' RENAME COLUMN ' + StringUtils.quoteWrap(columnName) + ' TO ' + StringUtils.quoteWrap(newColumnName)
   }
 
   /**
@@ -90,7 +91,7 @@ export class AlterTable {
    * @return add column SQL
    */
   static addColumnSQL (tableName: string, columnName: string, columnDef: string) {
-    return AlterTable.alterTableSQL(tableName) + ' ADD COLUMN ' + CoreSQLUtils.quoteWrap(columnName) + ' ' + columnDef
+    return AlterTable.alterTableSQL(tableName) + ' ADD COLUMN ' + StringUtils.quoteWrap(columnName) + ' ' + columnDef
   }
 
   /**

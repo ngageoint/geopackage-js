@@ -3,11 +3,11 @@
  */
 import { TableColumn } from './tableColumn';
 import { GeoPackageConnection } from '../geoPackageConnection';
-import { CoreSQLUtils } from '../coreSQLUtils';
 import { GeoPackageDataType } from '../geoPackageDataType';
 import { GeometryType } from '../../features/user/geometryType';
 import { SQLiteMaster } from '../master/sqliteMaster';
 import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
+import { StringUtils } from '../stringUtils';
 
 export class TableInfo {
 
@@ -173,7 +173,7 @@ export class TableInfo {
    * @return table info or null if no table
    */
   static info(db: GeoPackageConnection, tableName: string): TableInfo {
-    let sql = 'PRAGMA table_info(' + CoreSQLUtils.quoteWrap(tableName) + ')';
+    let sql = 'PRAGMA table_info(' + StringUtils.quoteWrap(tableName) + ')';
     let results = db.all(sql, null);
     let tableColumns: TableColumn[] = [];
 

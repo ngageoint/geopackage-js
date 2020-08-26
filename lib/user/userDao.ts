@@ -14,7 +14,7 @@ import { DBValue } from '../db/dbAdapter';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { UserColumn } from './userColumn';
 import { AlterTable } from '../db/alterTable';
-import {CoreSQLUtils} from "../db/coreSQLUtils";
+import { CoreSQLUtils } from '../db/coreSQLUtils';
 
 /**
  * Abstract User DAO for reading user tables
@@ -332,7 +332,7 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * @param column new column
    */
   addColumn(column: UserColumn) {
-    CoreSQLUtils.addColumn(this.connection, this.table_name, column);
+    AlterTable.addColumn(this.connection, this.table_name, column.getName(), CoreSQLUtils.columnDefinition(column));
     this._table.addColumn(column);
   }
 
