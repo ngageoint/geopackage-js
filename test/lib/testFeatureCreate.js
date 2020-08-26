@@ -1,5 +1,3 @@
-import { default as testSetup } from '../fixtures/testSetup'
-
 var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
   , DataColumns = require('../../lib/dataColumns/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
@@ -11,14 +9,11 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
   , GeometryData = require('../../lib/geom/geometryData').GeometryData
   , ConstraintType = require('../../lib/db/table/constraintType').ConstraintType
   , UserColumn = require('../../lib/user/userColumn').UserColumn
-  , TableInfo = require('../../lib/db/table/tableInfo').TableInfo
   , GeometryType = require('../../lib/features/user/geometryType').GeometryType
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
-  // , testSetup = require('../fixtures/testSetup')
+  , testSetup = require('../fixtures/testSetup')
   , should = require('chai').should()
-  , wkb = require('../../lib/wkb/index').WKB
-  , wkx = require('wkx')
-  , path = require('path');
+  , wkx = require('wkx');
 
 describe('GeoPackage Feature table create tests', function() {
   var testGeoPackage;

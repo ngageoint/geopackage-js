@@ -1375,7 +1375,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Number} icon id
    */
   getOrInsertIcon(icon: IconRow): number {
-    let iconId;
+    let iconId: number;
     if (icon.hasId()) {
       iconId = icon.id;
     } else {

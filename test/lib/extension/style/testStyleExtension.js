@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles

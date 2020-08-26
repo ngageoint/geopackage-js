@@ -1,13 +1,10 @@
-import { GeoPackageAPI, TableCreator } from '../../../.'
-import { default as testSetup } from '../../fixtures/testSetup'
-import {DataColumnsDao} from '../../../lib/dataColumns/dataColumnsDao';
-import {DataColumnConstraintsDao} from '../../../lib/dataColumnConstraints/dataColumnConstraintsDao';
-import {Contents} from "../../../lib/core/contents/contents";
-
 var DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
   , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').DataColumnConstraints
-  // , GeoPackageAPI = require('../../../.')
-  // , testSetup = require('../../fixtures/testSetup')
+  , TableCreator = require('../../../lib/db/tableCreator').TableCreator
+  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnConstraintsDao
+  , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints/dataColumnConstraintsDao').DataColumnConstraintsDao
+  , Contents = require('../../../lib/core/contents/contents').Contents
+  , testSetup = require('../../fixtures/testSetup')
   , path = require('path')
   , should = require('chai').should();
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 var GeometryData = require('../../../lib/geom/geometryData').GeometryData;
 
 var wkx = require('wkx')

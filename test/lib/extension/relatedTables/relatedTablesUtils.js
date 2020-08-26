@@ -5,7 +5,6 @@ var GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPac
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
   , should = require('chai').should();
 
-
 module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   var columns = [];
   var columnIndex = startingIndex;

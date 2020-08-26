@@ -1,3 +1,4 @@
+
 import { default as testSetup } from '../../fixtures/testSetup'
 import { TableCreator } from '../../../lib/db/tableCreator'
 

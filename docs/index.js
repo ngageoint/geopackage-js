@@ -3,15 +3,17 @@ const Promise = require('promise-polyfill');
 if (!window.Promise) {
   window.Promise = Promise;
 }
-var async = require('async'),
+const async = require('async'),
   reproject = require('reproject'),
   L = require('leaflet'),
   $ = require('jquery'),
   proj4 = require('proj4'),
-  async = require('async'),
   Mustache = require('mustache'),
   fileType = require('file-type'),
-  FileSaver = require('file-saver');
+  FileSaver = require('file-saver'),
+  path = require('path'),
+  fs = require('fs'),
+  _ = require('lodash');
 
 window.proj4 = proj4;
 window.async = async;
@@ -21,6 +23,9 @@ window.fileType = fileType;
 window.reproject = reproject;
 window.Mustache = Mustache;
 window.FileSaver = FileSaver;
+window.path = path;
+window.fs = fs;
+window._ = _;
 
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
@@ -29,3 +34,4 @@ const gp = require('@ngageoint/geopackage');
 console.log('gp is', gp);
 window.GeoPackage = gp;
 window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage').GeoJSONToGeoPackage;
+window.KMLToGeoPackage = require('@ngageoint/kml-to-geopackage').KMLToGeoPackage;

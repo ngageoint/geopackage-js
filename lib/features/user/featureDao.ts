@@ -166,7 +166,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     const srs = this.srs;
     const projection = this.projection;
     const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
-    const thisgetRow = this.getRow.bind(this);
+    const thisGetRow = this.getRow.bind(this);
     const projectedBoundingBox = boundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
     return {
       [Symbol.iterator](): IterableIterator<FeatureRow> {
@@ -178,7 +178,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
           let featureRow: FeatureRow;
           let geometry;
           while (!nextRow.done && !geometry) {
-            featureRow = thisgetRow(nextRow.value);
+            featureRow = thisGetRow(nextRow.value);
             try {
               const reporjectedGeometry = FeatureDao.reprojectFeature(featureRow, srs, projection);
               geometry = FeatureDao.verifyFeature(reporjectedGeometry, projectedBoundingBox);

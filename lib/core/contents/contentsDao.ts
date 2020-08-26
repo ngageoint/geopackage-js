@@ -170,12 +170,12 @@ export class ContentsDao extends Dao<Contents> {
     const dao = this.geoPackage.tileMatrixDao;
     const results = dao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, contents.table_name);
     if (!results || !results.length) return undefined;
-    const tileMatricies = [];
+    const tileMatrices = [];
     for (let i = 0; i < results.length; i++) {
       const gc = dao.createObject(results[i]);
-      tileMatricies.push(gc);
+      tileMatrices.push(gc);
     }
-    return tileMatricies;
+    return tileMatrices;
   }
 
   deleteCascadeContents(contents: Contents): number {
