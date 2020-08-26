@@ -6,6 +6,8 @@
 import { BaseExtension } from '../baseExtension';
 import { GeoPackage } from '../../geoPackage';
 import { Extension } from '../extension';
+import { MetadataReferenceDao } from '../../metadata/reference/metadataReferenceDao';
+import { MetadataDao } from '../../metadata/metadataDao';
 
 /**
  * Metadata extension
@@ -27,7 +29,27 @@ export class MetadataExtension extends BaseExtension {
   /**
    * Get or create the metadata extension
    */
-  getOrCreateExtension(): Promise<Extension> {
+  getOrCreateExtension(): Extension {
     return this.getOrCreate(this.extensionName, null, null, this.extensionDefinition, Extension.READ_WRITE);
+  }
+
+  has() {
+    return this.hasExtension(MetadataExtension.EXTENSION_NAME, null, null);
+  }
+
+  removeExtension() {
+    if (this.geoPackage.isTable(MetadataReferenceDao.TABLE_NAME)) {
+      this.geoPackage.dropTable(MetadataReferenceDao.TABLE_NAME);
+    }
+    if (this.geoPackage.isTable(MetadataDao.TABLE_NAME)) {
+      this.geoPackage.dropTable(MetadataDao.TABLE_NAME);
+    }
+    try {
+      if (this.extensionsDao.isTableExists()) {
+        this.extensionsDao.deleteByExtension(MetadataExtension.EXTENSION_NAME);
+      }
+    } catch (e) {
+      throw new Error("Failed to delete Schema extension. GeoPackage: " + this.geoPackage.name);
+    }
   }
 }

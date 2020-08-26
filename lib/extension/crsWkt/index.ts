@@ -21,7 +21,21 @@ export class CrsWktExtension extends BaseExtension {
   /**
    * Get or create the extension
    */
-  getOrCreateExtension(): Promise<Extension> {
+  getOrCreateExtension(): Extension {
     return this.getOrCreate(this.extensionName, null, null, this.extensionDefinition, Extension.READ_WRITE);
+  }
+
+  has() {
+    return this.hasExtension(CrsWktExtension.EXTENSION_NAME, null, null);
+  }
+
+  removeExtension() {
+    try {
+      if (this.extensionsDao.isTableExists()) {
+        this.extensionsDao.deleteByExtension(CrsWktExtension.EXTENSION_NAME);
+      }
+    } catch (e) {
+      throw new Error("Failed to delete CrsWkt extension. GeoPackage: " + this.geoPackage.name);
+    }
   }
 }

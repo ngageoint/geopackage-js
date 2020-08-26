@@ -3,30 +3,33 @@
  */
 
 import { UserColumn } from '../userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
+import { UserTableDefaults } from "../userTableDefaults";
 
 /**
  * Create a new user custom columnd
  *  @param {Number} index        column index
  *  @param {string} name         column name
- *  @param {module:db/dataTypes~GPKGDataType} dataType  data type
+ *  @param {module:db/geoPackageDataType~GPKGDataType} dataType  data type
  *  @param {Number} max max value
  *  @param {Boolean} notNull      not null
  *  @param {Object} defaultValue default value or nil
  *  @param {Boolean} primaryKey primary key
+ *  @param {Boolean} autoincrement autoincrement
  */
 export class UserCustomColumn extends UserColumn {
   constructor(
     index: number,
     name: string,
-    dataType: DataTypes,
+    dataType: GeoPackageDataType,
     max?: number,
     notNull?: boolean,
     defaultValue?: DBValue,
     primaryKey?: boolean,
+    autoincrement?: boolean,
   ) {
-    super(index, name, dataType, max, notNull, defaultValue, primaryKey);
+    super(index, name, dataType, max, notNull, defaultValue, primaryKey, autoincrement);
     // eslint-disable-next-line eqeqeq
     if (dataType == null) {
       throw new Error('Data type is required to create column: ' + name);
@@ -37,21 +40,38 @@ export class UserCustomColumn extends UserColumn {
    *
    *  @param {Number} index        column index
    *  @param {string} name         column name
-   *  @param {module:db/dataTypes~GPKGDataType} dataType         data type
+   *  @param {GeoPackageDataType} type data type
    *  @param {Number} [max] max value
    *  @param {Boolean} [notNull]      not null
    *  @param {Object} [defaultValue] default value or nil
+   *  @param {Object} [max] max value or nil
+   *  @param {Boolean} [autoincrement] autoincrement or nil
    *
-   *  @return {module:user/custom~UserCustomColumn} created column
+   *  @return {UserCustomColumn} created column
    */
   static createColumn(
     index: number,
     name: string,
-    type: DataTypes,
+    type: GeoPackageDataType,
     notNull = false,
     defaultValue?: DBValue,
     max?: number,
+    autoincrement?: boolean,
   ): UserCustomColumn {
-    return new UserCustomColumn(index, name, type, max, notNull, defaultValue, false);
+    return new UserCustomColumn(index, name, type, max, notNull, defaultValue, false, autoincrement);
+  }
+
+  /**
+   * Create a new primary key column
+   * @param index
+   * @param name
+   * @param autoincrement
+   */
+  static createPrimaryKeyColumn(
+    index: number,
+    name: string,
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
+  ): UserCustomColumn {
+    return new UserCustomColumn(index, name, GeoPackageDataType.INTEGER, undefined, undefined, undefined, true, autoincrement);
   }
 }

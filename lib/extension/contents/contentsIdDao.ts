@@ -30,7 +30,7 @@ export class ContentsIdDao extends Dao<ContentsId> {
    * Create the necessary tables for this dao
    * @return {Promise}
    */
-  createTable(): Promise<boolean> {
+  createTable(): boolean {
     return this.geoPackage.getTableCreator().createContentsId();
   }
   /**

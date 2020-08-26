@@ -3,7 +3,7 @@ import {
   GeoPackageAPI,
   FeatureColumn,
   GeometryColumns,
-  DataTypes,
+  GeoPackageDataType,
   BoundingBox,
 } from '@ngageoint/geopackage';
 
@@ -165,7 +165,7 @@ export class ShapefileToGeoPackage {
     for (const key in builder.properties) {
       const prop = builder.properties[key];
       if (prop.name.toLowerCase() !== 'id') {
-        columns.push(FeatureColumn.createColumn(index, prop.name, DataTypes.fromName(prop.type), false, null));
+        columns.push(FeatureColumn.createColumn(index, prop.name, GeoPackageDataType.fromName(prop.type), false, null));
         index++;
       }
     }

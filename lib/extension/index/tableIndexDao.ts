@@ -31,9 +31,9 @@ export class TableIndexDao extends Dao<TableIndex> {
   }
   /**
    * Creates the tables necessary
-   * @return {Promise}
+   * @return {boolean}
    */
-  async createTable(): Promise<boolean> {
+  createTable(): boolean {
     const tc = new TableCreator(this.geoPackage);
     return tc.createTableIndex();
   }

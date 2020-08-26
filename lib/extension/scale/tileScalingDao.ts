@@ -34,7 +34,7 @@ export class TileScalingDao extends Dao<TileScaling> {
    * Create the necessary tables for this dao
    * @return {Promise}
    */
-  createTable(): Promise<boolean> {
+  createTable(): boolean {
     return this.geoPackage.getTableCreator().createTileScaling();
   }
   /**

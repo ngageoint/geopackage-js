@@ -46,20 +46,20 @@ export abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @param  {String}   definition    extension definition
    * @param  {String}   scopeType     extension scope type
-   * @return {Promise<Extension>}
+   * @return {Extension}
    */
-  async getOrCreate(
+  getOrCreate(
     extensionName: string,
     tableName: string | null,
     columnName: string | null,
     definition: string,
     scopeType: string,
-  ): Promise<Extension> {
+  ): Extension {
     const extension = this.getExtension(extensionName, tableName, columnName);
     if (extension.length) {
       return extension[0];
     }
-    await this.extensionsDao.createTable();
+    this.extensionsDao.createTable();
     this.createExtension(extensionName, tableName, columnName, definition, scopeType);
     return this.getExtension(extensionName, tableName, columnName)[0];
   }
@@ -85,6 +85,10 @@ export abstract class BaseExtension {
    */
   hasExtension(extensionName: string, tableName: string, columnName: string): boolean {
     return !!this.getExtension(extensionName, tableName, columnName).length;
+  }
+
+  hasExtensions(extensionName: string): boolean {
+    return this.extensionsDao.queryAllByExtension(extensionName).length !== 0;
   }
 
   /**

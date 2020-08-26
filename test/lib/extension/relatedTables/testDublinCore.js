@@ -1,7 +1,9 @@
 import {UserTable} from '../../../../lib/user/userTable';
 import {UserColumn} from '../../../../lib/user/userColumn';
 import {UserRow} from '../../../../lib/user/userRow';
-import { DataTypes } from '../../../../lib/db/dataTypes';
+import { GeoPackageDataType } from '../../../../lib/db/geoPackageDataType';
+import {UserColumns} from "../../../../lib/user/userColumns";
+import {UserCustomTable} from "../../../../lib/user/custom/userCustomTable";
 
 var DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
@@ -21,7 +23,7 @@ describe('Dublin Core tests', function() {
   });
 
   it('has column', function() {
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       hasColumn(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
@@ -41,7 +43,7 @@ describe('Dublin Core tests', function() {
   });
 
   it('has synonym column', function() {
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       hasColumn(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
@@ -64,11 +66,11 @@ describe('Dublin Core tests', function() {
   });
 
   it('get column', function() {
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
@@ -90,23 +92,23 @@ describe('Dublin Core tests', function() {
         }
       }
     }
-    var fakeTable = new MockUserTable('table', []);
+   var fakeTable = new MockUserTable('table', []);
     should.exist(DublinCoreMetadata.getColumn(fakeTable, DublinCoreType.IDENTIFIER));
     should.not.exist(DublinCoreMetadata.getColumn(fakeTable, DublinCoreType.FORMAT));
   });
 
   it('get synonym column', function() {
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'identifier', DataTypes.TEXT);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.TEXT);
         }
         return;
       }
@@ -123,7 +125,7 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    var fakeTable = new MockUserTable('table', []);
+   var fakeTable = new MockUserTable('table', []);
     should.exist(DublinCoreMetadata.getColumn(fakeTable, DublinCoreType.IDENTIFIER));
     should.exist(DublinCoreMetadata.getColumn(fakeTable, DublinCoreType.FORMAT))
     should.not.exist(DublinCoreMetadata.getColumn(fakeTable, DublinCoreType.SOURCE));
@@ -142,7 +144,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
       }
       hasColumn(name) {
@@ -152,17 +154,17 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'identifier', DataTypes.TEXT);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.TEXT);
         }
         return;
       }
@@ -179,7 +181,7 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    var fakeTable = new MockUserTable('table', []);
+   var fakeTable = new MockUserTable('table', []);
     var fakeRow = new MockUserRow(fakeTable)
 
     DublinCoreMetadata.setValue(fakeRow, DublinCoreType.IDENTIFIER, 'identifier');
@@ -199,13 +201,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', DataTypes.TEXT);
+          return new UserColumn(0, 'content_type', GeoPackageDataType.TEXT);
         }
       }
       hasColumn(columnNanameme) {
@@ -221,17 +223,17 @@ describe('Dublin Core tests', function() {
         }
       }
     }
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type' || name === 'source').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', DataTypes.TEXT);
+          return new UserColumn(0, 'content_type', GeoPackageDataType.TEXT);
         }
         return;
       }
@@ -248,7 +250,7 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    var fakeTable = new MockUserTable('table', []);
+   var fakeTable = new MockUserTable('table', []);;
     var fakeRow = new MockUserRow(fakeTable)
 
     DublinCoreMetadata.setValue(fakeRow, DublinCoreType.FORMAT, 'format');
@@ -267,7 +269,7 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
       }
       hasColumn(name) {
@@ -277,7 +279,7 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       hasColumn(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
@@ -293,11 +295,11 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
       }
     }
-    var fakeTable = new MockUserTable('table', [])
+   var fakeTable = new MockUserTable('table', []);
     var fakeRow = new MockUserRow(fakeTable);
     DublinCoreMetadata.getValue(fakeRow, DublinCoreType.IDENTIFIER).should.be.equal('identifier');
   });
@@ -316,13 +318,13 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
-          return new UserColumn(0, 'identifier', DataTypes.INTEGER);
+          return new UserColumn(0, 'identifier', GeoPackageDataType.INTEGER);
         }
         if (name === 'format') {
           return;
         }
         if (name === 'content_type') {
-          return new UserColumn(0, 'content_type', DataTypes.TEXT);
+          return new UserColumn(0, 'content_type', GeoPackageDataType.TEXT);
         }
       }
       hasColumn(name) {
@@ -338,7 +340,7 @@ describe('Dublin Core tests', function() {
         }
       }
     };
-    class MockUserTable extends UserTable {
+    class MockUserTable extends UserCustomTable {
       hasColumn(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'identifier') {
@@ -354,11 +356,11 @@ describe('Dublin Core tests', function() {
       getColumnWithColumnName(name) {
         (name === 'identifier' || name === 'format' || name === 'content_type').should.be.equal(true);
         if (name === 'format') {
-          return new UserColumn(0, 'format', DataTypes.TEXT);
+          return new UserColumn(0, 'format', GeoPackageDataType.TEXT);
         }
       }
     }
-    var fakeTable = new MockUserTable('table', []);
+   var fakeTable = new MockUserTable('table', []);
     var fakeRow = new MockUserRow(fakeTable);
     DublinCoreMetadata.getValue(fakeRow, DublinCoreType.FORMAT).should.be.equal('format');
   });

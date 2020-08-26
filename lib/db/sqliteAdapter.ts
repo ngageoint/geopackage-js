@@ -263,4 +263,8 @@ export class SqliteAdapter implements DBAdapter {
       return statement.get().count;
     }
   }
+
+  transaction(func: Function): void {
+    this.db.transaction(func)();
+  }
 }

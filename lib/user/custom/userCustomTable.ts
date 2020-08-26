@@ -3,6 +3,8 @@
  */
 import { UserTable } from '../userTable';
 import { UserColumn } from '../userColumn';
+import { UserCustomColumn } from './userCustomColumn';
+import { UserCustomColumns } from './userCustomColumns';
 
 /**
  * Create a new user custom table
@@ -11,22 +13,38 @@ import { UserColumn } from '../userColumn';
  * @param  {module:user/userColumn~UserColumn[]} columns         user columns
  * @param  {string[]} requiredColumns required columns
  */
-export class UserCustomTable extends UserTable {
-  constructor(tableName: string, columns: UserColumn[], requiredColumns: string[]) {
-    super(tableName, columns);
-    if (requiredColumns && requiredColumns.length) {
-      const found: Record<string, number> = {};
-      for (let i = 0; i < columns.length; i++) {
-        const column = columns[i];
-        if (requiredColumns.indexOf(column.name) !== -1) {
-          const previousIndex = found[column.name];
-          this.duplicateCheck(column.index, previousIndex, column.name);
-          found[column.name] = column.index;
-        }
-      }
-      for (let i = 0; i < requiredColumns.length; i++) {
-        this.missingCheck(found[requiredColumns[i]], requiredColumns[i]);
-      }
-    }
+export class UserCustomTable extends UserTable<UserCustomColumn> {
+  constructor(tableName: string, columns: UserColumn[], requiredColumns: string[] = []) {
+    super(new UserCustomColumns(tableName, columns, requiredColumns, true));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  copy(): UserCustomTable {
+    return new UserCustomTable(this.getTableName(), this.getUserColumns().getColumns(), this.getUserColumns().getRequiredColumns());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  getDataType(): string {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  getUserColumns(): UserCustomColumns {
+    return super.getUserColumns() as UserCustomColumns;
+  }
+
+  /**
+   * Get the required columns
+   *
+   * @return required columns
+   */
+  public getRequiredColumns(): string[] {
+    return this.getUserColumns().getRequiredColumns();
   }
 }

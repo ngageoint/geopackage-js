@@ -2,7 +2,7 @@ import { TileTable } from './tileTable';
 import { UserRow } from '../../user/userRow';
 import { TileColumn } from './tileColumn';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 /**
  * tileRow module.
  * @module tiles/user/tileRow
@@ -18,7 +18,7 @@ import { DataTypes } from '../../db/dataTypes';
  */
 export class TileRow extends UserRow {
   tileTable: TileTable;
-  constructor(tileTable: TileTable, columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>) {
+  constructor(tileTable: TileTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
     super(tileTable, columnTypes, values);
     this.tileTable = tileTable;
   }
@@ -27,14 +27,14 @@ export class TileRow extends UserRow {
    * @return {Number} zoom level column index
    */
   get zoomLevelColumnIndex(): number {
-    return this.tileTable.zoomLevelIndex;
+    return this.tileTable.getZoomLevelColumnIndex();
   }
   /**
    * Get the zoom level column
    * @return {TileColumn} zoom level column
    */
   get zoomLevelColumn(): TileColumn {
-    return this.tileTable.zoomLevelColumn;
+    return this.tileTable.getZoomLevelColumn();
   }
   /**
    * Get the zoom level
@@ -55,14 +55,14 @@ export class TileRow extends UserRow {
    * @return {number} tile column column index
    */
   get tileColumnColumnIndex(): number {
-    return this.tileTable.tileColumnIndex;
+    return this.tileTable.getTileColumnColumnIndex();
   }
   /**
    * Get the tile column column
    * @return {TileColumn} tile column column
    */
   get tileColumnColumn(): TileColumn {
-    return this.tileTable.tileColumnColumn;
+    return this.tileTable.getTileColumnColumn();
   }
   /**
    * Get the tile column
@@ -83,14 +83,14 @@ export class TileRow extends UserRow {
    * @return {Number} tile row column index
    */
   get rowColumnIndex(): number {
-    return this.tileTable.tileRowIndex;
+    return this.tileTable.getTileRowColumnIndex();
   }
   /**
    * Get the tile row column
    * @return {TileColumn} tile row column
    */
   get rowColumn(): TileColumn {
-    return this.tileTable.rowColumn;
+    return this.tileTable.getTileRowColumn();
   }
   /**
    * Get the tile row
@@ -111,14 +111,14 @@ export class TileRow extends UserRow {
    * @return {Number} tile data column index
    */
   get tileDataColumnIndex(): number {
-    return this.tileTable.tileDataIndex;
+    return this.tileTable.getTileDataColumnIndex();
   }
   /**
    * Get the tile data column
    * @return {TileColumn} tile data column
    */
   get tileDataColumn(): TileColumn {
-    return this.tileTable.tileDataColumn;
+    return this.tileTable.getTileDataColumn();
   }
   /**
    * Get the tile data

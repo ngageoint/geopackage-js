@@ -4,7 +4,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 import {UserMappingTable} from '../../../../lib/extension/relatedTables/userMappingTable';
 
-var DataType = require('../../../../lib/db/dataTypes').DataTypes
+var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
@@ -54,7 +54,7 @@ describe('Related Attributes tests', function() {
     var mappingTableName = 'attributes_2_attributes';
     var userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
     rte.has(userMappingTable.table_name).should.be.equal(false);
-    userMappingTable.columnNames.length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
+    userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
     var baseIdColumn = userMappingTable.baseIdColumn;
     should.exist(baseIdColumn);
@@ -76,122 +76,120 @@ describe('Related Attributes tests', function() {
       .setRelatedTableName(baseTableName)
       .setUserMappingTable(userMappingTable);
 
-    return rte.addAttributesRelationship(relationship)
-      .then(function(extendedRelation) {
-        rte.has().should.be.equal(true);
-        rte.has(userMappingTable.table_name).should.be.equal(true);
-        should.exist(extendedRelation);
-        var relationships = rte.getRelationships();
-        relationships.length.should.be.equal(1);
-        geoPackage.isTable(mappingTableName).should.be.equal(true);
-        'attributes'.should.be.equal(geoPackage.getTableType(baseTableName));
-        geoPackage.isTableType('attributes', baseTableName);
+    let extendedRelation =  rte.addAttributesRelationship(relationship);
 
-        // Insert user mapping rows between attributes
-        var userMappingDao = rte.getMappingDao(mappingTableName);
-        var userMappingRow = userMappingDao.newRow();
-        userMappingRow.baseId = 4;
-        userMappingRow.relatedId = 7;
-        RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-        var createdId = userMappingDao.create(userMappingRow);
-        createdId.should.be.equal(1);
+    rte.has().should.be.equal(true);
+    rte.has(userMappingTable.table_name).should.be.equal(true);
+    should.exist(extendedRelation);
+    var relationships = rte.getRelationships();
+    relationships.length.should.be.equal(1);
+    geoPackage.isTable(mappingTableName).should.be.equal(true);
+    'attributes'.should.be.equal(geoPackage.getTableType(baseTableName));
+    geoPackage.isTableType('attributes', baseTableName);
 
-        userMappingDao.count().should.be.equal(1);
+    // Insert user mapping rows between attributes
+    var userMappingDao = rte.getMappingDao(mappingTableName);
+    var userMappingRow = userMappingDao.newRow();
+    userMappingRow.baseId = 4;
+    userMappingRow.relatedId = 7;
+    RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+    var createdId = userMappingDao.create(userMappingRow);
+    createdId.should.be.equal(1);
 
-        userMappingRow = userMappingDao.newRow();
-        userMappingRow.baseId = 5;
-        userMappingRow.relatedId = 5;
-        RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-        createdId = userMappingDao.create(userMappingRow);
-        createdId.should.be.equal(2);
+    userMappingDao.count().should.be.equal(1);
 
-        userMappingDao.count().should.be.equal(2);
+    userMappingRow = userMappingDao.newRow();
+    userMappingRow.baseId = 5;
+    userMappingRow.relatedId = 5;
+    RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+    createdId = userMappingDao.create(userMappingRow);
+    createdId.should.be.equal(2);
 
+    userMappingDao.count().should.be.equal(2);
 
-        // Validate the user mapping rows
-        userMappingTable = userMappingDao.table;
-        var mappingColumns = userMappingTable.columnNames;
-        var userMappingRows = userMappingDao.queryForAll();
-        var count = userMappingRows.length;
-        count.should.be.equal(2);
-        var manualCount = 0;
+    // Validate the user mapping rows
+    userMappingTable = userMappingDao.table;
+    var mappingColumns = userMappingTable.getUserColumns().getColumnNames();
+    var userMappingRows = userMappingDao.queryForAll();
+    var count = userMappingRows.length;
+    count.should.be.equal(2);
+    var manualCount = 0;
 
-        for (var i = 0; i < count; i++) {
-          const umr = userMappingRows[i];
-          var row = userMappingDao.getUserMappingRow(umr);
-          row.hasId().should.be.equal(false);
-          row.baseId.should.be.oneOf([4, 5]);
-          if (row.baseId === 4) {
-            row.baseId.should.be.equal(4);
-            row.relatedId.should.be.equal(7);
-          } else if (row.baseId === 5) {
-            row.baseId.should.be.equal(5);
-            row.relatedId.should.be.equal(5);
-          }
-          RelatedTablesUtils.validateUserRow(mappingColumns, row);
-          RelatedTablesUtils.validateDublinCoreColumns(row);
-          manualCount++;
-        }
+    for (var i = 0; i < count; i++) {
+      const umr = userMappingRows[i];
+      var row = userMappingDao.getUserMappingRow(umr);
+      row.hasId().should.be.equal(false);
+      row.baseId.should.be.oneOf([4, 5]);
+      if (row.baseId === 4) {
+        row.baseId.should.be.equal(4);
+        row.relatedId.should.be.equal(7);
+      } else if (row.baseId === 5) {
+        row.baseId.should.be.equal(5);
+        row.relatedId.should.be.equal(5);
+      }
+      RelatedTablesUtils.validateUserRow(mappingColumns, row);
+      RelatedTablesUtils.validateDublinCoreColumns(row);
+      manualCount++;
+    }
 
-        manualCount.should.be.equal(count);
+    manualCount.should.be.equal(count);
 
-        var extendedRelationsDao = rte.extendedRelationDao;
-        var attributeBaseTableRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.table_name);
-        var attributeTableRelations = extendedRelationsDao.getTableRelations(attributesDao.table_name);
-        attributeBaseTableRelations.length.should.be.equal(1);
-        attributeTableRelations.length.should.be.equal(1);
-        attributeBaseTableRelations[0].id.should.be.equal(attributeTableRelations[0].id);
-        extendedRelationsDao.getRelatedTableRelations(attributesDao.table_name).length.should.be.equal(1);
+    var extendedRelationsDao = rte.extendedRelationDao;
+    var attributeBaseTableRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.table_name);
+    var attributeTableRelations = extendedRelationsDao.getTableRelations(attributesDao.table_name);
+    attributeBaseTableRelations.length.should.be.equal(1);
+    attributeTableRelations.length.should.be.equal(1);
+    attributeBaseTableRelations[0].id.should.be.equal(attributeTableRelations[0].id);
+    extendedRelationsDao.getRelatedTableRelations(attributesDao.table_name).length.should.be.equal(1);
 
-        // Test the attribute table relations
-        for (i = 0; i < attributeBaseTableRelations.length; i++) {
+    // Test the attribute table relations
+    for (i = 0; i < attributeBaseTableRelations.length; i++) {
 
-          // Test the relation
-          var attributeRelation = attributeBaseTableRelations[i];
-          attributeRelation.id.should.be.greaterThan(0);
-          attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
-          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.base_primary_column);
-          baseTableName.should.be.equal(attributeRelation.related_table_name);
-          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.related_primary_column);
-          'attributes'.should.be.equal(attributeRelation.relation_name);
-        }
+      // Test the relation
+      var attributeRelation = attributeBaseTableRelations[i];
+      attributeRelation.id.should.be.greaterThan(0);
+      attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
+      attributesDao.table.getPkColumn().getName().should.be.equal(attributeRelation.base_primary_column);
+      baseTableName.should.be.equal(attributeRelation.related_table_name);
+      attributesDao.table.getPkColumn().getName().should.be.equal(attributeRelation.related_primary_column);
+      'attributes'.should.be.equal(attributeRelation.relation_name);
+    }
 
-        var baseTables = extendedRelationsDao.getBaseTables();
-        baseTables.length.should.be.equal(1);
-        baseTables[0].should.be.equal(baseTableName);
-        var relatedTables = extendedRelationsDao.getRelatedTables();
-        relatedTables.length.should.be.equal(1);
-        relatedTables[0].should.be.equal(baseTableName);
+    var baseTables = extendedRelationsDao.getBaseTables();
+    baseTables.length.should.be.equal(1);
+    baseTables[0].should.be.equal(baseTableName);
+    var relatedTables = extendedRelationsDao.getRelatedTables();
+    relatedTables.length.should.be.equal(1);
+    relatedTables[0].should.be.equal(baseTableName);
 
-        // Delete a single mapping
-        var countOfIds = userMappingDao.countByIds(5);
-        var queryOfIds = userMappingDao.queryByIds(5);
-        var queryCount = 0;
-        for (let counter of queryOfIds) {
-          queryCount++;
-        }
+    // Delete a single mapping
+    var countOfIds = userMappingDao.countByIds(5);
+    var queryOfIds = userMappingDao.queryByIds(5);
+    var queryCount = 0;
+    for (let counter of queryOfIds) {
+      queryCount++;
+    }
 
-        queryCount.should.be.equal(countOfIds);
-        countOfIds.should.be.equal(userMappingDao.deleteByIds(5));
-        var userMappingCount = userMappingDao.count();
-        userMappingCount.should.be.equal(2-countOfIds);
+    queryCount.should.be.equal(countOfIds);
+    countOfIds.should.be.equal(userMappingDao.deleteByIds(5));
+    var userMappingCount = userMappingDao.count();
+    userMappingCount.should.be.equal(2-countOfIds);
 
-        // Delete by base id
-        var baseIdQuery = userMappingDao.queryByBaseId(4);
-        var countOfBaseIds = baseIdQuery.length;
-        var deleted = userMappingDao.deleteByBaseId(4);
-        deleted.should.be.equal(countOfBaseIds);
+    // Delete by base id
+    var baseIdQuery = userMappingDao.queryByBaseId(4);
+    var countOfBaseIds = baseIdQuery.length;
+    var deleted = userMappingDao.deleteByBaseId(4);
+    deleted.should.be.equal(countOfBaseIds);
 
-        // Delete the relationship and user mapping table
-        rte.removeRelationship(extendedRelation);
-        rte.has(userMappingTable.table_name).should.be.equal(false);
-        relationships = rte.getRelationships();
-        relationships.length.should.be.equal(0);
-        geoPackage.isTable(mappingTableName).should.be.equal(false);
+    // Delete the relationship and user mapping table
+    rte.removeRelationship(extendedRelation);
+    rte.has(userMappingTable.getTableName()).should.be.equal(false);
+    relationships = rte.getRelationships();
+    relationships.length.should.be.equal(0);
+    geoPackage.isTable(mappingTableName).should.be.equal(false);
 
-        // Delete the related tables extension
-        rte.removeExtension();
-        rte.has().should.be.equal(false);
-      });
+    // Delete the related tables extension
+    rte.removeExtension();
+    rte.has().should.be.equal(false);
   });
 });

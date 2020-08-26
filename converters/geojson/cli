@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 var {GeoJSONToGeoPackage} = require('./built/index');
 var path = require('path');
 

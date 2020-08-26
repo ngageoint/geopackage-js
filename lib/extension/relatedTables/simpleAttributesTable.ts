@@ -6,7 +6,7 @@
 import { UserRelatedTable } from './userRelatedTable';
 import { RelationType } from './relationType';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table
  * @class
@@ -37,11 +37,11 @@ export class SimpleAttributesTable extends UserRelatedTable {
    */
   validateColumns(): boolean {
     const columns = this.columns;
-    if (columns.length < 2) {
+    if (columns.getColumns().length < 2) {
       throw new Error('Simple Attributes Tables require at least one non id column');
     }
-    for (let i = 0; i < columns.length; i++) {
-      const column = columns[i];
+    for (let i = 0; i < columns.getColumns().length; i++) {
+      const column = columns.getColumns()[i];
       if (!SimpleAttributesTable.isSimple(column)) {
         throw new Error(
           'Simple Attributes Tables only support simple data types. Column: ' +
@@ -99,7 +99,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createIdColumn(index: number, idColumnName: string): UserColumn {
-    return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
+    return UserColumn.createPrimaryKeyColumn(index, idColumnName);
   }
   /**
    * Determine if the column is a simple column
@@ -111,10 +111,10 @@ export class SimpleAttributesTable extends UserRelatedTable {
   }
   /**
    * Determine if the data type is a simple type: TEXT, INTEGER, or REAL
-   * @param {module:db/dataTypes~GPKGDataType} dataType
+   * @param {module:db/geoPackageDataType~GPKGDataType} dataType
    * @return {Boolean}
    */
-  static isSimpleDataType(dataType: DataTypes): boolean {
-    return dataType !== DataTypes.BLOB && dataType !== DataTypes.GEOMETRY;
+  static isSimpleDataType(dataType: GeoPackageDataType): boolean {
+    return dataType !== GeoPackageDataType.BLOB;
   }
 }

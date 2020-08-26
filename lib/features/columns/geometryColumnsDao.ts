@@ -4,7 +4,6 @@
  * @module features/columns
  */
 import { Dao } from '../../dao/dao';
-
 import { GeometryColumns } from './geometryColumns';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { Contents } from '../../core/contents/contents';

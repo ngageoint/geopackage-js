@@ -7,7 +7,7 @@ import { SimpleAttributesTable } from './simpleAttributesTable';
 import { SimpleAttributesRow } from './simpleAttributesRow';
 import { GeoPackage } from '../../geoPackage';
 import { DBValue } from '../../db/dbAdapter';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * User Simple Attributes DAO for reading user simple attributes data tables
@@ -22,11 +22,11 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
   }
   /**
    * Create a new {module:extension/relatedTables~SimpleAttributesRow} with the column types and values
-   * @param  {module:db/dataTypes[]} columnTypes  column types
+   * @param  {module:db/geoPackageDataType[]} columnTypes  column types
    * @param  {module:dao/columnValues~ColumnValues[]} values      values
    * @return {module:extension/relatedTables~SimpleAttributesRow}             simple attributes row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): SimpleAttributesRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): SimpleAttributesRow {
     return new SimpleAttributesRow(this.table, columnTypes, values);
   }
   /**
@@ -50,5 +50,9 @@ export class SimpleAttributesDao<T extends SimpleAttributesRow> extends UserDao<
       }
     }
     return simpleAttributesRows;
+  }
+
+  static readTable(geoPackage: GeoPackage, tableName: string) {
+    return geoPackage.relatedTablesExtension.getSimpleAttributesDao(tableName);
   }
 }

@@ -2,11 +2,11 @@
  * @memberOf module:extension/style
  * @class StyleTable
  */
-import { AttributeTable } from '../../attributes/attributeTable';
+import { AttributesTable } from '../../attributes/attributesTable';
 import { RelationType } from '../relatedTables/relationType';
 import { UserColumn } from '../../user/userColumn';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * Icon Requirements Class Media Table
@@ -14,7 +14,7 @@ import { DataTypes } from '../../db/dataTypes';
  * @param  {module:user/userColumn~UserColumn[]} columns   media columns
  * @constructor
  */
-export class StyleTable extends AttributeTable {
+export class StyleTable extends AttributesTable {
   public static readonly TABLE_NAME: string = 'nga_style';
   public static readonly COLUMN_ID: string = 'id';
   public static readonly COLUMN_NAME: string = 'name';
@@ -25,14 +25,9 @@ export class StyleTable extends AttributeTable {
   public static readonly COLUMN_FILL_COLOR: string = 'fill_color';
   public static readonly COLUMN_FILL_OPACITY: string = 'fill_opacity';
   readonly TABLE_TYPE: string = 'media';
-  data_type: string;
-  relation_name: string;
+  data_type: string = RelationType.ATTRIBUTES.dataType;
+  relation_name: string = RelationType.ATTRIBUTES.name;
 
-  constructor(tableName: string, columns: UserCustomColumn[]) {
-    super(tableName, columns);
-    this.data_type = RelationType.ATTRIBUTES.dataType;
-    this.relation_name = RelationType.ATTRIBUTES.name;
-  }
   /**
    * Get the name column index
    * @return int
@@ -145,34 +140,34 @@ export class StyleTable extends AttributeTable {
   static createColumns(): UserCustomColumn[] {
     const columns = [];
     let index = 0;
-    columns.push(UserColumn.createPrimaryKeyColumnWithIndexAndName(index++, StyleTable.COLUMN_ID));
+    columns.push(UserColumn.createPrimaryKeyColumn(index++, StyleTable.COLUMN_ID));
     columns.push(
-      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_NAME, DataTypes.TEXT, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, undefined, false, undefined),
     );
     columns.push(
       UserCustomColumn.createColumn(
         index++,
         StyleTable.COLUMN_DESCRIPTION,
-        DataTypes.TEXT,
+        GeoPackageDataType.TEXT,
         undefined,
         false,
         undefined,
       ),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_COLOR, DataTypes.TEXT, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_COLOR, GeoPackageDataType.TEXT, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, DataTypes.TEXT, undefined, false, undefined),
+      UserCustomColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, GeoPackageDataType.TEXT, undefined, false, undefined),
     );
     columns.push(
-      UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, DataTypes.REAL, undefined, false, undefined),
+      UserCustomColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, GeoPackageDataType.REAL, undefined, false, undefined),
     );
     return columns;
   }

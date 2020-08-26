@@ -25,7 +25,7 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
       geoPackage = result.geopackage;
       tileDao = geoPackage.getTileDao('denver');
       tileScalingExtension = geoPackage.getTileScalingExtension('denver');
-      await tileScalingExtension.getOrCreateExtension();
+      tileScalingExtension.getOrCreateExtension();
       tileScalingDao = tileScalingExtension.dao;
     });
 

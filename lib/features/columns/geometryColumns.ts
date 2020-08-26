@@ -1,4 +1,6 @@
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { ContentsDataType } from '../../core/contents/contentsDataType';
+import { Contents } from '../../core/contents/contents';
 
 /**
  * Spatial Reference System object. The coordinate reference system definitions it contains are referenced by the GeoPackage Contents and GeometryColumns objects to relate the vector and tile data in user tables to locations on the earth.
@@ -52,5 +54,22 @@ export class GeometryColumns {
   }
   get id(): string {
     return `${this.table_name} ${this.column_name}`;
+  }
+
+  /**
+   * Set the contents
+   * @param contents contents
+   */
+  setContents(contents: Contents) {
+    if (contents !== null && contents !== undefined) {
+      // Verify the Contents have a features data type (Spec Requirement 23)
+      const dataType = contents.data_type;
+      if (dataType === null || dataType === undefined || dataType !== ContentsDataType.FEATURES) {
+        throw new Error("The Contents of a GeometryColumns must have a data type of " + ContentsDataType.nameFromType(ContentsDataType.FEATURES))
+      }
+      this.table_name = contents.table_name;
+    } else {
+      this.table_name = null;
+    }
   }
 }

@@ -28,6 +28,10 @@ import { BoundingBox } from '../../boundingBox';
 export class FeatureTableIndex extends BaseExtension {
   public static readonly EXTENSION_GEOMETRY_INDEX_AUTHOR: string = 'nga';
   public static readonly EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR: string = 'geometry_index';
+  public static readonly EXTENSION_NAME: string = Extension.buildExtensionName(
+    FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR,
+    FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR,
+  );
   public static readonly EXTENSION_GEOMETRY_INDEX_DEFINITION: string =
     'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
   progress: Function;
@@ -46,10 +50,7 @@ export class FeatureTableIndex extends BaseExtension {
   constructor(geoPackage: GeoPackage, public featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
     this.progress;
-    this.extensionName = Extension.buildExtensionName(
-      FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_AUTHOR,
-      FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_NAME_NO_AUTHOR,
-    );
+    this.extensionName = FeatureTableIndex.EXTENSION_NAME;
     this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
     this.tableName = featureDao.table_name;
     this.columnName = featureDao.getGeometryColumnName();
@@ -87,7 +88,7 @@ export class FeatureTableIndex extends BaseExtension {
     let indexed = this.isIndexed();
     if (!indexed || force) {
       const rtreeIndex = new RTreeIndex(this.geoPackage, this.featureDao);
-      await rtreeIndex.create();
+      rtreeIndex.create();
       this.rtreeIndexed = rtreeIndex.hasExtension(
         rtreeIndex.extensionName,
         rtreeIndex.tableName,
@@ -96,9 +97,9 @@ export class FeatureTableIndex extends BaseExtension {
       indexed = this.isIndexed();
     }
     if (!indexed) {
-      await this.getOrCreateExtension();
-      const tableIndex = await this.getOrCreateTableIndex();
-      await this.createOrClearGeometryIndicies();
+      this.getOrCreateExtension();
+      const tableIndex = this.getOrCreateTableIndex();
+      this.createOrClearGeometryIndicies();
       return this.indexTable(tableIndex);
     } else {
       return indexed;
@@ -123,7 +124,7 @@ export class FeatureTableIndex extends BaseExtension {
       await rtreeIndex.create();
     }
     if (!indexed || force) {
-      await this.getOrCreateExtension();
+      this.getOrCreateExtension();
       const tableIndex = await this.getOrCreateTableIndex();
       await this.createOrClearGeometryIndicies();
       return this.indexTable(tableIndex);
@@ -179,7 +180,7 @@ export class FeatureTableIndex extends BaseExtension {
    * Get or create the extension for this table name and column name
    * @return {module:extension~Extension}
    */
-  async getOrCreateExtension(): Promise<Extension> {
+  getOrCreateExtension(): Extension {
     return this.getOrCreate(
       this.extensionName,
       this.tableName,
@@ -190,12 +191,12 @@ export class FeatureTableIndex extends BaseExtension {
   }
   /**
    * Get or create if needed the table index
-   * @return {Promise<TableIndex>}
+   * @return {TableIndex}
    */
-  async getOrCreateTableIndex(): Promise<TableIndex> {
+  getOrCreateTableIndex(): TableIndex {
     const tableIndex = this.tableIndex;
     if (tableIndex) return tableIndex;
-    await this.tableIndexDao.createTable();
+    this.tableIndexDao.createTable();
     this.createTableIndex();
     return this.tableIndex;
   }
@@ -224,8 +225,8 @@ export class FeatureTableIndex extends BaseExtension {
    * Clear the geometry indices or create the table if needed
    * @return {Promise} resolved when complete
    */
-  async createOrClearGeometryIndicies(): Promise<number> {
-    await this.geometryIndexDao.createTable();
+  createOrClearGeometryIndicies(): number {
+    this.geometryIndexDao.createTable();
     return this.clearGeometryIndicies();
   }
   /**

@@ -151,10 +151,10 @@ describe('Related Tables tests', function() {
 
       var additionalColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
       var userMappingTable = UserMappingTable.create(mappingTableName, additionalColumns);
-      rte.has(userMappingTable.table_name).should.be.equal(false);
+      rte.has(userMappingTable.getTableName()).should.be.equal(false);
 
       var numColumns = UserMappingTable.numRequiredColumns() + additionalColumns.length;
-      numColumns.should.be.equal(userMappingTable.columns.length);
+      numColumns.should.be.equal(userMappingTable.getUserColumns().getColumns().length);
 
       var baseIdColumn = userMappingTable.baseIdColumn;
       should.exist(baseIdColumn);
@@ -167,8 +167,9 @@ describe('Related Tables tests', function() {
       .setRelatedTableName(relatedTableName)
       .setUserMappingTable(userMappingTable);
 
-      return rte.addFeaturesRelationship(featureRelationship)
-      .then(function(extendedRelation){
+      try {
+
+        let extendedRelation = rte.addFeaturesRelationship(featureRelationship);
         rte.has().should.be.equal(true);
         rte.has(userMappingTable.table_name).should.be.equal(true);
         should.exist(extendedRelation);
@@ -176,10 +177,12 @@ describe('Related Tables tests', function() {
         relationships.length.should.be.equal(1);
         geoPackage.isTable(mappingTableName).should.be.equal(true);
 
+
         var baseDao = geoPackage.getFeatureDao(baseTableName);
         var relatedDao = geoPackage.getFeatureDao(relatedTableName);
         var baseResults = baseDao.queryForAll();
         var relatedResults = relatedDao.queryForAll();
+
 
         var userMappingDao = rte.getMappingDao(mappingTableName);
         var userMappingRow;
@@ -191,16 +194,17 @@ describe('Related Tables tests', function() {
           userMappingDao.create(userMappingRow);
         }
 
+
         var count = userMappingDao.getCount();
         count.should.be.equal(10);
 
         userMappingTable = userMappingDao.table;
-        var columns = userMappingTable.columnNames;
+        var columns = userMappingTable.getUserColumns().getColumnNames();
         var userMappingRows = userMappingDao.queryForAll();
         userMappingRows.length.should.be.equal(10);
 
         var rowsDeleted = 0;
-        for (var i = 0; i < userMappingRows.length; i++) {
+        for (i = 0; i < userMappingRows.length; i++) {
           var resultRow = userMappingDao.getUserMappingRow(userMappingRows[i]);
           should.not.exist(resultRow.id);
           RelatedTablesUtils.validateUserRow(columns, resultRow);
@@ -209,18 +213,17 @@ describe('Related Tables tests', function() {
           rowsDeleted += deleteResult;
         }
         rowsDeleted.should.be.equal(10);
-        rte.removeRelationship(extendedRelation);
-        rte.has(userMappingTable.table_name).should.be.equal(false);
+        rte.removeRelationship(extendedRelation).should.be.equal(1);
+        rte.has(userMappingTable.getTableName()).should.be.equal(false);
         relationships = rte.getRelationships();
         relationships.length.should.be.equal(0);
         geoPackage.isTable(mappingTableName).should.be.equal(false);
         rte.removeExtension();
         rte.has().should.be.equal(false);
-      })
-      .catch(function(error) {
-        console.log('error', error);
+      } catch(e) {
+        console.log('error', e);
         false.should.be.equal(true);
-      });
+      }
     });
   });
 });

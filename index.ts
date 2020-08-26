@@ -5,12 +5,14 @@ import { BoundingBox } from './lib/boundingBox';
 import { ClosestFeature, GeoPackage } from './lib/geoPackage';
 import { ContentsDao } from './lib/core/contents/contentsDao';
 import { ContentsIdDao } from './lib/extension/contents/contentsIdDao';
+import { Constraint } from './lib/db/table/constraint';
+import { Constraints } from './lib/db/table/constraints';
 import { CrsWktExtension } from './lib/extension/crsWkt';
 import { DataColumnConstraints } from './lib/dataColumnConstraints/dataColumnConstraints';
 import { DataColumnConstraintsDao } from './lib/dataColumnConstraints/dataColumnConstraintsDao';
 import { DataColumns } from './lib/dataColumns/dataColumns';
+import { GeoPackageDataType } from './lib/db/geoPackageDataType';
 import { DataColumnsDao } from './lib/dataColumns/dataColumnsDao';
-import { DataTypes } from './lib/db/dataTypes';
 import { DublinCoreMetadata } from './lib/extension/relatedTables/dublinCoreMetadata';
 import { DublinCoreType } from './lib/extension/relatedTables/dublinCoreType';
 import { Extension } from './lib/extension/extension';
@@ -28,6 +30,7 @@ import { FeatureTiles } from './lib/tiles/features';
 import { GeometryColumns } from './lib/features/columns/geometryColumns';
 import { GeometryColumnsDao } from './lib/features/columns/geometryColumnsDao';
 import { GeometryData } from './lib/geom/geometryData';
+import { GeometryType } from './lib/features/user/geometryType';
 import { GeoPackageAPI } from './lib/api';
 import { GeoPackageConnection } from './lib/db/geoPackageConnection';
 import { GeoPackageTileRetriever } from './lib/tiles/retriever';
@@ -70,21 +73,21 @@ import { UserRow } from './lib/user/userRow';
 import { UserTable } from './lib/user/userTable';
 import { UserTableReader } from './lib/user/userTableReader';
 import { WebPExtension } from './lib/extension/webp';
-import { WKB } from './lib/wkb/index';
+import { WKB } from './lib/wkb';
 
 export {
   proj4Defs,
-  TileUtilities,
   BoundingBox,
   ClosestFeature,
   ContentsDao,
   ContentsIdDao,
+  Constraint,
+  Constraints,
   CrsWktExtension,
   DataColumnConstraints,
   DataColumnConstraintsDao,
   DataColumns,
   DataColumnsDao,
-  DataTypes,
   DublinCoreMetadata,
   DublinCoreType,
   Extension,
@@ -99,12 +102,14 @@ export {
   FeatureTableReader,
   FeatureTableStyles,
   FeatureTiles,
+  GeometryType,
   GeometryColumns,
   GeometryColumnsDao,
   GeometryData,
   GeoPackage,
   GeoPackageAPI,
   GeoPackageConnection,
+  GeoPackageDataType,
   GeoPackageTileRetriever,
   GeoPackageValidate,
   IconCache,
@@ -138,6 +143,7 @@ export {
   TileScaling,
   TileScalingType,
   TileTable,
+  TileUtilities,
   UserColumn,
   UserDao,
   UserMappingTable,

@@ -1,7 +1,8 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import {ContentsDataType} from "../../../../lib/core/contents/contentsDataType";
 
-var DataType = require('../../../../lib/db/dataTypes').DataTypes
+var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , Verification = require('../../../fixtures/verification')
   , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
@@ -41,7 +42,7 @@ describe('Related Simple Attributes tests', function() {
     should.exist(contents);
     should.exist(contents.data_type);
     SimpleAttributesTable.RELATION_TYPE.dataType.should.be.equal(contents.data_type);
-    simpleAttributesTable.table_name.should.be.equal(contents.table_name);
+    simpleAttributesTable.getTableName().should.be.equal(contents.table_name);
     should.exist(contents.last_change);
   }
 
@@ -83,22 +84,21 @@ describe('Related Simple Attributes tests', function() {
     // Populate and validate a simple attribute table
     var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(SimpleAttributesTable.numRequiredColumns(), true);
     var simpleTable = SimpleAttributesTable.create('simple_table', simpleUserColumns);
-    var simpleColumns = simpleTable.columnNames;
+    var simpleColumns = simpleTable.getUserColumns().getColumnNames();
     simpleColumns.length.should.be.equal(SimpleAttributesTable.numRequiredColumns() + simpleUserColumns.length);
 
-    var idColumn = simpleTable.idColumn;
+    var idColumn = simpleTable.getIdColumn();
     should.exist(idColumn);
     idColumn.name.should.be.equal(SimpleAttributesTable.COLUMN_ID);
     idColumn.dataType.should.be.equal(DataType.INTEGER);
     idColumn.notNull.should.be.equal(true);
     idColumn.primaryKey.should.be.equal(true);
 
-
     var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
     var mappingTableName = 'attributes_simple_attributes';
     var userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
-    rte.has(userMappingTable.table_name).should.be.equal(false);
-    userMappingTable.columnNames.length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
+    rte.has(userMappingTable.getTableName()).should.be.equal(false);
+    userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
     var baseIdColumn = userMappingTable.baseIdColumn;
     should.exist(baseIdColumn);
@@ -113,286 +113,283 @@ describe('Related Simple Attributes tests', function() {
     relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
     relatedIdColumn.notNull.should.be.equal(true);
     relatedIdColumn.primaryKey.should.be.equal(false);
-    rte.has(userMappingTable.table_name).should.be.equal(false);
+    rte.has(userMappingTable.getTableName()).should.be.equal(false);
 
     // Create the simple attributes table, content row, and relationship between the
 	  // attributes table and simple attributes table
-
     var contentsDao = geoPackage.contentsDao;
     var contentsTables = contentsDao.getTables();
-    contentsTables.indexOf(simpleTable.table_name).should.be.equal(-1);
+    contentsTables.indexOf(simpleTable.getTableName()).should.be.equal(-1);
     var relationship = RelatedTablesExtension.RelationshipBuilder()
       .setBaseTableName(baseTableName)
       .setRelatedTable(simpleTable)
       .setUserMappingTable(userMappingTable);
 
-    return rte.addSimpleAttributesRelationship(relationship)
-      .then(function(extendedRelation) {
-        validateContents(simpleTable, simpleTable.contents);
-        rte.has().should.be.equal(true);
-        rte.has(userMappingTable.table_name).should.be.equal(true);
-        should.exist(extendedRelation);
-        var relationships = rte.getRelationships();
-        relationships.length.should.be.equal(1);
-        geoPackage.isTable(mappingTableName).should.be.equal(true);
-        geoPackage.isTable(simpleTable.table_name).should.be.equal(true);
-        contentsDao.getTables().indexOf(simpleTable.table_name).should.not.be.equal(-1);
-        validateContents(simpleTable, contentsDao.queryForId(simpleTable.table_name));
-        SimpleAttributesTable.RELATION_TYPE.dataType.should.be.equal(geoPackage.getTableType(simpleTable.table_name));
-        geoPackage.isTableType(SimpleAttributesTable.RELATION_TYPE.dataType, simpleTable.table_name);
+    let extendedRelation = rte.addSimpleAttributesRelationship(relationship)
+    validateContents(simpleTable, simpleTable.contents);
+    rte.has().should.be.equal(true);
+    rte.has(userMappingTable.getTableName()).should.be.equal(true);
+    should.exist(extendedRelation);
+    var relationships = rte.getRelationships();
+    relationships.length.should.be.equal(1);
+    geoPackage.isTable(mappingTableName).should.be.equal(true);
+    geoPackage.isTable(simpleTable.getTableName()).should.be.equal(true);
+    contentsDao.getTables().indexOf(simpleTable.getTableName()).should.not.be.equal(-1);
+    validateContents(simpleTable, contentsDao.queryForId(simpleTable.getTableName()));
+    SimpleAttributesTable.RELATION_TYPE.dataType.should.be.equal(geoPackage.getTableType(simpleTable.getTableName()));
+    geoPackage.isTableType(SimpleAttributesTable.RELATION_TYPE.dataType, simpleTable.getTableName());
 
-        // Validate the simple attributes DAO
-        var simpleDao = rte.getSimpleAttributesDao(simpleTable);
-        should.exist(simpleDao);
-        simpleTable = simpleDao.table;
-        should.exist(simpleTable);
-        validateContents(simpleTable, simpleTable.contents);
+    // Validate the simple attributes DAO
+    var simpleDao = rte.getSimpleAttributesDao(simpleTable);
+    should.exist(simpleDao);
+    simpleTable = simpleDao.table;
+    should.exist(simpleTable);
+    validateContents(simpleTable, simpleTable.contents);
 
-        // Insert ismple attributes table rows
-        var simpleCount = 2 + Math.floor(Math.random() * 9);
-        var simpleRowId = 0;
+    // Insert simple attributes table rows
+    var simpleCount = 2 + Math.floor(Math.random() * 9);
+    var simpleRowId = 0;
 
-        for (var i = 0; i < simpleCount-1; i++) {
-          var simpleRow = simpleDao.newRow();
-          RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
-          simpleRowId = simpleDao.create(simpleRow);
-          simpleRowId.should.be.greaterThan(0);
-        }
+    for (i = 0; i < simpleCount-1; i++) {
+      var simpleRow = simpleDao.newRow();
+      RelatedTablesUtils.populateRow(simpleTable, simpleRow, SimpleAttributesTable.requiredColumns());
+      simpleRowId = simpleDao.create(simpleRow);
+      simpleRowId.should.be.greaterThan(0);
+    }
 
-        // copy the last row insert and insert the final simple row
-        var simpleRowToCopy = simpleDao.queryForId(simpleRowId);
-        simpleRowToCopy.resetId();
-        var copiedSimpleId = simpleDao.create(simpleRowToCopy);
-        copiedSimpleId.should.be.greaterThan(0);
-        copiedSimpleId.should.be.equal(simpleRowId + 1);
-        simpleCount.should.be.equal(simpleDao.count());
+    // copy the last row insert and insert the final simple row
+    var simpleRowToCopy = simpleDao.queryForId(simpleRowId);
+    simpleRowToCopy.resetId();
+    var copiedSimpleId = simpleDao.create(simpleRowToCopy);
+    copiedSimpleId.should.be.greaterThan(0);
+    copiedSimpleId.should.be.equal(simpleRowId + 1);
+    simpleCount.should.be.equal(simpleDao.count());
 
-        // Build the Attributes Ids
-        var attributesDao = geoPackage.getAttributeDao(baseTableName);
-        var allAttributes = attributesDao.queryForAll();
-        var attributeIds = [];
-        for (var i = 0; i < allAttributes.length; i++) {
-          const row = attributesDao.getRow(allAttributes[i]);
-          attributeIds.push(row.id);
-        }
+    // Build the Attributes Ids
+    var attributesDao = geoPackage.getAttributeDao(baseTableName);
+    var allAttributes = attributesDao.queryForAll();
+    var attributeIds = [];
+    for (var i = 0; i < allAttributes.length; i++) {
+      const row = attributesDao.getRow(allAttributes[i]);
+      attributeIds.push(row.id);
+    }
 
-        var allSimpleAttributes = simpleDao.queryForAll();
-        var simpleIds = [];
-        for (var i = 0; i < allSimpleAttributes.length; i++) {
-          const row = simpleDao.getRow(allSimpleAttributes[i]);
-          simpleIds.push(row.id);
-        }
+    var allSimpleAttributes = simpleDao.queryForAll();
+    var simpleIds = [];
+    for (var i = 0; i < allSimpleAttributes.length; i++) {
+      const row = simpleDao.getRow(allSimpleAttributes[i]);
+      simpleIds.push(row.id);
+    }
 
-        // Insert user mapping rows between feature ids and attribute ids
-        var userMappingDao = rte.getMappingDao(mappingTableName);
-        for (var i = 0; i < 10; i++) {
-          var userMappingRow = userMappingDao.newRow();
-          userMappingRow.baseId = attributeIds[Math.floor(Math.random() * attributeIds.length)];
-          userMappingRow.relatedId = simpleIds[Math.floor(Math.random() * simpleIds.length)];
-          RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-          var created = userMappingDao.create(userMappingRow);
-          created.should.be.greaterThan(0);
-        }
+    // Insert user mapping rows between feature ids and attribute ids
+    userMappingDao = rte.getMappingDao(mappingTableName);
+    for (i = 0; i < 10; i++) {
+      var userMappingRow = userMappingDao.newRow();
+      userMappingRow.baseId = attributeIds[Math.floor(Math.random() * attributeIds.length)];
+      userMappingRow.relatedId = simpleIds[Math.floor(Math.random() * simpleIds.length)];
+      RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+      var created = userMappingDao.create(userMappingRow);
+      created.should.be.greaterThan(0);
+    }
 
-        userMappingDao.count().should.be.equal(10);
+    userMappingDao.count().should.be.equal(10);
 
-        // Validate the user mapping rows
-        userMappingTable = userMappingDao.table;
-        var mappingColumns = userMappingTable.columnNames;
-        var userMappingRows = userMappingDao.queryForAll();
-        var count = userMappingRows.length;
-        count.should.be.equal(10);
-        var manualCount = 0;
+    // Validate the user mapping rows
+    userMappingTable = userMappingDao.table;
+    var mappingColumns = userMappingTable.getUserColumns().getColumnNames();
+    var userMappingRows = userMappingDao.queryForAll();
+    var count = userMappingRows.length;
+    count.should.be.equal(10);
+    var manualCount = 0;
 
-        for (var i = 0; i < count; i++) {
-          var umr = userMappingRows[i];
-          var row2 = userMappingDao.getUserMappingRow(umr);
-          row2.hasId().should.be.equal(false);
-          attributeIds.indexOf(row2.baseId.should.be.not.equal(-1));
-          simpleIds.indexOf(row2.relatedId.should.be.not.equal(-1));
-          RelatedTablesUtils.validateUserRow(mappingColumns, row2);
-          RelatedTablesUtils.validateDublinCoreColumns(row2);
-          manualCount++;
-        }
+    for (var i = 0; i < count; i++) {
+      var umr = userMappingRows[i];
+      var row2 = userMappingDao.getUserMappingRow(umr);
+      row2.hasId().should.be.equal(false);
+      attributeIds.indexOf(row2.baseId.should.be.not.equal(-1));
+      simpleIds.indexOf(row2.relatedId.should.be.not.equal(-1));
+      RelatedTablesUtils.validateUserRow(mappingColumns, row2);
+      RelatedTablesUtils.validateDublinCoreColumns(row2);
+      manualCount++;
+    }
 
-        manualCount.should.be.equal(count);
+    manualCount.should.be.equal(count);
 
-        var extendedRelationsDao = rte.extendedRelationDao;
-        var attributeBaseTableRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.table_name);
-        var attributeTableRelations = extendedRelationsDao.getTableRelations(attributesDao.table_name);
-        attributeBaseTableRelations.length.should.be.equal(1);
-        attributeTableRelations.length.should.be.equal(1);
-        attributeBaseTableRelations[0].id.should.be.equal(attributeTableRelations[0].id);
-        extendedRelationsDao.getRelatedTableRelations(attributesDao.table_name).length.should.be.equal(0);
+    var extendedRelationsDao = rte.extendedRelationDao;
+    var attributeBaseTableRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.table_name);
+    var attributeTableRelations = extendedRelationsDao.getTableRelations(attributesDao.table_name);
+    attributeBaseTableRelations.length.should.be.equal(1);
+    attributeTableRelations.length.should.be.equal(1);
+    attributeBaseTableRelations[0].id.should.be.equal(attributeTableRelations[0].id);
+    extendedRelationsDao.getRelatedTableRelations(attributesDao.table_name).length.should.be.equal(0);
 
-        // Test the attribute table relations
-        for (var i = 0; i < attributeBaseTableRelations.length; i++) {
+    // Test the attribute table relations
+    for (var i = 0; i < attributeBaseTableRelations.length; i++) {
 
-          // Test the relation
-          var attributeRelation = attributeBaseTableRelations[i];
-          attributeRelation.id.should.be.greaterThan(0);
-          attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
-          attributesDao.table.pkColumn.name.should.be.equal(attributeRelation.base_primary_column);
-          simpleDao.table_name.should.be.equal(attributeRelation.related_table_name);
-          simpleDao.table.pkColumn.name.should.be.equal(attributeRelation.related_primary_column);
-          SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(attributeRelation.relation_name);
+      // Test the relation
+      var attributeRelation = attributeBaseTableRelations[i];
+      attributeRelation.id.should.be.greaterThan(0);
+      attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
+      attributesDao.table.getPkColumn().name.should.be.equal(attributeRelation.base_primary_column);
+      simpleDao.getTableName().should.be.equal(attributeRelation.related_table_name);
+      simpleDao.table.getPkColumn().name.should.be.equal(attributeRelation.related_primary_column);
+      SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(attributeRelation.relation_name);
 
-          // test the user mappings from the relation
-          var userMappingDao = rte.getMappingDao(attributeRelation.mapping_table_name);
-          var totalMappedCount = userMappingDao.count();
-          var mappings = userMappingDao.queryForAll();
-          for (var m = 0; m < mappings.length; m++) {
-            umr = userMappingDao.getUserMappingRow(mappings[i]);
-            attributeIds.indexOf(umr.baseId.should.not.be.equal(-1));
-            simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
-            RelatedTablesUtils.validateUserRow(mappingColumns, umr);
-            RelatedTablesUtils.validateDublinCoreColumns(umr);
-          }
+      // test the user mappings from the relation
+      var userMappingDao = rte.getMappingDao(attributeRelation.mapping_table_name);
+      var totalMappedCount = userMappingDao.count();
+      var mappings = userMappingDao.queryForAll();
+      for (var m = 0; m < mappings.length; m++) {
+        umr = userMappingDao.getUserMappingRow(mappings[i]);
+        attributeIds.indexOf(umr.baseId.should.not.be.equal(-1));
+        simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
+        RelatedTablesUtils.validateUserRow(mappingColumns, umr);
+        RelatedTablesUtils.validateDublinCoreColumns(umr);
+      }
 
-          // get and test the attributes DAO
-          simpleDao = rte.getSimpleAttributesDao(attributeRelation);
-          should.exist(simpleDao);
-          simpleTable = simpleDao.table;
-          should.exist(simpleTable);
-          validateContents(simpleTable, simpleTable.contents);
+      // get and test the attributes DAO
+      simpleDao = rte.getSimpleAttributesDao(attributeRelation);
+      should.exist(simpleDao);
+      simpleTable = simpleDao.table;
+      should.exist(simpleTable);
+      validateContents(simpleTable, simpleTable.contents);
 
-          var totalMapped = 0;
+      var totalMapped = 0;
 
-          // get and test the Attributes Rows mapped to each Simple Attributes Row
-          var attributes = attributesDao.queryForAll();
-          for (var f = 0; f < attributes.length; f++) {
-            var attributeRow = attributesDao.getRow(attributes[f]);
-            var mappedIds = rte.getMappingsForBase(attributeRelation, attributeRow.id);
-            var simpleRows = simpleDao.getRows(mappedIds);
-            simpleRows.length.should.be.equal(mappedIds.length);
+      // get and test the Attributes Rows mapped to each Simple Attributes Row
+      var attributes = attributesDao.queryForAll();
+      for (var f = 0; f < attributes.length; f++) {
+        var attributeRow = attributesDao.getRow(attributes[f]);
+        var mappedIds = rte.getMappingsForBase(attributeRelation, attributeRow.id);
+        var simpleRows = simpleDao.getRows(mappedIds);
+        simpleRows.length.should.be.equal(mappedIds.length);
 
-            simpleRows.forEach(function(simpleRow) {
-              simpleRow.hasId().should.be.equal(true);
-              simpleRow.id.should.be.greaterThan(0);
-              simpleIds.indexOf(simpleRow.id).should.not.be.equal(-1);
-              mappedIds.indexOf(simpleRow.id).should.not.be.equal(-1);
-              RelatedTablesUtils.validateUserRow(simpleColumns, simpleRow);
-              RelatedTablesUtils.validateSimpleDublinCoreColumns(simpleRow);
-            });
-
-            totalMapped += mappedIds.length;
-          }
-          totalMappedCount.should.be.equal(totalMapped);
-        }
-
-        // Get the relations starting from the simple attributes table
-        var simpleRelatedTableRelations = extendedRelationsDao.getRelatedTableRelations(simpleTable.table_name);
-        var simpleTableRelations = extendedRelationsDao.getTableRelations(simpleTable.table_name);
-
-        simpleRelatedTableRelations.length.should.be.equal(1);
-        simpleTableRelations.length.should.be.equal(1);
-        simpleRelatedTableRelations[0].id.should.be.equal(simpleTableRelations[0].id);
-        extendedRelationsDao.getBaseTableRelations(simpleTable.table_name).length.should.be.equal(0);
-
-        // Test the media table relations
-        simpleRelatedTableRelations.forEach(function(simpleRelation) {
-
-          // Test the relation
-          simpleRelation.id.should.be.greaterThan(0);
-          attributesDao.table_name.should.be.equal(simpleRelation.base_table_name);
-          attributesDao.table.pkColumn.name.should.be.equal(simpleRelation.base_primary_column);
-          simpleDao.table_name.should.be.equal(simpleRelation.related_table_name);
-          simpleDao.table.pkColumn.name.should.be.equal(simpleRelation.related_primary_column);
-          SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(simpleRelation.relation_name);
-          mappingTableName.should.be.equal(simpleRelation.mapping_table_name);
-
-          // Test the user mappings from the relation
-          var userMappingDao = rte.getMappingDao(simpleRelation);
-          var totalMappedCount = userMappingDao.count();
-          var mappings = userMappingDao.queryForAll();
-          var umr;
-          mappings.forEach(function(row) {
-            umr = userMappingDao.getUserMappingRow(row);
-            attributeIds.indexOf(umr.baseId).should.not.be.equal(-1);
-            simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
-            RelatedTablesUtils.validateUserRow(mappingColumns, umr);
-            RelatedTablesUtils.validateDublinCoreColumns(umr);
-          });
-
-          // Get and test the attributes DAO
-          attributesDao = geoPackage.getAttributeDao(attributesDao.table_name);
-          should.exist(attributesDao);
-          var attributeTable = attributesDao.table;
-          should.exist(attributeTable);
-          var attributeContents = attributesDao.contents;
-          should.exist(attributeContents);
-          ContentsDao.GPKG_CDT_ATTRIBUTES_NAME.should.be.equal(attributeContents.data_type);
-          attributeTable.table_name.should.be.equal(attributeContents.table_name);
-          should.exist(attributeContents.last_change);
-
-          var simples = simpleDao.queryForAll();
-          var totalMapped = 0;
-          simples.forEach(function(row) {
-            var simpleRow = simpleDao.getRow(row);
-            var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.id);
-            mappedIds.forEach(function(mappedId){
-              var attributeRow = attributesDao.queryForId(mappedId);
-              should.exist(attributeRow);
-              attributeRow.hasId().should.be.equal(true);
-              attributeRow.id.should.be.greaterThan(0);
-              attributeIds.indexOf(attributeRow.id).should.not.equal(-1);
-              mappedIds.indexOf(attributeRow.id).should.not.equal(-1);
-            });
-            totalMapped += mappedIds.length;
-          });
-
-          totalMapped.should.be.equal(totalMappedCount);
+        simpleRows.forEach(function(simpleRow) {
+          simpleRow.hasId().should.be.equal(true);
+          simpleRow.id.should.be.greaterThan(0);
+          simpleIds.indexOf(simpleRow.id).should.not.be.equal(-1);
+          mappedIds.indexOf(simpleRow.id).should.not.be.equal(-1);
+          RelatedTablesUtils.validateUserRow(simpleColumns, simpleRow);
+          RelatedTablesUtils.validateSimpleDublinCoreColumns(simpleRow);
         });
 
-        var baseTables = extendedRelationsDao.getBaseTables();
-        baseTables.length.should.be.equal(1);
-        baseTables[0].should.be.equal(baseTableName);
-        var relatedTables = extendedRelationsDao.getRelatedTables();
-        relatedTables.length.should.be.equal(1);
-        relatedTables[0].should.be.equal(simpleTable.table_name);
+        totalMapped += mappedIds.length;
+      }
+      totalMappedCount.should.be.equal(totalMapped);
+    }
 
-        // Delete a single mapping
-        var countOfIds = userMappingDao.countByIds(umr);
-        var queryOfIds = userMappingDao.queryByIds(umr);
-        var queryCount = 0;
-        for (var row of queryOfIds) {
-          queryCount++;
-        }
-        queryCount.should.be.equal(countOfIds);
-        countOfIds.should.be.equal(userMappingDao.deleteByIds(umr));
-        userMappingDao.count().should.be.equal(10-countOfIds);
+    // Get the relations starting from the simple attributes table
+    var simpleRelatedTableRelations = extendedRelationsDao.getRelatedTableRelations(simpleTable.getTableName());
+    var simpleTableRelations = extendedRelationsDao.getTableRelations(simpleTable.getTableName());
 
-        // Delete by base id
-        var userMappings = userMappingDao.queryForAll();
-        var baseIdQuery = userMappingDao.queryByBaseId(userMappingDao.getUserMappingRow(userMappings[0]));
-        var countOfBaseIds = baseIdQuery.length;
-        var deleted = userMappingDao.deleteByBaseId(userMappingDao.getUserMappingRow(userMappings[0]));
-        deleted.should.be.equal(countOfBaseIds);
+    simpleRelatedTableRelations.length.should.be.equal(1);
+    simpleTableRelations.length.should.be.equal(1);
+    simpleRelatedTableRelations[0].id.should.be.equal(simpleTableRelations[0].id);
+    extendedRelationsDao.getBaseTableRelations(simpleTable.getTableName()).length.should.be.equal(0);
 
-        // Delete by related id
-        var userMappings = userMappingDao.queryForAll();
-        var relatedIdQuery = userMappingDao.queryByRelatedId(userMappingDao.getUserMappingRow(userMappings[0]));
-        var countOfRelatedIds = relatedIdQuery.length;
-        var deleted = userMappingDao.deleteByRelatedId(userMappingDao.getUserMappingRow(userMappings[0]));
-        deleted.should.be.equal(countOfRelatedIds);
+    // Test the media table relations
+    simpleRelatedTableRelations.forEach(function(simpleRelation) {
 
-        // Delete the relationship and user mapping table
-        rte.removeRelationship(extendedRelation);
-        rte.has(userMappingTable.table_name).should.be.equal(false);
-        var relationships = rte.getRelationships();
-        relationships.length.should.be.equal(0);
-        geoPackage.isTable(mappingTableName).should.be.equal(false);
+      // Test the relation
+      simpleRelation.id.should.be.greaterThan(0);
+      attributesDao.table_name.should.be.equal(simpleRelation.base_table_name);
+      attributesDao.table.getPkColumn().name.should.be.equal(simpleRelation.base_primary_column);
+      simpleDao.table_name.should.be.equal(simpleRelation.related_table_name);
+      simpleDao.table.getPkColumn().name.should.be.equal(simpleRelation.related_primary_column);
+      SimpleAttributesTable.RELATION_TYPE.name.should.be.equal(simpleRelation.relation_name);
+      mappingTableName.should.be.equal(simpleRelation.mapping_table_name);
 
-        // Delete the media table and contents row
-        geoPackage.isTable(simpleTable.table_name);
-        should.exist(contentsDao.queryForId(simpleTable.table_name));
-        geoPackage.deleteTable(simpleTable.table_name);
-        geoPackage.isTable(simpleTable.table_name).should.be.equal(false);
-        should.exist(contentsDao.queryForId(simpleTable.table_name));
-
-        // Delete the related tables extension
-        rte.removeExtension();
-        rte.has().should.be.equal(false);
+      // Test the user mappings from the relation
+      var userMappingDao = rte.getMappingDao(simpleRelation);
+      var totalMappedCount = userMappingDao.count();
+      var mappings = userMappingDao.queryForAll();
+      var umr;
+      mappings.forEach(function(row) {
+        umr = userMappingDao.getUserMappingRow(row);
+        attributeIds.indexOf(umr.baseId).should.not.be.equal(-1);
+        simpleIds.indexOf(umr.relatedId).should.not.be.equal(-1);
+        RelatedTablesUtils.validateUserRow(mappingColumns, umr);
+        RelatedTablesUtils.validateDublinCoreColumns(umr);
       });
+
+      // Get and test the attributes DAO
+      attributesDao = geoPackage.getAttributeDao(attributesDao.table_name);
+      should.exist(attributesDao);
+      var attributeTable = attributesDao.table;
+      should.exist(attributeTable);
+      var attributeContents = attributesDao.contents;
+      should.exist(attributeContents);
+      ContentsDataType.ATTRIBUTES.should.be.equal(attributeContents.data_type);
+      attributeTable.getTableName().should.be.equal(attributeContents.table_name);
+      should.exist(attributeContents.last_change);
+
+      var simples = simpleDao.queryForAll();
+      var totalMapped = 0;
+      simples.forEach(function(row) {
+        var simpleRow = simpleDao.getRow(row);
+        var mappedIds = rte.getMappingsForRelated(simpleRelation.mapping_table_name, simpleRow.id);
+        mappedIds.forEach(function(mappedId){
+          var attributeRow = attributesDao.queryForId(mappedId);
+          should.exist(attributeRow);
+          attributeRow.hasId().should.be.equal(true);
+          attributeRow.id.should.be.greaterThan(0);
+          attributeIds.indexOf(attributeRow.id).should.not.equal(-1);
+          mappedIds.indexOf(attributeRow.id).should.not.equal(-1);
+        });
+        totalMapped += mappedIds.length;
+      });
+
+      totalMapped.should.be.equal(totalMappedCount);
+    });
+
+    var baseTables = extendedRelationsDao.getBaseTables();
+    baseTables.length.should.be.equal(1);
+    baseTables[0].should.be.equal(baseTableName);
+    var relatedTables = extendedRelationsDao.getRelatedTables();
+    relatedTables.length.should.be.equal(1);
+    relatedTables[0].should.be.equal(simpleTable.getTableName());
+
+    // Delete a single mapping
+    var countOfIds = userMappingDao.countByIds(umr);
+    var queryOfIds = userMappingDao.queryByIds(umr);
+    var queryCount = 0;
+    for (var row of queryOfIds) {
+      queryCount++;
+    }
+    queryCount.should.be.equal(countOfIds);
+    countOfIds.should.be.equal(userMappingDao.deleteByIds(umr));
+    userMappingDao.count().should.be.equal(10-countOfIds);
+
+    // Delete by base id
+    var userMappings = userMappingDao.queryForAll();
+    var baseIdQuery = userMappingDao.queryByBaseId(userMappingDao.getUserMappingRow(userMappings[0]));
+    var countOfBaseIds = baseIdQuery.length;
+    var deleted = userMappingDao.deleteByBaseId(userMappingDao.getUserMappingRow(userMappings[0]));
+    deleted.should.be.equal(countOfBaseIds);
+
+    // Delete by related id
+    var userMappings = userMappingDao.queryForAll();
+    var relatedIdQuery = userMappingDao.queryByRelatedId(userMappingDao.getUserMappingRow(userMappings[0]));
+    var countOfRelatedIds = relatedIdQuery.length;
+    var deleted = userMappingDao.deleteByRelatedId(userMappingDao.getUserMappingRow(userMappings[0]));
+    deleted.should.be.equal(countOfRelatedIds);
+
+    // Delete the relationship and user mapping table
+    rte.removeRelationship(extendedRelation);
+    rte.has(userMappingTable.getTableName()).should.be.equal(false);
+    var relationships = rte.getRelationships();
+    relationships.length.should.be.equal(0);
+    geoPackage.isTable(mappingTableName).should.be.equal(false);
+
+    // Delete the media table and contents row
+    geoPackage.isTable(simpleTable.getTableName());
+    should.exist(contentsDao.queryForId(simpleTable.getTableName()));
+    geoPackage.deleteTable(simpleTable.getTableName());
+    geoPackage.isTable(simpleTable.getTableName()).should.be.equal(false);
+    should.not.exist(contentsDao.queryForId(simpleTable.getTableName()));
+
+    // Delete the related tables extension
+    rte.removeExtension();
+    rte.has().should.be.equal(false);
   });
 });

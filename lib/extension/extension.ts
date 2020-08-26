@@ -56,4 +56,22 @@ export class Extension {
   static getExtensionNameNoAuthor(extensionName: string): string {
     return extensionName.slice(extensionName.indexOf(Extension.EXTENSION_NAME_DIVIDER) + 1);
   }
+  /**
+   * Get the table name
+   * @return table name
+   */
+  getTableName(): string {
+    return this.table_name;
+  }
+
+  /**
+   * Set the table name
+   * @param tableName table name
+   */
+  setTableName(tableName: string) {
+    this.table_name = tableName;
+    if (tableName === null || tableName === undefined) {
+      this.column_name = null;
+    }
+  }
 }

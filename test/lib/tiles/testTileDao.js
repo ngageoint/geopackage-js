@@ -67,8 +67,8 @@ describe('TileDao tests', function() {
 
     it('should get the table', function() {
       var tileTable = tileDao.table;
-      tileTable.table_name.should.be.equal('TILESosmds');
-      should.exist(tileTable.tileDataColumn);
+      tileTable.getTableName().should.be.equal('TILESosmds');
+      should.exist(tileTable.getUserColumns().getTileDataColumn());
     });
 
     it('should query for a tile', function() {
@@ -202,8 +202,8 @@ describe('TileDao tests', function() {
 
     it('should get the table', function() {
       var tileTable = tileDao.table;
-      tileTable.tableName.should.be.equal('alaska');
-      should.exist(tileTable.getTileDataColumn);
+      tileTable.getTableName().should.be.equal('alaska');
+      should.exist(tileTable.getUserColumns().getTileDataColumn());
     });
 
     it('should query for a tile', function() {

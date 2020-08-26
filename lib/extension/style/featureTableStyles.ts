@@ -29,7 +29,7 @@ export class FeatureTableStyles {
   tableName: string;
   constructor(public geoPackage: GeoPackage, tableNameOrTable: string | FeatureTable) {
     if (tableNameOrTable instanceof FeatureTable) {
-      this.tableName = tableNameOrTable.table_name;
+      this.tableName = tableNameOrTable.getTableName();
     } else {
       this.tableName = tableNameOrTable;
     }
@@ -63,12 +63,12 @@ export class FeatureTableStyles {
    * feature table
    * @return {Promise}
    */
-  createRelationships(): Promise<{
+  createRelationships(): {
     styleRelationship: ExtendedRelation;
     tableStyleRelationship: ExtendedRelation;
     iconRelationship: ExtendedRelation;
     tableIconRelationship: ExtendedRelation;
-  }> {
+  } {
     return this.featureStyleExtension.createRelationships(this.tableName);
   }
   /**
@@ -83,7 +83,7 @@ export class FeatureTableStyles {
    * Create a style relationship for the feature table
    * @return {Promise}
    */
-  createStyleRelationship(): Promise<ExtendedRelation> {
+  createStyleRelationship(): ExtendedRelation {
     return this.featureStyleExtension.createStyleRelationship(this.tableName);
   }
   /**
@@ -97,7 +97,7 @@ export class FeatureTableStyles {
    * Create a feature table style relationship
    * @return {Promise}
    */
-  createTableStyleRelationship(): Promise<ExtendedRelation> {
+  createTableStyleRelationship(): ExtendedRelation {
     return this.featureStyleExtension.createTableStyleRelationship(this.tableName);
   }
   /**
@@ -112,7 +112,7 @@ export class FeatureTableStyles {
    * Create an icon relationship for the feature table
    * @return {Promise}
    */
-  createIconRelationship(): Promise<ExtendedRelation> {
+  createIconRelationship(): ExtendedRelation {
     return this.featureStyleExtension.createIconRelationship(this.tableName);
   }
   /**
@@ -126,7 +126,7 @@ export class FeatureTableStyles {
    * Create a feature table icon relationship
    * @return {Promise}
    */
-  createTableIconRelationship(): Promise<ExtendedRelation> {
+  createTableIconRelationship(): ExtendedRelation {
     return this.featureStyleExtension.createTableIconRelationship(this.tableName);
   }
   /**
@@ -552,13 +552,12 @@ export class FeatureTableStyles {
   }
   /**
    * Set the feature table default feature styles
-   *
    * @param {module:extension/style.FeatureStyles} featureStyles default feature styles
    * @return {Promise}
    */
-  async setTableFeatureStyles(
+  setTableFeatureStyles(
     featureStyles: FeatureStyles,
-  ): Promise<{
+  ): {
     tableStyles: {
       styleDefault: number;
       styles: number[];
@@ -571,8 +570,8 @@ export class FeatureTableStyles {
       styles: number;
       icons: number;
     };
-  }> {
-    const styles = await this.featureStyleExtension.setTableFeatureStyles(this.tableName, featureStyles);
+  } {
+    const styles = this.featureStyleExtension.setTableFeatureStyles(this.tableName, featureStyles);
     this.clearCachedTableFeatureStyles();
     return styles;
   }
@@ -582,14 +581,14 @@ export class FeatureTableStyles {
    * @param {module:extension/style.Styles} styles default styles
    * @return {Promise}
    */
-  async setTableStyles(
+  setTableStyles(
     styles: Styles,
-  ): Promise<{
+  ): {
     styleDefault: number;
     styles: number[];
     deleted: number;
-  }> {
-    const result = await this.featureStyleExtension.setTableStyles(this.tableName, styles);
+  } {
+    const result = this.featureStyleExtension.setTableStyles(this.tableName, styles);
     this.clearCachedTableStyles();
     return result;
   }
@@ -597,10 +596,10 @@ export class FeatureTableStyles {
    * Set the feature table style default
    *
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {number}
    */
-  async setTableStyleDefault(style: StyleRow): Promise<number> {
-    const result = await this.featureStyleExtension.setTableStyleDefault(this.tableName, style);
+  setTableStyleDefault(style: StyleRow): number {
+    const result = this.featureStyleExtension.setTableStyleDefault(this.tableName, style);
     this.clearCachedTableStyles();
     return result;
   }
@@ -608,11 +607,11 @@ export class FeatureTableStyles {
    * Set the feature table style for the geometry type
    *
    * @param {String} geometryType geometry type
-   * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @param {StyleRow} style style row
+   * @return {number}
    */
-  async setTableStyle(geometryType: string, style: StyleRow): Promise<number> {
-    const result = await this.featureStyleExtension.setTableStyle(this.tableName, geometryType, style);
+  setTableStyle(geometryType: string, style: StyleRow): number {
+    const result = this.featureStyleExtension.setTableStyle(this.tableName, geometryType, style);
     this.clearCachedTableStyles();
     return result;
   }
@@ -620,16 +619,16 @@ export class FeatureTableStyles {
    * Set the feature table default icons
    *
    * @param {module:extension/style.Icons} icons default icons
-   * @return {Promise}
+   * @return {any}
    */
-  async setTableIcons(
+  setTableIcons(
     icons: Icons,
-  ): Promise<{
+  ): {
     iconDefault: number;
     icons: number[];
     deleted: number;
-  }> {
-    const result = await this.featureStyleExtension.setTableIcons(this.tableName, icons);
+  } {
+    const result = this.featureStyleExtension.setTableIcons(this.tableName, icons);
     this.clearCachedTableIcons();
     return result;
   }
@@ -637,10 +636,10 @@ export class FeatureTableStyles {
    * Set the feature table icon default
    *
    * @param {module:extension/style.IconRow} icon icon row
-   * @return {Promise}
+   * @return {number}
    */
-  async setTableIconDefault(icon: IconRow): Promise<number> {
-    const result = await this.featureStyleExtension.setTableIconDefault(this.tableName, icon);
+  setTableIconDefault(icon: IconRow): number {
+    const result = this.featureStyleExtension.setTableIconDefault(this.tableName, icon);
     this.clearCachedTableIcons();
     return result;
   }
@@ -649,10 +648,10 @@ export class FeatureTableStyles {
    *
    * @param {String} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
-   * @return {Promise}
+   * @return {number}
    */
-  async setTableIcon(geometryType: string, icon: IconRow): Promise<number> {
-    const result = await this.featureStyleExtension.setTableIcon(this.tableName, geometryType, icon);
+  setTableIcon(geometryType: string, icon: IconRow): number {
+    const result = this.featureStyleExtension.setTableIcon(this.tableName, geometryType, icon);
     this.clearCachedTableIcons();
     return result;
   }
@@ -661,12 +660,12 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.FeatureStyles} featureStyles feature styles
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStylesForFeatureRow(
+  setFeatureStylesForFeatureRow(
     featureRow: FeatureRow,
     featureStyles: FeatureStyles,
-  ): Promise<{
+  ): {
     styles: { styleDefault: number; styles: number[] };
     icons: {
       iconDefault: number;
@@ -676,27 +675,27 @@ export class FeatureTableStyles {
         icon: number;
       };
     };
-  }> {
-    return await this.featureStyleExtension.setFeatureStylesForFeatureRow(featureRow, featureStyles);
+  } {
+    return this.featureStyleExtension.setFeatureStylesForFeatureRow(featureRow, featureStyles);
   }
   /**
    * Set the feature styles for the feature table and feature id
    *
    * @param {Number} featureId feature id
    * @param {module:extension/style.FeatureStyles} featureStyles feature styles
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyles(
+  setFeatureStyles(
     featureId: number,
     featureStyles: FeatureStyles,
-  ): Promise<{
+  ): {
     styles: { styleDefault: number; styles: number[] };
     icons: { iconDefault: number; icons: number[] };
     deleted?: {
       deletedStyles: number;
       deletedIcons: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyles(this.tableName, featureId, featureStyles);
   }
   /**
@@ -704,19 +703,19 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyleForFeatureRow(
+  setFeatureStyleForFeatureRow(
     featureRow: FeatureRow,
     featureStyle: FeatureStyle,
-  ): Promise<{
+  ): {
     style: number;
     icon: number;
     deleted?: {
       style: number;
       icon: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyleForFeatureRow(featureRow, featureStyle);
   }
   /**
@@ -726,20 +725,20 @@ export class FeatureTableStyles {
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {String} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyleForFeatureRowAndGeometryType(
+  setFeatureStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
     geometryType: string,
     featureStyle: FeatureStyle,
-  ): Promise<{
+  ): {
     style: number;
     icon: number;
     deleted?: {
       style: number;
       icon: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyleForFeatureRowAndGeometryType(
       featureRow,
       geometryType,
@@ -751,19 +750,19 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyleDefaultForFeatureRow(
+  setFeatureStyleDefaultForFeatureRow(
     featureRow: FeatureRow,
     featureStyle: FeatureStyle,
-  ): Promise<{
+  ): {
     style: number;
     icon: number;
     deleted?: {
       style: number;
       icon: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyleDefaultForFeatureRow(featureRow, featureStyle);
   }
   /**
@@ -772,20 +771,20 @@ export class FeatureTableStyles {
    * @param {Number} featureId feature id
    * @param {String} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyle(
+  setFeatureStyle(
     featureId: number,
     geometryType: string,
     featureStyle: FeatureStyle,
-  ): Promise<{
+  ): {
     style: number;
     icon: number;
     deleted?: {
       style: number;
       icon: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyle(this.tableName, featureId, geometryType, featureStyle);
   }
   /**
@@ -793,19 +792,19 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
-   * @return {Promise}
+   * @return {any}
    */
-  async setFeatureStyleDefault(
+  setFeatureStyleDefault(
     featureId: number,
     featureStyle: FeatureStyle,
-  ): Promise<{
+  ): {
     style: number;
     icon: number;
     deleted?: {
       style: number;
       icon: number;
     };
-  }> {
+  } {
     return this.featureStyleExtension.setFeatureStyleDefault(this.tableName, featureId, featureStyle);
   }
   /**
@@ -813,12 +812,12 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.Styles} styles styles
-   * @return {Promise}
+   * @return {any}
    */
-  async setStylesForFeatureRow(
+  setStylesForFeatureRow(
     featureRow: FeatureRow,
     styles: Styles,
-  ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
+  ): { styleDefault: number; styles: number[]; deleted: number } {
     return this.featureStyleExtension.setStylesForFeatureRow(featureRow, styles);
   }
   /**
@@ -826,12 +825,12 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {module:extension/style.Styles} styles styles
-   * @return {Promise}
+   * @return {any}
    */
-  async setStyles(
+  setStyles(
     featureId: number,
     styles: Styles,
-  ): Promise<{ styleDefault: number; styles: number[]; deleted: number }> {
+  ): { styleDefault: number; styles: number[]; deleted: number } {
     return this.featureStyleExtension.setStyles(this.tableName, featureId, styles);
   }
   /**
@@ -839,9 +838,9 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {any}
    */
-  async setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
+  setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
     return this.featureStyleExtension.setStyleForFeatureRow(featureRow, style);
   }
   /**
@@ -850,13 +849,13 @@ export class FeatureTableStyles {
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {String} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {number}
    */
-  async setStyleForFeatureRowAndGeometryType(
+  setStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
     geometryType: string,
     style: StyleRow,
-  ): Promise<number> {
+  ): number {
     return this.featureStyleExtension.setStyleForFeatureRowAndGeometryType(featureRow, geometryType, style);
   }
   /**
@@ -864,9 +863,9 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {number}
    */
-  async setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): Promise<number> {
+  setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
     return this.featureStyleExtension.setStyleDefaultForFeatureRow(featureRow, style);
   }
   /**
@@ -875,9 +874,9 @@ export class FeatureTableStyles {
    * @param {Number} featureId feature id
    * @param {String} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {number}
    */
-  async setStyle(featureId: number, geometryType: string, style: StyleRow): Promise<number> {
+  setStyle(featureId: number, geometryType: string, style: StyleRow): number {
     return this.featureStyleExtension.setStyle(this.tableName, featureId, geometryType, style);
   }
   /**
@@ -885,9 +884,9 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {module:extension/style.StyleRow} style style row
-   * @return {Promise}
+   * @return {number}
    */
-  async setStyleDefault(featureId: number, style: StyleRow): Promise<number> {
+  setStyleDefault(featureId: number, style: StyleRow): number {
     return this.featureStyleExtension.setStyleDefault(this.tableName, featureId, style);
   }
   /**
@@ -895,16 +894,16 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.Icons} icons icons
-   * @return {Promise}
+   * @return {any}
    */
-  async setIconsForFeatureRow(
+  setIconsForFeatureRow(
     featureRow: FeatureRow,
     icons: Icons,
-  ): Promise<{
+  ): {
     iconDefault: number;
     icons: number[];
     deleted: number;
-  }> {
+  } {
     return this.featureStyleExtension.setIconsForFeatureRow(featureRow, icons);
   }
   /**
@@ -912,16 +911,16 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {module:extension/style.Icons} icons icons
-   * @return {Promise}
+   * @return {any}
    */
-  async setIcons(
+  setIcons(
     featureId: number,
     icons: Icons,
-  ): Promise<{
+  ): {
     iconDefault: number;
     icons: number[];
     deleted: number;
-  }> {
+  } {
     return this.featureStyleExtension.setIcons(this.tableName, featureId, icons);
   }
   /**
@@ -929,9 +928,9 @@ export class FeatureTableStyles {
    *
    * @param {module:features/user/featureRow} featureRow feature row
    * @param {module:extension/style.IconRow} icon icon row
-   * @return {Promise}
+   * @return {number}
    */
-  async setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
+  setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
     return this.featureStyleExtension.setIconForFeatureRow(featureRow, icon);
   }
   /**
@@ -942,11 +941,11 @@ export class FeatureTableStyles {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
-  async setIconForFeatureRowAndGeometryType(
+  setIconForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
     geometryType: string,
     icon: IconRow,
-  ): Promise<number> {
+  ): number {
     return this.featureStyleExtension.setIconForFeatureRowAndGeometryType(featureRow, geometryType, icon);
   }
   /**
@@ -956,7 +955,7 @@ export class FeatureTableStyles {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
-  async setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): Promise<number> {
+  setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
     return this.featureStyleExtension.setIconDefaultForFeatureRow(featureRow, icon);
   }
   /**
@@ -968,7 +967,7 @@ export class FeatureTableStyles {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
-  async setIcon(featureId: number, geometryType: string, icon: IconRow): Promise<number> {
+  setIcon(featureId: number, geometryType: string, icon: IconRow): number {
     return this.featureStyleExtension.setIcon(this.tableName, featureId, geometryType, icon);
   }
   /**
@@ -978,7 +977,7 @@ export class FeatureTableStyles {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
-  async setIconDefault(featureId: number, icon: IconRow): Promise<number> {
+  setIconDefault(featureId: number, icon: IconRow): number {
     return this.featureStyleExtension.setIconDefault(this.tableName, featureId, icon);
   }
   /**

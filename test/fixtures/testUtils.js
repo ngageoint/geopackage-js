@@ -1,9 +1,10 @@
+import { default as testSetup } from './testSetup'
+import { default as fsExtra } from 'fs-extra'
+
 // @ts-nocheck
 var should = require('chai').should();
 var GeoPackageAPI = require('../..').GeoPackageAPI
 var Path = require('path')
-import { default as testSetup } from './testSetup'
-import {default as fsExtra} from 'fs-extra'
 
 global.compareProperties = module.exports.compareProperties = function(o1, o2) {
   o2.should.have.all.keys(Object.keys(o1));

@@ -5,7 +5,7 @@
 import { UserRelatedTable } from './userRelatedTable';
 import { RelationType } from './relationType';
 import { UserColumn } from '../../user/userColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**
  * Media Requirements Class User-Defined Related Data Table
@@ -96,7 +96,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createIdColumn(index: number, idColumnName: string): UserColumn {
-    return UserColumn.createPrimaryKeyColumnWithIndexAndName(index, idColumnName);
+    return UserColumn.createPrimaryKeyColumn(index, idColumnName);
   }
   /**
    * Create the data column
@@ -104,7 +104,7 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createDataColumn(index: number): UserColumn {
-    return UserColumn.createColumn(index, MediaTable.COLUMN_DATA, DataTypes.BLOB, true);
+    return UserColumn.createColumn(index, MediaTable.COLUMN_DATA, GeoPackageDataType.BLOB, true);
   }
   /**
    * Create the content type column
@@ -112,6 +112,6 @@ export class MediaTable extends UserRelatedTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createContentTypeColumn(index: number): UserColumn {
-    return UserColumn.createColumn(index, MediaTable.COLUMN_CONTENT_TYPE, DataTypes.TEXT, true);
+    return UserColumn.createColumn(index, MediaTable.COLUMN_CONTENT_TYPE, GeoPackageDataType.TEXT, true);
   }
 }

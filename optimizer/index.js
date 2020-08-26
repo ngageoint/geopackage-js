@@ -97,13 +97,13 @@ function copyFeatures(options) {
   const featureDao = inputGeoPackage.getFeatureDao(table);
   const featureTable = featureDao.getFeatureTable();
 
-  const geometryColumns = inputGeoPackage.getGeometryColumnsDao().queryForTableName(table);
+  const geometryColumns = inputGeoPackage.geometryColumnsDao.queryForTableName(table);
   const boundingBox = featureDao.getBoundingBox();
   const srsId = featureDao.getSrs().srs_id;
-  const columns = featureTable.columns;
+  const columns = featureTable.getUserColumns().getColumns();
 
   return outputGeoPackage
-    .createFeatureTableWithGeometryColumns(geometryColumns, boundingBox, srsId, columns)
+    .createFeatureTable(table, geometryColumns, columns, boundingBox, srsId)
     .then(function() {
       const outputFeatureDao = outputGeoPackage.getFeatureDao(table);
       const featureDao = inputGeoPackage.getFeatureDao(table);

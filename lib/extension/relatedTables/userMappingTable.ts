@@ -2,11 +2,10 @@
  * userMappingTable module.
  * @module extension/relatedTables
  */
-
-import { UserTable } from '../../user/userTable';
 import { UserColumn } from '../../user/userColumn';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
+import { UserCustomTable } from '../../user/custom/userCustomTable';
 
 /**
  * Contains user mapping table factory and utility methods
@@ -14,7 +13,7 @@ import { DataTypes } from '../../db/dataTypes';
  * @param  {string} tableName table name
  * @param  {module:user/userColumn~UserColumn[]} columns   user mapping columns
  */
-export class UserMappingTable extends UserTable {
+export class UserMappingTable extends UserCustomTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
   public static readonly COLUMN_RELATED_ID: string = 'related_id';
 
@@ -46,7 +45,7 @@ export class UserMappingTable extends UserTable {
     if (columns) {
       allColumns = allColumns.concat(columns);
     }
-    return new UserMappingTable(tableName, allColumns);
+    return new UserMappingTable(tableName, allColumns, UserMappingTable.requiredColumns());
   }
   /**
    * Get the number of required columns
@@ -72,8 +71,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createBaseIdColumn(index: number): UserColumn {
-    const baseIdColumn = UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, DataTypes.INTEGER, true);
-    return baseIdColumn;
+    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Create the related id column
@@ -81,7 +79,7 @@ export class UserMappingTable extends UserTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createRelatedIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, DataTypes.INTEGER, true);
+    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Get the required columns

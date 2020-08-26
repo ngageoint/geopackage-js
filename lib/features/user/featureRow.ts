@@ -1,7 +1,7 @@
 import { FeatureTable } from './featureTable';
 import { UserRow } from '../../user/userRow';
 import { FeatureColumn } from './featureColumn';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { GeometryData } from '../../geom/geometryData';
 import { DBValue } from '../../db/dbAdapter';
 
@@ -19,7 +19,7 @@ import { DBValue } from '../../db/dbAdapter';
 export class FeatureRow extends UserRow {
   constructor(
     public featureTable: FeatureTable,
-    columnTypes?: { [key: string]: DataTypes },
+    columnTypes?: { [key: string]: GeoPackageDataType },
     values?: Record<string, DBValue>,
   ) {
     super(featureTable, columnTypes, values);
@@ -29,28 +29,28 @@ export class FeatureRow extends UserRow {
    * @return {Number} geometry column index
    */
   get geometryColumnIndex(): number {
-    return this.featureTable.geometryIndex;
+    return this.featureTable.getGeometryColumnIndex();
   }
   /**
    * Get the geometry column
    * @return {FeatureColumn} geometry column
    */
   get geometryColumn(): FeatureColumn {
-    return this.featureTable.geometryColumn;
+    return this.featureTable.getGeometryColumn();
   }
   /**
    * Get the geometry
    * @return {Buffer} geometry data
    */
   get geometry(): GeometryData {
-    return this.getValueWithIndex(this.featureTable.geometryIndex);
+    return this.getValueWithIndex(this.featureTable.getGeometryColumnIndex());
   }
   /**
    * set the geometry
    * @param {Buffer} geometryData geometry data
    */
   set geometry(geometryData: GeometryData) {
-    this.setValueWithIndex(this.featureTable.geometryIndex, geometryData);
+    this.setValueWithIndex(this.featureTable.getGeometryColumnIndex(), geometryData);
   }
   /**
    * Get the geometry's type
@@ -58,7 +58,7 @@ export class FeatureRow extends UserRow {
    */
   get geometryType(): string {
     let geometryType = null;
-    const geometry = this.getValueWithIndex(this.featureTable.geometryIndex);
+    const geometry = this.getValueWithIndex(this.featureTable.getGeometryColumnIndex());
     if (geometry !== null) {
       geometryType = geometry.toGeoJSON().type;
     }
@@ -75,12 +75,13 @@ export class FeatureRow extends UserRow {
     }
     return super.toObjectValue(index, value);
   }
-  toDatabaseValue(columnName: string): DBValue {
+
+  getValueWithColumnName(columnName: string): any {
+    const value = this.values[columnName];
     const column = this.getColumnWithColumnName(columnName);
-    const value = this.getValueWithColumnName(columnName);
-    if (column instanceof FeatureColumn && column.isGeometry() && value.toData) {
-      return value.toData();
+    if (value !== undefined && value !== null && column instanceof FeatureColumn && column.isGeometry() && (value as any).toData) {
+      return (value as any).toData();
     }
-    return super.toDatabaseValue(columnName);
+    return super.getValueWithColumnName(columnName);
   }
 }

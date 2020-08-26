@@ -2,7 +2,8 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {ContentsDao} from '../../../../lib/core/contents/contentsDao'
 
-var Verification = require('../../../fixtures/verification')  
+var Verification = require('../../../fixtures/verification')
+  , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
   , should = require('chai').should()
   , path = require('path');
 
@@ -21,13 +22,13 @@ describe('ContentsIdExtension Tests', function() {
   beforeEach('create the GeoPackage connection', async function() {
     var contentsDao = geopackage.contentsDao;
     var contentsIdExtension = geopackage.contentsIdExtension;
-    await contentsIdExtension.getOrCreateExtension();
+    contentsIdExtension.getOrCreateExtension();
     var contentsIdDao = contentsIdExtension.dao;
     contents = contentsDao.createObject();
     contents.table_name = tableName;
-    contents.data_type = ContentsDao.GPKG_CDT_FEATURES_NAME;
+    contents.data_type = ContentsDataType.FEATURES;
     contentsDao.create(contents);
-    await contentsIdDao.createTable();
+    contentsIdDao.createTable();
   });
 
   afterEach(async function() {
@@ -63,13 +64,13 @@ describe('ContentsIdExtension Tests', function() {
 
   it('should retrieve table_name\'s of contents without record in contentsId table for given type', function() {
     // test getMissing
-    var missing = geopackage.contentsIdExtension.getMissing(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    var missing = geopackage.contentsIdExtension.getMissing(ContentsDataType.FEATURES);
     missing.length.should.be.equal(1);
     // test create
     var contentsId = geopackage.contentsIdExtension.create(contents);
     contentsId.table_name.should.be.equal(tableName);
     // test getMissing returns nothing when all contents records have entry in contentsId table
-    missing = geopackage.contentsIdExtension.getMissing(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    missing = geopackage.contentsIdExtension.getMissing(ContentsDataType.FEATURES);
     missing.length.should.be.equal(0);
   });
 
@@ -85,13 +86,13 @@ describe('ContentsIdExtension Tests', function() {
     geopackage.contentsIdExtension.create(contents);
 
     // test getIdsByType
-    var contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    var contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDataType.FEATURES);
     contentIdsForTypeFeature.length.should.be.equal(1);
 
-    contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDao.GPKG_CDT_ATTRIBUTES_NAME);
+    contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDataType.ATTRIBUTES);
     contentIdsForTypeFeature.length.should.be.equal(0);
 
-    contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDao.GPKG_CDT_TILES_NAME);
+    contentIdsForTypeFeature = geopackage.contentsIdExtension.getIdsByType(ContentsDataType.TILES);
     contentIdsForTypeFeature.length.should.be.equal(0);
   });
 
@@ -100,11 +101,11 @@ describe('ContentsIdExtension Tests', function() {
     geopackage.contentsIdExtension.create(contents);
 
     // test deleteIds
-    let numDeleted = geopackage.contentsIdExtension.deleteIds(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    let numDeleted = geopackage.contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
     numDeleted.should.be.equal(1);
 
     // test deleteIds when no ids to be deleted
-    numDeleted = geopackage.contentsIdExtension.deleteIds(ContentsDao.GPKG_CDT_FEATURES_NAME);
+    numDeleted = geopackage.contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
     numDeleted.should.be.equal(0);
   });
 

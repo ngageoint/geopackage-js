@@ -11,7 +11,7 @@ export class WebPExtension extends BaseExtension {
     super(geoPackage);
     this.tableName = tableName;
   }
-  getOrCreateExtension(): Promise<Extension> {
+  getOrCreateExtension(): Extension {
     return this.getOrCreate(
       WebPExtension.EXTENSION_NAME,
       this.tableName,

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { GeoPackageAPI } from '../..';
-import {GeoPackage} from '../../lib/geoPackage';
-import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
+import { GeoPackage } from '../../lib/geoPackage';
+import { GeoPackageConnection } from '../../lib/db/geoPackageConnection';
 
 var fs = require('fs-extra')
   , path = require('path')
@@ -92,7 +92,6 @@ global.loadTile = module.exports.loadTile = async function(tilePath) {
 };
 
 module.exports.diffImages = function(actualTile, expectedTilePath, callback) {
-  console.log('diff');
   module.exports.diffImagesWithDimensions(actualTile, expectedTilePath, 256, 256, callback);
 };
 
@@ -199,9 +198,8 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         var image2 = new Image();
         image2.onload = function() {
           ctx2.drawImage(image2, 0, 0);
-          console.log('equal', ctx2)
           var equal = module.exports.diffCanvasesContexts(ctx, ctx2, width, height);
-          
+
           if (!equal) {
             var h1Tags = document.getElementsByTagName('h1');
             var h2Tags = document.getElementsByTagName('li');

@@ -4,11 +4,10 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 // @ts-ignore
 var FeatureDao = require('../../../../lib/features/user/featureDao').FeatureDao
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
-  , DataTypes = require('../../../../lib/db/dataTypes').DataTypes
-  // , GeoPackageAPI = require('../../../../index.js')
+  , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
-  // , testSetup = require('../../../fixtures/testSetup')
+  , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
@@ -126,7 +125,7 @@ describe('FeatureDao tests', function() {
     it('should iterate GeoJSON features', async function() {
       var count = 0;
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      const iterator = await geoPackage.iterateGeoJSONFeatures('QueryTest', bb)
+      const iterator = geoPackage.iterateGeoJSONFeatures('QueryTest', bb)
       for (var feature of iterator) {
         feature.properties.name.should.be.equal('box1');
         count++;
@@ -236,16 +235,16 @@ describe('FeatureDao tests', function() {
       geopackage = await testSetup.createGeoPackage(testGeoPackage)
 
       // @ts-ignore
-      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', wkx.Types.wkt.GeometryCollection);
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.GEOMETRYCOLLECTION);
 
       var columns = [];
 
-      columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
+      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
       // @ts-ignore
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', wkx.Types.wkt.Point, false, null));
-      columns.push(FeatureColumn.createColumn(2, 'name', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(3, '_feature_id', DataTypes.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(4, '_properties_id', DataTypes.TEXT, false, ""));
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
+      columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
 
       var box1 = {
         "type": "Polygon",
@@ -375,7 +374,7 @@ describe('FeatureDao tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      await geopackage.createFeatureTable('QueryTest', geometryColumns, columns)
+      geopackage.createFeatureTable('QueryTest', geometryColumns, columns)
       var featureDao = geopackage.getFeatureDao('QueryTest');
       queryTestFeatureDao = featureDao;
       createRow(box1, 'box1', featureDao);
@@ -618,13 +617,11 @@ describe('FeatureDao tests', function() {
       mediaRow = mediaDao.queryForId(mediaRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
-      return queryTestFeatureDao.linkMediaRow(featureRow, mediaRow)
-      .then(function() {
-        var linkedMedia = queryTestFeatureDao.getLinkedMedia(featureRow);
-        linkedMedia.length.should.be.equal(1);
-        // @ts-ignore
-        linkedMedia[0].id.should.be.equal(mediaRowId);
-      });
+      queryTestFeatureDao.linkMediaRow(featureRow, mediaRow);
+      var linkedMedia = queryTestFeatureDao.getLinkedMedia(featureRow);
+      linkedMedia.length.should.be.equal(1);
+      // @ts-ignore
+      linkedMedia[0].id.should.be.equal(mediaRowId);
     });
 
     it('should create a simple attributes relationship between a feature and a simple attributes row', function() {
@@ -646,13 +643,11 @@ describe('FeatureDao tests', function() {
       simpleRow = simpleDao.queryForId(simpleRowId);
 
       var featureRow = queryTestFeatureDao.getRow(queryTestFeatureDao.queryForAll()[0]);
-      return queryTestFeatureDao.linkSimpleAttributesRow(featureRow, simpleRow)
-      .then(function() {
-        var linkedAttributes = queryTestFeatureDao.getLinkedSimpleAttributes(featureRow);
-        linkedAttributes.length.should.be.equal(1);
-        // @ts-ignore
-        linkedAttributes[0].id.should.be.equal(simpleRowId);
-      });
+      queryTestFeatureDao.linkSimpleAttributesRow(featureRow, simpleRow);
+      var linkedAttributes = queryTestFeatureDao.getLinkedSimpleAttributes(featureRow);
+      linkedAttributes.length.should.be.equal(1);
+      // @ts-ignore
+      linkedAttributes[0].id.should.be.equal(simpleRowId);
     });
 
     it('should create a feature relationship between a feature and another feature row', function() {
@@ -660,12 +655,10 @@ describe('FeatureDao tests', function() {
       var featureRow = queryTestFeatureDao.getRow(all[0]);
       var relatedFeatureRow = queryTestFeatureDao.getRow(all[1]);
 
-      return queryTestFeatureDao.linkFeatureRow(featureRow, relatedFeatureRow)
-      .then(function() {
-        var linkedFeatures = queryTestFeatureDao.getLinkedFeatures(featureRow);
-        linkedFeatures.length.should.be.equal(1);
-        linkedFeatures[0].id.should.be.equal(relatedFeatureRow.id);
-      });
+      queryTestFeatureDao.linkFeatureRow(featureRow, relatedFeatureRow);
+      var linkedFeatures = queryTestFeatureDao.getLinkedFeatures(featureRow);
+      linkedFeatures.length.should.be.equal(1);
+      linkedFeatures[0].id.should.be.equal(relatedFeatureRow.id);
     });
   });
 

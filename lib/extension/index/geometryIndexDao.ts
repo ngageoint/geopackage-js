@@ -105,9 +105,9 @@ export class GeometryIndexDao extends Dao<GeometryIndex> {
   }
   /**
    * Create the GeometryIndex table
-   * @return {Promise}
+   * @return {boolean}
    */
-  async createTable(): Promise<boolean> {
+  createTable(): boolean {
     const exists = this.isTableExists();
     if (exists) return true;
     const tc = new TableCreator(this.geoPackage);

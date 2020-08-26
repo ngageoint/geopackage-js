@@ -1,7 +1,6 @@
 import { Extension } from './extension';
 import { Dao } from '../dao/dao';
 import { ColumnValues } from '../dao/columnValues';
-
 import { TableCreator } from '../db/tableCreator';
 import { DBValue } from '../db/dbAdapter';
 
@@ -75,14 +74,9 @@ export class ExtensionDao extends Dao<Extension> {
     values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
-      const e = this.createObject(row);
-      extensions.push(e);
+      extensions.push(this.createObject(row));
     }
-    if (extensions.length) {
-      return extensions;
-    } else {
-      return;
-    }
+    return extensions;
   }
   /**
    * Query by extension name and table name and return all results
@@ -94,8 +88,12 @@ export class ExtensionDao extends Dao<Extension> {
   queryByExtensionAndTableNameAndColumnName(extensionName: string, tableName: string, columnName: string): Extension[] {
     const values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
-    values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
-    values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
+    if (tableName !== null && tableName !== undefined) {
+      values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
+    }
+    if (columnName !== null && columnName !== undefined) {
+      values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
+    }
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
       const e = this.createObject(row);
@@ -106,7 +104,7 @@ export class ExtensionDao extends Dao<Extension> {
   /**
    * Creates the extensions table
    */
-  async createTable(): Promise<boolean> {
+  createTable(): boolean {
     const tc = new TableCreator(this.geoPackage);
     return tc.createExtensions();
   }
@@ -130,6 +128,19 @@ export class ExtensionDao extends Dao<Extension> {
     const values = new ColumnValues();
     values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
     values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
+    return this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
+  }
+  /**
+   * Deletes all extension entries with this name and table name
+   * @param {String} extensionName extension name to delete
+   * @param {String} tableName table name to delete
+   * @returns {Number} Number of extensions deleted
+   */
+  deleteByExtensionAndTableNameAndColumnName(extensionName: string, tableName: string, columnName: string): number {
+    const values = new ColumnValues();
+    values.addColumn(ExtensionDao.COLUMN_EXTENSION_NAME, extensionName);
+    values.addColumn(ExtensionDao.COLUMN_TABLE_NAME, tableName);
+    values.addColumn(ExtensionDao.COLUMN_COLUMN_NAME, columnName);
     return this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
   }
 }

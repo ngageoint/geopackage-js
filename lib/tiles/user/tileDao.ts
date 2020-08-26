@@ -13,7 +13,7 @@ import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { GeoPackage } from '../../geoPackage';
 import { TileTable } from './tileTable';
-import { DataTypes } from '../../db/dataTypes';
+import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { TileDaoUtils } from './tileDaoUtils';
 
@@ -28,7 +28,7 @@ import { TileDaoUtils } from './tileDaoUtils';
  * @param  {TileMatrixSet} tileMatrixSet
  * @param  {TileMatrix[]} tileMatrices
  */
-export class TileDao extends UserDao<TileRow> {
+export class TileDao<T extends TileRow> extends UserDao<TileRow> {
   zoomLevelToTileMatrix: TileMatrix[];
   widths: number[];
   heights: number[];
@@ -185,7 +185,7 @@ export class TileDao extends UserDao<TileRow> {
    * @param  {Array} values      values
    * @return {TileRow}             tile row
    */
-  newRow(columnTypes?: { [key: string]: DataTypes }, values?: Record<string, DBValue>): TileRow {
+  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): TileRow {
     return new TileRow(this.table, columnTypes, values);
   }
   /**
@@ -545,5 +545,9 @@ export class TileDao extends UserDao<TileRow> {
     const tileMatrixWhere = this.buildWhereWithFieldAndValue(TileMatrixDao.COLUMN_TABLE_NAME, oldName);
     tileMatrixDao.updateWithValues(tileMatrixUpdate, tileMatrixWhere, whereArgs);
     contentsDao.deleteById(oldName);
+  }
+
+  static readTable(geoPackage: GeoPackage, tableName: string): TileDao<TileRow> {
+    return geoPackage.getTileDao(tableName);
   }
 }

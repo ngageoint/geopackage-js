@@ -20,4 +20,5 @@ export interface DBAdapter {
   delete(sql: string, params?: [] | Record<string, any>): number;
   dropTable(table: string): boolean;
   count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number;
+  transaction(func: Function): void;
 }

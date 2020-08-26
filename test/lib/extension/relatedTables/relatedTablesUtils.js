@@ -1,4 +1,4 @@
-var DataTypes = require('../../../../lib/db/dataTypes').DataTypes
+var GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , UserColumn = require('../../../../lib/user/userColumn').UserColumn
   , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
   , DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
@@ -10,21 +10,21 @@ module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {
   var columnIndex = startingIndex;
 
   // Add Dublin Core Metadata term columns
-  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DATE.name, DataTypes.DATETIME, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DESCRIPTION.name, DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.SOURCE.name, DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.TITLE.name, DataTypes.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DATE.name, GeoPackageDataType.DATETIME, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.DESCRIPTION.name, GeoPackageDataType.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.SOURCE.name, GeoPackageDataType.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, DublinCoreType.TITLE.name, GeoPackageDataType.TEXT, notNull));
 
   // Add test columns for common data types, some with limits
-  columns.push(UserColumn.createColumn(columnIndex++, "test_text", DataTypes.TEXT, notNull, ''));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_real", DataTypes.REAL, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_boolean", DataTypes.BOOLEAN, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_blob", DataTypes.BLOB, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_integer", DataTypes.INTEGER, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_text_limited", DataTypes.TEXT, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_blob_limited", DataTypes.BLOB, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_date", DataTypes.DATE, notNull));
-  columns.push(UserColumn.createColumn(columnIndex++, "test_datetime", DataTypes.DATETIME, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_text", GeoPackageDataType.TEXT, notNull, ''));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_real", GeoPackageDataType.REAL, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_boolean", GeoPackageDataType.BOOLEAN, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_blob", GeoPackageDataType.BLOB, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_integer", GeoPackageDataType.INTEGER, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_text_limited", GeoPackageDataType.TEXT, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_blob_limited", GeoPackageDataType.BLOB, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_date", GeoPackageDataType.DATE, notNull));
+  columns.push(UserColumn.createColumn(columnIndex++, "test_datetime", GeoPackageDataType.DATETIME, notNull));
 
   return columns;
 }
@@ -46,8 +46,8 @@ module.exports.createSimpleUserColumns = function(startingIndex, notNull) {
 }
 
 module.exports.populateRow = function(table, row, skipColumns) {
-  for (var i = 0; i < table.columns.length; i++) {
-    var column = table.columns[i];
+  for (var i = 0; i < table.getUserColumns().getColumns().length; i++) {
+    var column = table.getUserColumns().getColumns()[i];
     if (skipColumns.indexOf(column.name) === -1) {
       // leave nullable columns null 20% of the time
       if (!column.notNull && DublinCoreType.fromName(column.name) == null) {
@@ -58,29 +58,29 @@ module.exports.populateRow = function(table, row, skipColumns) {
 
       var value;
       switch (column.dataType) {
-        case DataTypes.TEXT:
+        case GeoPackageDataType.TEXT:
           var text = Math.random().toString(36).replace(/[^a-z]+/g, '');
           if (column.max != null) {
             text = text.substr(0, column.max);
           }
           value = text;
           break;
-        case DataTypes.REAL:
-        case DataTypes.DOUBLE:
+        case GeoPackageDataType.REAL:
+        case GeoPackageDataType.DOUBLE:
           value = Math.random() * 5000.0;
           break;
-        case DataTypes.BOOLEAN:
+        case GeoPackageDataType.BOOLEAN:
           value = Math.random() < .5 ? false : true;
           break;
-        case DataTypes.INTEGER:
-        case DataTypes.INT:
+        case GeoPackageDataType.INTEGER:
+        case GeoPackageDataType.INT:
           value = Math.floor(Math.random() * 500);
           break;
-        case DataTypes.BLOB:
+        case GeoPackageDataType.BLOB:
           value = Buffer.from(Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5));
           break;
-        case DataTypes.DATE:
-        case DataTypes.DATETIME:
+        case GeoPackageDataType.DATE:
+        case GeoPackageDataType.DATETIME:
           value = new Date();
           break;
       }
@@ -91,21 +91,13 @@ module.exports.populateRow = function(table, row, skipColumns) {
 }
 
 module.exports.validateUserRow = function(columns, userRow) {
-  columns.length.should.be.equal(userRow.columnCount);
-  for (var i = 0; i < userRow.columnCount; i++) {
-    var column = userRow.table.columns[i];
-    var dataType = column.dataType;
-    column.index.should.be.equal(i);
-    columns[i].should.be.equal(column.name);
+  columns.length.should.be.equal(userRow.table.getUserColumns().getColumns().length);
+  for (var i = 0; i < userRow.table.getUserColumns().getColumns().length; i++) {
+    var column = userRow.table.getUserColumns().getColumns()[i];
+    column.getIndex().should.be.equal(i);
+    columns[i].should.be.equal(column.getName());
     userRow.getColumnNameWithIndex(i).should.be.equal(columns[i]);
     userRow.getColumnIndexWithColumnName(columns[i]).should.be.equal(i);
-    var rowType = userRow.getRowColumnTypeWithIndex(i);
-    var value = userRow.getValueWithIndex(i);
-    switch(rowType) {
-      case DataTypes.INTEGER:
-
-
-    }
   }
 }
 

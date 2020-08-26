@@ -120,27 +120,21 @@ describe('RTree tests', function() {
 
     it('should add the RTree extension to the GeoPackage', function() {
       var rtreeIndex = new RTreeIndex(geoPackage, featureDao);
-      return rtreeIndex.create()
-        .then(function(extension) {
-          var fti = new FeatureTableIndex(geoPackage, featureDao);
-          var indexed = fti.isIndexed();
-          indexed.should.be.equal(true);
-        })
-        .then(function() {
-          var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName);
-          exists.should.be.equal(true);
-        })
-        .then(function() {
-          var extensionDao = rtreeIndex.extensionsDao;
-          var extension = extensionDao.queryByExtension(rtreeIndex.extensionName);
-          extension.author.should.be.equal('gpkg');
-          extension.extensionNameNoAuthor.should.be.equal('rtree_index');
-          extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
-          extension.column_name.should.be.equal('geom');
-          extension.table_name.should.be.equal('FEATURESriversds');
-          extension.scope.should.be.equal('write-only');
-          extension.extension_name.should.be.equal('gpkg_rtree_index');
-        });
+      let extension = rtreeIndex.create()[0];
+      var fti = new FeatureTableIndex(geoPackage, featureDao);
+      var indexed = fti.isIndexed();
+      indexed.should.be.equal(true);
+      var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName);
+      exists.should.be.equal(true);
+      var extensionDao = rtreeIndex.extensionsDao;
+      extensionDao.queryByExtension(rtreeIndex.extensionName);
+      extension.author.should.be.equal('gpkg');
+      extension.extensionNameNoAuthor.should.be.equal('rtree_index');
+      extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
+      extension.column_name.should.be.equal('geom');
+      extension.table_name.should.be.equal('FEATURESriversds');
+      extension.scope.should.be.equal('write-only');
+      extension.extension_name.should.be.equal('gpkg_rtree_index');
     });
   });
 });

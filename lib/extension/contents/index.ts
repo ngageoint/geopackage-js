@@ -29,15 +29,15 @@ export class ContentsIdExtension extends BaseExtension {
    * Get or create the contents id extension
    * @return {Promise}
    */
-  async getOrCreateExtension(): Promise<Extension> {
-    const extension = await this.getOrCreate(
+  getOrCreateExtension(): Extension {
+    const extension = this.getOrCreate(
       ContentsIdExtension.EXTENSION_NAME,
       null,
       null,
       ContentsIdExtension.EXTENSION_DEFINITION,
       Extension.READ_WRITE,
     );
-    await this.contentsIdDao.createTable();
+    this.contentsIdDao.createTable();
     return extension;
   }
   /**
