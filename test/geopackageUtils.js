@@ -17,6 +17,7 @@ const GeoPackageDataType = GP.GeoPackageDataType,
   WebPExtension = GP.WebPExtension,
   DataColumnsDao = GP.DataColumnsDao,
   DataColumnConstraintsDao = GP.DataColumnConstraintsDao,
+  Constraints = GP.Constraints,
   TableCreator = GP.TableCreator,
   MediaTable = GP.MediaTable,
   UserMappingTable = GP.UserMappingTable,
@@ -688,7 +689,7 @@ GeoPackageUtils.createAttributes = function(geopackage) {
   dc.mime_type = 'text/html';
   dc.constraint_name = 'test constraint';
 
-  geopackage.createAttributesTable(tableName, columns, [], [dc]);
+  geopackage.createAttributesTable(tableName, columns, new Constraints(), [dc]);
   const attributeDao = geopackage.getAttributeDao(tableName);
 
   for (let i = 0; i < 10; i++) {

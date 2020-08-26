@@ -5,6 +5,7 @@ import { Constraint } from '../db/table/constraint';
 import { ConstraintType } from '../db/table/constraintType';
 import { Contents } from '../core/contents/contents';
 import { UserColumns } from './userColumns';
+import { Constraints } from '../db/table/constraints';
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
  * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
@@ -33,11 +34,7 @@ export class UserTable<TColumn extends UserColumn> {
   /**
    * Constraints
    */
-  constraints: Constraint[] = [];
-  /**
-   * Type Constraints
-   */
-  typedContraints:  Map<ConstraintType, Constraint[]> = new Map<ConstraintType, Constraint[]>();
+  constraints: Constraints = new Constraints();
 
   /**
    * Foreign key to Contents
@@ -50,15 +47,12 @@ export class UserTable<TColumn extends UserColumn> {
    */
   constructor(columns: UserColumns<TColumn>) {
     this.columns = columns;
-    this.constraints = [];
-    this.typedContraints = new Map<ConstraintType, Constraint[]>();
+    this.constraints = new Constraints();
   }
 
   copy(): UserTable<TColumn> {
     const userTableCopy = new UserTable<TColumn>(this.columns.copy());
-    this.constraints.forEach(constraint => {
-      userTableCopy.addConstraint(constraint.copy());
-    });
+    userTableCopy.constraints.addConstraints(this.constraints);
     if (this.contents !== null && this.contents !== undefined) {
       userTableCopy.contents = this.contents.copy();
     }
@@ -170,23 +164,15 @@ export class UserTable<TColumn extends UserColumn> {
    * @param constraint constraint
    */
   addConstraint(constraint: Constraint) {
-    this.constraints.push(constraint);
-    let typeConstraints = this.typedContraints.get(constraint.type);
-    if (typeConstraints === null || typeConstraints === undefined) {
-      typeConstraints = [];
-      this.typedContraints.set(constraint.type, typeConstraints);
-    }
-    typeConstraints.push(constraint);
+    this.constraints.add(constraint);
   }
 
   /**
    * Add constraints
    * @param constraints constraints
    */
-  addConstraints(constraints: Constraint[]) {
-    constraints.forEach(constraint => {
-      this.addConstraint(constraint);
-    });
+  addConstraints(constraints: Constraints) {
+    this.constraints.addConstraints(constraints);
   }
 
   /**
@@ -194,14 +180,14 @@ export class UserTable<TColumn extends UserColumn> {
    * @return true if has constraints
    */
   hasConstraints(): boolean {
-    return this.constraints.length > 0;
+    return this.constraints.has();
   }
 
   /**
    * Get the constraints
    * @return constraints
    */
-  getConstraints(): Constraint[] {
+  getConstraints(): Constraints {
     return this.constraints;
   }
 
@@ -211,11 +197,7 @@ export class UserTable<TColumn extends UserColumn> {
    * @return constraints
    */
   getConstraintsByType(type: ConstraintType): Constraint[] {
-    let constraints = this.typedContraints.get(type);
-    if (constraints === null || constraints === undefined) {
-      constraints = [];
-    }
-    return constraints;
+    return this.constraints.getConstraintsForType(type);
   }
 
   /**
@@ -223,10 +205,7 @@ export class UserTable<TColumn extends UserColumn> {
    * @return cleared constraints
    */
   clearConstraints(): Constraint[] {
-    let constraintsCopy = Array.from(this.constraints);
-    this.constraints = [];
-    this.typedContraints.clear();
-    return constraintsCopy;
+    return this.constraints.clear();
   }
 
   /**

@@ -285,8 +285,7 @@ export class GeoPackageExtensions {
             dataColumnsTable.clearConstraints();
             let constraintSql = TableCreator.tableCreationScripts.data_columns[0];
             let constraints = ConstraintParser.getConstraints(constraintSql);
-            dataColumnsTable.addConstraints(
-              constraints.getTableConstraints());
+            dataColumnsTable.addConstraints(constraints.getTableConstraints());
           }
           AlterTable.alterColumnForTable(geoPackage.connection, dataColumnsTable, nameColumn);
         }

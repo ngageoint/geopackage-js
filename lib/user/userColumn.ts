@@ -11,6 +11,7 @@ import { ColumnConstraints } from '../db/table/columnConstraints';
 import { CoreSQLUtils } from '../db/coreSQLUtils';
 import { ConstraintType } from '../db/table/constraintType';
 import { UserTable } from './userTable';
+import { Constraints } from '../db/table/constraints';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -26,8 +27,32 @@ import { UserTable } from './userTable';
  */
 export class UserColumn {
   static readonly NO_INDEX = -1;
+  /**
+   * Not Null Constraint Order
+   */
+  static readonly NOT_NULL_CONSTRAINT_ORDER = 1;
 
-  constraints: Constraint[] = [];
+  /**
+   * Default Value Constraint Order
+   */
+  static readonly DEFAULT_VALUE_CONSTRAINT_ORDER = 2;
+
+  /**
+   * Primary Key Constraint Order
+   */
+  static readonly PRIMARY_KEY_CONSTRAINT_ORDER = 3;
+
+  /**
+   * Autoincrement Constraint Order
+   */
+  static readonly AUTOINCREMENT_CONSTRAINT_ORDER = 4;
+
+  /**
+   * Unique Constraint Order
+   */
+  static readonly UNIQUE_CONSTRAINT_ORDER = 5;
+
+  constraints: Constraints = new Constraints();
   type: string;
   min: number;
   constructor(
@@ -39,6 +64,7 @@ export class UserColumn {
     public defaultValue?: DBValue,
     public primaryKey?: boolean,
     public autoincrement?: boolean,
+    public unique?: boolean,
   ) {
     this.validateMax();
     this.type = this.getTypeName(name, dataType);
@@ -61,9 +87,9 @@ export class UserColumn {
    * @return copied column
    */
   copy(): UserColumn {
-    const userColumnCopy = new UserColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey);
+    const userColumnCopy = new UserColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.unique);
     userColumnCopy.min = this.min;
-    userColumnCopy.constraints = this.constraints.slice();
+    userColumnCopy.constraints = this.constraints.copy();
     return userColumnCopy;
   }
 
@@ -71,9 +97,7 @@ export class UserColumn {
    * Clears the constraints
    */
   clearConstraints() {
-    const constraintsCopy = this.constraints.slice();
-    this.constraints = [];
-    return constraintsCopy;
+    return this.constraints.clear();
   }
 
   getConstraints() {
@@ -168,12 +192,14 @@ export class UserColumn {
    * @param notNull not null flag
    */
   setNotNull(notNull: boolean) {
-    this.notNull = notNull;
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.NOT_NULL);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
+    if (this.notNull !== notNull) {
+      if (notNull) {
+        this.addNotNullConstraint();
+      } else {
+        this.removeConstraintByType(ConstraintType.NOT_NULL);
+      }
     }
-    this.addConstraintSql('NOT NULL');
+    this.notNull = notNull;
   }
 
   /**
@@ -197,12 +223,11 @@ export class UserColumn {
    * @param defaultValue default value
    */
   setDefaultValue(defaultValue: any) {
-    this.defaultValue = defaultValue;
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.DEFAULT);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
+    this.removeConstraintByType(ConstraintType.DEFAULT);
+    if (defaultValue !== null && defaultValue !== undefined) {
+      this.addDefaultValueConstraint(defaultValue);
     }
-    this.addConstraintSql('DEFAULT ' + CoreSQLUtils.columnDefaultValue(defaultValue, this.getDataType()));
+    this.defaultValue = defaultValue;
   }
 
   /**
@@ -218,12 +243,16 @@ export class UserColumn {
    * @param primaryKey primary key flag
    */
   setPrimaryKey(primaryKey: boolean) {
-    this.primaryKey = primaryKey;
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.PRIMARY_KEY);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
+    if (this.primaryKey !== primaryKey) {
+      if (primaryKey) {
+        this.addPrimaryKeyConstraint();
+      } else {
+        this.autoincrement = false;
+        this.removeConstraintByType(ConstraintType.AUTOINCREMENT);
+        this.removeConstraintByType(ConstraintType.PRIMARY_KEY);
+      }
     }
-    this.addConstraintSql('PRIMARY KEY');
+    this.primaryKey = primaryKey;
   }
 
   /**
@@ -238,15 +267,15 @@ export class UserColumn {
    * Set the autoincrement flag
    * @param autoincrement autoincrement flag
    */
-  protected setAutoincrement(autoincrement: boolean) {
+  setAutoincrement(autoincrement: boolean) {
+    if (this.autoincrement !== autoincrement) {
+      if (autoincrement) {
+        this.addAutoincrementConstraint();
+      } else {
+        this.removeConstraintByType(ConstraintType.AUTOINCREMENT);
+      }
+    }
     this.autoincrement = autoincrement;
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.AUTOINCREMENT);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
-    }
-    if (autoincrement) {
-      this.addConstraintSql('AUTOINCREMENT');
-    }
   }
 
   /**
@@ -255,6 +284,30 @@ export class UserColumn {
    */
   isAutoincrement(): boolean {
     return this.autoincrement;
+  }
+
+
+  /**
+   * Set the unique flag
+   * @param unique autoincrement flag
+   */
+  protected setUnique(unique: boolean) {
+    if (this.unique !== unique) {
+      if (unique) {
+        this.addUniqueConstraint();
+      } else {
+        this.removeConstraintByType(ConstraintType.UNIQUE);
+      }
+    }
+    this.unique = unique;
+  }
+
+  /**
+   * Get the autoincrement flag
+   * @return autoincrement flag
+   */
+  isUnique(): boolean {
+    return this.unique;
   }
 
   /**
@@ -348,6 +401,9 @@ export class UserColumn {
         this.addAutoincrementConstraint();
       }
     }
+    if (this.isUnique()) {
+      this.addUniqueConstraint();
+    }
   }
 
   /**
@@ -355,7 +411,38 @@ export class UserColumn {
    * @param constraint constraint
    */
   addConstraint(constraint: Constraint) {
-    this.constraints.push(constraint);
+    if (constraint.order === null || constraint.order === undefined) {
+      this.setConstraintOrder(constraint);
+    }
+
+    this.constraints.add(constraint);
+  }
+
+  /**
+   * Set the constraint order by constraint type
+   * @param constraint constraint
+   */
+  setConstraintOrder(constraint: Constraint) {
+    let order = null;
+    switch (constraint.getType()) {
+      case ConstraintType.PRIMARY_KEY:
+        order = UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER;
+        break;
+      case ConstraintType.UNIQUE:
+        order = UserColumn.UNIQUE_CONSTRAINT_ORDER;
+        break;
+      case ConstraintType.NOT_NULL:
+        order = UserColumn.NOT_NULL_CONSTRAINT_ORDER;
+        break;
+      case ConstraintType.DEFAULT:
+        order = UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER;
+        break;
+      case ConstraintType.AUTOINCREMENT:
+        order = UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER;
+        break;
+      default:
+    }
+    constraint.order = order;
   }
 
   /**
@@ -365,17 +452,15 @@ export class UserColumn {
   addConstraintSql(constraint: string) {
     const type = ConstraintParser.getType(constraint);
     const name = ConstraintParser.getName(constraint);
-    this.constraints.push(new RawConstraint(type, name, constraint));
+    this.constraints.add(new RawConstraint(type, name, constraint));
   }
 
   /**
    * Add constraints
    * @param constraints constraints
    */
-  addConstraints(constraints: Constraint[]) {
-    constraints.forEach(constraint => {
-      this.addConstraint(constraint);
-    })
+  addConstraints(constraints: Constraints) {
+    this.constraints.addConstraints(constraints);
   }
 
   /**
@@ -389,55 +474,48 @@ export class UserColumn {
   /**
    * Add a not null constraint
    */
-  addNotNullConstraint() {
-    this.setNotNull(true);
+  private addNotNullConstraint() {
+    this.addConstraint(new RawConstraint(ConstraintType.NOT_NULL, null, "NOT NULL", UserColumn.NOT_NULL_CONSTRAINT_ORDER));
   }
 
   /**
    * Add a default value constraint
    * @param defaultValue default value
    */
-  addDefaultValueConstraint(defaultValue: any) {
-    this.setDefaultValue(defaultValue);
+  private addDefaultValueConstraint(defaultValue: any) {
+    this.addConstraint(new RawConstraint(ConstraintType.DEFAULT, null, "DEFAULT " + CoreSQLUtils.columnDefaultValue(defaultValue, this.getDataType()), UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER));
   }
 
   /**
    * Add a primary key constraint
    */
-  addPrimaryKeyConstraint() {
-    this.setPrimaryKey(true);
+  private addPrimaryKeyConstraint() {
+    this.addConstraint(new RawConstraint(ConstraintType.PRIMARY_KEY, null, "PRIMARY KEY", UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER));
   }
 
   /**
    * Add an autoincrement constraint
    */
-  addAutoincrementConstraint() {
+  private addAutoincrementConstraint() {
     if (this.isPrimaryKey()) {
-      this.setAutoincrement(true);
+      this.addConstraint(new RawConstraint(ConstraintType.AUTOINCREMENT, null, "AUTOINCREMENT", UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER));
     } else {
-      throw new Error('Autoincrement may only be set on primary key columns');
+      throw new Error('Autoincrement may only be set on a primary key column');
     }
   }
 
   /**
    * Add a unique constraint
    */
-  addUniqueConstraint() {
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.UNIQUE);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
-    }
-    this.addConstraintSql('UNIQUE');
+  private addUniqueConstraint() {
+    this.addConstraint(new RawConstraint(ConstraintType.UNIQUE, null, "UNIQUE", UserColumn.UNIQUE_CONSTRAINT_ORDER));
   }
 
   /**
-   * Removes a unique constraint, if one exists
+   * Removes constraints by type
    */
-  removeUniqueConstraint() {
-    const index = this.constraints.findIndex(constraint => constraint.getType() === ConstraintType.UNIQUE);
-    if (index >= 0) {
-      this.constraints.splice(index, 1);
-    }
+  removeConstraintByType(type: ConstraintType) {
+    this.constraints.clearConstraintsByType(type);
   }
 
   getType(): string {
@@ -445,16 +523,13 @@ export class UserColumn {
   }
 
   hasConstraints() {
-    return this.constraints.length > 0;
+    return this.constraints.has();
   }
 
   /**
    * Build the SQL for the constraint
-   *
-   * @param constraint
-   *            constraint
+   * @param constraint constraint
    * @return SQL or null
-   * @since 4.0.0
    */
   buildConstraintSql(constraint: Constraint): string {
     let sql = null;

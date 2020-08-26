@@ -2,12 +2,13 @@
  * Column Constraints
  */
 import { Constraint } from './constraint';
+import { Constraints } from './constraints';
 
 export class ColumnConstraints {
   /**
    * Column constraints
    */
-  constraints: Constraint[] = [];
+  constraints: Constraints = new Constraints();
 
   /**
    * Constructor
@@ -20,22 +21,22 @@ export class ColumnConstraints {
    * @param constraint constraint
    */
   addConstraint(constraint: Constraint) {
-    this.constraints.push(constraint);
+    this.constraints.add(constraint);
   }
 
   /**
    * Add constraints
    * @param constraints constraints
    */
-  addConstraints(constraints: Constraint[]) {
-    this.constraints.push(...constraints);
+  addConstraints(constraints: Constraints) {
+    this.constraints.addConstraints(constraints);
   }
 
   /**
    * Get the constraints
    * @return constraints
    */
-  getConstraints(): Constraint[] {
+  getConstraints(): Constraints {
     return this.constraints;
   }
 
@@ -45,10 +46,10 @@ export class ColumnConstraints {
    * @return constraint
    */
   getConstraint(index: number): Constraint {
-    if (index >= this.constraints.length) {
+    if (index >= this.constraints.size()) {
       return null;
     }
-    return this.constraints[index];
+    return this.constraints.get(index);
   }
 
   /**
@@ -56,7 +57,7 @@ export class ColumnConstraints {
    * @return constraints count
    */
   public numConstraints(): number {
-    return this.constraints.length;
+    return this.constraints.size();
   }
 
   /**
@@ -74,7 +75,7 @@ export class ColumnConstraints {
    * @return true if has constraints
    */
   hasConstraints(): boolean {
-    return this.constraints.length !== 0;
+    return this.constraints.has();
   }
 
 }

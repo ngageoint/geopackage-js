@@ -185,7 +185,7 @@ describe('GeoPackage Extensions tests', function() {
 
   afterEach(async function() {
     geopackage.close();
-    // await testSetup.deleteGeoPackage(testGeoPackage);
+    await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should copy extensions for table', function() {

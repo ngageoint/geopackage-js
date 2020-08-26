@@ -130,7 +130,7 @@ export class CoreSQLUtils {
     }
 
     // Add unique constraints
-    table.getConstraints().forEach(constraint => {
+    table.getConstraints().all().forEach(constraint => {
       sql = sql.concat(',\n  ');
       sql = sql.concat(constraint.buildSql());
     });
@@ -163,7 +163,7 @@ export class CoreSQLUtils {
       sql = sql.concat('(').concat(column.getMax().toString()).concat(')');
     }
 
-    column.getConstraints().forEach(constraint => {
+    column.getConstraints().all().forEach(constraint => {
       sql = sql.concat(' ');
       sql = sql.concat(column.buildConstraintSql(constraint));
     });

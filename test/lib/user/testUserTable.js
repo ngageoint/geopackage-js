@@ -24,7 +24,7 @@ describe('UserTable tests', function() {
     const contents = new Contents();
     contents.table_name = 'test_table_contents';
     userTable.setContents(contents);
-    userTable.addConstraints([new UniqueConstraint('test_table_index_unique', userColumnList[0])]);
+    userTable.addConstraint(new UniqueConstraint('test_table_index_unique', userColumnList[0]));
   });
 
   it('should create a UserCustomTable object', function() {
@@ -86,7 +86,7 @@ describe('UserTable tests', function() {
     userTableCopy.getUserColumns().getColumns().length.should.be.equal(2);
     userTableCopy.getTableName().should.be.equal('test_table');
     userTableCopy.getContents().getTableName().should.be.equal('test_table_contents');
-    userTableCopy.getConstraints().length.should.be.equal(1);
+    userTableCopy.getConstraints().size().should.be.equal(1);
     userTableCopy.hasColumn('test_column_not_found').should.be.equal(false);
     userTableCopy.getIdColumn().getName().should.be.equal('test_table_index');
     userTableCopy.getIdColumnIndex().should.be.equal(0);
@@ -102,7 +102,7 @@ describe('UserTable tests', function() {
     userTableCopy.getUserColumns().getColumns().length.should.be.equal(2);
     userTableCopy.getTableName().should.be.equal('test_table');
     should.not.exist(userTableCopy.getContents());
-    userTableCopy.getConstraints().length.should.be.equal(1);
+    userTableCopy.getConstraints().size().should.be.equal(1);
     userTableCopy.hasColumn('test_column_not_found').should.be.equal(false);
     userTableCopy.getIdColumn().getName().should.be.equal('test_table_index');
     userTableCopy.getIdColumnIndex().should.be.equal(0);

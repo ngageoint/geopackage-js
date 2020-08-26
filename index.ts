@@ -37,6 +37,8 @@ import { TileMatrixSet } from './lib/tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from './lib/tiles/matrix/tileMatrix';
 import { TileBoundingBoxUtils } from './lib/tiles/tileBoundingBoxUtils';
 import { GeometryType } from './lib/features/user/geometryType';
+import { Constraints } from './lib/db/table/constraints';
+import { Constraint } from './lib/db/table/constraint';
 
 export {
   proj4Defs,
@@ -78,4 +80,6 @@ export {
   TileMatrix,
   TileBoundingBoxUtils,
   GeometryType,
+  Constraints,
+  Constraint,
 };

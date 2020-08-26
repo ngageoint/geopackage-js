@@ -8,7 +8,7 @@ export class Constraint {
    */
   static CONSTRAINT = 'CONSTRAINT';
 
-  constructor(public type: ConstraintType, public name?: string) {
+  constructor(public type: ConstraintType, public name?: string, public order: number = Number.MAX_SAFE_INTEGER) {
   }
 
   /**
@@ -42,4 +42,13 @@ export class Constraint {
   getType(): ConstraintType {
     return this.type;
   }
+
+  compareTo(constraint: Constraint) {
+    return this.getOrder(this.order) - this.getOrder(constraint.order) <= 0 ? -1 : 1;
+  }
+
+  private getOrder(order: number): number {
+    return order !== null && order !== undefined ? order : Number.MAX_VALUE;
+  }
 }
+

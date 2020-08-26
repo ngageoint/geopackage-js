@@ -7,80 +7,79 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 // @ts-ignore
 import pointDistance from '@turf/distance';
 import * as helpers from '@turf/helpers';
-import {Feature, FeatureCollection, Geometry, LineString, MultiPolygon, Point, Polygon} from 'geojson';
-
-import {GeometryData} from './geom/geometryData';
-import {GeoPackageConnection} from './db/geoPackageConnection';
-import {CrsWktExtension} from './extension/crsWkt';
-import {RelatedTablesExtension} from './extension/relatedTables';
-import {FeatureStyleExtension} from './extension/style';
-import {ContentsIdExtension} from './extension/contents';
-import {TileScalingExtension} from './extension/scale';
-import {SpatialReferenceSystemDao} from './core/srs/spatialReferenceSystemDao';
-import {GeometryColumnsDao} from './features/columns/geometryColumnsDao';
-import {FeatureDao} from './features/user/featureDao';
-import {FeatureTableReader} from './features/user/featureTableReader';
-import {ContentsDao} from './core/contents/contentsDao';
-import {TileMatrixSetDao} from './tiles/matrixset/tileMatrixSetDao';
-import {TileMatrixDao} from './tiles/matrix/tileMatrixDao';
-import {DataColumnsDao} from './dataColumns/dataColumnsDao';
-import {DataColumnConstraintsDao} from './dataColumnConstraints/dataColumnConstraintsDao';
-import {MetadataDao} from './metadata/metadataDao';
-import {MetadataReferenceDao} from './metadata/reference/metadataReferenceDao';
-import {ExtensionDao} from './extension/extensionDao';
-import {TableIndexDao} from './extension/index/tableIndexDao';
-import {GeometryIndexDao} from './extension/index/geometryIndexDao';
-import {ExtendedRelationDao} from './extension/relatedTables/extendedRelationDao';
-import {AttributesDao} from './attributes/attributesDao';
-import {TileDao} from './tiles/user/tileDao';
-import {ContentsIdDao} from './extension/contents/contentsIdDao';
-import {TileScalingDao} from './extension/scale/tileScalingDao';
-import {AttributesTable} from './attributes/attributesTable';
-import {TileTableReader} from './tiles/user/tileTableReader';
-import {AttributesTableReader} from './attributes/attributesTableReader';
-import {FeatureTable} from './features/user/featureTable';
-import {StyleMappingTable} from './extension/style/styleMappingTable';
-import {TileTable} from './tiles/user/tileTable';
-import {Contents} from './core/contents/contents';
-import {GeoPackageDataType} from './db/geoPackageDataType';
-import {SchemaExtension} from './extension/schema';
-import {GeometryColumns} from './features/columns/geometryColumns';
-import {TableCreator} from './db/tableCreator';
-import {TileMatrix} from './tiles/matrix/tileMatrix';
-import {TileBoundingBoxUtils} from './tiles/tileBoundingBoxUtils';
-import {BoundingBox} from './boundingBox';
-import {TileMatrixSet} from './tiles/matrixset/tileMatrixSet';
-
 import proj4 from 'proj4';
-import {UserColumn} from './user/userColumn';
-import {DataColumns} from './dataColumns/dataColumns';
-import {AttributesRow} from './attributes/attributesRow';
-import {SpatialReferenceSystem} from './core/srs/spatialReferenceSystem';
 import * as defs from './proj4Defs';
-import {FeatureRow} from './features/user/featureRow';
-import {GeoPackageValidate, GeoPackageValidationError} from './validate/geoPackageValidate';
-import {FeatureColumn} from './features/user/featureColumn';
-import {DBValue} from './db/dbAdapter';
-import {MediaDao} from './extension/relatedTables/mediaDao';
-import {MediaRow} from './extension/relatedTables/mediaRow';
-import {MediaTable} from './extension/relatedTables/mediaTable';
-import {ExtendedRelation} from './extension/relatedTables/extendedRelation';
-import {RelationType} from './extension/relatedTables/relationType';
-import {SimpleAttributesDao} from './extension/relatedTables/simpleAttributesDao';
-import {SimpleAttributesRow} from './extension/relatedTables/simpleAttributesRow';
-import {SimpleAttributesTable} from './extension/relatedTables/simpleAttributesTable';
-import {TileRow} from './tiles/user/tileRow';
-import {FeatureTiles} from './tiles/features';
-import {GeoPackageTileRetriever} from './tiles/retriever';
-import {TileScaling} from './extension/scale/tileScaling';
-import {TileScalingType} from './extension/scale/tileScalingType';
-import {AttributesColumn} from './attributes/attributesColumn';
-import {AlterTable} from './db/alterTable';
-import {GeoPackageExtensions} from './extension/geoPackageExtensions';
-import {Constraint} from './db/table/constraint';
-import {ContentsDataType} from './core/contents/contentsDataType';
-import {UserMappingTable} from './extension/relatedTables/userMappingTable';
-import {GeometryType} from './features/user/geometryType';
+import { Feature, FeatureCollection, Geometry, LineString, MultiPolygon, Point, Polygon } from 'geojson';
+
+import { GeometryData } from './geom/geometryData';
+import { GeoPackageConnection } from './db/geoPackageConnection';
+import { CrsWktExtension } from './extension/crsWkt';
+import { RelatedTablesExtension } from './extension/relatedTables';
+import { FeatureStyleExtension } from './extension/style';
+import { ContentsIdExtension } from './extension/contents';
+import { TileScalingExtension } from './extension/scale';
+import { SpatialReferenceSystemDao } from './core/srs/spatialReferenceSystemDao';
+import { GeometryColumnsDao } from './features/columns/geometryColumnsDao';
+import { FeatureDao } from './features/user/featureDao';
+import { FeatureTableReader } from './features/user/featureTableReader';
+import { ContentsDao } from './core/contents/contentsDao';
+import { TileMatrixSetDao } from './tiles/matrixset/tileMatrixSetDao';
+import { TileMatrixDao } from './tiles/matrix/tileMatrixDao';
+import { DataColumnsDao } from './dataColumns/dataColumnsDao';
+import { DataColumnConstraintsDao } from './dataColumnConstraints/dataColumnConstraintsDao';
+import { MetadataDao } from './metadata/metadataDao';
+import { MetadataReferenceDao } from './metadata/reference/metadataReferenceDao';
+import { ExtensionDao } from './extension/extensionDao';
+import { TableIndexDao } from './extension/index/tableIndexDao';
+import { GeometryIndexDao } from './extension/index/geometryIndexDao';
+import { ExtendedRelationDao } from './extension/relatedTables/extendedRelationDao';
+import { AttributesDao } from './attributes/attributesDao';
+import { TileDao } from './tiles/user/tileDao';
+import { ContentsIdDao } from './extension/contents/contentsIdDao';
+import { TileScalingDao } from './extension/scale/tileScalingDao';
+import { AttributesTable } from './attributes/attributesTable';
+import { TileTableReader } from './tiles/user/tileTableReader';
+import { AttributesTableReader } from './attributes/attributesTableReader';
+import { FeatureTable } from './features/user/featureTable';
+import { StyleMappingTable } from './extension/style/styleMappingTable';
+import { TileTable } from './tiles/user/tileTable';
+import { Contents } from './core/contents/contents';
+import { GeoPackageDataType } from './db/geoPackageDataType';
+import { SchemaExtension } from './extension/schema';
+import { GeometryColumns } from './features/columns/geometryColumns';
+import { TableCreator } from './db/tableCreator';
+import { TileMatrix } from './tiles/matrix/tileMatrix';
+import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
+import { BoundingBox } from './boundingBox';
+import { TileMatrixSet } from './tiles/matrixset/tileMatrixSet';
+import { UserColumn } from './user/userColumn';
+import { DataColumns } from './dataColumns/dataColumns';
+import { AttributesRow } from './attributes/attributesRow';
+import { SpatialReferenceSystem } from './core/srs/spatialReferenceSystem';
+import { FeatureRow } from './features/user/featureRow';
+import { GeoPackageValidate, GeoPackageValidationError } from './validate/geoPackageValidate';
+import { FeatureColumn } from './features/user/featureColumn';
+import { DBValue } from './db/dbAdapter';
+import { MediaDao } from './extension/relatedTables/mediaDao';
+import { MediaRow } from './extension/relatedTables/mediaRow';
+import { MediaTable } from './extension/relatedTables/mediaTable';
+import { ExtendedRelation } from './extension/relatedTables/extendedRelation';
+import { RelationType } from './extension/relatedTables/relationType';
+import { SimpleAttributesDao } from './extension/relatedTables/simpleAttributesDao';
+import { SimpleAttributesRow } from './extension/relatedTables/simpleAttributesRow';
+import { SimpleAttributesTable } from './extension/relatedTables/simpleAttributesTable';
+import { TileRow } from './tiles/user/tileRow';
+import { FeatureTiles } from './tiles/features';
+import { GeoPackageTileRetriever } from './tiles/retriever';
+import { TileScaling } from './extension/scale/tileScaling';
+import { TileScalingType } from './extension/scale/tileScalingType';
+import { AttributesColumn } from './attributes/attributesColumn';
+import { AlterTable } from './db/alterTable';
+import { GeoPackageExtensions } from './extension/geoPackageExtensions';
+import { ContentsDataType } from './core/contents/contentsDataType';
+import { UserMappingTable } from './extension/relatedTables/userMappingTable';
+import { GeometryType } from './features/user/geometryType';
+import { Constraints } from './db/table/constraints';
 
 type ColumnMap = {
   [key: string]: {
@@ -570,7 +569,7 @@ export class GeoPackage {
         dataColumns.push(dc);
       }
     }
-    return this.createAttributesTable(tableName, attributeColumns, [], dataColumns);
+    return this.createAttributesTable(tableName, attributeColumns, new Constraints(), dataColumns);
   }
 
   /**
@@ -580,7 +579,7 @@ export class GeoPackage {
    * @param constraints
    * @param dataColumns
    */
-  createAttributesTable(tableName: string, additionalColumns: AttributesColumn[], constraints?: Constraint[], dataColumns?: DataColumns[]): boolean {
+  createAttributesTable(tableName: string, additionalColumns: AttributesColumn[], constraints?: Constraints, dataColumns?: DataColumns[]): boolean {
     let columns = [];
 
     // Check for primary key field

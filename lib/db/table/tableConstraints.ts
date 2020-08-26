@@ -3,40 +3,41 @@
  */
 import { ColumnConstraints } from './columnConstraints';
 import { Constraint } from './constraint';
+import { Constraints } from './constraints';
 
 export class TableConstraints {
 
   /**
    * Table constraints
    */
-  public constraints = [];
+  public constraints: Constraints = new Constraints();
 
   /**
    * Column constraints
    */
-  private columnConstraints:Map<string, ColumnConstraints> = new Map<string, ColumnConstraints>();
+  private columnConstraints = {};
 
   /**
    * Add a table constraint
    * @param constraint constraint
    */
   addTableConstraint(constraint: Constraint) {
-    this.constraints.push(constraint);
+    this.constraints.add(constraint);
   }
 
   /**
    * Add table constraints
    * @param constraints constraints
    */
-  addTableConstraints(constraints: Constraint[]) {
-    this.constraints.push(...constraints);
+  addTableConstraints(constraints: Constraints) {
+    this.constraints.addConstraints(constraints);
   }
 
   /**
    * Get the table constraints
    * @return table constraints
    */
-  getTableConstraints(): Constraint[] {
+  getTableConstraints(): Constraints {
     return this.constraints;
   }
 
@@ -46,10 +47,10 @@ export class TableConstraints {
    * @return table constraint
    */
   getTableConstraint(index: number): Constraint {
-    if (index >= this.constraints.length) {
+    if (index >= this.constraints.size()) {
       return null;
     }
-    return this.constraints[index];
+    return this.constraints.get(index);
   }
 
   /**
@@ -57,7 +58,7 @@ export class TableConstraints {
    * @return table constraints count
    */
   numTableConstraints(): number {
-    return this.constraints.length;
+    return this.constraints.size();
   }
 
   /**
@@ -74,7 +75,7 @@ export class TableConstraints {
    * @param columnName column name
    * @param constraints constraints
    */
-  addConstraints(columnName: string, constraints: Constraint[]) {
+  addConstraints(columnName: string, constraints: Constraints) {
     this.getOrCreateColumnConstraints(columnName).addConstraints(constraints);
   }
 
@@ -92,10 +93,10 @@ export class TableConstraints {
    * @return column constraints
    */
   getOrCreateColumnConstraints(columnName: string): ColumnConstraints {
-    let constraints = this.columnConstraints.get(columnName);
-    if (constraints == null) {
+    let constraints = this.columnConstraints[columnName];
+    if (constraints === null || constraints === undefined) {
       constraints = new ColumnConstraints(columnName);
-      this.columnConstraints.set(columnName, constraints);
+      this.columnConstraints[columnName] = constraints;
     }
     return constraints;
   }
@@ -114,7 +115,7 @@ export class TableConstraints {
    * Get the column constraints
    * @return column constraints
    */
-  getColumnConstraintsMap(): Map<string, ColumnConstraints>  {
+  getColumnConstraintsMap(): any  {
     return this.columnConstraints;
   }
 
@@ -123,7 +124,7 @@ export class TableConstraints {
    * @return column names
    */
   getColumnsWithConstraints(): string[] {
-    return Array.from(this.columnConstraints.keys());
+    return Array.from(Object.keys(this.columnConstraints));
   }
 
   /**
@@ -132,7 +133,7 @@ export class TableConstraints {
    * @return constraints
    */
   getColumnConstraints(columnName: string): ColumnConstraints {
-    return this.columnConstraints.get(columnName);
+    return this.columnConstraints[columnName];
   }
 
   /**
@@ -188,7 +189,7 @@ export class TableConstraints {
    * @return true if has table constraints
    */
   hasTableConstraints(): boolean {
-    return this.constraints.length > 0;
+    return this.constraints.has();
   }
 
   /**
@@ -196,7 +197,7 @@ export class TableConstraints {
    * @return true if has column constraints
    */
   hasColumnConstraints(): boolean {
-    return this.columnConstraints.size > 0;
+    return Object.keys(this.columnConstraints).length > 0;
   }
 
   /**

@@ -1,24 +1,118 @@
 import { default as testSetup } from '../../fixtures/testSetup'
-import {DataColumnsDao} from '../../../lib/dataColumns/dataColumnsDao'
-import {AttributesDao} from '../../../lib/attributes/attributesDao'
-import {AttributesTableReader} from '../../../lib/attributes/attributesTableReader'
-import {AttributesTable} from '../../../lib/attributes/attributesTable'
-import {GeoPackageDataType} from '../../../lib/db/geoPackageDataType'
-import {Contents} from '../../../lib/core/contents/contents'
-import {ConstraintType} from '../../../lib/db/table/constraintType'
-import {UserCustomTableReader} from '../../../lib/user/custom/userCustomTableReader'
 
-// var GeoPackageAPI = require('../../../.')
-// var testSetup = require('../../fixtures/testSetup')
 var Verification = require('../../fixtures/verification')
   , DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
-
+  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnsDao
+  , AttributesDao = require('../../../lib/attributes/attributesDao').AttributesDao
+  , AttributesTableReader = require('../../../lib/attributes/attributesTableReader').AttributesTableReader
+  , AttributesTable = require('../../../lib/attributes/attributesTable').AttributesTable
+  , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
+  , Contents = require('../../../lib/core/contents/contents').Contents
+  , ConstraintType = require('../../../lib/db/table/constraintType').ConstraintType
+  , Constraints = require('../../../lib/db/table/constraints').Constraints
+  , UserCustomTableReader = require('../../../lib/user/custom/userCustomTableReader').UserCustomTableReader
   , UserColumn = require('../../../lib/user/userColumn').UserColumn;
 
 describe('GeoPackage Attribute table create tests', function() {
   var testGeoPackage;
   var tableName = 'test_attributes.test';
   var geopackage;
+
+  const notNullPrimaryKeyConstraints = {
+    constraints: [
+      {
+        name: null,
+        order: UserColumn.NOT_NULL_CONSTRAINT_ORDER,
+        sql: "NOT NULL",
+        type: ConstraintType.NOT_NULL
+      },
+      {
+        name: null,
+        sql: "PRIMARY KEY",
+        order: UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER,
+        type: ConstraintType.PRIMARY_KEY
+      },
+      {
+        name: null,
+        order: UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER,
+        sql: "AUTOINCREMENT",
+        type: ConstraintType.AUTOINCREMENT
+      }
+    ],
+    typedConstraints: {
+      "0": [
+        {
+          name: null,
+          order: UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER,
+          sql: "PRIMARY KEY",
+          type: ConstraintType.PRIMARY_KEY,
+        }
+      ],
+      "4": [
+        {
+          name: null,
+          order: UserColumn.NOT_NULL_CONSTRAINT_ORDER,
+          sql: "NOT NULL",
+          type: ConstraintType.NOT_NULL,
+        }
+      ],
+      "7": [
+        {
+          name: null,
+          order: UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER,
+          sql: "AUTOINCREMENT",
+          type: ConstraintType.AUTOINCREMENT,
+        }
+      ]
+    }
+  };
+
+  const emptyConstraints = {
+    constraints: [],
+    typedConstraints: {},
+  };
+
+  const defaultConstraints = value => {
+    return {
+      constraints: [{
+        name: null,
+        order: UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
+        sql: "DEFAULT " + value,
+        type: ConstraintType.DEFAULT
+      }],
+      typedConstraints: {
+        "5": [
+          {
+            name: null,
+            order: UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
+            sql: "DEFAULT " + value,
+            type: ConstraintType.DEFAULT,
+          }
+        ]
+      },
+    };
+  }
+
+  const notNullConstraints = {
+    constraints: [
+      {
+        name: null,
+        order: UserColumn.NOT_NULL_CONSTRAINT_ORDER,
+        sql: "NOT NULL",
+        type: ConstraintType.NOT_NULL
+      },
+    ],
+    typedConstraints: {
+      "4": [
+        {
+          name: null,
+          order: UserColumn.NOT_NULL_CONSTRAINT_ORDER,
+          sql: "NOT NULL",
+          type: ConstraintType.NOT_NULL,
+        }
+      ],
+    }
+  };
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
@@ -79,23 +173,7 @@ describe('GeoPackage Attribute table create tests', function() {
     var plainObject = JSON.parse(JSON.stringify(columns));
 
     plainObject.should.deep.include.members([{
-      constraints: [
-        {
-          name: null,
-          sql: "NOT NULL",
-          type: ConstraintType.NOT_NULL
-        },
-        {
-          name: null,
-          sql: "PRIMARY KEY",
-          type: ConstraintType.PRIMARY_KEY
-        },
-        {
-          name: null,
-          sql: "AUTOINCREMENT",
-          type: ConstraintType.AUTOINCREMENT
-        }
-      ],
+      constraints: notNullPrimaryKeyConstraints,
       index: 0,
       type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
       name: 'id',
@@ -107,7 +185,10 @@ describe('GeoPackage Attribute table create tests', function() {
     },
     {
       index: 1,
-      constraints: [],
+      constraints: {
+        constraints: [],
+        typedConstraints: {},
+      },
       name: 'Name',
       max: null,
       dataType: 9,
@@ -118,7 +199,10 @@ describe('GeoPackage Attribute table create tests', function() {
     },
     {
       index: 2,
-      constraints: [],
+      constraints: {
+        constraints: [],
+        typedConstraints: {},
+      },
       name: 'Number',
       max: null,
       dataType: 5,
@@ -158,89 +242,63 @@ describe('GeoPackage Attribute table create tests', function() {
 
     var plainObject = JSON.parse(JSON.stringify(columns));
 
-    plainObject.should.deep.include.members([ {
-      index: 0,
-      name: 'id',
-      dataType: 5,
-      notNull: true,
-      primaryKey: true,
-      autoincrement: true,
-      max: null,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-      constraints: [
-        {
-          name: null,
-          sql: "NOT NULL",
-          type: ConstraintType.NOT_NULL
-        },
-        {
-          name: null,
-          sql: "PRIMARY KEY",
-          type: ConstraintType.PRIMARY_KEY
-        },
-        {
-          name: null,
-          sql: "AUTOINCREMENT",
-          type: ConstraintType.AUTOINCREMENT
-        }
-      ]
-    },
-    {
-      index: 1,
-      name: 'data',
-      dataType: 10,
-      notNull: true,
-      primaryKey: false,
-      autoincrement: false,
-      max: null,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
-      constraints: [
-        {
-          name: null,
-          sql: "NOT NULL",
-          type: ConstraintType.NOT_NULL
-        }
-      ]
-    },
-    {
-      index: 2,
-      name: 'content_type',
-      dataType: 9,
-      notNull: true,
-      primaryKey: false,
-      autoincrement: false,
-      max: null,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-      constraints: [
-        {
-          name: null,
-          sql: "NOT NULL",
-          type: ConstraintType.NOT_NULL
-        }
-      ]
-    },
-    {
-      index: 3,
-      name: 'Name',
-      dataType: 9,
-      notNull: false,
-      primaryKey: false,
-      autoincrement: false,
-      max: null,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-      constraints: []
-    },
-    {
-      index: 4,
-      name: 'Number',
-      dataType: 5,
-      notNull: false,
-      primaryKey: false,
-      autoincrement: false,
-      max: null,
-      type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-      constraints: []
-    } ]);
+    plainObject.should.deep.include.members([
+      {
+        index: 0,
+        name: 'id',
+        dataType: 5,
+        notNull: true,
+        primaryKey: true,
+        autoincrement: true,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: notNullPrimaryKeyConstraints,
+      },
+      {
+        index: 1,
+        name: 'data',
+        dataType: 10,
+        notNull: true,
+        primaryKey: false,
+        autoincrement: false,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
+        constraints: notNullConstraints,
+      },
+      {
+        index: 2,
+        name: 'content_type',
+        dataType: 9,
+        notNull: true,
+        primaryKey: false,
+        autoincrement: false,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+        constraints: notNullConstraints,
+      },
+      {
+        index: 3,
+        name: 'Name',
+        dataType: 9,
+        notNull: false,
+        primaryKey: false,
+        autoincrement: false,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+        constraints: emptyConstraints,
+      },
+      {
+        index: 4,
+        name: 'Number',
+        dataType: 5,
+        notNull: false,
+        primaryKey: false,
+        autoincrement: false,
+        max: null,
+        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+        constraints: emptyConstraints,
+      }
+    ]);
   });
 
   it('should create a simple attribute table from properties', function() {
@@ -271,23 +329,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: true,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: [
-          {
-            name: null,
-            sql: "NOT NULL",
-            type: ConstraintType.NOT_NULL
-          },
-          {
-            name: null,
-            sql: "PRIMARY KEY",
-            type: ConstraintType.PRIMARY_KEY
-          },
-          {
-            name: null,
-            sql: "AUTOINCREMENT",
-            type: ConstraintType.AUTOINCREMENT
-          }
-        ]
+        constraints: notNullPrimaryKeyConstraints,
       },
       {
         index: 1,
@@ -298,13 +340,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-        constraints: [
-          {
-            name: null,
-            sql: "NOT NULL",
-            type: ConstraintType.NOT_NULL
-          }
-        ]
+        constraints: notNullConstraints,
       },
       {
         index: 2,
@@ -315,13 +351,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: [
-          {
-            name: null,
-            sql: "NOT NULL",
-            type: ConstraintType.NOT_NULL
-          }
-        ]
+        constraints: notNullConstraints,
       }
     ]);
   });
@@ -409,7 +439,7 @@ describe('GeoPackage Attribute table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    geopackage.createAttributesTable(tableName, columns, [], [dc]);
+    geopackage.createAttributesTable(tableName, columns, new Constraints(), [dc]);
     var reader = new AttributesTableReader(tableName);
     var result = reader.readTable(geopackage.connection);
     columns = result.getUserColumns().getColumns();
@@ -424,23 +454,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: true,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: [
-          {
-            name: null,
-            sql: "NOT NULL",
-            type: ConstraintType.NOT_NULL
-          },
-          {
-            name: null,
-            sql: "PRIMARY KEY",
-            type: ConstraintType.PRIMARY_KEY
-          },
-          {
-            name: null,
-            sql: "AUTOINCREMENT",
-            type: ConstraintType.AUTOINCREMENT
-          }
-        ]
+        constraints: notNullPrimaryKeyConstraints,
       },
       {
         index: 1,
@@ -452,11 +466,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-        constraints: [{
-          name: null,
-          sql: "DEFAULT 'default'",
-          type: ConstraintType.DEFAULT
-        }]
+        constraints: defaultConstraints('\'default\''),
       },
       {
         index: 2,
@@ -467,7 +477,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
-        constraints: []
+        constraints: emptyConstraints,
       },
       {
         index: 3,
@@ -478,7 +488,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
-        constraints: []
+        constraints: emptyConstraints,
       },
       {
         index: 4,
@@ -489,7 +499,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
-        constraints: []
+        constraints: emptyConstraints,
       },
       {
         index: 5,
@@ -501,11 +511,7 @@ describe('GeoPackage Attribute table create tests', function() {
         autoincrement: false,
         max: null,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: [{
-          name: null,
-          sql: "DEFAULT 5",
-          type: ConstraintType.DEFAULT
-        }]
+        constraints: defaultConstraints(5),
       },
       {
         index: 6,
@@ -516,7 +522,7 @@ describe('GeoPackage Attribute table create tests', function() {
         primaryKey: false,
         autoincrement: false,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-        constraints: []
+        constraints: emptyConstraints,
       },
       {
         index: 7,
@@ -527,7 +533,7 @@ describe('GeoPackage Attribute table create tests', function() {
         primaryKey: false,
         autoincrement: false,
         type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
-        constraints: []
+        constraints: emptyConstraints,
       }]);
     var dao = new DataColumnsDao(geopackage);
     var dataColumn = dao.getDataColumns('test_attributes.test', 'test_text_limited.test');

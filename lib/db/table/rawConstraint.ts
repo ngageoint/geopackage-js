@@ -11,9 +11,10 @@ export class RawConstraint extends Constraint {
    * @param type constraint type
    * @param name constraint name
    * @param sql constraint SQL
+   * @param order constraint order
    */
-  constructor(type: ConstraintType, name: string, public sql: string) {
-    super(type, name);
+  constructor(type: ConstraintType, name: string, public sql: string, order: number = null) {
+    super(type, name, order);
   }
 
   buildSql(): string {
