@@ -12,7 +12,7 @@ export class ConstraintParser {
   /**
    * Constraint name pattern
    */
-  static NAME_PATTERN = (s: string) => s.match(/CONSTRAINT\s+(".+"|\S+)\s/is);
+  static NAME_PATTERN = (s: string) => s.match(/CONSTRAINT\s+("[\s\S]+"|\S+)\s/i);
 
   /**
    * Constraint name pattern name matcher group
@@ -22,7 +22,7 @@ export class ConstraintParser {
   /**
    * Constraint name and definition pattern
    */
-  static CONSTRAINT_PATTERN = (s: string): string[] => s.match(/(CONSTRAINT\s+(".+"|\S+)\s)?(.*)/is);
+  static CONSTRAINT_PATTERN = (s: string): string[] => s.match(/(CONSTRAINT\s+("[\s\S]+"|\S+)\s)?([\s\S]*)/i);
 
   /**
    * Constraint name and definition pattern name matcher group
