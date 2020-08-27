@@ -209,17 +209,13 @@ export class NGAExtensions {
   static copyTileScaling(geoPackage: GeoPackage, table: string, newTable: string) {
     try {
       let tileTableScaling = new TileScalingExtension(geoPackage, table);
-
       if (tileTableScaling.has()) {
         let extension = tileTableScaling.getOrCreateExtension();
         if (extension !== null && extension !== undefined) {
           extension.setTableName(newTable);
-          tileTableScaling.getOrCreateExtension();
+          tileTableScaling.extensionsDao.create(extension);
           if (geoPackage.isTable(TileScalingDao.TABLE_NAME)) {
-            CoreSQLUtils.transferTableContent(
-              geoPackage.connection,
-              TileScalingDao.TABLE_NAME,
-              TileScalingDao.COLUMN_TABLE_NAME, newTable, table);
+            CoreSQLUtils.transferTableContent(geoPackage.connection, TileScalingDao.TABLE_NAME, TileScalingDao.COLUMN_TABLE_NAME, newTable, table);
           }
         }
       }
@@ -371,7 +367,8 @@ export class NGAExtensions {
     try {
       let contentsIdExtension = new ContentsIdExtension(geoPackage);
       if (contentsIdExtension.has()) {
-        if (contentsIdExtension.getByTableName(table) !== null) {
+        let contentsId = contentsIdExtension.getByTableName(table);
+        if (contentsId !== null && contentsId !== undefined) {
           contentsIdExtension.createWithTableName(newTable);
         }
       }

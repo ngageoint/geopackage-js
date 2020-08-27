@@ -2293,32 +2293,32 @@ export class GeoPackage {
    */
   copyTileTable(tableName, newTableName, transferContent) {
     const tileMatrixSetDao = this.tileMatrixSetDao;
-    let tileMatrixSet = null;
+    let tileMatrixSet: TileMatrixSet = null;
     try {
       tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
     } catch (e) {
       throw new Error('Failed to retrieve table tile matrix set: ' + tableName);
     }
-    if (tileMatrixSet == null) {
+    if (tileMatrixSet === null || tileMatrixSet === undefined) {
       throw new Error('No tile matrix set for table: ' + tableName);
     }
     const tileMatrixDao = this.tileMatrixDao;
-    let tileMatrixes = null;
+    let tileMatrices: TileMatrix[] = null;
     try {
-      tileMatrixes = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tableName);
+      tileMatrices = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tableName).map(results => tileMatrixDao.createObject(results));
     } catch (e) {
-      throw new Error('Failed to retrieve table tile matrixes: ' + tableName);
+      throw new Error('Failed to retrieve table tile matrices: ' + tableName);
     }
     let contents = this.copyUserTable(tableName, newTableName, transferContent);
-    tileMatrixSet.setContents(contents);
+    tileMatrixSet.contents = contents;
     try {
       tileMatrixSetDao.create(tileMatrixSet);
     } catch (e) {
       throw new Error('Failed to create tile matrix set for tile table: ' + newTableName);
     }
 
-    tileMatrixes.forEach(tileMatrix => {
-      tileMatrix.setContents(contents);
+    tileMatrices.forEach(tileMatrix => {
+      tileMatrix.contents = contents;
       try {
         tileMatrixDao.create(tileMatrix);
       } catch (e) {
