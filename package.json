@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -39,6 +39,7 @@
     "@types/geojson": "^7946.0.7",
     "@types/proj4": "^2.5.0",
     "better-sqlite3": "6.0.1",
+    "buffer": "^5.6.0",
     "canvas": "2.6.0",
     "concat-stream": "2.0.0",
     "file-type": "12.4.0",
@@ -122,6 +123,7 @@
     "tsc": "rm -rf ./built && tsc",
     "build-browserify": "npm run tsc && browserify -t browserify-css ./built/index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage-browserify.js",
     "no-prepublish": "mkdir dist; browserify -t browserify-css index.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage.js && uglifyjs dist/geopackage.js > dist/geopackage.min.js",
-    "prepare": "rm -rf ./built && tsc"
+    "prepare": "rm -rf ./built && tsc",
+    "prepublishOnly": "mkdir dist; browserify -t browserify-css ./browser.js --standalone geopackage --exclude better-sqlite3 --exclude inquirer --exclude canvas -o dist/geopackage-browser.js"
   }
 }
