@@ -10,15 +10,13 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , FeatureStyle = require('../../../../lib/extension/style/featureStyle').FeatureStyle
   , IconTable = require('../../../../lib/extension/style/iconTable').IconTable
   , ContentsIdDao = require('../../../../lib/extension/contents/contentsIdDao').ContentsIdDao
-  // , testSetup = require('../../../fixtures/testSetup')
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
-  // , GeoPackageAPI = require('../../../../lib/api')
   , wkx = require('wkx')
-  , fs = require('fs-extra')
   , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
+  , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
   , FeatureStyleExtension = require('../../../../lib/extension/style').FeatureStyleExtension;
 
 describe('StyleExtension Tests', function() {
@@ -238,8 +236,8 @@ describe('StyleExtension Tests', function() {
   it('should test IconRow methods', mochaAsync(async () => {
     featureTableStyles.createTableIconRelationship();
     var pointIcon = randomIcon(featureTableStyles);
-    featureTableStyles.setTableIcon('Point', pointIcon);
-    var retrievedIcon = featureTableStyles.getTableIcon('Point');
+    featureTableStyles.setTableIcon(GeometryType.POINT, pointIcon);
+    var retrievedIcon = featureTableStyles.getTableIcon(GeometryType.POINT);
     retrievedIcon.name.should.be.equal('Icon Name');
     retrievedIcon.description.should.be.equal('Icon Description');
     retrievedIcon.width.should.be.below(retrievedIcon.width + 0.1);
@@ -355,11 +353,13 @@ describe('StyleExtension Tests', function() {
     should.not.exist(styles.getDefault());
     styles.setDefault(styleRow);
     should.exist(styles.getDefault());
-    should.not.exist(styles.getStyle('Point'));
-    styles.setStyle(styleRow, 'Point');
-    should.exist(styles.getStyle('Point'));
-    styles.setStyle(null, 'Point');
-    should.not.exist(styles.getStyle('Point'));
+    should.exist(styles.getStyle(GeometryType.POINT));
+    styles.setDefault(null);
+    should.not.exist(styles.getStyle(GeometryType.POINT));
+    styles.setStyle(styleRow, GeometryType.POINT);
+    should.exist(styles.getStyle(GeometryType.POINT));
+    styles.setStyle(null, GeometryType.POINT);
+    should.not.exist(styles.getStyle(GeometryType.POINT));
     styles.setStyle(null, null);
     should.not.exist(styles.getStyle(null));
 
@@ -367,11 +367,13 @@ describe('StyleExtension Tests', function() {
     should.not.exist(icons.getDefault());
     icons.setDefault(iconRow);
     should.exist(icons.getDefault());
-    should.not.exist(icons.getIcon('Point'));
-    icons.setIcon(iconRow, 'Point');
-    should.exist(icons.getIcon('Point'));
-    icons.setIcon(null, 'Point');
-    should.not.exist(icons.getIcon('Point'));
+    should.exist(icons.getIcon(GeometryType.POINT));
+    icons.setDefault(null);
+    should.not.exist(icons.getIcon(GeometryType.POINT));
+    icons.setIcon(iconRow, GeometryType.POINT);
+    should.exist(icons.getIcon(GeometryType.POINT));
+    icons.setIcon(null, GeometryType.POINT);
+    should.not.exist(icons.getIcon(GeometryType.POINT));
     icons.setIcon(null, null);
     should.not.exist(icons.getIcon(null));
   }));
@@ -434,7 +436,7 @@ describe('StyleExtension Tests', function() {
     should.exist(featureTableStyles.getTableStyleDefault());
     // test geometry style
     var polygonStyle = randomStyle(featureTableStyles);
-    featureTableStyles.setTableStyle('Polygon', polygonStyle);
+    featureTableStyles.setTableStyle(GeometryType.POLYGON, polygonStyle);
     var featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
     should.exist(featureStyles.styles);
@@ -444,7 +446,7 @@ describe('StyleExtension Tests', function() {
     should.exist(tableStyles.getDefault());
     tableStyles.getDefault().id.should.be.equal(tableStyleDefault.id);
     featureTableStyles.getTableStyle(null).id.should.be.equal(tableStyleDefault.id);
-    featureTableStyles.getTableStyle('Polygon').id.should.be.equal(polygonStyle.id);
+    featureTableStyles.getTableStyle(GeometryType.POLYGON).id.should.be.equal(polygonStyle.id);
 
     featureTableStyles.hasTableIconRelationship().should.be.equal(false);
     geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(false);
@@ -457,7 +459,7 @@ describe('StyleExtension Tests', function() {
     var tableIconDefault = randomIcon(featureTableStyles);
     featureTableStyles.setTableIconDefault(tableIconDefault);
     var pointIcon = randomIcon(featureTableStyles);
-    featureTableStyles.setTableIcon('Point', pointIcon);
+    featureTableStyles.setTableIcon(GeometryType.POINT, pointIcon);
     geopackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
     geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(true);
 
@@ -469,14 +471,14 @@ describe('StyleExtension Tests', function() {
     should.exist(tableIcons.getDefault());
     tableIconDefault.id.should.be.equal(tableIcons.getDefault().id);
     tableIconDefault.id.should.be.equal(featureTableStyles.getTableIcon(null).id);
-    pointIcon.id.should.be.equal(featureTableStyles.getTableIcon('Point').id);
+    pointIcon.id.should.be.equal(featureTableStyles.getTableIcon(GeometryType.POINT).id);
 
     featureTableStyles.hasStyleRelationship().should.be.equal(false);
     geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(false);
     featureTableStyles.hasIconRelationship().should.be.equal(false);
     geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTableName)).should.be.equal(false);
 
-    var types = ['Point', 'Polygon', 'LineString', 'MultiPolygon', 'MultiPoint', 'MultiLineString'];
+    var types = [GeometryType.POINT, GeometryType.POLYGON, GeometryType.LINESTRING, GeometryType.MULTIPOINT, GeometryType.MULTIPOLYGON, GeometryType.MULTILINESTRING];
     // Create style and icon relationship
     featureTableStyles.createStyleRelationship();
     featureTableStyles.hasStyleRelationship().should.be.equal(true);
@@ -635,9 +637,9 @@ describe('StyleExtension Tests', function() {
     var tableStyleDefault = randomStyle(featureTableStyles);
     var tableIconDefault = randomIcon(featureTableStyles);
     featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    featureTableStyles.setTableStyle('Point', tableStyleDefault);
+    featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
     featureTableStyles.setTableIconDefault(tableIconDefault);
-    featureTableStyles.setTableIcon('Point', tableIconDefault);
+    featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
     should.exist(featureTableStyles.getTableStyleDefault());
     var featureStyles = featureTableStyles.getTableFeatureStyles();
     featureTableStyles.setTableFeatureStyles(null);
@@ -648,7 +650,6 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.setTableIcons(null);
     should.not.exist(featureTableStyles.getTableStyles());
     should.not.exist(featureTableStyles.getTableIcons());
-
     featureTableStyles.setFeatureStylesForFeatureRow(featureRow, featureStyles);
     should.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
     featureTableStyles.deleteStylesForFeatureRow(featureRow);
@@ -660,16 +661,15 @@ describe('StyleExtension Tests', function() {
     should.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
     featureTableStyles.setFeatureStyleForFeatureRow(featureRow, null);
     should.not.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
+    featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    featureTableStyles.setTableStyle(GeometryType.POINT, null);
+    should.not.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
 
-    featureTableStyles.setTableStyle('Point', tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyle('Point'));
-    featureTableStyles.setTableStyle('Point', null);
-    should.not.exist(featureTableStyles.getTableStyle('Point'));
-
-    featureTableStyles.setTableIcon('Point', tableIconDefault);
-    should.exist(featureTableStyles.getTableIcon('Point'));
-    featureTableStyles.setTableIcon('Point', null);
-    should.not.exist(featureTableStyles.getTableIcon('Point'));
+    featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    featureTableStyles.setTableIcon(GeometryType.POINT, null);
+    should.not.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
 
     featureTableStyles.setTableStyleDefault(tableStyleDefault);
     featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);

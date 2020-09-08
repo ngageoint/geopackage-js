@@ -11,6 +11,7 @@ import { StyleMappingRow } from './styleMappingRow';
 import { UserRow } from '../../user/userRow';
 import { DBValue } from '../../db/dbAdapter';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
+import { GeometryType } from '../../features/user/geometryType';
 
 /**
  * Style Mapping DAO for reading user mapping data tables
@@ -53,15 +54,15 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
   /**
    * Delete by base id and geometry type
    * @param  {Number} baseId base id
-   * @param  {String} geometryType geometry type
+   * @param  {GeometryType} geometryType geometry type
    * @return {Number} number of deleted rows
    */
-  deleteByBaseIdAndGeometryType(baseId: number, geometryType: string): number {
+  deleteByBaseIdAndGeometryType(baseId: number, geometryType: GeometryType): number {
     let where = '';
     where += this.buildWhereWithFieldAndValue(UserMappingTable.COLUMN_BASE_ID, baseId);
     where += ' AND ';
-    where += this.buildWhereWithFieldAndValue(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, geometryType);
-    const whereArgs = this.buildWhereArgs([baseId, geometryType]);
+    where += this.buildWhereWithFieldAndValue(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, GeometryType.nameFromType(geometryType));
+    const whereArgs = this.buildWhereArgs([baseId, GeometryType.nameFromType(geometryType)]);
     return this.deleteWhere(where, whereArgs);
   }
 }
