@@ -634,7 +634,7 @@ export class FeatureTiles {
     const transformedGeoJson = transform(geoJson);
     const x = TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, transformedGeoJson.coordinates[0]);
     const y = TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, transformedGeoJson.coordinates[1]);
-    if (featureStyle !== undefined && featureStyle !== null && featureStyle.hasIcon()) {
+    if (featureStyle !== undefined && featureStyle !== null && featureStyle.useIcon()) {
       const iconRow = featureStyle.icon;
       const image = await this.iconCache.createIcon(iconRow);
       width = Math.round(this.scale * iconRow.width);

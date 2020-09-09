@@ -12,12 +12,17 @@ import { GeometryType } from '../../features/user/geometryType';
 export class Icons {
   defaultIcon: IconRow = null;
   icons: Map<GeometryType, IconRow>;
+  tableIcons: boolean;
 
-  constructor() {
+  constructor(tableIcons: boolean = false) {
     this.icons = new Map();
+    this.tableIcons = tableIcons;
   }
 
   setDefault(iconRow: IconRow): void {
+    if (iconRow !== null && iconRow !== undefined) {
+      iconRow.setTableIcon(this.tableIcons);
+    }
     this.defaultIcon = iconRow;
   }
   getDefault(): IconRow {
@@ -26,6 +31,7 @@ export class Icons {
   setIcon(iconRow: IconRow, geometryType: GeometryType = null): void {
     if (geometryType !== null) {
       if (iconRow !== null && iconRow !== undefined) {
+        iconRow.setTableIcon(this.tableIcons);
         this.icons.set(geometryType, iconRow);
       } else {
         this.icons.delete(geometryType);

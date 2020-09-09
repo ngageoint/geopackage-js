@@ -20,6 +20,7 @@ import { GeoPackageDataType } from '../../db/geoPackageDataType';
  */
 export class IconRow extends MediaRow {
   iconTable: IconTable;
+  tableIcon: boolean = false;
   constructor(iconTable: IconTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
     super(iconTable, columnTypes, values);
     this.iconTable = iconTable;
@@ -235,5 +236,21 @@ export class IconRow extends MediaRow {
       throw new Error('Anchor must be set inclusively between 0.0 and 1.0, invalid value: ' + anchor);
     }
     return true;
+  }
+
+  /**
+   * Is a table icon
+   * @return table icon flag
+   */
+  isTableIcon(): boolean {
+    return this.tableIcon;
+  }
+
+  /**
+   * Set table icon flag
+   * @param tableIcon table icon flag
+   */
+  setTableIcon(tableIcon: boolean) {
+    this.tableIcon = tableIcon;
   }
 }

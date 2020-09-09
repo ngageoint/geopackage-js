@@ -9,12 +9,17 @@ export class Styles {
   defaultStyle: StyleRow = null;
   // @ts-ignore
   styles: Map<GeometryType, StyleRow>;
+  tableStyles: boolean;
 
-  constructor() {
+  constructor(tableStyles: boolean = false) {
     this.styles = new Map();
+    this.tableStyles = tableStyles;
   }
 
   setDefault(styleRow: StyleRow): void {
+    if (styleRow !== null && styleRow !== undefined) {
+      styleRow.setTableStyle(this.tableStyles);
+    }
     this.defaultStyle = styleRow;
   }
   getDefault(): StyleRow {
@@ -23,6 +28,7 @@ export class Styles {
   setStyle(styleRow: StyleRow, geometryType: GeometryType = null): void {
     if (geometryType !== null) {
       if (styleRow !== null && styleRow !== undefined) {
+        styleRow.setTableStyle(this.tableStyles);
         this.styles.set(geometryType, styleRow);
       } else {
         this.styles.delete(geometryType);

@@ -51,4 +51,14 @@ export class FeatureStyle {
   hasIcon(): boolean {
     return !!this.iconRow;
   }
+
+  /**
+   * Determine if an icon exists and should be used. Returns false when an
+   * icon does not exist or when both a table level icon and row level style
+   * exist.
+   * @return true if the icon exists and should be used over a style
+   */
+  useIcon(): boolean {
+    return this.hasIcon() && (!this.iconRow.isTableIcon() || !this.hasStyle() || this.styleRow.isTableStyle());
+  }
 }

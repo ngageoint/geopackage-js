@@ -616,6 +616,30 @@ describe('StyleExtension Tests', function() {
     geopackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(false);
   }));
 
+  it('should test featureStyles useIcon functionality', mochaAsync(async () => {
+    // setup relationships
+    featureTableStyles.createTableStyleRelationship();
+    featureTableStyles.createTableIconRelationship();
+    featureTableStyles.createStyleRelationship();
+    featureTableStyles.createIconRelationship();
+
+    var featureDao = geopackage.getFeatureDao(featureTableName);
+    var results = featureDao.queryForAll();
+    var featureRow = featureDao.createObject(results[0]);
+
+    // test table style default
+    var tableStyleDefault = randomStyle(featureTableStyles);
+    var tableIconDefault = randomIcon(featureTableStyles);
+    featureTableStyles.setTableStyleDefault(tableStyleDefault);
+    featureTableStyles.setTableStyle(GeometryType.POLYGON, tableStyleDefault);
+    featureTableStyles.setTableIconDefault(tableIconDefault);
+    featureTableStyles.setTableIcon(GeometryType.POLYGON, tableIconDefault);
+
+    featureTableStyles.getFeatureStyleForFeatureRow(featureRow).useIcon().should.be.equal(true);
+    featureTableStyles.setStyleForFeatureRow(featureRow, tableStyleDefault);
+    featureTableStyles.getFeatureStyleForFeatureRow(featureRow).useIcon().should.be.equal(false);
+  }));
+
   it('should test FeatureTableStyles functions', mochaAsync(async () => {
     // relationships do not yet exist, thus these will be null
     should.not.exist(featureTableStyles.getAllTableStyleIds());

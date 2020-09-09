@@ -234,7 +234,6 @@ export class NGAExtensions {
     if (featureStyleExtension.has(table)) {
       featureStyleExtension.deleteRelationships(table);
     }
-
   }
 
   /**
@@ -247,7 +246,6 @@ export class NGAExtensions {
     if (featureStyleExtension.has(null)) {
       featureStyleExtension.removeExtension();
     }
-
   }
 
   /**

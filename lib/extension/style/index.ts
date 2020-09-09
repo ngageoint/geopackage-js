@@ -565,7 +565,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styles = null;
     const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
-      styles = this.getStyles(id, this.getTableStyleMappingDao(featureTable));
+      styles = this.getStyles(id, this.getTableStyleMappingDao(featureTable), true);
     }
     return styles;
   }
@@ -604,7 +604,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let icons = null;
     const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
-      icons = this.getIcons(id, this.getTableIconMappingDao(featureTable));
+      icons = this.getIcons(id, this.getTableIconMappingDao(featureTable), true);
     }
     return icons;
   }
@@ -612,11 +612,12 @@ export class FeatureStyleExtension extends BaseExtension {
    * Gets Icons for featureId and mappingDao
    * @param {Number} featureId
    * @param mappingDao
+   * @param {boolean} tableIcons
    * @returns {module:extension/style.Icons}
    * @private
    */
-  getIcons(featureId: number, mappingDao: StyleMappingDao): Icons {
-    let icons = new Icons();
+  getIcons(featureId: number, mappingDao: StyleMappingDao, tableIcons: boolean = false): Icons {
+    let icons = new Icons(tableIcons);
     if (mappingDao !== null) {
       const iconDao = this.getIconDao();
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
@@ -639,10 +640,11 @@ export class FeatureStyleExtension extends BaseExtension {
    * Gets Styles for featureId and mappingDao
    * @param {Number} featureId
    * @param {module:extension/style.StyleMappingDao} mappingDao
+   * @param {boolean} tableStyles
    * @returns {module:extension/style.Styles}
    */
-  getStyles(featureId: number, mappingDao: StyleMappingDao): Styles {
-    let styles = new Styles();
+  getStyles(featureId: number, mappingDao: StyleMappingDao, tableStyles: boolean = false): Styles {
+    let styles = new Styles(tableStyles);
     if (mappingDao !== null) {
       const styleDao = this.getStyleDao();
       const styleMappingRows = mappingDao.queryByBaseId(featureId);

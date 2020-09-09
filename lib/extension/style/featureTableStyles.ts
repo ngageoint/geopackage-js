@@ -236,14 +236,11 @@ export class FeatureTableStyles {
   getCachedTableStyles(): Styles {
     let styles = this.cachedTableFeatureStyles.styles;
     if (styles === null) {
-      styles = this.cachedTableFeatureStyles.styles;
+      styles = this.getTableStyles();
       if (styles === null) {
-        styles = this.getTableStyles();
-        if (styles === null) {
-          styles = new Styles();
-        }
-        this.cachedTableFeatureStyles.styles = styles;
+        styles = new Styles(true);
       }
+      this.cachedTableFeatureStyles.styles = styles;
     }
     if (styles.isEmpty()) {
       styles = null;
@@ -279,14 +276,11 @@ export class FeatureTableStyles {
   getCachedTableIcons(): Icons {
     let icons = this.cachedTableFeatureStyles.icons;
     if (icons === null) {
-      icons = this.cachedTableFeatureStyles.icons;
+      icons = this.getTableIcons();
       if (icons === null) {
-        icons = this.getTableIcons();
-        if (icons === null) {
-          icons = new Icons();
-        }
-        this.cachedTableFeatureStyles.icons = icons;
+        icons = new Icons(true);
       }
+      this.cachedTableFeatureStyles.icons = icons;
     }
     if (icons.isEmpty()) {
       icons = null;
