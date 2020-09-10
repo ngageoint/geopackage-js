@@ -445,6 +445,8 @@ export class RelatedTablesExtension extends BaseExtension {
       values.addColumn(ExtendedRelationDao.COLUMN_BASE_TABLE_NAME, baseTableName);
       values.addColumn(ExtendedRelationDao.COLUMN_RELATED_TABLE_NAME, relatedTableName);
       values.addColumn(ExtendedRelationDao.COLUMN_RELATION_NAME, relationName);
+      values.addColumn(ExtendedRelationDao.COLUMN_MAPPING_TABLE_NAME, userMappingTable);
+
       const iterator = this.extendedRelationDao.queryForFieldValues(values);
       const tablesToDelete: string[] = [];
       const relationsToDelete: ExtendedRelation[] = [];
@@ -693,6 +695,22 @@ export class RelatedTablesExtension extends BaseExtension {
       }
     } catch (e) {
       throw new Error("Failed to remove relationships for table: " + table);
+    }
+  }
+  /**
+   * Remove all relationships with the mapping table
+   * @param mappingTable mapping table
+   */
+  removeRelationshipsWithMappingTable(mappingTable: string) {
+    try {
+      if (this.extendedRelationDao.isTableExists()) {
+        const extendedRelations = this.extendedRelationDao.queryByMappingTableName(mappingTable);
+        extendedRelations.forEach(extendedRelation => {
+          this.removeRelationship(extendedRelation);
+        });
+      }
+    } catch (e) {
+      throw new Error("Failed to remove relationships for mapping table: " + mappingTable);
     }
   }
 }

@@ -416,10 +416,7 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   _deleteStyleRelationship(mappingTableName: string, featureTable: string | FeatureTable): number {
     let removed = 0;
-    const relationships = this.geoPackage.extendedRelationDao.queryByMappingTableName(mappingTableName);
-    for (let i = 0; i < relationships.length; i++) {
-      removed += this.relatedTablesExtension.removeRelationship(relationships[i]);
-    }
+    this.relatedTablesExtension.removeRelationshipsWithMappingTable(mappingTableName)
     if (!this.hasRelationship(featureTable)) {
       if (this.extensionsDao.isTableExists()) {
         this.extensionsDao.deleteByExtensionAndTableName(
@@ -1632,10 +1629,22 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {Number} styleRowId style row id
    */
   deleteStyleAndMappingsByStyleRowId(featureTable: string | FeatureTable, styleRowId: number): number {
-    this.getStyleDao().deleteById(styleRowId);
-    this.getStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
-    return this.getTableStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
+    let rowsDeleted = 0;
+    const styleDao = this.getStyleDao();
+    if (styleDao !== null && styleDao !== undefined) {
+      rowsDeleted += styleDao.deleteById(styleRowId);
+    }
+    const styleMappingDao = this.getStyleMappingDao(featureTable);
+    if (styleMappingDao !== null && styleMappingDao !== undefined) {
+      rowsDeleted += styleMappingDao.deleteByRelatedId(styleRowId);
+    }
+    const tableStyleMappingDao = this.getTableStyleMappingDao(featureTable);
+    if (tableStyleMappingDao !== null && tableStyleMappingDao !== undefined) {
+      rowsDeleted += tableStyleMappingDao.deleteByRelatedId(styleRowId);
+    }
+    return rowsDeleted;
   }
+
   /**
    * Delete all icons
    * @param {module:features/user/featureTable|String} featureTable feature table
@@ -1712,10 +1721,22 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {Number} iconRowId icon row id
    */
   deleteIconAndMappingsByIconRowId(featureTable: FeatureTable | string, iconRowId: number): number {
-    this.getIconDao().deleteById(iconRowId);
-    this.getIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
-    return this.getTableIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
+    let rowsDeleted = 0;
+    const iconDao = this.getStyleDao();
+    if (iconDao !== null && iconDao !== undefined) {
+      rowsDeleted += iconDao.deleteById(iconRowId);
+    }
+    const iconMappingDao = this.getIconMappingDao(featureTable);
+    if (iconMappingDao !== null && iconMappingDao !== undefined) {
+      rowsDeleted += iconMappingDao.deleteByRelatedId(iconRowId);
+    }
+    const tableIconMappingDao = this.getTableIconMappingDao(featureTable);
+    if (tableIconMappingDao !== null && tableIconMappingDao !== undefined) {
+      rowsDeleted += tableIconMappingDao.deleteByRelatedId(iconRowId);
+    }
+    return rowsDeleted;
   }
+
   /**
    * Delete all style mappings
    * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao

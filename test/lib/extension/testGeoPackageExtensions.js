@@ -158,11 +158,11 @@ describe('GeoPackage Extensions tests', function() {
     geopackage.featureStyleExtension.getContentsId().getOrCreateExtension();
     const featureTableStyles = new FeatureTableStyles(geopackage, tableName);
     featureTableStyles.createRelationships();
-    featureTableStyles.setTableStyle(GeometryType.nameFromType(GeometryType.POINT), randomStyle(featureTableStyles));
+    featureTableStyles.setTableStyle(GeometryType.POINT, randomStyle(featureTableStyles));
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', 'fixtures', 'point.png'));
     // @ts-ignore
     iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', 'fixtures', 'point.png'));
-    featureTableStyles.setTableIcon(GeometryType.nameFromType(GeometryType.POINT), randomIcon(featureTableStyles));
+    featureTableStyles.setTableIcon(GeometryType.POINT, randomIcon(featureTableStyles));
 
     // setup schema extension
     schemaExtension = new SchemaExtension(geopackage);
@@ -181,7 +181,8 @@ describe('GeoPackage Extensions tests', function() {
 
     geopackage.createMetadataTable();
     geopackage.createMetadataReferenceTable();
-    const metadataDao = geopackage.metadataDao;  });
+    const metadataDao = geopackage.metadataDao;
+  });
 
   afterEach(async function() {
     geopackage.close();
@@ -207,5 +208,23 @@ describe('GeoPackage Extensions tests', function() {
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
     GeoPackageExtensions.deleteExtensions(geopackage);
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
+  });
+
+  it('should copy table and then delete copy and style extension for original table should be unchanged', function() {
+    const newTableName = 'copied_feature_table';
+    let featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    geopackage.copyTable(tableName, newTableName, true, true);
+    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    featureTableStyles = new FeatureTableStyles(geopackage, newTableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    geopackage.deleteTable(newTableName);
+    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
   });
 });
