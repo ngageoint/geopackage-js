@@ -132,14 +132,14 @@ export class NGAExtensions {
           let tableIndexDao = geoPackage.tableIndexDao;
           if (tableIndexDao.isTableExists()) {
             let tableIndex = tableIndexDao.queryForId(table);
-            if (tableIndex != null) {
+            if (tableIndex !== null && tableIndex !== undefined) {
               tableIndex.table_name = newTable;
               tableIndexDao.create(tableIndex);
               if (geoPackage.isTable(GeometryIndexDao.TABLE_NAME)) {
                 CoreSQLUtils.transferTableContent(
                   geoPackage.connection,
                   GeometryIndexDao.TABLE_NAME,
-                  GeometryIndexDao.COLUMN_TABLE_NAME,
+                  GeometryIndexDao.COLUMN_TABLE_NAME_FIELD,
                   newTable, table);
               }
             }

@@ -101,9 +101,7 @@ export class CanvasTileCreator extends TileCreator {
     return this.canvas.toDataURL();
   }
   async reproject(tileData: any, tilePieceBoundingBox: any): Promise<void> {
-    const useWorker = true;
-    if (useWorker) {
-      console.log('Using a web worker');
+    if (window.Worker) {
       const ctx = this.ctx;
       const piecePosition = TileUtilities.getPiecePosition(
         tilePieceBoundingBox,
@@ -145,10 +143,7 @@ export class CanvasTileCreator extends TileCreator {
             const tmpCanvas = document.createElement('canvas');
             tmpCanvas.width = this.width;
             tmpCanvas.height = this.height;
-            tmpCanvas
-              .getContext('2d')
-              .putImageData(new ImageData(new Uint8ClampedArray(e.data.imageData), this.height, this.width), 0, 0);
-
+            tmpCanvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(e.data), this.height, this.width), 0, 0);
             this.canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
             resolve();
           };
@@ -157,10 +152,13 @@ export class CanvasTileCreator extends TileCreator {
           ]);
         } catch (e) {
           const worker = ProjectTile;
-          worker(job, (err: any, data: any) => {
-            this.canvas.getContext('2d').putImageData(new ImageData(data, this.height, this.width), 0, 0);
-            resolve();
-          });
+          const data = worker(job);
+          const tmpCanvas = document.createElement('canvas');
+          tmpCanvas.width = this.width;
+          tmpCanvas.height = this.height;
+          tmpCanvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(data), this.height, this.width), 0, 0);
+          this.canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
+          resolve();
         }
       });
     } else {
