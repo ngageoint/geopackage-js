@@ -1722,7 +1722,7 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   deleteIconAndMappingsByIconRowId(featureTable: FeatureTable | string, iconRowId: number): number {
     let rowsDeleted = 0;
-    const iconDao = this.getStyleDao();
+    const iconDao = this.getIconDao();
     if (iconDao !== null && iconDao !== undefined) {
       rowsDeleted += iconDao.deleteById(iconRowId);
     }
