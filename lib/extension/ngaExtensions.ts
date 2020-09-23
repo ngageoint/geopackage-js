@@ -72,12 +72,16 @@ export class NGAExtensions {
    * @param table table name
    */
   static deleteGeometryIndex(geoPackage: GeoPackage, table: string) {
+    let geometryIndexDao = geoPackage.getGeometryIndexDao(null);
     let tableIndexDao = geoPackage.tableIndexDao;
     let extensionsDao = geoPackage.extensionDao;
 
     try {
+      if (geometryIndexDao.isTableExists()) {
+        geometryIndexDao.deleteWhere(geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME_FIELD, table), geometryIndexDao.buildWhereArgs(table))
+      }
       if (tableIndexDao.isTableExists()) {
-        tableIndexDao.deleteById(table)
+        tableIndexDao.deleteWhere(tableIndexDao.buildWhereWithFieldAndValue(TableIndexDao.COLUMN_TABLE_NAME, table), tableIndexDao.buildWhereArgs(table))
       }
       if (extensionsDao.isTableExists()) {
         extensionsDao.deleteByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, table);
