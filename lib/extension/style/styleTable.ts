@@ -142,26 +142,25 @@ export class StyleTable extends AttributesTable {
     let index = 0;
     columns.push(UserColumn.createPrimaryKeyColumn(index++, StyleTable.COLUMN_ID));
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, undefined, false, undefined),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, false),
     );
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, undefined, false, undefined,
-      ),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, false),
     );
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_COLOR, GeoPackageDataType.TEXT, undefined, false, undefined),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_COLOR, GeoPackageDataType.TEXT, false),
     );
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, GeoPackageDataType.REAL, undefined, false, undefined),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, GeoPackageDataType.REAL, false),
     );
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, GeoPackageDataType.REAL, undefined, false, undefined),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, GeoPackageDataType.REAL, false),
     );
     columns.push(
-      UserColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, GeoPackageDataType.TEXT, undefined, false, undefined),
+      UserColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, GeoPackageDataType.TEXT, false),
     );
     columns.push(
-      UserColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, GeoPackageDataType.REAL, undefined, false, undefined),
+      UserColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, GeoPackageDataType.REAL, false),
     );
     return columns;
   }
