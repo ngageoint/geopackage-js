@@ -47,16 +47,7 @@ export class StyleMappingTable extends UserMappingTable {
   static createColumns(): UserColumn[] {
     const columns = UserMappingTable.createRequiredColumns();
     const index = columns.length;
-    columns.push(
-      UserColumn.createColumn(
-        index,
-        StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME,
-        GeoPackageDataType.TEXT,
-        undefined,
-        false,
-        undefined,
-      ),
-    );
+    columns.push(UserColumn.createColumn(index, StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, GeoPackageDataType.TEXT, false));
     return columns;
   }
 }
