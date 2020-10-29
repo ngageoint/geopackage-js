@@ -31,7 +31,7 @@ export class Icons {
   getIcon(geometryType: string): IconRow {
     let iconRow = null;
     if (geometryType != null) {
-      iconRow = this.icons[geometryType];
+      iconRow = this.icons[geometryType] || this.icons[geometryType.toUpperCase()];
     }
     if (iconRow === null || geometryType === null) {
       iconRow = this.getDefault();
