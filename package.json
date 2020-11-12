@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.0.0-beta.13",
+  "version": "4.0.0-beta.14",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -38,7 +38,7 @@
     "@turf/simplify": "~5.1.5",
     "@types/geojson": "^7946.0.7",
     "@types/proj4": "^2.5.0",
-    "better-sqlite3": "6.0.1",
+    "better-sqlite3": "7.1.1",
     "canvas": "2.6.0",
     "concat-stream": "2.0.0",
     "file-type": "12.4.0",
@@ -75,6 +75,8 @@
     "nock": "11.7.0",
     "nyc": "^14.1.1",
     "prettier": "^1.19.1",
+    "sass": "^1.29.0",
+    "sass-loader": "^10.0.5",
     "source-map-support": "0.5.16",
     "ts-loader": "6.2.1",
     "ts-node": "^8.5.2",
