@@ -44,6 +44,23 @@ describe('GeoPackage Tile table create tests', function() {
     Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
   });
 
+  it('should create a tile table, then delete it, then create it again', function() {
+    var contentsBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var contentsSrsId = 4326;
+    var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var tileMatrixSetSrsId = 4326;
+    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    geopackage.deleteTable(tableName)
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(false);
+    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+  });
+
   describe('GeoPackage tile create tile matrix tests', function(done) {
 
     var tileMatrixSet;

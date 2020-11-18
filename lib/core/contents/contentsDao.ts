@@ -189,7 +189,7 @@ export class ContentsDao extends Dao<Contents> {
             let geometryColumnsDao = this.geoPackage.geometryColumnsDao;
             if (geometryColumnsDao.isTableExists()) {
               let geometryColumns = this.getGeometryColumns(contents);
-              if (geometryColumns != null) {
+              if (geometryColumns !== null && geometryColumns !== undefined) {
                 geometryColumnsDao.deleteByMultiId([geometryColumns.table_name, geometryColumns.column_name]);
               }
             }
@@ -200,7 +200,7 @@ export class ContentsDao extends Dao<Contents> {
             let tileMatrixDao = this.geoPackage.tileMatrixDao;
             if (tileMatrixDao.isTableExists()) {
               let tileMatrixCollection = this.getTileMatrix(contents);
-              if (tileMatrixCollection.length > 0) {
+              if (tileMatrixCollection !== null && tileMatrixCollection !== undefined && tileMatrixCollection.length > 0) {
                 tileMatrixCollection.forEach(tileMatrix => {
                   tileMatrixDao.deleteByMultiId([tileMatrix.table_name, tileMatrix.zoom_level]);
                 });
@@ -210,7 +210,7 @@ export class ContentsDao extends Dao<Contents> {
             let tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
             if (tileMatrixSetDao.isTableExists()) {
               let tileMatrixSet = this.getTileMatrixSet(contents);
-              if (tileMatrixSet != null) {
+              if (tileMatrixSet !== null && tileMatrixSet !== undefined) {
                 tileMatrixSetDao.deleteById(tileMatrixSet.table_name);
               }
             }

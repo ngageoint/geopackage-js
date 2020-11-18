@@ -75,7 +75,6 @@ export class SqliteAdapter implements DBAdapter {
         });
       } else {
         console.log('create in memory');
-        // creating a random name here.  If the same name is used twice the database is appended to
         this.db = new Database(':memory:');
         return this;
       }
