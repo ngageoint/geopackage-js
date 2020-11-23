@@ -38,6 +38,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 3.0.6
+
+- Fix for styles for feature types ignoring case
+
 ##### 2.1.0
 
 - Implementation of the Feature Style Extension and Contents ID Extension

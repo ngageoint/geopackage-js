@@ -15,6 +15,7 @@ export class Styles {
   }
   setStyle(styleRow: StyleRow, geometryType: string): void {
     if (geometryType != null) {
+      geometryType = geometryType.toUpperCase();
       if (styleRow != null) {
         this.styles[geometryType] = styleRow;
       } else {
@@ -27,7 +28,7 @@ export class Styles {
   getStyle(geometryType: string): StyleRow {
     let styleRow = null;
     if (geometryType != null) {
-      styleRow = this.styles[geometryType];
+      styleRow = this.styles[geometryType] || this.styles[geometryType.toUpperCase()];
     }
     if (styleRow === null || geometryType === null) {
       styleRow = this.getDefault();
