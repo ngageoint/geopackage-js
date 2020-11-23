@@ -1,30 +1,30 @@
 // @ts-ignore
-import concat from 'concat-stream';
-// @ts-ignore
-import reproject from 'reproject';
 import PolyToLine from '@turf/polygon-to-line';
 import Simplify from '@turf/simplify';
-import proj4 from 'proj4';
+import concat from 'concat-stream';
 import { Geometry } from 'geojson';
-
-import { FeatureDao } from '../../features/user/featureDao';
-import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
+import proj4 from 'proj4';
+// @ts-ignore
+import reproject from 'reproject';
 import { BoundingBox } from '../../boundingBox';
-import { ImageUtils } from '../imageUtils';
+import { FeatureStyle } from '../../extension/style/featureStyle';
+import { FeatureTableStyles } from '../../extension/style/featureTableStyles';
 import { IconCache } from '../../extension/style/iconCache';
-import { GeometryCache } from './geometryCache';
+import { IconRow } from '../../extension/style/iconRow';
+import { StyleRow } from '../../extension/style/styleRow';
+import { FeatureDao } from '../../features/user/featureDao';
+import { FeatureRow } from '../../features/user/featureRow';
+import { GeoPackage } from '../../geoPackage';
+import { CrsGeometry } from '../../types/CrsGeometry';
+import { ImageUtils } from '../imageUtils';
+import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
+import { CustomFeaturesTile } from './custom/customFeaturesTile';
 import { FeatureDrawType } from './featureDrawType';
 import { FeaturePaintCache } from './featurePaintCache';
-import { Paint } from './paint';
-import { FeatureTableStyles } from '../../extension/style/featureTableStyles';
-import { GeoPackage } from '../../geoPackage';
-import { FeatureRow } from '../../features/user/featureRow';
-import { StyleRow } from '../../extension/style/styleRow';
 import { FeatureTilePointIcon } from './featureTilePointIcon';
-import { CustomFeaturesTile } from './custom/customFeaturesTile';
-import { FeatureStyle } from '../../extension/style/featureStyle';
-import { IconRow } from '../../extension/style/iconRow';
-import { CrsGeometry } from '../../types/CrsGeometry';
+import { GeometryCache } from './geometryCache';
+import { Paint } from './paint';
+
 /**
  * FeatureTiles module.
  * @module tiles/features
@@ -45,13 +45,19 @@ export class FeatureTiles {
   public compressFormat = 'png';
   public pointRadius = 4.0;
   pointPaint: Paint = new Paint();
+  private _overrideGeoPackagePointPaint = false;
   public pointIcon: FeatureTilePointIcon = null;
   linePaint: Paint = new Paint();
+  private _overrideGeoPackageLinePaint = false;
   private _lineStrokeWidth = 2.0;
+  private _overrideGeoPackageLineStrokeWidth = false;
   polygonPaint: Paint = new Paint();
+  private _overrideGeoPackagePolygonPaint = false;
   private _polygonStrokeWidth = 2.0;
+  private _overrideGeoPackagePolygonStrokeWidth = false;
   public fillPolygon = true;
   polygonFillPaint: Paint = new Paint();
+  private _overrideGeoPackagePolygonFillPaint = false;
   featurePaintCache: FeaturePaintCache = new FeaturePaintCache();
   geometryCache: GeometryCache = new GeometryCache();
   public cacheGeometries = true;
@@ -251,6 +257,9 @@ export class FeatureTiles {
    * @return paint
    */
   getPointPaint(featureStyle: FeatureStyle): Paint {
+    if (this._overrideGeoPackagePointPaint) {
+      return this.pointPaint;
+    }
     let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.CIRCLE);
     if (paint == null) {
       paint = this.pointPaint;
@@ -263,6 +272,9 @@ export class FeatureTiles {
    * @return paint
    */
   getLinePaint(featureStyle: FeatureStyle): Paint {
+    if (this._overrideGeoPackageLinePaint) {
+      return this.linePaint;
+    }
     let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint === null) {
       paint = this.linePaint;
@@ -275,6 +287,9 @@ export class FeatureTiles {
    * @return paint
    */
   getPolygonPaint(featureStyle: FeatureStyle): Paint {
+    if (this._overrideGeoPackagePolygonPaint) {
+      return this.polygonPaint;
+    }
     let paint = this.getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
     if (paint == null) {
       paint = this.polygonPaint;
@@ -288,6 +303,9 @@ export class FeatureTiles {
    * @return paint
    */
   getPolygonFillPaint(featureStyle: FeatureStyle): Paint {
+    if (this._overrideGeoPackagePolygonFillPaint && this.fillPolygon) {
+      return this.polygonFillPaint;
+    }
     let paint = null;
     let hasStyleColor = false;
     if (featureStyle != null) {
@@ -368,6 +386,11 @@ export class FeatureTiles {
    * @param {String} pointColor point color
    */
   set pointColor(pointColor: string) {
+    if (pointColor) {
+      this._overrideGeoPackagePointPaint = true;
+    } else {
+      this._overrideGeoPackagePointPaint = false;
+    }
     this.pointPaint.color = pointColor;
   }
   /**
@@ -382,6 +405,11 @@ export class FeatureTiles {
    * @param {Number} lineStrokeWidth line stroke width
    */
   set lineStrokeWidth(lineStrokeWidth: number) {
+    if (lineStrokeWidth) {
+      this._overrideGeoPackageLineStrokeWidth = true;
+    } else {
+      this._overrideGeoPackageLineStrokeWidth = false;
+    }
     this._lineStrokeWidth = lineStrokeWidth;
     this.linePaint.strokeWidth = this.scale * this.lineStrokeWidth;
   }
@@ -397,6 +425,11 @@ export class FeatureTiles {
    * @param {String} lineColor line color
    */
   set lineColor(lineColor: string) {
+    if (lineColor) {
+      this._overrideGeoPackageLinePaint = true;
+    } else {
+      this._overrideGeoPackageLinePaint = false;
+    }
     this.linePaint.color = lineColor;
   }
   /**
@@ -411,6 +444,11 @@ export class FeatureTiles {
    * @param {Number} polygonStrokeWidth polygon stroke width
    */
   set polygonStrokeWidth(polygonStrokeWidth: number) {
+    if (polygonStrokeWidth) {
+      this._overrideGeoPackageLineStrokeWidth = true;
+    } else {
+      this._overrideGeoPackageLineStrokeWidth = false;
+    }
     this._polygonStrokeWidth = polygonStrokeWidth;
     this.polygonPaint.strokeWidth = this.scale * polygonStrokeWidth;
   }
@@ -426,6 +464,11 @@ export class FeatureTiles {
    * @param {String} polygonColor polygon color
    */
   set polygonColor(polygonColor: string) {
+    if (polygonColor) {
+      this._overrideGeoPackagePolygonPaint = true;
+    } else {
+      this._overrideGeoPackagePolygonPaint = false;
+    }
     this.polygonPaint.color = polygonColor;
   }
   /**
@@ -440,6 +483,11 @@ export class FeatureTiles {
    * @param {String} polygonFillColor polygon fill color
    */
   set polygonFillColor(polygonFillColor: string) {
+    if (polygonFillColor) {
+      this._overrideGeoPackagePolygonFillPaint = true;
+    } else {
+      this._overrideGeoPackagePolygonFillPaint = false;
+    }
     this.polygonFillPaint.color = polygonFillColor;
   }
   getFeatureCountXYZ(x: number, y: number, z: number): number {

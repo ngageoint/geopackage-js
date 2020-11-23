@@ -38,6 +38,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 3.0.7
+
+- Styles that are set on the FeatureTiles class will override any styles in the GeoPackage
+
 ##### 3.0.6
 
 - Fix for styles for feature types ignoring case
