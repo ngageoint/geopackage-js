@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.0.0-beta.16",
+  "version": "4.0.0-beta.17",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -13,6 +13,7 @@
   },
   "contributors": [
     "Daniel Barela <daniel.barela@gmail.com>",
+    "Christopher Caldwell <c.caldwell90@gmail.com>",
     "Jared Lincenberg <jaredlincenberg@gmail.com>"
   ],
   "homepage": "http://ngageoint.github.io/geopackage-js/",

@@ -899,6 +899,17 @@ export class FeatureTiles {
           featureStyle,
         );
       }
+    } else if (geoJson.type === 'GeometryCollection') {
+      for (i = 0; i < geoJson.geometries.length; i++) {
+        await this.drawGeometry(
+          simplifyTolerance,
+          geoJson.geometries[i],
+          context,
+          transform,
+          boundingBox,
+          featureStyle,
+        );
+      }
     }
   }
   /**
