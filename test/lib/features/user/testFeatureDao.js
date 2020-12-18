@@ -134,6 +134,88 @@ describe('FeatureDao tests', function() {
     });
   });
 
+  describe('geometry collection test', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('test');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should return feature when bounds overlap a feature within geometry collection', function() {
+      var bb = new BoundingBox(-34.98046875, -15.1171875, 42.293564192170095, 55.3791104480105);
+      var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+      const features = [];
+      for (const feature of iterator) {
+        features.push(feature);
+      }
+      features.length.should.be.equal(1);
+    });
+
+    it('should return no features when bounds do not overlap a feature within geometry collection', function() {
+      var bb = new BoundingBox(-70.48828125, -52.3828125, -7.01366792756663, 9.44906182688142);
+      var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+      const features = [];
+      for (const feature of iterator) {
+        features.push(feature);
+      }
+      features.length.should.be.equal(0);
+    });
+  });
+
+  describe('multi point test', function() {
+    var geoPackage;
+    var featureDao;
+
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipoint.gpkg');
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('multipoint');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should return feature when bounds overlap a feature within multipoint', function() {
+      var bb = new BoundingBox(45.52734375, 64.3359375, 53.4357192066942, 61.938950426660604);
+      var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+      const features = [];
+      for (const feature of iterator) {
+        features.push(feature);
+      }
+      features.length.should.be.equal(1);
+    });
+
+    it('should return no features when bounds do not overlap a feature within multipoint', function() {
+      var bb = new BoundingBox(69.9609375, 85.4296875, 31.50362930577303, 40.0);
+      var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+      const features = [];
+      for (const feature of iterator) {
+        features.push(feature);
+      }
+      features.length.should.be.equal(0);
+    });
+  });
+
   describe('rivers 2 test', function() {
     var geoPackage;
     var featureDao;

@@ -8,6 +8,8 @@ import LineIntersect from '@turf/line-intersect';
 import Intersect from '@turf/intersect';
 // @ts-ignore
 import BooleanWithin from '@turf/boolean-within';
+// @ts-ignore
+import BooleanPointInPolygon from '@turf/boolean-point-in-polygon';
 
 import { FeatureTableIndex } from '../../extension/index/featureTableIndex';
 import { UserDao } from '../../user/userDao';
@@ -417,13 +419,28 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
         return FeatureDao.verifyLineString(geometry, boundingBox);
       } else if (geometry.type === 'Polygon') {
         return FeatureDao.verifyPolygon(geometry, boundingBox);
+      } else if (geometry.type === 'MultiPoint') {
+        return FeatureDao.verifyMultiPoint(geometry, boundingBox);
       } else if (geometry.type === 'MultiLineString') {
         return FeatureDao.verifyLineString(geometry, boundingBox);
       } else if (geometry.type === 'MultiPolygon') {
         return FeatureDao.verifyPolygon(geometry, boundingBox);
+      } else if (geometry.type === 'GeometryCollection') {
+        return FeatureDao.verifyGeometryCollection(geometry, boundingBox);
+      } else {
+        return undefined;
       }
     } catch (e) {
       return undefined;
+    }
+  }
+
+  static verifyMultiPoint(geometry: any, boundingBox: BoundingBox): Feature {
+    const multiPointIntersects = FeatureDao.multiPointIntersects(geometry, boundingBox.toGeoJSON().geometry);
+    if (multiPointIntersects) {
+      return geometry;
+    } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
+      return geometry;
     }
   }
 
@@ -439,6 +456,58 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   static verifyPolygon(geometry: any, boundingBox: BoundingBox): Feature {
     const polyIntersect = Intersect(geometry, boundingBox.toGeoJSON().geometry);
     if (polyIntersect) {
+      return geometry;
+    } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
+      return geometry;
+    }
+  }
+
+  static multiPointIntersects(geometry, boundsGeometry): Boolean {
+    let intersects: Boolean = false;
+    for (let i = 0; i < geometry.coordinates.length && !intersects; i++) {
+      const point = geometry.coordinates[i];
+      intersects = BooleanPointInPolygon(point, boundsGeometry);
+    }
+    return intersects;
+  }
+
+  /**
+   * Iterate over geometries in GeometryCollection looking for any geometry that intersects the bounding box provided
+   * @param geometry
+   * @param boundsGeometry
+   */
+  static geometryCollectionIntersects(geometry, boundsGeometry): Boolean {
+    let intersects: Boolean = false;
+    for (let i = 0; i < geometry.geometries.length && !intersects; i++) {
+      const childGeometry = geometry.geometries[i];
+      switch (childGeometry.type) {
+        case 'Point':
+          intersects = BooleanPointInPolygon(childGeometry, boundsGeometry);
+          break;
+        case 'LineString':
+        case 'MultiLineString':
+          intersects = LineIntersect(childGeometry, boundsGeometry).features.length > 0;
+          break;
+        case 'Polygon':
+        case 'MultiPolygon':
+          intersects = Intersect(childGeometry, boundsGeometry) !== null;
+          break;
+        case 'MultiPoint':
+          intersects = FeatureDao.multiPointIntersects(childGeometry, boundsGeometry);
+          break;
+        case 'GeometryCollection':
+          intersects = FeatureDao.geometryCollectionIntersects(childGeometry, boundsGeometry);
+          break;
+        default:
+          break;
+      }
+    }
+    return intersects;
+  }
+
+  static verifyGeometryCollection(geometry: any, boundingBox: BoundingBox): Feature {
+    const geomCollectionIntersect = FeatureDao.geometryCollectionIntersects(geometry, boundingBox.toGeoJSON().geometry);
+    if (geomCollectionIntersect) {
       return geometry;
     } else if (BooleanWithin(geometry, boundingBox.toGeoJSON().geometry)) {
       return geometry;

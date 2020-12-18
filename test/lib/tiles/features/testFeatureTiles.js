@@ -714,13 +714,13 @@ describe('GeoPackage FeatureTiles tests', function() {
     });
   });
 
-  describe('Styled GeoPackage tests', function() {
+  describe('Styled GeometryCollection GeoPackage tests', function() {
     var geoPackage;
     var featureDao;
     var filename;
 
     beforeEach('should open the geopackage', async function() {
-      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multigeometry.gpkg');
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
@@ -733,12 +733,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should get the x: 0, y: 0, z: 0 tile for multigeometries', function(done) {
+    it('should get the x: 0, y: 0, z: 0 tile for geometry collection', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(0, 0, 0)
         .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'multigeometry_0_0_0.png'), function(err, equal) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'geometrycollection_0_0_0.png'), function(err, equal) {
             equal.should.be.equal(true);
             done();
           });
