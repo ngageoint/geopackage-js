@@ -18,9 +18,6 @@ export class Paint {
    * @param {String} color String color in the format #RRGGBB or #RRGGBBAA
    */
   set color(color: string) {
-    if (!color) {
-      color = '#000000FF';
-    }
     this._color = color;
   }
   /**

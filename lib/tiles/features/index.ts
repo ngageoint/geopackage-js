@@ -69,6 +69,8 @@ export class FeatureTiles {
   public maxFeaturesTileDraw: CustomFeaturesTile = null;
   widthOverlap: number;
   heightOverlap: number;
+  private _defaultStroke = '#000000FF';
+  private _defaultFill = '#00000011';
   constructor(
     public featureDao: FeatureDao<FeatureRow>,
     public tileWidth: number = 256,
@@ -77,7 +79,7 @@ export class FeatureTiles {
     this.projection = featureDao.projection;
     this.linePaint.strokeWidth = 2.0;
     this.polygonPaint.strokeWidth = 2.0;
-    this.polygonFillPaint.color = '#00000011';
+    this.polygonFillPaint.color = this._defaultFill;
     this.geoPackage = this.featureDao.geoPackage;
     if (this.geoPackage != null) {
       this.featureTableStyles = new FeatureTableStyles(this.geoPackage, featureDao.table);
@@ -390,6 +392,7 @@ export class FeatureTiles {
       this._overrideGeoPackagePointPaint = true;
     } else {
       this._overrideGeoPackagePointPaint = false;
+      pointColor = this._defaultStroke;
     }
     this.pointPaint.color = pointColor;
   }
@@ -429,6 +432,7 @@ export class FeatureTiles {
       this._overrideGeoPackageLinePaint = true;
     } else {
       this._overrideGeoPackageLinePaint = false;
+      lineColor = this._defaultStroke;
     }
     this.linePaint.color = lineColor;
   }
@@ -468,6 +472,7 @@ export class FeatureTiles {
       this._overrideGeoPackagePolygonPaint = true;
     } else {
       this._overrideGeoPackagePolygonPaint = false;
+      polygonColor = this._defaultStroke;
     }
     this.polygonPaint.color = polygonColor;
   }
@@ -487,6 +492,7 @@ export class FeatureTiles {
       this._overrideGeoPackagePolygonFillPaint = true;
     } else {
       this._overrideGeoPackagePolygonFillPaint = false;
+      polygonFillColor = this._defaultFill;
     }
     this.polygonFillPaint.color = polygonFillColor;
   }
