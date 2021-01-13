@@ -38,6 +38,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 3.0.8
+
+- If a null color is set on the FeatureTiles class, the color will be reset to the initial default of #000000FF
+
 ##### 3.0.7
 
 - Styles that are set on the FeatureTiles class will override any styles in the GeoPackage
