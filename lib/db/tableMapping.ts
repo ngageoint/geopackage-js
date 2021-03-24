@@ -1,7 +1,10 @@
-import _ from 'lodash'
+import isNil from 'lodash/isNil'
+import isEqual from 'lodash/isEqual'
+import keys from 'lodash/keys'
+import values from 'lodash/values'
 import { MappedColumn } from './mappedColumn'
 import { UserColumn } from '../user/userColumn'
-import { TableInfo } from './table/tableInfo';
+import { TableInfo } from './table/tableInfo'
 
 /**
  * Mapping between column names being mapped to and the mapped column
@@ -100,7 +103,7 @@ export class TableMapping {
    * @return true if a new table
    */
   isNewTable(): boolean {
-    return !_.isNil(this._toTable) && !_.isEqual(this._toTable, this._fromTable)
+    return !isNil(this._toTable) && !isEqual(this._toTable, this._fromTable)
   }
 
   /**
@@ -153,7 +156,7 @@ export class TableMapping {
    * @return column names
    */
   getColumnNames(): string[] {
-    return _.keys(this._columns)
+    return keys(this._columns)
   }
 
   /**
@@ -169,7 +172,7 @@ export class TableMapping {
    * @return columns
    */
   getMappedColumns(): MappedColumn[] {
-    return _.values(this._columns)
+    return values(this._columns)
   }
 
   /**
@@ -220,7 +223,7 @@ export class TableMapping {
    * @return true if where clause
    */
   hasWhere(): boolean {
-    return !_.isNil(this._where)
+    return !isNil(this._where)
   }
 
   /**

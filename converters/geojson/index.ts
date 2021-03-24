@@ -9,7 +9,6 @@ import {
 import fs from 'fs';
 import path from 'path';
 import bbox from '@turf/bbox';
-import _ from 'lodash';
 
 export interface GeoJSONConverterOptions {
   append?: boolean;

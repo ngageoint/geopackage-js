@@ -1,7 +1,7 @@
 import * as turf from '@turf/turf';
 import { BoundingBox, proj4Defs } from '@ngageoint/geopackage';
 import proj4 from 'proj4';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
 export const TILE_SIZE_IN_PIXELS = 256;
 export const WEB_MERCATOR_MIN_LAT_RANGE = -85.05112877980659;
 export const WEB_MERCATOR_MAX_LAT_RANGE = 85.0511287798066;
@@ -43,7 +43,7 @@ export class GeoSpatialUtilities {
    * Finds the x position of a tile
    *
    * Taken from Map Cache Electron
-   * 
+   *
    * @static
    * @param {number} lon longitude in degrees
    * @param {number} zoom Zoom level
@@ -122,7 +122,7 @@ export class GeoSpatialUtilities {
    * Calls function for each tile needed.
    *
    * Taken from Map Cache Electron
-   * 
+   *
    * @static
    * @param {BoundingBox} extent Bounding Box
    * @param {number[]} zoomLevels Array of Zoom Levels
@@ -156,7 +156,7 @@ export class GeoSpatialUtilities {
    * @param {number} y y tile position
    * @param {number} zoom zoom level
    * @returns {BoundingBox} Geopackage Bounding box.
-   * @memberof GeoSpatialUtilities 
+   * @memberof GeoSpatialUtilities
    */
   static tileBboxCalculator(x: number, y: number, zoom: number): BoundingBox {
     return new BoundingBox(
@@ -299,16 +299,16 @@ export class GeoSpatialUtilities {
     if (copyBoundingBox) {
       boundingBox = new BoundingBox(boundingBox);
     }
-    if (!_.isNil(latitude)) {
-      if (_.isNil(boundingBox.minLatitude)) {
-        if (_.isNil(boundingBox.maxLatitude)) {
+    if (!isNil(latitude)) {
+      if (isNil(boundingBox.minLatitude)) {
+        if (isNil(boundingBox.maxLatitude)) {
           boundingBox.minLatitude = latitude;
         } else {
           boundingBox.minLatitude = boundingBox.maxLatitude;
         }
       }
-      if (_.isNil(boundingBox.maxLatitude)) {
-        if (_.isNil(boundingBox.minLatitude)) {
+      if (isNil(boundingBox.maxLatitude)) {
+        if (isNil(boundingBox.minLatitude)) {
           boundingBox.maxLatitude = latitude;
         } else {
           boundingBox.maxLatitude = boundingBox.minLatitude;
@@ -317,16 +317,16 @@ export class GeoSpatialUtilities {
       if (latitude < boundingBox.minLatitude) boundingBox.minLatitude = latitude;
       if (latitude > boundingBox.maxLatitude) boundingBox.maxLatitude = latitude;
     }
-    if (!_.isNil(longitude)) {
-      if (_.isNil(boundingBox.minLongitude)) {
-        if (_.isNil(boundingBox.maxLongitude)) {
+    if (!isNil(longitude)) {
+      if (isNil(boundingBox.minLongitude)) {
+        if (isNil(boundingBox.maxLongitude)) {
           boundingBox.minLongitude = longitude;
         } else {
           boundingBox.minLongitude = boundingBox.maxLongitude;
         }
       }
-      if (_.isNil(boundingBox.maxLongitude)) {
-        if (_.isNil(boundingBox.minLongitude)) {
+      if (isNil(boundingBox.maxLongitude)) {
+        if (isNil(boundingBox.minLongitude)) {
           boundingBox.maxLongitude = longitude;
         } else {
           boundingBox.maxLongitude = boundingBox.minLongitude;

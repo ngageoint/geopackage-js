@@ -1,5 +1,5 @@
 import * as KMLTAGS from './KMLTags';
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
 import { BoundingBox, GeoPackage, TileScaling, TileScalingType, FeatureTableStyles } from '@ngageoint/geopackage';
 import { GeoSpatialUtilities } from './geoSpatialUtilities';
 import { ImageUtilities } from './imageUtilities';
@@ -246,7 +246,7 @@ export class KMLUtilities {
             coordArray.push([coords[0], coords[1], coords[2]]);
           } else if (coords.length == 2) {
             coordArray.push([coords[0], coords[1]]);
-          } else if(coords.length === 1 && coords[0] === NaN) {} 
+          } else if(coords.length === 1 && coords[0] === NaN) {}
           else {
             console.error(
               'Invalid InnerBoundary: Coordinates must have a length of 2 or 3. You gave: ',
@@ -297,7 +297,7 @@ export class KMLUtilities {
           });
         }
       }
-    } else if (!_.isNil(node)) {
+    } else if (!isNil(node)) {
       nodes.push(node);
     } else {
       console.error('Placemark node is Nil.');
@@ -439,7 +439,7 @@ export class KMLUtilities {
     anchorV = 0.5,
   ): Promise<number> {
     newIcon.data = await jimpImage.getBufferAsync(jimpImage.getMIME());
-    if (_.isNil(newIcon.data)) {
+    if (isNil(newIcon.data)) {
       console.error('NULL', newIcon);
     }
     newIcon.width = jimpImage.getWidth();
@@ -468,7 +468,7 @@ export class KMLUtilities {
       const kmlStyle = item[1];
       newIcon.name = item[0];
       let id = -2;
-      if (_.isNil(kmlStyle)) {
+      if (isNil(kmlStyle)) {
         console.error('kml Style Undefined');
         reject();
       }
@@ -476,23 +476,23 @@ export class KMLUtilities {
         let aU = 0.5;
         let aV = 0.5;
         const iconStyle = kmlStyle[KMLTAGS.STYLE_TYPE_TAGS.ICON_STYLE];
-        if (_.isNil(iconStyle)) {
+        if (isNil(iconStyle)) {
           console.error('Icon Style Undefined');
           reject();
         }
-        if (_.isNil(iconStyle[KMLTAGS.ICON_TAG])) {
+        if (isNil(iconStyle[KMLTAGS.ICON_TAG])) {
           console.error('Icon Tag Undefined');
           reject();
           return;
         }
-        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !_.isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
+        if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
           let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
           iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
           const img: Jimp = await Jimp.read(iconLocation).catch(err => {
             console.error('Image Reading Error', err);
             throw err;
           });
-          if (_.isNil(img)) {
+          if (isNil(img)) {
             reject();
           }
           if (iconStyle.hasOwnProperty(KMLTAGS.SCALE_TAG)) {

@@ -23,7 +23,9 @@ import JSZip from 'jszip';
 import mkdirp from 'mkdirp';
 
 // Utilities
-import _ from 'lodash';
+import isNil from 'lodash/isNil';
+import findIndex from 'lodash/findIndex';
+import isEmpty from 'lodash/isEmpty';
 
 // Handle images
 import Jimp from 'jimp';
@@ -42,7 +44,7 @@ export interface KMLConverterOptions {
   kmlOrKmzPath?: PathLike;
   kmlOrKmzData?: Uint8Array;
   isKMZ?: boolean | false;
-  mainTableName?: string; 
+  mainTableName?: string;
   append?: boolean;
   preserverFolders?: boolean;
   geoPackage?: GeoPackage | string;
@@ -107,7 +109,7 @@ export class KMLToGeoPackage {
   /**
    * Determines the function calls depending on the type of file and the environment it is in
    *
-   * @param {PathLike} kmlOrKmzPath 
+   * @param {PathLike} kmlOrKmzPath
    * @param {boolean} [isKMZ]
    * @param {(GeoPackage | string)} [geopackage] String or instance of the Geopackage to use.
    * @param {string} [tableName] Name of Main Geometry table
@@ -124,7 +126,7 @@ export class KMLToGeoPackage {
     kmlOrKmzData?: Uint8Array | null,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+    if (typeof geopackage === 'string' || isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
     if (isKMZ) {
@@ -161,7 +163,7 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+    if (typeof geopackage === 'string' || isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
     let data: PathLike | Uint8Array;
@@ -184,14 +186,14 @@ export class KMLToGeoPackage {
               const fileDestination = path.join(path.dirname(kmzData.toString()), key);
               kmlData = zip.files[key].name.endsWith('.kml') ? fileDestination : kmlData;
               const dir = mkdirp(path.dirname(fileDestination));
-              if (!_.isNil(dir)) {
+              if (!isNil(dir)) {
                 await dir.catch(err => {
                   console.error('mkdirp was not able to be made', err);
                   reject();
                 });
               }
               const file = zip.file(key);
-              if (!_.isNil(file)) {
+              if (!isNil(file)) {
                 file
                   .nodeStream()
                   .pipe(
@@ -250,7 +252,7 @@ export class KMLToGeoPackage {
     tableName: string,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    if (typeof geopackage === 'string' || _.isNil(geopackage)) {
+    if (typeof geopackage === 'string' || isNil(geopackage)) {
       geopackage = await this.createOrOpenGeoPackage(geopackage, this.options);
     }
 
@@ -328,7 +330,7 @@ export class KMLToGeoPackage {
   /**
    * Inserts style information from the KML in the GeoPackage.
    *
-   * @param {GeoPackage} geopackage Geopackage instance of 
+   * @param {GeoPackage} geopackage Geopackage instance of
    * @param {string} tableName Name of Main Table
    * @param {Function} [progressCallback] Passed the current status of the function.
    * @returns {Promise<FeatureTableStyles>} Promise of a Feature Table of Styles
@@ -469,7 +471,7 @@ export class KMLToGeoPackage {
    *
    * @param {(PathLike | Uint8Array)} kmlData Path to KML File or KML Data
    * @param {GeoPackage} [geopackage] Geopackage instance; Needed when using Network Links
-   * @param {Function} [progressCallback] 
+   * @param {Function} [progressCallback]
    * @returns {Promise<{ props: Set<string>; bbox: BoundingBox }>} Object of the set of property name and the total Bounding Box
    * @memberof KMLToGeoPackage
    */
@@ -553,14 +555,14 @@ export class KMLToGeoPackage {
         for (const property in node) {
           // Item to be treated like a Geometry
           if (
-            _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
+            findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
               return o === property;
             }) !== -1
           ) {
             node[property].forEach(element => {
               for (const subProperty in element) {
                 if (
-                  _.findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
+                  findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
                     return o === subProperty;
                   }) === -1
                 ) {
@@ -574,7 +576,7 @@ export class KMLToGeoPackage {
               node[property][subProperty].forEach(element => {
                 for (const subSubProperty in element) {
                   if (
-                    _.findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
+                    findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
                       return o === subSubProperty;
                     }) === -1
                   ) {
@@ -591,7 +593,7 @@ export class KMLToGeoPackage {
       });
       kml.on('endElement: ' + KMLTAGS.PLACEMARK_TAG + ' ' + KMLTAGS.COORDINATES_TAG, node => {
         kmlOnsRunning++;
-        if (!_.isEmpty(node)) {
+        if (!isEmpty(node)) {
           try {
             const rows = node[KMLTAGS.XML_STREAM_TEXT_SELECTOR].split(/\s+/);
             rows.forEach((element: string) => {
@@ -655,7 +657,7 @@ export class KMLToGeoPackage {
    * Determines whether to create a new file or open an existing file.
    *
    * @param {(GeoPackage | string)} geopackage String Name or instance of a GeoPackage
-   * @param {KMLConverterOptions} options 
+   * @param {KMLConverterOptions} options
    * @param {Function} [progressCallback]
    * @returns {Promise<GeoPackage>} Promise of a GeoPackage
    * @memberof KMLUtilities
@@ -757,13 +759,13 @@ export class KMLToGeoPackage {
         }
       }
 
-      const element = _.findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
+      const element = findIndex(KMLTAGS.ITEM_TO_SEARCH_WITHIN, o => {
         return o === prop;
       });
       if (element !== -1) {
         for (const subProp in node[prop][0]) {
           if (
-            _.findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
+            findIndex(KMLTAGS.INNER_ITEMS_TO_IGNORE, o => {
               return o === subProp;
             }) === -1
           ) {
@@ -781,7 +783,7 @@ export class KMLToGeoPackage {
       }
     }
     const geometryData = KMLUtilities.kmlToGeoJSON(node);
-    const isGeom = !_.isNil(geometryData);
+    const isGeom = !isNil(geometryData);
 
     const feature: any = {
       type: 'Feature',
@@ -792,10 +794,10 @@ export class KMLToGeoPackage {
     let featureID = -1;
     if (isGeom) {
       featureID = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
-      if (!_.isNil(styleRow)) {
+      if (!isNil(styleRow)) {
         defaultStyles.setStyle(featureID, geometryData.type, styleRow);
       }
-      if (!_.isNil(iconRow) && !_.isNil(iconRow.data)) {
+      if (!isNil(iconRow) && !isNil(iconRow.data)) {
         defaultStyles.setIcon(featureID, geometryData.type, iconRow).catch(e => console.error(e));
       }
     } else {
@@ -821,7 +823,7 @@ export class KMLToGeoPackage {
           console.error(e);
           return { id: -1, newIcon: null };
         });
-        if (id >= 0 && !_.isNil(icon)) {
+        if (id >= 0 && !isNil(icon)) {
           this.iconUrlMap.set('#' + item[0], id);
           this.iconRowMap.set(id, icon);
         }
@@ -833,7 +835,7 @@ export class KMLToGeoPackage {
   /**
    * Adds styles to the table provided.
    * Saves id and name in this.styleRowMap and this.styleUrlMap
-   * 
+   *
    * @private
    * @param {FeatureTableStyles} styleTable Feature Style Table
    * @param {Map<string, object>} items Map of the name of the style and the style itself from the KML
