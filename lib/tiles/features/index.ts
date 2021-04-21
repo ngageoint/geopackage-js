@@ -523,22 +523,7 @@ export class FeatureTiles {
           console.log('Error drawing geometry', e);
         }
       }
-      return new Promise(resolve => {
-        if (FeatureTiles.useNodeCanvas) {
-          const writeStream = concat(function(buffer: Uint8Array | Buffer) {
-            resolve(buffer);
-          });
-          let stream = null;
-          if (this.compressFormat === 'png') {
-            stream = canvas.createPNGStream();
-          } else {
-            stream = canvas.createJPEGStream();
-          }
-          stream.pipe(writeStream);
-        } else {
-          resolve(canvas.toDataURL('image/' + this.compressFormat));
-        }
-      });
+      return canvas.toDataURL('image/' + this.compressFormat);
     } else if (this.maxFeaturesTileDraw !== null) {
       // Draw the max features tile
       return this.maxFeaturesTileDraw.drawTile(width, height, tileCount.toString(), canvas);
@@ -595,22 +580,7 @@ export class FeatureTiles {
         console.log('Error drawing geometry', e);
       }
     }
-    return new Promise(resolve => {
-      if (FeatureTiles.useNodeCanvas) {
-        const writeStream = concat(function(buffer: Uint8Array | Buffer) {
-          resolve(buffer);
-        });
-        let stream = null;
-        if (this.compressFormat === 'png') {
-          stream = canvas.createPNGStream();
-        } else {
-          stream = canvas.createJPEGStream();
-        }
-        stream.pipe(writeStream);
-      } else {
-        resolve(canvas.toDataURL('image/' + this.compressFormat));
-      }
-    });
+    return canvas.toDataURL('image/' + this.compressFormat);
   }
   /**
    * Draw a point in the context
