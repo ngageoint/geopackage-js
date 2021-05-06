@@ -1,10 +1,7 @@
-import {GeoPackage} from '../../../lib/geoPackage';
-import {GeoPackageConnection} from '../../../lib/db/geoPackageConnection'
-var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever;
-
-var path = require('path')
-  , should = require('chai').should();
-var path = require('path')
+var GeoPackage = require('../../../lib/geoPackage').GeoPackage
+  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection').GeoPackageConnection
+  , GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
+  , path = require('path')
   , should = require('chai').should();
 
 describe('Tests for issue 68', function() {

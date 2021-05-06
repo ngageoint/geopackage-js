@@ -1,4 +1,5 @@
 import { IconRow } from './iconRow';
+
 /**
  * @memberOf module:extension/style
  * @class IconCache
@@ -120,7 +121,7 @@ export class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  async createIcon(icon: IconRow): Promise<any> {
+  async createIcon(icon: IconRow): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheIcon(icon, this);
   }
   /**
@@ -129,7 +130,7 @@ export class IconCache {
    * @param {Number} scale scale factor
    * @return {Promise<Image>} icon image
    */
-  async createScaledIcon(icon: IconRow, scale: number): Promise<any> {
+  async createScaledIcon(icon: IconRow, scale: number): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, scale, this);
   }
   /**
@@ -137,7 +138,7 @@ export class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  async createIconNoCache(icon: IconRow): Promise<any> {
+  async createIconNoCache(icon: IconRow): Promise<{image: any, width: number, height: number}> {
     return this.createScaledIconNoCache(icon, 1.0);
   }
   /**
@@ -146,7 +147,7 @@ export class IconCache {
    * @param scale scale factor
    * @return {Promise<Image>} icon image
    */
-  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<any> {
+  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, scale, null);
   }
   /**
@@ -155,7 +156,7 @@ export class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<any> {
+  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, 1.0, iconCache);
   }
   /**
@@ -165,19 +166,19 @@ export class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<any> {
+  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<{image: any, width: number, height: number}> {
     let iconImage = null;
     if (icon != null) {
       const iconId = icon.id;
-      if (iconCache !== null) {
+      if (iconCache != null) {
         iconImage = iconCache.get(iconId);
       }
       const iconScaledWidth = Math.round(icon.width * scale);
       const iconScaledHeight = Math.round(icon.height * scale);
-      if (!iconImage || iconImage.width !== iconScaledWidth || iconImage.height !== iconScaledHeight) {
+      if (!iconImage || ((iconImage.width === 'function' ? iconImage.width() : iconImage.width) !== iconScaledWidth) || ((iconImage.height === 'function' ? iconImage.height() : iconImage.height) !== iconScaledHeight)) {
         iconImage = await icon.getScaledDataImage(scale);
       }
-      if (iconCache !== null) {
+      if (iconCache != null && iconImage != null) {
         iconCache.putIconForIconRow(icon, iconImage);
       }
     }

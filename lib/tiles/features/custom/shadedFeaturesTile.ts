@@ -1,6 +1,6 @@
-import { CustomFeaturesTile } from './customFeaturesTile';
 // @ts-ignore
-import concat from 'concat-stream';
+import { Canvas } from '../../../canvas/canvas'
+import { CustomFeaturesTile } from './customFeaturesTile';
 
 /**
  * Draws a tile which is shaded to indicate too many features. By default a
@@ -119,20 +119,15 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
     text: string,
     tileCanvas: null,
   ): Promise<string | Buffer | Uint8Array> {
+    await Canvas.initializeAdapter();
     return new Promise(resolve => {
       let canvas;
+      let dispose = false;
       if (tileCanvas !== undefined && tileCanvas !== null) {
         canvas = tileCanvas;
       } else {
-        if (CustomFeaturesTile.useNodeCanvas) {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const Canvas = require('canvas');
-          canvas = Canvas.createCanvas(tileWidth, tileHeight);
-        } else {
-          canvas = document.createElement('canvas');
-          canvas.width = tileWidth;
-          canvas.height = tileHeight;
-        }
+        canvas = Canvas.create(tileWidth, tileHeight);
+        dispose = true;
       }
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, tileWidth, tileHeight);
@@ -147,20 +142,11 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      if (CustomFeaturesTile.useNodeCanvas) {
-        const writeStream = concat(function(buffer: Buffer | Uint8Array) {
-          resolve(buffer);
-        });
-        let stream = null;
-        if (this.compressFormat === 'png') {
-          stream = canvas.createPNGStream();
-        } else {
-          stream = canvas.createJPEGStream();
-        }
-        stream.pipe(writeStream);
-      } else {
-        resolve(canvas.toDataURL('image/' + this.compressFormat));
+      const result = canvas.toDataURL('image/' + this.compressFormat);
+      if (dispose) {
+        Canvas.disposeCanvas(canvas);
       }
+      resolve(result);
     });
   }
 }

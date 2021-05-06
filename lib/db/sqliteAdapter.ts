@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
+import Database from 'better-sqlite3';
+
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
@@ -19,8 +21,6 @@ export class SqliteAdapter implements DBAdapter {
    */
   async initialize(): Promise<this> {
     // @ts-ignore
-    const bettersqlite = await import('better-sqlite3');
-    const Database = bettersqlite.default;
     try {
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
@@ -110,6 +110,11 @@ export class SqliteAdapter implements DBAdapter {
   getDBConnection(): any {
     return this.db;
   }
+
+  getFunctionList(): any[] {
+    return this.db.pragma('function_list');
+  }
+
   /**
    * Returns a Buffer containing the contents of the database as a file
    */

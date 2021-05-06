@@ -1,6 +1,6 @@
 
-var TileGrid = require('../../../lib/tiles/tileGrid').TileGrid
-  , should = require('chai').should();
+var TileGrid = require('../../../lib/tiles/tileGrid').TileGrid;
+require('chai').should();
 
 describe('TileGrid tests', function() {
 

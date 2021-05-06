@@ -1,7 +1,5 @@
-var polyfill = require('babel-polyfill');
-
 require('chai').should();
-
+require('./fixtures/testUtils');
 require('./lib/db/table/testConstraintParser');
 require('./lib/core/contents/testContents');
 require('./lib/core/srs/testSpatialReferenceSystem');
@@ -15,6 +13,7 @@ require('./lib/geom/testGeometryData');
 require('./lib/metadata/reference/testMetadataReference.js');
 require('./lib/metadata/testMetadata');
 require('./lib/tiles/testGeopackageTileRetriever');
+require('./lib/canvas/testCanvas');
 require('./lib/tiles/testTileBoundingBoxUtils');
 require('./lib/tiles/testTileDao');
 require('./lib/tiles/testTileGrid');
@@ -24,7 +23,6 @@ require('./lib/user/testUserTableReader');
 require('./lib/validate/testGeoPackageValidate');
 require('./lib/wkb/testWkb');
 require('./lib/testBoundingBox');
-require('./lib/wkb/testWkb');
 require('./lib/testFeatureCreate');
 require('./lib/testGeoPackage');
 require('./lib/testGeoPackageCreate');

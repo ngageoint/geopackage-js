@@ -15,7 +15,6 @@ var GeoPackageExtensions = require('../../../lib/extension/geoPackageExtensions'
   , RTreeIndex = require('../../../lib/extension/rtree/rtreeIndex').RTreeIndex
   , FeatureTableIndex = require('../../../lib/extension/index/featureTableIndex').FeatureTableIndex
   , MetadataExtension = require('../../../lib/extension/metadata').MetadataExtension
-  , GeoPackageAPI = require('../../../lib/api').GeoPackageAPI
   , should = require('chai').should()
   , expect = require('chai').expect
   , wkx = require('wkx')

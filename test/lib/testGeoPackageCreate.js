@@ -1,16 +1,10 @@
-
 import { default as testSetup } from '../fixtures/testSetup'
 
-var GeoPackageConnection = require('../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../lib/geoPackage')
-  , Verification = require('../fixtures/verification')
+var Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable').TileTable
   , GeometryType = require('../../lib/features/user/geometryType').GeometryType
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
-  , should = require('chai').should()
-  , wkx = require('wkx')
-  , wkb = require('../../lib/wkb').WKB
-  , path = require('path');
+  , should = require('chai').should();
 
 describe('GeoPackage create tests', function() {
 

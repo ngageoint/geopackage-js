@@ -1,17 +1,13 @@
-
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 import {UserMappingTable} from '../../../../lib/extension/relatedTables/userMappingTable';
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , path = require('path');
 
 describe('Related Attributes tests', function() {
-
   var testGeoPackage;
   var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
   var geoPackage;

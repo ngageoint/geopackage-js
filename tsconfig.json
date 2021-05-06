@@ -11,7 +11,7 @@
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
-      "outDir": "built",
+      "outDir": "dist/browser",
       "downlevelIteration": true,
       "noEmit": false,
       "noImplicitAny": false,
@@ -26,7 +26,7 @@
   ],
   "exclude": [
       "./lib/wkb",
-      "built/**/*",
+      "dist/**/*",
       "./test"
   ]
 }

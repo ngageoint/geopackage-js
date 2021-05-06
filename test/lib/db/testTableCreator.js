@@ -1,11 +1,9 @@
-
 import { default as testSetup } from '../../fixtures/testSetup'
-import { TableCreator } from '../../../lib/db/tableCreator'
 
 var TileTable = require('../../../lib/tiles/user/tileTable').TileTable
+  , TableCreator = require('../../../lib/db/tableCreator').TableCreator
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
-  , wkb = require('../../../lib/wkb/index').WKB
   , should = require('chai').should()
   , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
   , path = require('path');

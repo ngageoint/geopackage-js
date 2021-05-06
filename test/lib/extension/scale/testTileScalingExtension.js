@@ -7,6 +7,7 @@ var GeoPackageTileRetriever = require('../../../../lib/tiles/retriever').GeoPack
   , path = require('path');
 
 var isLinux = process.platform === 'linux';
+var isWeb = !(typeof(process) !== 'undefined' && process.version);
 
 describe('GeoPackage Tile Scaling Extension Tests', function() {
 
@@ -39,9 +40,13 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(13683,24889,16)
         .then(function(tile) {
-          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','16','13683', isLinux ? '24889_linux.png' : '24889.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','16','13683', isWeb ? 'web' : '', isLinux ? '24889_linux.png' : '24889.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -162,9 +167,13 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
       gpr.setScaling(tileScalingDao.queryForTableName('denver'));
       gpr.getTile(27366, 49778,17)
         .then(function(tile) {
-          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','17','27366', isLinux ? '49778_linux.png' : '49778.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','17','27366', isWeb ? 'web' : '', isLinux ? '49778_linux.png' : '49778.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -178,9 +187,13 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
       gpr.setScaling(tileScalingDao.queryForTableName('denver'));
       gpr.getTile(6841, 12444,15)
         .then(function(tile) {
-          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','15','6841', isLinux ? '12444_linux.png' : '12444.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+          testSetup.diffImages(tile, path.join(__dirname, '..','..','..','fixtures','tiles','15','6841', isWeb ? 'web' : '', isLinux ? '12444_linux.png' : '12444.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });

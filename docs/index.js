@@ -30,8 +30,9 @@ window._ = _;
 require('leaflet-mapkey-icon');
 require('leaflet-basemaps');
 
-const gp = require('@ngageoint/geopackage');
+const gp = require('@ngageoint/geopackage/dist/browser/index.min');
+gp.setSqljsWasmLocateFile(filename => `/public/${filename}`);
 console.log('gp is', gp);
 window.GeoPackage = gp;
-window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage').GeoJSONToGeoPackage;
-window.KMLToGeoPackage = require('@ngageoint/kml-to-geopackage').KMLToGeoPackage;
+// window.GeoJSONToGeoPackage = require('@ngageoint/geojson-to-geopackage').GeoJSONToGeoPackage;
+// window.KMLToGeoPackage = require('@ngageoint/kml-to-geopackage').KMLToGeoPackage;

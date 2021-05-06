@@ -51,12 +51,12 @@ const map = L.map('map', {
 
 map.addControl(new L.Control.ZoomIndicator());
 
-const defs = window.GeoPackage.proj4Defs;
-for (const name in defs) {
-  if (defs[name]) {
-    window.proj4.defs(name, defs[name]);
-  }
-}
+// const defs = window.GeoPackage.proj4Defs;
+// for (const name in defs) {
+//   if (defs[name]) {
+//     window.proj4.defs(name, defs[name]);
+//   }
+// }
 
 const osm = L.tileLayer('https://osm-{s}.gs.mil/tiles/default/{z}/{x}/{y}.png', {
   subdomains: '1234',
@@ -649,30 +649,22 @@ window.toggleLayer = function(layerType, table) {
           .find('span')
           .html(message);
       })
-      .then(function(indexed) {
+      .then(function() {
         const tableLayer = new L.GridLayer({ noWrap: true, pane: 'overlayPane' });
+        const featureDao = geoPackage.getFeatureDao(table);
+        const ft = new window.GeoPackage.FeatureTiles(featureDao, 256, 256);
+        ft.maxFeaturesPerTile = 10000;
+        ft.maxFeaturesTileDraw = new window.GeoPackage.NumberFeaturesTile();
+
         tableLayer.createTile = function(tilePoint, done) {
           const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
-          const size = this.getTileSize();
-          canvas.width = size.x;
-          canvas.height = size.y;
+          canvas.width = 256;
+          canvas.height = 256;
+          if (!featureDao) return;
+          ft.drawTile(tilePoint.x, tilePoint.y, tilePoint.z, canvas).then(() => {
+            done(null, canvas);
+          });
 
-          setTimeout(function() {
-            console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-
-            const width = size.x;
-            const height = size.y;
-            const featureDao = geoPackage.getFeatureDao(table);
-            if (!featureDao) return;
-            const ft = new window.GeoPackage.FeatureTiles(featureDao, width, height);
-            ft.maxFeaturesPerTile = 10000;
-            const numberFeaturesTile = new window.GeoPackage.NumberFeaturesTile();
-            ft.maxFeaturesTileDraw = numberFeaturesTile;
-            ft.drawTile(tilePoint.x, tilePoint.y, tilePoint.z, canvas).then(() => {
-              console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-              done(null, canvas);
-            });
-          }, 0);
           return canvas;
         };
         map.addLayer(tableLayer);

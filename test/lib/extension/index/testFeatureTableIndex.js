@@ -1,15 +1,9 @@
-
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex';
 
 
-var GeoPackage = require('../../../../lib/geoPackage')
+var FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex').FeatureTableIndex
   , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
-  , Verification = require('../../../fixtures/verification')
-  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
-  , fs = require('fs-extra')
   , path = require('path');
 
 describe('GeoPackage Feature Table Index Extension tests', function() {

@@ -8,7 +8,6 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import pointDistance from '@turf/distance';
 import * as helpers from '@turf/helpers';
 import proj4 from 'proj4';
-import * as defs from './proj4Defs';
 import { Feature, FeatureCollection, Geometry, LineString, MultiPolygon, Point, Polygon } from 'geojson';
 
 import { GeometryData } from './geom/geometryData';
@@ -101,13 +100,6 @@ export interface ClosestFeature {
   gp_table: string;
   gp_name: string;
   distance?: number;
-}
-
-const anyDefs = defs as any;
-for (const def in anyDefs) {
-  if (anyDefs[def]) {
-    proj4.defs(def, anyDefs[def]);
-  }
 }
 
 /**
@@ -1034,7 +1026,12 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = 256,
   ): TileMatrixSet {
-    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
+    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857);
+    if (!webMercator) {
+      this.spatialReferenceSystemDao.createWebMercator();
+      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857);
+    }
+    const webMercatorSrsId = webMercator.srs_id;
 
     if (contentsSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
@@ -2169,19 +2166,19 @@ export class GeoPackage {
     return info;
   }
 
-  static loadProjections(items: string[]): void {
+  static loadProjections(items: {name: string, definition: string}[]): void {
     if (!items) throw new Error('Invalid array of projections');
     for (let i = 0; i < items.length; i++) {
-      if (!anyDefs[items[i]]) throw new Error('Projection not found');
-      this.addProjection(items[i], anyDefs[items[i]]);
+      if (!items[i] || !items[i].name || !items[i].definition) throw new Error('Invalid projection in array. Valid projection {name: string, definition: string}.');
+      this.addProjection(items[i].name, items[i].definition);
     }
   }
   static addProjection(name: string, definition: string): void {
     if (!name || !definition) throw new Error('Invalid projection name/definition');
-    proj4.defs('' + name, '' + definition);
+    proj4.defs(name, definition);
   }
   static hasProjection(name: string): proj4.ProjectionDefinition {
-    return proj4.defs('' + name);
+    return proj4.defs(name);
   }
 
   renameTable (tableName, newTableName) {

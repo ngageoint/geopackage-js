@@ -1,7 +1,7 @@
 import { GeoPackage } from './geoPackage';
 import { GeoPackageConnection } from './db/geoPackageConnection';
 import { GeoPackageValidate } from './validate/geoPackageValidate';
-
+import { Canvas } from './canvas/canvas';
 import path from 'path';
 import fs from 'fs';
 
@@ -28,6 +28,7 @@ export class GeoPackageAPI {
       throw new Error('Invalid GeoPackage - Invalid GeoPackage Extension');
     }
     const connection = await GeoPackageConnection.connect(gppathOrByteArray);
+    await Canvas.initializeAdapter();
     let geoPackage;
     if (gppathOrByteArray && typeof gppathOrByteArray === 'string') {
       geoPackage = new GeoPackage(path.basename(gppathOrByteArray), gppathOrByteArray, connection);
@@ -60,6 +61,7 @@ export class GeoPackageAPI {
     }
 
     const connection = await GeoPackageConnection.connect(gppath);
+    await Canvas.initializeAdapter();
     connection.setApplicationId();
     let geopackage: GeoPackage;
     if (gppath) {

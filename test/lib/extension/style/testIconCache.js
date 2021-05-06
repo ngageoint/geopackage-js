@@ -1,14 +1,13 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
+import {Canvas} from "../../../../lib/canvas/canvas";
 
 var FeatureTableStyles = require('../../../../lib/extension/style/featureTableStyles').FeatureTableStyles
   , IconCache = require('../../../../lib/extension/style/iconCache').IconCache
-  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
-  // , GeoPackageAPI = require('../../../../lib/api')
-  // @ts-ignore
-  , fs = require('fs-extra');
+  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils;
+
+var isWeb = !(typeof(process) !== 'undefined' && process.version);
 
 describe('IconCache Tests', function() {
   var testGeoPackage;
@@ -36,34 +35,20 @@ describe('IconCache Tests', function() {
   var compareImages = function (imageA, imageB) {
     return new Promise(function(resolve) {
       var actualCanvas, actualCtx, expectedCanvas, expectedCtx;
-      if (typeof(process) !== 'undefined' && process.version) {
-        var Canvas = require('canvas');
-        actualCanvas = Canvas.createCanvas(imageA.width, imageA.height);
-        actualCtx = actualCanvas.getContext('2d');
-        expectedCanvas = Canvas.createCanvas(imageB.width, imageB.height);
-        expectedCtx = expectedCanvas.getContext('2d');
-      } else {
-        actualCanvas = document.getElementById('canvas');
-        // @ts-ignore
-        actualCanvas.width = imageA.width;
-        // @ts-ignore
-        actualCanvas.height = imageA.height;
-        // @ts-ignore
-        actualCtx = actualCanvas.getContext('2d');
-        expectedCanvas = document.getElementById('canvas');
-        // @ts-ignore
-        expectedCanvas.width = imageB.width;
-        // @ts-ignore
-        expectedCanvas.height = imageB.height;
-        // @ts-ignore
-        expectedCtx = expectedCanvas.getContext('2d');
-      }
-      actualCtx.drawImage(imageA, 0, 0);
-      expectedCtx.drawImage(imageB, 0, 0);
+      actualCanvas = Canvas.create(imageA.width, imageA.height);
+      actualCtx = actualCanvas.getContext('2d');
+      expectedCanvas = Canvas.create(imageB.width, imageB.height);
+      expectedCtx = expectedCanvas.getContext('2d');
+      actualCtx.drawImage(imageA.image, 0, 0);
+      expectedCtx.drawImage(imageB.image, 0, 0);
+
       // @ts-ignore
-      resolve(actualCanvas.toDataURL() === expectedCanvas.toDataURL());
+      const result = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
+      Canvas.disposeCanvas(actualCanvas);
+      Canvas.disposeCanvas(expectedCanvas);
+      resolve(result);
     });
-  }
+  };
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
@@ -187,18 +172,18 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.id = 0;
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
+    should.not.exist(iconCache.getIconForIconRow(iconRow));
     var result = await compareImages(expectedImage, image);
     result.should.be.equal(true);
-    should.not.exist(iconCache.getIconForIconRow(iconRow));
   }));
 
   it('should create scaled icon and cache it', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.id = 0;
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIcon(iconRow, 2.0);
     var result = await compareImages(expectedImage, image);
     result.should.be.equal(true);
@@ -210,7 +195,7 @@ describe('IconCache Tests', function() {
     var iconRow = randomIcon(featureTableStyles);
     iconRow.id = 0;
     iconCache.putIconForIconRow(iconRow, iconImage);
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point_2x.png'));
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIcon(iconRow, 2.0);
     var result = await compareImages(expectedImage, image);
     result.should.be.equal(true);

@@ -1,15 +1,15 @@
 // @ts-ignore
-import concat from 'concat-stream';
-
 import { ImageUtils } from '../imageUtils';
 import { TileCreator } from './tileCreator';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { BoundingBox } from '../../boundingBox';
+import { Canvas } from '../../canvas/canvas';
 
 export class NodeTileCreator extends TileCreator {
   canvas: any;
+  dispose: boolean = false;
   pixelAdded: boolean;
   Canvas: any;
   ctx: any;
@@ -32,18 +32,17 @@ export class NodeTileCreator extends TileCreator {
     this.pixelAdded = false;
   }
   async initialize(): Promise<NodeTileCreator> {
-    this.Canvas = await import('canvas');
-    this.canvas = this.canvas || this.Canvas.createCanvas(this.width, this.height);
+    await Canvas.initializeAdapter();
+    if (this.canvas == null) {
+      this.canvas = Canvas.create(this.width, this.height);
+      this.dispose = true;
+    }
     this.ctx = this.canvas.getContext('2d');
-    this.tileCanvas = this.Canvas.createCanvas(this.width, this.height);
+    this.tileCanvas = Canvas.create(this.tileMatrix.tile_width, this.tileMatrix.tile_height);
     this.tileContext = this.tileCanvas.getContext('2d');
     this.tileCanvas.width = this.tileMatrix.tile_width;
     this.tileCanvas.height = this.tileMatrix.tile_height;
-    this.imageData = this.Canvas.createImageData(
-      new Uint8ClampedArray(this.width * this.height * 4),
-      this.width,
-      this.height,
-    );
+    this.imageData = Canvas.createImageData(this.width, this.height);
     return this;
   }
   addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number): void {
@@ -54,7 +53,7 @@ export class NodeTileCreator extends TileCreator {
   async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
     const tile = await ImageUtils.getImage(tileData);
     this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
-    this.tileContext.drawImage(tile, 0, 0);
+    this.tileContext.drawImage(tile.image, 0, 0);
     this.chunks = [];
     await this.projectTile(tileData, gridColumn, gridRow);
     if (this.pixelAdded) {
@@ -64,23 +63,18 @@ export class NodeTileCreator extends TileCreator {
       for (let i = 0; i < this.chunks.length; i++) {
         const image = await ImageUtils.getImage(tileData);
         const p = this.chunks[i].position;
-        this.ctx.drawImage(image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
+        this.ctx.drawImage(image.image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
       }
     }
     return this.canvas;
   }
-  async getCompleteTile(format?: string): Promise<Buffer> {
-    return new Promise(resolve => {
-      const writeStream = concat(function(buffer: Buffer) {
-        resolve(buffer);
-      });
-      let stream = null;
-      if (format === 'png') {
-        stream = this.canvas.createPNGStream();
-      } else {
-        stream = this.canvas.createJPEGStream();
-      }
-      stream.pipe(writeStream);
-    });
+  async getCompleteTile(): Promise<any> {
+    return this.canvas.toDataURL();
+  }
+  cleanup () {
+    if (this.dispose) {
+      Canvas.disposeCanvas(this.canvas);
+    }
+    Canvas.disposeCanvas(this.tileCanvas);
   }
 }

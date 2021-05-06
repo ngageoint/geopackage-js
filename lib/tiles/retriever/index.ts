@@ -158,8 +158,9 @@ export class GeoPackageTileRetriever {
         }
       }
       if (!canvas && tileFound) {
-        tile = creator.getCompleteTile('png');
+        tile = creator.getCompleteTile();
       }
+      creator.cleanup();
     }
     return tile;
   }

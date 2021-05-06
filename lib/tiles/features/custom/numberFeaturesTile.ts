@@ -1,7 +1,6 @@
-import { CustomFeaturesTile } from './customFeaturesTile';
 // @ts-ignore
-import concat from 'concat-stream';
-import path from 'path';
+import { Canvas } from '../../../canvas/canvas';
+import { CustomFeaturesTile } from './customFeaturesTile';
 
 /**
  * Draws a tile indicating the number of features that exist within the tile,
@@ -23,7 +22,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
   constructor() {
     super();
     this.textSize = 18;
-    this.textFont = 'PT Mono';
+    this.textFont = 'Noto Mono';
     this.textColor = 'rgba(255, 255, 255, 1.0)';
     this.circleStrokeWidth = 3;
     this.circleBorderColor = 'rgba(0, 0, 0, 0.25)';
@@ -31,22 +30,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
     this.circlePaddingPercentage = 0.25;
     this.defaultFontRegistered = false;
   }
-  /**
-   * register a font
-   * @private
-   */
-  _registerDefaultFont(): void {
-    if (!this.defaultFontRegistered) {
-      if (CustomFeaturesTile.useNodeCanvas) {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const Canvas = require('canvas');
-        Canvas.registerFont(path.join(__dirname, '..', '..', '..', 'fonts', 'PTMono-Regular.ttf'), {
-          family: 'PT Mono',
-        });
-      }
-      this.defaultFontRegistered = true;
-    }
-  }
+
   /**
    * Get the text size
    * @return {Number} text size
@@ -243,21 +227,15 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
     tileCanvas: null,
   ): Promise<string | Buffer | Uint8Array> {
     // eslint-disable-next-line complexity
+    await Canvas.initializeAdapter();
     return new Promise(resolve => {
-      this._registerDefaultFont();
       let canvas;
+      let dispose = false;
       if (tileCanvas !== undefined && tileCanvas !== null) {
         canvas = tileCanvas;
       } else {
-        if (CustomFeaturesTile.useNodeCanvas) {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          const Canvas = require('canvas');
-          canvas = Canvas.createCanvas(tileWidth, tileHeight);
-        } else {
-          canvas = document.createElement('canvas');
-          canvas.width = tileWidth;
-          canvas.height = tileHeight;
-        }
+        canvas = Canvas.create(tileWidth, tileHeight);
+        dispose = true;
       }
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, tileWidth, tileHeight);
@@ -272,9 +250,7 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      context.font = this.textSize + "px '" + this.textFont + "'";
-      const textSize = context.measureText(text);
-      const textWidth = textSize.width;
+      const textWidth = Canvas.measureText(context, this.textFont, this.textSize, text);
       const textHeight = this.textSize;
       // Determine the center of the tile
       const centerX = Math.round(tileWidth / 2.0);
@@ -302,26 +278,14 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
           context.stroke();
         }
       }
-      // Draw the text
-      const textX = centerX - Math.round(textWidth / 2.0);
-      const textY = centerY;
-      context.fillStyle = this.textColor;
-      context.textBaseline = 'middle';
-      context.fillText(text, textX, textY);
-      if (CustomFeaturesTile.useNodeCanvas) {
-        const writeStream = concat(function(buffer: Buffer | Uint8Array) {
-          resolve(buffer);
-        });
-        let stream = null;
-        if (this.compressFormat === 'png') {
-          stream = canvas.createPNGStream();
-        } else {
-          stream = canvas.createJPEGStream();
-        }
-        stream.pipe(writeStream);
-      } else {
-        resolve(canvas.toDataURL('image/' + this.compressFormat));
+
+      Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
+
+      const result = canvas.toDataURL('image/' + this.compressFormat);
+      if (dispose) {
+        Canvas.disposeCanvas(canvas);
       }
+      resolve(result);
     });
   }
 }

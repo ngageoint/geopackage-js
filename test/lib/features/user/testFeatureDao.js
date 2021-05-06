@@ -1,9 +1,6 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-// @ts-ignore
-// @ts-ignore
-var FeatureDao = require('../../../../lib/features/user/featureDao').FeatureDao
-  , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
+var FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
@@ -13,9 +10,6 @@ var FeatureDao = require('../../../../lib/features/user/featureDao').FeatureDao
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
   , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
   , wkx = require('wkx')
-  // @ts-ignore
-  // @ts-ignore
-  , fs = require('fs-extra')
   , helpers = require('@turf/helpers')
   , path = require('path')
   , should = require('chai').should();
@@ -304,6 +298,9 @@ describe('FeatureDao tests', function() {
     var tileBuffer;
 
     afterEach('should delete the geopackage', async function() {
+      try {
+        geopackage.close();
+      } catch (e) {}
       await testSetup.deleteGeoPackage(testGeoPackage);
     });
 
@@ -317,13 +314,12 @@ describe('FeatureDao tests', function() {
       geopackage = await testSetup.createGeoPackage(testGeoPackage)
 
       // @ts-ignore
-      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.GEOMETRYCOLLECTION);
+      var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.GEOMETRY);
 
       var columns = [];
 
       columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
-      // @ts-ignore
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
+      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.GEOMETRY, false, null));
       columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
       columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
       columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
@@ -398,26 +394,6 @@ describe('FeatureDao tests', function() {
         ]
       };
 
-      // @ts-ignore
-      // @ts-ignore
-      var line2 = {
-        "type": "Feature",
-        "properties": {},
-        "geometry": {
-          "type": "LineString",
-          "coordinates": [
-            [
-              2.0,
-              2.5
-            ],
-            [
-              -0.5,
-              0
-            ]
-          ]
-        }
-      };
-
       var point = {
         "type": "Point",
         "coordinates": [
@@ -446,7 +422,7 @@ describe('FeatureDao tests', function() {
         featureRow.setValueWithColumnName('_feature_id', name);
         featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
         return featureDao.create(featureRow);
-      }
+      };
       // create the features
       // Two intersecting boxes with a line going through the intersection and a point on the line
       // ---------- / 3
@@ -456,7 +432,7 @@ describe('FeatureDao tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      geopackage.createFeatureTable('QueryTest', geometryColumns, columns)
+      geopackage.createFeatureTable('QueryTest', geometryColumns, columns);
       var featureDao = geopackage.getFeatureDao('QueryTest');
       queryTestFeatureDao = featureDao;
       createRow(box1, 'box1', featureDao);
@@ -464,7 +440,7 @@ describe('FeatureDao tests', function() {
       createRow(line, 'line', featureDao);
       createRow(point, 'point', featureDao);
       createRow(point2, 'point2', featureDao);
-      await featureDao.featureTableIndex.index()
+      await featureDao.featureTableIndex.index();
     });
 
     it('should update a shape', function() {

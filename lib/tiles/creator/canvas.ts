@@ -5,17 +5,19 @@ import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 
 import fileType from 'file-type';
 import { TileCreator } from './tileCreator';
-import TileUtilities from './tileUtilities';
+import { TileUtilities } from './tileUtilities';
 import ProjectTile from './projectTile';
 import { BoundingBox } from '../../boundingBox';
+import { Canvas } from '../../canvas/canvas';
 
 export class CanvasTileCreator extends TileCreator {
-  canvas: HTMLCanvasElement;
+  canvas: any;
+  dispose: boolean = false;
   ctx: any;
-  image: HTMLImageElement;
-  tileCanvas: HTMLCanvasElement;
+  image: any;
+  tileCanvas: any;
   tileContext: any;
-  imageData: Uint8ClampedArray;
+  imageData: any;
   constructor(
     width: number,
     height: number,
@@ -27,26 +29,27 @@ export class CanvasTileCreator extends TileCreator {
     canvas?: any,
   ) {
     super(width, height, tileMatrix, tileMatrixSet, tileBoundingBox, srs, projectionTo);
+    this.canvas = canvas;
+  }
+  async initialize(): Promise<CanvasTileCreator> {
+    await Canvas.initializeAdapter();
     // eslint-disable-next-line no-undef
-    this.canvas = canvas || document.createElement('canvas');
-    this.canvas.width = width;
-    this.canvas.height = height;
+    if (this.canvas == null) {
+      this.canvas = Canvas.create(this.width, this.height);
+      this.dispose = true;
+    }
     this.ctx = this.canvas.getContext('2d');
     // eslint-disable-next-line no-undef
     this.image = document.createElement('img');
     // eslint-disable-next-line no-undef
-    this.tileCanvas = document.createElement('canvas');
+    this.tileCanvas = Canvas.create(this.tileMatrix.tile_width, this.tileMatrix.tile_height);
     this.tileContext = this.tileCanvas.getContext('2d');
-    this.tileCanvas.width = tileMatrix.tile_width;
-    this.tileCanvas.height = tileMatrix.tile_height;
-    this.imageData = new Uint8ClampedArray(width * height * 4);
-  }
-  async initialize(): Promise<CanvasTileCreator> {
+    this.imageData = Canvas.createImageData(this.width, this.height);
     return this;
   }
   addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number): void {
     const color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
-    this.imageData.set(color.data, targetY * this.width * 4 + targetX * 4);
+    this.imageData.data.set(color.data, targetY * this.width * 4 + targetX * 4);
   }
   async loadImage(tileData: any): Promise<any> {
     const type = fileType(tileData);
@@ -61,7 +64,8 @@ export class CanvasTileCreator extends TileCreator {
     return new Promise((resolve: Function) => {
       this.image.onload = (): void => {
         this.tileContext.clearRect(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height);
-        resolve(this.tileContext.drawImage(this.image, 0, 0));
+        this.tileContext.drawImage(this.image, 0, 0)
+        resolve();
       };
       this.image.src = 'data:' + type.mime + ';base64,' + base64Data;
     });
@@ -102,8 +106,7 @@ export class CanvasTileCreator extends TileCreator {
   }
   async reproject(tileData: any, tilePieceBoundingBox: any): Promise<void> {
     if (window.Worker) {
-      const ctx = this.ctx;
-      const piecePosition = TileUtilities.getPiecePosition(
+      TileUtilities.getPiecePosition(
         tilePieceBoundingBox,
         this.tileBoundingBox,
         this.height,
@@ -140,11 +143,10 @@ export class CanvasTileCreator extends TileCreator {
           const work = require('webworkify');
           const worker = work(require('./tileWorker.js'));
           worker.onmessage = (e: { data: any }): void => {
-            const tmpCanvas = document.createElement('canvas');
-            tmpCanvas.width = this.width;
-            tmpCanvas.height = this.height;
+            const tmpCanvas = Canvas.create(this.width, this.height);
             tmpCanvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(e.data), this.height, this.width), 0, 0);
             this.canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
+            Canvas.disposeCanvas(tmpCanvas);
             resolve();
           };
           worker.postMessage(job, [
@@ -153,18 +155,23 @@ export class CanvasTileCreator extends TileCreator {
         } catch (e) {
           const worker = ProjectTile;
           const data = worker(job);
-          const tmpCanvas = document.createElement('canvas');
-          tmpCanvas.width = this.width;
-          tmpCanvas.height = this.height;
+          const tmpCanvas = Canvas.create(this.width, this.height);
           tmpCanvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(data), this.height, this.width), 0, 0);
           this.canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
+          Canvas.disposeCanvas(tmpCanvas);
           resolve();
         }
       });
     } else {
       console.log('No web worker');
       await super.reproject(tileData, tilePieceBoundingBox);
-      this.canvas.getContext('2d').putImageData(new ImageData(this.imageData, this.height, this.width), 0, 0);
+      this.canvas.getContext('2d').putImageData(new ImageData(this.imageData.data, this.height, this.width), 0, 0);
     }
+  }
+  cleanup () {
+    if (this.dispose) {
+      Canvas.disposeCanvas(this.canvas);
+    }
+    Canvas.disposeCanvas(this.tileCanvas);
   }
 }

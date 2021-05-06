@@ -1,4 +1,3 @@
-
 import { default as testSetup } from '../fixtures/testSetup'
 
 const

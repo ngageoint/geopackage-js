@@ -1,17 +1,6 @@
-import { SqliteAdapter } from './sqliteAdapter';
-import { SqljsAdapter } from './sqljsAdapter';
+import { Db } from './db';
 import { DBAdapter } from './dbAdapter';
 import { GeoPackageConstants } from '../geoPackageConstants';
-/**
- * Connection to the SQLite file
- * @module db/geoPackageConnection
- */
-
-if (typeof process !== 'undefined' && process.version && !process.env.FORCE_SQLJS) {
-  console.log('Better SQLite');
-} else {
-  console.log('SQL.js');
-}
 
 /**
  * Represents a connection to the GeoPackage database
@@ -19,31 +8,24 @@ if (typeof process !== 'undefined' && process.version && !process.env.FORCE_SQLJ
 export class GeoPackageConnection {
   filePath: string | Buffer | Uint8Array | undefined;
   adapter: DBAdapter;
-  adapterCreator: typeof SqliteAdapter | typeof SqljsAdapter;
+  registeredFunctions: string[];
   /**
    * Construct a new connection to the GeoPackage SQLite file
    * @param filePath path to the sqlite file
    */
   constructor(filePath: string | Buffer | Uint8Array | undefined) {
     this.filePath = filePath;
+    this.registeredFunctions = [];
   }
   /**
    * Creates a connection to the SQLite file and when connected, returns a promise that resolves the connection.
-   * This will create a {module:db/sqliteAdapter~Adapter} if running in node and the FORCE_SQLJS environment variable is not set.
-   * This will create a {module:db/sqljsAdapter~Adapter} if running in the browser or the FORCE_SQLJS environment variable is set
+   * This will create a {module:db/sqliteAdapter~Adapter} if running in node.
+   * This will create a {module:db/sqljsAdapter~Adapter} if running in the browser
    * @return {Promise<GeoPackageConnection>}
    */
   async init(): Promise<GeoPackageConnection> {
     try {
-      if (typeof process !== 'undefined' && process.version && !process.env.FORCE_SQLJS) {
-        const { SqliteAdapter } = await import('./sqliteAdapter');
-        this.adapterCreator = SqliteAdapter;
-        this.adapter = new SqliteAdapter(this.filePath);
-      } else {
-        const { SqljsAdapter } = await import('./sqljsAdapter');
-        this.adapterCreator = SqljsAdapter;
-        this.adapter = new SqljsAdapter(this.filePath);
-      }
+      this.adapter = Db.create(this.filePath);
       await this.adapter.initialize();
     } catch (e) {
       console.log('Failed to create adapter', e);
@@ -81,17 +63,20 @@ export class GeoPackageConnection {
    * @param  {any} db database to connect to
    */
   setDBConnection(db: any): void {
-    this.adapter = new this.adapterCreator();
+    this.adapter = Db.create();
     this.adapter.db = db;
   }
   /**
    * Registers the given function so that it can be used by SQL statements
-   * @param  {string} name               name of function to register
+   * @param  {string} name name of function to register
    * @param  {Function} functionDefinition function to register
    * @return {DBAdapter} the adapter in use
    */
   registerFunction(name: string, functionDefinition: Function): DBAdapter {
-    this.adapter.registerFunction(name, functionDefinition);
+    if (this.registeredFunctions.indexOf(name) === -1) {
+      this.registeredFunctions.push(name);
+      this.adapter.registerFunction(name, functionDefinition);
+    }
     return this.adapter;
   }
   /**

@@ -7,10 +7,12 @@ import { Feature, Polygon } from 'geojson';
  * @class BoundingBox
  */
 export class BoundingBox {
-  minLongitude: number;
-  maxLongitude: number;
-  minLatitude: number;
-  maxLatitude: number;
+  _minLongitude: number;
+  _maxLongitude: number;
+  _minLatitude: number;
+  _maxLatitude: number;
+  _width: number;
+  _height: number;
   /**
    * @param  {BoundingBox | Number} minLongitudeOrBoundingBox minimum longitude or bounding box to copy (west)
    * @param  {Number} [maxLongitude]              maximum longitude (east)
@@ -25,11 +27,10 @@ export class BoundingBox {
   ) {
     // if there is a second argument the first argument is the minLongitude
     if (minLongitudeOrBoundingBox instanceof BoundingBox) {
-      const boundingBox = minLongitudeOrBoundingBox;
-      this.minLongitude = boundingBox.minLongitude;
-      this.maxLongitude = boundingBox.maxLongitude;
-      this.minLatitude = boundingBox.minLatitude;
-      this.maxLatitude = boundingBox.maxLatitude;
+      this.minLongitude = minLongitudeOrBoundingBox.minLongitude;
+      this.maxLongitude = minLongitudeOrBoundingBox.maxLongitude;
+      this.minLatitude = minLongitudeOrBoundingBox.minLatitude;
+      this.maxLatitude = minLongitudeOrBoundingBox.maxLatitude;
     } else {
       this.minLongitude = minLongitudeOrBoundingBox;
       this.maxLongitude = maxLongitude;
@@ -37,6 +38,60 @@ export class BoundingBox {
       this.maxLatitude = maxLatitude;
     }
   }
+
+  get minLongitude (): number {
+    return this._minLongitude
+  }
+
+  set minLongitude (longitude: number) {
+    this._minLongitude = longitude;
+    this.width = this.maxLongitude - this.minLongitude;
+  }
+
+  get maxLongitude (): number {
+    return this._maxLongitude
+  }
+
+  set maxLongitude (longitude: number) {
+    this._maxLongitude = longitude;
+    this.width = this.maxLongitude - this.minLongitude;
+  }
+
+  get minLatitude (): number {
+    return this._minLatitude
+  }
+
+  set minLatitude (latitude: number) {
+    this._minLatitude = latitude;
+    this.height = this.maxLatitude - this.minLatitude;
+  }
+
+  get maxLatitude (): number {
+    return this._maxLatitude
+  }
+
+  set maxLatitude (latitude: number) {
+    this._maxLatitude = latitude;
+    this.height = this.maxLatitude - this.minLatitude;
+  }
+
+  get width (): number {
+    return this._width
+  }
+
+  set width (width: number) {
+    this._width = width;
+  }
+
+  get height (): number {
+    return this._height
+  }
+
+  set height (height: number) {
+    this._height = height;
+  }
+
+
   /**
    * Build a Geometry Envelope from the bounding box
    *
@@ -101,12 +156,7 @@ export class BoundingBox {
    */
   projectBoundingBox(from?: string | proj4.Converter, to?: string | proj4.Converter): BoundingBox {
     if (from && from !== 'undefined' && to && to !== 'undefined') {
-      if (
-        !this.isConverter(to) &&
-        to.toUpperCase() === 'EPSG:3857' &&
-        !this.isConverter(from) &&
-        from.toUpperCase() === 'EPSG:4326'
-      ) {
+      if (!this.isConverter(to) && to.toUpperCase() === 'EPSG:3857' && !this.isConverter(from) && from.toUpperCase() === 'EPSG:4326') {
         this.maxLatitude = Math.min(this.maxLatitude, 85.0511);
         this.minLatitude = Math.max(this.minLatitude, -85.0511);
         this.minLongitude = Math.max(this.minLongitude, -180.0);
@@ -125,18 +175,18 @@ export class BoundingBox {
       } else {
         fromConverter = proj4(from);
       }
+
       const sw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.minLatitude]));
       const ne = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.maxLatitude]));
       const se = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.minLatitude]));
       const nw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.maxLatitude]));
 
-      const projected = new BoundingBox(
+      return new BoundingBox(
         Math.min(sw[0], nw[0]),
         Math.max(ne[0], se[0]),
         Math.min(sw[1], se[1]),
         Math.max(ne[1], se[1]),
       );
-      return projected;
     }
     return this;
   }

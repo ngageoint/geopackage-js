@@ -53,14 +53,12 @@ export class SpatialReferenceSystem {
    */
   get projection(): proj4.Converter {
     if (this.organization === 'NONE') return null;
-    if (this.organization_coordsys_id === 4326 && (this.organization === 'EPSG' || this.organization === 'epsg')) {
-      return proj4('EPSG:4326');
+    if (!!this.organization && this.organization.toUpperCase() === 'EPSG' && (this.organization_coordsys_id === 4326 || this.organization_coordsys_id === 3857)) {
+      return proj4('EPSG:' + this.organization_coordsys_id);
     } else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
       return proj4(this.definition_12_063);
     } else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
       return proj4(this.definition);
-    } else if (this.organization && this.organization_coordsys_id) {
-      return proj4(this.organization.toUpperCase() + ':' + this.organization_coordsys_id);
     }
     return null;
   }

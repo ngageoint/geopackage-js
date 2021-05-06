@@ -1,13 +1,8 @@
-
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var fs = require('fs-extra')
-  , should = require('chai').should()
-  , path = require('path')
+var should = require('chai').should()
   , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').MetadataReference
   , Metadata = require('../../../../lib/metadata/metadata').Metadata
-  , GeoPackage = require('../../../../lib/geoPackage')
-  , TableCreator = require('../../../../lib/db/tableCreator').TableCreator
   , Verification = require('../../../fixtures/verification');
 
 describe('Metadata Reference tests', function() {

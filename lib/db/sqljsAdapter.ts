@@ -5,21 +5,38 @@ import { DBAdapter, DBValue } from './dbAdapter';
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
  */
 // @ts-ignore
-import sqljs from 'rtree-sql.js/dist/sql-asm-memory-growth.js';
-// var sqljs = require('sql.js/js/sql.js');
+import initSqlJs from 'rtree-sql.js';
 
 /**
  * Class which adapts generic GeoPackage queries to sqljs queries
  */
 export class SqljsAdapter implements DBAdapter {
+  static SQL: { Database: any };
   db: any;
   filePath: string | Buffer | Uint8Array;
+  static sqljsWasmLocateFile: (filename: string) => string = filename => filename;
+
+  static setSqljsWasmLocateFile(locateFile: (filename: string) => string) {
+    SqljsAdapter.sqljsWasmLocateFile = locateFile;
+  }
+
   /**
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   initialize(): Promise<this> {
-    const promise = new Promise<this>((resolve, reject) => {
-      sqljs().then((SQL: { Database: any }) => {
+    return new Promise<this>((resolve, reject) => {
+      new Promise(resolve => {
+        if (SqljsAdapter.SQL == null) {
+          initSqlJs({
+            locateFile: SqljsAdapter.sqljsWasmLocateFile,
+          }).then((SQL: { Database: any }) => {
+            SqljsAdapter.SQL = SQL;
+            resolve(SQL);
+          });
+        } else {
+          resolve(SqljsAdapter.SQL)
+        }
+      }).then((SQL: { Database: any }) => {
         if (this.filePath && typeof this.filePath === 'string') {
           if (typeof process !== 'undefined' && process.version) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -54,10 +71,6 @@ export class SqljsAdapter implements DBAdapter {
               const filebuffer = fs.readFileSync(this.filePath);
               const t = new Uint8Array(filebuffer);
               this.db = new SQL.Database(t);
-              // console.log('setting wal mode');
-              // var walMode = db.exec('PRAGMA journal_mode=DELETE');
-              // console.log('walMode', walMode);
-              // adapter = new SqljsAdapter(db);
               return resolve(this);
             }
           } else {
@@ -88,8 +101,6 @@ export class SqljsAdapter implements DBAdapter {
         }
       });
     });
-
-    return promise;
   }
 
   // /**

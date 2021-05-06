@@ -159,9 +159,7 @@ export class TileBoundingBoxUtils {
     minLat = Math.max(-1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, minLat);
     maxLat = Math.min(TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, maxLat);
 
-    const box = new BoundingBox(minLon, maxLon, minLat, maxLat);
-
-    return box;
+    return new BoundingBox(minLon, maxLon, minLat, maxLat);
   }
 
   /**
@@ -366,8 +364,7 @@ export class TileBoundingBoxUtils {
   ): BoundingBox {
     // Get the tile width
     const matrixMinX = matrixSetBoundingBox.minLongitude;
-    const matrixMaxX = matrixSetBoundingBox.maxLongitude;
-    const matrixWidth = matrixMaxX - matrixMinX;
+    const matrixWidth = matrixSetBoundingBox.width;
     const tileWidth = matrixWidth / tileMatrixWidth;
 
     // Find the longitude range
@@ -375,9 +372,8 @@ export class TileBoundingBoxUtils {
     const maxLon = minLon + tileWidth * (tileGrid.max_x + 1 - tileGrid.min_x);
 
     // Get the tile height
-    const matrixMinY = matrixSetBoundingBox.minLatitude;
     const matrixMaxY = matrixSetBoundingBox.maxLatitude;
-    const matrixHeight = matrixMaxY - matrixMinY;
+    const matrixHeight = matrixSetBoundingBox.height;
     const tileHeight = matrixHeight / tileMatrixHeight;
 
     // Find the latitude range
@@ -388,10 +384,7 @@ export class TileBoundingBoxUtils {
   }
 
   static getXPixel(width: number, boundingBox: BoundingBox, longitude: number): number {
-    const boxWidth = boundingBox.maxLongitude - boundingBox.minLongitude;
-    const offset = longitude - boundingBox.minLongitude;
-    const percentage = offset / boxWidth;
-    return percentage * width;
+    return (longitude - boundingBox.minLongitude) / boundingBox.width * width;
   }
 
   static getLongitudeFromPixel(
@@ -400,17 +393,11 @@ export class TileBoundingBoxUtils {
     tileBoundingBox: BoundingBox,
     pixel: number,
   ): number {
-    const boxWidth = tileBoundingBox.maxLongitude - tileBoundingBox.minLongitude;
-    const percentage = pixel / width;
-    const offset = percentage * boxWidth;
-    return offset + boundingBox.minLongitude;
+    return (pixel / width) * tileBoundingBox.width + boundingBox.minLongitude;
   }
 
   static getYPixel(height: number, boundingBox: BoundingBox, latitude: number): number {
-    const boxHeight = boundingBox.maxLatitude - boundingBox.minLatitude;
-    const offset = boundingBox.maxLatitude - latitude;
-    const percentage = offset / boxHeight;
-    return percentage * height;
+    return ((boundingBox.maxLatitude - latitude) / boundingBox.height) * height;
   }
 
   static getLatitudeFromPixel(
@@ -419,10 +406,7 @@ export class TileBoundingBoxUtils {
     tileBoundingBox: BoundingBox,
     pixel: number,
   ): number {
-    const boxHeight = tileBoundingBox.maxLatitude - tileBoundingBox.minLatitude;
-    const percentage = pixel / height;
-    const offset = percentage * boxHeight;
-    return boundingBox.maxLatitude - offset;
+    return boundingBox.maxLatitude - ((pixel / height) * tileBoundingBox.height);
   }
 
   /**

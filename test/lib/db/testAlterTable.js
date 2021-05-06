@@ -271,7 +271,6 @@ describe('AlterTable tests - Tile Table Copying', function() {
     tileScaling.zoom_in = 2;
     tileScaling.zoom_out = 1;
     tileScalingExtension.createOrUpdate(tileScaling);
-    console.log('super freaking awesome' + filename);
   });
 
   afterEach('close the geopackage connection', async function() {

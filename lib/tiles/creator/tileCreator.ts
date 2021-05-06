@@ -4,6 +4,7 @@ import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { BoundingBox } from '../../boundingBox';
+import { Creator } from './creator';
 
 export abstract class TileCreator {
   width: number;
@@ -23,6 +24,7 @@ export abstract class TileCreator {
   abstract getCompleteTile(format?: string): Promise<any>;
   abstract addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number): void;
   abstract async addTile(tileData: any, gridColumn: number, gridRow: number): Promise<any>;
+  abstract cleanup();
 
   static async create(
     width: number,
@@ -34,40 +36,18 @@ export abstract class TileCreator {
     projectionTo: string,
     canvas: any,
   ): Promise<TileCreator> {
-    const isElectron = !!(
-      typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
+    const creator = Creator.create(
+      width,
+      height,
+      tileMatrix,
+      tileMatrixSet,
+      tileBoundingBox,
+      srs,
+      projectionTo,
+      canvas,
     );
-
-    const isNode = typeof process !== 'undefined' && process.version;
-    if (isNode && !isElectron) {
-      const NodeTileCreator = require('./node').NodeTileCreator;
-      const creator = new NodeTileCreator(
-        width,
-        height,
-        tileMatrix,
-        tileMatrixSet,
-        tileBoundingBox,
-        srs,
-        projectionTo,
-        canvas,
-      );
-      await creator.initialize();
-      return creator;
-    } else {
-      const CanvasTileCreator = require('./canvas').CanvasTileCreator;
-      const canvasCreator = new CanvasTileCreator(
-        width,
-        height,
-        tileMatrix,
-        tileMatrixSet,
-        tileBoundingBox,
-        srs,
-        projectionTo,
-        canvas,
-      );
-      await canvasCreator.initialize();
-      return canvasCreator;
-    }
+    await creator.initialize();
+    return creator;
   }
 
   constructor(
@@ -97,6 +77,7 @@ export abstract class TileCreator {
       (this.projectionTo === 'EPSG:3857' &&
         (this.projectionFrom === 'EPSG:900913' || this.projectionFrom === 'EPSG:102113'));
   }
+
   async projectTile(tileData: any, gridColumn: number, gridRow: number): Promise<any> {
     const bb = TileBoundingBoxUtils.getTileBoundingBox(
       this.tileMatrixSet.boundingBox,
@@ -132,20 +113,10 @@ export abstract class TileCreator {
     });
   }
   async reproject(tileData: any, tilePieceBoundingBox: BoundingBox): Promise<void> {
-    const y = 0;
-    const x = 0;
     const height = this.height;
     const width = this.width;
-    const proj4To = proj4(this.projectionTo);
-    let proj4From;
-    if (this.projectionFrom) {
-      try {
-        proj4From = proj4(this.projectionFrom);
-      } catch (e) {}
-    }
-    if (!proj4From && this.projectionFromDefinition) {
-      proj4From = proj4(this.projectionFromDefinition);
-    }
+    const tileHeight = this.tileMatrix.tile_height;
+    const tileWidth = this.tileMatrix.tile_width;
     let conversion;
     try {
       conversion = proj4(this.projectionTo, this.projectionFrom);
@@ -154,32 +125,14 @@ export abstract class TileCreator {
       conversion = proj4(this.projectionTo, this.projectionFromDefinition);
     }
     let latitude;
-    const rows = [];
-    for (let i = 0; i < height; i++) {
-      rows.push(i);
-    }
-    const columns = [];
-    for (let i = 0; i < width; i++) {
-      columns.push(i);
-    }
     for (let row = 0; row < height; row++) {
       latitude = this.tileBoundingBox.maxLatitude - row * this.tileHeightUnitsPerPixel;
       for (let column = 0; column < width; column++) {
-        // loop over all pixels in the target tile
-        // determine the position of the current pixel in the target tile
         const longitude = this.tileBoundingBox.minLongitude + column * this.tileWidthUnitsPerPixel;
-        // project that lat/lng to the source coordinate system
         const projected = conversion.forward([longitude, latitude]);
-        const projectedLongitude = projected[0];
-        const projectedLatitude = projected[1];
-        // now find the source pixel
-        const xPixel =
-          this.tileMatrix.tile_width -
-          Math.round((tilePieceBoundingBox.maxLongitude - projectedLongitude) / this.tileMatrix.pixel_x_size);
-        const yPixel = Math.round(
-          (tilePieceBoundingBox.maxLatitude - projectedLatitude) / this.tileMatrix.pixel_y_size,
-        );
-        if (xPixel >= 0 && xPixel < this.tileMatrix.tile_width && yPixel >= 0 && yPixel < this.tileMatrix.tile_height) {
+        const xPixel = tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projected[0]) / this.tileMatrix.pixel_x_size);
+        const yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projected[1]) / this.tileMatrix.pixel_y_size);
+        if (xPixel >= 0 && xPixel < tileWidth && yPixel >= 0 && yPixel < tileHeight) {
           this.addPixel(column, row, xPixel, yPixel);
         }
       }

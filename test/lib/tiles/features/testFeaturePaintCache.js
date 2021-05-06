@@ -1,8 +1,6 @@
-
-import { StyleRow } from '../../../../lib/extension/style/styleRow';
-import { StyleTable } from '../../../../lib/extension/style/styleTable';
-
 var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
+  , StyleRow = require('../../../../lib/extension/style/styleRow').StyleRow
+  , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
   , Paint = require('../../../../lib/tiles/features/paint').Paint
   , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
   , should = require('chai').should();
@@ -30,7 +28,7 @@ describe('FeaturePaintCache Tests', function() {
   it('should test paint cache should return paint for style row id', function() {
     var featurePaintCache = new FeaturePaintCache();
     var paint = new Paint();
-    
+
     class MockStyleRow extends StyleRow {
       getId() {
         return 0;

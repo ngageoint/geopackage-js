@@ -1,5 +1,5 @@
-import { GeoPackageAPI } from '../index';
-import { GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox, GeometryType } from '../index';
+import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox, GeometryType } from '../index';
+import {Canvas} from "../lib/canvas/canvas";
 const testSetup = require('./fixtures/testSetup').default;
 
 const path = require('path'),
@@ -317,27 +317,17 @@ describe('GeoPackageAPI tests', function() {
     });
 
     it('should get the 0 0 0 tile in a canvas', async function() {
-      let canvas;
-      if (typeof process !== 'undefined' && process.version) {
-        const Canvas = require('canvas');
-        canvas = Canvas.createCanvas(256, 256);
-      } else {
-        canvas = document.createElement('canvas');
-      }
+      let canvas = Canvas.create(256, 256);
       await indexedGeopackage.xyzTile('rivers_tiles', 0, 0, 0, 256, 256, canvas);
-      testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '3857_rivers_world_tile.png'));
+      await testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '3857_rivers_world_tile.png'));
+      Canvas.disposeCanvas(canvas);
     });
 
     it('should get the world as a 4326 tile in a canvas', async function() {
-      let canvas;
-      if (typeof process !== 'undefined' && process.version) {
-        const Canvas = require('canvas');
-        canvas = Canvas.createCanvas(512, 256);
-      } else {
-        canvas = document.createElement('canvas');
-      }
+      let canvas = Canvas.create(256, 256);
       await indexedGeopackage.projectedTile('rivers_tiles', -90, -180, 90, 180, 0, 'EPSG:4326', 512, 256, canvas);
-      testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '4326_rivers_world_tile.png'));
+      await testSetup.diffCanvas(canvas, path.join(__dirname, 'fixtures', '4326_rivers_world_tile.png'));
+      Canvas.disposeCanvas(canvas);
     });
 
     // it('should get the 0 0 0 vector tile', function() {
@@ -831,22 +821,19 @@ describe('GeoPackageAPI tests', function() {
       fs.readFile(tilePath, function(err, tile) {
         const result = geopackage.addTile(tile, tableName, 0, 0, 0);
         result.should.be.equal(1);
-        let canvas;
-        if (typeof process !== 'undefined' && process.version) {
-          const Canvas = require('canvas');
-          canvas = Canvas.createCanvas(256, 256);
-        } else {
-          canvas = document.createElement('canvas');
-        }
-        geopackage.xyzTile(tableName, 0, 0, 0, 256, 256, canvas)
-        // @ts-ignore
-          .then(function(tile) {
-            // @ts-ignore
-            testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
-              equal.should.be.equal(true);
-              done();
+        Canvas.initializeAdapter().then(() => {
+          let canvas = Canvas.create(256, 256);
+          geopackage.xyzTile(tableName, 0, 0, 0, 256, 256, canvas)
+          // @ts-ignore
+            .then(function (tile) {
+              // @ts-ignore
+              testSetup.diffCanvas(canvas, tilePath, function(err, equal) {
+                equal.should.be.equal(true);
+                Canvas.disposeCanvas(canvas);
+                done();
+              });
             });
-          });
+        });
       });
     });
   });

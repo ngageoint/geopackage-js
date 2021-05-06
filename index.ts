@@ -1,6 +1,3 @@
-import proj4Defs from './lib/proj4Defs';
-import TileUtilities from './lib/tiles/creator/tileUtilities';
-
 import { BoundingBox } from './lib/boundingBox';
 import { ClosestFeature, GeoPackage } from './lib/geoPackage';
 import { ContentsDao } from './lib/core/contents/contentsDao';
@@ -66,6 +63,7 @@ import { TileMatrixSet } from './lib/tiles/matrixset/tileMatrixSet';
 import { TileScaling } from './lib/extension/scale/tileScaling';
 import { TileScalingType } from './lib/extension/scale/tileScalingType';
 import { TileTable } from './lib/tiles/user/tileTable';
+import { TileUtilities } from './lib/tiles/creator/tileUtilities';
 import { UserColumn } from './lib/user/userColumn';
 import { UserDao } from './lib/user/userDao';
 import { UserMappingTable } from './lib/extension/relatedTables/userMappingTable';
@@ -74,10 +72,30 @@ import { UserTable } from './lib/user/userTable';
 import { UserTableReader } from './lib/user/userTableReader';
 import { WebPExtension } from './lib/extension/webp';
 import { WKB } from './lib/wkb';
+import { Db } from './lib/db/db';
+import { DBAdapter } from './lib/db/dbAdapter';
+import { SqljsAdapter } from './lib/db/sqljsAdapter';
+import { Creator } from './lib/tiles/creator/creator';
+import { TileCreator } from './lib/tiles/creator/tileCreator';
+import { CanvasTileCreator } from './lib/tiles/creator/canvas';
+import { Canvas } from './lib/canvas/canvas';
+import { CanvasAdapter } from './lib/canvas/canvasAdapter';
+import { BrowserCanvasAdapter } from './lib/canvas/browserCanvasAdapter';
+
+const registerCanvasAdapter = Canvas.registerCanvasAdapter;
+const registerDbAdapter = Db.registerDbAdapter;
+const registerTileCreator = Creator.registerTileCreator;
+
+const setSqljsWasmLocateFile = SqljsAdapter.setSqljsWasmLocateFile;
+
+// browser default adapters
+registerDbAdapter(SqljsAdapter);
+registerCanvasAdapter(BrowserCanvasAdapter);
+registerTileCreator(CanvasTileCreator);
 
 export {
-  proj4Defs,
   BoundingBox,
+  CanvasAdapter,
   ClosestFeature,
   ContentsDao,
   ContentsIdDao,
@@ -88,6 +106,7 @@ export {
   DataColumnConstraintsDao,
   DataColumns,
   DataColumnsDao,
+  DBAdapter,
   DublinCoreMetadata,
   DublinCoreType,
   Extension,
@@ -124,9 +143,13 @@ export {
   NumberFeaturesTile,
   OptionBuilder,
   Paint,
+  registerCanvasAdapter,
+  registerDbAdapter,
+  registerTileCreator,
   RelatedTablesExtension,
   RTreeIndex,
   RTreeIndexDao,
+  setSqljsWasmLocateFile,
   SchemaExtension,
   ShadedFeaturesTile,
   SimpleAttributesTable,
@@ -136,6 +159,7 @@ export {
   Styles,
   StyleTable,
   TableCreator,
+  TileCreator,
   TileBoundingBoxUtils,
   TileColumn,
   TileMatrix,

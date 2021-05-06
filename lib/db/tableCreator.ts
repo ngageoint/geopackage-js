@@ -45,7 +45,7 @@ export class TableCreator {
    */
   createRequired(): boolean {
     const dao = new SpatialReferenceSystemDao(this.geopackage);
-    this.createSpatialReferenceSystem()
+    this.createSpatialReferenceSystem();
     this.createContents();
     // Create the required Spatial Reference Systems (spec Requirement 11)
     dao.createUndefinedGeographic();
