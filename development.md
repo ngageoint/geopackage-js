@@ -14,6 +14,12 @@
 3. python -m SimpleHTTPServer
 4. open browser and navigate to http://localhost:8080/index.html
 
+### CanvasKit
+CanvasKit + WebAssembly is used for canvas operations in Node.js environments. A custom version of the wasm is used and 
+should be rebuilt when canvaskit-wasm has updated releases.
+
+see ./canvaskit/README.md for more instructions
+
 ### Build
 1. npm run build
 

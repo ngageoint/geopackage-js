@@ -2,7 +2,7 @@ import { CanvasAdapter } from './canvasAdapter';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
-import CanvasKitInit from 'canvaskit-wasm/bin/canvaskit.js';
+import CanvasKitInit from '../../canvaskit/canvaskit.js';
 
 /**
  * Node based canvas creation
@@ -13,7 +13,7 @@ export class NodeCanvasAdapter implements CanvasAdapter {
 
   // default wasm locator
   static canvasKitWasmLocateFile: (filename: string) => string = (filename) => {
-    return process.env.NODE_ENV === 'production' ? path.join(__dirname, filename) : path.join('node_modules', 'canvaskit-wasm', 'bin', filename);
+    return process.env.NODE_ENV === 'production' ? path.join(__dirname, 'canvaskit', filename) : path.join('canvaskit', filename);
   };
 
   // allow user to set the locate file function, if they place it somewhere else

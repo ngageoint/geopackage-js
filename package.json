@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.0.0-beta.23",
+  "version": "4.0.0-beta.24",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -39,7 +39,6 @@
     "@types/geojson": "^7946.0.7",
     "@types/proj4": "^2.5.0",
     "better-sqlite3": "7.1.4",
-    "canvaskit-wasm": "^0.25.1",
     "file-type": "12.4.0",
     "image-size": "0.8.3",
     "lodash": "^4.17.15",
@@ -119,6 +118,6 @@
     "test": "npm run test-node && npm run report",
     "report": "nyc report",
     "build": "npm run clean && webpack",
-    "prepare": "rm -rf ./dist && npm run build"
+    "prepare": "npm run build"
   }
 }

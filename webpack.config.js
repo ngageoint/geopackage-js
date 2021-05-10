@@ -54,7 +54,7 @@ const nodeConfig = {
     new CopyPlugin({
       patterns: [
         {
-          from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm',
+          from: 'canvaskit/*',
           to: '.',
         },
       ],
