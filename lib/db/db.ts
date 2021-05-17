@@ -1,11 +1,13 @@
-export class Db {
-  private static adapterCreator: any = undefined;
+import { DBAdapter } from './dbAdapter';
 
-  static registerDbAdapter (adapter) {
+export class Db {
+  private static adapterCreator: new (path: string | Buffer | Uint8Array | undefined) => DBAdapter = undefined;
+
+  static registerDbAdapter (adapter: new (path: string | Buffer | Uint8Array | undefined) => DBAdapter) {
     Db.adapterCreator = adapter;
   }
 
-  static create (path?: string | Buffer | Uint8Array | undefined) {
+  static create (path?: string | Buffer | Uint8Array | undefined): DBAdapter {
     return new Db.adapterCreator(path);
   }
 }

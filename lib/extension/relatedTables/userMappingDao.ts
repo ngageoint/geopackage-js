@@ -110,7 +110,7 @@ export class UserMappingDao<T extends UserMappingRow> extends UserCustomDao<User
     let query = 'SELECT DISTINCT ';
     query += UserMappingTable.COLUMN_RELATED_ID;
     query += ' FROM ';
-    query += "'" + this.gpkgTableName + "'";
+    query += '\'' + this.gpkgTableName + '\'';
     return this.connection.all(query);
   }
   /**

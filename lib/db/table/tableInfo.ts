@@ -19,32 +19,32 @@ export class TableInfo {
   /**
    * Name column
    */
-  static NAME = "name";
+  static NAME = 'name';
 
   /**
    * Type column
    */
-  static TYPE = "type";
+  static TYPE = 'type';
 
   /**
    * Not null column
    */
-  static NOT_NULL = "notnull";
+  static NOT_NULL = 'notnull';
 
   /**
    * Default value column
    */
-  static DFLT_VALUE = "dflt_value";
+  static DFLT_VALUE = 'dflt_value';
 
   /**
    * Primary key column
    */
-  static PK = "pk";
+  static PK = 'pk';
 
   /**
    * Default of NULL value
    */
-  static DEFAULT_NULL = "NULL";
+  static DEFAULT_NULL = 'NULL';
 
   /**
    * Table name

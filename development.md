@@ -25,12 +25,10 @@ see ./canvaskit/README.md for more instructions
 
 The geopackage build will generate several files in the dist directory. 
 * dist/browser
-  * bundle: index.min.js
-  * license: index.min.js.LICENSE.txt
+  * browser entry: geopackage.min.js
+  * browser license: geopackage.min.js.LICENSE.txt
+  * node entry: index.js, lib
   * types: index.d.ts, lib
   * sql.js wasm: sql-wasm.wasm
-* dist/node
-  * bundle: index.node.min.js
-  * license: index.node.min.js.LICENSE.txt
-  * types: index.node.d.ts, lib
-  * canvaskit wasm: canvaskit.wasm
+  * canvaskit js: canvaskit/canvaskit.js
+  * canvaskit wasm: canvaskit/canvaskit.wasm

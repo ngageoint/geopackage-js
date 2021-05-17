@@ -1,5 +1,6 @@
-# CanvasKit + Web Assembly
-Version: 0.25.1
+# CanvasKit + Web Assembly Custom Build
+* CanvasKit: 0.25.1
+* EMScript: 2.0.20
 
 # Build Instructions
 * Install emscripten

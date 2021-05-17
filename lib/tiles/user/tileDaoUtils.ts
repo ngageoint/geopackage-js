@@ -294,7 +294,7 @@ export class TileDaoUtils {
    * @return approximate zoom level
    */
   static getApproximateZoomLevel(lengths: number[], tileMatrices: TileMatrix[], length: number): number {
-    let lengthZoomLevel = null;
+    let lengthZoomLevel;
 
     const minLength = lengths[0];
     const maxLength = lengths[lengths.length - 1];

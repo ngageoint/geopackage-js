@@ -1615,7 +1615,7 @@ export class GeoPackage {
       if (distance < closestDistance) {
         closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
-      } else if (distance === closestDistance && closest.geometry.type !== 'Point') {
+      } else if (distance === closestDistance && closest != null &&  closest.geometry.type !== 'Point') {
         closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
       }

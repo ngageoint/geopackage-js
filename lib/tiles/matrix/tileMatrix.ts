@@ -1,4 +1,4 @@
-import {Contents} from "../../core/contents/contents";
+import { Contents } from '../../core/contents/contents';
 
 /**
  * Tile Matrix object. Documents the structure of the tile matrix at each zoom

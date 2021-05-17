@@ -11,7 +11,7 @@
       "allowSyntheticDefaultImports": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
-      "outDir": "dist/browser",
+      "outDir": "dist",
       "downlevelIteration": true,
       "noEmit": false,
       "noImplicitAny": false,

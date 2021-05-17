@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Canvas } from '../../../canvas/canvas';
 import { CustomFeaturesTile } from './customFeaturesTile';
 
@@ -281,11 +280,12 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
 
       Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
 
-      const result = canvas.toDataURL('image/' + this.compressFormat);
-      if (dispose) {
-        Canvas.disposeCanvas(canvas);
-      }
-      resolve(result);
+      Canvas.toDataURL(canvas, 'image/' + this.compressFormat).then(result => {
+        if (dispose) {
+          Canvas.disposeCanvas(canvas);
+        }
+        resolve(result);
+      });
     });
   }
 }

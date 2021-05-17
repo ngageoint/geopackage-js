@@ -5,7 +5,7 @@
 import { UserColumn } from '../userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
-import { UserTableDefaults } from "../userTableDefaults";
+import { UserTableDefaults } from '../userTableDefaults';
 
 /**
  * Create a new user custom columnd

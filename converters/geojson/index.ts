@@ -5,6 +5,7 @@ import {
   GeometryColumns,
   GeoPackageDataType,
   BoundingBox,
+  GeometryType
 } from '@ngageoint/geopackage';
 import fs from 'fs';
 import path from 'path';
@@ -193,8 +194,8 @@ export class GeoJSONToGeoPackage {
     geometryColumns.m = 2;
 
     const columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', GeometryType.GEOMETRY, false, null));
     let index = 2;
 
     for (const key in properties) {

@@ -6,7 +6,7 @@ import { ColumnConstraints } from './columnConstraints';
 import { Constraint } from './constraint';
 import { ConstraintType } from './constraintType';
 import { RawConstraint } from './rawConstraint';
-import { StringUtils } from "../stringUtils";
+import { StringUtils } from '../stringUtils';
 
 export class ConstraintParser {
   /**
@@ -172,7 +172,7 @@ export class ConstraintParser {
     const definition = nameAndDefinition[1];
     if (definition !== null && definition !== undefined) {
       const prefix = definition.split(/\s+/)[0];
-      let type = null;
+      let type;
       if (table) {
         type = ConstraintType.getTableType(prefix);
 

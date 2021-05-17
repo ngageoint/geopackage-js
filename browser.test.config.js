@@ -9,6 +9,10 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
+          from: 'canvaskit/*',
+          to: '.',
+        },
+        {
           from: 'node_modules/rtree-sql.js/dist/sql-wasm.wasm',
           to: '..',
         },
@@ -33,7 +37,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-      "fs": false,
+      'fs': false,
     }
   },
   output: {

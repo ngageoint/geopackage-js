@@ -3,7 +3,7 @@ import { CanvasAdapter } from './canvasAdapter';
 export class Canvas {
   private static adapter: CanvasAdapter = undefined;
 
-  static registerCanvasAdapter (adapter: any) {
+  static registerCanvasAdapter (adapter: new () => CanvasAdapter) {
     Canvas.adapter = new adapter();
   }
 
@@ -59,5 +59,10 @@ export class Canvas {
   static scaleImage(image: {image: any, width: number, height: number}, scale: number) {
     Canvas.checkCanvasAdapter();
     return Canvas.adapter.scaleImage(image, scale);
+  }
+
+  static async toDataURL(canvas, format = 'image/png'): Promise<string> {
+    Canvas.checkCanvasAdapter();
+    return Canvas.adapter.toDataURL(canvas, format)
   }
 }

@@ -1,13 +1,5 @@
-var Db = require('../lib/db/db').Db;
-var Canvas = require('../lib/canvas/canvas').Canvas;
-var Creator = require('../lib/tiles/creator/creator').Creator;
-var SqliteAdapter = require('../lib/db/sqliteAdapter').SqliteAdapter;
-var NodeCanvasAdapter = require('../lib/canvas/nodeCanvasAdapter').NodeCanvasAdapter;
-var NodeTileCreator = require('../lib/tiles/creator/node').NodeTileCreator;
-
+var Context = require('../lib/context/context').Context;
 before(async () => {
-  Db.registerDbAdapter(SqliteAdapter);
-  Creator.registerTileCreator(NodeTileCreator);
-  Canvas.registerCanvasAdapter(NodeCanvasAdapter);
-  await Canvas.initializeAdapter();
+  Context.setupNodeContext();
+  await Context.initializeContext();
 });

@@ -3,18 +3,18 @@ import { CanvasAdapter } from './canvasAdapter';
 /**
  * Browser based canvas adapter
  */
-export class BrowserCanvasAdapter implements CanvasAdapter {
+export class HtmlCanvasAdapter implements CanvasAdapter {
   private static initialized = false;
 
   initialize(): Promise<void> {
     return new Promise(resolve => {
-      BrowserCanvasAdapter.initialized = true;
+      HtmlCanvasAdapter.initialized = true;
       resolve();
     });
   }
 
   isInitialized(): boolean {
-    return BrowserCanvasAdapter.initialized;
+    return HtmlCanvasAdapter.initialized;
   }
 
   create(width: number, height: number): any {
@@ -27,16 +27,17 @@ export class BrowserCanvasAdapter implements CanvasAdapter {
   createImage(data: any, contentType: string): Promise<{image: any, width: number, height: number}> {
     return new Promise((resolve, reject) => {
       let src = data;
-      if (data instanceof Buffer) {
-        src = 'data:' + contentType + ';base64,' + data.toString('base64');
+      if (data instanceof Buffer || Object.prototype.toString.call(data) === '[object Uint8Array]') {
+        src = URL.createObjectURL(new Blob([data], {type: contentType}));
       }
       const image = new Image();
-      image.onload = (): void => {
-        resolve({
+      image.onload = () => {
+        const result = {
           image: image,
           width: image.width,
           height: image.height,
-        });
+        }
+        resolve(result);
       };
       image.onerror = (error: any): void => {
         reject(error);
@@ -60,7 +61,7 @@ export class BrowserCanvasAdapter implements CanvasAdapter {
 
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string) {
     context.save();
-    context.font = fontSize + "px '" + fontFace + "'";
+    context.font = fontSize + 'px \'' + fontFace + '\'';
     context.fillStyle = fontColor;
     context.textBaseline = 'middle';
     context.textAlign = 'center';
@@ -72,15 +73,17 @@ export class BrowserCanvasAdapter implements CanvasAdapter {
     if (scale === 1.0) {
       return image;
     }
-    const iconWidth = image.width;
-    const iconHeight = image.height;
-    const scaledWidth = Math.round(scale * iconWidth);
-    const scaledHeight = Math.round(scale * iconHeight);
+    const scaledWidth = Math.round(scale * image.width);
+    const scaledHeight = Math.round(scale * image.height);
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.image, 0, 0, iconWidth, iconHeight, 0, 0, scaledWidth, scaledHeight);
-    const result = await this.createImage(canvas.toDataURL(), 'image/png');
+    ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
+    const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
+  }
+
+  toDataURL(canvas: any, format: string = 'image/png'): Promise<string> {
+    return Promise.resolve(canvas.toDataURL(format));
   }
 }

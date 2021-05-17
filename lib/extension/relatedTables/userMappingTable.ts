@@ -3,7 +3,6 @@
  * @module extension/relatedTables
  */
 import { UserColumn } from '../../user/userColumn';
-import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
 

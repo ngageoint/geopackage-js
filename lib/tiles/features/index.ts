@@ -522,13 +522,13 @@ export class FeatureTiles {
             console.log('Error drawing geometry', e);
           }
         }
-        image = canvas.toDataURL('image/' + this.compressFormat);
+        image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
       } else if (this.maxFeaturesTileDraw != null) {
         // Draw the max features tile
         image = this.maxFeaturesTileDraw.drawTile(width, height, featureCount.toString(), canvas);
       }
     } else {
-      image = canvas.toDataURL('image/' + this.compressFormat);
+      image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
     }
     if (dispose) {
       Canvas.disposeCanvas(canvas);
@@ -539,7 +539,6 @@ export class FeatureTiles {
     const width = 256;
     const height = 256;
     const simplifyTolerance = TileBoundingBoxUtils.toleranceDistanceWidthAndHeight(zoom, width, height);
-
     let canvas: any;
     let dispose = false;
     await Canvas.initializeAdapter();
@@ -579,7 +578,7 @@ export class FeatureTiles {
         console.log('Error drawing geometry', e);
       }
     }
-    const image = canvas.toDataURL('image/' + this.compressFormat);
+    const image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
     if (dispose) {
       Canvas.disposeCanvas(canvas);
     }

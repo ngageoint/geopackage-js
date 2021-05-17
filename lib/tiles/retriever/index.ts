@@ -198,7 +198,7 @@ export class GeoPackageTileRetriever {
       const distanceHeight = projectedRequestBoundingBox.maxLatitude - projectedRequestBoundingBox.minLatitude;
 
       // Get the zoom level to request based upon the tile size
-      let requestZoomLevel = null;
+      let requestZoomLevel;
       if (this.scaling != null) {
         // When options are provided, get the approximate zoom level regardless of whether a tile level exists
         requestZoomLevel = this.tileDao.getApproximateZoomLevelForWidthAndHeight(distanceWidth, distanceHeight);

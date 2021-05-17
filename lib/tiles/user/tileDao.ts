@@ -138,10 +138,8 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
           tileGrid,
         );
       }
-      return boundingBox;
-    } else {
-      return boundingBox;
     }
+    return boundingBox;
   }
   get boundingBox(): BoundingBox {
     return this.tileMatrixSet.boundingBox;

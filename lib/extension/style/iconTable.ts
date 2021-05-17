@@ -4,8 +4,6 @@
  */
 
 import { MediaTable } from '../relatedTables/mediaTable';
-import { UserCustomColumn } from '../../user/custom/userCustomColumn';
-
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserColumn } from '../../user/userColumn';
 

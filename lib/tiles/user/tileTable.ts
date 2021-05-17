@@ -4,9 +4,8 @@
 
 import { UserTable } from '../../user/userTable';
 import { TileColumn } from './tileColumn';
-import { TileColumns } from "./tileColumns";
+import { TileColumns } from './tileColumns';
 import { UniqueConstraint } from '../../db/table/uniqueConstraint';
-import { ConstraintType } from '../../db/table/constraintType';
 import { ContentsDataType } from '../../core/contents/contentsDataType';
 import { Contents } from '../../core/contents/contents';
 

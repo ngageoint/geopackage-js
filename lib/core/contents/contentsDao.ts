@@ -75,7 +75,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {string[]}           Array of table names
    */
   getTables(tableType?: string): string[] {
-    let results = [];
+    let results;
     if (tableType) {
       const fieldValues = new ColumnValues();
       fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);

@@ -378,7 +378,7 @@ export abstract class Dao<T> {
     } else if (values instanceof ColumnValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
-      if (values !== undefined || values !== null) {
+      if (values !== undefined && values !== null) {
         args.push(values);
       }
     }

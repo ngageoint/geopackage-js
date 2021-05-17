@@ -5,7 +5,6 @@
 import { AttributesTable } from '../../attributes/attributesTable';
 import { RelationType } from '../relatedTables/relationType';
 import { UserColumn } from '../../user/userColumn';
-import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 
 /**

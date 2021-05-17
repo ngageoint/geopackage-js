@@ -1,14 +1,10 @@
 import { DBAdapter, DBValue } from './dbAdapter';
+import initSqlJs from 'rtree-sql.js';
+
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
  * @module db/sqljsAdapter
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
- */
-// @ts-ignore
-import initSqlJs from 'rtree-sql.js';
-
-/**
- * Class which adapts generic GeoPackage queries to sqljs queries
  */
 export class SqljsAdapter implements DBAdapter {
   static SQL: { Database: any };
@@ -32,6 +28,8 @@ export class SqljsAdapter implements DBAdapter {
           }).then((SQL: { Database: any }) => {
             SqljsAdapter.SQL = SQL;
             resolve(SQL);
+          }).catch(e => {
+            reject(e);
           });
         } else {
           resolve(SqljsAdapter.SQL)
@@ -99,18 +97,12 @@ export class SqljsAdapter implements DBAdapter {
           this.db = new SQL.Database();
           return resolve(this);
         }
+      }).catch(e => {
+        reject(e);
       });
     });
   }
 
-  // /**
-  //  * Creates an adapter from an already established better-sqlite3 database connection
-  //  * @param  {any} db sqljs database connection
-  //  * @return {module:db/sqljsAdapter~Adapter}
-  //  */
-  // static createAdapterFromDb(db) {
-  //   return new SqljsAdapter(db);
-  // }
   /**
    * @param  {string|Buffer|Uint8Array} [filePath] string path to an existing file or a path to where a new file will be created or a url from which to download a GeoPackage or a Uint8Array containing the contents of the file, if undefined, an in memory database is created
    */
@@ -279,7 +271,7 @@ export class SqljsAdapter implements DBAdapter {
    * @return {Number} deleted rows
    */
   delete(sql: string, params?: [] | Record<string, DBValue>): number {
-    let rowsModified = 0;
+    let rowsModified;
     const statement = this.db.prepare(sql, params);
     statement.step();
     rowsModified = this.db.getRowsModified();

@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Canvas } from '../../../canvas/canvas'
+import { Canvas } from '../../../canvas/canvas';
 import { CustomFeaturesTile } from './customFeaturesTile';
 
 /**
@@ -142,11 +141,12 @@ export class ShadedFeaturesTile extends CustomFeaturesTile {
         context.lineWidth = this.tileBorderStrokeWidth;
         context.strokeRect(0, 0, tileWidth, tileHeight);
       }
-      const result = canvas.toDataURL('image/' + this.compressFormat);
-      if (dispose) {
-        Canvas.disposeCanvas(canvas);
-      }
-      resolve(result);
+      Canvas.toDataURL(canvas, 'image/' + this.compressFormat).then(result => {
+        if (dispose) {
+          Canvas.disposeCanvas(canvas);
+        }
+        resolve(result);
+      });
     });
   }
 }

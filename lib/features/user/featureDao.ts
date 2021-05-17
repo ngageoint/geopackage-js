@@ -147,7 +147,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
       [Symbol.iterator](): IterableIterator<FeatureRow> {
         return this;
       },
-      next: (): IteratorResult<FeatureRow, any> => {
+      next: (): IteratorResult<FeatureRow> => {
         const nextRow = iterator.next();
         if (!nextRow.done) {
           const featureRow = this.getRow(nextRow.value) as FeatureRow;
@@ -174,7 +174,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
       [Symbol.iterator](): IterableIterator<FeatureRow> {
         return this;
       },
-      next: (): IteratorResult<FeatureRow, any> => {
+      next: (): IteratorResult<FeatureRow> => {
         let nextRow = iterator.next();
         if (!nextRow.done) {
           let featureRow: FeatureRow;

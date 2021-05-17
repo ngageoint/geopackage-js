@@ -49,7 +49,6 @@ export class FeatureTableIndex extends BaseExtension {
    */
   constructor(geoPackage: GeoPackage, public featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
-    this.progress;
     this.extensionName = FeatureTableIndex.EXTENSION_NAME;
     this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
     this.tableName = featureDao.table_name;

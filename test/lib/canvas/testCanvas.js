@@ -2,8 +2,8 @@ var should = require('chai').should()
   , expect = require('chai').expect
   , Canvas = require('../../../lib/canvas/canvas').Canvas
   , path = require('path')
-  , NodeCanvasAdapter = require('../../../lib/canvas/nodeCanvasAdapter').NodeCanvasAdapter
-  , BrowserCanvasAdapter = require('../../../lib/canvas/browserCanvasAdapter').BrowserCanvasAdapter;
+  , CanvasKitCanvasAdapter = require('../../../lib/canvas/canvasKitCanvasAdapter').CanvasKitCanvasAdapter
+  , HtmlCanvasAdapter = require('../../../lib/canvas/htmlCanvasAdapter').HtmlCanvasAdapter;
 
 const isWeb = typeof window !== 'undefined';
 
@@ -153,12 +153,12 @@ const webTextBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAY
 describe('Canvas tests', function() {
   beforeEach(function (done) {
     if (isWeb) {
-      Canvas.registerCanvasAdapter(BrowserCanvasAdapter);
+      Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
       Canvas.initializeAdapter().then(() => {
         done();
       });
     } else {
-      Canvas.registerCanvasAdapter(NodeCanvasAdapter);
+      Canvas.registerCanvasAdapter(CanvasKitCanvasAdapter);
       Canvas.initializeAdapter().then(() => {
         done();
       });
@@ -167,21 +167,21 @@ describe('Canvas tests', function() {
 
   it('should register the canvas adapter', function() {
     if (isWeb) {
-      Canvas.registerCanvasAdapter(BrowserCanvasAdapter);
-      (Canvas.adapter instanceof BrowserCanvasAdapter).should.be.equal(true);
+      Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
+      (Canvas.adapter instanceof HtmlCanvasAdapter).should.be.equal(true);
     } else {
-      Canvas.registerCanvasAdapter(NodeCanvasAdapter);
-      (Canvas.adapter instanceof NodeCanvasAdapter).should.be.equal(true);
+      Canvas.registerCanvasAdapter(CanvasKitCanvasAdapter);
+      (Canvas.adapter instanceof CanvasKitCanvasAdapter).should.be.equal(true);
     }
   });
 
   it('should initialize the canvas adapter', function(done) {
     if (isWeb) {
-      Canvas.registerCanvasAdapter(BrowserCanvasAdapter);
-      BrowserCanvasAdapter.initialized = false;
+      Canvas.registerCanvasAdapter(HtmlCanvasAdapter);
+      HtmlCanvasAdapter.initialized = false;
     } else {
-      Canvas.registerCanvasAdapter(NodeCanvasAdapter);
-      NodeCanvasAdapter.initialized = false;
+      Canvas.registerCanvasAdapter(CanvasKitCanvasAdapter);
+      CanvasKitCanvasAdapter.initialized = false;
     }
     Canvas.adapterInitialized().should.be.equal(false);
     Canvas.initializeAdapter().then(() => {
@@ -212,9 +212,9 @@ describe('Canvas tests', function() {
 
   it('should fail to make an image', function(done) {
     if (isWeb) {
-      BrowserCanvasAdapter.initialized = false;
+      HtmlCanvasAdapter.initialized = false;
     } else {
-      NodeCanvasAdapter.initialized = false;
+      CanvasKitCanvasAdapter.initialized = false;
     }
     Canvas.createImage(pushPinBase64).catch(e => {
       e.message.should.be.equal('Canvas adapter not initialized.');
@@ -270,9 +270,7 @@ describe('Canvas tests', function() {
 
   it('should fail to load a bad url', function(done) {
     this.timeout(10000);
-    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png').then((image) => {
-      console.log(image);
-    }).catch(e => {
+    Canvas.createImage('http://maps.google.com/mapfiles/kml/pushpin/bad-pushpin.png').catch(e => {
       if (isWeb) {
         e.type.should.be.equal('error')
       } else {

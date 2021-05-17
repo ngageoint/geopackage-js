@@ -35,7 +35,7 @@ export class FeatureColumns extends UserColumns<FeatureColumn> {
   updateColumns() {
     super.updateColumns();
     let index = null;
-    if (this.geometryColumn !== null || this.geometryColumn !== undefined) {
+    if (this.geometryColumn !== null && this.geometryColumn !== undefined) {
       index = this.getColumnIndex(this.geometryColumn, false);
     } else {
       for (let i = 0; i < this.getColumns().length; i++) {

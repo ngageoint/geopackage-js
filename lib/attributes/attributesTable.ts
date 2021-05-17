@@ -1,12 +1,11 @@
 /**
  * @module attributes/attributesTable
  */
-import {ContentsDao} from '../core/contents/contentsDao';
-import {UserTable} from '../user/userTable';
-import {Contents} from '../core/contents/contents';
-import {AttributesColumn} from './attributesColumn';
-import {AttributesColumns} from './attributesColumns';
-import {ContentsDataType} from "../core/contents/contentsDataType";
+import { UserTable } from '../user/userTable';
+import { Contents } from '../core/contents/contents';
+import { AttributesColumn } from './attributesColumn';
+import { AttributesColumns } from './attributesColumns';
+import { ContentsDataType } from '../core/contents/contentsDataType';
 
 /**
  * Represents a user attribute table

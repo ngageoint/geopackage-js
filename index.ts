@@ -72,35 +72,33 @@ import { UserTable } from './lib/user/userTable';
 import { UserTableReader } from './lib/user/userTableReader';
 import { WebPExtension } from './lib/extension/webp';
 import { WKB } from './lib/wkb';
-import { Db } from './lib/db/db';
 import { DBAdapter } from './lib/db/dbAdapter';
+import { SqliteAdapter } from './lib/db/sqliteAdapter';
 import { SqljsAdapter } from './lib/db/sqljsAdapter';
-import { Creator } from './lib/tiles/creator/creator';
 import { TileCreator } from './lib/tiles/creator/tileCreator';
-import { CanvasTileCreator } from './lib/tiles/creator/canvas';
 import { Canvas } from './lib/canvas/canvas';
 import { CanvasAdapter } from './lib/canvas/canvasAdapter';
-import { BrowserCanvasAdapter } from './lib/canvas/browserCanvasAdapter';
+import { CanvasKitCanvasAdapter } from './lib/canvas/canvasKitCanvasAdapter';
+import { OffscreenCanvasAdapter } from './lib/canvas/offscreenCanvasAdapter';
+import { HtmlCanvasAdapter } from './lib/canvas/htmlCanvasAdapter';
+import { Context } from './lib/context/context';
 
-const registerCanvasAdapter = Canvas.registerCanvasAdapter;
-const registerDbAdapter = Db.registerDbAdapter;
-const registerTileCreator = Creator.registerTileCreator;
+Context.setupDefaultContext();
 
 const setSqljsWasmLocateFile = SqljsAdapter.setSqljsWasmLocateFile;
-
-// browser default adapters
-registerDbAdapter(SqljsAdapter);
-registerCanvasAdapter(BrowserCanvasAdapter);
-registerTileCreator(CanvasTileCreator);
+const setCanvasKitWasmLocateFile = CanvasKitCanvasAdapter.setCanvasKitWasmLocateFile;
 
 export {
   BoundingBox,
+  Canvas,
   CanvasAdapter,
+  CanvasKitCanvasAdapter,
   ClosestFeature,
   ContentsDao,
   ContentsIdDao,
   Constraint,
   Constraints,
+  Context,
   CrsWktExtension,
   DataColumnConstraints,
   DataColumnConstraintsDao,
@@ -131,6 +129,7 @@ export {
   GeoPackageDataType,
   GeoPackageTileRetriever,
   GeoPackageValidate,
+  HtmlCanvasAdapter,
   IconCache,
   Icons,
   IconTable,
@@ -141,21 +140,22 @@ export {
   MetadataExtension,
   MetadataReference,
   NumberFeaturesTile,
+  OffscreenCanvasAdapter,
   OptionBuilder,
   Paint,
-  registerCanvasAdapter,
-  registerDbAdapter,
-  registerTileCreator,
   RelatedTablesExtension,
   RTreeIndex,
   RTreeIndexDao,
+  setCanvasKitWasmLocateFile,
   setSqljsWasmLocateFile,
   SchemaExtension,
   ShadedFeaturesTile,
   SimpleAttributesTable,
   SpatialReferenceSystem,
+  SqliteAdapter,
   SqliteQueryBuilder,
   StyleMappingTable,
+  SqljsAdapter,
   Styles,
   StyleTable,
   TableCreator,

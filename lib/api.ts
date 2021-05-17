@@ -19,6 +19,7 @@ export class GeoPackageAPI {
    * @return {Promise<GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an `Error`
    */
   static async open(gppathOrByteArray: string | Uint8Array | Buffer): Promise<GeoPackage> {
+    let geoPackage: GeoPackage;
     const valid =
       typeof gppathOrByteArray !== 'string' ||
       (typeof gppathOrByteArray === 'string' &&
@@ -27,13 +28,20 @@ export class GeoPackageAPI {
     if (!valid) {
       throw new Error('Invalid GeoPackage - Invalid GeoPackage Extension');
     }
-    const connection = await GeoPackageConnection.connect(gppathOrByteArray);
-    await Canvas.initializeAdapter();
-    let geoPackage;
-    if (gppathOrByteArray && typeof gppathOrByteArray === 'string') {
-      geoPackage = new GeoPackage(path.basename(gppathOrByteArray), gppathOrByteArray, connection);
-    } else {
-      geoPackage = new GeoPackage('geopackage', undefined, connection);
+    try {
+      await Canvas.initializeAdapter();
+    } catch (e) {
+      throw new Error('Unable to initialize canvas.');
+    }
+    try {
+      const connection = await GeoPackageConnection.connect(gppathOrByteArray);
+      if (gppathOrByteArray && typeof gppathOrByteArray === 'string') {
+        geoPackage = new GeoPackage(path.basename(gppathOrByteArray), gppathOrByteArray, connection);
+      } else {
+        geoPackage = new GeoPackage('geopackage', undefined, connection);
+      }
+    } catch (e) {
+      throw new Error('Unable to open GeoPackage.');
     }
     return geoPackage;
   }
@@ -45,6 +53,7 @@ export class GeoPackageAPI {
    * @return {Promise<typeof GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an  `Error`
    */
   static async create(gppath?: string): Promise<GeoPackage> {
+    let geoPackage: GeoPackage;
     const valid =
       typeof gppath !== 'string' ||
       (typeof gppath === 'string' && !GeoPackageValidate.validateGeoPackageExtension(gppath));
@@ -60,18 +69,24 @@ export class GeoPackageAPI {
       }
     }
 
-    const connection = await GeoPackageConnection.connect(gppath);
-    await Canvas.initializeAdapter();
-    connection.setApplicationId();
-    let geopackage: GeoPackage;
-    if (gppath) {
-      geopackage = new GeoPackage(path.basename(gppath), gppath, connection);
-    } else {
-      geopackage = new GeoPackage('geopackage', undefined, connection);
+    try {
+      await Canvas.initializeAdapter();
+    } catch (e) {
+      throw new Error('Unable to initialize canvas.');
     }
-    await geopackage.createRequiredTables();
-    geopackage.createSupportedExtensions();
-
-    return geopackage;
+    try {
+      const connection = await GeoPackageConnection.connect(gppath);
+      connection.setApplicationId();
+      if (gppath) {
+        geoPackage = new GeoPackage(path.basename(gppath), gppath, connection);
+      } else {
+        geoPackage = new GeoPackage('geopackage', undefined, connection);
+      }
+      await geoPackage.createRequiredTables();
+      geoPackage.createSupportedExtensions();
+    } catch (e) {
+      throw new Error('Unable to create GeoPackage.')
+    }
+    return geoPackage;
   }
 }

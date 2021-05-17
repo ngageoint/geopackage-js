@@ -14,7 +14,6 @@ import { UserMappingTable } from './userMappingTable';
 import { UserMappingDao } from './userMappingDao';
 import { UserCustomDao } from '../../user/custom/userCustomDao';
 import { UserDao } from '../../user/userDao';
-import { UserTableReader } from '../../user/userTableReader';
 import { ExtendedRelationDao } from './extendedRelationDao';
 import { RelationType } from './relationType';
 import { Contents } from '../../core/contents/contents';
@@ -27,11 +26,10 @@ import { UserRow } from '../../user/userRow';
 import { UserMappingRow } from './userMappingRow';
 import { MediaRow } from './mediaRow';
 import { SimpleAttributesRow } from './simpleAttributesRow';
-import {UserCustomTableReader} from "../../user/custom/userCustomTableReader";
-import {AttributesDao} from "../../attributes/attributesDao";
-import {AttributesRow} from "../../attributes/attributesRow";
-import {FeatureDao} from "../../features/user/featureDao";
-import {TileDao} from "../../tiles/user/tileDao";
+import { UserCustomTableReader } from '../../user/custom/userCustomTableReader';
+import { AttributesDao } from '../../attributes/attributesDao';
+import { FeatureDao } from '../../features/user/featureDao';
+import { TileDao } from '../../tiles/user/tileDao';
 /**
  * Related Tables Extension
  * @param  {module:geoPackage~GeoPackage} geoPackage the GeoPackage object
@@ -41,7 +39,7 @@ import {TileDao} from "../../tiles/user/tileDao";
 export class RelatedTablesExtension extends BaseExtension {
   extendedRelationDao: ExtendedRelationDao;
 
-  public static readonly EXTENSION_NAME: string = 'related_tables';
+  public static readonly EXTENSION_NAME: string = 'gpkg_related_tables';
   public static readonly EXTENSION_RELATED_TABLES_AUTHOR: string = 'gpkg';
   public static readonly EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR: string = 'related_tables';
   public static readonly EXTENSION_RELATED_TABLES_DEFINITION: string = 'TBD';
@@ -669,9 +667,13 @@ export class RelatedTablesExtension extends BaseExtension {
       return (
         this.hasExtension(RelatedTablesExtension.EXTENSION_NAME, ExtendedRelationDao.TABLE_NAME, null) &&
         this.hasExtension(RelatedTablesExtension.EXTENSION_NAME, mappingTableName, null)
+      ) || (
+        this.hasExtension(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, ExtendedRelationDao.TABLE_NAME, null) &&
+        this.hasExtension(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, mappingTableName, null)
       );
     }
-    return this.hasExtension(RelatedTablesExtension.EXTENSION_NAME, ExtendedRelationDao.TABLE_NAME, null);
+    return this.hasExtension(RelatedTablesExtension.EXTENSION_NAME, ExtendedRelationDao.TABLE_NAME, null) ||
+      this.hasExtension(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, ExtendedRelationDao.TABLE_NAME, null);
   }
   static RelationshipBuilder(): any {
     return OptionBuilder.build([

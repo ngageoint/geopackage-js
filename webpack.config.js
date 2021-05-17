@@ -8,10 +8,15 @@ const browserConfig = {
   plugins: [
     // new BundleAnalyzerPlugin({analyzerMode: 'static'}),
     new NodePolyfillWebpackPlugin(),
+    // copy
     new CopyPlugin({
       patterns: [
         {
           from: 'node_modules/rtree-sql.js/dist/sql-wasm.wasm',
+          to: '.',
+        },
+        {
+          from: 'canvaskit/*',
           to: '.',
         },
       ],
@@ -19,6 +24,7 @@ const browserConfig = {
   ],
   target: 'web',
   module: {
+    noParse: /node_modules\/rtree-sql\.js\/dist\/sql-wasm\.js$/,
     rules: [
       {
         test: /\.tsx?$/,
@@ -35,61 +41,20 @@ const browserConfig = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-      "fs": false,
+      'fs': false
     },
   },
   output: {
-    filename: 'index.min.js',
-    path: path.resolve(__dirname, 'dist', 'browser'),
-    libraryTarget: 'umd',
-  },
-  devtool: 'source-map',
-  mode: 'production'
-};
-
-const nodeConfig = {
-  entry: './index.node.ts',
-  plugins: [
-    // new BundleAnalyzerPlugin({analyzerMode: 'static'}),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'canvaskit/*',
-          to: '.',
-        },
-      ],
-    }),
-  ],
-  target: "node",
-  module: {
-    rules: [
-      {
-        test: /\.node$/,
-        use: 'node-loader',
-      },
-      {
-        test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            configFile: "./tsconfig.node.json"
-          },
-        },
-        exclude: /node_modules/,
-      },
-    ],
+    filename: 'geopackage.min.js',
+    path: path.resolve(__dirname, 'dist'),
+    library: {
+      name: 'GeoPackage',
+      type: 'umd'
+    },
   },
   externals: ['better-sqlite3'],
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-  output: {
-    filename: 'index.node.min.js',
-    path: path.resolve(__dirname, 'dist', 'node'),
-    libraryTarget: 'commonjs2',
-  },
   devtool: 'source-map',
   mode: 'production'
 };
 
-module.exports = [browserConfig, nodeConfig];
+module.exports = [browserConfig];

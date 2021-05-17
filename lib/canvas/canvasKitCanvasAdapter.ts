@@ -3,11 +3,12 @@ import path from 'path';
 import fs from 'fs';
 import http from 'http';
 import CanvasKitInit from '../../canvaskit/canvaskit.js';
+import { CanvasUtils } from './canvasUtils';
 
 /**
  * Node based canvas creation
  */
-export class NodeCanvasAdapter implements CanvasAdapter {
+export class CanvasKitCanvasAdapter implements CanvasAdapter {
   private static CanvasKit;
   private static initialized = false;
 
@@ -18,53 +19,40 @@ export class NodeCanvasAdapter implements CanvasAdapter {
 
   // allow user to set the locate file function, if they place it somewhere else
   static setCanvasKitWasmLocateFile(locateFile: (filename: string) => string) {
-    NodeCanvasAdapter.canvasKitWasmLocateFile = locateFile;
+    CanvasKitCanvasAdapter.canvasKitWasmLocateFile = locateFile;
   }
 
   // Let user set CanvasKit from outside of this module. i.e. they load it into their context and then pass the CanvasKit object to this adapter.
   static setCanvasKit (CanvasKit) {
-    NodeCanvasAdapter.CanvasKit = CanvasKit;
-    NodeCanvasAdapter.initialized = true;
+    CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
+    CanvasKitCanvasAdapter.initialized = true;
   }
 
   initialize(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         CanvasKitInit({
-          locateFile: NodeCanvasAdapter.canvasKitWasmLocateFile
+          locateFile: CanvasKitCanvasAdapter.canvasKitWasmLocateFile
         }).then(CanvasKit => {
-          NodeCanvasAdapter.CanvasKit = CanvasKit;
-          NodeCanvasAdapter.initialized = true;
+          CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
+          CanvasKitCanvasAdapter.initialized = true;
           resolve();
         }).catch(() => {
-          reject('Failed to load the CanvasKit WebAssembly file at ' + NodeCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
+          reject('Failed to load the CanvasKit WebAssembly file at ' + CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
         });
       } catch (e) {
-        reject('Failed to load the CanvasKit WebAssembly file at ' + NodeCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
+        reject('Failed to load the CanvasKit WebAssembly file at ' + CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
       }
     });
   }
 
   isInitialized(): boolean {
-    return NodeCanvasAdapter.initialized;
+    return CanvasKitCanvasAdapter.initialized;
   }
 
   create(width: number, height: number): any {
-    return NodeCanvasAdapter.CanvasKit.MakeCanvas(width, height);
+    return CanvasKitCanvasAdapter.CanvasKit.MakeCanvas(width, height);
   }
-
-  static base64toUInt8Array(data) {
-    const bytes = Buffer.from(data, 'base64').toString('binary');
-    let length = bytes.length;
-    let out = new Uint8Array(length);
-
-    // Loop and convert.
-    while (length--) {
-      out[length] = bytes.charCodeAt(length);
-    }
-
-    return out;
-  };
 
   /**
    * Supports creating an image from file, base64 encoded image, image data buffer or url
@@ -79,7 +67,7 @@ export class NodeCanvasAdapter implements CanvasAdapter {
     try {
       if (typeof imageData === 'string') {
         if (/^\s*data:/.test(imageData)) {
-          src = NodeCanvasAdapter.base64toUInt8Array(imageData.split(',')[1]);
+          src = CanvasUtils.base64toUInt8Array(imageData.split(',')[1]);
         } else if (/^\s*https?:\/\//.test(imageData)) {
           src = await new Promise((resolve, reject) => {
             http.get(imageData, res => {
@@ -110,7 +98,7 @@ export class NodeCanvasAdapter implements CanvasAdapter {
           });
         }
       }
-      image = NodeCanvasAdapter.CanvasKit.MakeImageFromEncoded(src);
+      image = CanvasKitCanvasAdapter.CanvasKit.MakeImageFromEncoded(src);
       if (image != null) {
         width = image.width();
         height = image.height();
@@ -127,7 +115,7 @@ export class NodeCanvasAdapter implements CanvasAdapter {
   }
 
   createImageData(width, height): any {
-    return new NodeCanvasAdapter.CanvasKit.ImageData(width, height);
+    return new CanvasKitCanvasAdapter.CanvasKit.ImageData(width, height);
   }
 
   disposeCanvas(canvas: any) {
@@ -138,10 +126,10 @@ export class NodeCanvasAdapter implements CanvasAdapter {
   }
 
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
-    const font = new NodeCanvasAdapter.CanvasKit.Font(null, fontSize);
+    const font = new CanvasKitCanvasAdapter.CanvasKit.Font(null, fontSize);
     const ids = font.getGlyphIDs(text);
-    const paint = new NodeCanvasAdapter.CanvasKit.Paint();
-    paint.setStyle(NodeCanvasAdapter.CanvasKit.PaintStyle.Fill);
+    const paint = new CanvasKitCanvasAdapter.CanvasKit.Paint();
+    paint.setStyle(CanvasKitCanvasAdapter.CanvasKit.PaintStyle.Fill);
     return font.getGlyphWidths(ids, paint).reduce(function(a, b){
       return a + b;
     }, 0);
@@ -150,11 +138,15 @@ export class NodeCanvasAdapter implements CanvasAdapter {
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string): void {
     context.save();
     context.fillStyle = fontColor;
-    context.font = fontSize + "px '" + fontFace + "'";
+    context.font = fontSize + 'px \'' + fontFace + '\'';
     context.textBaseline = 'middle';
     const textWidth = this.measureText(context, fontFace, fontSize, text);
     context.fillText(text, location[0] - textWidth / 2, location[1] + fontSize / 4);
     context.restore();
+  }
+
+  toDataURL(canvas: any, format: string = 'image/png'): Promise<string> {
+    return Promise.resolve(canvas.toDataURL(format));
   }
 
   async scaleImage(image: { image: any; width: number; height: number }, scale: number): Promise<{ image: any; width: number; height: number }> {
@@ -166,7 +158,7 @@ export class NodeCanvasAdapter implements CanvasAdapter {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
-    const result = await this.createImage(canvas.toDataURL(), 'image/png');
+    const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
   }

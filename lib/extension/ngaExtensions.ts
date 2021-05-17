@@ -301,7 +301,8 @@ export class NGAExtensions {
     let geoPackage: GeoPackage = featureStyleExtension.geoPackage;
     let mappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, table);
     let extensionsDao = geoPackage.extensionDao;
-    let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName);
+    let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName)
+      .concat(extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, mappingTableName));
 
     if (extensions.length > 0) {
       let newMappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, newTable);

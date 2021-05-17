@@ -62,4 +62,11 @@ export interface CanvasAdapter {
    * @param fontColor
    */
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string): void;
+
+  /**
+   * Converts the canvas to a base64 data url in the format specified
+   * @param canvas
+   * @param format
+   */
+  toDataURL(canvas: any, format: string): Promise<string>;
 }
