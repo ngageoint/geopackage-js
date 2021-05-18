@@ -359,6 +359,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
             if (geometry) {
               const geoJson = {
                 id: undefined,
+                type: 'Feature',
                 properties: {},
                 geometry: geometry,
               } as Feature;
