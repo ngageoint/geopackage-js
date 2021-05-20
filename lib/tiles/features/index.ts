@@ -23,6 +23,8 @@ import { FeatureStyle } from '../../extension/style/featureStyle';
 import { IconRow } from '../../extension/style/iconRow';
 import { CrsGeometry } from '../../types/CrsGeometry';
 import { Canvas } from '../../canvas/canvas';
+import { Projection } from '../../projection/projection';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 /**
  * FeatureTiles module.
@@ -63,7 +65,7 @@ export class FeatureTiles {
     public tileWidth: number = 256,
     public tileHeight: number = 256,
   ) {
-    this.projection = featureDao.projection;
+    this.projection = this.featureDao.projection;
     this.linePaint.strokeWidth = 2.0;
     this.polygonPaint.strokeWidth = 2.0;
     this.polygonFillPaint.color = '#00000011';
@@ -74,7 +76,7 @@ export class FeatureTiles {
         this.featureTableStyles = null;
       }
     }
-    this.webMercatorProjection = proj4('EPSG:3857');
+    this.webMercatorProjection = Projection.getWebMercatorToWGS84Converter();
     this.calculateDrawOverlap();
   }
   /**
@@ -501,25 +503,27 @@ export class FeatureTiles {
       if (this.maxFeaturesPerTile == null || featureCount <= this.maxFeaturesPerTile) {
         const iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
         for (const featureRow of iterator) {
-          let geojson = null;
-          if (this.cacheGeometries) {
-            geojson = this.geometryCache.getGeometry(featureRow.id);
-          }
-          if (geojson == null) {
-            geojson = featureRow.geometry.geometry.toGeoJSON() as Geometry & CrsGeometry;
-            this.geometryCache.setGeometry(featureRow.id, geojson);
-          }
-          const style = this.getFeatureStyle(featureRow);
-          try {
-            await this.drawGeometry(
-              simplifyTolerance,
-              this.webMercatorTransform(geojson),
-              context,
-              boundingBox,
-              style,
-            );
-          } catch (e) {
-            console.log('Error drawing geometry', e);
+          if (featureRow.geometry != null) {
+            let geojson = null;
+            if (this.cacheGeometries) {
+              geojson = this.geometryCache.getGeometry(featureRow.id);
+            }
+            if (geojson == null) {
+              geojson = featureRow.geometry.geometry.toGeoJSON() as Geometry & CrsGeometry;
+              this.geometryCache.setGeometry(featureRow.id, geojson);
+            }
+            const style = this.getFeatureStyle(featureRow);
+            try {
+              await this.drawGeometry(
+                simplifyTolerance,
+                this.webMercatorTransform(geojson),
+                context,
+                boundingBox,
+                style,
+              );
+            } catch (e) {
+              console.log('Error drawing geometry', e);
+            }
           }
         }
         image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
@@ -552,30 +556,35 @@ export class FeatureTiles {
     context.clearRect(0, 0, width, height);
     const featureDao = this.featureDao;
     const each = featureDao.queryForEach();
-    const featureRows = [];
+    const featureRowsToDraw = [];
     for (const row of each) {
-      featureRows.push(featureDao.getRow(row));
+      const fr = featureDao.getRow(row)
+      if (fr.geometry != null) {
+        featureRowsToDraw.push(fr);
+      }
     }
-    for (const fr of featureRows) {
+    for (const fr of featureRowsToDraw) {
       let gj: Geometry & CrsGeometry = null;
       if (this.cacheGeometries) {
         gj = this.geometryCache.getGeometryForFeatureRow(fr);
       }
-      if (gj === undefined || gj === null) {
+      if (gj == null) {
         gj = fr.geometry.geometry.toGeoJSON() as Geometry & CrsGeometry;
         this.geometryCache.setGeometry(fr.id, gj);
       }
-      const style = this.getFeatureStyle(fr);
-      try {
-        await this.drawGeometry(
-          simplifyTolerance,
-          this.webMercatorTransform(gj),
-          context,
-          boundingBox,
-          style,
-        );
-      } catch (e) {
-        console.log('Error drawing geometry', e);
+      if (gj != null) {
+        const style = this.getFeatureStyle(fr);
+        try {
+          await this.drawGeometry(
+            simplifyTolerance,
+            this.webMercatorTransform(gj),
+            context,
+            boundingBox,
+            style,
+          );
+        } catch (e) {
+          console.log('Error drawing geometry', e);
+        }
       }
     }
     const image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
@@ -730,24 +739,33 @@ export class FeatureTiles {
   /**
    * Draw a polygon in the context
    * @param simplifyTolerance
-   * @param geoJson
+   * @param externalRing
+   * @param internalRings
    * @param context
    * @param featureStyle
    * @param boundingBox
+   * @param fill
    */
   drawPolygon(
     simplifyTolerance: any,
-    geoJson: any,
+    externalRing: any,
+    internalRings: any[],
     context: any,
     featureStyle: FeatureStyle,
     boundingBox: BoundingBox,
+    fill: boolean = true
   ): void {
+    // get paint
     context.save();
     context.beginPath();
-    this.getPath(simplifyTolerance, geoJson, context, boundingBox);
+    this.getPath(simplifyTolerance, externalRing, context, boundingBox);
     context.closePath();
+    for (let i = 0; i < internalRings.length; i++) {
+      this.getPath(simplifyTolerance, internalRings[i], context, boundingBox);
+      context.closePath();
+    }
     const fillPaint = this.getPolygonFillPaint(featureStyle);
-    if (fillPaint !== undefined && fillPaint != null) {
+    if (fill && fillPaint !== undefined && fillPaint != null) {
       context.fillStyle = fillPaint.colorRGBA;
       context.fill();
     }
@@ -781,28 +799,31 @@ export class FeatureTiles {
       const converted = PolyToLine(geoJson);
       if (converted.type === 'Feature') {
         if (converted.geometry.type === 'LineString') {
-          this.drawPolygon(simplifyTolerance, converted.geometry, context, featureStyle, boundingBox);
-        } else if (converted.geometry.type === 'MultiLineString') {
-          for (i = 0; i < converted.geometry.coordinates.length; i++) {
-            lsGeom = {
+          this.drawPolygon(simplifyTolerance, converted.geometry, [], context, featureStyle, boundingBox);
+        } else if (converted.geometry.type === 'MultiLineString') { // internal rings
+          // draw internal rings without fill
+          const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[converted.geometry.coordinates.length - 1]};
+          const internalRings = converted.geometry.coordinates.slice(0, converted.geometry.coordinates.length - 1).map(coords => {
+            return {
               type: 'LineString',
-              coordinates: converted.geometry.coordinates[i],
-            };
-            this.drawPolygon(simplifyTolerance, lsGeom, context, featureStyle, boundingBox);
-          }
+              coordinates: coords.reverse()
+            }
+          });
+          this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
         }
       } else {
         converted.features.forEach(feature => {
           if (feature.geometry.type === 'LineString') {
-            this.drawPolygon(simplifyTolerance, feature.geometry, context, featureStyle, boundingBox);
+            this.drawPolygon(simplifyTolerance, feature.geometry, [], context, featureStyle, boundingBox);
           } else if (feature.geometry.type === 'MultiLineString') {
-            for (i = 0; i < feature.geometry.coordinates.length; i++) {
-              lsGeom = {
+            const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[feature.geometry.coordinates.length - 1]};
+            const internalRings = feature.geometry.coordinates.slice(0, feature.geometry.coordinates.length - 1).map(coords => {
+              return {
                 type: 'LineString',
-                coordinates: feature.geometry.coordinates[i],
-              };
-              this.drawPolygon(simplifyTolerance, lsGeom, context, featureStyle, boundingBox);
-            }
+                coordinates: coords.reverse()
+              }
+            });
+            this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
           }
         });
       }
@@ -894,10 +915,10 @@ export class FeatureTiles {
     minLatitude = Math.min(minLatitude, webMercatorBoundingBox.minLatitude);
     maxLatitude = Math.max(maxLatitude, webMercatorBoundingBox.maxLatitude);
     // Bound with the web mercator limits
-    minLongitude = Math.max(minLongitude, -1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    maxLongitude = Math.min(maxLongitude, TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    minLatitude = Math.max(minLatitude, -1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    maxLatitude = Math.min(maxLatitude, TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    minLongitude = Math.max(minLongitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    minLatitude = Math.max(minLatitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
     return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
   }
 }

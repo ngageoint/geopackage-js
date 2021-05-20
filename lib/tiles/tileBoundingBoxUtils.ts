@@ -1,6 +1,6 @@
+import { ProjectionConstants } from '../projection/projectionConstants';
 import { TileGrid } from './tileGrid';
 import { BoundingBox } from '../boundingBox';
-import proj4 from 'proj4';
 import { TileMatrix } from './matrix/tileMatrix';
 
 /**
@@ -11,8 +11,6 @@ import { TileMatrix } from './matrix/tileMatrix';
  */
 
 export class TileBoundingBoxUtils {
-  public static readonly WEB_MERCATOR_HALF_WORLD_WIDTH = proj4('EPSG:4326', 'EPSG:3857').forward([180, 0])[0];
-  public static webMercatorProjection = proj4('EPSG:3857');
   /**
    * Calculate the bounds in tile coordinates that covers the given bounding box
    * at the given zoom level.  The result object contains the keys `minX`, `maxX`,
@@ -28,28 +26,28 @@ export class TileBoundingBoxUtils {
     const tileSize = TileBoundingBoxUtils.tileSizeWithTilesPerSide(tilesPerSide);
 
     const minLonClip = Math.max(
-      -TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH,
+      -ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
       webMercatorBoundingBox.minLongitude,
     );
     const maxLonClip = Math.min(
-      TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH,
+      ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
       webMercatorBoundingBox.maxLongitude,
     );
     const minLatClip = Math.max(
-      -TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH,
+      -ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
       webMercatorBoundingBox.minLatitude,
     );
-    const maxLatClip = Math.min(TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLatitude);
+    const maxLatClip = Math.min(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLatitude);
 
-    const minX = Math.floor((minLonClip + TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
+    const minX = Math.floor((minLonClip + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
     const maxX = Math.max(
       0,
-      Math.ceil((maxLonClip + TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize) - 1,
+      Math.ceil((maxLonClip + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize) - 1,
     );
-    const minY = Math.floor((TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH - maxLatClip) / tileSize);
+    const minY = Math.floor((ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - maxLatClip) / tileSize);
     const maxY = Math.max(
       0,
-      Math.ceil((TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH - minLatClip) / tileSize) - 1,
+      Math.ceil((ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - minLatClip) / tileSize) - 1,
     );
     return new BoundingBox(minX, maxX, minY, maxY);
   }
@@ -149,15 +147,15 @@ export class TileBoundingBoxUtils {
       meterBuffer = metersPerPixel * pixelBuffer;
     }
 
-    let minLon = -1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH + x * tileSize - meterBuffer;
-    let maxLon = -1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH + (x + 1) * tileSize + meterBuffer;
-    let minLat = TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH - (y + 1) * tileSize - meterBuffer;
-    let maxLat = TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH - y * tileSize + meterBuffer;
+    let minLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + x * tileSize - meterBuffer;
+    let maxLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + (x + 1) * tileSize + meterBuffer;
+    let minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - (y + 1) * tileSize - meterBuffer;
+    let maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - y * tileSize + meterBuffer;
 
-    minLon = Math.max(-1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, minLon);
-    maxLon = Math.min(TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, maxLon);
-    minLat = Math.max(-1 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, minLat);
-    maxLat = Math.min(TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH, maxLat);
+    minLon = Math.max(-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, minLon);
+    maxLon = Math.min(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, maxLon);
+    minLat = Math.max(-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, minLat);
+    maxLat = Math.min(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, maxLat);
 
     return new BoundingBox(minLon, maxLon, minLat, maxLat);
   }
@@ -170,7 +168,7 @@ export class TileBoundingBoxUtils {
    *  @return meters
    */
   static tileSizeWithTilesPerSide(tilesPerSide: number): number {
-    return (2 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+    return (2 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
   }
 
   static intersects(boundingBoxA: BoundingBox, boundingBoxB: BoundingBox): boolean {
@@ -415,7 +413,7 @@ export class TileBoundingBoxUtils {
    * @return {Number} tile size
    */
   static tileSize(tilesPerSide: number): number {
-    return (2 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
+    return (2 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
   }
 
   /**
@@ -425,7 +423,7 @@ export class TileBoundingBoxUtils {
    * @since 1.2.0
    */
   static zoomLevelOfTileSize(tileSize: number): number {
-    const tilesPerSide = (2 * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
+    const tilesPerSide = (2 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
     return Math.log(tilesPerSide) / Math.log(2);
   }
 

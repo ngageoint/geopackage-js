@@ -10,6 +10,8 @@ import { BoundingBox } from '../../boundingBox';
 import { Canvas } from '../../canvas/canvas';
 import { ImageUtils } from '../imageUtils';
 import { TileUtilities } from './tileUtilities';
+import { Projection } from '../../projection/projection';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 export class TileCreator {
   dispose: boolean = false;
@@ -26,6 +28,7 @@ export class TileCreator {
   projectionFrom: string;
   projectionFromDefinition: string;
   projectionTo: string;
+  projectionToDefinition: string | proj4.ProjectionDefinition;
   tileBoundingBox: BoundingBox;
   tileMatrixSet: TileMatrixSet;
   chunks: any[];
@@ -41,6 +44,7 @@ export class TileCreator {
     tileBoundingBox: BoundingBox,
     srs: SpatialReferenceSystem,
     projectionTo: string,
+    projectionToDefinition: string | proj4.ProjectionDefinition,
     canvas: any,
   ) {
     this.width = width;
@@ -49,6 +53,7 @@ export class TileCreator {
     this.projectionFrom = srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id;
     this.projectionFromDefinition = srs.definition;
     this.projectionTo = projectionTo.toUpperCase();
+    this.projectionToDefinition = projectionToDefinition
     this.tileBoundingBox = tileBoundingBox;
     this.tileMatrixSet = tileMatrixSet;
     this.chunks = [];
@@ -58,8 +63,8 @@ export class TileCreator {
     // special cases 'EPSG:900913' =='EPSG:3857' == 'EPSG:102113'
     this.sameProjection =
       this.projectionFrom === this.projectionTo ||
-      (this.projectionTo === 'EPSG:3857' &&
-        (this.projectionFrom === 'EPSG:900913' || this.projectionFrom === 'EPSG:102113'));
+      (this.projectionTo === ProjectionConstants.EPSG_3857 &&
+        (this.projectionFrom === ProjectionConstants.EPSG_900913 || this.projectionFrom === ProjectionConstants.EPSG_102113));
 
     this.canvas = canvas;
   }
@@ -73,6 +78,7 @@ export class TileCreator {
    * @param tileBoundingBox
    * @param srs
    * @param projectionTo
+   * @param projectionToDefinition
    * @param canvas
    */
   static async create(
@@ -83,6 +89,7 @@ export class TileCreator {
     tileBoundingBox: BoundingBox,
     srs: SpatialReferenceSystem,
     projectionTo: string,
+    projectionToDefinition: string | proj4.ProjectionDefinition,
     canvas: any,
   ): Promise<TileCreator> {
     const creator = new TileCreator(
@@ -93,6 +100,7 @@ export class TileCreator {
       tileBoundingBox,
       srs,
       projectionTo,
+      projectionToDefinition,
       canvas,
     );
     await creator.initialize();
@@ -219,6 +227,7 @@ export class TileCreator {
         this.height,
         this.width,
         this.projectionTo,
+        this.projectionToDefinition,
         this.projectionFrom,
         this.projectionFromDefinition,
         this.tileHeightUnitsPerPixel,
@@ -231,6 +240,7 @@ export class TileCreator {
         height: this.height,
         width: this.width,
         projectionTo: this.projectionTo,
+        projectionToDefinition: this.projectionToDefinition,
         projectionFrom: this.projectionFrom,
         projectionFromDefinition: this.projectionFromDefinition,
         maxLatitude: this.tileBoundingBox.maxLatitude,
@@ -269,12 +279,14 @@ export class TileCreator {
       const tileWidth = this.tileMatrix.tile_width;
       let conversion;
       try {
+        if (Projection.hasProjection(this.projectionTo) == null) {
+          Projection.loadProjection(this.projectionTo, this.projectionToDefinition)
+        }
+        if (Projection.hasProjection(this.projectionFrom) == null) {
+          Projection.loadProjection(this.projectionFrom, this.projectionFromDefinition)
+        }
         conversion = proj4(this.projectionTo, this.projectionFrom);
-      } catch (e) {
-      }
-      if (!conversion) {
-        conversion = proj4(this.projectionTo, this.projectionFromDefinition);
-      }
+      } catch (e) {}
       let latitude;
       for (let row = 0; row < height; row++) {
         latitude = this.tileBoundingBox.maxLatitude - row * this.tileHeightUnitsPerPixel;

@@ -79,6 +79,8 @@ import { ContentsDataType } from './core/contents/contentsDataType';
 import { UserMappingTable } from './extension/relatedTables/userMappingTable';
 import { GeometryType } from './features/user/geometryType';
 import { Constraints } from './db/table/constraints';
+import { Projection } from './projection/projection';
+import { ProjectionConstants } from './projection/projectionConstants';
 
 type ColumnMap = {
   [key: string]: {
@@ -143,6 +145,7 @@ export class GeoPackage {
     this.path = path;
     this.connection = connection;
     this.tableCreator = new TableCreator(this);
+    this.loadSpatialReferenceSystemsIntoProj4();
   }
   close(): void {
     this.connection.close();
@@ -153,7 +156,16 @@ export class GeoPackage {
   async export(): Promise<any> {
     return this.connection.export();
   }
-
+  loadSpatialReferenceSystemsIntoProj4(): void {
+    this.spatialReferenceSystemDao.getAllSpatialReferenceSystems().forEach(spatialReferenceSystem => {
+      try {
+        if (spatialReferenceSystem.srs_id > 0 && (spatialReferenceSystem.organization !== ProjectionConstants.EPSG ||
+          (spatialReferenceSystem.organization_coordsys_id !== ProjectionConstants.EPSG_CODE_4326 &&
+          spatialReferenceSystem.organization_coordsys_id !== ProjectionConstants.EPSG_CODE_3857)))
+        Projection.loadProjection([spatialReferenceSystem.organization, spatialReferenceSystem.organization_coordsys_id].join(':'), spatialReferenceSystem.definition)
+      } catch (e) {}
+    })
+  }
   validate(): GeoPackageValidationError[] {
     let errors: GeoPackageValidationError[] = [];
     errors = errors.concat(GeoPackageValidate.validateMinimumTables(this));
@@ -246,8 +258,8 @@ export class GeoPackage {
 
   /**
    * Get a Tile DAO
-   *  @returns {FeatureDao}
    * @param table
+   * @returns {TileDao}
    */
   getTileDao(table: string | Contents | TileMatrixSet): TileDao<TileRow> {
     if (table instanceof Contents) {
@@ -734,8 +746,8 @@ export class GeoPackage {
     const featureRow = featureDao.newRow();
     const geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);
-    if (!(srs.organization === 'EPSG' && srs.organization_coordsys_id === 4326)) {
-      feature = reproject.reproject(feature, 'EPSG:4326', featureDao.projection);
+    if (!(srs.organization === ProjectionConstants.EPSG && srs.organization_coordsys_id === ProjectionConstants.EPSG_CODE_4326)) {
+      feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
     }
 
     const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
@@ -861,9 +873,14 @@ export class GeoPackage {
     geometryColumns?: GeometryColumns,
     featureColumns?: UserColumn[] | { name: string; dataType: string }[],
     boundingBox: BoundingBox = new BoundingBox(-180, 180, -90, 90),
-    srsId = 4326,
+    srsId: number = ProjectionConstants.EPSG_CODE_4326,
     dataColumns?: DataColumns[],
   ): boolean {
+    const srs = this.spatialReferenceSystemDao.getBySrsId(srsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + srsId + ') is not defined.');
+    }
+
     this.createGeometryColumnsTable();
 
     let geometryColumn;
@@ -946,6 +963,16 @@ export class GeoPackage {
   createTileTable(tileTable: TileTable): { lastInsertRowid: number; changes: number } {
     return this.tableCreator.createUserTable(tileTable);
   }
+
+  /**
+   * Adds a spatial reference system to the gpkg_spatial_ref_sys table to be used by feature and tile tables.
+   * @param spatialReferenceSystem
+   */
+  createSpatialReferenceSystem(spatialReferenceSystem: SpatialReferenceSystem) {
+    Projection.loadProjection([spatialReferenceSystem.organization.toUpperCase(), spatialReferenceSystem.organization_coordsys_id].join(':'), spatialReferenceSystem.definition)
+    this.spatialReferenceSystemDao.create(spatialReferenceSystem)
+  }
+
   /**
    * Create a new [tile table]{@link module:tiles/user/tileTable~TileTable} in this GeoPackage.
    *
@@ -963,6 +990,14 @@ export class GeoPackage {
     tileMatrixSetBoundingBox: BoundingBox,
     tileMatrixSetSrsId: number,
   ): TileMatrixSet {
+    let srs = this.spatialReferenceSystemDao.getBySrsId(contentsSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + contentsSrsId + ') is not defined.');
+    }
+    srs = this.spatialReferenceSystemDao.getBySrsId(tileMatrixSetSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + tileMatrixSetSrsId + ') is not defined.');
+    }
     const columns = TileTable.createRequiredColumns(0);
     const tileTable = new TileTable(tableName, columns);
     const contents = new Contents();
@@ -1026,22 +1061,31 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = 256,
   ): TileMatrixSet {
-    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857);
+    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
     if (!webMercator) {
       this.spatialReferenceSystemDao.createWebMercator();
-      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857);
+      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
     }
     const webMercatorSrsId = webMercator.srs_id;
+
+    let srs = this.spatialReferenceSystemDao.getBySrsId(contentsSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + contentsSrsId + ') is not defined.');
+    }
+    srs = this.spatialReferenceSystemDao.getBySrsId(tileMatrixSetSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + tileMatrixSetSrsId + ') is not defined.');
+    }
 
     if (contentsSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
       const from = srsDao.getBySrsId(contentsSrsId).projection;
-      contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, 'EPSG:3857');
+      contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, ProjectionConstants.EPSG_3857);
     }
     if (tileMatrixSetSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
       const from = srsDao.getBySrsId(tileMatrixSetSrsId).projection;
-      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, 'EPSG:3857');
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, ProjectionConstants.EPSG_3857);
     }
     const tileMatrixSet = this.createTileTableWithTableName(
       tableName,
@@ -1050,6 +1094,7 @@ export class GeoPackage {
       tileMatrixSetBoundingBox,
       webMercatorSrsId,
     );
+
     this.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, tileSize);
     return tileMatrixSet;
   }
@@ -1079,7 +1124,12 @@ export class GeoPackage {
     zoomLevels: Set<number>,
     tileSize = 256,
   ): Promise<TileMatrixSet> {
-    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
+    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    if (!webMercator) {
+      this.spatialReferenceSystemDao.createWebMercator();
+      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    }
+    const webMercatorSrsId = webMercator.srs_id;
     const tileMatrixSet = await this.createTileTableWithTableName(
       tableName,
       contentsBoundingBox,
@@ -1167,10 +1217,8 @@ export class GeoPackage {
     const box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoomLevel);
     const matrixWidth = box.maxLongitude - box.minLongitude + 1;
     const matrixHeight = box.maxLatitude - box.minLatitude + 1;
-    const pixelXSize =
-      (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
-    const pixelYSize =
-      (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
+    const pixelXSize = (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
+    const pixelYSize = (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
     const tileMatrix = new TileMatrix();
     tileMatrix.table_name = tileMatrixSet.table_name;
     tileMatrix.zoom_level = zoomLevel;
@@ -1324,7 +1372,7 @@ export class GeoPackage {
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(
-      'EPSG:4326',
+      ProjectionConstants.EPSG_4326,
       tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id,
     );
 
@@ -1487,7 +1535,7 @@ export class GeoPackage {
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(
-      'EPSG:4326',
+      ProjectionConstants.EPSG_4326,
       tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id,
     );
 
@@ -1581,7 +1629,7 @@ export class GeoPackage {
     const ft = new FeatureTiles(featureDao, 256, 256);
     const tileCount = ft.getFeatureCountXYZ(x, y, z);
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    boundingBox = boundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+    boundingBox = boundingBox.projectBoundingBox(ProjectionConstants.EPSG_3857, ProjectionConstants.EPSG_4326);
 
     if (tileCount > 10000) {
       // too many, send back the entire tile
@@ -1824,9 +1872,9 @@ export class GeoPackage {
       if (
         srs.definition &&
         srs.definition !== 'undefined' &&
-        srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id !== 'EPSG:4326'
+        srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id !== ProjectionConstants.EPSG_4326
       ) {
-        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.projection, 'EPSG:4326');
+        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.projection, ProjectionConstants.EPSG_4326);
       }
       geoJson.geometry = geoJsonGeom;
     }
@@ -1870,7 +1918,7 @@ export class GeoPackage {
     skipVerification = false,
   ): Promise<Feature[]> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    const bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+    const bb = webMercatorBoundingBox.projectBoundingBox(ProjectionConstants.EPSG_3857, ProjectionConstants.EPSG_4326);
     await this.indexFeatureTable(table);
     const featureDao = this.getFeatureDao(table);
     if (!featureDao) return;
@@ -1983,13 +2031,14 @@ export class GeoPackage {
   }
 
   /**
-   * Draws a tile projected into the specified projection, bounded by the specified by the bounds in EPSG:4326 into the canvas or the image is returned if no canvas is passed in
+   * Draws a tile projected into the specified projection, bounded by the specified by the bounds in EPSG:4326 into the canvas or the image is returned if no canvas is passed in.
    * @param  {string}   table      name of the table containing the tiles
    * @param  {Number}   minLat     minimum latitude bounds of tile
    * @param  {Number}   minLon     minimum longitude bounds of tile
    * @param  {Number}   maxLat     maximum latitude bounds of tile
    * @param  {Number}   maxLon     maximum longitude bounds of tile
    * @param  {Number}   z          zoom level of the tile
+   * @param  {string}   projection project from tile's projection to this one.
    * @param  {Number}   width      width of the resulting tile
    * @param  {Number}   height     height of the resulting tile
    * @param  {any}   canvas     canvas element to draw the tile into
@@ -2001,7 +2050,7 @@ export class GeoPackage {
     maxLat: number,
     maxLon: number,
     z: number,
-    projection: 'EPSG:4326',
+    projection: string = ProjectionConstants.EPSG_4326,
     width = 256,
     height = 256,
     canvas?: any,
@@ -2166,13 +2215,6 @@ export class GeoPackage {
     return info;
   }
 
-  static loadProjections(items: {name: string, definition: string}[]): void {
-    if (!items) throw new Error('Invalid array of projections');
-    for (let i = 0; i < items.length; i++) {
-      if (!items[i] || !items[i].name || !items[i].definition) throw new Error('Invalid projection in array. Valid projection {name: string, definition: string}.');
-      this.addProjection(items[i].name, items[i].definition);
-    }
-  }
   static addProjection(name: string, definition: string): void {
     if (!name || !definition) throw new Error('Invalid projection name/definition');
     proj4.defs(name, definition);

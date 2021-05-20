@@ -44,6 +44,8 @@ import { MetadataReference } from './lib/metadata/reference/metadataReference';
 import { NumberFeaturesTile } from './lib/tiles/features/custom/numberFeaturesTile';
 import { OptionBuilder } from './lib/optionBuilder';
 import { Paint } from './lib/tiles/features/paint';
+import { Projection } from './lib/projection/projection';
+import { ProjectionConstants } from './lib/projection/projectionConstants';
 import { RelatedTablesExtension } from './lib/extension/relatedTables';
 import { RTreeIndex } from './lib/extension/rtree/rtreeIndex';
 import { RTreeIndexDao } from './lib/extension/rtree/rtreeIndexDao';
@@ -143,6 +145,8 @@ export {
   OffscreenCanvasAdapter,
   OptionBuilder,
   Paint,
+  Projection,
+  ProjectionConstants,
   RelatedTablesExtension,
   RTreeIndex,
   RTreeIndexDao,

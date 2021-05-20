@@ -16,6 +16,8 @@ import { TileTable } from './tileTable';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { TileDaoUtils } from './tileDaoUtils';
+import { Projection } from '../../projection/projection';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -66,13 +68,15 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
   initialize(): void {
     const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     this.srs = tileMatrixSetDao.getSrs(this.tileMatrixSet);
-    this.projection = this.srs.organization.toUpperCase() + ':' + this.srs.organization_coordsys_id;
+    this.projection = [this.srs.organization.toUpperCase(), this.srs.organization_coordsys_id].join(':');
+    Projection.loadProjection(this.projection, this.srs.definition);
+
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
     for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
       const tileMatrix = this.tileMatrices[i];
       let width = tileMatrix.pixel_x_size * tileMatrix.tile_width;
       let height = tileMatrix.pixel_y_size * tileMatrix.tile_height;
-      const proj4Projection: proj4.Converter & { to_meter?: number } = proj4(this.projection);
+      const proj4Projection: proj4.Converter & { to_meter?: number } = Projection.getConverter(this.projection);
       if (proj4Projection.to_meter) {
         width = proj4Projection.to_meter * tileMatrix.pixel_x_size * tileMatrix.tile_width;
         height = proj4Projection.to_meter * tileMatrix.pixel_y_size * tileMatrix.tile_height;
@@ -102,7 +106,7 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
         this.tileMatrixSet.min_y,
         this.tileMatrixSet.min_y + singleTileHeight,
       );
-      const proj4Projection = proj4(this.projection, 'EPSG:4326');
+      const proj4Projection = Projection.getConverter(this.projection, ProjectionConstants.EPSG_4326);
       const ne = proj4Projection.forward([tileBox.maxLongitude, tileBox.maxLatitude]);
       const sw = proj4Projection.forward([tileBox.minLongitude, tileBox.minLatitude]);
       const width = ne[0] - sw[0];

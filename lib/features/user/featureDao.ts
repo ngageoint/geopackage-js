@@ -2,6 +2,7 @@
  * featureDao module.
  * @module features/user/featureDao
  */
+import proj4 from 'proj4';
 // @ts-ignore
 import reproject from 'reproject';
 import LineIntersect from '@turf/line-intersect';
@@ -26,6 +27,7 @@ import { Contents } from '../../core/contents/contents';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
 import { DataColumns } from '../../dataColumns/dataColumns';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -102,7 +104,6 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * Get the geometry types
    * @return {Number} well known binary geometry type
    */
-  //TODO is this a string?
   get geometryType(): string {
     return this.geometryColumns.geometryType;
   }
@@ -125,7 +126,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @returns {Number}
    */
   countWebMercatorBoundingBox(boundingBox: BoundingBox): number {
-    return this.featureTableIndex.countWithBoundingBox(boundingBox, 'EPSG:3857');
+    return this.featureTableIndex.countWithBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
   }
   /**
    * Query for count in bounding box
@@ -142,7 +143,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @returns {any}
    */
   fastQueryWebMercatorBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
-    const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
+    const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
     return {
       [Symbol.iterator](): IterableIterator<FeatureRow> {
         return this;
@@ -167,9 +168,9 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
   queryIndexedFeaturesWithWebMercatorBoundingBox(boundingBox: BoundingBox): IterableIterator<FeatureRow> {
     const srs = this.srs;
     const projection = this.projection;
-    const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:3857');
+    const iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
     const thisGetRow = this.getRow.bind(this);
-    const projectedBoundingBox = boundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+    const projectedBoundingBox = boundingBox.projectBoundingBox(ProjectionConstants.EPSG_3857, ProjectionConstants.EPSG_4326);
     return {
       [Symbol.iterator](): IterableIterator<FeatureRow> {
         return this;
@@ -330,7 +331,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     });
     let iterator: IterableIterator<any>;
     if (boundingBox) {
-      iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, 'EPSG:4326')[Symbol.iterator]();
+      iterator = this.featureTableIndex.queryWithBoundingBox(boundingBox, ProjectionConstants.EPSG_4326)[Symbol.iterator]();
     } else {
       iterator = this.queryForEach();
     }
@@ -406,8 +407,8 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
     projection: proj4.Converter | string,
   ): GeoJsonObject {
     let geometry = featureRow.geometry.toGeoJSON();
-    if (srs.organization + ':' + srs.organization_coordsys_id !== 'EPSG:4326') {
-      geometry = reproject.reproject(geometry, projection, 'EPSG:4326');
+    if (srs.organization !== ProjectionConstants.EPSG || srs.organization_coordsys_id !== ProjectionConstants.EPSG_CODE_4326) {
+      geometry = reproject.reproject(geometry, projection, ProjectionConstants.EPSG_4326);
     }
     return geometry;
   }

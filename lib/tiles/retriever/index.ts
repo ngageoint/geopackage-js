@@ -6,6 +6,8 @@ import { TileCreator } from '../creator/tileCreator';
 import { TileRow } from '../user/tileRow';
 import { TileScaling } from '../../extension/scale/tileScaling';
 import { TileScalingType } from '../../extension/scale/tileScalingType';
+import { Projection } from '../../projection/projection';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 export class GeoPackageTileRetriever {
   tileDao: TileDao<TileRow>;
@@ -25,23 +27,10 @@ export class GeoPackageTileRetriever {
     this.scaling = scaling;
   }
   getWebMercatorBoundingBox(): BoundingBox {
-    if (this.setWebMercatorBoundingBox) {
-      return this.setWebMercatorBoundingBox;
-    } else {
-      const tileMatrixSetDao = this.tileDao.geoPackage.tileMatrixSetDao;
-      const tileMatrixSet = this.tileDao.tileMatrixSet;
-      const srs = tileMatrixSetDao.getSrs(tileMatrixSet);
-      this.setProjectionBoundingBox = tileMatrixSet.boundingBox;
-      if (srs.organization_coordsys_id === 4326 && srs.organization === 'EPSG') {
-        this.setProjectionBoundingBox.minLatitude = Math.max(this.setProjectionBoundingBox.minLatitude, -85.05);
-        this.setProjectionBoundingBox.maxLatitude = Math.min(this.setProjectionBoundingBox.maxLatitude, 85.05);
-      }
-      this.setWebMercatorBoundingBox = this.setProjectionBoundingBox.projectBoundingBox(
-        this.tileDao.projection,
-        'EPSG:3857',
-      );
-      return this.setWebMercatorBoundingBox;
+    if (this.setWebMercatorBoundingBox == null) {
+      this.setWebMercatorBoundingBox = this.tileDao.tileMatrixSet.boundingBox.projectBoundingBox(this.tileDao.projection, ProjectionConstants.EPSG_3857);
     }
+    return this.setWebMercatorBoundingBox;
   }
 
   /**
@@ -54,7 +43,7 @@ export class GeoPackageTileRetriever {
     let hasTile = false;
     if (x >= 0 && y >= 0 && zoom >= 0) {
       const tilesBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-      hasTile = this.hasTileForBoundingBox(tilesBoundingBox, 'EPSG:3857');
+      hasTile = this.hasTileForBoundingBox(tilesBoundingBox, ProjectionConstants.EPSG_3857);
     }
     return hasTile;
   }
@@ -79,23 +68,23 @@ export class GeoPackageTileRetriever {
 
   async getTile(x: number, y: number, zoom: number): Promise<any> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, 'EPSG:3857');
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857);
   }
 
   async getWebMercatorTile(x: number, y: number, zoom: number): Promise<any> {
     // need to determine the geoPackage zoom level from the web mercator zoom level
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, 'EPSG:3857');
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857);
   }
 
   async drawTileIn(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, 'EPSG:3857', canvas);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857, canvas);
   }
 
   async getTileWithWgs84Bounds(wgs84BoundingBox: BoundingBox, canvas?: any): Promise<any> {
-    const webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-    return this.getTileWithBounds(webMercatorBoundingBox, 'EPSG:3857', canvas);
+    const webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox(ProjectionConstants.EPSG_4326, ProjectionConstants.EPSG_3857);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857, canvas);
   }
 
   async getTileWithWgs84BoundsInProjection(
@@ -104,11 +93,15 @@ export class GeoPackageTileRetriever {
     targetProjection: string,
     canvas?: any,
   ): Promise<any> {
-    const targetBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', targetProjection);
+    const targetBoundingBox = wgs84BoundingBox.projectBoundingBox(ProjectionConstants.EPSG_4326, targetProjection);
     return this.getTileWithBounds(targetBoundingBox, targetProjection, canvas);
   }
 
   async getTileWithBounds(targetBoundingBox: BoundingBox, targetProjection: string, canvas?: any): Promise<any> {
+    const targetProjectionDefinition = Projection.hasProjection(targetProjection);
+    if (targetProjectionDefinition == null) {
+      throw new Error('Projection ' + targetProjection + ' is not loaded.');
+    }
     const projectedBoundingBox = targetBoundingBox.projectBoundingBox(targetProjection, this.tileDao.projection);
 
     const tileMatrices = this.getTileMatrices(projectedBoundingBox);
@@ -126,6 +119,7 @@ export class GeoPackageTileRetriever {
         targetBoundingBox,
         this.tileDao.srs,
         targetProjection,
+        targetProjectionDefinition,
         canvas,
       );
       const iterator = this.retrieveTileResults(projectedBoundingBox, tileMatrix);

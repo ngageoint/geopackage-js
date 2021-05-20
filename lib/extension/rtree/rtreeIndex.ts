@@ -381,6 +381,9 @@ export class RTreeIndex extends BaseExtension {
   createMinXFunction(): void {
     this.connection.registerFunction('ST_MinX', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
+      if (!geom.geometry) {
+        return null;
+      }
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
@@ -394,6 +397,9 @@ export class RTreeIndex extends BaseExtension {
   createMinYFunction(): void {
     this.connection.registerFunction('ST_MinY', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
+      if (!geom.geometry) {
+        return null;
+      }
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
@@ -407,6 +413,9 @@ export class RTreeIndex extends BaseExtension {
   createMaxXFunction(): void {
     this.connection.registerFunction('ST_MaxX', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
+      if (!geom.geometry) {
+        return null;
+      }
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);
@@ -420,6 +429,9 @@ export class RTreeIndex extends BaseExtension {
   createMaxYFunction(): void {
     this.connection.registerFunction('ST_MaxY', function(buffer: Buffer | Uint8Array) {
       const geom = new GeometryData(buffer);
+      if (!geom.geometry) {
+        return null;
+      }
       let envelope = geom.envelope;
       if (!envelope) {
         envelope = EnvelopeBuilder.buildEnvelopeWithGeometry(geom.geometry);

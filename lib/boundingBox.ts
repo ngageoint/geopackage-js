@@ -1,6 +1,8 @@
 import proj4 from 'proj4';
 import { Envelope } from './geom/envelope';
 import { Feature, Polygon } from 'geojson';
+import { Projection } from './projection/projection';
+import { ProjectionConstants } from './projection/projectionConstants';
 
 /**
  * Create a new bounding box
@@ -143,9 +145,6 @@ export class BoundingBox {
     );
   }
 
-  isConverter(x: proj4.Converter | string): x is proj4.Converter {
-    return (x as proj4.Converter).forward !== undefined;
-  }
 
   /**
    * Project the bounding box into a new projection
@@ -155,31 +154,35 @@ export class BoundingBox {
    * @return {BoundingBox}
    */
   projectBoundingBox(from?: string | proj4.Converter, to?: string | proj4.Converter): BoundingBox {
+    let minLatitude = this.minLatitude
+    let maxLatitude = this.maxLatitude
+    let minLongitude = this.minLongitude
+    let maxLongitude = this.maxLongitude
     if (from && from !== 'undefined' && to && to !== 'undefined') {
-      if (!this.isConverter(to) && to.toUpperCase() === 'EPSG:3857' && !this.isConverter(from) && from.toUpperCase() === 'EPSG:4326') {
-        this.maxLatitude = Math.min(this.maxLatitude, 85.0511);
-        this.minLatitude = Math.max(this.minLatitude, -85.0511);
-        this.minLongitude = Math.max(this.minLongitude, -180.0);
-        this.maxLongitude = Math.min(this.maxLongitude, 180.0);
+      if (!Projection.isConverter(to) && to.toUpperCase() === ProjectionConstants.EPSG_3857 && !Projection.isConverter(from) && from.toUpperCase() === ProjectionConstants.EPSG_4326) {
+        maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
+        minLatitude = Math.max(minLatitude, ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
+        maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_MAX_LON_RANGE);
+        minLongitude = Math.max(minLongitude, ProjectionConstants.WEB_MERCATOR_MIN_LON_RANGE);
       }
 
       let toConverter: proj4.Converter;
-      if (this.isConverter(to)) {
+      if (Projection.isConverter(to)) {
         toConverter = to;
       } else {
-        toConverter = proj4(to);
+        toConverter = Projection.getConverter(to);
       }
       let fromConverter: proj4.Converter;
-      if (this.isConverter(from)) {
+      if (Projection.isConverter(from)) {
         fromConverter = from;
       } else {
-        fromConverter = proj4(from);
+        fromConverter = Projection.getConverter(from);
       }
 
-      const sw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.minLatitude]));
-      const ne = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.maxLatitude]));
-      const se = toConverter.forward(fromConverter.inverse([this.maxLongitude, this.minLatitude]));
-      const nw = toConverter.forward(fromConverter.inverse([this.minLongitude, this.maxLatitude]));
+      const sw = toConverter.forward(fromConverter.inverse([minLongitude, minLatitude]));
+      const ne = toConverter.forward(fromConverter.inverse([maxLongitude, maxLatitude]));
+      const se = toConverter.forward(fromConverter.inverse([maxLongitude, minLatitude]));
+      const nw = toConverter.forward(fromConverter.inverse([minLongitude, maxLatitude]));
 
       return new BoundingBox(
         Math.min(sw[0], nw[0]),

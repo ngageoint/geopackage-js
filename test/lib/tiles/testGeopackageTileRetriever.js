@@ -253,7 +253,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       result.minLongitude.should.be.equal(-20037508.342789244);
       result.maxLongitude.should.be.equal(-15028131.257091932);
       result.minLatitude.should.be.equal(5621521.486192066);
-      result.maxLatitude.should.be.equal(20036051.91933679);
+      result.maxLatitude.should.be.equal(20037508.342789244);
     });
 
     it('should get the web mercator bounding box twice', function() {
@@ -262,13 +262,13 @@ describe('GeoPackage Tile Retriever tests', function() {
       result.minLongitude.should.be.equal(-20037508.342789244);
       result.maxLongitude.should.be.equal(-15028131.257091932);
       result.minLatitude.should.be.equal(5621521.486192066);
-      result.maxLatitude.should.be.equal(20036051.91933679);
+      result.maxLatitude.should.be.equal(20037508.342789244);
 
       var result2 = gpr.getWebMercatorBoundingBox();
       result2.minLongitude.should.be.equal(-20037508.342789244);
       result2.maxLongitude.should.be.equal(-15028131.257091932);
       result2.minLatitude.should.be.equal(5621521.486192066);
-      result2.maxLatitude.should.be.equal(20036051.91933679);
+      result2.maxLatitude.should.be.equal(20037508.342789244);
     });
 
     it('should get the x: 0, y: 4, z: 4 tile', function(done) {
@@ -293,5 +293,4 @@ describe('GeoPackage Tile Retriever tests', function() {
       });
     });
   });
-
 });

@@ -370,7 +370,9 @@ var {
   GeoPackageAPI,
   GeoPackageTileRetriever,
   FeatureTiles,
-  setCanvasKitWasmLocateFile
+  setCanvasKitWasmLocateFile,
+  SpatialReferenceSystem,
+  Projection
 } = require('@ngageoint/geopackage');
 
 setCanvasKitWasmLocateFile(file => 'path/to/geopackage/dist/canvaskit/' + file);
@@ -439,6 +441,33 @@ GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
     // query for all features as geojson
     const geojsonFeatures = geoPackage.queryForGeoJSONFeaturesInTable(table);
   });
+  
+  // add a spatial reference system to the geopackage
+  const srs = new SpatialReferenceSystem();
+  srs.srs_name = 'NAD27 / UTM zone 11N';
+  srs.srs_id = 26711;
+  srs.organization = 'EPSG';
+  srs.organization_coordsys_id = 26711;
+  srs.definition = 'PROJCS["NAD27 / UTM zone 11N",GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-117],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","26711"]]';
+  geoPackage.createSpatialReferenceSystem(srs);
+  
+  // create a tile table using the spatial reference system
+  // bounding box is the bounds for EPSG:26711
+  const boundingBox = new BoundingBox(202161.66, 568941.68, 2982030.40, 8674415.25);
+  geoPackage.createTileTableWithTableName(
+    tableName,
+    boundingBox,
+    srs.srs_id,
+    boundingBox,
+    srs.srs_id,
+  );
+
+  /**
+   * Note: any projection in the spatial reference system table is loaded into proj4 for use throughout the geopackage api
+   * By default, this includes EPSG:3856 and EPSG:4326
+   */
+  // Load a projection to be used by API, but not saved to spatial reference system table.
+  Projection.loadProjection('EPSG:26711', srs.definition)
 });
 
 ```

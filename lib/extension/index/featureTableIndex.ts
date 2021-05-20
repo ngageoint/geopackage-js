@@ -2,6 +2,7 @@
  * Feature Table Index
  * @module extension/index
  */
+import proj4 from 'proj4';
 import { RTreeIndex } from '../rtree/rtreeIndex';
 import { BaseExtension } from '../baseExtension';
 import { GeoPackage } from '../../geoPackage';

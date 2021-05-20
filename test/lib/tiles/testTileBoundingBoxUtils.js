@@ -1,6 +1,7 @@
 const TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
   , TileUtilities = require('../../../lib/tiles/creator/tileUtilities').TileUtilities
-  , BoundingBox = require('../../../lib/boundingBox').BoundingBox;
+  , BoundingBox = require('../../../lib/boundingBox').BoundingBox
+  , Projection = require('../../../lib/projection/projection').Projection;
 
 require('chai').should();
 
@@ -56,13 +57,14 @@ describe('TileBoundingBoxUtils tests', function() {
     var height = 256;
     var width = 256;
     var projectionTo = 'EPSG:3857';
+    var projectionToDefinition = Projection.hasProjection(projectionTo)
     var projectionFrom = 'EPSG:3395';
     var projectionFromDefinition = 'PROJCS["WGS 84 / World Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3395"],AXIS["Easting",EAST],AXIS["Northing",NORTH]]';
     var tileHeightUnitsPerPixel = 19567.87924100511;
     var tileWidthUnitsPerPixel = 19567.879241005125;
     var pixelXSize = 19567.87924100512;
     var pixelYSize = 19567.87924100512;
-    var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, tileBoundingBox, height, width, projectionTo, projectionFrom, projectionFromDefinition, tileHeightUnitsPerPixel, tileWidthUnitsPerPixel, pixelXSize, pixelYSize);
+    var piecePosition = TileUtilities.getPiecePosition(tilePieceBoundingBox, tileBoundingBox, height, width, projectionTo, projectionToDefinition, projectionFrom, projectionFromDefinition, tileHeightUnitsPerPixel, tileWidthUnitsPerPixel, pixelXSize, pixelYSize);
     var finalWidth = (piecePosition.endX - piecePosition.startX);
     finalWidth.should.be.gt(0);
     done();
