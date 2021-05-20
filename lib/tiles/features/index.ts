@@ -621,7 +621,7 @@ export class FeatureTiles {
       if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height && y <= this.tileHeight + height) {
         iconX = Math.round(x - iconRow.anchorUOrDefault * width);
         iconY = Math.round(y - iconRow.anchorVOrDefault * height);
-        context.drawImage(image.image, iconX, iconY);
+        context.drawImage(image.image, iconX, iconY, width, height);
       }
     } else if (this.pointIcon != null) {
       width = Math.round(this.scale * this.pointIcon.getWidth());
