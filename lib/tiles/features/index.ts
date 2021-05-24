@@ -79,6 +79,18 @@ export class FeatureTiles {
     this.webMercatorProjection = Projection.getWebMercatorToWGS84Converter();
     this.calculateDrawOverlap();
   }
+
+  /**
+   * Will handle disposing any saved icons
+   */
+  cleanup () {
+    this.clearIconCache();
+    if (this.pointIcon) {
+      Canvas.disposeImage(this.pointIcon.getIcon());
+      this.pointIcon = null;
+    }
+  }
+
   /**
    * Manually set the width and height draw overlap
    * @param {Number} pixels pixels

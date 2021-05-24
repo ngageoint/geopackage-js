@@ -1,6 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
+  , Canvas = require('../../../../lib/canvas/canvas').Canvas
   , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
@@ -501,6 +502,7 @@ describe('GeoPackage FeatureTiles tests', function() {
         ft.calculateDrawOverlap();
         ft.drawTile(153632, 91343, 18)
           .then(function(image) {
+            Canvas.disposeImage(icon);
             testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_styled_with_icon.png'), function(err, equal) {
               try {
                 equal.should.be.equal(true);

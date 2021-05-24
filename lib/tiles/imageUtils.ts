@@ -44,24 +44,22 @@ export class ImageUtils {
   public static async getScaledImage(data: Buffer | string, scale: number): Promise<{image: any, width: number, height: number}> {
     return new Promise((resolve) => {
       ImageUtils.getImage(data).then(image => {
-        ImageUtils.scaleBitmap(image, scale).then(scaledImage => resolve(scaledImage)).catch((e) => {
-          console.error(e);
-          resolve(null);
-        })
+        if (scale === 1.0) {
+          resolve(image);
+        } else {
+          Canvas.scaleImage(image, scale).then(scaledImage => {
+            Canvas.disposeImage(image);
+            resolve(scaledImage)
+          }).catch((e) => {
+            Canvas.disposeImage(image);
+            console.error(e);
+            resolve(null);
+          })
+        }
       }).catch(e => {
         console.error(e);
         resolve(null);
       });
     });
-  }
-
-  /**
-   * Get a scaled image
-   * @param {typeof Image} image
-   * @param {Number} scale
-   * @returns {Promise<typeof Image>}
-   */
-  public static async scaleBitmap(image: {image: any, width: number, height: number}, scale: number): Promise<{image: any, width: number, height: number}> {
-    return Canvas.scaleImage(image, scale);
   }
 }

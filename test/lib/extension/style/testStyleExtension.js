@@ -5,6 +5,7 @@ var FeatureTableStyles = require('../../../../lib/extension/style/featureTableSt
   , StyleMappingTable = require('../../../../lib/extension/style/styleMappingTable').StyleMappingTable
   , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
   , Styles = require('../../../../lib/extension/style/styles').Styles
+  , Canvas = require('../../../../lib/canvas/canvas').Canvas
   , Icons = require('../../../../lib/extension/style/icons').Icons
   , FeatureStyles = require('../../../../lib/extension/style/featureStyles').FeatureStyles
   , FeatureStyle = require('../../../../lib/extension/style/featureStyle').FeatureStyle
@@ -109,6 +110,7 @@ describe('StyleExtension Tests', function() {
 
   afterEach(async function() {
     geopackage.close();
+    Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 

@@ -46,6 +46,8 @@ describe('IconCache Tests', function() {
       const result = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
       Canvas.disposeCanvas(actualCanvas);
       Canvas.disposeCanvas(expectedCanvas);
+      Canvas.disposeImage(imageA);
+      Canvas.disposeImage(imageB);
       resolve(result);
     });
   };
@@ -71,6 +73,7 @@ describe('IconCache Tests', function() {
 
   afterEach(async function() {
     geopackage.close();
+    Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 

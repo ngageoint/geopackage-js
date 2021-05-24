@@ -86,4 +86,7 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
   toDataURL(canvas: any, format: string = 'image/png'): Promise<string> {
     return Promise.resolve(canvas.toDataURL(format));
   }
+
+  disposeImage(image: {image: any, width: number, height: number}): void {
+  }
 }

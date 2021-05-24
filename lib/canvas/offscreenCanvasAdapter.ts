@@ -95,4 +95,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
       })
     })
   }
+
+  disposeImage(image: {image: any, width: number, height: number}): void {
+  }
 }

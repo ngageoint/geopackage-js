@@ -111,6 +111,7 @@ module.exports.diffCanvas = async function(actualCanvas, expectedTilePath, callb
       expectedCanvas.getContext('2d').drawImage(img.image, 0, 0);
       let same = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
       Canvas.disposeCanvas(expectedCanvas);
+      Canvas.disposeImage(img);
       if (callback) {
         callback(null, same);
       }
@@ -237,6 +238,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
         // cleanup
         actualCtx = null;
         Canvas.disposeCanvas(actual);
+        Canvas.disposeImage(expectedImage);
         // cleanup
         expectedCtx = null;
         Canvas.disposeCanvas(expected);

@@ -20,8 +20,7 @@ export class Canvas {
   static checkCanvasAdapter() {
     if (!Canvas.adapter) {
       throw new Error('Canvas adapter not registered.');
-    }
-    if (!Canvas.adapter.isInitialized()) {
+    } else if (!Canvas.adapter.isInitialized()) {
       throw new Error('Canvas adapter not initialized.');
     }
   }
@@ -64,5 +63,10 @@ export class Canvas {
   static async toDataURL(canvas, format = 'image/png'): Promise<string> {
     Canvas.checkCanvasAdapter();
     return Canvas.adapter.toDataURL(canvas, format)
+  }
+
+  static disposeImage(image: {image: any, width: number, height: number}) {
+    Canvas.checkCanvasAdapter();
+    Canvas.adapter.disposeImage(image);
   }
 }

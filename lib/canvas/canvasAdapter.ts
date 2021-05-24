@@ -69,4 +69,10 @@ export interface CanvasAdapter {
    * @param format
    */
   toDataURL(canvas: any, format: string): Promise<string>;
+
+  /**
+   * Performs any cleanup needed for the specified image
+   * @param image
+   */
+  disposeImage(image: {image: any, width: number, height: number}): void;
 }

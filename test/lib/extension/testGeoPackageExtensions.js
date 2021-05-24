@@ -2,7 +2,7 @@ import { default as testSetup } from '../../fixtures/testSetup'
 
 var GeoPackageExtensions = require('../../../lib/extension/geoPackageExtensions').GeoPackageExtensions
   , FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
-  , NGAExtensions = require('../../../lib/extension/ngaExtensions').NGAExtensions
+  , Canvas = require('../../../lib/canvas/canvas').Canvas
   , ExtensionDao = require('../../../lib/extension/extensionDao').ExtensionDao
   , SchemaExtension = require('../../../lib/extension/schema').SchemaExtension
   , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
@@ -185,6 +185,7 @@ describe('GeoPackage Extensions tests', function() {
 
   afterEach(async function() {
     geopackage.close();
+    Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 

@@ -130,9 +130,11 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     const ids = font.getGlyphIDs(text);
     const paint = new CanvasKitCanvasAdapter.CanvasKit.Paint();
     paint.setStyle(CanvasKitCanvasAdapter.CanvasKit.PaintStyle.Fill);
-    return font.getGlyphWidths(ids, paint).reduce(function(a, b){
+    const size = font.getGlyphWidths(ids, paint).reduce(function(a, b){
       return a + b;
     }, 0);
+    paint.delete();
+    return size;
   }
 
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string): void {
@@ -150,9 +152,6 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   }
 
   async scaleImage(image: { image: any; width: number; height: number }, scale: number): Promise<{ image: any; width: number; height: number }> {
-    if (scale === 1.0) {
-      return image;
-    }
     const scaledWidth = Math.round(scale * image.width);
     const scaledHeight = Math.round(scale * image.height);
     const canvas: any = this.create(scaledWidth, scaledHeight);
@@ -161,5 +160,12 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
+  }
+
+  disposeImage(image: {image: any, width: number, height: number}): void {
+    if (image != null && image.image && image.image.delete) {
+      image.image.delete();
+      image.image = null;
+    }
   }
 }

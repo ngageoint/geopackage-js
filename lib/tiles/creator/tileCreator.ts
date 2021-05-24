@@ -158,6 +158,7 @@ export class TileCreator {
         this.ctx.drawImage(tile.image, p.sx, p.sy, p.sWidth, p.sHeight, p.dx, p.dy, p.dWidth, p.dHeight);
       }
     }
+    Canvas.disposeImage(tile);
   }
 
   /**
