@@ -541,7 +541,7 @@ export class FeatureTiles {
         image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);
       } else if (this.maxFeaturesTileDraw != null) {
         // Draw the max features tile
-        image = this.maxFeaturesTileDraw.drawTile(width, height, featureCount.toString(), canvas);
+        image = await this.maxFeaturesTileDraw.drawTile(width, height, featureCount.toString(), canvas);
       }
     } else {
       image = await Canvas.toDataURL(canvas, 'image/' + this.compressFormat);

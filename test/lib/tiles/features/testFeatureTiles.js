@@ -516,6 +516,45 @@ describe('GeoPackage FeatureTiles tests', function() {
     });
   });
 
+  describe('Max Features Indexed', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('rivers');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the number features tile with the correct number of features listed', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.maxFeaturesPerTile = 1;
+      ft.maxFeaturesTileDraw = new NumberFeaturesTile()
+      ft.drawTile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'max_feature_tile_indexed.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
+
+
   describe('Styled With Icon GeoPackage tests', function() {
     var geoPackage;
     var featureDao;

@@ -51,12 +51,18 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
   }
 
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
-    return context.measureText(text).width;
+    context.save();
+    context.font = fontSize + 'px' + (fontFace != null ? (' \'' + fontFace + '\'') : '');
+    context.textBaseline = 'middle';
+    context.textAlign = 'center';
+    const width = context.measureText(text).width;
+    context.restore();
+    return width;
   }
 
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string) {
     context.save();
-    context.font = fontSize + 'px \'' + fontFace + '\'';
+    context.font = fontSize + 'px' + (fontFace != null ? (' \'' + fontFace + '\'') : '');
     context.fillStyle = fontColor;
     context.textBaseline = 'middle';
     context.textAlign = 'center';
