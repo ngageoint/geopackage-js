@@ -926,5 +926,40 @@ describe('GeoPackage FeatureTiles tests', function() {
         });
     });
   });
+  describe('MultiPolygon with multiple holes test', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipleholes.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('multipolywithholes');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the x: 18, y: 24, z: 6 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(18, 24, 6)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '18_24_6.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
 
 });

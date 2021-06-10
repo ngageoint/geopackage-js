@@ -1,6 +1,7 @@
 // @ts-ignore
 import reproject from 'reproject';
 import PolyToLine from '@turf/polygon-to-line';
+import booleanClockwise from '@turf/boolean-clockwise';
 import Simplify from '@turf/simplify';
 import proj4 from 'proj4';
 import { Geometry } from 'geojson';
@@ -707,7 +708,7 @@ export class FeatureTiles {
     simplifyTolerance: number,
     lineString: any,
     context: any,
-    boundingBox: BoundingBox,
+    boundingBox: BoundingBox
   ): void {
     const simplifiedLineString = this.simplifyGeometries ? FeatureTiles.simplifyPoints(simplifyTolerance, lineString) : lineString;
     if (simplifiedLineString.coordinates.length > 0) {
@@ -770,9 +771,15 @@ export class FeatureTiles {
     // get paint
     context.save();
     context.beginPath();
+    if (!booleanClockwise(externalRing.coordinates)) {
+      externalRing.coordinates = externalRing.coordinates.reverse()
+    }
     this.getPath(simplifyTolerance, externalRing, context, boundingBox);
     context.closePath();
     for (let i = 0; i < internalRings.length; i++) {
+      if (booleanClockwise(internalRings[i].coordinates)) {
+        internalRings[i].coordinates = internalRings[i].coordinates.reverse()
+      }
       this.getPath(simplifyTolerance, internalRings[i], context, boundingBox);
       context.closePath();
     }
@@ -814,11 +821,11 @@ export class FeatureTiles {
           this.drawPolygon(simplifyTolerance, converted.geometry, [], context, featureStyle, boundingBox);
         } else if (converted.geometry.type === 'MultiLineString') { // internal rings
           // draw internal rings without fill
-          const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[converted.geometry.coordinates.length - 1]};
-          const internalRings = converted.geometry.coordinates.slice(0, converted.geometry.coordinates.length - 1).map(coords => {
+          const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[0]};
+          const internalRings = converted.geometry.coordinates.slice(1).map(coords => {
             return {
               type: 'LineString',
-              coordinates: coords.reverse()
+              coordinates: coords
             }
           });
           this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
@@ -828,11 +835,11 @@ export class FeatureTiles {
           if (feature.geometry.type === 'LineString') {
             this.drawPolygon(simplifyTolerance, feature.geometry, [], context, featureStyle, boundingBox);
           } else if (feature.geometry.type === 'MultiLineString') {
-            const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[feature.geometry.coordinates.length - 1]};
-            const internalRings = feature.geometry.coordinates.slice(0, feature.geometry.coordinates.length - 1).map(coords => {
+            const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[0]};
+            const internalRings = feature.geometry.coordinates.slice(1).map(coords => {
               return {
                 type: 'LineString',
-                coordinates: coords.reverse()
+                coordinates: coords
               }
             });
             this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
