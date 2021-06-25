@@ -198,4 +198,47 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
         });
     });
   });
+
+  describe('Test Add Scaling Extension for multiple tables', function() {
+    var geoPackage;
+    var tileDao;
+    var filename;
+    beforeEach('should open the copied geopackage', async function() {
+      var fileName = path.join(__dirname, '..', '..', '..', 'fixtures', 'example.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(fileName);
+      filename = result.path;
+      geoPackage = result.geopackage;
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+
+    it('should create tileScaling for every table', function(done) {
+      this.timeout(30000);
+      const tables = geoPackage.getTileTables();
+      const promises = []
+      for (let table of tables) {
+        promises.push(new Promise(resolve => {
+          const tileScalingExtension = geoPackage.getTileScalingExtension(table);
+          tileScalingExtension.getOrCreateExtension();
+          const tileScalingDao = tileScalingExtension.dao;
+          const tileScaling = new TileScaling()
+          tileScaling.scaling_type = TileScalingType.IN_OUT;
+          tileScaling.zoom_in = 25;
+          tileScaling.zoom_out = 25;
+          tileScalingDao.create(tileScaling);
+          tileScalingDao.count().should.be.greaterThan(0);
+          resolve();
+        }))
+      }
+      Promise.allSettled(promises).then(() => {
+        done();
+      })
+    });
+  });
+
 });

@@ -130,7 +130,6 @@ export class GeoPackage {
   private _contentsIdDao: ContentsIdDao;
   private _tileScalingDao: TileScalingDao;
   private _contentsIdExtension: ContentsIdExtension;
-  private _tileScalingExtension: TileScalingExtension;
   private _featureStyleExtension: FeatureStyleExtension;
   private _relatedTablesExtension: RelatedTablesExtension;
 
@@ -232,7 +231,7 @@ export class GeoPackage {
     return this._featureStyleExtension || (this._featureStyleExtension = new FeatureStyleExtension(this));
   }
   getTileScalingExtension(tableName: string): TileScalingExtension {
-    return this._tileScalingExtension || (this._tileScalingExtension = new TileScalingExtension(this, tableName));
+    return new TileScalingExtension(this, tableName);
   }
   getGeometryIndexDao(featureDao: FeatureDao<FeatureRow>): GeometryIndexDao {
     return new GeometryIndexDao(this, featureDao);

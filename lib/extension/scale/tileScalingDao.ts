@@ -15,7 +15,7 @@ export class TileScalingDao extends Dao<TileScaling> {
   public static readonly COLUMN_ZOOM_OUT: string = 'zoom_out';
 
   readonly gpkgTableName: string = TileScalingDao.TABLE_NAME;
-  readonly idColumns: string[] = [];
+  readonly idColumns: string[] = [TileScalingDao.COLUMN_TABLE_NAME];
   /**
    * Create a {module:extension/scale.TileScaling} object
    * @return {module:extension/scale.TileScaling}
