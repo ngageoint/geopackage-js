@@ -263,7 +263,6 @@ export class FeatureTableIndex extends BaseExtension {
     const rows = this.featureDao.queryForChunk(100, page);
     if (rows.length) {
       this.progress('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
-      console.log('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
       rows.forEach(row => {
         const fr = this.featureDao.getRow(row) as FeatureRow;
         this.indexRow(tableIndex, fr.id, fr.geometry);

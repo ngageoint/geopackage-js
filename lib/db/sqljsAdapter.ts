@@ -265,6 +265,34 @@ export class SqljsAdapter implements DBAdapter {
     }
   }
   /**
+   * Prepares a SQL statement
+   * @param sql
+   */
+  prepareStatement (sql: string): any {
+    return this.db.prepare(sql);
+  }
+  /**
+   * Runs an insert statement with the parameters provided
+   * @param  {any} statement  statement to run
+   * @param  {Object|Array} [params] bind parameters
+   * @return {Number} last inserted row id
+   */
+  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+    if (params && !(params instanceof Array)) {
+      for (const key in params) {
+        params['$' + key] = params[key];
+      }
+    }
+    return statement.run(params).lastInsertRowid;
+  }
+  /**
+   * Closes a prepared statement
+   * @param statement
+   */
+  closeStatement (statement: any) {
+    statement.free();
+  }
+  /**
    * Runs the specified delete statement and returns the number of deleted rows
    * @param  {String} sql    statement to run
    * @param  {Object|Array} [params] bind parameters

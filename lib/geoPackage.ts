@@ -81,6 +81,7 @@ import { GeometryType } from './features/user/geometryType';
 import { Constraints } from './db/table/constraints';
 import { Projection } from './projection/projection';
 import { ProjectionConstants } from './projection/projectionConstants';
+import {SqliteQueryBuilder} from "./db/sqliteQueryBuilder";
 
 type ColumnMap = {
   [key: string]: {
@@ -733,15 +734,116 @@ export class GeoPackage {
   }
 
   /**
-   * Adds a GeoJSON feature to the GeoPackage
+   * Adds a list of features to a FeatureTable. Inserts features from the list in batches, providing progress updates
+   * after each batch completes.
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
-   * @param  {object}   feature    GeoJSON feature to add
+   * @param  {object}   features    GeoJSON features to add
    * @param  {string}   tableName  name of the table that will store the feature
    * @param {boolean} index updates the FeatureTableIndex extension if it exists
+   * @param {number} batchSize how many features are inserted in a single transaction,
+   * progress is published after each batch is inserted. 1000 is recommended, 100 is about 25% slower,
+   * but provides more updates and keeps the thread open.
+   * @param  {function}  progress  optional progress function that is called after a batch of features has been
+   * processed. The number of features added is sent as an argument to that function.
+   * @return {Promise<number>} number of features inserted
    */
+  async addGeoJSONFeaturesToGeoPackage (features: Feature[], tableName: string, index = false, batchSize = 1000,  progress?: (featuresAdded: number) => void): Promise<number> {
+    let inserted = 0;
+    const featureDao = this.getFeatureDao(tableName);
+    const srs = featureDao.srs;
+    let geometryData;
+    let featureRow = featureDao.newRow();
+
+    // empty geometry when none is present
+    const emptyPoint = wkx.Geometry.parse('POINT EMPTY');
+
+    // determine if we need to reproject to the srs of the table
+    const reprojectionNeeded = !(srs.organization === ProjectionConstants.EPSG && srs.organization_coordsys_id === ProjectionConstants.EPSG_CODE_4326);
+
+    // progress is called after each step
+    const progressFunction = function(featuresAdded: any): void {
+      setTimeout((progress || function(): void {}), 0, featuresAdded);
+    };
+
+    const insertSql = SqliteQueryBuilder.buildInsert("'" + featureDao.gpkgTableName + "'", featureRow);
+
+    const stepFunction = async (start: number, end: number, resolve: Function) => {
+      // execute step if there are still features
+      if (start < end) {
+        featureDao.connection.transaction(() => {
+          // builds the insert sql statement
+          const insertStatement = featureDao.connection.adapter.prepareStatement(insertSql);
+
+          // determine if indexing is needed
+          let fti;
+          let tableIndex;
+          if (index) {
+            fti = featureDao.featureTableIndex;
+            tableIndex = fti.tableIndex;
+          }
+
+          for (let i = start; i < end; i++) {
+            let feature = features[i];
+            featureRow = featureDao.newRow();
+            geometryData = new GeometryData();
+            geometryData.setSrsId(srs.srs_id);
+            if (reprojectionNeeded) {
+              feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
+            }
+            const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
+            geometryData.setGeometry(featureGeometry ? wkx.Geometry.parseGeoJSON(featureGeometry) : emptyPoint);
+            featureRow.geometry = geometryData;
+            for (const propertyKey in feature.properties) {
+              if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
+                featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+              }
+            }
+            // bind this feature's data to the insert statement and insert into the table
+            const id = featureDao.connection.adapter.bindAndInsert(insertStatement, SqliteQueryBuilder.buildUpdateOrInsertObject(featureRow));
+            inserted++;
+            // if table index exists, be sure to index the row (note, rtree will run using a trigger)
+            if (tableIndex != null) {
+              fti.indexRow(tableIndex, id, geometryData);
+            }
+          }
+          if (tableIndex != null) {
+            fti.updateLastIndexed(tableIndex);
+          }
+
+          // close the prepared statement
+          featureDao.connection.adapter.closeStatement(insertStatement);
+        });
+        progressFunction(end);
+        setTimeout(() => {
+          stepFunction(end, Math.min(end + batchSize, features.length), resolve);
+        })
+      } else {
+        resolve(inserted);
+      }
+    }
+
+    return new Promise ((resolve) => {
+      setTimeout(() => {
+        stepFunction(0, Math.min(batchSize, features.length), resolve);
+      });
+    });
+  }
+
   addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
     const featureDao = this.getFeatureDao(tableName);
     const srs = featureDao.srs;
+    return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, this.getFeatureDao(tableName), srs, index);
+  }
+
+  /**
+   * Adds a GeoJSON feature to the GeoPackage
+   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
+   * @param  {object}   feature    GeoJSON feature to add
+   * @param  {string}   featureDao  feature dao for the table
+   * @param  {string}   srs  srs of the table
+   * @param {boolean} index updates the FeatureTableIndex extension if it exists
+   */
+  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature: Feature, featureDao: FeatureDao<FeatureRow>, srs: SpatialReferenceSystem, index = false): number {
     const featureRow = featureDao.newRow();
     const geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);

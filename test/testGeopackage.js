@@ -361,6 +361,35 @@ describe('GeoPackageAPI tests', function() {
       index.geom_id.should.be.equal(id);
     });
 
+    it('should add several geojson features to the geopackage and index them', function(done) {
+      this.timeout(5000);
+      const features = []
+      for (let i = 0; i < 100; i++) {
+        features.push({
+          type: 'Feature',
+          properties: {
+            property_0: 'test',
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [-99.84374999999999, 40.17887331434696],
+          },
+        })
+      }
+      indexedGeopackage.addGeoJSONFeaturesToGeoPackage(
+        features,
+        'rivers',
+        true
+      ).then(() => {
+        const result = indexedGeopackage.queryForGeoJSONFeaturesInTable(
+          'rivers',
+          new BoundingBox(-99.9, -99.8, 40.16, 40.18),
+        );
+        result.length.should.be.equal(100);
+        done();
+      });
+    });
+
     it('should add geojson to the geopackage and keep it indexed and query it', function() {
       // @ts-ignore
       const id = indexedGeopackage.addGeoJSONFeatureToGeoPackage(

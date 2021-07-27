@@ -217,6 +217,29 @@ export class SqliteAdapter implements DBAdapter {
     return statement.run(params).lastInsertRowid;
   }
   /**
+   * Prepares a SQL statement
+   * @param sql
+   */
+  prepareStatement (sql: string): any {
+    return this.db.prepare(sql);
+  }
+  /**
+   * Runs an insert statement with the parameters provided
+   * @param  {any} statement  statement to run
+   * @param  {Object|Array} [params] bind parameters
+   * @return {Number} last inserted row id
+   */
+  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+    return statement.run(params).lastInsertRowid;
+  }
+  /**
+   * Closes a prepared statement
+   * @param statement
+   */
+  closeStatement (statement: any) {
+    statement = null;
+  }
+  /**
    * Runs the specified delete statement and returns the number of deleted rows
    * @param  {String} sql    statement to run
    * @param  {Object|Array} params bind parameters
