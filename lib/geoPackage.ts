@@ -831,8 +831,7 @@ export class GeoPackage {
 
   addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
     const featureDao = this.getFeatureDao(tableName);
-    const srs = featureDao.srs;
-    return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, this.getFeatureDao(tableName), srs, index);
+    return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, featureDao, featureDao.srs, index);
   }
 
   /**
