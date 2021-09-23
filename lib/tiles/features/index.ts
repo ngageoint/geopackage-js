@@ -535,7 +535,7 @@ export class FeatureTiles {
                 style,
               );
             } catch (e) {
-              // ignore error
+              console.error('Failed to draw feature in tile. Id: ' + featureRow.id + ', Table: ' + this.featureDao.table_name)
             }
           }
         }
