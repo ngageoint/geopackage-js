@@ -61,7 +61,6 @@ export class RTreeIndex extends BaseExtension {
       this.tableName = featureDao.table_name;
       this.primaryKeyColumn = featureDao.idColumns[0];
       this.columnName = featureDao.getGeometryColumnName();
-      this.featureCount = featureDao.count();
     }
     this.rtreeIndexDao = new RTreeIndexDao(geoPackage, featureDao);
     this.extensionExists = this.hasExtension(this.extensionName, this.tableName, this.columnName);
@@ -119,10 +118,11 @@ export class RTreeIndex extends BaseExtension {
     );
     this.createAllFunctions();
     this.createRTreeIndex(this.tableName, this.columnName);
+    const totalCount = this.connection.count(this.tableName);
     safeProgress({
       description: 'Creating Feature Index',
       count: 0,
-      totalCount: this.featureCount,
+      totalCount: totalCount,
       layer: this.tableName,
     });
     try {
