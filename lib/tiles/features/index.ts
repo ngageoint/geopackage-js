@@ -535,7 +535,7 @@ export class FeatureTiles {
                 style,
               );
             } catch (e) {
-              console.log('Error drawing geometry', e);
+              // ignore error
             }
           }
         }
@@ -596,7 +596,7 @@ export class FeatureTiles {
             style,
           );
         } catch (e) {
-          console.log('Error drawing geometry', e);
+          console.error('Failed to draw feature in tile. Id: ' + fr.id + ', Table: ' + this.featureDao.table_name)
         }
       }
     }
@@ -645,7 +645,7 @@ export class FeatureTiles {
         try {
           context.drawImage(this.pointIcon.getIcon().image, iconX, iconY, width, height);
         } catch (e) {
-          console.error(e);
+          // ignore error
         }
       }
     } else {
@@ -683,17 +683,11 @@ export class FeatureTiles {
    * @since 2.0.0
    */
   static simplifyPoints(simplifyTolerance: number, lineString: any): any | null {
-    let simplifiedGeoJSON = null;
-    try {
-      simplifiedGeoJSON = Simplify(lineString, {
-        tolerance: simplifyTolerance,
-        highQuality: false,
-        mutate: true,
-      });
-    } catch (e) {
-      // This could happen if the linestring contains any empty points [NaN, NaN]
-      console.log('Unable to simplify geometry', e);
-    }
+    let simplifiedGeoJSON = Simplify(lineString, {
+      tolerance: simplifyTolerance,
+      highQuality: false,
+      mutate: true,
+    });
     return simplifiedGeoJSON;
   }
 
@@ -809,7 +803,7 @@ export class FeatureTiles {
     boundingBox: BoundingBox,
     featureStyle: FeatureStyle,
   ): Promise<void> {
-    let i, lsGeom;
+    let i;
     if (geoJson.type === 'Point') {
       await this.drawPoint(geoJson, context, boundingBox, featureStyle);
     } else if (geoJson.type === 'LineString') {
