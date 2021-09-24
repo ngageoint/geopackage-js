@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.0.0-beta.38",
+  "version": "4.0.0-beta.39",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -27,25 +27,25 @@
   "bin": "./cli",
   "dependencies": {
     "@turf/bbox": "6.3.0",
-    "@turf/boolean-point-in-polygon": "^6.3.0",
-    "@turf/boolean-within": "6.3.0",
-    "@turf/boolean-clockwise": "6.3.0",
-    "@turf/distance": "6.3.0",
-    "@turf/helpers": "6.3.0",
-    "@turf/intersect": "6.3.0",
-    "@turf/line-intersect": "6.3.0",
-    "@turf/point-to-line-distance": "6.3.0",
-    "@turf/polygon-to-line": "6.3.0",
-    "@turf/simplify": "6.3.0",
-    "@types/geojson": "^7946.0.7",
-    "@types/proj4": "^2.5.0",
+    "@turf/boolean-clockwise": "6.5.0",
+    "@turf/boolean-point-in-polygon": "6.5.0",
+    "@turf/boolean-within": "6.5.0",
+    "@turf/distance": "6.5.0",
+    "@turf/helpers": "6.5.0",
+    "@turf/intersect": "6.5.0",
+    "@turf/line-intersect": "6.5.0",
+    "@turf/point-to-line-distance": "6.5.0",
+    "@turf/polygon-to-line": "6.5.0",
+    "@types/geojson": "7946.0.8",
+    "@types/proj4": "2.5.2",
     "file-type": "12.4.0",
     "image-size": "0.8.3",
-    "lodash": "^4.17.15",
+    "lodash": "4.17.21",
     "proj4": "2.7.2",
     "reproject": "1.2.5",
     "rtree-sql.js": "1.0.0",
-    "webworkify": "^1.1.0",
+    "simplify-js": "1.2.4",
+    "webworkify": "1.5.0",
     "wkx": "0.4.8"
   },
   "devDependencies": {
@@ -88,9 +88,9 @@
     "xhr-mock": "2.5.1"
   },
   "optionalDependencies": {
+    "better-sqlite3": "7.4.1",
     "chalk": "4.1.1",
-    "inquirer": "8.0.0",
-    "better-sqlite3": "7.4.1"
+    "inquirer": "8.0.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

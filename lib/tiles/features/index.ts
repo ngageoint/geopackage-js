@@ -2,7 +2,7 @@
 import reproject from 'reproject';
 import PolyToLine from '@turf/polygon-to-line';
 import booleanClockwise from '@turf/boolean-clockwise';
-import Simplify from '@turf/simplify';
+import simplify from 'simplify-js'
 import proj4 from 'proj4';
 import { Geometry } from 'geojson';
 
@@ -40,6 +40,7 @@ export class FeatureTiles {
   projection: proj4.Converter = null;
   webMercatorProjection: proj4.Converter = null;
   public simplifyGeometries = true;
+  public  simplifyToleranceInPixels = 1;
   public compressFormat = 'png';
   public pointRadius = 4.0;
   pointPaint: Paint = new Paint();
@@ -99,6 +100,20 @@ export class FeatureTiles {
   set drawOverlap(pixels: number) {
     this.widthDrawOverlap = pixels;
     this.heightDrawOverlap = pixels;
+  }
+  /**
+   * Get the simplify tolerance in pixels
+   * @return {Number} width draw overlap
+   */
+  get simplifyTolerance(): number {
+    return this.simplifyToleranceInPixels;
+  }
+  /**
+   * Set the tolerance in pixels used for simplifying rendered geometries
+   * @param {Number} pixels pixels
+   */
+  set simplifyTolerance(pixels: number) {
+    this.simplifyToleranceInPixels = pixels;
   }
   /**
    * Get the width draw overlap
@@ -497,7 +512,6 @@ export class FeatureTiles {
     const expandedBoundingBox = this.expandBoundingBox(boundingBox);
     const width = 256;
     const height = 256;
-    const simplifyTolerance = TileBoundingBoxUtils.toleranceDistanceWidthAndHeight(z, width, height);
     await Canvas.initializeAdapter();
     // create Canvas if user does not provide canvas.
     if (tileCanvas != null) {
@@ -528,7 +542,6 @@ export class FeatureTiles {
             const style = this.getFeatureStyle(featureRow);
             try {
               await this.drawGeometry(
-                simplifyTolerance,
                 this.webMercatorTransform(geojson),
                 context,
                 boundingBox,
@@ -555,7 +568,6 @@ export class FeatureTiles {
   async drawTileWithBoundingBox(boundingBox: BoundingBox, zoom: number, tileCanvas?: any): Promise<any> {
     const width = 256;
     const height = 256;
-    const simplifyTolerance = TileBoundingBoxUtils.toleranceDistanceWidthAndHeight(zoom, width, height);
     let canvas: any;
     let dispose = false;
     await Canvas.initializeAdapter();
@@ -589,7 +601,6 @@ export class FeatureTiles {
         const style = this.getFeatureStyle(fr);
         try {
           await this.drawGeometry(
-            simplifyTolerance,
             this.webMercatorTransform(gj),
             context,
             boundingBox,
@@ -675,59 +686,62 @@ export class FeatureTiles {
   }
 
   /**
-   * When the simplify tolerance is set, simplify the points to a similar
-   * curve with fewer points.
-   * @param simplifyTolerance simplify tolerance in meters
-   * @param lineString GeoJSON
+   * Simplify x,y tile coordinates by 1 pixel
+   * @param lineString GeoJSON with coordinates in pixels
+   * @param isPolygon determines if the first and last point need to stay connected
    * @return simplified GeoJSON
    * @since 2.0.0
    */
-  static simplifyPoints(simplifyTolerance: number, lineString: any): any | null {
-    let simplifiedGeoJSON = Simplify(lineString, {
-      tolerance: simplifyTolerance,
-      highQuality: false,
-      mutate: true,
-    });
-    return simplifiedGeoJSON;
+  simplifyPoints(lineString: any, isPolygon: boolean = false): any | null {
+    let coords = simplify(lineString.coordinates.map(coordinate => {
+      return {x: coordinate[0], y: coordinate[1]}
+    }), this.simplifyToleranceInPixels, false).map(point => [point.x, point.y]);
+    if (isPolygon) {
+      if (coords.length < 4) {
+        return null;
+      } else if (coords[0][0] !== coords[coords.length - 1][0] || coords[0][1] !== coords[coords.length - 1][1]) {
+        // if first and last point do not match, add first point to end
+        coords.push(coords[0].slice());
+      }
+    } else if (coords.length < 2) {
+      return null;
+    }
+    lineString.coordinates = coords;
+    return lineString;
   }
 
   /**
    * Get the path of the line string
-   * @param simplifyTolerance simplify tolerance in meters
    * @param lineString
    * @param context
    * @param boundingBox
+   * @param isPolygon if this was a polygon
    */
   getPath(
-    simplifyTolerance: number,
     lineString: any,
     context: any,
-    boundingBox: BoundingBox
+    boundingBox: BoundingBox,
+    isPolygon: boolean = false
   ): void {
-    const simplifiedLineString = this.simplifyGeometries ? FeatureTiles.simplifyPoints(simplifyTolerance, lineString) : lineString;
-    if (simplifiedLineString.coordinates.length > 0) {
-      let coordinate = simplifiedLineString.coordinates[0];
-      let x = TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]);
-      let y = TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1]);
-      context.moveTo(x, y);
+    lineString.coordinates = lineString.coordinates.map(coordinate => {
+      return [TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]), TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1])]
+    })
+    const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(lineString, isPolygon) : lineString;
+    if (simplifiedLineString != null && simplifiedLineString.coordinates.length > 0) {
+      context.moveTo(simplifiedLineString.coordinates[0][0], simplifiedLineString.coordinates[0][1]);
       for (let i = 1; i < simplifiedLineString.coordinates.length; i++) {
-        coordinate = simplifiedLineString.coordinates[i];
-        x = TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]);
-        y = TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1]);
-        context.lineTo(x, y);
+        context.lineTo(simplifiedLineString.coordinates[i][0], simplifiedLineString.coordinates[i][1]);
       }
     }
   }
   /**
    * Draw a line in the context
-   * @param simplifyTolerance
    * @param geoJson
    * @param context
    * @param featureStyle
    * @param boundingBox
    */
   drawLine(
-    simplifyTolerance: number,
     geoJson: any,
     context: any,
     featureStyle: FeatureStyle,
@@ -738,14 +752,13 @@ export class FeatureTiles {
     const paint = this.getLinePaint(featureStyle);
     context.strokeStyle = paint.colorRGBA;
     context.lineWidth = paint.strokeWidth;
-    this.getPath(simplifyTolerance, geoJson, context, boundingBox);
+    this.getPath(geoJson, context, boundingBox);
     context.stroke();
     context.closePath();
     context.restore();
   }
   /**
    * Draw a polygon in the context
-   * @param simplifyTolerance
    * @param externalRing
    * @param internalRings
    * @param context
@@ -754,7 +767,6 @@ export class FeatureTiles {
    * @param fill
    */
   drawPolygon(
-    simplifyTolerance: any,
     externalRing: any,
     internalRings: any[],
     context: any,
@@ -768,13 +780,13 @@ export class FeatureTiles {
     if (!booleanClockwise(externalRing.coordinates)) {
       externalRing.coordinates = externalRing.coordinates.reverse()
     }
-    this.getPath(simplifyTolerance, externalRing, context, boundingBox);
+    this.getPath(externalRing, context, boundingBox, true);
     context.closePath();
     for (let i = 0; i < internalRings.length; i++) {
       if (booleanClockwise(internalRings[i].coordinates)) {
         internalRings[i].coordinates = internalRings[i].coordinates.reverse()
       }
-      this.getPath(simplifyTolerance, internalRings[i], context, boundingBox);
+      this.getPath(internalRings[i], context, boundingBox, true);
       context.closePath();
     }
     const fillPaint = this.getPolygonFillPaint(featureStyle);
@@ -797,7 +809,6 @@ export class FeatureTiles {
    * @param featureStyle
    */
   async drawGeometry(
-    simplifyTolerance: number,
     geoJson: Geometry,
     context: any,
     boundingBox: BoundingBox,
@@ -807,12 +818,12 @@ export class FeatureTiles {
     if (geoJson.type === 'Point') {
       await this.drawPoint(geoJson, context, boundingBox, featureStyle);
     } else if (geoJson.type === 'LineString') {
-      this.drawLine(simplifyTolerance, geoJson, context, featureStyle, boundingBox);
+      this.drawLine(geoJson, context, featureStyle, boundingBox);
     } else if (geoJson.type === 'Polygon') {
       const converted = PolyToLine(geoJson);
       if (converted.type === 'Feature') {
         if (converted.geometry.type === 'LineString') {
-          this.drawPolygon(simplifyTolerance, converted.geometry, [], context, featureStyle, boundingBox);
+          this.drawPolygon(converted.geometry, [], context, featureStyle, boundingBox);
         } else if (converted.geometry.type === 'MultiLineString') { // internal rings
           // draw internal rings without fill
           const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[0]};
@@ -822,12 +833,12 @@ export class FeatureTiles {
               coordinates: coords
             }
           });
-          this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
+          this.drawPolygon(externalRing, internalRings, context, featureStyle, boundingBox);
         }
       } else {
         converted.features.forEach(feature => {
           if (feature.geometry.type === 'LineString') {
-            this.drawPolygon(simplifyTolerance, feature.geometry, [], context, featureStyle, boundingBox);
+            this.drawPolygon(feature.geometry, [], context, featureStyle, boundingBox);
           } else if (feature.geometry.type === 'MultiLineString') {
             const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[0]};
             const internalRings = feature.geometry.coordinates.slice(1).map(coords => {
@@ -836,7 +847,7 @@ export class FeatureTiles {
                 coordinates: coords
               }
             });
-            this.drawPolygon(simplifyTolerance, externalRing, internalRings, context, featureStyle, boundingBox);
+            this.drawPolygon(externalRing, internalRings, context, featureStyle, boundingBox);
           }
         });
       }
@@ -849,7 +860,7 @@ export class FeatureTiles {
       }
     } else if (geoJson.type === 'MultiLineString') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
-        this.drawLine(simplifyTolerance, {
+        this.drawLine({
           type: 'LineString',
           coordinates: geoJson.coordinates[i],
         }, context, featureStyle, boundingBox);
@@ -857,7 +868,6 @@ export class FeatureTiles {
     } else if (geoJson.type === 'MultiPolygon') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
         await this.drawGeometry(
-          simplifyTolerance,
           {
             type: 'Polygon',
             coordinates: geoJson.coordinates[i],
@@ -870,7 +880,6 @@ export class FeatureTiles {
     } else if (geoJson.type === 'GeometryCollection') {
       for (i = 0; i < geoJson.geometries.length; i++) {
         await this.drawGeometry(
-          simplifyTolerance,
           geoJson.geometries[i],
           context,
           boundingBox,
