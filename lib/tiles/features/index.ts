@@ -580,34 +580,30 @@ export class FeatureTiles {
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, width, height);
     const featureDao = this.featureDao;
-    const each = featureDao.queryForEach();
-    const featureRowsToDraw = [];
+    const each = featureDao.queryForEach(undefined, undefined, undefined, undefined, undefined, [featureDao.table.getIdColumn().getName(), featureDao.table.getGeometryColumn().getName()]);
     for (const row of each) {
       const fr = featureDao.getRow(row)
       if (fr.geometry != null) {
-        featureRowsToDraw.push(fr);
-      }
-    }
-    for (const fr of featureRowsToDraw) {
-      let gj: Geometry & CrsGeometry = null;
-      if (this.cacheGeometries) {
-        gj = this.geometryCache.getGeometryForFeatureRow(fr);
-      }
-      if (gj == null) {
-        gj = fr.geometry.geometry.toGeoJSON() as Geometry & CrsGeometry;
-        this.geometryCache.setGeometry(fr.id, gj);
-      }
-      if (gj != null) {
-        const style = this.getFeatureStyle(fr);
-        try {
-          await this.drawGeometry(
-            this.webMercatorTransform(gj),
-            context,
-            boundingBox,
-            style,
-          );
-        } catch (e) {
-          console.error('Failed to draw feature in tile. Id: ' + fr.id + ', Table: ' + this.featureDao.table_name)
+        let gj: Geometry & CrsGeometry = null;
+        if (this.cacheGeometries) {
+          gj = this.geometryCache.getGeometryForFeatureRow(fr);
+        }
+        if (gj == null) {
+          gj = fr.geometry.geometry.toGeoJSON() as Geometry & CrsGeometry;
+          this.geometryCache.setGeometry(fr.id, gj);
+        }
+        if (gj != null) {
+          const style = this.getFeatureStyle(fr);
+          try {
+            await this.drawGeometry(
+              this.webMercatorTransform(gj),
+              context,
+              boundingBox,
+              style,
+            );
+          } catch (e) {
+            console.error('Failed to draw feature in tile. Id: ' + fr.id + ', Table: ' + this.featureDao.table_name)
+          }
         }
       }
     }

@@ -172,6 +172,7 @@ export abstract class Dao<T> {
    * @param  {string} [groupBy] group by clause
    * @param  {string} [having]  having clause
    * @param  {string} [orderBy] order by clause
+   * @param  {Array<string>} [columns] columns to retrieve
    * @return {IterableIterator<any>} iterable of database objects
    */
   queryForEach(
@@ -180,12 +181,13 @@ export abstract class Dao<T> {
     groupBy?: string,
     having?: string,
     orderBy?: string,
+    columns?: Array<string>
   ): IterableIterator<Record<string, DBValue>> {
     if (!field) {
       const query: string = SqliteQueryBuilder.buildQuery(
         false,
         "'" + this.gpkgTableName + "'",
-        undefined,
+        columns,
         undefined,
         undefined,
         groupBy,
