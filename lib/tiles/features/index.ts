@@ -640,8 +640,8 @@ export class FeatureTiles {
     if (featureStyle != null && featureStyle.useIcon()) {
       const iconRow = featureStyle.icon;
       const image = await this.iconCache.createIcon(iconRow);
-      width = Math.round(this.scale * iconRow.width);
-      height = Math.round(this.scale * iconRow.height);
+      width = Math.round(this.scale * image.width);
+      height = Math.round(this.scale * image.height);
       if (x >= 0 - width && x <= this.tileWidth + width && y >= 0 - height && y <= this.tileHeight + height) {
         iconX = Math.round(x - iconRow.anchorUOrDefault * width);
         iconY = Math.round(y - iconRow.anchorVOrDefault * height);

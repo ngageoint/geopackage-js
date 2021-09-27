@@ -26,14 +26,14 @@ describe('IconCache Tests', function() {
     iconRow.name = "Icon Name";
     iconRow.description = "Icon Description";
     if (!noWidth) {
-      iconRow.width = Math.random() * iconImage.width;
+      iconRow.width = iconImage.width;
     }
     if (!noHeight) {
-      iconRow.height = Math.random() * iconImage.height;
+      iconRow.height = iconImage.height;
     }
     if (!noAnchors) {
-      iconRow.anchorU = Math.random();
-      iconRow.anchorV = Math.random();
+      iconRow.anchorU = 0.5;
+      iconRow.anchorV = 1.0;
     }
     return iconRow;
   };
@@ -208,9 +208,6 @@ describe('IconCache Tests', function() {
     iconRow.name = "Icon Name";
     iconRow.description = "Icon Description";
     iconRow.width = iconImage.width;
-    // iconRow.height = Math.random() * iconImage.height;
-    // iconRow.anchorU = Math.random();
-    // iconRow.anchorV = Math.random();
 
     var image = await iconCache.createScaledIcon(iconRow, 1.0);
     image.width.should.be.equal(iconImage.width);

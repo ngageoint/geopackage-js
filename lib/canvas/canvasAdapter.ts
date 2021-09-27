@@ -31,6 +31,14 @@ export interface CanvasAdapter {
   scaleImage(image: {image: any, width: number, height: number}, scale: number): Promise<{image: any, width: number, height: number}>;
 
   /**
+   * Scales an image created using this adapter.
+   * @param image
+   * @param scaledWidth
+   * @param scaledHeight
+   */
+  scaleImageToDimensions(image: {image: any, width: number, height: number}, scaledWidth: number, scaledHeight: number): Promise<{image: any, width: number, height: number}>;
+
+  /**
    * Creates an ImageData object
    * @param width
    * @param height

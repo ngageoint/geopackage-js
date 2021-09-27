@@ -219,7 +219,7 @@ export class IconCache {
           const scaledHeight = Math.round(scale * iconHeight);
 
           if (scaledWidth != dataWidth || scaledHeight != dataHeight) {
-            iconImage = await ImageUtils.scaleImage(iconImage, scale);
+            iconImage = await ImageUtils.scaleImage(iconImage, scaledWidth, scaledHeight);
           }
         }
 

@@ -60,6 +60,11 @@ export class Canvas {
     return Canvas.adapter.scaleImage(image, scale);
   }
 
+  static scaleImageToDimensions(image: {image: any, width: number, height: number}, scaledWidth: number, scaledHeight: number) {
+    Canvas.checkCanvasAdapter();
+    return Canvas.adapter.scaleImageToDimensions(image, scaledWidth, scaledHeight);
+  }
+
   static async toDataURL(canvas, format = 'image/png'): Promise<string> {
     Canvas.checkCanvasAdapter();
     return Canvas.adapter.toDataURL(canvas, format)

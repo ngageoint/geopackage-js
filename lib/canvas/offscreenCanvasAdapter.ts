@@ -76,6 +76,10 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     }
     const scaledWidth = Math.round(scale * image.width);
     const scaledHeight = Math.round(scale * image.height);
+    return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
+  }
+
+  async scaleImageToDimensions(image: { image: any; width: number; height: number }, scaledWidth: number, scaledHeight: number): Promise<{ image: any; width: number; height: number }> {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
