@@ -694,7 +694,7 @@ export class FeatureTiles {
    */
   simplifyPoints(lineString: any, isPolygon: boolean = false): any | null {
     let coords = simplify(lineString.coordinates.map(coordinate => {
-      return {x: coordinate[0], y: coordinate[1]}
+      return {x: coordinate[0], y: coordinate[1]};
     }), this.simplifyToleranceInPixels, false).map(point => [point.x, point.y]);
     if (isPolygon) {
       if (coords.length < 4) {
@@ -723,9 +723,7 @@ export class FeatureTiles {
     boundingBox: BoundingBox,
     isPolygon: boolean = false
   ): void {
-    lineString.coordinates = lineString.coordinates.map(coordinate => {
-      return [TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]), TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1])]
-    })
+    lineString.coordinates = lineString.coordinates.map(coordinate => [TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]), TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1])]);
     const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(lineString, isPolygon) : lineString;
     if (simplifiedLineString != null && simplifiedLineString.coordinates.length > 0) {
       context.moveTo(simplifiedLineString.coordinates[0][0], simplifiedLineString.coordinates[0][1]);

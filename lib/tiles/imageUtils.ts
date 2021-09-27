@@ -62,4 +62,27 @@ export class ImageUtils {
       });
     });
   }
+
+  /**
+   * Get a scaled image
+   * @param {any} image
+   * @param {Number} scale
+   * @returns {Promise<any>}
+   */
+  public static async scaleImage(image: any, scale: number): Promise<{image: any, width: number, height: number}> {
+    return new Promise((resolve) => {
+      if (scale === 1.0) {
+        resolve(image);
+      } else {
+        Canvas.scaleImage(image, scale).then(scaledImage => {
+          Canvas.disposeImage(image);
+          resolve(scaledImage)
+        }).catch((e) => {
+          Canvas.disposeImage(image);
+          console.error(e);
+          resolve(null);
+        })
+      }
+    });
+  }
 }

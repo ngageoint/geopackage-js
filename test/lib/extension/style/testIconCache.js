@@ -19,16 +19,22 @@ describe('IconCache Tests', function() {
   var iconImage;
   var iconImageBuffer;
 
-  var randomIcon = function(featureTableStyles) {
+  var randomIcon = function(featureTableStyles, noWidth = false, noHeight = false, noAnchors = false) {
     var iconRow = featureTableStyles.getIconDao().newRow();
     iconRow.data = iconImageBuffer;
     iconRow.contentType = 'image/png';
     iconRow.name = "Icon Name";
     iconRow.description = "Icon Description";
-    iconRow.width = Math.random() * iconImage.width;
-    iconRow.height = Math.random() * iconImage.height;
-    iconRow.anchorU = Math.random();
-    iconRow.anchorV = Math.random();
+    if (!noWidth) {
+      iconRow.width = Math.random() * iconImage.width;
+    }
+    if (!noHeight) {
+      iconRow.height = Math.random() * iconImage.height;
+    }
+    if (!noAnchors) {
+      iconRow.anchorU = Math.random();
+      iconRow.anchorV = Math.random();
+    }
     return iconRow;
   };
 
@@ -193,15 +199,27 @@ describe('IconCache Tests', function() {
     should.exist(iconCache.getIconForIconRow(iconRow));
   }));
 
-  it('should create scaled icon and cache it even when already cached', mochaAsync(async () => {
+  it('should automatically determine dimensions of an icon with no explicit width/height', mochaAsync(async () => {
     var iconCache = new IconCache();
-    var iconRow = randomIcon(featureTableStyles);
+    var iconRow = featureTableStyles.getIconDao().newRow();
     iconRow.id = 0;
-    iconCache.putIconForIconRow(iconRow, iconImage);
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
-    var image = await iconCache.createScaledIcon(iconRow, 2.0);
-    var result = await compareImages(expectedImage, image);
-    result.should.be.equal(true);
-    should.exist(iconCache.getIconForIconRow(iconRow));
+    iconRow.data = iconImageBuffer;
+    iconRow.contentType = 'image/png';
+    iconRow.name = "Icon Name";
+    iconRow.description = "Icon Description";
+    iconRow.width = iconImage.width;
+    // iconRow.height = Math.random() * iconImage.height;
+    // iconRow.anchorU = Math.random();
+    // iconRow.anchorV = Math.random();
+
+    var image = await iconCache.createScaledIcon(iconRow, 1.0);
+    image.width.should.be.equal(iconImage.width);
+    image.height.should.be.equal(iconImage.height);
+
+    iconRow.id = 1;
+    iconRow.width = undefined;
+    var image = await iconCache.createScaledIcon(iconRow, 1.0);
+    image.width.should.be.equal(iconImage.width);
+    image.height.should.be.equal(iconImage.height);
   }));
 });

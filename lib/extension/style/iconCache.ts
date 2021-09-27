@@ -1,5 +1,6 @@
 import { IconRow } from './iconRow';
 import { Canvas } from '../../canvas/canvas';
+import {ImageUtils} from "../../tiles/imageUtils";
 
 /**
  * @memberOf module:extension/style
@@ -183,17 +184,48 @@ export class IconCache {
     let iconImage = null;
     if (icon != null) {
       const iconId = icon.id;
-      // get image from cache
+
       if (iconCache != null) {
         iconImage = iconCache.get(iconId);
       }
-      const iconScaledWidth = Math.round(icon.width * scale);
-      const iconScaledHeight = Math.round(icon.height * scale);
-      if (iconImage == null || (iconImage.width !== iconScaledWidth) || iconImage.height !== iconScaledHeight) {
-        iconImage = await icon.getScaledDataImage(scale);
-      }
-      if (iconCache != null && iconImage != null) {
-        iconCache.putIconForIconRow(icon, iconImage);
+
+      if (iconImage == null) {
+        try {
+          iconImage = await ImageUtils.getImage(icon.data);
+        } catch (e) {
+          throw new Error('Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.name)
+        }
+
+        const dataWidth = iconImage.width;
+        const dataHeight = iconImage.height;
+        let iconWidth = icon.width;
+        let iconHeight = icon.height;
+
+        let scaleImage = iconWidth != null || iconHeight != null;
+        if (!scaleImage && scale != 1.0) {
+          iconWidth = dataWidth;
+          iconHeight = dataHeight;
+          scaleImage = true;
+        }
+
+        if (scaleImage) {
+          if (iconWidth == null) {
+            iconWidth = dataWidth * (iconHeight / dataHeight);
+          } else if (iconHeight == null) {
+            iconHeight = dataHeight * (iconWidth / dataWidth);
+          }
+
+          const scaledWidth = Math.round(scale * iconWidth);
+          const scaledHeight = Math.round(scale * iconHeight);
+
+          if (scaledWidth != dataWidth || scaledHeight != dataHeight) {
+            iconImage = await ImageUtils.scaleImage(iconImage, scale);
+          }
+        }
+
+        if (iconCache != null) {
+          iconCache.putIconForIconRow(icon, iconImage);
+        }
       }
     }
     return iconImage;
