@@ -1,5 +1,7 @@
 # GeoPackage JS
 
+*** Modified library to take in account de id property on queryForGeoJSONIndexedFeaturesWithBoundingBox method to create GeoJSON with id property from feature property
+
 GeoPackage JS is an implementation of the OGC GeoPackage spec.  This library works in both the browser and Node 4+.
 
 ### Demo ###
