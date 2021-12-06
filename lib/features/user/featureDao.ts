@@ -363,10 +363,9 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
               for (const key in featureRow.values) {
                 if (
                   Object.prototype.hasOwnProperty.call(featureRow.values, key) &&
-                  key !== featureRow.geometryColumn.name &&
-                  key !== 'id'
+                  key !== featureRow.geometryColumn.name
                 ) {
-                  if (key.toLowerCase() === '_feature_id') {
+                  if (key.toLowerCase() === '_feature_id' || key.toLowerCase() === 'id') {
                     geoJson.id = featureRow.values[key] as string | number;
                   } else if (key.toLowerCase() === '_properties_id') {
                     geoJson.properties[key.substring(12)] = featureRow.values[key];
