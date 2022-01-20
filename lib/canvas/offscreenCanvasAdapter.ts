@@ -1,6 +1,10 @@
 import { CanvasAdapter } from './canvasAdapter';
 import { CanvasUtils } from './canvasUtils';
 
+declare class OffscreenCanvas {
+  constructor(width: number, height: number);
+}
+
 /**
  * OffscreenCanvas canvas adapter. This can only run inside a web worker.
  */
