@@ -22,7 +22,6 @@ import { GeometryType } from '../../features/user/geometryType';
  * @constructor
  */
 export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
-  public table: StyleMappingTable;
   constructor(
     userCustomDao: UserCustomDao<StyleMappingRow>,
     geoPackage: GeoPackage,
@@ -34,6 +33,11 @@ export class StyleMappingDao extends UserMappingDao<StyleMappingRow> {
       styleMappingTable || new StyleMappingTable(userCustomDao.table.getTableName(), userCustomDao.table.getUserColumns().getColumns(), null),
     );
   }
+
+  get table(): StyleMappingTable {
+    return this._table as StyleMappingTable;
+  }
+
   /**
    * Create a new {module:user/custom~UserCustomTable}
    * @param  {module:user/custom~UserCustomDao} userCustomDao
