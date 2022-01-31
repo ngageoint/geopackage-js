@@ -4,6 +4,7 @@ import { ContentsDao } from './lib/core/contents/contentsDao';
 import { ContentsIdDao } from './lib/extension/contents/contentsIdDao';
 import { Constraint } from './lib/db/table/constraint';
 import { Constraints } from './lib/db/table/constraints';
+import { ConstraintType } from './lib/db/table/constraintType';
 import { CrsWktExtension } from './lib/extension/crsWkt';
 import { DataColumnConstraints } from './lib/dataColumnConstraints/dataColumnConstraints';
 import { DataColumnConstraintsDao } from './lib/dataColumnConstraints/dataColumnConstraintsDao';
@@ -100,6 +101,7 @@ export {
   ContentsIdDao,
   Constraint,
   Constraints,
+  ConstraintType,
   Context,
   CrsWktExtension,
   DataColumnConstraints,
