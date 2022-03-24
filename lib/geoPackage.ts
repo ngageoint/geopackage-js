@@ -301,7 +301,7 @@ export class GeoPackage {
       const tm = tileMatrixDao.createObject(result);
       // verify first that there are actual tiles at this zoom level due to QGIS doing weird things and
       // creating tile matrix entries for zoom levels that have no tiles
-      if (tileMatrixDao.tileCount(tm)) {
+      if (tileMatrixDao.hasTiles(tm)) {
         tileMatrices.push(tm);
       }
     });
