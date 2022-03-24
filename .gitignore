@@ -57,6 +57,7 @@ dist
 
 built
 api-docs
+docs
 tmp
 bundle
 test/bundle
