@@ -31,7 +31,7 @@ const browserConfig = {
         use: {
           loader: 'ts-loader',
           options: {
-            configFile: "./tsconfig.json"
+            configFile: './tsconfig.json',
           },
         },
         exclude: /node_modules/,
@@ -41,7 +41,7 @@ const browserConfig = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     fallback: {
-      'fs': false
+      fs: false,
     },
   },
   output: {
@@ -49,12 +49,12 @@ const browserConfig = {
     path: path.resolve(__dirname, 'dist'),
     library: {
       name: 'GeoPackage',
-      type: 'umd'
+      type: 'umd',
     },
   },
   externals: ['better-sqlite3'],
   devtool: 'source-map',
-  mode: 'production'
+  mode: 'production',
 };
 
 module.exports = [browserConfig];

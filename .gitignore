@@ -55,10 +55,6 @@ test/fixtures/private
 dist
 **/*/package-lock.json
 
-docs/coverage
-docs/jsdoc
-docs/gp.js
-
 built
 api-docs
 tmp
