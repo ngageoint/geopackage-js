@@ -5,11 +5,18 @@ import {
   GeometryColumns,
   GeoPackageDataType,
   BoundingBox,
-  GeometryType
+  GeometryType,
+  setCanvasKitWasmLocateFile,
 } from '@ngageoint/geopackage';
 import fs from 'fs';
 import path from 'path';
 import bbox from '@turf/bbox';
+
+if (typeof window === 'undefined') {
+  setCanvasKitWasmLocateFile(file => {
+    return path.join(__dirname, 'node_modules', '@ngageoint', 'geopackage', 'dist', 'canvaskit', file);
+  });
+}
 
 export interface GeoJSONConverterOptions {
   append?: boolean;
@@ -22,10 +29,88 @@ export interface GeoJSONConverterOptions {
 export class GeoJSONToGeoPackage {
   constructor(private options?: GeoJSONConverterOptions) {}
 
+  _calculateTrueExtentForFeatureTable(gp, tableName): Array<number> {
+    let extent = undefined;
+    const featureDao = gp.getFeatureDao(tableName);
+    if (featureDao.isIndexed()) {
+      if (featureDao.featureTableIndex.rtreeIndexDao != null) {
+        const iterator = featureDao.featureTableIndex.rtreeIndexDao.queryForEach();
+        let nextRow = iterator.next();
+        while (!nextRow.done) {
+          if (extent == null) {
+            extent = [nextRow.value.minx, nextRow.value.miny, nextRow.value.maxx, nextRow.value.maxy];
+          } else {
+            extent[0] = Math.min(extent[0], nextRow.value.minx);
+            extent[1] = Math.min(extent[1], nextRow.value.miny);
+            extent[2] = Math.max(extent[2], nextRow.value.maxx);
+            extent[3] = Math.max(extent[3], nextRow.value.maxy);
+          }
+          nextRow = iterator.next();
+        }
+      } else if (featureDao.featureTableIndex.geometryIndexDao != null) {
+        const iterator = featureDao.featureTableIndex.geometryIndexDao.queryForEach();
+        let nextRow = iterator.next();
+        while (!nextRow.done) {
+          if (extent == null) {
+            extent = [nextRow.value.min_x, nextRow.value.min_y, nextRow.value.max_x, nextRow.value.max_y];
+          } else {
+            extent[0] = Math.min(extent[0], nextRow.value.min_x);
+            extent[1] = Math.min(extent[1], nextRow.value.min_y);
+            extent[2] = Math.max(extent[2], nextRow.value.max_x);
+            extent[3] = Math.max(extent[3], nextRow.value.max_y);
+          }
+          nextRow = iterator.next();
+        }
+      }
+    }
+
+    if (extent == null) {
+      const iterator = featureDao.queryForEach();
+      let nextRow = iterator.next();
+      while (!nextRow.done) {
+        const featureRow = featureDao.getRow(nextRow.value);
+        if (featureRow.geometry != null && featureRow.geometry.envelope != null) {
+          if (extent == null) {
+            extent = [
+              featureRow.geometry.envelope.minX,
+              featureRow.geometry.envelope.minY,
+              featureRow.geometry.envelope.maxX,
+              featureRow.geometry.envelope.maxY,
+            ];
+          } else {
+            extent[0] = Math.min(extent[0], featureRow.geometry.envelope.minX);
+            extent[1] = Math.min(extent[1], featureRow.geometry.envelope.minY);
+            extent[2] = Math.max(extent[2], featureRow.geometry.envelope.maxX);
+            extent[3] = Math.max(extent[3], featureRow.geometry.envelope.maxY);
+          }
+        }
+        nextRow = iterator.next();
+      }
+    }
+    return extent;
+  }
+
+  _updateBoundingBoxForFeatureTable(gp, tableName): void {
+    const contentsDao = gp.contentsDao;
+    const contents = contentsDao.queryForId(tableName);
+    const extent = this._calculateTrueExtentForFeatureTable(gp, tableName);
+    if (extent != null) {
+      contents.min_x = extent[0];
+      contents.min_y = extent[1];
+      contents.max_x = extent[2];
+      contents.max_y = extent[3];
+    } else {
+      contents.min_x = -180.0;
+      contents.min_y = -90.0;
+      contents.max_x = 180.0;
+      contents.max_y = 90.0;
+    }
+    contentsDao.update(contents);
+  }
+
   async addLayer(options?: GeoJSONConverterOptions, progressCallback?: Function): Promise<any> {
     const clonedOptions = { ...this.options, ...options };
     clonedOptions.append = true;
-
     return this.setupConversion(clonedOptions, progressCallback);
   }
 
@@ -48,26 +133,25 @@ export class GeoJSONToGeoPackage {
   }
 
   async setupConversion(options: GeoJSONConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
-    let geopackage = options.geoPackage;
+    let geoPackage = options.geoPackage;
     const srsNumber = options.srsNumber || 4326;
-    const append = options.append;
     let geoJson: any = options.geoJson;
     let tableName = options.tableName;
-
-    geopackage = await this.createOrOpenGeoPackage(geopackage, options, progressCallback);
+    geoPackage = await this.createOrOpenGeoPackage(geoPackage, options, progressCallback);
     // figure out the table name to put the data into
     let name;
     if (typeof geoJson === 'string') {
       name = path.basename(geoJson, path.extname(geoJson));
     }
-    name = name || tableName || 'features';
-    const tables = geopackage.getFeatureTables();
+    name = tableName || name || 'features';
+    let nameSuffix = '';
+    const tables = geoPackage.getFeatureTables();
     let count = 1;
-    while (tables.indexOf(name) !== -1) {
-      name = name + '_' + count;
+    while (tables.indexOf(name + nameSuffix) !== -1) {
+      nameSuffix = '_' + count;
       count++;
     }
-    tableName = name;
+    tableName = name + nameSuffix;
     if (typeof geoJson === 'string') {
       if (progressCallback) await progressCallback({ status: 'Reading GeoJSON file' });
       geoJson = await new Promise(function(resolve, reject) {
@@ -77,7 +161,7 @@ export class GeoJSONToGeoPackage {
       });
     }
 
-    const correctedGeoJson = {
+    const featureCollection = {
       type: 'FeatureCollection',
       features: [],
     };
@@ -86,30 +170,10 @@ export class GeoJSONToGeoPackage {
     for (let i = 0; i < geoJson.features.length; i++) {
       const feature = geoJson.features[i];
       this.addFeatureProperties(feature, properties);
-      let splitType = '';
       if (feature.geometry !== null) {
-        if (feature.geometry.type === 'MultiPolygon') {
-          splitType = 'Polygon';
-        } else if (feature.geometry.type === 'MultiLineString') {
-          splitType = 'LineString';
-        } else {
-          correctedGeoJson.features.push(feature);
-          continue;
-        }
-        // split if necessary
-        for (let c = 0; c < feature.geometry.coordinates.length; c++) {
-          const coords = feature.geometry.coordinates[c];
-          correctedGeoJson.features.push({
-            type: 'Feature',
-            properties: feature.properties,
-            geometry: {
-              type: splitType,
-              coordinates: coords,
-            },
-          });
-        }
+        featureCollection.features.push(feature);
       } else {
-        correctedGeoJson.features.push({
+        featureCollection.features.push({
           type: 'Feature',
           properties: feature.properties,
           geometry: null,
@@ -117,7 +181,14 @@ export class GeoJSONToGeoPackage {
       }
     }
 
-    return this.convertGeoJSONToGeoPackage(correctedGeoJson, geopackage, tableName, properties, progressCallback);
+    return this.convertGeoJSONToGeoPackage(
+      featureCollection,
+      geoPackage,
+      tableName,
+      properties,
+      srsNumber,
+      progressCallback,
+    );
   }
 
   addFeatureProperties(feature: any, currentProperties: Record<string, any>): void {
@@ -130,6 +201,7 @@ export class GeoJSONToGeoPackage {
       if (!currentProperties['_feature_id']) {
         currentProperties['_feature_id'] = currentProperties['_feature_id'] || {
           name: '_feature_id',
+          type: 'DOUBLE',
         };
       }
     }
@@ -170,17 +242,25 @@ export class GeoJSONToGeoPackage {
 
   async convertGeoJSONToGeoPackage(
     geoJson: any,
-    geopackage: GeoPackage,
+    geoPackage: GeoPackage,
     tableName: string,
     properties: Record<string, any>,
+    srsNumber: number,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    return this.convertGeoJSONToGeoPackageWithSrs(geoJson, geopackage, tableName, properties, 4326, progressCallback);
+    return this.convertGeoJSONToGeoPackageWithSrs(
+      geoJson,
+      geoPackage,
+      tableName,
+      properties,
+      srsNumber,
+      progressCallback,
+    );
   }
 
   async convertGeoJSONToGeoPackageWithSrs(
     geoJson: any,
-    geopackage: GeoPackage,
+    geoPackage: GeoPackage,
     tableName: string,
     properties: Record<string, any>,
     srsNumber: number,
@@ -193,22 +273,27 @@ export class GeoJSONToGeoPackage {
     geometryColumns.z = 2;
     geometryColumns.m = 2;
 
-    const columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
+    const columns: FeatureColumn[] = [];
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id', true));
     columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', GeometryType.GEOMETRY, false, null));
     let index = 2;
 
     for (const key in properties) {
       const prop = properties[key];
       if (prop.name.toLowerCase() !== 'id') {
-        columns.push(FeatureColumn.createColumn(index, prop.name, GeoPackageDataType.fromName(prop.type), false, null));
-        index++;
+        columns.push(FeatureColumn.createColumn(index, prop.name, GeoPackageDataType.fromName(prop.type)));
       } else {
         columns.push(
-          FeatureColumn.createColumn(index, '_properties_' + prop.name, GeoPackageDataType.fromName(prop.type), false, null),
+          FeatureColumn.createColumn(
+            index,
+            '_properties_' + prop.name,
+            GeoPackageDataType.fromName(prop.type),
+            false,
+            null,
+          ),
         );
-        index++;
       }
+      index++;
     }
     if (progressCallback) await progressCallback({ status: 'Creating table "' + tableName + '"' });
     const tmp = bbox(geoJson);
@@ -218,7 +303,17 @@ export class GeoJSONToGeoPackage {
       Math.max(-90, tmp[1]),
       Math.min(90, tmp[3]),
     );
-    const featureDao = await geopackage.createFeatureTable(tableName, geometryColumns, columns, boundingBox, srsNumber);
+    if (
+      geoPackage
+        .getFeatureTables()
+        .map(table => table.toLowerCase())
+        .indexOf(tableName.toLowerCase()) === -1
+    ) {
+      console.log('creating feature table: ' + tableName)
+      geoPackage.createFeatureTable(tableName, geometryColumns, columns, boundingBox, srsNumber);
+    }
+    const featureDao = geoPackage.getFeatureDao(tableName);
+    const srs = featureDao.srs;
     let count = 0;
     const featureCount = geoJson.features.length;
     const fivePercent = Math.floor(featureCount / 20);
@@ -236,7 +331,7 @@ export class GeoJSONToGeoPackage {
         feature.properties._properties_ID = feature.properties.ID;
         delete feature.properties.ID;
       }
-      const featureId = geopackage.addGeoJSONFeatureToGeoPackage(feature, tableName);
+      geoPackage.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, featureDao, srs, true);
       if (count++ % fivePercent === 0) {
         if (progressCallback)
           await progressCallback({
@@ -246,36 +341,36 @@ export class GeoJSONToGeoPackage {
           });
       }
     }
-    if (progressCallback)
+    if (progressCallback) {
       await progressCallback({
         status: 'Done inserting features into table "' + tableName + '"',
       });
-    return geopackage;
+    }
+
+    this._updateBoundingBoxForFeatureTable(geoPackage, tableName);
+    return geoPackage;
   }
 
   async createOrOpenGeoPackage(
-    geopackage: GeoPackage | string,
+    geoPackage: GeoPackage | string,
     options: GeoJSONConverterOptions,
     progressCallback?: Function,
   ): Promise<GeoPackage> {
-    if (typeof geopackage === 'object') {
+    if (typeof geoPackage === 'object') {
       if (progressCallback) await progressCallback({ status: 'Opening GeoPackage' });
-      return geopackage;
+      return geoPackage;
     } else {
       let stats;
       try {
-        stats = fs.statSync(geopackage);
+        stats = fs.statSync(geoPackage);
       } catch (e) {}
       if (stats && !options.append) {
-        console.log('GeoPackage file already exists, refusing to overwrite ' + geopackage);
-        throw new Error('GeoPackage file already exists, refusing to overwrite ' + geopackage);
+        throw new Error('GeoPackage file already exists, refusing to overwrite ' + geoPackage);
       } else if (stats) {
-        console.log('open geopackage');
-        return GeoPackageAPI.open(geopackage);
+        return GeoPackageAPI.open(geoPackage);
       }
       if (progressCallback) await progressCallback({ status: 'Creating GeoPackage' });
-      console.log('Create new geopackage', geopackage);
-      return GeoPackageAPI.create(geopackage);
+      return GeoPackageAPI.create(geoPackage);
     }
   }
 }

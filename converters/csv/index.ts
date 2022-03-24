@@ -5,6 +5,8 @@ import {
   GeometryColumns,
   GeoPackageDataType,
   BoundingBox,
+  GeometryType,
+  setCanvasKitWasmLocateFile,
 } from '@ngageoint/geopackage';
 
 import fs from 'fs';
@@ -14,6 +16,11 @@ import bbox from '@turf/bbox';
 import wkx from 'wkx';
 import CSVStream from 'csv-streamify';
 
+if (typeof window === 'undefined') {
+  setCanvasKitWasmLocateFile(file => {
+    return path.join(__dirname, 'node_modules', '@ngageoint', 'geopackage', 'dist', 'canvaskit', file);
+  });
+}
 export interface CSVConverterOptions {
   append?: boolean;
   geoPackage?: GeoPackage;
@@ -31,7 +38,6 @@ export class CSVToGeoPackage {
   async addLayer(options?: CSVConverterOptions, progressCallback?: Function): Promise<any> {
     const clonedOptions = { ...this.options, ...options };
     clonedOptions.append = true;
-
     return this.setupConversion(clonedOptions, progressCallback);
   }
 
@@ -114,8 +120,6 @@ export class CSVToGeoPackage {
 
   async setupConversion(options: CSVConverterOptions, progressCallback?: Function): Promise<GeoPackage> {
     let geopackage = options.geoPackage;
-    const srsNumber = options.srsNumber || 4326;
-    const append = options.append;
     const csv = options.csv;
     let tableName = options.tableName;
 
@@ -190,7 +194,7 @@ export class CSVToGeoPackage {
       geoJson.features.push(gj);
     });
 
-    await new Promise(function(resolve, reject) {
+    await new Promise<void>(function(resolve) {
       if (options.csv && typeof options.csv === 'string') {
         fs.createReadStream(csv)
           .pipe(parser)
@@ -290,8 +294,8 @@ export class CSVToGeoPackage {
     geometryColumns.m = 2;
 
     const columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', GeometryType.GEOMETRY, false, null));
     let index = 2;
 
     for (const key in properties) {
@@ -301,7 +305,13 @@ export class CSVToGeoPackage {
         index++;
       } else {
         columns.push(
-          FeatureColumn.createColumn(index, '_properties_' + prop.name, GeoPackageDataType.fromName(prop.type), false, null),
+          FeatureColumn.createColumn(
+            index,
+            '_properties_' + prop.name,
+            GeoPackageDataType.fromName(prop.type),
+            false,
+            null,
+          ),
         );
         index++;
       }

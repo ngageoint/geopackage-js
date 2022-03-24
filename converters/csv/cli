@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+var {CSVToGeoPackage} = require('./built/index');
+var path = require('path');
+
+console.log('CSV to GeoPackage Converter');
+
+var csvFile = path.resolve(process.cwd(), process.argv[2]);
+var geoPackageFile = path.resolve(process.cwd(), process.argv[3]);
+
+console.log('Converting %s to %s', csvFile, geoPackageFile);
+// const temp = new GeoJSONToGeoPackage();
+new CSVToGeoPackage().convert({ csv: csvFile, geopackage: geoPackageFile }).then(function(result) {
+  console.log('File conversion complete');
+  console.log('Converted %s to %s', csvFile, geoPackageFile);
+});

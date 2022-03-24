@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "lib": ["dom", "es2015", "es2017", "es2015.iterable"],
+      "jsx": "react", // uses typescript to transpile jsx to js
+      "target": "es5", // specify ECMAScript target version
+      "allowJs": true, // allows a partial TypeScript and JavaScript codebase
+      "declaration": true,
+      "checkJs": false, // checks types in .js files (https://github.com/microsoft/TypeScript/wiki/Type-Checking-JavaScript-Files)
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "outDir": "built",
+      "downlevelIteration": true,
+      "noEmit": false,
+      "noImplicitAny": false,
+      "esModuleInterop": true,
+      "sourceMap": true
+  },
+  "include": [
+      "index.ts"
+  ]
+}

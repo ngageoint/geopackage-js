@@ -2,8 +2,8 @@
 
 GeoPackage JS is an implementation of the OGC GeoPackage spec.  This library works in both the browser and Node 12+.
 
-### Demo ###
-[GeoPackage JS Demo Page](http://ngageoint.github.io/geopackage-js/)
+### GeoPackage Viewer ###
+[GeoPackage Viewer](http://ngageoint.github.io/geopackage-viewer-js/)
 
 Cloning this repository and opening the docs/index.html in your browser will run the demo locally.
 
@@ -37,6 +37,11 @@ Software source code previously released under an open source license and then m
 The GeoPackage JavaScript library currently provides the ability to read GeoPackage files.  This library works both in the browser and in Node.  In the browser tiles are rendered using HTML5 Canvas and GeoPackages are read using [sql.js](https://github.com/kripken/sql.js/).  In Node tiles are rendered  [PureImage](https://github.com/joshmarinacci/node-pureimage) and GeoPackages are read using [node-sqlite3](https://github.com/mapbox/node-sqlite3).
 
 ### Changelog
+
+##### 4.1.0
+
+- Typescript updates
+- Extract converters, leaflet plugin, mobile optimizer, and viewer into their own packages
 
 ##### 4.0.0
 
@@ -92,7 +97,7 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Usage ###
 
-View the latest [docs](https://ngageoint.github.io/geopackage-js/api-docs/).
+View the latest [docs](https://ngageoint.github.io/geopackage-js/).
 
 #### Browser Usage ####
 ```html

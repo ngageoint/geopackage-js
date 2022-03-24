@@ -5,6 +5,8 @@ import {
   GeometryColumns,
   GeoPackageDataType,
   BoundingBox,
+  GeometryType,
+  setCanvasKitWasmLocateFile,
 } from '@ngageoint/geopackage';
 
 import fs from 'fs';
@@ -15,6 +17,12 @@ import shpwrite from 'shp-write';
 import proj4 from 'proj4';
 import reproject from 'reproject';
 import jszip from 'jszip';
+
+if (typeof window === 'undefined') {
+  setCanvasKitWasmLocateFile(file => {
+    return path.join(__dirname, 'node_modules', '@ngageoint', 'geopackage', 'dist', 'canvaskit', file);
+  });
+}
 
 /**
  * Add a Shapefile to the GeoPackage
@@ -96,6 +104,7 @@ export class ShapefileToGeoPackage {
     return name;
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   readRecord(builder) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -112,9 +121,10 @@ export class ShapefileToGeoPackage {
             if (!builder.properties[key]) {
               builder.properties[key] = builder.properties[key] || {
                 name: key,
+                type: 'TEXT',
               };
 
-              let type: string = typeof feature.properties[key];
+              let type: string = typeof feature.properties[key] || 'TEXT';
               if (feature.properties[key] !== undefined && feature.properties[key] !== null && type !== 'undefined') {
                 if (type === 'object') {
                   if (feature.properties[key] instanceof Date) {
@@ -159,12 +169,13 @@ export class ShapefileToGeoPackage {
     geometryColumns.m = 0;
 
     const columns = [];
-    columns.push(FeatureColumn.createPrimaryKeyColumnWithIndexAndName(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', 'GEOMETRY', false, null));
+    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
+    columns.push(FeatureColumn.createGeometryColumn(1, 'geometry', GeometryType.GEOMETRY, false, null));
     let index = 2;
     for (const key in builder.properties) {
       const prop = builder.properties[key];
       if (prop.name.toLowerCase() !== 'id') {
+        console.log(prop.type);
         columns.push(FeatureColumn.createColumn(index, prop.name, GeoPackageDataType.fromName(prop.type), false, null));
         index++;
       }
@@ -241,7 +252,7 @@ export class ShapefileToGeoPackage {
       await this.createFeatureTable(geopackage, builder);
       await this.addFeaturesToTable(geopackage, builder, progressCallback);
 
-      await new Promise(function(resolve, reject) {
+      await new Promise<void>(function(resolve, reject) {
         if (shapefile.reader) {
           shapefile.reader.close(resolve);
         } else {

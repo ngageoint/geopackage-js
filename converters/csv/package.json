@@ -1,6 +1,6 @@
 {
-  "name": "csv-to-geopackage",
-  "version": "3.0",
+  "name": "@ngageoint/csv-to-geopackage",
+  "version": "4.1.0",
   "description": "GeoJSON to GeoPackage converter",
   "keywords": [
     "NGA",
@@ -24,7 +24,7 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/geopackage": "3.0.0",
+    "@ngageoint/geopackage": "4.1.0",
     "@turf/bbox": "6.0.1",
     "csv-streamify": "4.0.0",
     "wkx": "0.5.0"

@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/leaflet-geopackage",
-  "version": "3.0.3",
+  "version": "4.1.0",
   "description": "Load a GeoPackage layer.",
   "main": "leaflet-geopackage.js",
   "keywords": [
@@ -28,12 +28,15 @@
     "leaflet": "1.x"
   },
   "dependencies": {
-    "@ngageoint/geopackage": "3.0.0"
+    "@ngageoint/geopackage": "4.1.0"
   },
   "scripts": {
-    "build-dev": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js",
-    "build-min": "browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer | uglifyjs -c -m -o dist/leaflet-geopackage.min.js",
-    "prepublish": "mkdir dist; browserify leaflet-geopackage.js --exclude sqlite3 --exclude lwip --exclude inquirer -o dist/leaflet-geopackage.js && uglifyjs dist/leaflet-geopackage.js > dist/leaflet-geopackage.min.js"
+    "clean": "rm -rf dist",
+    "mkdist": "mkdir dist",
+    "copy-sqljs-wasm": "cp node_modules/@ngageoint/geopackage/dist/sql-wasm.wasm dist/sql-wasm.wasm",
+    "build-dev": "npm run clean; npm run mkdist; npm run copy-sqljs-wasm; browserify leaflet-geopackage.js -o dist/leaflet-geopackage.js",
+    "build-min": "npm run clean; npm run mkdist; npm run copy-sqljs-wasm; browserify leaflet-geopackage.js | uglifyjs -c -m -o dist/leaflet-geopackage.min.js",
+    "prepublish": "npm run clean; npm run mkdist; npm run copy-sqljs-wasm; browserify leaflet-geopackage.js -o dist/leaflet-geopackage.js && uglifyjs dist/leaflet-geopackage.js > dist/leaflet-geopackage.min.js"
   },
   "devDependencies": {
     "browserify": "^14.1.0",

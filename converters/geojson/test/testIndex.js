@@ -61,7 +61,7 @@ describe('GeoJSON to GeoPackage tests', function() {
       tables[0].should.be.equal('ne_10m_land');
       var featureDao = geopackage.getFeatureDao('ne_10m_land');
       var count = featureDao.getCount();
-      count.should.be.equal(4063);
+      count.should.be.equal(1);
     });
   });
 
@@ -100,7 +100,7 @@ describe('GeoJSON to GeoPackage tests', function() {
         tables[0].should.be.equal('features');
         var featureDao = geopackage.getFeatureDao('features');
         var count = featureDao.getCount();
-        count.should.be.equal(2);
+        count.should.be.equal(1);
       })
       .then(function() {
         done();

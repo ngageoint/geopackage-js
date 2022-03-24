@@ -60,8 +60,10 @@ docs/jsdoc
 docs/gp.js
 
 built
-docs/api-docs
+api-docs
 tmp
 bundle
 test/bundle
 test/sql-wasm.wasm
+
+.idea

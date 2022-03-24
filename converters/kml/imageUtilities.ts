@@ -96,7 +96,7 @@ export class ImageUtilities {
       } else if (uri.startsWith('http://')) {
         imageLocation = uri;
       } else {
-        path.join(dir, uri);
+        imageLocation = path.join(dir, uri);
       }
     } else if (isBrowser) {
       // imageLocation = uri.startsWith('http') ? uri : Buffer.from(zipMap.get(uri), 'base64');

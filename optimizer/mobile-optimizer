@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-
 const GeoPackageOptimizer = require('./index.js');
-
 const fs = require('fs');
-const GeoPackageAPI = require('@ngageoint/geopackage');
-const GeoPackage = GeoPackageAPI.GeoPackage;
+const {GeoPackageAPI, CanvasKitCanvasAdapter} = require('@ngageoint/geopackage');
+
+console.log(CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm'))
+
 
 console.log('GeoPackage Optimizer For Mobile Clients');
 
@@ -25,20 +25,18 @@ fs.stat(geoPackageFile, function(err, stats) {
     console.log('File does not exist.', geoPackageFile);
     process.exit(1);
   }
-  console.log('GeoPackageAPI', GeoPackageAPI);
-  console.log('GeoPackage', GeoPackage);
-  return GeoPackage.open(geoPackageFile)
+  return GeoPackageAPI.open(geoPackageFile)
     .then(function(inputGeoPackage) {
       console.log('Processing %s', geoPackageFile);
       if (same) {
-        return GeoPackage.open(outputGeoPackageFile).then(function(outputGeoPackage) {
+        return GeoPackageAPI.open(outputGeoPackageFile).then(function(outputGeoPackage) {
           return {
             inputGeoPackage: inputGeoPackage,
             outputGeoPackage: outputGeoPackage,
           };
         });
       }
-      return GeoPackage.create(outputGeoPackageFile).then(function(outputGeoPackage) {
+      return GeoPackageAPI.create(outputGeoPackageFile).then(function(outputGeoPackage) {
         return {
           inputGeoPackage: inputGeoPackage,
           outputGeoPackage: outputGeoPackage,

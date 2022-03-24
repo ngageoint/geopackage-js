@@ -37,11 +37,12 @@ L.geoPackageFeatureLayer([], {
 
 GeoPackageTileLayer extends L.GridLayer and accepts all options for L.GridLayer in addition to the following:
 
-| option       | type    |  |
-| ------------ | ------- | -------------- |
-| `geoPackageUrl`     | String  | The URL to the GeoPackage
-| `layerName`   | String  | Name of the Tile Layer within the GeoPackage
-| `noCache`   | Boolean  | defaults to true set false to re-download the GeoPackage even if a previous layer has already downloaded it
+| option           | type     |  |
+|------------------|----------| -------------- |
+| `geoPackageUrl`  | String   | The URL to the GeoPackage
+| `layerName`      | String   | Name of the Tile Layer within the GeoPackage
+| `noCache`        | Boolean  | defaults to true set false to re-download the GeoPackage even if a previous layer has already downloaded it
+| `sqlJsWasmLocateFile` | Function | defaults to (filename) => 'https://unpkg.com/@ngageoint/geopackage@4.1.0/dist/' + filename. This will grab the necessary file to run GeoPackage in the browser. If you need your application to remain offline, you can set this option to <strong>(filename) => '/public/' + filename</strong> and be sure to copy the sql-wasm.wasm into your public folder.
 
 ### GeoPackageFeatureLayer Options
 
@@ -52,6 +53,7 @@ GeoPackageFeatureLayer extends L.GeoJSON and accepts all options for L.GeoJSON i
 | `geoPackageUrl`     | String  | The URL to the GeoPackage
 | `layerName`   | String  | Name of the Feature Layer within the GeoPackage
 | `noCache`   | Boolean  | defaults to true set false to re-download the GeoPackage even if a previous layer has already downloaded it
+| `sqlJsWasmLocateFile` | Function | defaults to (filename) => 'https://unpkg.com/@ngageoint/geopackage@4.1.0/dist/' + filename. This will grab the necessary file to run GeoPackage in the browser. If you need your application to remain offline, you can set this option to <strong>(filename) => '/public/' + filename</strong> and be sure to copy the sql-wasm.wasm into your public folder.
 
 ### Browser builds
 
@@ -72,6 +74,10 @@ Software source code previously released under an open source license and then m
 
 
 ### Changelog
+
+##### 4.1.0
+
+- Depends on @ngageoint/geopackage v4.1.0
 
 ##### 2.0.5
 

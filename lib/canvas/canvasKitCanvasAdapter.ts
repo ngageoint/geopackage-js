@@ -14,7 +14,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
 
   // default wasm locator
   static canvasKitWasmLocateFile: (filename: string) => string = (filename) => {
-    return process.env.NODE_ENV === 'production' ? path.join(__dirname, 'canvaskit', filename) : path.join('canvaskit', filename);
+    return path.join(__dirname, '..', '..', 'canvaskit', filename);
   };
 
   // allow user to set the locate file function, if they place it somewhere else

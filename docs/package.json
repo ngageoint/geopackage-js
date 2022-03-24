@@ -5,7 +5,7 @@
     "@babel/preset-env": "^7.10.4",
     "@babel/runtime": "^7.10.4",
     "@mapbox/vector-tile": "^1.3.1",
-    "@ngageoint/geopackage": "../",
+    "@ngageoint/geopackage": "4.1.0",
     "@types/lodash": "^4.14.157",
     "async": "^2.0.0-rc.5",
     "babelify": "^10.0.0",
@@ -23,15 +23,14 @@
     "reproject": "^1.1.1",
     "simple-server": "^1.1.1",
     "tsify": "^4.0.2",
-    "webworkify": "^1.5.0"
-  },
-  "no": {
-    "@ngageoint/geojson-to-geopackage": "../converters/geojson",
-    "@ngageoint/kml-to-geopackage": "../converters/kml",
-    "@ngageoint/shapefile-to-geopackage": "../converters/shapefile",
-    "mbtiles-to-geopackage": "../converters/mbtiles",
-    "shapefile-to-geopackage": "../converters/shapefile",
-    "pbf-to-geopackage": "../converters/pbf"
+    "webworkify": "^1.5.0",
+    "@ngageoint/geojson-to-geopackage": "4.1.0",
+    "@ngageoint/shapefile-to-geopackage": "4.1.0",
+    "@ngageoint/kml-to-geopackage": "4.1.0",
+    "@ngageoint/mbtiles-to-geopackage": "4.1.0",
+    "@ngageoint/pbf-to-geopackage": "4.1.0",
+    "@ngageoint/xyz-to-geopackage": "4.1.0",
+    "@ngageoint/csv-to-geopackage": "4.1.0"
   },
   "devDependencies": {
     "@types/node": "^14.0.18",
@@ -39,7 +38,6 @@
     "browserify": "^14.5.0",
     "browserify-css": "^0.9.1",
     "tsify": "^4.0.2",
-    "typedoc": "^0.15.4",
     "typescript": "3.7.5"
   },
   "browserify": {
@@ -52,9 +50,8 @@
     "postinstall": "npm run build",
     "prebuild": "mkdir -p vendor/leaflet-mapkey-icon; cp -R node_modules/leaflet-mapkey-icon/dist/ vendor/leaflet-mapkey-icon",
     "copySqlJsWasm": "cp ./node_modules/@ngageoint/geopackage/dist/sql-wasm.wasm public/",
-    "build": "npm run copySqlJsWasm; browserify index.js --standalone gp --exclude inquirer --exclude node-expat -t [ babelify --presets [@babel/preset-env] ] -o gp.js",
+    "build": "npm run copySqlJsWasm; browserify index.js --standalone gp -t [ babelify --presets [@babel/preset-env] ] -o gp.js",
     "clean": "rm -rf ./node_modules",
-    "tsc": "rm -rf ./built && tsc",
-    "typedoc": "rm -rf ./api-docs; typedoc --tsconfig ../tsconfig.json --mode file --out api-docs ../index.ts"
+    "tsc": "rm -rf ./built && tsc"
   }
 }

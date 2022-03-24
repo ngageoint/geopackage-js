@@ -1,11 +1,17 @@
 import * as KMLTAGS from './KMLTags';
 import isNil from 'lodash/isNil';
-import { BoundingBox, GeoPackage, TileScaling, TileScalingType, FeatureTableStyles } from '@ngageoint/geopackage';
-import { GeoSpatialUtilities } from './geoSpatialUtilities';
-import { ImageUtilities } from './imageUtilities';
+import {
+  BoundingBox,
+  FeatureTableStyles,
+  GeometryType,
+  GeoPackage,
+  RelatedTablesExtension,
+  TileScaling,
+  TileScalingType
+} from '@ngageoint/geopackage';
+import {GeoSpatialUtilities} from './geoSpatialUtilities';
+import {ImageUtilities} from './imageUtilities';
 import Jimp from 'jimp';
-import { IconRow } from '@ngageoint/geopackage/built/lib/extension/style/iconRow';
-import { RelatedTablesExtension } from '@ngageoint/geopackage/built/lib/extension/relatedTables';
 import path from 'path';
 
 /**
@@ -24,14 +30,38 @@ export class KMLUtilities {
    * @memberof KMLUtilities
    */
   public static abgrStringToColorOpacity(abgr: string): { rgb: string; a: number } {
-    // Valid Color and Hex number
-    if (abgr.match(/^[0-9A-Fa-f]{8}$/)) {
-      const rgb = abgr.slice(6, 8) + abgr.slice(4, 6) + abgr.slice(2, 4);
-      const a = parseInt('0x' + abgr.slice(0, 2)) / 255;
-      return { rgb, a };
-    } else {
+    let a = 1.0;
+    let blue = '00';
+    let green = '00';
+    let red = '00';
+    try {
+      if (abgr.length === 3) {
+        a = 1.0;
+        blue = abgr.substring(0, 1) + abgr.substring(0, 1);
+        green = abgr.substring(1, 2) + abgr.substring(1, 2);
+        red = abgr.substring(2) + abgr.substring(2);
+      } else if (abgr.length === 4) {
+        a = parseInt(abgr.substring(0, 1) + abgr.substring(0, 1), 16) / 255;
+        blue = abgr.substring(1, 2) + abgr.substring(1, 2);
+        green = abgr.substring(2, 3) + abgr.substring(2, 3);
+        red = abgr.substring(3) + abgr.substring(3);
+      } else if (abgr.length === 6) {
+        a = 1.0;
+        blue = abgr.substring(0, 2);
+        green = abgr.substring(2, 4);
+        red = abgr.substring(4);
+      } else  if (abgr.length === 8) {
+        a = parseInt(abgr.substring(0, 2), 16) / 255.0;
+        blue = abgr.substring(2, 4);
+        green = abgr.substring(4, 6);
+        red = abgr.substring(6);
+      }
+      return { rgb: red + green + blue, a };
+      // eslint-disable-next-line no-empty, no-unused-vars
+    } catch (e) {
       throw new Error('Invalid Color');
     }
+
   }
 
   /**
@@ -69,7 +99,7 @@ export class KMLUtilities {
     const zoomLevels = GeoSpatialUtilities.getZoomLevels(kmlBBox, naturalScale);
 
     if (progressCallback) progressCallback({ status: 'Setting Up Web Mercator Tile Table' });
-    geopackage.createStandardWebMercatorTileTableWithZoomLevels(
+    await geopackage.createStandardWebMercatorTileTableWithZoomLevels(
       imageName,
       kmlBBoxWebMercator,
       kmlBBoxWebMercator,
@@ -78,7 +108,7 @@ export class KMLUtilities {
 
     if (progressCallback) progressCallback({ status: 'Setting Up tile Scaling Extension' });
     const tileScalingExt = geopackage.getTileScalingExtension(imageName);
-    await tileScalingExt.getOrCreateExtension();
+    tileScalingExt.getOrCreateExtension();
     const ts = new TileScaling();
     ts.scaling_type = TileScalingType.IN_OUT;
     ts.zoom_in = 2;
@@ -89,7 +119,7 @@ export class KMLUtilities {
         status: 'Inserting Zoomed and transformed images into Geopackage database.',
         data: { naturalScale: naturalScale, zoomLevels: zoomLevels },
       });
-    ImageUtilities.insertZoomImages(image, Array.from(zoomLevels), kmlBBox, geopackage, imageName, progressCallback);
+    await ImageUtilities.insertZoomImages(image, Array.from(zoomLevels), kmlBBox, geopackage, imageName, progressCallback);
 
     if (progressCallback)
       progressCallback({
@@ -389,7 +419,7 @@ export class KMLUtilities {
       console.error(err);
     }
 
-    await defaultStyles.setTableIcon('Point', defaultIcon);
+    defaultStyles.setTableIcon(GeometryType.POINT, defaultIcon);
     const polygonStyleRow = defaultStyles.getStyleDao().newRow();
     polygonStyleRow.setColor('FFFFFF', 1.0);
     polygonStyleRow.setFillColor('FFFFFF', 1.0);
@@ -409,9 +439,9 @@ export class KMLUtilities {
     pointStyleRow.setName('Table Point Style');
     defaultStyles.getFeatureStyleExtension().getOrInsertStyle(pointStyleRow);
 
-    await defaultStyles.setTableStyle('Polygon', polygonStyleRow);
-    await defaultStyles.setTableStyle('LineString', lineStringStyleRow);
-    await defaultStyles.setTableStyle('Point', pointStyleRow);
+    defaultStyles.setTableStyle(GeometryType.POLYGON, polygonStyleRow);
+    defaultStyles.setTableStyle(GeometryType.LINESTRING, lineStringStyleRow);
+    defaultStyles.setTableStyle(GeometryType.POINT, pointStyleRow);
     // await defaultStyles.setTableStyle('MultiPolygon', polygonStyleRow);
     // await defaultStyles.setTableStyle('MultiLineString', lineStringStyleRow);
     // await defaultStyles.setTableStyle('MultiPoint', pointStyleRow);
@@ -433,7 +463,7 @@ export class KMLUtilities {
    */
   public static async insertIconImageData(
     jimpImage: Jimp,
-    newIcon: IconRow,
+    newIcon: any,
     styleTable: FeatureTableStyles,
     anchorU = 0.5,
     anchorV = 0.5,
@@ -456,13 +486,15 @@ export class KMLUtilities {
    * @static
    * @param {FeatureTableStyles} styleTable Database Object for the style
    * @param {[string, object]} item The id from KML and the object data from KML
+   * @param zipFileMap
    * @returns {Promise<{ id: number; newIcon: IconRow }>}
    * @memberof KMLUtilities
    */
   public static async addSpecificIcon(
     styleTable: FeatureTableStyles,
     item: [string, object],
-  ): Promise<{ id: number; newIcon: IconRow }> {
+    zipFileMap: Map<string, any>,
+  ): Promise<{ id: number; newIcon: any }> {
     return new Promise(async (resolve, reject) => {
       const newIcon = styleTable.getIconDao().newRow();
       const kmlStyle = item[1];
@@ -487,7 +519,11 @@ export class KMLUtilities {
         }
         if (iconStyle[KMLTAGS.ICON_TAG].hasOwnProperty('href') && !isNil(iconStyle[KMLTAGS.ICON_TAG]['href'])) {
           let iconLocation = iconStyle[KMLTAGS.ICON_TAG]['href'];
-          iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
+          if (zipFileMap.get(iconLocation) != null) {
+            iconLocation = Buffer.from(zipFileMap.get(iconLocation), 'base64');
+          } else {
+            iconLocation = iconLocation.startsWith('http') ? iconLocation : path.join(__dirname, iconLocation);
+          }
           const img: Jimp = await Jimp.read(iconLocation).catch(err => {
             console.error('Image Reading Error', err);
             throw err;

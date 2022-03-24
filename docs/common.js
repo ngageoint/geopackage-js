@@ -158,25 +158,11 @@ function mapClickEventHandler(event) {
 
 map.on('click', mapClickEventHandler);
 
-const saveByteArray = (function() {
-  const a = document.createElement('a');
-  document.body.appendChild(a);
-  a.style = 'display: none';
-  return function(data, name) {
-    const blob = new Blob(data, { type: 'octet/stream' }),
-      url = window.URL.createObjectURL(blob);
-    a.href = url;
-    a.download = name;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-})();
-
-window.saveGeoPackage = function() {
-  geoPackage.export(function(err, data) {
-    fileName = fileName || 'geopackage.gpkg';
-    saveByteArray([data.buffer], fileName.substring(0, fileName.lastIndexOf('.')) + '.gpkg');
-  });
+window.saveGeoPackage = async function() {
+  const data = await geoPackage.export();
+  fileName = fileName || 'geopackage.gpkg';
+  const blob = new Blob([data.buffer], { type: 'octet/stream' });
+  FileSaver.saveAs(blob, fileName.substring(0, fileName.lastIndexOf('.')) + '.gpkg');
 };
 
 window.downloadGeoJSON = function(tableName) {
@@ -301,31 +287,33 @@ function handleShapefileZipByteArray(array, shapefileZipDoneCallback) {
     eventLabel: 'File Size',
     eventValue: array.byteLength,
   });
-  ShapefileToGeoPackage.convert(
-    {
-      shapezipData: array,
-    },
-    function(status) {
-      let text = status.status;
-      if (status.completed) {
-        text +=
-          ' - ' +
-          ((status.completed / status.total) * 100).toFixed(2) +
-          ' (' +
-          status.completed +
-          ' of ' +
-          status.total +
-          ')';
-      }
-      $('#status').text(text);
-      return Promise.resolve();
-    },
-  ).then(function(gp) {
-    geoPackage = gp;
-    clearInfo();
-    readGeoPackage();
-    shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
-  });
+  new ShapefileToGeoPackage()
+    .convert(
+      {
+        shapezipData: array,
+      },
+      function(status) {
+        let text = status.status;
+        if (status.completed) {
+          text +=
+            ' - ' +
+            ((status.completed / status.total) * 100).toFixed(2) +
+            ' (' +
+            status.completed +
+            ' of ' +
+            status.total +
+            ')';
+        }
+        $('#status').text(text);
+        return Promise.resolve();
+      },
+    )
+    .then(function(gp) {
+      geoPackage = gp;
+      clearInfo();
+      readGeoPackage(gp);
+      shapefileZipDoneCallback ? shapefileZipDoneCallback() : null;
+    });
 }
 
 function loadByteArray(array, callback) {
@@ -408,7 +396,7 @@ window.loadGeoPackage = function(files) {
         {
           shapeData: array,
         },
-        function(status, callback) {
+        function(status) {
           let text = status.status;
           if (status.completed) {
             text +=
@@ -421,12 +409,11 @@ window.loadGeoPackage = function(files) {
               ')';
           }
           $('#status').text(text);
-          setTimeout(callback, 0);
         },
         function(err, gp) {
           geoPackage = gp;
           clearInfo();
-          readGeoPackage();
+          readGeoPackage(gp);
           $('#choose-label')
             .find('i')
             .toggle();
@@ -447,11 +434,57 @@ window.loadGeoPackage = function(files) {
         eventLabel: 'File Size',
         eventValue: array.byteLength,
       });
-      MBTilesToGeoPackage.convert(
+      new MBTilesToGeoPackage()
+        .convert(
+          {
+            mbtilesData: array,
+          },
+          function(status) {
+            let text = status.status;
+            if (status.completed) {
+              text +=
+                ' - ' +
+                ((status.completed / status.total) * 100).toFixed(2) +
+                ' (' +
+                status.completed +
+                ' of ' +
+                status.total +
+                ')';
+            }
+            $('#status').text(text);
+          },
+        )
+        .then(gp => {
+          geoPackage = gp;
+          clearInfo();
+          readGeoPackage(gp);
+          $('#choose-label')
+            .find('i')
+            .toggle();
+          $('#download').removeClass('gone');
+          $('#status').addClass('gone');
+        })
+        .catch(e => {
+          console.error(e);
+        });
+    }
+    // if it is a CSV file
+    else if (f.name.lastIndexOf('csv') > f.name.lastIndexOf('.')) {
+      if (window.Piwik) {
+        Piwik.getAsyncTracker().trackEvent('CSV', 'load', 'File Size', array.byteLength);
+      }
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'CSV',
+        eventAction: 'load',
+        eventLabel: 'File Size',
+        eventValue: array.byteLength,
+      });
+      new CSVToGeoPackage().convert(
         {
-          mbtilesData: array,
+          csvData: array,
         },
-        function(status, callback) {
+        function(status) {
           let text = status.status;
           if (status.completed) {
             text +=
@@ -464,12 +497,11 @@ window.loadGeoPackage = function(files) {
               ')';
           }
           $('#status').text(text);
-          setTimeout(callback, 0);
         },
         function(err, gp) {
           geoPackage = gp;
           clearInfo();
-          readGeoPackage();
+          readGeoPackage(gp);
           $('#choose-label')
             .find('i')
             .toggle();
@@ -494,7 +526,7 @@ window.loadGeoPackage = function(files) {
         {
           pbf: array,
         },
-        function(status, callback) {
+        function(status) {
           let text = status.status;
           if (status.completed) {
             text +=
@@ -507,7 +539,6 @@ window.loadGeoPackage = function(files) {
               ')';
           }
           $('#status').text(text);
-          setTimeout(callback, 0);
         },
         function(err, gp) {
           geoPackage = gp;

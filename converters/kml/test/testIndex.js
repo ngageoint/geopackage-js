@@ -36,8 +36,7 @@ describe('KML and KMZ to Geopackage Tests', function() {
         const KML_Samples_Edited_Path = path.join(__dirname, 'fixtures', 'KML_Samples_Edited.kml');
         const KML_Samples_Edited_Converter = new KMLToGeoPackage({append: true});
         const geometryTableName = 'kmlSamples';
-        const kmlGeopackage = KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, false, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
-        const geopackage = await kmlGeopackage;
+        const geopackage = await KML_Samples_Edited_Converter.convertKMLOrKMZToGeopackage(KML_Samples_Edited_Path, false, path.join(__dirname, 'fixtures', 'tmp', 'kmlSamplesEdited.gpkg'), geometryTableName);
         // Geopackage Should exist
         should.exist(geopackage);
         // Feature Table exists
@@ -46,72 +45,10 @@ describe('KML and KMZ to Geopackage Tests', function() {
         tableData[0].should.be.equal(geometryTableName);
         const featureDao = geopackage.getFeatureDao(geometryTableName);
         featureDao.getCount().should.be.equal(23);
-        // Tile Table Exists
-        const tileMatrixTable = geopackage.getTileTables();
-        should.exist(tileMatrixTable);
-        tileMatrixTable.length.should.be.equal(1);
         // Attribute table Exists.
         const attributeTables = geopackage.getAttributesTables();
         should.exist(attributeTables);
         attributeTables.length.should.be.equal(3);
-    });
-    it ('should handle a file with a network Link', async function() {
-        this.enableTimeouts(false);
-        try {
-            fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'));
-        } catch (e) {}
-        const KML = path.join(__dirname, 'fixtures', '3D Image Locations.kml');
-        const KML_Network_Link = new KMLToGeoPackage({append: true});
-        const geometryTableName = '3D Image Locations';
-        // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_Network_Link.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'), geometryTableName, null, a => {console.log(a.status)});
-        const geopackage = await kmlGeopackage;
-        should.exist(geopackage);
-
-        // Has Correct Tables
-        const tables = geopackage.getTables();
-        _.findIndex(tables.features, (a) => {console.log(a === '3DMeshLocations'); return a === '3DMeshLocations'}).should.not.be.equal(-1);
-        _.size(tables.attributes).should.be.equal(3);
-        _.size(tables.tiles).should.be.equal(0);
-
-        // Has Correct Meta data about features
-        const features = geopackage.getTableContents('3DMeshLocations');
-        features.min_y.should.be.equal(-158.12911);
-        features.max_y.should.be.equal(174.8913);
-        features.min_x.should.be.equal(-43.63739);
-        features.max_x.should.be.equal(69.72088);
-        features.srs_id.should.be.equal(4326);
-
-        // Has correct Number of Features
-        const featureDao = geopackage.getFeatureDao(features);
-        featureDao.count().should.be.equal(6477);
-
-        const multiGeomDao = geopackage.getAttributeDao('multi_geometry');
-        multiGeomDao.count().should.be.equal(182);  
-        geopackage.close()
-        fs.unlinkSync(path.join(__dirname, '..', '3DMeshLocations.kml'));
-        // done();
-    });
-    it ('should handle Large GroundOverlays', async function() {
-        this.enableTimeouts(false);
-        try {
-            fs.unlinkSync(path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'));
-        } catch (e) {}
-        const KML = path.join(__dirname, 'fixtures', 'Air Traffic.kml');
-        const KML_GroundOverlay = new KMLToGeoPackage({append: true});
-        const geometryTableName = 'Air Traffic';
-        // console.log(path.join(__dirname, 'fixtures', 'tmp', 'networkLink.gpkg'))
-        const kmlGeopackage = KML_GroundOverlay.convertKMLOrKMZToGeopackage(KML, false, path.join(__dirname, 'fixtures', 'tmp', 'Air Traffic.gpkg'), geometryTableName, null, (obj) => {should.exist(obj)});
-        const geopackage = await kmlGeopackage;
-        should.exist(geopackage);
-
-        const tileDao = geopackage.getTileDao('Air Traffic');
-        tileDao.count().should.be.equal(272);
-        // console.log(tileDao.boundingBox, geoSpatialUtilities.getWebMercatorBoundingBox('ESPG:4326', bboxWorld))
-        // assert.isTrue(_.isEqual(tileDao.boundingBox, geoSpatialUtilities.getWebMercatorBoundingBox('ESPG:4326', bboxWorld)));
-        // _.findIndex(tables.features, (a) => {console.log(a === '3DMeshLocations'); return a === '3DMeshLocations'}).should.not.be.equal(-1);
-        // _.size(tables.attributes).should.be.equal(3);
-        // _.size(tables.tiles).should.be.equal(0);
     });
     it ('should call progress call backs when defined', async function () {
         this.enableTimeouts(false);
@@ -185,35 +122,6 @@ describe('KML and KMZ to Geopackage Tests', function() {
             const {rgb: color5, a: opacity5} = kmlUtilities.abgrStringToColorOpacity('1aA12bcC')
             color5.should.be.equal('cC2bA1');
             opacity5.should.be.equal(0x1a/255);
-
-            try {
-                kmlUtilities.abgrStringToColorOpacity('9eA12bcCff') 
-                should.fail()
-            } catch(e) {
-                if(e instanceof AssertionError){
-                    should.fail()
-                }
-                should.exist(e, 'More than 8 char')
-            }
-            try {
-                kmlUtilities.abgrStringToColorOpacity('9eA12b') 
-            } catch(e) {
-                if(e instanceof AssertionError){
-                    should.fail()
-                }
-                should.exist(e, 'Less Than 8 char')
-            }
-            try {
-                kmlUtilities.abgrStringToColorOpacity('00FFGFFF')
-                should.fail()
-                
-            } catch(e) {
-                if(e instanceof AssertionError){
-                    should.fail()
-                }
-                should.exist(e, 'non-hex char')
-            }
-
         });
         it('should handle creating bounding boxes out of a parsed LatLonBox', function () {
             const bboxNode1 = {

@@ -1,6 +1,6 @@
 {
-  "name": "xyz-to-geopackage",
-  "version": "1.0.0",
+  "name": "@ngageoint/xyz-to-geopackage",
+  "version": "4.1.0",
   "description": "XYZ to GeoPackage converter",
   "keywords": [
     "NGA"
@@ -21,27 +21,50 @@
   "bugs": {
     "url": "https://github.com/ngageoint/geopackage-js/issues"
   },
+  "private": true,
   "dependencies": {
-    "@ngageoint/geopackage": "ngageoint/geopackage-js",
+    "@ngageoint/geopackage": "4.1.0",
     "jszip": "^3.1.3"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "istanbul": "^0.4.2",
-    "jsdoc": "^3.4.0",
-    "mocha": "^3.0.2"
+    "@istanbuljs/nyc-config-typescript": "0.1.3",
+    "chai": "4.2.0",
+    "coveralls": "^3.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "mocha": "6.2.2",
+    "mocha-lcov-reporter": "^1.3.0",
+    "ts-loader": "6.2.1",
+    "ts-node": "^8.5.2",
+    "typescript": "^3.7.2",
+    "nyc": "14.1.1",
+    "prettier": "^1.19.1",
+    "source-map-support": "0.5.16"
   },
-  "private": true,
-  "main": "index.js",
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "temp-dir": "./.test_run",
+    "report-dir": "./docs/coverage",
+    "reporter": [
+      "lcov"
+    ]
+  },
+  "main": "built/index.js",
+  "types": "built/index.d.ts",
   "files": [
-    "index.js",
+    "built",
+    "index.ts",
     "cli",
     "lib"
   ],
   "scripts": {
-    "test": "istanbul cover  _mocha",
-    "mocha": "mocha",
-    "predoc": "rm -rf docs/jsdoc/*",
-    "doc": "jsdoc --verbose -c jsdoc.conf"
+    "test": "npm run clean-built && nyc mocha -r ts-node/register",
+    "report": "nyc report",
+    "tsc": "rm -rf ./built && tsc",
+    "prepare": "rm -rf ./built && tsc",
+    "postinstall": "rm -rf ./built && tsc",
+    "clean-built": "rm -rf ./built",
+    "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage"
   }
 }

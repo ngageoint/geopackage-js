@@ -20,7 +20,7 @@ $ npm install @ngageoint/geopackage-mobile-optimizer
 
 ```javascript
 var fs = require('fs');
-var GeoPackageAPI = require('@ngageoint/geopackage');
+var { GeoPackageAPI, setCanvasKitWasmLocateFile } = require('@ngageoint/geopackage');
 var GeoPackageOptimizer = require("@ngageoint/geopackage-mobile-optimizer");
 
 var geoPackageFile = '/path/to/file/to/convert.gpkg';
@@ -36,7 +36,7 @@ async.series({
     });
   },
   geoPackage: function(callback) {
-    GeoPackageAPI.openGeoPackage(geoPackageFile, function(err, result) {
+    GeoPackageAPI.open(geoPackageFile, function(err, result) {
       if (err || !result) {
         return callback('Invalid GeoPackage file.');
       }
@@ -45,7 +45,7 @@ async.series({
     });
   },
   outputGeoPackage: function (callback) {
-    GeoPackageAPI.createGeoPackage(outputGeoPackageFile, function(err, result) {
+    GeoPackageAPI.create(outputGeoPackageFile, function(err, result) {
       if (err || !result) {
         return callback('Invalid GeoPackage file.');
       }
