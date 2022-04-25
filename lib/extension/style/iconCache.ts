@@ -1,4 +1,7 @@
 import { IconRow } from './iconRow';
+import { Canvas } from '../../canvas/canvas';
+import {ImageUtils} from "../../tiles/imageUtils";
+
 /**
  * @memberOf module:extension/style
  * @class IconCache
@@ -9,16 +12,17 @@ import { IconRow } from './iconRow';
  */
 export class IconCache {
   public static DEFAULT_CACHE_SIZE = 100;
-  iconCache: { [key: number]: any } = {};
+  iconCache: { [key: number]: {image: any, width: number, height: number} } = {};
   accessHistory: number[] = [];
 
   constructor(public cacheSize = IconCache.DEFAULT_CACHE_SIZE) {}
+
   /**
    * Get the cached image for the icon row or null if not cached
    * @param {module:extension/style.IconRow} iconRow icon row
    * @return {Image} icon image or null
    */
-  getIconForIconRow(iconRow: IconRow): any {
+  getIconForIconRow(iconRow: IconRow): {image: any, width: number, height: number} {
     return this.get(iconRow.id);
   }
   /**
@@ -26,7 +30,7 @@ export class IconCache {
    * @param {Number} iconRowId icon row id
    * @return {Image} icon image or null
    */
-  get(iconRowId: number): any {
+  get(iconRowId: number): {image: any, width: number, height: number} {
     const image = this.iconCache[iconRowId];
     if (image) {
       const index = this.accessHistory.indexOf(iconRowId);
@@ -43,7 +47,7 @@ export class IconCache {
    * @param {Image} image icon image
    * @return {Image} previous cached icon image or null
    */
-  putIconForIconRow(iconRow: IconRow, image: any): any {
+  putIconForIconRow(iconRow: IconRow, image: {image: any, width: number, height: number}): {image: any, width: number, height: number} {
     return this.put(iconRow.id, image);
   }
   /**
@@ -52,7 +56,7 @@ export class IconCache {
    * @param {Image} image icon image
    * @return {Image} previous cached icon image or null
    */
-  put(iconRowId: number, image: any): any {
+  put(iconRowId: number, image: {image: any, width: number, height: number}): {image: any, width: number, height: number} {
     const previous = this.iconCache[iconRowId];
     this.iconCache[iconRowId] = image;
     if (previous) {
@@ -65,17 +69,21 @@ export class IconCache {
     if (Object.keys(this.iconCache).length > this.cacheSize) {
       const iconId = this.accessHistory.shift();
       if (iconId) {
+        const iconToDelete = this.iconCache[iconId];
+        if (iconToDelete) {
+          Canvas.disposeImage(iconToDelete);
+        }
         delete this.iconCache[iconId];
       }
     }
     return previous;
   }
   /**
-   * Remove the cached image for the icon row
+   * Remove the cached image for the icon row, if using CanvasKitCanvasAdapter, dispose of returned image to free up memory using Canvas.dispose(icon.image)
    * @param {module:extension/style.IconRow} iconRow icon row
    * @return {Image} removed icon image or null
    */
-  removeIconForIconRow(iconRow: IconRow): any {
+  removeIconForIconRow(iconRow: IconRow): {image: any, width: number, height: number} {
     return this.remove(iconRow.id);
   }
   /**
@@ -83,7 +91,7 @@ export class IconCache {
    * @param {Number} iconRowId icon row id
    * @return {Image} removed icon image or null
    */
-  remove(iconRowId: number): any {
+  remove(iconRowId: number): {image: any, width: number, height: number} {
     const removed = this.iconCache[iconRowId];
     delete this.iconCache[iconRowId];
     if (removed) {
@@ -98,6 +106,10 @@ export class IconCache {
    * Clear the cache
    */
   clear(): void {
+    Object.keys(this.iconCache).forEach(key => {
+      const icon = this.iconCache[key];
+      Canvas.disposeImage(icon);
+    })
     this.iconCache = {};
     this.accessHistory = [];
   }
@@ -111,7 +123,10 @@ export class IconCache {
     if (keys.length > maxSize) {
       const numberToRemove = keys.length - maxSize;
       for (let i = 0; i < numberToRemove; i++) {
-        delete this.iconCache[this.accessHistory.shift()];
+        const indexToRemove = this.accessHistory.shift();
+        const icon = this.iconCache[indexToRemove];
+        Canvas.disposeImage(icon);
+        delete this.iconCache[indexToRemove];
       }
     }
   }
@@ -120,7 +135,7 @@ export class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  async createIcon(icon: IconRow): Promise<any> {
+  async createIcon(icon: IconRow): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheIcon(icon, this);
   }
   /**
@@ -129,7 +144,7 @@ export class IconCache {
    * @param {Number} scale scale factor
    * @return {Promise<Image>} icon image
    */
-  async createScaledIcon(icon: IconRow, scale: number): Promise<any> {
+  async createScaledIcon(icon: IconRow, scale: number): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, scale, this);
   }
   /**
@@ -137,7 +152,7 @@ export class IconCache {
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise<Image>} icon image
    */
-  async createIconNoCache(icon: IconRow): Promise<any> {
+  async createIconNoCache(icon: IconRow): Promise<{image: any, width: number, height: number}> {
     return this.createScaledIconNoCache(icon, 1.0);
   }
   /**
@@ -146,7 +161,7 @@ export class IconCache {
    * @param scale scale factor
    * @return {Promise<Image>} icon image
    */
-  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<any> {
+  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, scale, null);
   }
   /**
@@ -155,7 +170,7 @@ export class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<any> {
+  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<{image: any, width: number, height: number}> {
     return this.createAndCacheScaledIcon(icon, 1.0, iconCache);
   }
   /**
@@ -165,20 +180,52 @@ export class IconCache {
    * @param {module:extension/style.IconCache} iconCache icon cache
    * @return {Promise<Image>} icon image
    */
-  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<any> {
+  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<{image: any, width: number, height: number}> {
     let iconImage = null;
     if (icon != null) {
       const iconId = icon.id;
-      if (iconCache !== null) {
+
+      if (iconCache != null) {
         iconImage = iconCache.get(iconId);
       }
-      const iconScaledWidth = Math.round(icon.width * scale);
-      const iconScaledHeight = Math.round(icon.height * scale);
-      if (!iconImage || iconImage.width !== iconScaledWidth || iconImage.height !== iconScaledHeight) {
-        iconImage = await icon.getScaledDataImage(scale);
-      }
-      if (iconCache !== null) {
-        iconCache.putIconForIconRow(icon, iconImage);
+
+      if (iconImage == null) {
+        try {
+          iconImage = await ImageUtils.getImage(icon.data);
+        } catch (e) {
+          throw new Error('Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.name)
+        }
+
+        const dataWidth = iconImage.width;
+        const dataHeight = iconImage.height;
+        let iconWidth = icon.width;
+        let iconHeight = icon.height;
+
+        let scaleImage = iconWidth != null || iconHeight != null;
+        if (!scaleImage && scale != 1.0) {
+          iconWidth = dataWidth;
+          iconHeight = dataHeight;
+          scaleImage = true;
+        }
+
+        if (scaleImage) {
+          if (iconWidth == null) {
+            iconWidth = dataWidth * (iconHeight / dataHeight);
+          } else if (iconHeight == null) {
+            iconHeight = dataHeight * (iconWidth / dataWidth);
+          }
+
+          const scaledWidth = Math.round(scale * iconWidth);
+          const scaledHeight = Math.round(scale * iconHeight);
+
+          if (scaledWidth != dataWidth || scaledHeight != dataHeight) {
+            iconImage = await ImageUtils.scaleImage(iconImage, scaledWidth, scaledHeight);
+          }
+        }
+
+        if (iconCache != null) {
+          iconCache.putIconForIconRow(icon, iconImage);
+        }
       }
     }
     return iconImage;

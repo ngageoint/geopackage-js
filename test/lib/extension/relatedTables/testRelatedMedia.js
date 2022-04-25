@@ -1,18 +1,12 @@
-
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
   , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
   , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
   , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
-  , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow').MediaRow
-  // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
-  , wkx = require('wkx')
   , path = require('path');
 
 describe('Related Media tests', function() {

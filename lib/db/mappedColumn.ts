@@ -1,5 +1,7 @@
 import { GeoPackageDataType } from './geoPackageDataType'
-import _ from 'lodash'
+import isNil from 'lodash/isNil'
+import isEqual from 'lodash/isEqual'
+
 /**
  * Mapped column, to a column and potentially from a differently named column
  */
@@ -76,7 +78,7 @@ export class MappedColumn {
    * @return true if the to and from column names are different
    */
   hasNewName(): boolean {
-    return !_.isNil(this._fromColumn) && !_.isEqual(this._fromColumn, this._toColumn)
+    return !isNil(this._fromColumn) && !isEqual(this._fromColumn, this._toColumn)
   }
 
   /**
@@ -100,7 +102,7 @@ export class MappedColumn {
    * @return true if has a default value
    */
   hasDefaultValue(): boolean {
-    return !_.isNil(this._defaultValue)
+    return !isNil(this._defaultValue)
   }
 
   /**
@@ -148,7 +150,7 @@ export class MappedColumn {
    * @return true if has a constant value
    */
   hasConstantValue(): boolean {
-    return !_.isNil(this._constantValue)
+    return !isNil(this._constantValue)
   }
 
   /**
@@ -180,7 +182,7 @@ export class MappedColumn {
    * @return true if has a where value
    */
   hasWhereValue(): boolean {
-    return !_.isNil(this._whereValue)
+    return !isNil(this._whereValue)
   }
 
   /**
@@ -222,7 +224,7 @@ export class MappedColumn {
    * @return where operator
    */
   get whereOperator(): string {
-    return !_.isNil(this._whereOperator) ? this._whereOperator : '='
+    return !isNil(this._whereOperator) ? this._whereOperator : '='
   }
 
   /**

@@ -16,7 +16,7 @@ export class UniqueConstraint extends Constraint {
    */
   columns: UserColumn[] = [];
 
-  constructor(name: string, ...columns: UserColumn[]) {
+  constructor(name?: string, ...columns: UserColumn[]) {
     super(ConstraintType.UNIQUE, name);
     this.add(...columns);
   }

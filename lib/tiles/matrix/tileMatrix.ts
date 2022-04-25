@@ -1,3 +1,5 @@
+import { Contents } from '../../core/contents/contents';
+
 /**
  * Tile Matrix object. Documents the structure of the tile matrix at each zoom
  * level in each tiles table. It allows GeoPackages to contain rectangular as
@@ -56,4 +58,10 @@ export class TileMatrix {
    * @member {Number}
    */
   pixel_y_size: number;
+
+  set contents(contents: Contents) {
+    if (contents && contents.data_type === 'tiles') {
+      this.table_name = contents.table_name;
+    }
+  }
 }

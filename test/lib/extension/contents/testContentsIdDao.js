@@ -1,11 +1,8 @@
-
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {ContentsDao} from '../../../../lib/core/contents/contentsDao'
 
 var Verification = require('../../../fixtures/verification')
   , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
-  , should = require('chai').should()
-  , path = require('path');
+  , should = require('chai').should();
 
 describe('ContentsIdExtension Tests', function() {
   var testGeoPackage;

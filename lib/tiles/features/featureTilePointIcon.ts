@@ -38,7 +38,7 @@ export class FeatureTilePointIcon {
    * Get the icon
    * @returns {Image} icon
    */
-  getIcon(): any {
+  getIcon(): {image: any, width: number, height: number} {
     return this.icon;
   }
   /**

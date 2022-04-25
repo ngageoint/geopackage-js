@@ -17,6 +17,9 @@ export interface DBAdapter {
   each(sql: string, params?: [] | Record<string, any>): IterableIterator<any>;
   run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number };
   insert(sql: string, params?: [] | Record<string, any>): number;
+  prepareStatement(sql: string): any;
+  bindAndInsert(statement: any, params?: [] | Record<string, any>): number;
+  closeStatement(statement: any): void;
   delete(sql: string, params?: [] | Record<string, any>): number;
   dropTable(table: string): boolean;
   count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number;

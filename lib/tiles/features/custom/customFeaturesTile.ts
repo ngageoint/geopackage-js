@@ -7,12 +7,6 @@
  * @constructor
  */
 export abstract class CustomFeaturesTile {
-  static readonly isElectron = !!(
-    typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().indexOf(' electron/') > -1
-  );
-  static readonly isNode = typeof process !== 'undefined' && process.version;
-  static readonly useNodeCanvas = CustomFeaturesTile.isNode && !CustomFeaturesTile.isElectron;
-
   tileBorderStrokeWidth: number;
   tileBorderColor: string;
   tileFillColor: string;

@@ -4,7 +4,6 @@
  */
 
 import { UserMappingTable } from '../relatedTables/userMappingTable';
-import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserColumn } from '../../user/userColumn';
 
@@ -47,16 +46,7 @@ export class StyleMappingTable extends UserMappingTable {
   static createColumns(): UserColumn[] {
     const columns = UserMappingTable.createRequiredColumns();
     const index = columns.length;
-    columns.push(
-      UserCustomColumn.createColumn(
-        index,
-        StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME,
-        GeoPackageDataType.TEXT,
-        undefined,
-        false,
-        undefined,
-      ),
-    );
+    columns.push(UserColumn.createColumn(index, StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME, GeoPackageDataType.TEXT, false));
     return columns;
   }
 }

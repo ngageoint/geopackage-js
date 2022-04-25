@@ -11,7 +11,7 @@ import { ExtensionDao } from './extensionDao';
  */
 export abstract class BaseExtension {
   /**
-   * Connecton to the GeoPackage
+   * Connection to the GeoPackage
    */
   protected readonly connection: GeoPackageConnection;
   /**

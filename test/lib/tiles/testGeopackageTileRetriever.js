@@ -1,16 +1,12 @@
-
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
-  // , GeoPackageAPI = require('../../..')
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
-  // , testSetup = require('../../fixtures/testSetup')
-  , proj4 = require('proj4')
-  , fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path');
 
 var isLinux = process.platform === 'linux';
+var isNode = typeof(process) !== 'undefined' && process.version;
 
 describe('GeoPackage Tile Retriever tests', function() {
 
@@ -54,8 +50,12 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(2,1,2)
       .then(function(tile) {
         testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -68,8 +68,12 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTileWithWgs84BoundsInProjection(wgs84BoundingBox, 2, 'EPSG:3857')
       .then(function(tile) {
         testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','reprojTile.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -159,33 +163,6 @@ describe('GeoPackage Tile Retriever tests', function() {
         should.exist(tile);
       });
     });
-
-    // it('should get the tile matrix for 1 tile and no zoom specified', function(done) {
-    //   var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-    //   var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
-    //   var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-    //
-    //   gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, function(err, tileMatrix) {
-    //     should.not.exist(err);
-    //     should.exist(tileMatrix);
-    //     tileMatrix.zoomLevel.should.be.equal(2);
-    //     done();
-    //   });
-    // });
-    //
-    // it('should get the tile matrix for 1 tile and zoom specified', function(done) {
-    //   var gpr = new GeoPackageTileRetriever(tileDao, 512, 512);
-    //   var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311188);
-    //   var webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox('EPSG:4326', 'EPSG:3857');
-    //
-    //   gpr.getTileMatrixWithWebMercatorBoundingBox(webMercatorBoundingBox, 3, function(err, tileMatrix) {
-    //     should.not.exist(err);
-    //     should.exist(tileMatrix);
-    //     tileMatrix.zoomLevel.should.be.equal(3);
-    //     done();
-    //   });
-    // });
-
   });
 
   describe('Scaled images GeoPackage tests', function() {
@@ -213,14 +190,18 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(0, 4, 4)
       .then(function(tile) {
         var expectedPath;
-        if (typeof(process) !== 'undefined' && process.version) {
+        if (isNode) {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTile.png');
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTileWeb.png');
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
-          imagesAreSame.should.be.equal(true);
-          done(err);
+          try {
+            imagesAreSame.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -231,14 +212,18 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(0, 4, 4)
       .then(function(tile) {
         var expectedPath;
-        if (typeof(process) !== 'undefined' && process.version) {
+        if (isNode) {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','450tile.png');
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','450tileWeb.png');
         }
         testSetup.diffImagesWithDimensions(tile, expectedPath, 450, 450, function (err, imagesAreSame) {
-          imagesAreSame.should.be.equal(true);
-          done(err);
+          try {
+            imagesAreSame.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -248,12 +233,6 @@ describe('GeoPackage Tile Retriever tests', function() {
     var tileDao;
     var geoPackage;
     var filename;
-    var defs = require('../../../lib/proj4Defs');
-    for (var name in defs) {
-      if (defs[name]) {
-        proj4.defs(name, defs[name]);
-      }
-    }
 
     beforeEach('should open the geopackage', async function() {
       var wgs84filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
@@ -266,7 +245,7 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     afterEach('should delete the geopackage', async function() {
       await testSetup.deleteGeoPackage(filename);
-    })
+    });
 
     it('should get the web mercator bounding box', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
@@ -274,7 +253,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       result.minLongitude.should.be.equal(-20037508.342789244);
       result.maxLongitude.should.be.equal(-15028131.257091932);
       result.minLatitude.should.be.equal(5621521.486192066);
-      result.maxLatitude.should.be.equal(20036051.91933679);
+      result.maxLatitude.should.be.equal(20037508.342789244);
     });
 
     it('should get the web mercator bounding box twice', function() {
@@ -283,13 +262,13 @@ describe('GeoPackage Tile Retriever tests', function() {
       result.minLongitude.should.be.equal(-20037508.342789244);
       result.maxLongitude.should.be.equal(-15028131.257091932);
       result.minLatitude.should.be.equal(5621521.486192066);
-      result.maxLatitude.should.be.equal(20036051.91933679);
+      result.maxLatitude.should.be.equal(20037508.342789244);
 
       var result2 = gpr.getWebMercatorBoundingBox();
       result2.minLongitude.should.be.equal(-20037508.342789244);
       result2.maxLongitude.should.be.equal(-15028131.257091932);
       result2.minLatitude.should.be.equal(5621521.486192066);
-      result2.maxLatitude.should.be.equal(20036051.91933679);
+      result2.maxLatitude.should.be.equal(20037508.342789244);
     });
 
     it('should get the x: 0, y: 4, z: 4 tile', function(done) {
@@ -298,17 +277,20 @@ describe('GeoPackage Tile Retriever tests', function() {
       gpr.getTile(0, 4, 4)
       .then(function(tile) {
         var expectedPath;
-        if (typeof(process) !== 'undefined' && process.version) {
+        if (isNode) {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles', isLinux ? 'reprojectTileLinux.png' : 'reprojectTile.png');
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
         }
         testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
-          imagesAreSame.should.be.equal(true);
-          done(err);
+          try {
+            imagesAreSame.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
   });
-
 });

@@ -4,9 +4,8 @@
 
 import { UserTable } from '../../user/userTable';
 import { TileColumn } from './tileColumn';
-import { TileColumns } from "./tileColumns";
+import { TileColumns } from './tileColumns';
 import { UniqueConstraint } from '../../db/table/uniqueConstraint';
-import { ConstraintType } from '../../db/table/constraintType';
 import { ContentsDataType } from '../../core/contents/contentsDataType';
 import { Contents } from '../../core/contents/contents';
 
@@ -52,7 +51,7 @@ export class TileTable extends UserTable<TileColumn> {
     super(new TileColumns(tableName, columns, false));
 
     // Build a unique constraint on zoom level, tile column, and tile data
-    let uniqueConstraint = new UniqueConstraint(ConstraintType.nameFromType(ConstraintType.UNIQUE));
+    let uniqueConstraint = new UniqueConstraint();
     uniqueConstraint.add(this.getUserColumns().getZoomLevelColumn());
     uniqueConstraint.add(this.getUserColumns().getTileColumnColumn());
     uniqueConstraint.add(this.getUserColumns().getTileRowColumn());

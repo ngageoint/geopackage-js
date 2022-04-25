@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import sortedIndex from 'lodash/sortedIndex';
 
 import { ConstraintType } from './constraintType';
 import { Constraint } from './constraint';
@@ -30,7 +30,7 @@ export class Constraints {
     const lastIndex = orders.lastIndexOf(constraint.order);
     let insertLocation = lastIndex + 1;
     if (lastIndex === -1) {
-      insertLocation = _.sortedIndex(this.constraints.map(c => c.order), constraint.order);
+      insertLocation = sortedIndex(this.constraints.map(c => c.order), constraint.order);
     }
 
     if (insertLocation === this.constraints.length) {

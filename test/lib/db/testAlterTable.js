@@ -1,4 +1,6 @@
 import { default as testSetup } from '../../fixtures/testSetup'
+import {TileScaling} from "../../../lib/extension/scale/tileScaling";
+import {TileScalingType} from "../../../lib/extension/scale/tileScalingType";
 
 var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
   , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
@@ -6,12 +8,12 @@ var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureC
   , AlterTable = require('../../../lib/db/alterTable').AlterTable
   , TableInfo = require('../../../lib/db/table/tableInfo').TableInfo
   , CoreSQLUtils = require('../../../lib/db/coreSQLUtils').CoreSQLUtils
-  , TableCreator = require('../../../lib/db/tableCreator').TableCreator
   , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../lib/geom/geometryData').GeometryData
   , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
+  , TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
+  , TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
   , NGAExtensions = require('../../../lib/extension/ngaExtensions').NGAExtensions
-  , GeoPackageAPI = require('../../../lib/api').GeoPackageAPI
   , should = require('chai').should()
   , wkx = require('wkx')
   , path = require('path')
@@ -247,5 +249,47 @@ describe('AlterTable tests', function() {
     AlterTable.alterColumn(geopackage.connection, tableName, columnCopy);
     tableInfo = TableInfo.info(geopackage.connection, tableName);
     tableInfo.getColumn(columnName).getDefaultValue().should.be.equal('1');
+  });
+});
+
+describe('AlterTable tests - Tile Table Copying', function() {
+  var geoPackage;
+  var tileDao;
+
+  var filename;
+  beforeEach('create the GeoPackage connection', async function() {
+    var originalFilename = path.join(__dirname, '..', '..', 'fixtures', 'denver_tile.gpkg');
+    // @ts-ignore
+    let result = await copyAndOpenGeopackage(originalFilename);
+    filename = result.path;
+    geoPackage = result.geopackage;
+    tileDao = geoPackage.getTileDao('denver');
+    let tileScalingExtension = geoPackage.getTileScalingExtension('denver');
+    tileScalingExtension.getOrCreateExtension();
+    const tileScaling = new TileScaling();
+    tileScaling.scaling_type = TileScalingType.IN;
+    tileScaling.zoom_in = 2;
+    tileScaling.zoom_out = 1;
+    tileScalingExtension.createOrUpdate(tileScaling);
+  });
+
+  afterEach('close the geopackage connection', async function() {
+    geoPackage.close();
+    // await testSetup.deleteGeoPackage(filename);
+  });
+
+  it('should copy TileTable and it\'s contents', function(done) {
+    geoPackage.copyTable('denver', 'cherry_creek', true, true);
+    let copyTileDao = geoPackage.getTileDao('cherry_creek');
+    copyTileDao.count().should.be.equal(42);
+    let tileMatrixDao = new TileMatrixDao(geoPackage);
+    tileMatrixDao.count().should.be.equal(2);
+    let tileMatrixSetDao = new TileMatrixSetDao(geoPackage);
+    tileMatrixSetDao.count().should.be.equal(2);
+    let tileScalingExtension = geoPackage.getTileScalingExtension('cherry_creek');
+    tileScalingExtension.has().should.be.equal(true);
+    let tileScalingDao = tileScalingExtension.dao;
+    should.exist(tileScalingDao.queryForTableName('cherry_creek'));
+    done();
   });
 });

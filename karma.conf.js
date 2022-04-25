@@ -22,7 +22,7 @@ module.exports = function(config) {
     frameworks: ['mocha', 'chai', 'browserify'],
 
     files: [
-      'test/test.js',
+      'test/browserTests.js',
       'test/index.html'
     ],
 

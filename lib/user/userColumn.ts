@@ -1,7 +1,7 @@
 /**
  * @module user/userColumn
  */
-import _ from 'lodash'
+import isEqual from 'lodash/isEqual';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { DBValue } from '../db/dbAdapter';
 import { Constraint } from '../db/table/constraint';
@@ -105,7 +105,7 @@ export class UserColumn {
 
   setIndex(index: number) {
     if (this.hasIndex()) {
-      if (!_.isEqual(index, this.index)) {
+      if (!isEqual(index, this.index)) {
         throw new Error('User Column with a valid index may not be changed. Column Name: ' + this.name + ', Index: ' + this.index + ', Attempted Index: ' + this.index);
       }
     } else {

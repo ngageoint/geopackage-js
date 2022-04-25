@@ -52,7 +52,7 @@ export class MediaRow extends UserRow {
    *
    * @return {Promise<Image>}
    */
-  get dataImage(): Promise<any> {
+  get dataImage(): Promise<{image: any, width: number, height: number}> {
     return ImageUtils.getImage(this.data, this.contentType);
   }
   /**
@@ -60,9 +60,10 @@ export class MediaRow extends UserRow {
    * @param {Number} scale
    * @return {Promise<Image>}
    */
-  getScaledDataImage(scale: number): Promise<any> {
+  getScaledDataImage(scale: number): Promise<{image: any, width: number, height: number}> {
     return ImageUtils.getScaledImage(this.data, scale);
   }
+
   /**
    * Get the content type column
    * @return {module:user/userColumn~UserColumn}

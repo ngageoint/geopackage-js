@@ -1,6 +1,4 @@
-import { GeoPackageAPI } from '../index';
 import * as GP from '../index';
-import { WKB } from '../lib/wkb';
 const GeoPackageDataType = GP.GeoPackageDataType,
   GeometryColumns = GP.GeometryColumns,
   GeometryData = GP.GeometryData,
@@ -15,19 +13,17 @@ const GeoPackageDataType = GP.GeoPackageDataType,
   SchemaExtension = GP.SchemaExtension,
   MetadataExtension = GP.MetadataExtension,
   WebPExtension = GP.WebPExtension,
-  DataColumnsDao = GP.DataColumnsDao,
   DataColumnConstraintsDao = GP.DataColumnConstraintsDao,
   Constraints = GP.Constraints,
   TableCreator = GP.TableCreator,
   MediaTable = GP.MediaTable,
   UserMappingTable = GP.UserMappingTable,
   DublinCoreType = GP.DublinCoreType,
-  wkb = WKB,
   GeometryType = GP.GeometryType;
 
 const wkx = require('wkx'),
   path = require('path'),
-  fs = require('fs-extra');
+  fs = require('fs');
 
 const GeoPackageUtils = {};
 

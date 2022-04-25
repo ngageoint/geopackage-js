@@ -11,6 +11,7 @@ import { SpatialReferenceSystem } from '../srs/spatialReferenceSystem';
 import { BoundingBox } from '../../boundingBox';
 import { DBValue } from '../../db/dbAdapter';
 import { ContentsDataType } from './contentsDataType';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -75,7 +76,7 @@ export class ContentsDao extends Dao<Contents> {
    * @return {string[]}           Array of table names
    */
   getTables(tableType?: string): string[] {
-    let results = [];
+    let results;
     if (tableType) {
       const fieldValues = new ColumnValues();
       fieldValues.addColumn(ContentsDao.COLUMN_DATA_TYPE, tableType);
@@ -100,7 +101,7 @@ export class ContentsDao extends Dao<Contents> {
         if (reprojectTo4326) {
           const bb = new BoundingBox(contents.min_x, contents.max_x, contents.min_y, contents.max_y).projectBoundingBox(
             this.getProjection(contents),
-            'EPSG:4326',
+            ProjectionConstants.EPSG_4326
           );
           contents.min_x = bb.minLongitude;
           contents.max_x = bb.maxLongitude;
@@ -189,7 +190,7 @@ export class ContentsDao extends Dao<Contents> {
             let geometryColumnsDao = this.geoPackage.geometryColumnsDao;
             if (geometryColumnsDao.isTableExists()) {
               let geometryColumns = this.getGeometryColumns(contents);
-              if (geometryColumns != null) {
+              if (geometryColumns !== null && geometryColumns !== undefined) {
                 geometryColumnsDao.deleteByMultiId([geometryColumns.table_name, geometryColumns.column_name]);
               }
             }
@@ -200,7 +201,7 @@ export class ContentsDao extends Dao<Contents> {
             let tileMatrixDao = this.geoPackage.tileMatrixDao;
             if (tileMatrixDao.isTableExists()) {
               let tileMatrixCollection = this.getTileMatrix(contents);
-              if (tileMatrixCollection.length > 0) {
+              if (tileMatrixCollection !== null && tileMatrixCollection !== undefined && tileMatrixCollection.length > 0) {
                 tileMatrixCollection.forEach(tileMatrix => {
                   tileMatrixDao.deleteByMultiId([tileMatrix.table_name, tileMatrix.zoom_level]);
                 });
@@ -210,7 +211,7 @@ export class ContentsDao extends Dao<Contents> {
             let tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
             if (tileMatrixSetDao.isTableExists()) {
               let tileMatrixSet = this.getTileMatrixSet(contents);
-              if (tileMatrixSet != null) {
+              if (tileMatrixSet !== null && tileMatrixSet !== undefined) {
                 tileMatrixSetDao.deleteById(tileMatrixSet.table_name);
               }
             }

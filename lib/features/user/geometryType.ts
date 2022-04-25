@@ -22,7 +22,11 @@ export enum GeometryType {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace GeometryType {
   export function nameFromType(type: GeometryType): string {
-    return GeometryType[type];
+    let name = null;
+    if (type !== null && type !== undefined) {
+      name = GeometryType[type];
+    }
+    return name;
   }
 
   export function fromName(type: string): GeometryType {

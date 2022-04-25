@@ -364,7 +364,7 @@ static alterTableWithSQLAndTableMapping(db: GeoPackageConnection, sql: string, t
       }
 
       // 4. Create the new table
-      sql = sql.replace(tableName, transferTable)
+      sql = sql.replace('"' + tableName + '"', '"' + transferTable + '"')
 
       db.run(sql)
 

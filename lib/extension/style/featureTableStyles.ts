@@ -16,6 +16,7 @@ import { StyleRow } from './styleRow';
 import { IconRow } from './iconRow';
 import { FeatureRow } from '../../features/user/featureRow';
 import { FeatureTable } from '../../features/user/featureTable';
+import { GeometryType } from '../../features/user/geometryType';
 
 /**
  * Feature Table Styles, styles and icons for an individual feature table
@@ -235,14 +236,11 @@ export class FeatureTableStyles {
   getCachedTableStyles(): Styles {
     let styles = this.cachedTableFeatureStyles.styles;
     if (styles === null) {
-      styles = this.cachedTableFeatureStyles.styles;
+      styles = this.getTableStyles();
       if (styles === null) {
-        styles = this.getTableStyles();
-        if (styles === null) {
-          styles = new Styles();
-        }
-        this.cachedTableFeatureStyles.styles = styles;
+        styles = new Styles(true);
       }
+      this.cachedTableFeatureStyles.styles = styles;
     }
     if (styles.isEmpty()) {
       styles = null;
@@ -251,10 +249,10 @@ export class FeatureTableStyles {
   }
   /**
    * Get the table style of the geometry type
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.StyleRow} style row
    */
-  getTableStyle(geometryType: string): StyleRow {
+  getTableStyle(geometryType: GeometryType): StyleRow {
     return this.featureStyleExtension.getTableStyle(this.tableName, geometryType);
   }
   /**
@@ -278,14 +276,11 @@ export class FeatureTableStyles {
   getCachedTableIcons(): Icons {
     let icons = this.cachedTableFeatureStyles.icons;
     if (icons === null) {
-      icons = this.cachedTableFeatureStyles.icons;
+      icons = this.getTableIcons();
       if (icons === null) {
-        icons = this.getTableIcons();
-        if (icons === null) {
-          icons = new Icons();
-        }
-        this.cachedTableFeatureStyles.icons = icons;
+        icons = new Icons(true);
       }
+      this.cachedTableFeatureStyles.icons = icons;
     }
     if (icons.isEmpty()) {
       icons = null;
@@ -294,10 +289,10 @@ export class FeatureTableStyles {
   }
   /**
    * Get the table icon of the geometry type
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.IconRow} icon row
    */
-  getTableIcon(geometryType: string): IconRow {
+  getTableIcon(geometryType: GeometryType): IconRow {
     return this.featureStyleExtension.getTableIcon(this.tableName, geometryType);
   }
   /**
@@ -334,7 +329,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
-    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()));
   }
   /**
    * Get the feature style (style and icon) of the feature row with the
@@ -343,10 +338,10 @@ export class FeatureTableStyles {
    * icon, table default style or icon
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.FeatureStyle} feature style
    */
-  getFeatureStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): FeatureStyle {
+  getFeatureStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): FeatureStyle {
     return this.getFeatureStyle(featureRow.id, geometryType);
   }
   /**
@@ -366,14 +361,14 @@ export class FeatureTableStyles {
    * icon, table geometry type style or icon, table default style or icon
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.FeatureStyle} feature style
    */
-  getFeatureStyle(featureId: number, geometryType: string): FeatureStyle {
+  getFeatureStyle(featureId: number, geometryType: GeometryType): FeatureStyle {
     let featureStyle = null;
     const style = this.getStyle(featureId, geometryType);
     const icon = this.getIcon(featureId, geometryType);
-    if (style != null || icon != null) {
+    if ((style !== null && style !== undefined) || (icon !== null && icon !== undefined)) {
       featureStyle = new FeatureStyle(style, icon);
     }
     return featureStyle;
@@ -416,7 +411,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.StyleRow} style row
    */
   getStyleForFeatureRow(featureRow: FeatureRow): StyleRow {
-    return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getStyleForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()));
   }
   /**
    * Get the style of the feature row with the provided geometry type,
@@ -424,10 +419,10 @@ export class FeatureTableStyles {
    * table geometry type style, table default style
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.StyleRow} style row
    */
-  getStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): StyleRow {
+  getStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): StyleRow {
     return this.getStyle(featureRow.id, geometryType);
   }
   /**
@@ -446,15 +441,15 @@ export class FeatureTableStyles {
    * style
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.StyleRow} style row
    */
-  getStyle(featureId: number, geometryType: string): StyleRow {
+  getStyle(featureId: number, geometryType: GeometryType): StyleRow {
     let styleRow = this.featureStyleExtension.getStyle(this.tableName, featureId, geometryType, false);
     if (styleRow === null) {
       // Table Style
       const styles = this.getCachedTableStyles();
-      if (styles != null) {
+      if (styles !== null) {
         styleRow = styles.getStyle(geometryType);
       }
     }
@@ -497,7 +492,7 @@ export class FeatureTableStyles {
    * @return {module:extension/style.IconRow} icon row
    */
   getIconForFeatureRow(featureRow: FeatureRow): IconRow {
-    return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getIconForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()));
   }
   /**
    * Get the icon of the feature row with the provided geometry type,
@@ -505,10 +500,10 @@ export class FeatureTableStyles {
    * table geometry type icon, table default icon
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.IconRow} icon row
    */
-  getIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): IconRow {
+  getIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): IconRow {
     return this.getIcon(featureRow.id, geometryType);
   }
   /**
@@ -526,15 +521,15 @@ export class FeatureTableStyles {
    * icon, feature default icon, table geometry type icon, table default icon
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.IconRow} icon row
    */
-  getIcon(featureId: number, geometryType: string): IconRow {
+  getIcon(featureId: number, geometryType: GeometryType): IconRow {
     let iconRow = this.featureStyleExtension.getIcon(this.tableName, featureId, geometryType, false);
     if (iconRow === null) {
       // Table Icon
       const icons = this.getCachedTableIcons();
-      if (icons != null) {
+      if (icons !== null) {
         iconRow = icons.getIcon(geometryType);
       }
     }
@@ -606,11 +601,11 @@ export class FeatureTableStyles {
   /**
    * Set the feature table style for the geometry type
    *
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {StyleRow} style style row
    * @return {number}
    */
-  setTableStyle(geometryType: string, style: StyleRow): number {
+  setTableStyle(geometryType: GeometryType, style: StyleRow): number {
     const result = this.featureStyleExtension.setTableStyle(this.tableName, geometryType, style);
     this.clearCachedTableStyles();
     return result;
@@ -646,11 +641,11 @@ export class FeatureTableStyles {
   /**
    * Set the feature table icon for the geometry type
    *
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {number}
    */
-  setTableIcon(geometryType: string, icon: IconRow): number {
+  setTableIcon(geometryType: GeometryType, icon: IconRow): number {
     const result = this.featureStyleExtension.setTableIcon(this.tableName, geometryType, icon);
     this.clearCachedTableIcons();
     return result;
@@ -723,13 +718,13 @@ export class FeatureTableStyles {
    * specified geometry type
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     featureStyle: FeatureStyle,
   ): {
     style: number;
@@ -769,13 +764,13 @@ export class FeatureTableStyles {
    * Set the feature style (style and icon) of the feature
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyle(
     featureId: number,
-    geometryType: string,
+    geometryType: GeometryType,
     featureStyle: FeatureStyle,
   ): {
     style: number;
@@ -847,13 +842,13 @@ export class FeatureTableStyles {
    * Set the style of the feature row for the specified geometry type
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
    * @return {number}
    */
   setStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     style: StyleRow,
   ): number {
     return this.featureStyleExtension.setStyleForFeatureRowAndGeometryType(featureRow, geometryType, style);
@@ -872,11 +867,11 @@ export class FeatureTableStyles {
    * Set the style of the feature
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
    * @return {number}
    */
-  setStyle(featureId: number, geometryType: string, style: StyleRow): number {
+  setStyle(featureId: number, geometryType: GeometryType, style: StyleRow): number {
     return this.featureStyleExtension.setStyle(this.tableName, featureId, geometryType, style);
   }
   /**
@@ -937,13 +932,13 @@ export class FeatureTableStyles {
    * Set the icon of the feature row for the specified geometry type
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
   setIconForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     icon: IconRow,
   ): number {
     return this.featureStyleExtension.setIconForFeatureRowAndGeometryType(featureRow, geometryType, icon);
@@ -963,11 +958,11 @@ export class FeatureTableStyles {
    * icon, feature default icon, table geometry type icon, table default icon
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {Promise}
    */
-  setIcon(featureId: number, geometryType: string, icon: IconRow): number {
+  setIcon(featureId: number, geometryType: GeometryType, icon: IconRow): number {
     return this.featureStyleExtension.setIcon(this.tableName, featureId, geometryType, icon);
   }
   /**
@@ -1050,9 +1045,9 @@ export class FeatureTableStyles {
   /**
    * Delete the feature table style for the geometry type
    *
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteTableStyle(geometryType: string): number {
+  deleteTableStyle(geometryType: GeometryType): number {
     const result = this.featureStyleExtension.deleteTableStyle(this.tableName, geometryType);
     this.clearCachedTableStyles();
     return result;
@@ -1076,9 +1071,9 @@ export class FeatureTableStyles {
   /**
    * Delete the feature table icon for the geometry type
    *
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteTableIcon(geometryType: string): number {
+  deleteTableIcon(geometryType: GeometryType): number {
     const result = this.featureStyleExtension.deleteTableIcon(this.tableName, geometryType);
     this.clearCachedTableIcons();
     return result;
@@ -1161,18 +1156,18 @@ export class FeatureTableStyles {
    * Delete the feature row style for the geometry type
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+  deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
     return this.featureStyleExtension.deleteStyleForFeatureRowAndGeometryType(featureRow, geometryType);
   }
   /**
    * Delete the feature row style for the geometry type
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteStyle(featureId: number, geometryType: string): number {
+  deleteStyle(featureId: number, geometryType: GeometryType): number {
     return this.featureStyleExtension.deleteStyle(this.tableName, featureId, geometryType);
   }
   /**
@@ -1243,18 +1238,18 @@ export class FeatureTableStyles {
    * Delete the feature row icon for the geometry type
    *
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+  deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
     return this.featureStyleExtension.deleteIconForFeatureRowAndGeometryType(featureRow, geometryType);
   }
   /**
    * Delete the feature row icon for the geometry type
    *
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteIcon(featureId: number, geometryType: string): number {
+  deleteIcon(featureId: number, geometryType: GeometryType): number {
     return this.featureStyleExtension.deleteIcon(this.tableName, featureId, geometryType);
   }
   /**

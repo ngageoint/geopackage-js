@@ -1,9 +1,7 @@
-
-var BoundingBox = require('../../lib/boundingBox').BoundingBox;
-var TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils;
-
-var proj4 = require('proj4')
-var should = require('chai').should();
+import proj4 from 'proj4';
+var should = require('chai').should()
+  , TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
+  , BoundingBox = require('../../lib/boundingBox').BoundingBox;
 
 describe('BoundingBox tests', function() {
 

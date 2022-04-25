@@ -73,4 +73,10 @@ export class TileMatrixDao extends Dao<TileMatrix> {
     const result = this.connection.get(query, whereArgs);
     return result?.count;
   }
+  hasTiles(tileMatrix: TileMatrix): boolean {
+    const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, tileMatrix.zoom_level);
+    const whereArgs = this.buildWhereArgs([tileMatrix.zoom_level]);
+    const query = SqliteQueryBuilder.buildQuery(false, "'" + tileMatrix.table_name + "'", undefined, where);
+    return this.connection.get(query, whereArgs) != null;
+  }
 }

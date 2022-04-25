@@ -1,11 +1,6 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
-var GeoPackageConnection = require('../../../lib/db/geoPackageConnection')
-  , GeoPackage = require('../../../lib/geoPackage')
-  , Verification = require('../../fixtures/verification')
-  , should = require('chai').should()
-  , path = require('path');
-
+var Verification = require('../../fixtures/verification');
 describe('GeoPackage Extension Dao tests', function() {
   var testGeoPackage;
   var tableName = 'test_features.test';

@@ -1,4 +1,3 @@
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
 import {RTreeIndex} from '../../../../lib/extension/rtree/rtreeIndex'
 import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex'
@@ -8,8 +7,6 @@ var BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
-
-var path = require('path');
 
 describe('RTree tests', function() {
 

@@ -1,12 +1,10 @@
-import proj4Defs from './lib/proj4Defs';
-import TileUtilities from './lib/tiles/creator/tileUtilities';
-
 import { BoundingBox } from './lib/boundingBox';
 import { ClosestFeature, GeoPackage } from './lib/geoPackage';
 import { ContentsDao } from './lib/core/contents/contentsDao';
 import { ContentsIdDao } from './lib/extension/contents/contentsIdDao';
 import { Constraint } from './lib/db/table/constraint';
 import { Constraints } from './lib/db/table/constraints';
+import { ConstraintType } from './lib/db/table/constraintType';
 import { CrsWktExtension } from './lib/extension/crsWkt';
 import { DataColumnConstraints } from './lib/dataColumnConstraints/dataColumnConstraints';
 import { DataColumnConstraintsDao } from './lib/dataColumnConstraints/dataColumnConstraintsDao';
@@ -47,6 +45,8 @@ import { MetadataReference } from './lib/metadata/reference/metadataReference';
 import { NumberFeaturesTile } from './lib/tiles/features/custom/numberFeaturesTile';
 import { OptionBuilder } from './lib/optionBuilder';
 import { Paint } from './lib/tiles/features/paint';
+import { Projection } from './lib/projection/projection';
+import { ProjectionConstants } from './lib/projection/projectionConstants';
 import { RelatedTablesExtension } from './lib/extension/relatedTables';
 import { RTreeIndex } from './lib/extension/rtree/rtreeIndex';
 import { RTreeIndexDao } from './lib/extension/rtree/rtreeIndexDao';
@@ -66,6 +66,7 @@ import { TileMatrixSet } from './lib/tiles/matrixset/tileMatrixSet';
 import { TileScaling } from './lib/extension/scale/tileScaling';
 import { TileScalingType } from './lib/extension/scale/tileScalingType';
 import { TileTable } from './lib/tiles/user/tileTable';
+import { TileUtilities } from './lib/tiles/creator/tileUtilities';
 import { UserColumn } from './lib/user/userColumn';
 import { UserDao } from './lib/user/userDao';
 import { UserMappingTable } from './lib/extension/relatedTables/userMappingTable';
@@ -74,20 +75,40 @@ import { UserTable } from './lib/user/userTable';
 import { UserTableReader } from './lib/user/userTableReader';
 import { WebPExtension } from './lib/extension/webp';
 import { WKB } from './lib/wkb';
+import { DBAdapter } from './lib/db/dbAdapter';
+import { SqliteAdapter } from './lib/db/sqliteAdapter';
+import { SqljsAdapter } from './lib/db/sqljsAdapter';
+import { TileCreator } from './lib/tiles/creator/tileCreator';
+import { Canvas } from './lib/canvas/canvas';
+import { CanvasAdapter } from './lib/canvas/canvasAdapter';
+import { CanvasKitCanvasAdapter } from './lib/canvas/canvasKitCanvasAdapter';
+import { OffscreenCanvasAdapter } from './lib/canvas/offscreenCanvasAdapter';
+import { HtmlCanvasAdapter } from './lib/canvas/htmlCanvasAdapter';
+import { Context } from './lib/context/context';
+
+Context.setupDefaultContext();
+
+const setSqljsWasmLocateFile = SqljsAdapter.setSqljsWasmLocateFile;
+const setCanvasKitWasmLocateFile = CanvasKitCanvasAdapter.setCanvasKitWasmLocateFile;
 
 export {
-  proj4Defs,
   BoundingBox,
+  Canvas,
+  CanvasAdapter,
+  CanvasKitCanvasAdapter,
   ClosestFeature,
   ContentsDao,
   ContentsIdDao,
   Constraint,
   Constraints,
+  ConstraintType,
+  Context,
   CrsWktExtension,
   DataColumnConstraints,
   DataColumnConstraintsDao,
   DataColumns,
   DataColumnsDao,
+  DBAdapter,
   DublinCoreMetadata,
   DublinCoreType,
   Extension,
@@ -112,6 +133,7 @@ export {
   GeoPackageDataType,
   GeoPackageTileRetriever,
   GeoPackageValidate,
+  HtmlCanvasAdapter,
   IconCache,
   Icons,
   IconTable,
@@ -122,20 +144,28 @@ export {
   MetadataExtension,
   MetadataReference,
   NumberFeaturesTile,
+  OffscreenCanvasAdapter,
   OptionBuilder,
   Paint,
+  Projection,
+  ProjectionConstants,
   RelatedTablesExtension,
   RTreeIndex,
   RTreeIndexDao,
+  setCanvasKitWasmLocateFile,
+  setSqljsWasmLocateFile,
   SchemaExtension,
   ShadedFeaturesTile,
   SimpleAttributesTable,
   SpatialReferenceSystem,
+  SqliteAdapter,
   SqliteQueryBuilder,
   StyleMappingTable,
+  SqljsAdapter,
   Styles,
   StyleTable,
   TableCreator,
+  TileCreator,
   TileBoundingBoxUtils,
   TileColumn,
   TileMatrix,

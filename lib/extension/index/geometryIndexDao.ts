@@ -15,6 +15,7 @@ import { DBValue } from '../../db/dbAdapter';
 export class GeometryIndexDao extends Dao<GeometryIndex> {
   public static readonly TABLE_NAME: string = 'nga_geometry_index';
   public static readonly COLUMN_TABLE_NAME: string = GeometryIndexDao.TABLE_NAME + '.table_name';
+  public static readonly COLUMN_TABLE_NAME_FIELD: string = 'table_name';
   public static readonly COLUMN_GEOM_ID: string = GeometryIndexDao.TABLE_NAME + '.geom_id';
   public static readonly COLUMN_MIN_X: string = GeometryIndexDao.TABLE_NAME + '.min_x';
   public static readonly COLUMN_MAX_X: string = GeometryIndexDao.TABLE_NAME + '.max_x';

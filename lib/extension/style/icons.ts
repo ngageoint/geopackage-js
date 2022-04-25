@@ -1,4 +1,5 @@
 import { IconRow } from './iconRow';
+import { GeometryType } from '../../features/user/geometryType';
 
 /**
  * @memberOf module:extension/style
@@ -10,35 +11,49 @@ import { IconRow } from './iconRow';
  */
 export class Icons {
   defaultIcon: IconRow = null;
-  icons: Record<string, IconRow> = {};
+  icons: Map<GeometryType, IconRow>;
+  tableIcons: boolean;
+
+  constructor(tableIcons: boolean = false) {
+    this.icons = new Map();
+    this.tableIcons = tableIcons;
+  }
+
   setDefault(iconRow: IconRow): void {
+    if (iconRow !== null && iconRow !== undefined) {
+      iconRow.setTableIcon(this.tableIcons);
+    }
     this.defaultIcon = iconRow;
   }
   getDefault(): IconRow {
     return this.defaultIcon;
   }
-  setIcon(iconRow: IconRow, geometryType: string): void {
-    if (geometryType != null) {
-      if (iconRow != null) {
-        this.icons[geometryType] = iconRow;
+  setIcon(iconRow: IconRow, geometryType: GeometryType = null): void {
+    if (geometryType !== null) {
+      if (iconRow !== null && iconRow !== undefined) {
+        iconRow.setTableIcon(this.tableIcons);
+        this.icons.set(geometryType, iconRow);
       } else {
-        delete this.icons[geometryType];
+        this.icons.delete(geometryType);
       }
     } else {
       this.setDefault(iconRow);
     }
   }
-  getIcon(geometryType: string): IconRow {
+  getIcon(geometryType: GeometryType = null): IconRow {
     let iconRow = null;
-    if (geometryType != null) {
-      iconRow = this.icons[geometryType];
+    if (geometryType !== null && this.icons.has(geometryType)) {
+      iconRow = this.icons.get(geometryType);
     }
-    if (iconRow === null || geometryType === null) {
+    if (iconRow === null || iconRow === undefined || geometryType === null) {
       iconRow = this.getDefault();
     }
     return iconRow;
   }
   isEmpty(): boolean {
-    return Object.keys(this.icons).length === 0 && this.defaultIcon === null;
+    return this.icons.size === 0 && this.defaultIcon === null;
+  }
+  getGeometryTypes(): GeometryType[] {
+    return Array.from(this.icons.keys());
   }
 }

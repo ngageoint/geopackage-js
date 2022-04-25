@@ -1,6 +1,6 @@
 name: GH Pages Deploy
 
-on: 
+on:
   push:
     branches:
       - master
@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '12.x'
     - uses: actions/checkout@v1
     - name: Build gh-pages
       run: npm run gh-pages-build
@@ -21,4 +21,4 @@ jobs:
       with:
         deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
         publish_branch: gh-pages
-        publish_dir: ./docs
+        publish_dir: ./api-docs

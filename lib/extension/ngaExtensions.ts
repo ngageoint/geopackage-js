@@ -72,12 +72,16 @@ export class NGAExtensions {
    * @param table table name
    */
   static deleteGeometryIndex(geoPackage: GeoPackage, table: string) {
+    let geometryIndexDao = geoPackage.getGeometryIndexDao(null);
     let tableIndexDao = geoPackage.tableIndexDao;
     let extensionsDao = geoPackage.extensionDao;
 
     try {
+      if (geometryIndexDao.isTableExists()) {
+        geometryIndexDao.deleteWhere(geometryIndexDao.buildWhereWithFieldAndValue(GeometryIndexDao.COLUMN_TABLE_NAME_FIELD, table), geometryIndexDao.buildWhereArgs(table))
+      }
       if (tableIndexDao.isTableExists()) {
-        tableIndexDao.deleteById(table)
+        tableIndexDao.deleteWhere(tableIndexDao.buildWhereWithFieldAndValue(TableIndexDao.COLUMN_TABLE_NAME, table), tableIndexDao.buildWhereArgs(table))
       }
       if (extensionsDao.isTableExists()) {
         extensionsDao.deleteByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, table);
@@ -132,14 +136,14 @@ export class NGAExtensions {
           let tableIndexDao = geoPackage.tableIndexDao;
           if (tableIndexDao.isTableExists()) {
             let tableIndex = tableIndexDao.queryForId(table);
-            if (tableIndex != null) {
+            if (tableIndex !== null && tableIndex !== undefined) {
               tableIndex.table_name = newTable;
               tableIndexDao.create(tableIndex);
               if (geoPackage.isTable(GeometryIndexDao.TABLE_NAME)) {
                 CoreSQLUtils.transferTableContent(
                   geoPackage.connection,
                   GeometryIndexDao.TABLE_NAME,
-                  GeometryIndexDao.COLUMN_TABLE_NAME,
+                  GeometryIndexDao.COLUMN_TABLE_NAME_FIELD,
                   newTable, table);
               }
             }
@@ -209,17 +213,13 @@ export class NGAExtensions {
   static copyTileScaling(geoPackage: GeoPackage, table: string, newTable: string) {
     try {
       let tileTableScaling = new TileScalingExtension(geoPackage, table);
-
       if (tileTableScaling.has()) {
         let extension = tileTableScaling.getOrCreateExtension();
         if (extension !== null && extension !== undefined) {
           extension.setTableName(newTable);
-          tileTableScaling.getOrCreateExtension();
+          tileTableScaling.extensionsDao.create(extension);
           if (geoPackage.isTable(TileScalingDao.TABLE_NAME)) {
-            CoreSQLUtils.transferTableContent(
-              geoPackage.connection,
-              TileScalingDao.TABLE_NAME,
-              TileScalingDao.COLUMN_TABLE_NAME, newTable, table);
+            CoreSQLUtils.transferTableContent(geoPackage.connection, TileScalingDao.TABLE_NAME, TileScalingDao.COLUMN_TABLE_NAME, newTable, table);
           }
         }
       }
@@ -238,7 +238,6 @@ export class NGAExtensions {
     if (featureStyleExtension.has(table)) {
       featureStyleExtension.deleteRelationships(table);
     }
-
   }
 
   /**
@@ -251,7 +250,6 @@ export class NGAExtensions {
     if (featureStyleExtension.has(null)) {
       featureStyleExtension.removeExtension();
     }
-
   }
 
   /**
@@ -303,7 +301,8 @@ export class NGAExtensions {
     let geoPackage: GeoPackage = featureStyleExtension.geoPackage;
     let mappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, table);
     let extensionsDao = geoPackage.extensionDao;
-    let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName);
+    let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName)
+      .concat(extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, mappingTableName));
 
     if (extensions.length > 0) {
       let newMappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, newTable);
@@ -371,7 +370,8 @@ export class NGAExtensions {
     try {
       let contentsIdExtension = new ContentsIdExtension(geoPackage);
       if (contentsIdExtension.has()) {
-        if (contentsIdExtension.getByTableName(table) !== null) {
+        let contentsId = contentsIdExtension.getByTableName(table);
+        if (contentsId !== null && contentsId !== undefined) {
           contentsIdExtension.createWithTableName(newTable);
         }
       }

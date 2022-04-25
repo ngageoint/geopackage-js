@@ -1,1 +1,2 @@
 --require ts-node/register/transpile-only // This will transpile your code first without type checking it. We have type checking as a separate step.
+--file ./test/setupNodeEnv.js

@@ -3,6 +3,7 @@
  * GeometryColumns module.
  * @module features/columns
  */
+import proj4 from 'proj4';
 import { Dao } from '../../dao/dao';
 import { GeometryColumns } from './geometryColumns';
 import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';

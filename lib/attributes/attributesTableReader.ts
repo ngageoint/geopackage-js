@@ -9,7 +9,6 @@ import { UserColumn } from '../user/userColumn';
 import { AttributesColumn } from './attributesColumn';
 import { TableColumn } from '../db/table/tableColumn';
 import { GeoPackage } from '../geoPackage';
-import {GeometryColumns} from "../features/columns/geometryColumns";
 
 /**
  * Reads the metadata from an existing attribute table

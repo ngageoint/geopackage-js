@@ -1,6 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
+  , Canvas = require('../../../../lib/canvas/canvas').Canvas
   , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
@@ -10,7 +11,6 @@ var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
-  , fs = require('fs-extra')
   , should = require('chai').should()
   , path = require('path')
   , wkx = require('wkx');
@@ -29,7 +29,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     beforeEach('should create the GeoPackage', async function() {
       filename = path.join(testPath, testSetup.createTempName());
-      geoPackage = await testSetup.createGeoPackage(filename)
+      geoPackage = await testSetup.createGeoPackage(filename);
 
       // @ts-ignore
       var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.POINT);
@@ -115,7 +115,7 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(image);
         });
     });
-  })
+  });
 
 
   describe('Rivers GeoPackage tests', function() {
@@ -138,26 +138,34 @@ describe('GeoPackage FeatureTiles tests', function() {
       await testSetup.deleteGeoPackage(filename);
     });
 
-    it('should get the x: 1, y: 0, z: 1 tile', function(done) {
-      this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.drawTile(1, 0, 1)
-        .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
-          });
-        });
-    });
-
     it('should get the x: 0, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(0, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '0_0_0.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+
+    it('should get the x: 1, y: 0, z: 1 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(1, 0, 1)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -170,8 +178,12 @@ describe('GeoPackage FeatureTiles tests', function() {
         should.exist(data);
         console.timeEnd('Generating non indexed tiles');
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -184,8 +196,12 @@ describe('GeoPackage FeatureTiles tests', function() {
         should.exist(data);
         console.timeEnd('Generating non indexed tiles');
         testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '5_8_12.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -216,9 +232,13 @@ describe('GeoPackage FeatureTiles tests', function() {
       var ft = new FeatureTiles(featureDao);
       ft.drawTile(1, 0, 1)
       .then(function(imageStream) {
-        testSetup.diffImages(imageStream, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0_indexed.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+        testSetup.diffImages(imageStream, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -230,9 +250,13 @@ describe('GeoPackage FeatureTiles tests', function() {
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0_indexed.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -244,9 +268,13 @@ describe('GeoPackage FeatureTiles tests', function() {
       .then(function(data) {
         should.exist(data);
         console.timeEnd('generating indexed tile');
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '0_0_0_indexed.png'), function(err, equal) {
-          equal.should.be.equal(true);
-          done();
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '0_0_0.png'), function(err, equal) {
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -258,11 +286,13 @@ describe('GeoPackage FeatureTiles tests', function() {
       .then(function(data) {
         should.exist(data);
         console.timeEnd('generating indexed tile');
-        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '5_8_12_indexed.png'), function(err, equal) {
-          fs.writeFileSync('/tmp/5_8_12_indexed.png', data);
-
-          equal.should.be.equal(true);
-          done();
+        testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '5_8_12.png'), function(err, equal) {
+          try {
+            equal.should.be.equal(true);
+            done();
+          } catch (e) {
+            done(e);
+          }
         });
       });
     });
@@ -294,8 +324,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153631, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153631_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -306,8 +340,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91342, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91342_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -318,8 +356,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -330,8 +372,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153633, 91342, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153633_91342_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -342,8 +388,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153633, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153633_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -356,8 +406,12 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153631_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -370,8 +424,12 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153632_91342_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -384,8 +442,12 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -398,8 +460,12 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153633_91342_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -412,34 +478,82 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153633_91343_18.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
 
-    it('should get the x: 153632, y: 91343, z: 18 tile', function(done) {
+    it('should get the x: 153632, y: 91343, z: 18 tile with a point icon set', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
-      ImageUtils.getImage(path.join(__dirname, '..','..','..', 'fixtures','marker-icon.png')).then((image) => {
-        var ftpi = new FeatureTilePointIcon(image);
+      ImageUtils.getImage(path.join(__dirname, '..','..','..', 'fixtures','marker-icon.png')).then((icon) => {
+        var ftpi = new FeatureTilePointIcon(icon);
         ftpi.setWidth(ftpi.getWidth());
         ftpi.setHeight(ftpi.getHeight());
         ftpi.setXOffset(0);
         ftpi.setYOffset(0);
         ftpi.pinIconCenter();
         ft.pointIcon = ftpi;
-        ft.calculateDrawOverlap()
+        ft.calculateDrawOverlap();
         ft.drawTile(153632, 91343, 18)
           .then(function(image) {
+            Canvas.disposeImage(icon);
             testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_styled_with_icon.png'), function(err, equal) {
-              equal.should.be.equal(true);
-              done();
+              try {
+                equal.should.be.equal(true);
+                done();
+              } catch (e) {
+                done(e);
+              }
             });
           });
       });
     });
   });
+
+  describe('Max Features Indexed', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('rivers');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the number features tile with the correct number of features listed', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.maxFeaturesPerTile = 1;
+      ft.maxFeaturesTileDraw = new NumberFeaturesTile()
+      ft.drawTile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'max_feature_tile_indexed.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
+
 
   describe('Styled With Icon GeoPackage tests', function() {
     var geoPackage;
@@ -466,8 +580,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_styled_with_icon.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -480,8 +598,12 @@ describe('GeoPackage FeatureTiles tests', function() {
           should.exist(data);
           console.timeEnd('Generating non indexed tiles');
           testSetup.diffImages(data, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_styled_with_icon.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -532,8 +654,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_scaled.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -553,8 +679,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '', '153632_91343_18_styles_ignored.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -584,8 +714,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '', '153632_91343_18_default_style_modified.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -661,8 +795,12 @@ describe('GeoPackage FeatureTiles tests', function() {
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles',isWeb ? 'web' : '',  isLinux ? 'max_feature_tile_unindexed_linux.png' : 'max_feature_tile_unindexed.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
@@ -705,12 +843,123 @@ describe('GeoPackage FeatureTiles tests', function() {
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
-          // fs.writeFileSync('/tmp/max_feature_tile_shaded.png', image);
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', 'max_feature_tile_shaded.png'), function(err, equal) {
-            equal.should.be.equal(true);
-            done();
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
           });
         });
     });
   });
+
+  describe('Styled GeometryCollection GeoPackage tests', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('test');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the x: 0, y: 0, z: 0 tile for geometry collection', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'geometrycollection_0_0_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
+
+  describe('Polygon with holes test', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multi.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('multi');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the x: 1, y: 2, z: 2 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(1, 2, 2)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '1_2_2.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
+  describe('MultiPolygon with multiple holes test', function() {
+    var geoPackage;
+    var featureDao;
+    var filename;
+
+    beforeEach('should open the geopackage', async function() {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipleholes.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      featureDao = geoPackage.getFeatureDao('multipolywithholes');
+    });
+
+    afterEach('should close the geopackage', async function() {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(filename);
+    });
+
+    it('should get the x: 18, y: 24, z: 6 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.drawTile(18, 24, 6)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '18_24_6.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+  });
+
 });

@@ -1,9 +1,7 @@
-
-import { GeoPackageAPI } from '../..'
 import { default as testSetup } from '../fixtures/testSetup'
 
-var should = require('chai').should()
-  , path = require('path');
+var { GeoPackageAPI } = require('../../')
+  , should = require('chai').should();
 
 describe('GeoPackageAPI Create tests', function() {
 
@@ -33,7 +31,6 @@ describe('GeoPackageAPI Create tests', function() {
   });
 
   it('should create the geopackage file', async function() {
-    let geopackage = await GeoPackageAPI.create(testGeoPackage);
     should.exist(geopackage);
     var applicationId = geopackage.getApplicationId();
     var buff = Buffer.alloc(4);

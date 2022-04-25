@@ -2,6 +2,7 @@ import { Dao } from '../../dao/dao';
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
 import { ColumnValues } from '../../dao/columnValues';
+import { ProjectionConstants } from '../../projection/projectionConstants';
 /**
  * Spatial Reference System Data Access Object
  * @extends Dao
@@ -81,6 +82,19 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
     return srs;
   }
 
+  getAllSpatialReferenceSystems(): SpatialReferenceSystem[] {
+    const spatialRefSystems: SpatialReferenceSystem[] = [];
+    if (this.connection != null && this.isTableExists()) {
+      const results: Record<string, DBValue>[] = this.queryForAll();
+      if (results && results.length) {
+        for (let i = 0; i < results.length; i++) {
+          spatialRefSystems.push(this.createObject(results[i]));
+        }
+      }
+    }
+    return spatialRefSystems;
+  }
+
   getByOrganizationAndCoordSysId(organization: string, organizationCoordSysId: number): SpatialReferenceSystem {
     const cv = new ColumnValues();
     cv.addColumn('organization', organization);
@@ -111,15 +125,15 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {Number} id of the created row
    */
   createWgs84(): number {
-    let srs = this.getBySrsId(4326);
+    let srs = this.getBySrsId(ProjectionConstants.EPSG_CODE_4326);
     if (srs) {
       return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'WGS 84 geodetic';
-    srs.srs_id = 4326;
+    srs.srs_id = ProjectionConstants.EPSG_CODE_4326;
     srs.organization = 'EPSG';
-    srs.organization_coordsys_id = 4326;
+    srs.organization_coordsys_id = ProjectionConstants.EPSG_CODE_4326;
     srs.definition =
       'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]';
     srs.description = 'longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid';
@@ -179,15 +193,15 @@ export class SpatialReferenceSystemDao extends Dao<SpatialReferenceSystem> {
    * @return {Number} id of the created row
    */
   createWebMercator(): number {
-    let srs = this.getByOrganizationAndCoordSysId('EPSG', 3857);
+    let srs = this.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
     if (srs) {
       return srs.srs_id;
     }
     srs = new SpatialReferenceSystem();
     srs.srs_name = 'WGS 84 / Pseudo-Mercator';
-    srs.srs_id = 3857;
+    srs.srs_id = ProjectionConstants.EPSG_CODE_3857;
     srs.organization = 'EPSG';
-    srs.organization_coordsys_id = 3857;
+    srs.organization_coordsys_id = ProjectionConstants.EPSG_CODE_3857;
     srs.definition =
       'PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],EXTENSION["PROJ4","+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"],AUTHORITY["EPSG","3857"]]';
     srs.description = 'Spherical Mercator projection coordinate system';

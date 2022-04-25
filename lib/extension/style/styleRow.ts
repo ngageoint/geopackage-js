@@ -23,6 +23,7 @@ export class StyleRow extends AttributesRow {
    */
   private static readonly colorPattern = /^#([0-9a-fA-F]{3}){1,2}$/;
   styleTable: StyleTable;
+  tableStyle: boolean = false;
   constructor(styleTable: StyleTable, columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>) {
     super(styleTable, columnTypes, values);
     this.styleTable = styleTable;
@@ -315,5 +316,21 @@ export class StyleRow extends AttributesRow {
    */
   _hasColor(hexColor: string, opacity: number): boolean {
     return hexColor !== null || opacity !== null;
+  }
+
+  /**
+   * Is a table style
+   * @return table style flag
+   */
+  isTableStyle(): boolean {
+    return this.tableStyle;
+  }
+
+  /**
+   * Set table style flag
+   * @param tableStyle table style flag
+   */
+  setTableStyle(tableStyle: boolean) {
+    this.tableStyle = tableStyle;
   }
 }

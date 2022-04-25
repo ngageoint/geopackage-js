@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import sortedIndexOf from 'lodash/sortedIndexOf';
+import sortedIndex from 'lodash/sortedIndex';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 
@@ -141,17 +142,17 @@ export class TileDaoUtils {
     lengthChecks: boolean,
   ): number {
     let zoomLevel = null;
-    let widthIndex = _.sortedIndexOf(widths, width);
+    let widthIndex = sortedIndexOf(widths, width);
     if (widthIndex === -1) {
-      widthIndex = _.sortedIndex(widths, width);
+      widthIndex = sortedIndex(widths, width);
     }
     if (widthIndex < 0) {
       widthIndex = (widthIndex + 1) * -1;
     }
 
-    let heightIndex = _.sortedIndexOf(heights, height);
+    let heightIndex = sortedIndexOf(heights, height);
     if (heightIndex === -1) {
-      heightIndex = _.sortedIndex(heights, height);
+      heightIndex = sortedIndex(heights, height);
     }
 
     if (heightIndex < 0) {
@@ -293,7 +294,7 @@ export class TileDaoUtils {
    * @return approximate zoom level
    */
   static getApproximateZoomLevel(lengths: number[], tileMatrices: TileMatrix[], length: number): number {
-    let lengthZoomLevel = null;
+    let lengthZoomLevel;
 
     const minLength = lengths[0];
     const maxLength = lengths[lengths.length - 1];
@@ -328,7 +329,7 @@ export class TileDaoUtils {
     }
     // Length is between the available tiles
     else {
-      let lengthIndex = _.sortedIndexOf(lengths, length);
+      let lengthIndex = sortedIndexOf(lengths, length);
       if (lengthIndex < 0) {
         lengthIndex = (lengthIndex + 1) * -1;
       }

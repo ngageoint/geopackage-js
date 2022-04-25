@@ -1,10 +1,7 @@
-
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {Contents} from "../../../../lib/core/contents/contents";
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
-  // @ts-ignore
-  , GeoPackageConnection = require('../../../../lib/db/geoPackageConnection')
+  , Contents = require('../../../../lib/core/contents/contents').Contents
   , should = require('chai').should()
   , path = require('path');
 

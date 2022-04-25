@@ -11,9 +11,7 @@ import { StyleTable } from './styleTable';
 import { StyleDao } from './styleDao';
 import { StyleMappingTable } from './styleMappingTable';
 import { StyleMappingDao } from './styleMappingDao';
-import { UserMappingTable } from '../relatedTables/userMappingTable';
 import { StyleTableReader } from './styleTableReader';
-import { UserTableReader } from '../../user/userTableReader';
 import { FeatureTable } from '../../features/user/featureTable';
 import { FeatureStyles } from './featureStyles';
 import { FeatureStyle } from './featureStyle';
@@ -27,7 +25,8 @@ import { GeoPackage } from '../../geoPackage';
 import { ExtendedRelation } from '../relatedTables/extendedRelation';
 import { StyleRow } from './styleRow';
 import { StyleMappingRow } from './styleMappingRow';
-import {UserCustomTableReader} from "../../user/custom/userCustomTableReader";
+import { UserCustomTableReader } from '../../user/custom/userCustomTableReader';
+import { GeometryType } from '../../features/user/geometryType';
 
 /**
  * Style extension
@@ -417,10 +416,7 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   _deleteStyleRelationship(mappingTableName: string, featureTable: string | FeatureTable): number {
     let removed = 0;
-    const relationships = this.geoPackage.extendedRelationDao.queryByMappingTableName(mappingTableName);
-    for (let i = 0; i < relationships.length; i++) {
-      removed += this.relatedTablesExtension.removeRelationship(relationships[i]);
-    }
+    this.relatedTablesExtension.removeRelationshipsWithMappingTable(mappingTableName)
     if (!this.hasRelationship(featureTable)) {
       if (this.extensionsDao.isTableExists()) {
         this.extensionsDao.deleteByExtensionAndTableName(
@@ -542,10 +538,10 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Get the style of the feature table and geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.StyleRow} style row
    */
-  getTableStyle(featureTable: string | FeatureTable, geometryType: string): StyleRow {
+  getTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType): StyleRow {
     let style = null;
     const styles = this.getTableStyles(featureTable);
     if (styles !== null) {
@@ -566,7 +562,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styles = null;
     const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
-      styles = this.getStyles(id, this.getTableStyleMappingDao(featureTable));
+      styles = this.getStyles(id, this.getTableStyleMappingDao(featureTable), true);
     }
     return styles;
   }
@@ -581,10 +577,10 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Get the icon of the feature table and geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @return {module:extension/style.IconRow} icon row
    */
-  getTableIcon(featureTable: string | FeatureTable, geometryType: string): IconRow {
+  getTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType): IconRow {
     let icon = null;
     const icons = this.getTableIcons(featureTable);
     if (icons !== null) {
@@ -605,7 +601,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let icons = null;
     const id = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
     if (id !== null) {
-      icons = this.getIcons(id, this.getTableIconMappingDao(featureTable));
+      icons = this.getIcons(id, this.getTableIconMappingDao(featureTable), true);
     }
     return icons;
   }
@@ -613,11 +609,12 @@ export class FeatureStyleExtension extends BaseExtension {
    * Gets Icons for featureId and mappingDao
    * @param {Number} featureId
    * @param mappingDao
+   * @param {boolean} tableIcons
    * @returns {module:extension/style.Icons}
    * @private
    */
-  getIcons(featureId: number, mappingDao: StyleMappingDao): Icons {
-    let icons = new Icons();
+  getIcons(featureId: number, mappingDao: StyleMappingDao, tableIcons: boolean = false): Icons {
+    let icons = new Icons(tableIcons);
     if (mappingDao !== null) {
       const iconDao = this.getIconDao();
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
@@ -627,7 +624,7 @@ export class FeatureStyleExtension extends BaseExtension {
         if (styleMappingRow.getGeometryTypeName() === null) {
           icons.setDefault(iconRow);
         } else {
-          icons.setIcon(iconRow, styleMappingRow.getGeometryTypeName());
+          icons.setIcon(iconRow, GeometryType.fromName(styleMappingRow.getGeometryTypeName().toUpperCase()));
         }
       }
     }
@@ -640,10 +637,11 @@ export class FeatureStyleExtension extends BaseExtension {
    * Gets Styles for featureId and mappingDao
    * @param {Number} featureId
    * @param {module:extension/style.StyleMappingDao} mappingDao
+   * @param {boolean} tableStyles
    * @returns {module:extension/style.Styles}
    */
-  getStyles(featureId: number, mappingDao: StyleMappingDao): Styles {
-    let styles = new Styles();
+  getStyles(featureId: number, mappingDao: StyleMappingDao, tableStyles: boolean = false): Styles {
+    let styles = new Styles(tableStyles);
     if (mappingDao !== null) {
       const styleDao = this.getStyleDao();
       const styleMappingRows = mappingDao.queryByBaseId(featureId);
@@ -653,7 +651,7 @@ export class FeatureStyleExtension extends BaseExtension {
         if (styleMappingRow.getGeometryTypeName() === null) {
           styles.setDefault(styleRow);
         } else {
-          styles.setStyle(styleRow, styleMappingRow.getGeometryTypeName());
+          styles.setStyle(styleRow, GeometryType.fromName(styleMappingRow.getGeometryTypeName().toUpperCase()));
         }
       }
     }
@@ -728,8 +726,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.featureTable.getTableName(), featureRow.id, featureRow.geometryType, true),
-      this.getIcon(featureRow.featureTable.getTableName(), featureRow.id, featureRow.geometryType, true),
+      this.getStyle(featureRow.featureTable.getTableName(), featureRow.id, GeometryType.fromName(featureRow.geometryType.toUpperCase()), true),
+      this.getIcon(featureRow.featureTable.getTableName(), featureRow.id, GeometryType.fromName(featureRow.geometryType.toUpperCase()), true),
     );
   }
   /**
@@ -751,12 +749,12 @@ export class FeatureStyleExtension extends BaseExtension {
    * table geometry type icon, table default icon
    * @param {module:features/user/featureTable|String} featureTable
    * @param {Number} featureId
-   * @param {String} geometryType
+   * @param {GeometryType} geometryType
    * @param {Boolean} tableIcon
    * @returns {module:extension/style.IconRow}
    * @private
    */
-  getIcon(featureTable: string | FeatureTable, featureId: number, geometryType: string, tableIcon: boolean): IconRow {
+  getIcon(featureTable: string | FeatureTable, featureId: number, geometryType: GeometryType, tableIcon: boolean): IconRow {
     let iconRow = null;
     const icons = this.getIcons(featureId, this.getIconMappingDao(featureTable));
     if (icons !== null) {
@@ -773,7 +771,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * table geometry type style, table default style
    * @param {module:features/user/featureTable|String} featureTable
    * @param {Number} featureId
-   * @param {String} geometryType
+   * @param {GeometryType} geometryType
    * @param {Boolean} tableStyle
    * @returns {module:extension/style.StyleRow}
    * @private
@@ -781,7 +779,7 @@ export class FeatureStyleExtension extends BaseExtension {
   getStyle(
     featureTable: string | FeatureTable,
     featureId: number,
-    geometryType: string,
+    geometryType: GeometryType,
     tableStyle: boolean,
   ): StyleRow {
     let styleRow = null;
@@ -849,10 +847,10 @@ export class FeatureStyleExtension extends BaseExtension {
       if (styles.getDefault() !== null) {
         styleDefault = this.setTableStyleDefault(featureTable, styles.getDefault());
       }
-      const keys = Object.keys(styles.styles);
+      const keys = styles.getGeometryTypes();
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        const value = styles.styles[key];
+        const value = styles.getStyle(key);
         styleIdList.push(this.setTableStyle(featureTable, key, value));
       }
       return {
@@ -874,11 +872,11 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Set the feature table style for the geometry type
    * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
    * @return {number}
    */
-  setTableStyle(featureTable: string | FeatureTable, geometryType: string, style?: StyleRow): number {
+  setTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType, style?: StyleRow): number {
     this.deleteTableStyle(featureTable, geometryType);
     if (style !== null) {
       this.createTableStyleRelationship(featureTable);
@@ -907,10 +905,10 @@ export class FeatureStyleExtension extends BaseExtension {
       if (icons.getDefault() !== null) {
         iconDefault = this.setTableIconDefault(featureTable, icons.getDefault());
       }
-      const keys = Object.keys(icons.icons);
+      const keys = icons.getGeometryTypes();
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        const value = icons.icons[key];
+        const value = icons.getIcon(key);
         iconIdList.push(this.setTableIcon(featureTable, key, value));
       }
       return {
@@ -932,11 +930,11 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Set the feature table icon for the geometry type
    * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {number}
    */
-  setTableIcon(featureTable: string | FeatureTable, geometryType: string, icon?: IconRow): number {
+  setTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType, icon?: IconRow): number {
     this.deleteTableIcon(featureTable, geometryType);
     if (icon !== null) {
       this.createTableIconRelationship(featureTable);
@@ -1027,19 +1025,19 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   } {
-    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, featureStyle);
+    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()), featureStyle);
   }
   /**
    * Set the feature style (style and icon) of the feature row for the
    * specified geometry type
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     featureStyle: FeatureStyle,
   ): {
     style: number;
@@ -1074,14 +1072,14 @@ export class FeatureStyleExtension extends BaseExtension {
    * Set the feature style (style and icon) of the feature
    * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyle(
     featureTable: string | FeatureTable,
     featureId: number,
-    geometryType: string,
+    geometryType: GeometryType,
     featureStyle?: FeatureStyle,
   ): {
     style: number;
@@ -1159,9 +1157,9 @@ export class FeatureStyleExtension extends BaseExtension {
       if (styles.getDefault() !== null) {
         styleDefault = this.setStyleDefault(featureTable, featureId, styles.getDefault());
       }
-      const keys = Object.keys(styles.styles);
+      const keys = styles.getGeometryTypes();
       for (let i = 0; i < keys.length; i++) {
-        styleIds.push(this.setStyle(featureTable, featureId, keys[i], styles.styles[keys[i]]));
+        styleIds.push(this.setStyle(featureTable, featureId, keys[i], styles.getStyle(keys[i])));
       }
       return {
         styleDefault,
@@ -1183,18 +1181,18 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
-    return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, style);
+    return this.setStyleForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()), style);
   }
   /**
    * Set the style of the feature row for the specified geometry type
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
    * @return {Promise}
    */
   setStyleForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     style: StyleRow,
   ): number {
     return this.setStyle(featureRow.featureTable.getTableName(), featureRow.id, geometryType, style);
@@ -1212,14 +1210,14 @@ export class FeatureStyleExtension extends BaseExtension {
    * Set the style of the feature
    * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.StyleRow} style style row
    * @return {number}
    */
   setStyle(
     featureTable: string | FeatureTable,
     featureId: number,
-    geometryType: string,
+    geometryType: GeometryType,
     style: StyleRow,
   ): number {
     this.deleteStyle(featureTable, featureId, geometryType);
@@ -1269,9 +1267,9 @@ export class FeatureStyleExtension extends BaseExtension {
       if (icons.getDefault() !== null) {
         this.setIconDefault(featureTable, featureId, icons.getDefault());
       }
-      const keys = Object.keys(icons.icons);
+      const keys = icons.getGeometryTypes();
       for (let i = 0; i < keys.length; i++) {
-        this.setIcon(featureTable, featureId, keys[i], icons.icons[keys[i]]);
+        this.setIcon(featureTable, featureId, keys[i], icons.getIcon(keys[i]));
       }
       return {
         iconDefault: undefined,
@@ -1293,18 +1291,18 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {number}
    */
   setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
-    return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, icon);
+    return this.setIconForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()), icon);
   }
   /**
    * Set the icon of the feature row for the specified geometry type
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {number}
    */
   setIconForFeatureRowAndGeometryType(
     featureRow: FeatureRow,
-    geometryType: string,
+    geometryType: GeometryType,
     icon: IconRow,
   ): number {
     return this.setIcon(featureRow.featureTable.getTableName(), featureRow.id, geometryType, icon);
@@ -1323,14 +1321,14 @@ export class FeatureStyleExtension extends BaseExtension {
    * icon, feature default icon, table geometry type icon, table default icon
    * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    * @param {module:extension/style.IconRow} icon icon row
    * @return {number}
    */
   setIcon(
     featureTable: string | FeatureTable,
     featureId: number,
-    geometryType: string,
+    geometryType: GeometryType,
     icon?: IconRow,
   ): number {
     this.deleteIcon(featureTable, featureId, geometryType);
@@ -1392,13 +1390,13 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:extension/style.StyleMappingDao} mappingDao mapping dao
    * @param {Number} baseId base id, either contents id or feature id
    * @param {Number} relatedId related id, either style or icon id
-   * @param {String} geometryType geometry type or null
+   * @param {GeometryType} geometryType geometry type or null
    */
-  insertStyleMapping(mappingDao: StyleMappingDao, baseId: number, relatedId: number, geometryType?: string): number {
+  insertStyleMapping(mappingDao: StyleMappingDao, baseId: number, relatedId: number, geometryType: GeometryType = null): number {
     const row = mappingDao.newRow();
     row.baseId = baseId;
     row.relatedId = relatedId;
-    row.setGeometryTypeName(geometryType);
+    row.setGeometryTypeName(GeometryType.nameFromType(geometryType));
     return mappingDao.create(row);
   }
   /**
@@ -1484,9 +1482,9 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Delete the feature table style for the geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteTableStyle(featureTable: string | FeatureTable, geometryType: string): number {
+  deleteTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType): number {
     return this.deleteTableMapping(this.getTableStyleMappingDao(featureTable), featureTable, geometryType);
   }
   /**
@@ -1506,9 +1504,9 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Delete the feature table icon for the geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteTableIcon(featureTable: string | FeatureTable, geometryType: string): number {
+  deleteTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType): number {
     return this.deleteTableMapping(this.getTableIconMappingDao(featureTable), featureTable, geometryType);
   }
   /**
@@ -1529,9 +1527,9 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete the table style mapping with the geometry type value
    * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
    * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteTableMapping(mappingDao: StyleMappingDao, featureTable: string | FeatureTable, geometryType: string): number {
+  deleteTableMapping(mappingDao: StyleMappingDao, featureTable: string | FeatureTable, geometryType: GeometryType): number {
     if (mappingDao !== null) {
       const featureContentsId = this.contentsIdExtension.getIdByTableName(this.getFeatureTableName(featureTable));
       if (featureContentsId !== null) {
@@ -1597,23 +1595,23 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteStyleForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()));
   }
   /**
    * Delete the feature row style for the geometry type
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+  deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
     return this.deleteStyle(featureRow.featureTable, featureRow.id, geometryType);
   }
   /**
    * Delete the feature row style for the geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteStyle(featureTable: string | FeatureTable, featureId: number, geometryType: string): number {
+  deleteStyle(featureTable: string | FeatureTable, featureId: number, geometryType: GeometryType): number {
     return this.deleteMapping(this.getStyleMappingDao(featureTable), featureId, geometryType);
   }
   /**
@@ -1631,10 +1629,22 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {Number} styleRowId style row id
    */
   deleteStyleAndMappingsByStyleRowId(featureTable: string | FeatureTable, styleRowId: number): number {
-    this.getStyleDao().deleteById(styleRowId);
-    this.getStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
-    return this.getTableStyleMappingDao(featureTable).deleteByRelatedId(styleRowId);
+    let rowsDeleted = 0;
+    const styleDao = this.getStyleDao();
+    if (styleDao !== null && styleDao !== undefined) {
+      rowsDeleted += styleDao.deleteById(styleRowId);
+    }
+    const styleMappingDao = this.getStyleMappingDao(featureTable);
+    if (styleMappingDao !== null && styleMappingDao !== undefined) {
+      rowsDeleted += styleMappingDao.deleteByRelatedId(styleRowId);
+    }
+    const tableStyleMappingDao = this.getTableStyleMappingDao(featureTable);
+    if (tableStyleMappingDao !== null && tableStyleMappingDao !== undefined) {
+      rowsDeleted += tableStyleMappingDao.deleteByRelatedId(styleRowId);
+    }
+    return rowsDeleted;
   }
+
   /**
    * Delete all icons
    * @param {module:features/user/featureTable|String} featureTable feature table
@@ -1677,23 +1687,23 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteIconForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.deleteIconForFeatureRowAndGeometryType(featureRow, GeometryType.fromName(featureRow.geometryType.toUpperCase()));
   }
   /**
    * Delete the feature row icon for the geometry type
    * @param {module:features/user/featureRow} featureRow feature row
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: string): number {
+  deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
     return this.deleteIcon(featureRow.featureTable, featureRow.id, geometryType);
   }
   /**
    * Delete the feature row icon for the geometry type
    * @param {module:features/user/featureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteIcon(featureTable: FeatureTable | string, featureId: number, geometryType: string): number {
+  deleteIcon(featureTable: FeatureTable | string, featureId: number, geometryType: GeometryType): number {
     return this.deleteMapping(this.getIconMappingDao(featureTable), featureId, geometryType);
   }
   /**
@@ -1711,10 +1721,22 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {Number} iconRowId icon row id
    */
   deleteIconAndMappingsByIconRowId(featureTable: FeatureTable | string, iconRowId: number): number {
-    this.getIconDao().deleteById(iconRowId);
-    this.getIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
-    return this.getTableIconMappingDao(featureTable).deleteByRelatedId(iconRowId);
+    let rowsDeleted = 0;
+    const iconDao = this.getIconDao();
+    if (iconDao !== null && iconDao !== undefined) {
+      rowsDeleted += iconDao.deleteById(iconRowId);
+    }
+    const iconMappingDao = this.getIconMappingDao(featureTable);
+    if (iconMappingDao !== null && iconMappingDao !== undefined) {
+      rowsDeleted += iconMappingDao.deleteByRelatedId(iconRowId);
+    }
+    const tableIconMappingDao = this.getTableIconMappingDao(featureTable);
+    if (tableIconMappingDao !== null && tableIconMappingDao !== undefined) {
+      rowsDeleted += tableIconMappingDao.deleteByRelatedId(iconRowId);
+    }
+    return rowsDeleted;
   }
+
   /**
    * Delete all style mappings
    * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
@@ -1740,9 +1762,9 @@ export class FeatureStyleExtension extends BaseExtension {
    * Delete the style mapping with the geometry type value
    * @param {module:extension/style.StyleMappingDao} mappingDao  mapping dao
    * @param {Number} featureId feature id
-   * @param {String} geometryType geometry type
+   * @param {GeometryType} geometryType geometry type
    */
-  deleteMapping(mappingDao?: StyleMappingDao, featureId?: number, geometryType?: string): number {
+  deleteMapping(mappingDao?: StyleMappingDao, featureId?: number, geometryType?: GeometryType): number {
     if (mappingDao !== null) {
       return mappingDao.deleteByBaseIdAndGeometryType(featureId, geometryType);
     }

@@ -1,11 +1,9 @@
-import {GeoPackage} from '../../lib/geoPackage'
-import {GeoPackageConnection} from '../../lib/db/geoPackageConnection';
-
 var GeoPackageTileRetriever = require('../../lib/tiles/retriever').GeoPackageTileRetriever
-  , proj4 = require('proj4')
+  , GeoPackage = require('../../lib/geoPackage').GeoPackage
+  , Projection = require('../../lib/projection/projection').Projection
+  , GeoPackageConnection = require('../../lib/db/geoPackageConnection').GeoPackageConnection
   , should = require('chai').should()
-  , path = require('path')
-  , fs = require('fs-extra');
+  , path = require('path');
 
 describe('GeoPackage tests', function() {
   it('should get the feature table names', function(done) {
@@ -182,37 +180,37 @@ describe('GeoPackage tests', function() {
   });
 
   it('should exists default projection', function() {
-    var result = GeoPackage.hasProjection('EPSG:4326');
+    var result = Projection.hasProjection('EPSG:4326');
     should.exist(result);
   });
 
   it('should throw error on invalid load projections argument', function() {
     (function() {
-      GeoPackage.loadProjections(null);
+      Projection.loadProjections(null);
     }).should.throw('Invalid array of projections');
   });
 
   it('should throw error on unknown projection item', function() {
     (function() {
-      GeoPackage.loadProjections([null]);
-    }).should.throw('Projection not found');
+      Projection.loadProjections([null]);
+    }).should.throw('Invalid projection in array. Valid projection {name: string, definition: string}.');
   });
 
   it('should load projections', function() {
-    GeoPackage.loadProjections(['EPSG:4326']);
-    var result = GeoPackage.hasProjection('EPSG:4326');
+    Projection.loadProjections([{name: 'EPSG:3821', definition: '+proj=longlat +ellps=aust_SA +no_defs '}]);
+    var result = Projection.hasProjection('EPSG:3821');
     should.exist(result);
   });
 
   it('should throw error on empty add projection args', function() {
     (function() {
-      GeoPackage.addProjection(null, null);
+      Projection.loadProjection(null, null);
     }).should.throw('Invalid projection name/definition');
   });
 
   it('should add projection', function() {
-    GeoPackage.addProjection('EPSG:4001', '+proj=longlat +ellps=airy +no_defs');
-    var result = GeoPackage.hasProjection('EPSG:4001');
+    Projection.loadProjection('EPSG:4001', '+proj=longlat +ellps=airy +no_defs');
+    var result = Projection.hasProjection('EPSG:4001');
     should.exist(result);
   });
 

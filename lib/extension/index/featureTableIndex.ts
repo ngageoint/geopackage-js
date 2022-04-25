@@ -2,6 +2,7 @@
  * Feature Table Index
  * @module extension/index
  */
+import proj4 from 'proj4';
 import { RTreeIndex } from '../rtree/rtreeIndex';
 import { BaseExtension } from '../baseExtension';
 import { GeoPackage } from '../../geoPackage';
@@ -49,7 +50,6 @@ export class FeatureTableIndex extends BaseExtension {
    */
   constructor(geoPackage: GeoPackage, public featureDao: FeatureDao<FeatureRow>) {
     super(geoPackage);
-    this.progress;
     this.extensionName = FeatureTableIndex.EXTENSION_NAME;
     this.extensionDefinition = FeatureTableIndex.EXTENSION_GEOMETRY_INDEX_DEFINITION;
     this.tableName = featureDao.table_name;
@@ -263,7 +263,6 @@ export class FeatureTableIndex extends BaseExtension {
     const rows = this.featureDao.queryForChunk(100, page);
     if (rows.length) {
       this.progress('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
-      console.log('Indexing ' + page * 100 + ' to ' + (page + 1) * 100);
       rows.forEach(row => {
         const fr = this.featureDao.getRow(row) as FeatureRow;
         this.indexRow(tableIndex, fr.id, fr.geometry);

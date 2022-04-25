@@ -3,25 +3,22 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
+
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
  * @see {@link https://github.com/JoshuaWise/better-sqlite3|better-sqlite3}
  */
-
-/**
- * Class which adapts generic GeoPackage queries to better-sqlite3 queries
- */
 export class SqliteAdapter implements DBAdapter {
   filePath: string | Buffer | Uint8Array;
   db: any;
+
   /**
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   async initialize(): Promise<this> {
     // @ts-ignore
-    const bettersqlite = await import('better-sqlite3');
-    const Database = bettersqlite.default;
     try {
+      const Database = require('better-sqlite3');
       if (this.filePath && typeof this.filePath === 'string') {
         if (this.filePath.indexOf('http') === 0) {
           const url: string = this.filePath as string;
@@ -75,10 +72,7 @@ export class SqliteAdapter implements DBAdapter {
         });
       } else {
         console.log('create in memory');
-        // creating a random name here.  If the same name is used twice the database is appended to
-        this.db = new Database('memory' + Math.random(), {
-          memory: !this.filePath,
-        });
+        this.db = new Database(':memory:');
         return this;
       }
     } catch (err) {
@@ -103,7 +97,7 @@ export class SqliteAdapter implements DBAdapter {
    */
   close(): void {
     this.db.pragma('wal_autocheckpoint=0');
-    this.db.checkpoint();
+    this.db.pragma('wal_checkpoint(RESTART)');
     this.db.close();
   }
   /**
@@ -113,6 +107,11 @@ export class SqliteAdapter implements DBAdapter {
   getDBConnection(): any {
     return this.db;
   }
+
+  getFunctionList(): any[] {
+    return this.db.pragma('function_list');
+  }
+
   /**
    * Returns a Buffer containing the contents of the database as a file
    */
@@ -216,6 +215,29 @@ export class SqliteAdapter implements DBAdapter {
   insert(sql: string, params?: [] | Record<string, DBValue>): number {
     const statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
+  }
+  /**
+   * Prepares a SQL statement
+   * @param sql
+   */
+  prepareStatement (sql: string): any {
+    return this.db.prepare(sql);
+  }
+  /**
+   * Runs an insert statement with the parameters provided
+   * @param  {any} statement  statement to run
+   * @param  {Object|Array} [params] bind parameters
+   * @return {Number} last inserted row id
+   */
+  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+    return statement.run(params).lastInsertRowid;
+  }
+  /**
+   * Closes a prepared statement
+   * @param statement
+   */
+  closeStatement (statement: any) {
+    statement = null;
   }
   /**
    * Runs the specified delete statement and returns the number of deleted rows

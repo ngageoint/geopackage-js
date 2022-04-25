@@ -205,7 +205,8 @@ export class GeoPackageExtensions {
         let extendedRelations = extendedRelationsDao.getBaseTableRelations(table);
         extendedRelations.forEach(extendedRelation => {
           let mappingTableName = extendedRelation.mapping_table_name;
-          let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName);
+          let extensions = extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName)
+            .concat(extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR, mappingTableName));
           if (extensions.length > 0) {
             let newMappingTableName = CoreSQLUtils.createName(geoPackage.connection, mappingTableName, table, newTable);
             let userTable = new UserCustomTableReader(mappingTableName).readTable(geoPackage.connection);

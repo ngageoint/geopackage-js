@@ -1,12 +1,8 @@
-import { GeoPackageAPI } from '../../../..'
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {ContentsDao} from '../../../../lib/core/contents/contentsDao';
 
-// var GeoPackageAPI = require('../../../..')
-var Contents = require('../../../../lib/core/contents/contents').Contents
-  , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
+var ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
+  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
-  , TestUtils = require('../../../fixtures/testUtils')
   , should = require('chai').should()
   , path = require('path');
 

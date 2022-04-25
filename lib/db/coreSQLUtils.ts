@@ -297,9 +297,9 @@ export class CoreSQLUtils {
     if (idColumnName != null) {
       tableMapping.removeColumn(idColumnName);
     }
-    let tileMatrixSetNameColumn = tableMapping.getColumn(columnName);
-    tileMatrixSetNameColumn.constantValue = newColumnValue;
-    tileMatrixSetNameColumn.whereValue = currentColumnValue;
+    let column = tableMapping.getColumn(columnName);
+    column.constantValue = newColumnValue;
+    column.whereValue = currentColumnValue;
     CoreSQLUtils.transferTableContentForTableMapping(db, tableMapping);
   }
 

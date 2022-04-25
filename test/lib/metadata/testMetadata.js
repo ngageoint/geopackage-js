@@ -1,9 +1,6 @@
 import {GeoPackage} from '../../../lib/geoPackage';
 
-var fs = require('fs-extra')
-  , should = require('chai').should()
-  , path = require('path')
-  // , GeoPackage = require('../../../lib/geoPackage')
+var should = require('chai').should()
   , Metadata = require('../../../lib/metadata/metadata').Metadata
   , MetadataDao = require('../../../lib/metadata/metadataDao').MetadataDao;
 

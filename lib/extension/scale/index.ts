@@ -26,7 +26,7 @@ export class TileScalingExtension extends BaseExtension {
   }
   /**
    * Get or create the tileScaling id extension
-   * @return {Promise}
+   * @return {Extension}
    */
   getOrCreateExtension(): Extension {
     const extension = this.getOrCreate(
@@ -46,7 +46,7 @@ export class TileScalingExtension extends BaseExtension {
    */
   createOrUpdate(tileScaling: TileScaling): number {
     tileScaling.table_name = this.tableName;
-    return this.tileScalingDao.createOrUpdate(tileScaling);
+    return this.tileScalingDao.createOrUpdate(tileScaling)
   }
 
   /**

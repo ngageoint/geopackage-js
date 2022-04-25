@@ -1,25 +1,40 @@
 import { DBAdapter, DBValue } from './dbAdapter';
+import initSqlJs from 'rtree-sql.js';
+
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
  * @module db/sqljsAdapter
  * @see {@link http://kripken.github.io/sql.js/documentation/|sqljs}
  */
-// @ts-ignore
-import sqljs from 'rtree-sql.js/dist/sql-asm-memory-growth.js';
-// var sqljs = require('sql.js/js/sql.js');
-
-/**
- * Class which adapts generic GeoPackage queries to sqljs queries
- */
 export class SqljsAdapter implements DBAdapter {
+  static SQL: { Database: any };
   db: any;
   filePath: string | Buffer | Uint8Array;
+  static sqljsWasmLocateFile: (filename: string) => string = filename => filename;
+
+  static setSqljsWasmLocateFile(locateFile: (filename: string) => string) {
+    SqljsAdapter.sqljsWasmLocateFile = locateFile;
+  }
+
   /**
    * Returns a Promise which, when resolved, returns a DBAdapter which has connected to the GeoPackage database file
    */
   initialize(): Promise<this> {
-    const promise = new Promise<this>((resolve, reject) => {
-      sqljs().then((SQL: { Database: any }) => {
+    return new Promise<this>((resolve, reject) => {
+      new Promise(resolve => {
+        if (SqljsAdapter.SQL == null) {
+          initSqlJs({
+            locateFile: SqljsAdapter.sqljsWasmLocateFile,
+          }).then((SQL: { Database: any }) => {
+            SqljsAdapter.SQL = SQL;
+            resolve(SQL);
+          }).catch(e => {
+            reject(e);
+          });
+        } else {
+          resolve(SqljsAdapter.SQL)
+        }
+      }).then((SQL: { Database: any }) => {
         if (this.filePath && typeof this.filePath === 'string') {
           if (typeof process !== 'undefined' && process.version) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -54,10 +69,6 @@ export class SqljsAdapter implements DBAdapter {
               const filebuffer = fs.readFileSync(this.filePath);
               const t = new Uint8Array(filebuffer);
               this.db = new SQL.Database(t);
-              // console.log('setting wal mode');
-              // var walMode = db.exec('PRAGMA journal_mode=DELETE');
-              // console.log('walMode', walMode);
-              // adapter = new SqljsAdapter(db);
               return resolve(this);
             }
           } else {
@@ -86,20 +97,12 @@ export class SqljsAdapter implements DBAdapter {
           this.db = new SQL.Database();
           return resolve(this);
         }
+      }).catch(e => {
+        reject(e);
       });
     });
-
-    return promise;
   }
 
-  // /**
-  //  * Creates an adapter from an already established better-sqlite3 database connection
-  //  * @param  {any} db sqljs database connection
-  //  * @return {module:db/sqljsAdapter~Adapter}
-  //  */
-  // static createAdapterFromDb(db) {
-  //   return new SqljsAdapter(db);
-  // }
   /**
    * @param  {string|Buffer|Uint8Array} [filePath] string path to an existing file or a path to where a new file will be created or a url from which to download a GeoPackage or a Uint8Array containing the contents of the file, if undefined, an in memory database is created
    */
@@ -262,13 +265,41 @@ export class SqljsAdapter implements DBAdapter {
     }
   }
   /**
+   * Prepares a SQL statement
+   * @param sql
+   */
+  prepareStatement (sql: string): any {
+    return this.db.prepare(sql);
+  }
+  /**
+   * Runs an insert statement with the parameters provided
+   * @param  {any} statement  statement to run
+   * @param  {Object|Array} [params] bind parameters
+   * @return {Number} last inserted row id
+   */
+  bindAndInsert (statement: any, params?: [] | Record<string, DBValue>): number {
+    if (params && !(params instanceof Array)) {
+      for (const key in params) {
+        params['$' + key] = params[key];
+      }
+    }
+    return statement.run(params).lastInsertRowid;
+  }
+  /**
+   * Closes a prepared statement
+   * @param statement
+   */
+  closeStatement (statement: any) {
+    statement.free();
+  }
+  /**
    * Runs the specified delete statement and returns the number of deleted rows
    * @param  {String} sql    statement to run
    * @param  {Object|Array} [params] bind parameters
    * @return {Number} deleted rows
    */
   delete(sql: string, params?: [] | Record<string, DBValue>): number {
-    let rowsModified = 0;
+    let rowsModified;
     const statement = this.db.prepare(sql, params);
     statement.step();
     rowsModified = this.db.getRowsModified();

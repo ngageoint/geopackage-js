@@ -3,7 +3,6 @@
  * @module extension/relatedTables
  */
 import { UserColumn } from '../../user/userColumn';
-import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
 
@@ -71,7 +70,7 @@ export class UserMappingTable extends UserCustomTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createBaseIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
+    return UserColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Create the related id column
@@ -79,7 +78,7 @@ export class UserMappingTable extends UserCustomTable {
    * @return {module:user/userColumn~UserColumn}
    */
   static createRelatedIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
+    return UserColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Get the required columns

@@ -1,10 +1,9 @@
-
 import { default as testSetup } from '../../fixtures/testSetup'
-import { UserCustomTableReader } from '../../../lib/user/custom/userCustomTableReader';
-import { UserCustomDao } from '../../../lib/user/custom/userCustomDao';
 
 var path = require('path')
-  , should = require('chai').should();
+  , should = require('chai').should()
+  , UserCustomTableReader = require('../../../lib/user/custom/userCustomTableReader').UserCustomTableReader
+  , UserCustomDao = require('../../../lib/user/custom/userCustomDao').UserCustomDao;
 
 describe('UserTableReader tests', function() {
   var geoPackage;

@@ -8,7 +8,6 @@ import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import pointDistance from '@turf/distance';
 import * as helpers from '@turf/helpers';
 import proj4 from 'proj4';
-import * as defs from './proj4Defs';
 import { Feature, FeatureCollection, Geometry, LineString, MultiPolygon, Point, Polygon } from 'geojson';
 
 import { GeometryData } from './geom/geometryData';
@@ -80,6 +79,9 @@ import { ContentsDataType } from './core/contents/contentsDataType';
 import { UserMappingTable } from './extension/relatedTables/userMappingTable';
 import { GeometryType } from './features/user/geometryType';
 import { Constraints } from './db/table/constraints';
+import { Projection } from './projection/projection';
+import { ProjectionConstants } from './projection/projectionConstants';
+import {SqliteQueryBuilder} from "./db/sqliteQueryBuilder";
 
 type ColumnMap = {
   [key: string]: {
@@ -101,13 +103,6 @@ export interface ClosestFeature {
   gp_table: string;
   gp_name: string;
   distance?: number;
-}
-
-const anyDefs = defs as any;
-for (const def in anyDefs) {
-  if (anyDefs[def]) {
-    proj4.defs(def, anyDefs[def]);
-  }
 }
 
 /**
@@ -136,7 +131,6 @@ export class GeoPackage {
   private _contentsIdDao: ContentsIdDao;
   private _tileScalingDao: TileScalingDao;
   private _contentsIdExtension: ContentsIdExtension;
-  private _tileScalingExtension: TileScalingExtension;
   private _featureStyleExtension: FeatureStyleExtension;
   private _relatedTablesExtension: RelatedTablesExtension;
 
@@ -151,6 +145,7 @@ export class GeoPackage {
     this.path = path;
     this.connection = connection;
     this.tableCreator = new TableCreator(this);
+    this.loadSpatialReferenceSystemsIntoProj4();
   }
   close(): void {
     this.connection.close();
@@ -161,7 +156,16 @@ export class GeoPackage {
   async export(): Promise<any> {
     return this.connection.export();
   }
-
+  loadSpatialReferenceSystemsIntoProj4(): void {
+    this.spatialReferenceSystemDao.getAllSpatialReferenceSystems().forEach(spatialReferenceSystem => {
+      try {
+        if (spatialReferenceSystem.srs_id > 0 && (spatialReferenceSystem.organization !== ProjectionConstants.EPSG ||
+          (spatialReferenceSystem.organization_coordsys_id !== ProjectionConstants.EPSG_CODE_4326 &&
+          spatialReferenceSystem.organization_coordsys_id !== ProjectionConstants.EPSG_CODE_3857)))
+        Projection.loadProjection([spatialReferenceSystem.organization, spatialReferenceSystem.organization_coordsys_id].join(':'), spatialReferenceSystem.definition)
+      } catch (e) {}
+    })
+  }
   validate(): GeoPackageValidationError[] {
     let errors: GeoPackageValidationError[] = [];
     errors = errors.concat(GeoPackageValidate.validateMinimumTables(this));
@@ -228,7 +232,7 @@ export class GeoPackage {
     return this._featureStyleExtension || (this._featureStyleExtension = new FeatureStyleExtension(this));
   }
   getTileScalingExtension(tableName: string): TileScalingExtension {
-    return this._tileScalingExtension || (this._tileScalingExtension = new TileScalingExtension(this, tableName));
+    return new TileScalingExtension(this, tableName);
   }
   getGeometryIndexDao(featureDao: FeatureDao<FeatureRow>): GeometryIndexDao {
     return new GeometryIndexDao(this, featureDao);
@@ -254,8 +258,8 @@ export class GeoPackage {
 
   /**
    * Get a Tile DAO
-   *  @returns {FeatureDao}
    * @param table
+   * @returns {TileDao}
    */
   getTileDao(table: string | Contents | TileMatrixSet): TileDao<TileRow> {
     if (table instanceof Contents) {
@@ -297,7 +301,7 @@ export class GeoPackage {
       const tm = tileMatrixDao.createObject(result);
       // verify first that there are actual tiles at this zoom level due to QGIS doing weird things and
       // creating tile matrix entries for zoom levels that have no tiles
-      if (tileMatrixDao.tileCount(tm)) {
+      if (tileMatrixDao.hasTiles(tm)) {
         tileMatrices.push(tm);
       }
     });
@@ -730,20 +734,120 @@ export class GeoPackage {
   }
 
   /**
+   * Adds a list of features to a FeatureTable. Inserts features from the list in batches, providing progress updates
+   * after each batch completes.
+   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
+   * @param  {object}   features    GeoJSON features to add
+   * @param  {string}   tableName  name of the table that will store the feature
+   * @param {boolean} index updates the FeatureTableIndex extension if it exists
+   * @param {number} batchSize how many features are inserted in a single transaction,
+   * progress is published after each batch is inserted. 1000 is recommended, 100 is about 25% slower,
+   * but provides more updates and keeps the thread open.
+   * @param  {function}  progress  optional progress function that is called after a batch of features has been
+   * processed. The number of features added is sent as an argument to that function.
+   * @return {Promise<number>} number of features inserted
+   */
+  async addGeoJSONFeaturesToGeoPackage (features: Feature[], tableName: string, index = false, batchSize = 1000,  progress?: (featuresAdded: number) => void): Promise<number> {
+    let inserted = 0;
+    const featureDao = this.getFeatureDao(tableName);
+    const srs = featureDao.srs;
+    let geometryData;
+    let featureRow = featureDao.newRow();
+
+    // empty geometry when none is present
+    const emptyPoint = wkx.Geometry.parse('POINT EMPTY');
+
+    // determine if we need to reproject to the srs of the table
+    const reprojectionNeeded = !(srs.organization === ProjectionConstants.EPSG && srs.organization_coordsys_id === ProjectionConstants.EPSG_CODE_4326);
+
+    // progress is called after each step
+    const progressFunction = function(featuresAdded: any): void {
+      setTimeout((progress || function(): void {}), 0, featuresAdded);
+    };
+
+    const insertSql = SqliteQueryBuilder.buildInsert("'" + featureDao.gpkgTableName + "'", featureRow);
+
+    const stepFunction = async (start: number, end: number, resolve: Function) => {
+      // execute step if there are still features
+      if (start < end) {
+        featureDao.connection.transaction(() => {
+          // builds the insert sql statement
+          const insertStatement = featureDao.connection.adapter.prepareStatement(insertSql);
+
+          // determine if indexing is needed
+          let fti;
+          let tableIndex;
+          if (index) {
+            fti = featureDao.featureTableIndex;
+            tableIndex = fti.tableIndex;
+          }
+
+          for (let i = start; i < end; i++) {
+            let feature = features[i];
+            featureRow = featureDao.newRow();
+            geometryData = new GeometryData();
+            geometryData.setSrsId(srs.srs_id);
+            if (reprojectionNeeded) {
+              feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
+            }
+            const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
+            geometryData.setGeometry(featureGeometry ? wkx.Geometry.parseGeoJSON(featureGeometry) : emptyPoint);
+            featureRow.geometry = geometryData;
+            for (const propertyKey in feature.properties) {
+              if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
+                featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+              }
+            }
+            // bind this feature's data to the insert statement and insert into the table
+            const id = featureDao.connection.adapter.bindAndInsert(insertStatement, SqliteQueryBuilder.buildUpdateOrInsertObject(featureRow));
+            inserted++;
+            // if table index exists, be sure to index the row (note, rtree will run using a trigger)
+            if (tableIndex != null) {
+              fti.indexRow(tableIndex, id, geometryData);
+            }
+          }
+          if (tableIndex != null) {
+            fti.updateLastIndexed(tableIndex);
+          }
+
+          // close the prepared statement
+          featureDao.connection.adapter.closeStatement(insertStatement);
+        });
+        progressFunction(end);
+        setTimeout(() => {
+          stepFunction(end, Math.min(end + batchSize, features.length), resolve);
+        })
+      } else {
+        resolve(inserted);
+      }
+    }
+
+    return new Promise ((resolve) => {
+      setTimeout(() => {
+        stepFunction(0, Math.min(batchSize, features.length), resolve);
+      });
+    });
+  }
+
+  addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
+    const featureDao = this.getFeatureDao(tableName);
+    return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, featureDao, featureDao.srs, index);
+  }
+
+  /**
    * Adds a GeoJSON feature to the GeoPackage
    * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {object}   feature    GeoJSON feature to add
-   * @param  {string}   tableName  name of the table that will store the feature
+   * @param  {string}   featureDao  feature dao for the table
+   * @param  {string}   srs  srs of the table
    * @param {boolean} index updates the FeatureTableIndex extension if it exists
    */
-  addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
-    const featureDao = this.getFeatureDao(tableName);
-    const srs = featureDao.srs;
+  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature: Feature, featureDao: FeatureDao<FeatureRow>, srs: SpatialReferenceSystem, index = false): number {
     const featureRow = featureDao.newRow();
     const geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);
-    if (!(srs.organization === 'EPSG' && srs.organization_coordsys_id === 4326)) {
-      feature = reproject.reproject(feature, 'EPSG:4326', featureDao.projection);
+    if (!(srs.organization === ProjectionConstants.EPSG && srs.organization_coordsys_id === ProjectionConstants.EPSG_CODE_4326)) {
+      feature = reproject.reproject(feature, ProjectionConstants.EPSG_4326, featureDao.projection);
     }
 
     const featureGeometry = typeof feature.geometry === 'string' ? JSON.parse(feature.geometry) : feature.geometry;
@@ -869,9 +973,14 @@ export class GeoPackage {
     geometryColumns?: GeometryColumns,
     featureColumns?: UserColumn[] | { name: string; dataType: string }[],
     boundingBox: BoundingBox = new BoundingBox(-180, 180, -90, 90),
-    srsId = 4326,
+    srsId: number = ProjectionConstants.EPSG_CODE_4326,
     dataColumns?: DataColumns[],
   ): boolean {
+    const srs = this.spatialReferenceSystemDao.getBySrsId(srsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + srsId + ') is not defined.');
+    }
+
     this.createGeometryColumnsTable();
 
     let geometryColumn;
@@ -954,6 +1063,16 @@ export class GeoPackage {
   createTileTable(tileTable: TileTable): { lastInsertRowid: number; changes: number } {
     return this.tableCreator.createUserTable(tileTable);
   }
+
+  /**
+   * Adds a spatial reference system to the gpkg_spatial_ref_sys table to be used by feature and tile tables.
+   * @param spatialReferenceSystem
+   */
+  createSpatialReferenceSystem(spatialReferenceSystem: SpatialReferenceSystem) {
+    Projection.loadProjection([spatialReferenceSystem.organization.toUpperCase(), spatialReferenceSystem.organization_coordsys_id].join(':'), spatialReferenceSystem.definition)
+    this.spatialReferenceSystemDao.create(spatialReferenceSystem)
+  }
+
   /**
    * Create a new [tile table]{@link module:tiles/user/tileTable~TileTable} in this GeoPackage.
    *
@@ -971,6 +1090,14 @@ export class GeoPackage {
     tileMatrixSetBoundingBox: BoundingBox,
     tileMatrixSetSrsId: number,
   ): TileMatrixSet {
+    let srs = this.spatialReferenceSystemDao.getBySrsId(contentsSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + contentsSrsId + ') is not defined.');
+    }
+    srs = this.spatialReferenceSystemDao.getBySrsId(tileMatrixSetSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + tileMatrixSetSrsId + ') is not defined.');
+    }
     const columns = TileTable.createRequiredColumns(0);
     const tileTable = new TileTable(tableName, columns);
     const contents = new Contents();
@@ -1034,17 +1161,31 @@ export class GeoPackage {
     maxZoom: number,
     tileSize = 256,
   ): TileMatrixSet {
-    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
+    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    if (!webMercator) {
+      this.spatialReferenceSystemDao.createWebMercator();
+      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    }
+    const webMercatorSrsId = webMercator.srs_id;
+
+    let srs = this.spatialReferenceSystemDao.getBySrsId(contentsSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + contentsSrsId + ') is not defined.');
+    }
+    srs = this.spatialReferenceSystemDao.getBySrsId(tileMatrixSetSrsId);
+    if (!srs) {
+      throw new Error('Spatial reference system (' + tileMatrixSetSrsId + ') is not defined.');
+    }
 
     if (contentsSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
       const from = srsDao.getBySrsId(contentsSrsId).projection;
-      contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, 'EPSG:3857');
+      contentsBoundingBox = contentsBoundingBox.projectBoundingBox(from, ProjectionConstants.EPSG_3857);
     }
     if (tileMatrixSetSrsId !== webMercatorSrsId) {
       const srsDao = new SpatialReferenceSystemDao(this);
       const from = srsDao.getBySrsId(tileMatrixSetSrsId).projection;
-      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, 'EPSG:3857');
+      tileMatrixSetBoundingBox = tileMatrixSetBoundingBox.projectBoundingBox(from, ProjectionConstants.EPSG_3857);
     }
     const tileMatrixSet = this.createTileTableWithTableName(
       tableName,
@@ -1053,6 +1194,7 @@ export class GeoPackage {
       tileMatrixSetBoundingBox,
       webMercatorSrsId,
     );
+
     this.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom, tileSize);
     return tileMatrixSet;
   }
@@ -1082,7 +1224,12 @@ export class GeoPackage {
     zoomLevels: Set<number>,
     tileSize = 256,
   ): Promise<TileMatrixSet> {
-    const webMercatorSrsId = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId('EPSG', 3857).srs_id;
+    let webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    if (!webMercator) {
+      this.spatialReferenceSystemDao.createWebMercator();
+      webMercator = this.spatialReferenceSystemDao.getByOrganizationAndCoordSysId(ProjectionConstants.EPSG, ProjectionConstants.EPSG_CODE_3857);
+    }
+    const webMercatorSrsId = webMercator.srs_id;
     const tileMatrixSet = await this.createTileTableWithTableName(
       tableName,
       contentsBoundingBox,
@@ -1170,10 +1317,8 @@ export class GeoPackage {
     const box = TileBoundingBoxUtils.webMercatorTileBox(epsg3857TileBoundingBox, zoomLevel);
     const matrixWidth = box.maxLongitude - box.minLongitude + 1;
     const matrixHeight = box.maxLatitude - box.minLatitude + 1;
-    const pixelXSize =
-      (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
-    const pixelYSize =
-      (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
+    const pixelXSize = (epsg3857TileBoundingBox.maxLongitude - epsg3857TileBoundingBox.minLongitude) / matrixWidth / tileSize;
+    const pixelYSize = (epsg3857TileBoundingBox.maxLatitude - epsg3857TileBoundingBox.minLatitude) / matrixHeight / tileSize;
     const tileMatrix = new TileMatrix();
     tileMatrix.table_name = tileMatrixSet.table_name;
     tileMatrix.zoom_level = zoomLevel;
@@ -1327,7 +1472,7 @@ export class GeoPackage {
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(
-      'EPSG:4326',
+      ProjectionConstants.EPSG_4326,
       tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id,
     );
 
@@ -1490,7 +1635,7 @@ export class GeoPackage {
     tiles.north = north.toFixed(2);
     tiles.zoom = zoom;
     mapBoundingBox = mapBoundingBox.projectBoundingBox(
-      'EPSG:4326',
+      ProjectionConstants.EPSG_4326,
       tileDao.srs.organization.toUpperCase() + ':' + tileDao.srs.organization_coordsys_id,
     );
 
@@ -1584,7 +1729,7 @@ export class GeoPackage {
     const ft = new FeatureTiles(featureDao, 256, 256);
     const tileCount = ft.getFeatureCountXYZ(x, y, z);
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    boundingBox = boundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+    boundingBox = boundingBox.projectBoundingBox(ProjectionConstants.EPSG_3857, ProjectionConstants.EPSG_4326);
 
     if (tileCount > 10000) {
       // too many, send back the entire tile
@@ -1618,7 +1763,7 @@ export class GeoPackage {
       if (distance < closestDistance) {
         closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
-      } else if (distance === closestDistance && closest.geometry.type !== 'Point') {
+      } else if (distance === closestDistance && closest != null &&  closest.geometry.type !== 'Point') {
         closest = feature as ClosestFeature & Feature;
         closestDistance = distance;
       }
@@ -1827,9 +1972,9 @@ export class GeoPackage {
       if (
         srs.definition &&
         srs.definition !== 'undefined' &&
-        srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id !== 'EPSG:4326'
+        srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id !== ProjectionConstants.EPSG_4326
       ) {
-        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.projection, 'EPSG:4326');
+        geoJsonGeom = reproject.reproject(geoJsonGeom, srs.projection, ProjectionConstants.EPSG_4326);
       }
       geoJson.geometry = geoJsonGeom;
     }
@@ -1873,7 +2018,7 @@ export class GeoPackage {
     skipVerification = false,
   ): Promise<Feature[]> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    const bb = webMercatorBoundingBox.projectBoundingBox('EPSG:3857', 'EPSG:4326');
+    const bb = webMercatorBoundingBox.projectBoundingBox(ProjectionConstants.EPSG_3857, ProjectionConstants.EPSG_4326);
     await this.indexFeatureTable(table);
     const featureDao = this.getFeatureDao(table);
     if (!featureDao) return;
@@ -1986,13 +2131,14 @@ export class GeoPackage {
   }
 
   /**
-   * Draws a tile projected into the specified projection, bounded by the specified by the bounds in EPSG:4326 into the canvas or the image is returned if no canvas is passed in
+   * Draws a tile projected into the specified projection, bounded by the specified by the bounds in EPSG:4326 into the canvas or the image is returned if no canvas is passed in.
    * @param  {string}   table      name of the table containing the tiles
    * @param  {Number}   minLat     minimum latitude bounds of tile
    * @param  {Number}   minLon     minimum longitude bounds of tile
    * @param  {Number}   maxLat     maximum latitude bounds of tile
    * @param  {Number}   maxLon     maximum longitude bounds of tile
    * @param  {Number}   z          zoom level of the tile
+   * @param  {string}   projection project from tile's projection to this one.
    * @param  {Number}   width      width of the resulting tile
    * @param  {Number}   height     height of the resulting tile
    * @param  {any}   canvas     canvas element to draw the tile into
@@ -2004,7 +2150,7 @@ export class GeoPackage {
     maxLat: number,
     maxLon: number,
     z: number,
-    projection: 'EPSG:4326',
+    projection: string = ProjectionConstants.EPSG_4326,
     width = 256,
     height = 256,
     canvas?: any,
@@ -2169,19 +2315,12 @@ export class GeoPackage {
     return info;
   }
 
-  static loadProjections(items: string[]): void {
-    if (!items) throw new Error('Invalid array of projections');
-    for (let i = 0; i < items.length; i++) {
-      if (!anyDefs[items[i]]) throw new Error('Projection not found');
-      this.addProjection(items[i], anyDefs[items[i]]);
-    }
-  }
   static addProjection(name: string, definition: string): void {
     if (!name || !definition) throw new Error('Invalid projection name/definition');
-    proj4.defs('' + name, '' + definition);
+    proj4.defs(name, definition);
   }
   static hasProjection(name: string): proj4.ProjectionDefinition {
-    return proj4.defs('' + name);
+    return proj4.defs(name);
   }
 
   renameTable (tableName, newTableName) {
@@ -2293,32 +2432,32 @@ export class GeoPackage {
    */
   copyTileTable(tableName, newTableName, transferContent) {
     const tileMatrixSetDao = this.tileMatrixSetDao;
-    let tileMatrixSet = null;
+    let tileMatrixSet: TileMatrixSet = null;
     try {
       tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
     } catch (e) {
       throw new Error('Failed to retrieve table tile matrix set: ' + tableName);
     }
-    if (tileMatrixSet == null) {
+    if (tileMatrixSet === null || tileMatrixSet === undefined) {
       throw new Error('No tile matrix set for table: ' + tableName);
     }
     const tileMatrixDao = this.tileMatrixDao;
-    let tileMatrixes = null;
+    let tileMatrices: TileMatrix[] = null;
     try {
-      tileMatrixes = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tableName);
+      tileMatrices = tileMatrixDao.queryForAllEq(TileMatrixDao.COLUMN_TABLE_NAME, tableName).map(results => tileMatrixDao.createObject(results));
     } catch (e) {
-      throw new Error('Failed to retrieve table tile matrixes: ' + tableName);
+      throw new Error('Failed to retrieve table tile matrices: ' + tableName);
     }
     let contents = this.copyUserTable(tableName, newTableName, transferContent);
-    tileMatrixSet.setContents(contents);
+    tileMatrixSet.contents = contents;
     try {
       tileMatrixSetDao.create(tileMatrixSet);
     } catch (e) {
       throw new Error('Failed to create tile matrix set for tile table: ' + newTableName);
     }
 
-    tileMatrixes.forEach(tileMatrix => {
-      tileMatrix.setContents(contents);
+    tileMatrices.forEach(tileMatrix => {
+      tileMatrix.contents = contents;
       try {
         tileMatrixDao.create(tileMatrix);
       } catch (e) {

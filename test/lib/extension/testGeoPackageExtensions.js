@@ -2,7 +2,7 @@ import { default as testSetup } from '../../fixtures/testSetup'
 
 var GeoPackageExtensions = require('../../../lib/extension/geoPackageExtensions').GeoPackageExtensions
   , FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
-  , NGAExtensions = require('../../../lib/extension/ngaExtensions').NGAExtensions
+  , Canvas = require('../../../lib/canvas/canvas').Canvas
   , ExtensionDao = require('../../../lib/extension/extensionDao').ExtensionDao
   , SchemaExtension = require('../../../lib/extension/schema').SchemaExtension
   , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
@@ -15,7 +15,6 @@ var GeoPackageExtensions = require('../../../lib/extension/geoPackageExtensions'
   , RTreeIndex = require('../../../lib/extension/rtree/rtreeIndex').RTreeIndex
   , FeatureTableIndex = require('../../../lib/extension/index/featureTableIndex').FeatureTableIndex
   , MetadataExtension = require('../../../lib/extension/metadata').MetadataExtension
-  , GeoPackageAPI = require('../../../lib/api').GeoPackageAPI
   , should = require('chai').should()
   , expect = require('chai').expect
   , wkx = require('wkx')
@@ -158,11 +157,11 @@ describe('GeoPackage Extensions tests', function() {
     geopackage.featureStyleExtension.getContentsId().getOrCreateExtension();
     const featureTableStyles = new FeatureTableStyles(geopackage, tableName);
     featureTableStyles.createRelationships();
-    featureTableStyles.setTableStyle(GeometryType.nameFromType(GeometryType.POINT), randomStyle(featureTableStyles));
+    featureTableStyles.setTableStyle(GeometryType.POINT, randomStyle(featureTableStyles));
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', 'fixtures', 'point.png'));
     // @ts-ignore
     iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', 'fixtures', 'point.png'));
-    featureTableStyles.setTableIcon(GeometryType.nameFromType(GeometryType.POINT), randomIcon(featureTableStyles));
+    featureTableStyles.setTableIcon(GeometryType.POINT, randomIcon(featureTableStyles));
 
     // setup schema extension
     schemaExtension = new SchemaExtension(geopackage);
@@ -181,10 +180,12 @@ describe('GeoPackage Extensions tests', function() {
 
     geopackage.createMetadataTable();
     geopackage.createMetadataReferenceTable();
-    const metadataDao = geopackage.metadataDao;  });
+    const metadataDao = geopackage.metadataDao;
+  });
 
   afterEach(async function() {
     geopackage.close();
+    Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
@@ -207,5 +208,23 @@ describe('GeoPackage Extensions tests', function() {
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
     GeoPackageExtensions.deleteExtensions(geopackage);
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
+  });
+
+  it('should copy table and then delete copy and style extension for original table should be unchanged', function() {
+    const newTableName = 'copied_feature_table';
+    let featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    geopackage.copyTable(tableName, newTableName, true, true);
+    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    featureTableStyles = new FeatureTableStyles(geopackage, newTableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+    geopackage.deleteTable(newTableName);
+    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
   });
 });
