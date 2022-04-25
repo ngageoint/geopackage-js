@@ -1,0 +1,2053 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>MetadataDao | @ngageoint/geopackage - v4.1.0</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">@ngageoint/geopackage - v4.1.0</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="metadatadao.html">MetadataDao</a>
+				</li>
+			</ul>
+			<h1>Class MetadataDao</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Metadata Data Access Object</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>class</dt>
+						<dd></dd>
+						<dt>extends</dt>
+						<dd><p>Dao</p>
+						</dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<a href="dao.html" class="tsd-signature-type">Dao</a><span class="tsd-signature-symbol">&lt;</span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">&gt;</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">MetadataDao</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-inherited tsd-is-external">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#connection" class="tsd-kind-icon">connection</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#geopackage" class="tsd-kind-icon">geo<wbr>Package</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external"><a href="metadatadao.html#gpkgtablename" class="tsd-kind-icon">gpkg<wbr>Table<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external"><a href="metadatadao.html#idcolumns" class="tsd-kind-icon">id<wbr>Columns</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#column_id" class="tsd-kind-icon">COLUMN_<wbr>ID</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#column_md_scope" class="tsd-kind-icon">COLUMN_<wbr>MD_<wbr>SCOPE</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#column_md_standard_uri" class="tsd-kind-icon">COLUMN_<wbr>MD_<wbr>STANDARD_<wbr>URI</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#column_metadata" class="tsd-kind-icon">COLUMN_<wbr>METADATA</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#column_mime_type" class="tsd-kind-icon">COLUMN_<wbr>MIME_<wbr>TYPE</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="metadatadao.html#table_name" class="tsd-kind-icon">TABLE_<wbr>NAME</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#_buildwhereargswitharray" class="tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Array</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#_buildwhereargswithcolumnvalues" class="tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Column<wbr>Values</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildpkwhere" class="tsd-kind-icon">build<wbr>PkWhere</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildpkwhereargs" class="tsd-kind-icon">build<wbr>PkWhere<wbr>Args</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildwhere" class="tsd-kind-icon">build<wbr>Where</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildwhereargs" class="tsd-kind-icon">build<wbr>Where<wbr>Args</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildwherelike" class="tsd-kind-icon">build<wbr>Where<wbr>Like</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#buildwherewithfieldandvalue" class="tsd-kind-icon">build<wbr>Where<wbr>With<wbr>Field<wbr>And<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#count" class="tsd-kind-icon">count</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#countjoinwherewithargs" class="tsd-kind-icon">count<wbr>Join<wbr>Where<wbr>With<wbr>Args</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#countwhere" class="tsd-kind-icon">count<wbr>Where</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#create" class="tsd-kind-icon">create</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-external"><a href="metadatadao.html#createobject" class="tsd-kind-icon">create<wbr>Object</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#createorupdate" class="tsd-kind-icon">create<wbr>OrUpdate</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#delete" class="tsd-kind-icon">delete</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#deleteall" class="tsd-kind-icon">delete<wbr>All</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#deletebyid" class="tsd-kind-icon">delete<wbr>ById</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#deletebymultiid" class="tsd-kind-icon">delete<wbr>ByMulti<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#deletewhere" class="tsd-kind-icon">delete<wbr>Where</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#droptable" class="tsd-kind-icon">drop<wbr>Table</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#droptablewithtablename" class="tsd-kind-icon">drop<wbr>Table<wbr>With<wbr>Table<wbr>Name</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#getmultiid" class="tsd-kind-icon">get<wbr>Multi<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#istableexists" class="tsd-kind-icon">is<wbr>Table<wbr>Exists</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#maxofcolumn" class="tsd-kind-icon">max<wbr>OfColumn</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#minofcolumn" class="tsd-kind-icon">min<wbr>OfColumn</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforall" class="tsd-kind-icon">query<wbr>For<wbr>All</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforalleq" class="tsd-kind-icon">query<wbr>For<wbr>All<wbr>Eq</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforchunk" class="tsd-kind-icon">query<wbr>For<wbr>Chunk</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforcolumns" class="tsd-kind-icon">query<wbr>For<wbr>Columns</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforeach" class="tsd-kind-icon">query<wbr>For<wbr>Each</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforfieldvalues" class="tsd-kind-icon">query<wbr>For<wbr>Field<wbr>Values</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforid" class="tsd-kind-icon">query<wbr>For<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforlike" class="tsd-kind-icon">query<wbr>For<wbr>Like</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryformultiid" class="tsd-kind-icon">query<wbr>For<wbr>Multi<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryforsameid" class="tsd-kind-icon">query<wbr>For<wbr>Same<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#queryjoinwherewithargs" class="tsd-kind-icon">query<wbr>Join<wbr>Where<wbr>With<wbr>Args</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#querywhere" class="tsd-kind-icon">query<wbr>Where</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#querywherewithargsdistinct" class="tsd-kind-icon">query<wbr>Where<wbr>With<wbr>Args<wbr>Distinct</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#refresh" class="tsd-kind-icon">refresh</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#rename" class="tsd-kind-icon">rename</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#update" class="tsd-kind-icon">update</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external"><a href="metadatadao.html#updatewithvalues" class="tsd-kind-icon">update<wbr>With<wbr>Values</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited tsd-is-external">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Metadata<wbr>Dao<span class="tsd-signature-symbol">(</span>geoPackage<span class="tsd-signature-symbol">: </span><a href="geopackage.html" class="tsd-signature-type">GeoPackage</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadatadao.html" class="tsd-signature-type">MetadataDao</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#constructor">constructor</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L29">lib/dao/dao.ts:29</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>geoPackage: <a href="geopackage.html" class="tsd-signature-type">GeoPackage</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>GeoPackage object this dao belongs to</p>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadatadao.html" class="tsd-signature-type">MetadataDao</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="connection" class="tsd-anchor"></a>
+					<h3>connection</h3>
+					<div class="tsd-signature tsd-kind-icon">connection<span class="tsd-signature-symbol">:</span> <a href="geopackageconnection.html" class="tsd-signature-type">GeoPackageConnection</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#connection">connection</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L19">lib/dao/dao.ts:19</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Database connection to the sqlite file</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="geopackage" class="tsd-anchor"></a>
+					<h3>geo<wbr>Package</h3>
+					<div class="tsd-signature tsd-kind-icon">geo<wbr>Package<span class="tsd-signature-symbol">:</span> <a href="geopackage.html" class="tsd-signature-type">GeoPackage</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#geopackage">geoPackage</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L35">lib/dao/dao.ts:35</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>GeoPackage object this dao belongs to</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+					<a name="gpkgtablename" class="tsd-anchor"></a>
+					<h3>gpkg<wbr>Table<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">gpkg<wbr>Table<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;MetadataDao.TABLE_NAME</span></div>
+					<aside class="tsd-sources">
+						<p>Overrides <a href="dao.html">Dao</a>.<a href="dao.html#gpkgtablename">gpkgTableName</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L24">lib/metadata/metadataDao.ts:24</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+					<a name="idcolumns" class="tsd-anchor"></a>
+					<h3>id<wbr>Columns</h3>
+					<div class="tsd-signature tsd-kind-icon">id<wbr>Columns<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[MetadataDao.COLUMN_ID]</span></div>
+					<aside class="tsd-sources">
+						<p>Overrides <a href="dao.html">Dao</a>.<a href="dao.html#idcolumns">idColumns</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L25">lib/metadata/metadataDao.ts:25</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="column_id" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> COLUMN_<wbr>ID</h3>
+					<div class="tsd-signature tsd-kind-icon">COLUMN_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;id&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L18">lib/metadata/metadataDao.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="column_md_scope" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> COLUMN_<wbr>MD_<wbr>SCOPE</h3>
+					<div class="tsd-signature tsd-kind-icon">COLUMN_<wbr>MD_<wbr>SCOPE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;md_scope&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L19">lib/metadata/metadataDao.ts:19</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="column_md_standard_uri" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> COLUMN_<wbr>MD_<wbr>STANDARD_<wbr>URI</h3>
+					<div class="tsd-signature tsd-kind-icon">COLUMN_<wbr>MD_<wbr>STANDARD_<wbr>URI<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;md_standard_uri&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L20">lib/metadata/metadataDao.ts:20</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="column_metadata" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> COLUMN_<wbr>METADATA</h3>
+					<div class="tsd-signature tsd-kind-icon">COLUMN_<wbr>METADATA<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;metadata&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L22">lib/metadata/metadataDao.ts:22</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="column_mime_type" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> COLUMN_<wbr>MIME_<wbr>TYPE</h3>
+					<div class="tsd-signature tsd-kind-icon">COLUMN_<wbr>MIME_<wbr>TYPE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;mime_type&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L21">lib/metadata/metadataDao.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="table_name" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> TABLE_<wbr>NAME</h3>
+					<div class="tsd-signature tsd-kind-icon">TABLE_<wbr>NAME<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;gpkg_metadata&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L17">lib/metadata/metadataDao.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="_buildwhereargswitharray" class="tsd-anchor"></a>
+					<h3>_build<wbr>Where<wbr>Args<wbr>With<wbr>Array</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Array<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#_buildwhereargswitharray">_buildWhereArgsWithArray</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L395">lib/dao/dao.ts:395</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Builds a where args array</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>values: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>argument values to push</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="_buildwhereargswithcolumnvalues" class="tsd-anchor"></a>
+					<h3>_build<wbr>Where<wbr>Args<wbr>With<wbr>Column<wbr>Values</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Column<wbr>Values<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#_buildwhereargswithcolumnvalues">_buildWhereArgsWithColumnValues</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L411">lib/dao/dao.ts:411</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Builds a where args array</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>values: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>argument values to push</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildpkwhere" class="tsd-anchor"></a>
+					<h3>build<wbr>PkWhere</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>PkWhere<span class="tsd-signature-symbol">(</span>idValue<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildpkwhere">buildPkWhere</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L306">lib/dao/dao.ts:306</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the primary key where clause</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>idValue: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>id</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>primary key where clause</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildpkwhereargs" class="tsd-anchor"></a>
+					<h3>build<wbr>PkWhere<wbr>Args</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>PkWhere<wbr>Args<span class="tsd-signature-symbol">(</span>idValue<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildpkwhereargs">buildPkWhereArgs</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L323">lib/dao/dao.ts:323</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the primary key where args</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>idValue: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>id</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h4>
+							<p>where args</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildwhere" class="tsd-anchor"></a>
+					<h3>build<wbr>Where</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Where<span class="tsd-signature-symbol">(</span>fields<span class="tsd-signature-symbol">: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a>, operation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildwhere">buildWhere</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L359">lib/dao/dao.ts:359</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Build where or selection statement for fields</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fields: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>columns and values</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> operation: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;and&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>where clause</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildwhereargs" class="tsd-anchor"></a>
+					<h3>build<wbr>Where<wbr>Args</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Where<wbr>Args<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol"> | </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildwhereargs">buildWhereArgs</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L376">lib/dao/dao.ts:376</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Builds a where args array</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>values: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> | </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol"> | </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>argument values to push</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">null</span>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildwherelike" class="tsd-anchor"></a>
+					<h3>build<wbr>Where<wbr>Like</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Where<wbr>Like<span class="tsd-signature-symbol">(</span>fields<span class="tsd-signature-symbol">: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a>, operation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildwherelike">buildWhereLike</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L341">lib/dao/dao.ts:341</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Build where (or selection) LIKE statement for fields</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fields: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>columns and values</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> operation: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>where clause</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="buildwherewithfieldandvalue" class="tsd-anchor"></a>
+					<h3>build<wbr>Where<wbr>With<wbr>Field<wbr>And<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">build<wbr>Where<wbr>With<wbr>Field<wbr>And<wbr>Value<span class="tsd-signature-symbol">(</span>field<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a>, operation<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#buildwherewithfieldandvalue">buildWhereWithFieldAndValue</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L430">lib/dao/dao.ts:430</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Builds a where clause from the field and value with an optional operation.  If the value is empty, &#39;is null&#39; is added to the query for the field</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>field: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>field name</p>
+									</div>
+								</li>
+								<li>
+									<h5>value: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> operation: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&#x3D;&quot;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>where clause</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="count" class="tsd-anchor"></a>
+					<h3>count</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">count<span class="tsd-signature-symbol">(</span>fields<span class="tsd-signature-symbol">?: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#count">count</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L477">lib/dao/dao.ts:477</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Count rows in the table optionally filtered by the parameters specified</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> fields: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>count of objects</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="countjoinwherewithargs" class="tsd-anchor"></a>
+					<h3>count<wbr>Join<wbr>Where<wbr>With<wbr>Args</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">count<wbr>Join<wbr>Where<wbr>With<wbr>Args<span class="tsd-signature-symbol">(</span>join<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#countjoinwherewithargs">countJoinWhereWithArgs</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L252">lib/dao/dao.ts:252</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Count all matching objects</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>join: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>join clause</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where clause</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>array of where query values</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="countwhere" class="tsd-anchor"></a>
+					<h3>count<wbr>Where</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">count<wbr>Where<span class="tsd-signature-symbol">(</span>where<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#countwhere">countWhere</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L503">lib/dao/dao.ts:503</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Count rows in the table optionally filtered by the parameters specified</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where string</p>
+									</div>
+								</li>
+								<li>
+									<h5>whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>arguments to filter on</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>count of objects</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="create" class="tsd-anchor"></a>
+					<h3>create</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#create">create</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L588">lib/dao/dao.ts:588</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Insert the object into the table</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>object to be inserted</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>id of the inserted object</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+					<a name="createobject" class="tsd-anchor"></a>
+					<h3>create<wbr>Object</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Object<span class="tsd-signature-symbol">(</span>results<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides <a href="dao.html">Dao</a>.<a href="dao.html#createobject">createObject</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/metadata/metadataDao.ts#L27">lib/metadata/metadataDao.ts:27</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> results: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadata.html" class="tsd-signature-type">Metadata</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="createorupdate" class="tsd-anchor"></a>
+					<h3>create<wbr>OrUpdate</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>OrUpdate<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#createorupdate">createOrUpdate</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L643">lib/dao/dao.ts:643</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Queries for the object by id, and if it exists, updates it, otherwise creates a new object</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>object to update or create</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects modified</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="delete" class="tsd-anchor"></a>
+					<h3>delete</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">delete<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#delete">delete</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L536">lib/dao/dao.ts:536</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Delete the object passed in.  Object is deleted by id</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>object to delete</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects deleted</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="deleteall" class="tsd-anchor"></a>
+					<h3>delete<wbr>All</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>All<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#deleteall">deleteAll</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L579">lib/dao/dao.ts:579</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Delete all objects in the table</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects deleted</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="deletebyid" class="tsd-anchor"></a>
+					<h3>delete<wbr>ById</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>ById<span class="tsd-signature-symbol">(</span>idValue<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#deletebyid">deleteById</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L548">lib/dao/dao.ts:548</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Delete the object specified by the id</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>idValue: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>id value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects deleted</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="deletebymultiid" class="tsd-anchor"></a>
+					<h3>delete<wbr>ByMulti<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>ByMulti<wbr>Id<span class="tsd-signature-symbol">(</span>idValues<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#deletebymultiid">deleteByMultiId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L559">lib/dao/dao.ts:559</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Delete the object specified by the ids</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>idValues: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>id values</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects deleted</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="deletewhere" class="tsd-anchor"></a>
+					<h3>delete<wbr>Where</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>Where<span class="tsd-signature-symbol">(</span>where<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#deletewhere">deleteWhere</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L571">lib/dao/dao.ts:571</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Delete objects that match the query</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where clause</p>
+									</div>
+								</li>
+								<li>
+									<h5>whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where arguments</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+							<p>number of objects deleted</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="droptable" class="tsd-anchor"></a>
+					<h3>drop<wbr>Table</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">drop<wbr>Table<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#droptable">dropTable</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L656">lib/dao/dao.ts:656</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Drops this table</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>results of the drop</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="droptablewithtablename" class="tsd-anchor"></a>
+					<h3>drop<wbr>Table<wbr>With<wbr>Table<wbr>Name</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">drop<wbr>Table<wbr>With<wbr>Table<wbr>Name<span class="tsd-signature-symbol">(</span>tableName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#droptablewithtablename">dropTableWithTableName</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L663">lib/dao/dao.ts:663</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Drops this table</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tableName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="getmultiid" class="tsd-anchor"></a>
+					<h3>get<wbr>Multi<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Multi<wbr>Id<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#getmultiid">getMultiId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L78">lib/dao/dao.ts:78</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="istableexists" class="tsd-anchor"></a>
+					<h3>is<wbr>Table<wbr>Exists</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Table<wbr>Exists<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#istableexists">isTableExists</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L47">lib/dao/dao.ts:47</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks if the table exists</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="maxofcolumn" class="tsd-anchor"></a>
+					<h3>max<wbr>OfColumn</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">max<wbr>OfColumn<span class="tsd-signature-symbol">(</span>column<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#maxofcolumn">maxOfColumn</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L527">lib/dao/dao.ts:527</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the max of the column</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>column: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>column name</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="minofcolumn" class="tsd-anchor"></a>
+					<h3>min<wbr>OfColumn</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">min<wbr>OfColumn<span class="tsd-signature-symbol">(</span>column<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#minofcolumn">minOfColumn</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L516">lib/dao/dao.ts:516</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the min of the column</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>column: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>column name</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforall" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>All</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>All<span class="tsd-signature-symbol">(</span>where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforall">queryForAll</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L109">lib/dao/dao.ts:109</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>raw object array from the database</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforalleq" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>All<wbr>Eq</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>All<wbr>Eq<span class="tsd-signature-symbol">(</span>field<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a>, groupBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, having<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, orderBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforalleq">queryForAllEq</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L449">lib/dao/dao.ts:449</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Query for all rows in the table that match</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>field: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>field to match</p>
+									</div>
+								</li>
+								<li>
+									<h5>value: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>value to match</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> groupBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> having: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> orderBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>array of raw database objects</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforchunk" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Chunk</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Chunk<span class="tsd-signature-symbol">(</span>pageSize<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforchunk">queryForChunk</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L152">lib/dao/dao.ts:152</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Queries for all items in the table with a page size and page number</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>pageSize: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>size of the chunk to query for</p>
+									</div>
+								</li>
+								<li>
+									<h5>page: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>chunk number to query for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>raw object array from the database</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforcolumns" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Columns</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Columns<span class="tsd-signature-symbol">(</span>columnName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fieldValues<span class="tsd-signature-symbol">?: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforcolumns">queryForColumns</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L135">lib/dao/dao.ts:135</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Queries for all matches and returns them.  Only queries for the specified column name  Be aware this pulls all results into memory</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>columnName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>name of the column to query for</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> fieldValues: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>raw object array from the database</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforeach" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Each</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Each<span class="tsd-signature-symbol">(</span>field<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a>, groupBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, having<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, orderBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, columns<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforeach">queryForEach</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L178">lib/dao/dao.ts:178</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate all items in the table one at a time.  If no parameters are passed, iterates the entire table.  Returns an Iterable object</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> field: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> value: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> groupBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> having: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> orderBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> columns: <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>iterable of database objects</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforfieldvalues" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Field<wbr>Values</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Field<wbr>Values<span class="tsd-signature-symbol">(</span>fieldValues<span class="tsd-signature-symbol">: </span><a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforfieldvalues">queryForFieldValues</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L220">lib/dao/dao.ts:220</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate all objects in thet able that match the ColumnValues passed in</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fieldValues: <a href="columnvalues.html" class="tsd-signature-type">ColumnValues</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>ColumnValues to query for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforid" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Id<span class="tsd-signature-symbol">(</span>id<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforid">queryForId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L64">lib/dao/dao.ts:64</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Query for object by id</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>id: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>ID of the object to query for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadata.html" class="tsd-signature-type">Metadata</a>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">undefined</span>
+							</h4>
+							<p>object created from the raw database object</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforlike" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Like</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Like<span class="tsd-signature-symbol">(</span>fieldName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforlike">queryForLike</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L120">lib/dao/dao.ts:120</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>fieldName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>name of the field to query for</p>
+									</div>
+								</li>
+								<li>
+									<h5>value: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>value of the like clause</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>raw object array from the database</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryformultiid" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Multi<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Multi<wbr>Id<span class="tsd-signature-symbol">(</span>idValues<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryformultiid">queryForMultiId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L94">lib/dao/dao.ts:94</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Query for object by multi id</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>idValues: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>ColumnValues with the multi id</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadata.html" class="tsd-signature-type">Metadata</a></h4>
+							<p>object created from the raw database object</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryforsameid" class="tsd-anchor"></a>
+					<h3>query<wbr>For<wbr>Same<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>For<wbr>Same<wbr>Id<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryforsameid">queryForSameId</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L73">lib/dao/dao.ts:73</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadata.html" class="tsd-signature-type">Metadata</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="queryjoinwherewithargs" class="tsd-anchor"></a>
+					<h3>query<wbr>Join<wbr>Where<wbr>With<wbr>Args</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Join<wbr>Where<wbr>With<wbr>Args<span class="tsd-signature-symbol">(</span>join<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span>, columns<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#queryjoinwherewithargs">queryJoinWhereWithArgs</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L235">lib/dao/dao.ts:235</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate all matching objects</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>join: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>join clause</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where clause</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>array of where query values</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> columns: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>columns to query for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="querywhere" class="tsd-anchor"></a>
+					<h3>query<wbr>Where</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Where<span class="tsd-signature-symbol">(</span>where<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span>, groupBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, having<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, orderBy<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, limit<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#querywhere">queryWhere</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L279">lib/dao/dao.ts:279</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate all matching rows</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> where: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> groupBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> having: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> orderBy: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> limit: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="querywherewithargsdistinct" class="tsd-anchor"></a>
+					<h3>query<wbr>Where<wbr>With<wbr>Args<wbr>Distinct</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">query<wbr>Where<wbr>With<wbr>Args<wbr>Distinct<span class="tsd-signature-symbol">(</span>where<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">?: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#querywherewithargsdistinct">queryWhereWithArgsDistinct</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L264">lib/dao/dao.ts:264</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Iterate all distinct matching rows in the table</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where clause</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>array of where query values</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">IterableIterator</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="refresh" class="tsd-anchor"></a>
+					<h3>refresh</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">refresh<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#refresh">refresh</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L55">lib/dao/dao.ts:55</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Refreshes the object by id</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>object to refresh</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metadata.html" class="tsd-signature-type">Metadata</a>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">undefined</span>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="rename" class="tsd-anchor"></a>
+					<h3>rename</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">rename<span class="tsd-signature-symbol">(</span>newName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#rename">rename</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L671">lib/dao/dao.ts:671</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Rename the table</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>newName: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="update" class="tsd-anchor"></a>
+					<h3>update</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">update<span class="tsd-signature-symbol">(</span>object<span class="tsd-signature-symbol">: </span><a href="metadata.html" class="tsd-signature-type">Metadata</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#update">update</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L618">lib/dao/dao.ts:618</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Update the object specified</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>object: <a href="metadata.html" class="tsd-signature-type">Metadata</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>object with updated values</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
+							<p>number of objects updated</p>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>changes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>last<wbr>Insert<wbr>Rowid<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+					<a name="updatewithvalues" class="tsd-anchor"></a>
+					<h3>update<wbr>With<wbr>Values</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>With<wbr>Values<span class="tsd-signature-symbol">(</span>values<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span>, where<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, whereArgs<span class="tsd-signature-symbol">: </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from <a href="dao.html">Dao</a>.<a href="dao.html#updatewithvalues">updateWithValues</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/a49df3f2/lib/dao/dao.ts#L601">lib/dao/dao.ts:601</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Update all rows that match the query</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>values: <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>values to insert</p>
+									</div>
+								</li>
+								<li>
+									<h5>where: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where clause</p>
+									</div>
+								</li>
+								<li>
+									<h5>whereArgs: <a href="../globals.html#dbvalue" class="tsd-signature-type">DBValue</a><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>where arguments</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span></h4>
+							<p>number of objects updated</p>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>changes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>last<wbr>Insert<wbr>Rowid<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-is-external">
+						<a href="metadatadao.html" class="tsd-kind-icon">Metadata<wbr>Dao</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#connection" class="tsd-kind-icon">connection</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#geopackage" class="tsd-kind-icon">geo<wbr>Package</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+								<a href="metadatadao.html#gpkgtablename" class="tsd-kind-icon">gpkg<wbr>Table<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+								<a href="metadatadao.html#idcolumns" class="tsd-kind-icon">id<wbr>Columns</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#column_id" class="tsd-kind-icon">COLUMN_<wbr>ID</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#column_md_scope" class="tsd-kind-icon">COLUMN_<wbr>MD_<wbr>SCOPE</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#column_md_standard_uri" class="tsd-kind-icon">COLUMN_<wbr>MD_<wbr>STANDARD_<wbr>URI</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#column_metadata" class="tsd-kind-icon">COLUMN_<wbr>METADATA</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#column_mime_type" class="tsd-kind-icon">COLUMN_<wbr>MIME_<wbr>TYPE</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="metadatadao.html#table_name" class="tsd-kind-icon">TABLE_<wbr>NAME</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#_buildwhereargswitharray" class="tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Array</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#_buildwhereargswithcolumnvalues" class="tsd-kind-icon">_build<wbr>Where<wbr>Args<wbr>With<wbr>Column<wbr>Values</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildpkwhere" class="tsd-kind-icon">build<wbr>PkWhere</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildpkwhereargs" class="tsd-kind-icon">build<wbr>PkWhere<wbr>Args</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildwhere" class="tsd-kind-icon">build<wbr>Where</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildwhereargs" class="tsd-kind-icon">build<wbr>Where<wbr>Args</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildwherelike" class="tsd-kind-icon">build<wbr>Where<wbr>Like</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#buildwherewithfieldandvalue" class="tsd-kind-icon">build<wbr>Where<wbr>With<wbr>Field<wbr>And<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#count" class="tsd-kind-icon">count</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#countjoinwherewithargs" class="tsd-kind-icon">count<wbr>Join<wbr>Where<wbr>With<wbr>Args</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#countwhere" class="tsd-kind-icon">count<wbr>Where</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#create" class="tsd-kind-icon">create</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite tsd-is-external">
+								<a href="metadatadao.html#createobject" class="tsd-kind-icon">create<wbr>Object</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#createorupdate" class="tsd-kind-icon">create<wbr>OrUpdate</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#delete" class="tsd-kind-icon">delete</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#deleteall" class="tsd-kind-icon">delete<wbr>All</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#deletebyid" class="tsd-kind-icon">delete<wbr>ById</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#deletebymultiid" class="tsd-kind-icon">delete<wbr>ByMulti<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#deletewhere" class="tsd-kind-icon">delete<wbr>Where</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#droptable" class="tsd-kind-icon">drop<wbr>Table</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#droptablewithtablename" class="tsd-kind-icon">drop<wbr>Table<wbr>With<wbr>Table<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#getmultiid" class="tsd-kind-icon">get<wbr>Multi<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#istableexists" class="tsd-kind-icon">is<wbr>Table<wbr>Exists</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#maxofcolumn" class="tsd-kind-icon">max<wbr>OfColumn</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#minofcolumn" class="tsd-kind-icon">min<wbr>OfColumn</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforall" class="tsd-kind-icon">query<wbr>For<wbr>All</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforalleq" class="tsd-kind-icon">query<wbr>For<wbr>All<wbr>Eq</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforchunk" class="tsd-kind-icon">query<wbr>For<wbr>Chunk</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforcolumns" class="tsd-kind-icon">query<wbr>For<wbr>Columns</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforeach" class="tsd-kind-icon">query<wbr>For<wbr>Each</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforfieldvalues" class="tsd-kind-icon">query<wbr>For<wbr>Field<wbr>Values</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforid" class="tsd-kind-icon">query<wbr>For<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforlike" class="tsd-kind-icon">query<wbr>For<wbr>Like</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryformultiid" class="tsd-kind-icon">query<wbr>For<wbr>Multi<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryforsameid" class="tsd-kind-icon">query<wbr>For<wbr>Same<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#queryjoinwherewithargs" class="tsd-kind-icon">query<wbr>Join<wbr>Where<wbr>With<wbr>Args</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#querywhere" class="tsd-kind-icon">query<wbr>Where</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#querywherewithargsdistinct" class="tsd-kind-icon">query<wbr>Where<wbr>With<wbr>Args<wbr>Distinct</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#refresh" class="tsd-kind-icon">refresh</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#rename" class="tsd-kind-icon">rename</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#update" class="tsd-kind-icon">update</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-external">
+								<a href="metadatadao.html#updatewithvalues" class="tsd-kind-icon">update<wbr>With<wbr>Values</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
