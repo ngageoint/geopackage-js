@@ -35,70 +35,79 @@ In your HTML, you can include GeoPackage JS from unpkg.
 For a full end to end example, please see index.js in this directory. Once you have your file loaded, you can access the tiles inside like so:
 
 ```javascript
-var GeoPackageAPI = window.geopackage;
+const { GeoPackageAPI, setSqljsWasmLocateFile } = window.GeoPackage;
+
+// need to load this web assembly module to interact with database in browser.
+setSqljsWasmLocateFile(file => 'https://unpkg.com/@ngageoint/geopackage/dist/' + file);
 
 ...
 
-GeoPackageAPI.openGeoPackageByteArray(array, function(err, geoPackage) { // Now you can operate on the GeoPackage
+GeoPackageAPI.open(array).then(geoPackage => {
+  // Now you can operate on the GeoPackage
   // Get the tile table names
-  geoPackage.getTileTables(function(err, tileTableNames) {
-    geoPackage.getTileDaoWithTableName(tileTableNames[0], function(err, tileDao) { // We know we have one tile layer, loop if you have more.
-    var maxZoom = tileDao.maxWebMapZoom;
-    var minZoom = tileDao.minWebMapZoom;
-    var tableLayer = new L.GridLayer({noWrap: true, minZoom: minZoom, maxZoom: maxZoom});
-    tableLayer.createTile = function(tilePoint, done) {
-      var canvas = L.DomUtil.create('canvas', 'leaflet-tile');
-      var size = this.getTileSize();
-      canvas.width = size.x;
-      canvas.height = size.y;
-      setTimeout(function() {
-        console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-        GeoPackageAPI.drawXYZTileInCanvas(geoPackage, tileTableNames[0], tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas, function(err) {
+  const tileTableNames = geoPackage.getTileTables();
+  const tileDao = geoPackage.getTileDao(tileTableNames[0]); // We know we have one tile layer, loop if you have more.
+  const maxZoom = tileDao.maxWebMapZoom;
+  const minZoom = tileDao.minWebMapZoom;
+  const tableLayer = new L.GridLayer({ noWrap: true, minZoom: minZoom, maxZoom: maxZoom });
+  tableLayer.createTile = function(tilePoint, done) {
+    const canvas = L.DomUtil.create('canvas', 'leaflet-tile');
+    const size = this.getTileSize();
+    canvas.width = size.x;
+    canvas.height = size.y;
+    let error = null;
+    setTimeout(function() {
+      console.time('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
+      geoPackage
+        .xyzTile(tileTableNames[0], tilePoint.x, tilePoint.y, tilePoint.z, size.x, size.y, canvas)
+        .catch(err => {
+          error = err;
+        })
+        .finally(() => {
           console.timeEnd('Draw tile ' + tilePoint.x + ', ' + tilePoint.y + ' zoom: ' + tilePoint.z);
-          done(err, canvas);
+          done(error, canvas);
         });
-      }, 0);
-      return canvas;
-    }
-    geopackageMap.addLayer(tableLayer);
-    tableLayer.bringToFront();
-    });
-  });
+    }, 0);
+    return canvas;
+  };
+  geopackageMap.addLayer(tableLayer);
+  tableLayer.bringToFront();
+});
 
 ```
 
 Now for the features. We need to pull the features out of the tables and convert them into a format that Leaflet can use display them on the map, in this case GeoJSON.
 
 ```javascript
-geoPackage.getFeatureTables(function(err, featureTableNames) {
-  for (var i = 0; i < featureTableNames.length; i++) {
-    geoPackage.getFeatureDaoWithTableName(featureTableNames[i], function(err, featureDao) {
-      geoPackage.getInfoForTable(featureDao, function(err, info) {
+const featureTableNames = geoPackage.getFeatureTables();
+  featureTableNames.forEach(featureTable => {
+    console.log('featureTable: ' + featureTable);
+    const featureDao = geoPackage.getFeatureDao(featureTable);
+    const info = geoPackage.getInfoForTable(featureDao);
+    // query for all features
+    const iterator = featureDao.queryForEach();
+    for (const row of iterator) {
+      const feature = featureDao.getRow(row);
+      const geometry = feature.geometry;
+      if (geometry) {
+        // Make the information into something we can display on the map with leaflet
+        const geom = geometry.geometry;
+        const geoJson = geom.toGeoJSON();
+        geoJson.properties = {};
+        geoJson.properties['table_name'] = featureTable;
 
-        // query for all features
-        featureDao.queryForEach(function(err, row, rowDone) {
-          var feature = featureDao.getFeatureRow(row);
-          var geometry = feature.getGeometry();
-          if (geometry) {
-            // Make the information into something we can display on the map with leaflet
-            var geom = geometry.geometry;
-            var geoJson = geometry.geometry.toGeoJSON();
-            geoJson.properties = {};
-            geoJson.properties["table_name"] = feature.featureTable.table_name;
-
-            // map the values from the feature table into GeoJSON properties we can use to style the map and show a popup
-            for (var key in feature.values) {
-              if(feature.values.hasOwnProperty(key) && key != feature.getGeometryColumn().name) {
-                var column = info.columnMap[key];
-                geoJson.properties[column.displayName] = feature.values[key];
-              }
-            }
-            geojsonLayer.addData(geoJson);
+        // map the values from the feature table into GeoJSON properties we can use to style the map and show a popup
+        for (const key in feature.values) {
+          if (feature.values.hasOwnProperty(key) && key != feature.geometryColumn.name) {
+            const column = info.columnMap[key];
+            geoJson.properties[column.displayName] = feature.values[key];
           }
-          rowDone();
-        });
-      });
-    });
-  }
+        }
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        geojsonLayer.addData(geoJson);
+      }
+    }
+  });
 });
+
 ```
