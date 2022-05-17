@@ -164,7 +164,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
   const geometryColumns = new GeometryColumns();
   geometryColumns.table_name = tableName;
   geometryColumns.column_name = 'geometry';
-  geometryColumns.geometry_type_name = type;
+  geometryColumns.geometry_type_name = GeometryType.nameFromType(type);
   geometryColumns.z = 0;
   geometryColumns.m = 0;
 
