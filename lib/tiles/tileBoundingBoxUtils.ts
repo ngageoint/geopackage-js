@@ -29,14 +29,8 @@ export class TileBoundingBoxUtils {
       -ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
       webMercatorBoundingBox.minLongitude,
     );
-    const maxLonClip = Math.min(
-      ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
-      webMercatorBoundingBox.maxLongitude,
-    );
-    const minLatClip = Math.max(
-      -ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH,
-      webMercatorBoundingBox.minLatitude,
-    );
+    const maxLonClip = Math.min(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLongitude);
+    const minLatClip = Math.max(-ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.minLatitude);
     const maxLatClip = Math.min(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH, webMercatorBoundingBox.maxLatitude);
 
     const minX = Math.floor((minLonClip + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
@@ -48,6 +42,38 @@ export class TileBoundingBoxUtils {
     const maxY = Math.max(
       0,
       Math.ceil((ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - minLatClip) / tileSize) - 1,
+    );
+    return new BoundingBox(minX, maxX, minY, maxY);
+  }
+
+  /**
+   * Calculate the bounds in tile coordinates that covers the given bounding box
+   * at the given zoom level.  The result object contains the keys `minX`, `maxX`,
+   * `minY`, and `maxY`, which are tile column and row values in the XYZ tile
+   * scheme.
+   *
+   * @param {BoundingBox} wgs84BoundingBox bounds in EPSG:4326 coordinates (meters)
+   * @param {number} zoom the integral zoom level
+   * @returns {{minX: number, maxX: number, minY: number, maxY: number}} bounds in tile column and row coordinates
+   */
+  static wgs84TileBox(wgs84BoundingBox: BoundingBox, zoom: number): BoundingBox {
+    const tilesPerSideLat = TileBoundingBoxUtils.tilesPerWGS84LatSide(zoom);
+    const tilesPerSideLon = TileBoundingBoxUtils.tilesPerWGS84LonSide(zoom);
+    const tileSizeLat = TileBoundingBoxUtils.tileSizeLatPerWGS84Side(tilesPerSideLat);
+    const tileSizeLon = TileBoundingBoxUtils.tileSizeLonPerWGS84Side(tilesPerSideLon);
+    const minLonClip = Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, wgs84BoundingBox.minLongitude);
+    const maxLonClip = Math.min(ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, wgs84BoundingBox.maxLongitude);
+    const minLatClip = Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT, wgs84BoundingBox.minLatitude);
+    const maxLatClip = Math.min(ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT, wgs84BoundingBox.maxLatitude);
+    const minX = Math.floor((minLonClip + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon);
+    const maxX = Math.max(
+      0,
+      Math.ceil((maxLonClip + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon) - 1,
+    );
+    const minY = Math.floor((ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT - maxLatClip) / tileSizeLat);
+    const maxY = Math.max(
+      0,
+      Math.ceil((ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT - minLatClip) / tileSizeLat) - 1,
     );
     return new BoundingBox(minX, maxX, minY, maxY);
   }
@@ -160,6 +186,18 @@ export class TileBoundingBoxUtils {
     return new BoundingBox(minLon, maxLon, minLat, maxLat);
   }
 
+  static getWGS84BoundingBoxFromXYZ(x: number, y: number, zoom: number): BoundingBox {
+    const tilesPerLat = TileBoundingBoxUtils.tilesPerWGS84LatSide(zoom);
+    const tilesPerLon = TileBoundingBoxUtils.tilesPerWGS84LonSide(zoom);
+    const tileSizeLat = TileBoundingBoxUtils.tileSizeLatPerWGS84Side(tilesPerLat);
+    const tileSizeLon = TileBoundingBoxUtils.tileSizeLonPerWGS84Side(tilesPerLon);
+    const minLon = -1 * ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH + x * tileSizeLon;
+    const maxLon = -1 * ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH + (x + 1) * tileSizeLon;
+    const minLat = ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT - (y + 1) * tileSizeLat;
+    const maxLat = ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT - y * tileSizeLat;
+    return new BoundingBox(minLon, maxLon, minLat, maxLat);
+  }
+
   /**
    *  Get the tile size in meters
    *
@@ -195,6 +233,52 @@ export class TileBoundingBoxUtils {
    */
   static tilesPerSideWithZoom(zoom: number): number {
     return 1 << zoom;
+  }
+
+  /**
+   * Get the tiles per latitude side at the zoom level
+   * @param zoom zoom level
+   * @return tiles per latitude side
+   * @since 1.2.0
+   */
+  static tilesPerWGS84LatSide(zoom: number): number {
+    return TileBoundingBoxUtils.tilesPerSide(zoom);
+  }
+
+  /**
+   * Get the tiles per longitude side at the zoom level
+   * @param zoom zoom level
+   * @return tiles per longitude side
+   * @since 1.2.0
+   */
+  static tilesPerWGS84LonSide(zoom: number): number {
+    return 2 * TileBoundingBoxUtils.tilesPerSide(zoom);
+  }
+
+  /**
+   * Get the tile height in degrees latitude
+   *
+   * @param tilesPerLat
+   *            tiles per latitude side
+   *
+   * @return degrees
+   * @since 1.2.0
+   */
+  static tileSizeLatPerWGS84Side(tilesPerLat: number): number {
+    return (2 * ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) / tilesPerLat;
+  }
+
+  /**
+   * Get the tile height in degrees longitude
+   *
+   * @param tilesPerLon
+   *            tiles per longitude side
+   *
+   * @return degrees
+   * @since 1.2.0
+   */
+  static tileSizeLonPerWGS84Side(tilesPerLon: number): number {
+    return (2 * ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tilesPerLon;
   }
 
   /**
@@ -382,7 +466,7 @@ export class TileBoundingBoxUtils {
   }
 
   static getXPixel(width: number, boundingBox: BoundingBox, longitude: number): number {
-    return (longitude - boundingBox.minLongitude) / boundingBox.width * width;
+    return ((longitude - boundingBox.minLongitude) / boundingBox.width) * width;
   }
 
   static getLongitudeFromPixel(
@@ -404,7 +488,7 @@ export class TileBoundingBoxUtils {
     tileBoundingBox: BoundingBox,
     pixel: number,
   ): number {
-    return boundingBox.maxLatitude - ((pixel / height) * tileBoundingBox.height);
+    return boundingBox.maxLatitude - (pixel / height) * tileBoundingBox.height;
   }
 
   /**

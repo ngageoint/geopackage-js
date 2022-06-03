@@ -145,7 +145,6 @@ export class BoundingBox {
     );
   }
 
-
   /**
    * Project the bounding box into a new projection
    *
@@ -154,12 +153,14 @@ export class BoundingBox {
    * @return {BoundingBox}
    */
   projectBoundingBox(from?: string | proj4.Converter, to?: string | proj4.Converter): BoundingBox {
-    let minLatitude = this.minLatitude
-    let maxLatitude = this.maxLatitude
-    let minLongitude = this.minLongitude
-    let maxLongitude = this.maxLongitude
+    let minLatitude = this.minLatitude;
+    let maxLatitude = this.maxLatitude;
+    let minLongitude = this.minLongitude;
+    let maxLongitude = this.maxLongitude;
+
     if (from && from !== 'undefined' && to && to !== 'undefined') {
-      if (!Projection.isConverter(to) && to.toUpperCase() === ProjectionConstants.EPSG_3857 && !Projection.isConverter(from) && from.toUpperCase() === ProjectionConstants.EPSG_4326) {
+      // if we are going from 4326 to 3857, we first need to trim to the maximum for 3857
+      if (Projection.isWebMercator(to) && Projection.isWGS84(from)) {
         maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
         minLatitude = Math.max(minLatitude, ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
         maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_MAX_LON_RANGE);
@@ -179,17 +180,22 @@ export class BoundingBox {
         fromConverter = Projection.getConverter(from);
       }
 
-      const sw = toConverter.forward(fromConverter.inverse([minLongitude, minLatitude]));
-      const ne = toConverter.forward(fromConverter.inverse([maxLongitude, maxLatitude]));
-      const se = toConverter.forward(fromConverter.inverse([maxLongitude, minLatitude]));
-      const nw = toConverter.forward(fromConverter.inverse([minLongitude, maxLatitude]));
+      // no need to convert if converters are the same
+      if (Projection.convertersMatch(toConverter, fromConverter)) {
+        return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
+      } else {
+        const sw = toConverter.forward(fromConverter.inverse([minLongitude, minLatitude]));
+        const ne = toConverter.forward(fromConverter.inverse([maxLongitude, maxLatitude]));
+        const se = toConverter.forward(fromConverter.inverse([maxLongitude, minLatitude]));
+        const nw = toConverter.forward(fromConverter.inverse([minLongitude, maxLatitude]));
 
-      return new BoundingBox(
-        Math.min(sw[0], nw[0]),
-        Math.max(ne[0], se[0]),
-        Math.min(sw[1], se[1]),
-        Math.max(ne[1], se[1]),
-      );
+        return new BoundingBox(
+          Math.min(sw[0], nw[0]),
+          Math.max(ne[0], se[0]),
+          Math.min(sw[1], se[1]),
+          Math.max(ne[1], se[1]),
+        );
+      }
     }
     return this;
   }

@@ -19,5 +19,6 @@ export class ProjectionConstants {
   public static readonly WEB_MERCATOR_MAX_LON_RANGE: number = 180.0;
   public static readonly WEB_MERCATOR_MIN_LON_RANGE: number = -180.0;
   public static readonly WEB_MERCATOR_HALF_WORLD_WIDTH: number = 20037508.342789244;
-
+  public static readonly WGS84_HALF_WORLD_LON_WIDTH: number = 180.0;
+  public static readonly WGS84_HALF_WORLD_LAT_HEIGHT: number = 90.0;
 }

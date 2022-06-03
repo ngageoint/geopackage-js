@@ -35,7 +35,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       var result = gpr.getWebMercatorBoundingBox();
       result.minLongitude.should.be.equal(-20037508.342789244);
       result.maxLongitude.should.be.equal(20037508.342789244);
-      result.minLatitude.should.be.equal(-20037508.342789255);
+      result.minLatitude.should.be.equal(-20037508.342789244);
       result.maxLatitude.should.be.equal(20037508.342789244);
     });
 

@@ -1,8 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore
 import reproject from 'reproject';
 import PolyToLine from '@turf/polygon-to-line';
 import booleanClockwise from '@turf/boolean-clockwise';
-import simplify from 'simplify-js'
+import simplify from 'simplify-js';
 import proj4 from 'proj4';
 import { Geometry } from 'geojson';
 
@@ -40,7 +41,7 @@ export class FeatureTiles {
   projection: proj4.Converter = null;
   webMercatorProjection: proj4.Converter = null;
   public simplifyGeometries = true;
-  public  simplifyToleranceInPixels = 1;
+  public simplifyToleranceInPixels = 1;
   public compressFormat = 'png';
   public pointRadius = 4.0;
   pointPaint: Paint = new Paint();
@@ -85,7 +86,7 @@ export class FeatureTiles {
   /**
    * Will handle disposing any saved icons
    */
-  cleanup () {
+  cleanup(): void {
     this.clearIconCache();
     if (this.pointIcon) {
       Canvas.disposeImage(this.pointIcon.getIcon());
@@ -469,49 +470,94 @@ export class FeatureTiles {
   set polygonFillColor(polygonFillColor: string) {
     this.polygonFillPaint.color = polygonFillColor;
   }
+
   getFeatureCountXYZ(x: number, y: number, z: number): number {
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    boundingBox = this.expandBoundingBox(boundingBox);
+    boundingBox = this.expandBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
     return this.featureDao.countWebMercatorBoundingBox(boundingBox);
   }
+
+  /**
+   * Renders the web mercator (EPSG:3857) xyz tile
+   * @param x
+   * @param y
+   * @param z
+   * @param canvas
+   */
   async drawTile(x: number, y: number, z: number, canvas: any = null): Promise<any> {
+    return this.draw3857Tile(x, y, z, canvas);
+  }
+
+  /**
+   * Renders the web mercator (EPSG:3857) xyz tile
+   * @param x
+   * @param y
+   * @param z
+   * @param canvas
+   */
+  async draw3857Tile(x: number, y: number, z: number, canvas: any = null): Promise<any> {
     if (this.featureDao.isIndexed()) {
-      return this.drawTileQueryIndex(x, y, z, canvas);
+      return this.drawTileQueryIndex(x, y, z, ProjectionConstants.EPSG_3857, canvas);
     } else {
-      return this.drawTileQueryAll(x, y, z, canvas);
+      return this.drawTileQueryAll(x, y, z, ProjectionConstants.EPSG_3857, canvas);
     }
   }
-  async drawTileQueryAll(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
-    let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
+
+  /**
+   * Renders the wgs84 (EPSG:4326) xyz tile
+   * @param x
+   * @param y
+   * @param z
+   * @param canvas
+   */
+  async draw4326Tile(x: number, y: number, z: number, canvas: any = null): Promise<any> {
+    if (this.featureDao.isIndexed()) {
+      return this.drawTileQueryIndex(x, y, z, ProjectionConstants.EPSG_4326, canvas);
+    } else {
+      return this.drawTileQueryAll(x, y, z, ProjectionConstants.EPSG_4326, canvas);
+    }
+  }
+
+  async drawTileQueryAll(x: number, y: number, zoom: number, tileProjection: string, canvas?: any): Promise<any> {
+    const boundingBox: BoundingBox =
+      tileProjection === ProjectionConstants.EPSG_3857
+        ? TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom)
+        : TileBoundingBoxUtils.getWGS84BoundingBoxFromXYZ(x, y, zoom);
     const count = this.featureDao.getCount();
     if (this.maxFeaturesPerTile === null || count <= this.maxFeaturesPerTile) {
-      return this.drawTileWithBoundingBox(boundingBox, zoom, canvas);
+      return this.drawTileWithBoundingBox(boundingBox, zoom, tileProjection, canvas);
     } else if (this.maxFeaturesTileDraw != null) {
-      return this.maxFeaturesTileDraw.drawUnindexedTile(256, 256, canvas);
+      return this.maxFeaturesTileDraw.drawUnindexedTile(this.tileWidth, this.tileHeight, canvas);
     }
   }
 
   /**
    * Transform geojson to web mercator if it is in another projection.
    * @param geoJson
+   * @param tileProjection
    */
-  webMercatorTransform(geoJson: any): any {
-    if (this.projection !== this.webMercatorProjection) {
-      return reproject.reproject(geoJson, this.projection, this.webMercatorProjection);
+  transformGeometry(geoJson: any, tileProjection: string): any {
+    const targetProjection = Projection.getConverter(tileProjection);
+    if (this.projection !== targetProjection) {
+      return reproject.reproject(geoJson, this.projection, targetProjection);
     } else {
       return geoJson;
     }
   }
 
-  async drawTileQueryIndex(x: number, y: number, z: number, tileCanvas?: any): Promise<any> {
+  async drawTileQueryIndex(x: number, y: number, z: number, tileProjection, tileCanvas?: any): Promise<any> {
     let canvas: any;
     let context: any;
     let dispose = false;
     let image;
-    const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z);
-    const expandedBoundingBox = this.expandBoundingBox(boundingBox);
-    const width = 256;
-    const height = 256;
+    const boundingBox =
+      tileProjection === ProjectionConstants.EPSG_3857
+        ? TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, z)
+        : TileBoundingBoxUtils.getWGS84BoundingBoxFromXYZ(x, y, z);
+    const expandedBoundingBox = this.expandBoundingBox(boundingBox, tileProjection);
+
+    const width = this.tileWidth;
+    const height = this.tileHeight;
     await Canvas.initializeAdapter();
     // create Canvas if user does not provide canvas.
     if (tileCanvas != null) {
@@ -525,10 +571,10 @@ export class FeatureTiles {
     }
 
     // get number of features that could intercept this bounding box
-    const featureCount = this.featureDao.countWebMercatorBoundingBox(expandedBoundingBox);
+    const featureCount = this.featureDao.countInBoundingBox(expandedBoundingBox, tileProjection);
     if (featureCount > 0) {
       if (this.maxFeaturesPerTile == null || featureCount <= this.maxFeaturesPerTile) {
-        const iterator = this.featureDao.fastQueryWebMercatorBoundingBox(expandedBoundingBox);
+        const iterator = this.featureDao.fastQueryBoundingBox(expandedBoundingBox, tileProjection);
         for (const featureRow of iterator) {
           if (featureRow.geometry != null) {
             let geojson = null;
@@ -541,14 +587,11 @@ export class FeatureTiles {
             }
             const style = this.getFeatureStyle(featureRow);
             try {
-              await this.drawGeometry(
-                this.webMercatorTransform(geojson),
-                context,
-                boundingBox,
-                style,
-              );
+              await this.drawGeometry(this.transformGeometry(geojson, tileProjection), context, boundingBox, style);
             } catch (e) {
-              console.error('Failed to draw feature in tile. Id: ' + featureRow.id + ', Table: ' + this.featureDao.table_name)
+              console.error(
+                'Failed to draw feature in tile. Id: ' + featureRow.id + ', Table: ' + this.featureDao.table_name,
+              );
             }
           }
         }
@@ -565,9 +608,15 @@ export class FeatureTiles {
     }
     return image;
   }
-  async drawTileWithBoundingBox(boundingBox: BoundingBox, zoom: number, tileCanvas?: any): Promise<any> {
-    const width = 256;
-    const height = 256;
+
+  async drawTileWithBoundingBox(
+    boundingBox: BoundingBox,
+    zoom: number,
+    tileProjection: string,
+    tileCanvas?: any,
+  ): Promise<any> {
+    const width = this.tileWidth;
+    const height = this.tileHeight;
     let canvas: any;
     let dispose = false;
     await Canvas.initializeAdapter();
@@ -580,9 +629,12 @@ export class FeatureTiles {
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, width, height);
     const featureDao = this.featureDao;
-    const each = featureDao.queryForEach(undefined, undefined, undefined, undefined, undefined, [featureDao.table.getIdColumn().getName(), featureDao.table.getGeometryColumn().getName()]);
+    const each = featureDao.queryForEach(undefined, undefined, undefined, undefined, undefined, [
+      featureDao.table.getIdColumn().getName(),
+      featureDao.table.getGeometryColumn().getName(),
+    ]);
     for (const row of each) {
-      const fr = featureDao.getRow(row)
+      const fr = featureDao.getRow(row);
       if (fr.geometry != null) {
         let gj: Geometry & CrsGeometry = null;
         if (this.cacheGeometries) {
@@ -595,14 +647,9 @@ export class FeatureTiles {
         if (gj != null) {
           const style = this.getFeatureStyle(fr);
           try {
-            await this.drawGeometry(
-              this.webMercatorTransform(gj),
-              context,
-              boundingBox,
-              style,
-            );
+            await this.drawGeometry(this.transformGeometry(gj, tileProjection), context, boundingBox, style);
           } catch (e) {
-            console.error('Failed to draw feature in tile. Id: ' + fr.id + ', Table: ' + this.featureDao.table_name)
+            console.error('Failed to draw feature in tile. Id: ' + fr.id + ', Table: ' + this.featureDao.table_name);
           }
         }
       }
@@ -612,7 +659,6 @@ export class FeatureTiles {
       Canvas.disposeCanvas(canvas);
     }
     return image;
-
   }
   /**
    * Draw a point in the context
@@ -621,12 +667,7 @@ export class FeatureTiles {
    * @param boundingBox
    * @param featureStyle
    */
-  async drawPoint(
-    geoJson: any,
-    context: any,
-    boundingBox: BoundingBox,
-    featureStyle: FeatureStyle,
-  ): Promise<void> {
+  async drawPoint(geoJson: any, context: any, boundingBox: BoundingBox, featureStyle: FeatureStyle): Promise<void> {
     let width: number;
     let height: number;
     let iconX: number;
@@ -688,10 +729,14 @@ export class FeatureTiles {
    * @return simplified GeoJSON
    * @since 2.0.0
    */
-  simplifyPoints(lineString: any, isPolygon: boolean = false): any | null {
-    let coords = simplify(lineString.coordinates.map(coordinate => {
-      return {x: coordinate[0], y: coordinate[1]};
-    }), this.simplifyToleranceInPixels, false).map(point => [point.x, point.y]);
+  simplifyPoints(lineString: any, isPolygon = false): any | null {
+    const coords = simplify(
+      lineString.coordinates.map(coordinate => {
+        return { x: coordinate[0], y: coordinate[1] };
+      }),
+      this.simplifyToleranceInPixels,
+      false,
+    ).map(point => [point.x, point.y]);
     if (isPolygon) {
       if (coords.length < 4) {
         return null;
@@ -713,13 +758,11 @@ export class FeatureTiles {
    * @param boundingBox
    * @param isPolygon if this was a polygon
    */
-  getPath(
-    lineString: any,
-    context: any,
-    boundingBox: BoundingBox,
-    isPolygon: boolean = false
-  ): void {
-    lineString.coordinates = lineString.coordinates.map(coordinate => [TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]), TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1])]);
+  getPath(lineString: any, context: any, boundingBox: BoundingBox, isPolygon = false): void {
+    lineString.coordinates = lineString.coordinates.map(coordinate => [
+      TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, coordinate[0]),
+      TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, coordinate[1]),
+    ]);
     const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(lineString, isPolygon) : lineString;
     if (simplifiedLineString != null && simplifiedLineString.coordinates.length > 0) {
       context.moveTo(simplifiedLineString.coordinates[0][0], simplifiedLineString.coordinates[0][1]);
@@ -735,12 +778,7 @@ export class FeatureTiles {
    * @param featureStyle
    * @param boundingBox
    */
-  drawLine(
-    geoJson: any,
-    context: any,
-    featureStyle: FeatureStyle,
-    boundingBox: BoundingBox,
-  ): void {
+  drawLine(geoJson: any, context: any, featureStyle: FeatureStyle, boundingBox: BoundingBox): void {
     context.save();
     context.beginPath();
     const paint = this.getLinePaint(featureStyle);
@@ -766,19 +804,19 @@ export class FeatureTiles {
     context: any,
     featureStyle: FeatureStyle,
     boundingBox: BoundingBox,
-    fill: boolean = true
+    fill = true,
   ): void {
     // get paint
     context.save();
     context.beginPath();
     if (!booleanClockwise(externalRing.coordinates)) {
-      externalRing.coordinates = externalRing.coordinates.reverse()
+      externalRing.coordinates = externalRing.coordinates.reverse();
     }
     this.getPath(externalRing, context, boundingBox, true);
     context.closePath();
     for (let i = 0; i < internalRings.length; i++) {
       if (booleanClockwise(internalRings[i].coordinates)) {
-        internalRings[i].coordinates = internalRings[i].coordinates.reverse()
+        internalRings[i].coordinates = internalRings[i].coordinates.reverse();
       }
       this.getPath(internalRings[i], context, boundingBox, true);
       context.closePath();
@@ -818,14 +856,15 @@ export class FeatureTiles {
       if (converted.type === 'Feature') {
         if (converted.geometry.type === 'LineString') {
           this.drawPolygon(converted.geometry, [], context, featureStyle, boundingBox);
-        } else if (converted.geometry.type === 'MultiLineString') { // internal rings
+        } else if (converted.geometry.type === 'MultiLineString') {
+          // internal rings
           // draw internal rings without fill
-          const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[0]};
+          const externalRing = { type: 'LineString', coordinates: converted.geometry.coordinates[0] };
           const internalRings = converted.geometry.coordinates.slice(1).map(coords => {
             return {
               type: 'LineString',
-              coordinates: coords
-            }
+              coordinates: coords,
+            };
           });
           this.drawPolygon(externalRing, internalRings, context, featureStyle, boundingBox);
         }
@@ -834,12 +873,12 @@ export class FeatureTiles {
           if (feature.geometry.type === 'LineString') {
             this.drawPolygon(feature.geometry, [], context, featureStyle, boundingBox);
           } else if (feature.geometry.type === 'MultiLineString') {
-            const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[0]};
+            const externalRing = { type: 'LineString', coordinates: feature.geometry.coordinates[0] };
             const internalRings = feature.geometry.coordinates.slice(1).map(coords => {
               return {
                 type: 'LineString',
-                coordinates: coords
-              }
+                coordinates: coords,
+              };
             });
             this.drawPolygon(externalRing, internalRings, context, featureStyle, boundingBox);
           }
@@ -847,17 +886,27 @@ export class FeatureTiles {
       }
     } else if (geoJson.type === 'MultiPoint') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
-        await this.drawPoint({
-          type: 'Point',
-          coordinates: geoJson.coordinates[i],
-        }, context, boundingBox, featureStyle);
+        await this.drawPoint(
+          {
+            type: 'Point',
+            coordinates: geoJson.coordinates[i],
+          },
+          context,
+          boundingBox,
+          featureStyle,
+        );
       }
     } else if (geoJson.type === 'MultiLineString') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
-        this.drawLine({
-          type: 'LineString',
-          coordinates: geoJson.coordinates[i],
-        }, context, featureStyle, boundingBox);
+        this.drawLine(
+          {
+            type: 'LineString',
+            coordinates: geoJson.coordinates[i],
+          },
+          context,
+          featureStyle,
+          boundingBox,
+        );
       }
     } else if (geoJson.type === 'MultiPolygon') {
       for (i = 0; i < geoJson.coordinates.length; i++) {
@@ -873,68 +922,61 @@ export class FeatureTiles {
       }
     } else if (geoJson.type === 'GeometryCollection') {
       for (i = 0; i < geoJson.geometries.length; i++) {
-        await this.drawGeometry(
-          geoJson.geometries[i],
-          context,
-          boundingBox,
-          featureStyle,
-        );
+        await this.drawGeometry(geoJson.geometries[i], context, boundingBox, featureStyle);
       }
     }
   }
+
   /**
    * Create an expanded bounding box to handle features outside the tile that overlap
-   * @param webMercatorBoundingBox  web mercator bounding box
+   * @param boundingBox bounding box
+   * @param tileProjection projection - only EPSG:3857 and EPSG:4326 are supported
    * @return {BoundingBox} bounding box
    */
-  expandBoundingBox(webMercatorBoundingBox: BoundingBox): BoundingBox {
-    return this.expandWebMercatorBoundingBox(webMercatorBoundingBox, webMercatorBoundingBox);
-  }
-  /**
-   * Create an expanded bounding box to handle features outside the tile that overlap
-   * @param webMercatorBoundingBox web mercator bounding box
-   * @param tileWebMercatorBoundingBox  tile web mercator bounding box
-   * @return {BoundingBox} bounding box
-   */
-  expandWebMercatorBoundingBox(
-    webMercatorBoundingBox: BoundingBox,
-    tileWebMercatorBoundingBox: BoundingBox,
-  ): BoundingBox {
+  expandBoundingBox(boundingBox: BoundingBox, tileProjection: string): BoundingBox {
     // Create an expanded bounding box to handle features outside the tile that overlap
     let minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
       this.tileWidth,
-      webMercatorBoundingBox,
-      tileWebMercatorBoundingBox,
+      boundingBox,
+      boundingBox,
       0 - this.widthOverlap,
     );
     let maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
       this.tileWidth,
-      webMercatorBoundingBox,
-      tileWebMercatorBoundingBox,
+      boundingBox,
+      boundingBox,
       this.tileWidth + this.widthOverlap,
     );
     let maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
       this.tileHeight,
-      webMercatorBoundingBox,
-      tileWebMercatorBoundingBox,
+      boundingBox,
+      boundingBox,
       0 - this.heightOverlap,
     );
     let minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
       this.tileHeight,
-      webMercatorBoundingBox,
-      tileWebMercatorBoundingBox,
+      boundingBox,
+      boundingBox,
       this.tileHeight + this.heightOverlap,
     );
     // Choose the most expanded longitudes and latitudes
-    minLongitude = Math.min(minLongitude, webMercatorBoundingBox.minLongitude);
-    maxLongitude = Math.max(maxLongitude, webMercatorBoundingBox.maxLongitude);
-    minLatitude = Math.min(minLatitude, webMercatorBoundingBox.minLatitude);
-    maxLatitude = Math.max(maxLatitude, webMercatorBoundingBox.maxLatitude);
-    // Bound with the web mercator limits
-    minLongitude = Math.max(minLongitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    minLatitude = Math.max(minLatitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-    maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    minLongitude = Math.min(minLongitude, boundingBox.minLongitude);
+    maxLongitude = Math.max(maxLongitude, boundingBox.maxLongitude);
+    minLatitude = Math.min(minLatitude, boundingBox.minLatitude);
+    maxLatitude = Math.max(maxLatitude, boundingBox.maxLatitude);
+
+    // Bound with limits
+    if (tileProjection === ProjectionConstants.EPSG_3857) {
+      minLongitude = Math.max(minLongitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+      maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+      minLatitude = Math.max(minLatitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+      maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
+    } else {
+      minLongitude = Math.max(minLongitude, -1 * ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH);
+      maxLongitude = Math.min(maxLongitude, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH);
+      minLatitude = Math.max(minLatitude, -1 * ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
+      maxLatitude = Math.min(maxLatitude, ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
+    }
     return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
   }
 }

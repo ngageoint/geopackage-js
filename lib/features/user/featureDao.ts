@@ -126,7 +126,7 @@ export class FeatureDao<T extends FeatureRow> extends UserDao<FeatureRow> {
    * @returns {Number}
    */
   countWebMercatorBoundingBox(boundingBox: BoundingBox): number {
-    return this.featureTableIndex.countWithBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
+    return this.countInBoundingBox(boundingBox, ProjectionConstants.EPSG_3857);
   }
   /**
    * Query for count in bounding box

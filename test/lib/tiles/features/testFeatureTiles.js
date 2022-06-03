@@ -138,6 +138,38 @@ describe('GeoPackage FeatureTiles tests', function() {
       await testSetup.deleteGeoPackage(filename);
     });
 
+    it('should get the 4326 x: 0, y: 0, z: 0 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.draw4326Tile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_0_0_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+
+    it('should get the 4326 x: 1, y: 0, z: 0 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.draw4326Tile(1, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_1_0_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+
     it('should get the x: 0, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
       var ft = new FeatureTiles(featureDao);
@@ -241,6 +273,38 @@ describe('GeoPackage FeatureTiles tests', function() {
           }
         });
       });
+    });
+
+    it('should get the 4326 x: 0, y: 0, z: 0 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.draw4326Tile(0, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_0_0_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
+    });
+
+    it('should get the 4326 x: 1, y: 0, z: 0 tile', function(done) {
+      this.timeout(30000);
+      var ft = new FeatureTiles(featureDao);
+      ft.draw4326Tile(1, 0, 0)
+        .then(function(image) {
+          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_1_0_0.png'), function(err, equal) {
+            try {
+              equal.should.be.equal(true);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+        });
     });
 
     it('should get the x: 1, y: 0, z: 1 tile from the GeoPackage api', function(done) {

@@ -60,7 +60,7 @@ describe('GeoPackage Tile table create tests', function() {
     Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
   });
 
-  describe('GeoPackage tile create tile matrix tests', function(done) {
+  describe('GeoPackage tile create tile matrix tests', function() {
 
     var tileMatrixSet;
     var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
@@ -149,7 +149,96 @@ describe('GeoPackage Tile table create tests', function() {
     });
   });
 
-  describe('delete tile tests', function(done) {
+  describe('GeoPackage WGS84 tile create tile matrix tests', function() {
+    var tileMatrixSet;
+    var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -90, 90);
+
+    beforeEach(function() {
+      var contentsBoundingBox = new BoundingBox(-180, 180, -90, 90);
+      var contentsSrsId = 4326;
+      var tileMatrixSetSrsId = 4326;
+      geopackage.spatialReferenceSystemDao.createWebMercator();
+      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    });
+
+    it('should create the standard WGS84 xyz tile matrix for the zoom levels with default tile size of 256', function(){
+      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
+      let zoom = 3;
+      while (zoom-- > 0) {
+        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        matrix.table_name.should.equal(tableName);
+        matrix.zoom_level.should.equal(zoom);
+        matrix.matrix_width.should.equal(Math.pow(2, zoom + 1));
+        matrix.matrix_height.should.equal(Math.pow(2, zoom));
+        matrix.tile_width.should.equal(256);
+        matrix.tile_height.should.equal(256);
+        const degreesPerTileWidth = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / matrix.matrix_width;
+        const degreesPerTileHeight = (tileMatrixSetBoundingBox.maxLatitude - tileMatrixSetBoundingBox.minLatitude) / matrix.matrix_height;
+        matrix.pixel_x_size.should.equal(degreesPerTileWidth / 256);
+        matrix.pixel_y_size.should.equal(degreesPerTileHeight / 256);
+      }
+    });
+
+    it('should create the standard WGS84 xyz tile matrix for the zoom levels with a custom tile size', function(){
+      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2, 100);
+      let zoom = 3;
+      while (zoom-- > 0) {
+        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const numTiles = Math.pow(2, zoom);
+        matrix.table_name.should.equal(tableName);
+        matrix.zoom_level.should.equal(zoom);
+        matrix.matrix_width.should.equal(Math.pow(2, zoom + 1));
+        matrix.matrix_height.should.equal(Math.pow(2, zoom));
+        matrix.tile_width.should.equal(100);
+        matrix.tile_height.should.equal(100);
+        const degreesPerTileWidth = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / matrix.matrix_width;
+        const degreesPerTileHeight = (tileMatrixSetBoundingBox.maxLatitude - tileMatrixSetBoundingBox.minLatitude) / matrix.matrix_height;
+        matrix.pixel_x_size.should.equal(degreesPerTileWidth / 100);
+        matrix.pixel_y_size.should.equal(degreesPerTileHeight / 100);
+      }
+    });
+
+    it('should add all of the tiles to the WGS84 tile matrix', function() {
+
+      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
+
+      var zooms = [0, 1, 2];
+
+      return zooms.reduce(function(zoomSequence, zoom) {
+        return zoomSequence.then(function() {
+          var xtiles = [];
+          var tileCount = Math.pow(2,zoom) * 2;
+          for (var i = 0; i < tileCount; i++) {
+            xtiles.push(i);
+          }
+          return xtiles.reduce(function(xSequence, x) {
+            return xSequence.then(function() {
+              var ytiles = [];
+              var tileCount = Math.pow(2,zoom);
+              for (var i = 0; i < tileCount; i++) {
+                ytiles.push(i);
+              }
+              return ytiles.reduce(function(ySequence, y) {
+                return ySequence.then(function() {
+                  return new Promise(async function(resolve, reject) {
+                    // @ts-ignore
+                    let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'wgs84Tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
+                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
+                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
+                  });
+                });
+              }, Promise.resolve());
+            });
+          }, Promise.resolve());
+        });
+      }, Promise.resolve());
+    });
+  });
+
+  describe('delete tile tests', function() {
 
     var tileMatrixSet;
     var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
@@ -171,14 +260,14 @@ describe('GeoPackage Tile table create tests', function() {
       return zooms.reduce(function(zoomSequence, zoom) {
         return zoomSequence.then(function() {
           var xtiles = [];
-          var tileCount = Math.pow(2,zoom);
+          var tileCount = Math.pow(2, zoom);
           for (var i = 0; i < tileCount; i++) {
             xtiles.push(i);
           }
           return xtiles.reduce(function(xSequence, x) {
             return xSequence.then(function() {
               var ytiles = [];
-              var tileCount = Math.pow(2,zoom);
+              var tileCount = Math.pow(2, zoom);
               for (var i = 0; i < tileCount; i++) {
                 ytiles.push(i);
               }

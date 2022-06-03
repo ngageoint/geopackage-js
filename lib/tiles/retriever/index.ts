@@ -28,7 +28,10 @@ export class GeoPackageTileRetriever {
   }
   getWebMercatorBoundingBox(): BoundingBox {
     if (this.setWebMercatorBoundingBox == null) {
-      this.setWebMercatorBoundingBox = this.tileDao.tileMatrixSet.boundingBox.projectBoundingBox(this.tileDao.projection, ProjectionConstants.EPSG_3857);
+      this.setWebMercatorBoundingBox = this.tileDao.tileMatrixSet.boundingBox.projectBoundingBox(
+        this.tileDao.projection,
+        ProjectionConstants.EPSG_3857,
+      );
     }
     return this.setWebMercatorBoundingBox;
   }

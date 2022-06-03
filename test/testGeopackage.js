@@ -686,6 +686,43 @@ describe('GeoPackageAPI tests', function() {
       });
     });
 
+    it('should create a standard plate carreé tile table with the default tile size', function() {
+      const tableName = 'tiles_web_mercator';
+      const contentsBounds = new BoundingBox(-180, 180, -90, 90);
+      const contentsSrsId = 4326;
+      const matrixSetBounds = new BoundingBox(-180, 180, -90, 90);
+      const tileMatrixSetSrsId = 4326;
+
+      // @ts-ignore
+      const matrixSet = geopackage.createStandardWGS84TileTable(
+        tableName,
+        contentsBounds,
+        contentsSrsId,
+        matrixSetBounds,
+        tileMatrixSetSrsId,
+        0,
+        3,
+      );
+      matrixSet.table_name.should.equal(tableName);
+      matrixSet.srs_id.should.equal(4326);
+      matrixSet.min_x.should.equal(matrixSetBounds.minLongitude);
+      matrixSet.max_x.should.equal(matrixSetBounds.maxLongitude);
+      matrixSet.min_y.should.equal(matrixSetBounds.minLatitude);
+      matrixSet.max_y.should.equal(matrixSetBounds.maxLatitude);
+
+      const dbMatrixSet = geopackage.tileMatrixSetDao.queryForId(tableName);
+      dbMatrixSet.should.deep.equal(matrixSet);
+
+      const matrixDao = geopackage.tileMatrixDao;
+      const matrices = matrixDao.queryForAll();
+
+      matrices.length.should.equal(4);
+      matrices.forEach(matrix => {
+        matrix.tile_width.should.equal(256);
+        matrix.tile_height.should.equal(256);
+      });
+    });
+
     it('should create a standard web mercator tile table with a custom tile size', function() {
       const tableName = 'custom_tile_size';
       const contentsBounds = new BoundingBox(-31644.9297, 6697565.2924, 4127.5995, 6723706.7561);

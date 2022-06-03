@@ -1,4 +1,5 @@
 import proj4 from 'proj4';
+import isEqual from 'lodash/isEqual';
 import { ProjectionConstants } from './projectionConstants';
 
 export class Projection {
@@ -11,7 +12,7 @@ export class Projection {
     }
   }
 
-  static loadProjections(items: {name: string, definition: string | proj4.ProjectionDefinition}[]): void {
+  static loadProjections(items: { name: string; definition: string | proj4.ProjectionDefinition }[]): void {
     if (!items) throw new Error('Invalid array of projections');
     for (let i = 0; i < items.length; i++) {
       if (!items[i] || !items[i].name || !items[i].definition) {
@@ -37,10 +38,10 @@ export class Projection {
    */
   static getConverter(from: string, to?: string): proj4.Converter {
     if (from != null && proj4(from) == null) {
-      throw new Error('Projection ' + from + ' has not been defined.')
+      throw new Error('Projection ' + from + ' has not been defined.');
     }
     if (to != null && proj4(to) == null) {
-      throw new Error('Projection ' + to + ' has not been defined.')
+      throw new Error('Projection ' + to + ' has not been defined.');
     }
     return proj4(from, to);
   }
@@ -54,10 +55,10 @@ export class Projection {
    */
   static convertCoordinates(from: string, to: string, coordinates: any): proj4.Converter {
     if (from != null && proj4(from) == null) {
-      throw new Error('Projection ' + from + ' has not been defined.')
+      throw new Error('Projection ' + from + ' has not been defined.');
     }
     if (to != null && proj4(to) == null) {
-      throw new Error('Projection ' + to + ' has not been defined.')
+      throw new Error('Projection ' + to + ' has not been defined.');
     }
     return proj4(from, to, coordinates);
   }
@@ -68,5 +69,25 @@ export class Projection {
 
   static getWebMercatorToWGS84Converter(): proj4.Converter {
     return proj4(ProjectionConstants.EPSG_3857);
+  }
+
+  static isWebMercator(proj: string | proj4.Converter): boolean {
+    if (typeof proj === 'string') {
+      return proj.toUpperCase() === ProjectionConstants.EPSG_3857;
+    } else {
+      return this.convertersMatch(this.getEPSGConverter(ProjectionConstants.EPSG_CODE_3857), proj);
+    }
+  }
+
+  static isWGS84(proj: string | proj4.Converter): boolean {
+    if (typeof proj === 'string') {
+      return proj.toUpperCase() === ProjectionConstants.EPSG_4326;
+    } else {
+      return this.convertersMatch(this.getEPSGConverter(ProjectionConstants.EPSG_CODE_4326), proj);
+    }
+  }
+
+  static convertersMatch(converterA: any, converterB: any): boolean {
+    return isEqual(converterA.oProj, converterB.oProj);
   }
 }

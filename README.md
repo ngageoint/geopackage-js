@@ -38,6 +38,11 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 4.2.0
+
+- Support for drawing vector data into EPSG:4326 tiles
+- Added createStandardWGS84TileTable
+
 ##### 4.1.0
 
 - Typescript updates

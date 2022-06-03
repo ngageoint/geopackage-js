@@ -61,5 +61,6 @@ tmp
 bundle
 test/bundle
 test/sql-wasm.wasm
+docs/coverage
 
 .idea
