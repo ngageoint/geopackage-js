@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Projection | @ngageoint/geopackage - v4.1.0</title>
+	<title>Projection | @ngageoint/geopackage - v4.2.0</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">@ngageoint/geopackage - v4.1.0</a>
+					<a href="../index.html" class="title">@ngageoint/geopackage - v4.2.0</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -82,11 +82,14 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#convertcoordinates" class="tsd-kind-icon">convert<wbr>Coordinates</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#convertersmatch" class="tsd-kind-icon">converters<wbr>Match</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#getconverter" class="tsd-kind-icon">get<wbr>Converter</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#getepsgconverter" class="tsd-kind-icon">getEPSGConverter</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#getwebmercatortowgs84converter" class="tsd-kind-icon">get<wbr>Web<wbr>Mercator<wbr>ToWGS84<wbr>Converter</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#hasprojection" class="tsd-kind-icon">has<wbr>Projection</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#isconverter" class="tsd-kind-icon">is<wbr>Converter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#iswgs84" class="tsd-kind-icon">isWGS84</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#iswebmercator" class="tsd-kind-icon">is<wbr>Web<wbr>Mercator</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#loadprojection" class="tsd-kind-icon">load<wbr>Projection</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="projection.html#loadprojections" class="tsd-kind-icon">load<wbr>Projections</a></li>
 							</ul>
@@ -106,7 +109,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L55">lib/projection/projection.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L56">lib/projection/projection.ts:56</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -141,6 +144,32 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="convertersmatch" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> converters<wbr>Match</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">converters<wbr>Match<span class="tsd-signature-symbol">(</span>converterA<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, converterB<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L90">lib/projection/projection.ts:90</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>converterA: <span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li>
+									<h5>converterB: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
 					<a name="getconverter" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Converter</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
@@ -150,7 +179,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L38">lib/projection/projection.ts:38</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L39">lib/projection/projection.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -188,7 +217,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L65">lib/projection/projection.ts:65</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L66">lib/projection/projection.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -211,7 +240,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L69">lib/projection/projection.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L70">lib/projection/projection.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Converter</span></h4>
@@ -228,7 +257,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L28">lib/projection/projection.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L29">lib/projection/projection.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -251,7 +280,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L24">lib/projection/projection.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L25">lib/projection/projection.ts:25</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -265,6 +294,52 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="iswgs84" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> isWGS84</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">isWGS84<span class="tsd-signature-symbol">(</span>proj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Converter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L82">lib/projection/projection.ts:82</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>proj: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Converter</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+					<a name="iswebmercator" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> is<wbr>Web<wbr>Mercator</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Web<wbr>Mercator<span class="tsd-signature-symbol">(</span>proj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Converter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L74">lib/projection/projection.ts:74</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>proj: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Converter</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
 					<a name="loadprojection" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> load<wbr>Projection</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
@@ -274,7 +349,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L5">lib/projection/projection.ts:5</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L6">lib/projection/projection.ts:6</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -300,7 +375,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/67e67c78/lib/projection/projection.ts#L14">lib/projection/projection.ts:14</a></li>
+									<li>Defined in <a href="https://github.com/ngageoint/geopackage-js/blob/77198749/lib/projection/projection.ts#L15">lib/projection/projection.ts:15</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -334,6 +409,9 @@
 								<a href="projection.html#convertcoordinates" class="tsd-kind-icon">convert<wbr>Coordinates</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="projection.html#convertersmatch" class="tsd-kind-icon">converters<wbr>Match</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
 								<a href="projection.html#getconverter" class="tsd-kind-icon">get<wbr>Converter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
@@ -347,6 +425,12 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
 								<a href="projection.html#isconverter" class="tsd-kind-icon">is<wbr>Converter</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="projection.html#iswgs84" class="tsd-kind-icon">isWGS84</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
+								<a href="projection.html#iswebmercator" class="tsd-kind-icon">is<wbr>Web<wbr>Mercator</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
 								<a href="projection.html#loadprojection" class="tsd-kind-icon">load<wbr>Projection</a>
