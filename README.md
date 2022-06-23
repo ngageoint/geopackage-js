@@ -38,6 +38,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 4.2.1
+
+- Fix for drawing geometries outside of the 3857 bounds
+
 ##### 4.2.0
 
 - Support for drawing vector data into EPSG:4326 tiles

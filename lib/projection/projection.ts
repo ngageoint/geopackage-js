@@ -90,4 +90,8 @@ export class Projection {
   static convertersMatch(converterA: any, converterB: any): boolean {
     return isEqual(converterA.oProj, converterB.oProj);
   }
+
+  static getConverterFromConverters(from: any, to?: any): proj4.Converter {
+    return proj4(from, to);
+  }
 }

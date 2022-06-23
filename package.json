@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -41,8 +41,8 @@
     "file-type": "12.4.0",
     "image-size": "0.8.3",
     "lodash": "4.17.21",
-    "proj4": "2.7.2",
     "reproject": "1.2.5",
+    "proj4": "2.8.0",
     "rtree-sql.js": "1.7.0",
     "simplify-js": "1.2.4",
     "webworkify": "1.5.0",
