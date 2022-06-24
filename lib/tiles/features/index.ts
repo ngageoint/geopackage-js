@@ -754,24 +754,13 @@ export class FeatureTiles {
    * @since 2.0.0
    */
   simplifyPoints(lineString: any, isPolygon = false): any | null {
-    const coords = simplify(
+    lineString.coordinates = simplify(
       lineString.coordinates.map(coordinate => {
         return { x: coordinate[0], y: coordinate[1] };
       }),
       this.simplifyToleranceInPixels,
       false,
     ).map(point => [point.x, point.y]);
-    if (isPolygon) {
-      if (coords.length < 4) {
-        return null;
-      } else if (coords[0][0] !== coords[coords.length - 1][0] || coords[0][1] !== coords[coords.length - 1][1]) {
-        // if first and last point do not match, add first point to end
-        coords.push(coords[0].slice());
-      }
-    } else if (coords.length < 2) {
-      return null;
-    }
-    lineString.coordinates = coords;
     return lineString;
   }
 
@@ -792,7 +781,7 @@ export class FeatureTiles {
       ];
     });
     const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(lineString, isPolygon) : lineString;
-    if (simplifiedLineString.coordinates.length > 0) {
+    if (simplifiedLineString.coordinates.length > 1) {
       context.moveTo(simplifiedLineString.coordinates[0][0], simplifiedLineString.coordinates[0][1]);
       for (let i = 1; i < simplifiedLineString.coordinates.length; i++) {
         context.lineTo(simplifiedLineString.coordinates[i][0], simplifiedLineString.coordinates[i][1]);
