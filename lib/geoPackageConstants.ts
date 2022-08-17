@@ -4,22 +4,71 @@
  */
 
 export class GeoPackageConstants {
-  /** @constant {string} GEOPACKAGE_EXTENSION Extension to GeoPackage files */
-  public static readonly GEOPACKAGE_EXTENSION: string = 'gpkg';
-  /** @constant {string} GEOPACKAGE_EXTENDED_EXTENSION Extension to GeoPackage extension files */
-  public static readonly GEOPACKAGE_EXTENDED_EXTENSION: string = 'gpkx';
-  /** @constant {string} APPLICATION_ID GeoPackage application id */
-  public static readonly APPLICATION_ID: string = 'GPKG';
-  /** @constant {string} USER_VERSION GeoPackage user version */
-  public static readonly USER_VERSION: string = '10200';
-  /** @constant {string} GEOPACKAGE_EXTENSION_AUTHOR GeoPackage author */
-  public static readonly GEOPACKAGE_EXTENSION_AUTHOR: string = GeoPackageConstants.GEOPACKAGE_EXTENSION;
-  /** @constant {string} GEOMETRY_EXTENSION_PREFIX Geometry extension prefix */
-  public static readonly GEOMETRY_EXTENSION_PREFIX: string = 'geom';
-  /** @constant {string} GEOPACKAGE_GEOMETRY_MAGIC_NUMBER Expected magic number */
-  public static readonly GEOPACKAGE_GEOMETRY_MAGIC_NUMBER: string = 'GP';
-  /** @constant {string} GEOPACKAGE_GEOMETRY_VERSION_1 Expected version 1 value */
-  public static readonly GEOPACKAGE_GEOMETRY_VERSION_1: number = 0;
-  /** @constant {string} SQLITE_HEADER_PREFIX SQLite header string prefix */
-  public static readonly SQLITE_HEADER_PREFIX: string = 'SQLite format 3';
+  /**
+   * Extension to GeoPackage files
+   */
+  public static readonly EXTENSION = 'gpkg';
+
+  /**
+   * Extension to GeoPackage extension files
+   *
+   * @deprecated in GeoPackage version 1.2
+   */
+  public static readonly EXTENDED_EXTENSION = 'gpkx';
+
+  /**
+   * GeoPackage Media Type (MIME type)
+   *
+   * @since 3.5.0
+   */
+  public static readonly MEDIA_TYPE = 'application/geopackage+sqlite3';
+
+  /**
+   * GeoPackage application id
+   */
+  public static readonly APPLICATION_ID = 'GPKG';
+
+  /**
+   * GeoPackage user version
+   *
+   * @since 1.2.1
+   */
+  public static readonly USER_VERSION = 10200;
+
+  /**
+   * Expected magic number
+   */
+  public static readonly GEOMETRY_MAGIC_NUMBER = 'GP';
+
+  /**
+   * Expected version 1 value
+   */
+  public static readonly GEOMETRY_VERSION_1 = 0;
+
+  /**
+   * SQLite header string prefix
+   */
+  public static readonly SQLITE_HEADER_PREFIX = 'SQLite format 3';
+
+  /**
+   * SQLite default application id
+   *
+   * @since 4.0.0
+   */
+  public static readonly SQLITE_APPLICATION_ID = 'SQLite';
+
+  /**
+   * GeoPackage author
+   */
+  public static readonly EXTENSION_AUTHOR = GeoPackageConstants.EXTENSION;
+
+  /**
+   * Geometry extension prefix
+   */
+  public static readonly GEOMETRY_EXTENSION_PREFIX = 'geom';
+
+  /**
+   * Optional undefined Spatial Reference System definition value
+   */
+  public static readonly UNDEFINED_DEFINITION = 'undefined';
 }

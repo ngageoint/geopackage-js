@@ -1,6 +1,6 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RTreeIndex} from '../../../../lib/extension/rtree/rtreeIndex'
-import {FeatureTableIndex} from '../../../../lib/extension/index/featureTableIndex'
+import {RTreeIndex} from '../../../../lib/extension/rtree/rtreeIndexExtension'
+import {FeatureTableIndex} from '../../../../lib/extension/nga/index/featureTableIndex'
 import {RTreeIndexDao} from '../../../../lib/extension/rtree/rtreeIndexDao'
 
 var BoundingBox = require('../../../../lib/boundingBox').BoundingBox

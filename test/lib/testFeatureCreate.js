@@ -1,17 +1,17 @@
 import { default as testSetup } from '../fixtures/testSetup'
 
 var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
-  , DataColumns = require('../../lib/dataColumns/dataColumns').DataColumns
-  , DataColumnsDao = require('../../lib/dataColumns/dataColumnsDao').DataColumnsDao
+  , DataColumns = require('../../lib/extension/schema/columns/dataColumns').DataColumns
+  , DataColumnsDao = require('../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
   , Verification = require('../fixtures/verification')
   , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , GeoPackageDataType = require('../../lib/db/geoPackageDataType').GeoPackageDataType
-  , GeometryData = require('../../lib/geom/geometryData').GeometryData
+  , GeometryData = require('../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , ConstraintType = require('../../lib/db/table/constraintType').ConstraintType
   , UserColumn = require('../../lib/user/userColumn').UserColumn
-  , GeometryType = require('../../lib/features/user/geometryType').GeometryType
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
   , should = require('chai').should()
   , wkx = require('wkx');

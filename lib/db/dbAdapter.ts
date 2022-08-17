@@ -11,9 +11,9 @@ export interface DBAdapter {
   getDBConnection(): any;
   export(): Promise<any>;
   registerFunction(name: string, functionDefinition: Function): this;
-  get(sql: string, params?: [] | Record<string, any>): any;
+  get(sql: string, params?: [] | Record<string, any>): Record<string, any>;
   isTableExists(tableName: string): boolean;
-  all(sql: string, params?: [] | Record<string, any> | null): any[];
+  all(sql: string, params?: [] | Record<string, any> | null): Record<string, any>[];
   each(sql: string, params?: [] | Record<string, any>): IterableIterator<any>;
   run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number };
   insert(sql: string, params?: [] | Record<string, any>): number;
@@ -24,4 +24,6 @@ export interface DBAdapter {
   dropTable(table: string): boolean;
   count(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number;
   transaction(func: Function): void;
+  size(): number;
+  readableSize(): string;
 }

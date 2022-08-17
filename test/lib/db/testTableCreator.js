@@ -1,11 +1,11 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var TileTable = require('../../../lib/tiles/user/tileTable').TileTable
-  , TableCreator = require('../../../lib/db/tableCreator').TableCreator
+  , TableCreator = require('../../../lib/db/tableCreator').GeoPackageTableCreator
   , SetupFeatureTable = require('../../fixtures/setupFeatureTable.js')
   , Verification = require('../../fixtures/verification')
   , should = require('chai').should()
-  , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , path = require('path');
 
 describe('TableCreator tests', function() {

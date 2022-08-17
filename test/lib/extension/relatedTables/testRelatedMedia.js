@@ -1,10 +1,10 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import {RelatedTablesExtension} from '../../../../lib/extension/related'
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
+  , ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
+  , UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
+  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , path = require('path');

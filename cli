@@ -6,7 +6,7 @@ var chalk = require('chalk');
 var path = require('path');
 
 var geopackage = require('./dist/index')
-  , GeoPackageAPI = geopackage.GeoPackageAPI
+  , GeoPackageManager = geopackage.GeoPackageManager
   , setCanvasKitWasmLocateFile = geopackage.setCanvasKitWasmLocateFile;
 
 setCanvasKitWasmLocateFile(file => path.join(__dirname, 'dist', 'canvaskit', file));
@@ -27,7 +27,7 @@ var fileQuestion = {
         if (err || !stats || !stats.isFile()) {
           reject('File does not exist.');
         } else {
-          GeoPackageAPI.open(input).then(geopackage => {
+          GeoPackageManager.open(input).then(geopackage => {
             gp = geopackage;
             tables = {
               tileTables: gp.getTileTables(),
@@ -35,6 +35,7 @@ var fileQuestion = {
             };
             resolve(true);
           }).catch((e) => {
+            console.error(e);
             reject(e);
           });
         }

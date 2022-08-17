@@ -2,12 +2,12 @@ export interface CanvasAdapter {
   /**
    * Initializes the adapter for use.
    */
-  initialize(): Promise<void>
+  initialize(): Promise<void>;
 
   /**
    * Returns if the Adapter has been initialized.
    */
-  isInitialized(): boolean
+  isInitialized(): boolean;
 
   /**
    * Creates a canvas object
@@ -21,14 +21,17 @@ export interface CanvasAdapter {
    * @param data
    * @param contentType
    */
-  createImage(data: any, contentType: string): Promise<{image: any, width: number, height: number}>;
+  createImage(data: any, contentType: string): Promise<{ image: any; width: number; height: number }>;
 
   /**
    * Scales an image created using this adapter.
    * @param image
    * @param scale
    */
-  scaleImage(image: {image: any, width: number, height: number}, scale: number): Promise<{image: any, width: number, height: number}>;
+  scaleImage(
+    image: { image: any; width: number; height: number },
+    scale: number,
+  ): Promise<{ image: any; width: number; height: number }>;
 
   /**
    * Scales an image created using this adapter.
@@ -36,7 +39,11 @@ export interface CanvasAdapter {
    * @param scaledWidth
    * @param scaledHeight
    */
-  scaleImageToDimensions(image: {image: any, width: number, height: number}, scaledWidth: number, scaledHeight: number): Promise<{image: any, width: number, height: number}>;
+  scaleImageToDimensions(
+    image: { image: any; width: number; height: number },
+    scaledWidth: number,
+    scaledHeight: number,
+  ): Promise<{ image: any; width: number; height: number }>;
 
   /**
    * Creates an ImageData object
@@ -82,5 +89,5 @@ export interface CanvasAdapter {
    * Performs any cleanup needed for the specified image
    * @param image
    */
-  disposeImage(image: {image: any, width: number, height: number}): void;
+  disposeImage(image: { image: any; width: number; height: number }): void;
 }

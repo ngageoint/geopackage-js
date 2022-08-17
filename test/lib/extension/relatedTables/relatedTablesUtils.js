@@ -1,8 +1,8 @@
 var GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , UserColumn = require('../../../../lib/user/userColumn').UserColumn
-  , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
-  , DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
+  , DublinCoreType = require('../../../../lib/extension/related/dublin/dublinCoreType').DublinCoreType
+  , DublinCoreMetadata = require('../../../../lib/extension/related/dublin/dublinCoreMetadata').DublinCoreMetadata
+  , SimpleAttributesTable = require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable
   , should = require('chai').should();
 
 module.exports.createAdditionalUserColumns = function(startingIndex, notNull) {

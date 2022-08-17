@@ -1,6 +1,6 @@
-import { GeoPackageDataType } from './geoPackageDataType'
-import isNil from 'lodash/isNil'
-import isEqual from 'lodash/isEqual'
+import { GeoPackageDataType } from './geoPackageDataType';
+import isNil from 'lodash/isNil';
+import isEqual from 'lodash/isEqual';
 
 /**
  * Mapped column, to a column and potentially from a differently named column
@@ -9,37 +9,37 @@ export class MappedColumn {
   /**
    * To column
    */
-  _toColumn: string
+  _toColumn: string;
 
   /**
    * From column or null if the same as to column
    */
-  _fromColumn: string
+  _fromColumn: string;
 
   /**
    * Default to column value
    */
-  _defaultValue: any
+  _defaultValue: any;
 
   /**
    * Column data type
    */
-  _dataType: GeoPackageDataType
+  _dataType: GeoPackageDataType;
 
   /**
    * Constant value
    */
-  _constantValue: any
+  _constantValue: any;
 
   /**
    * Where value
    */
-  _whereValue: any
+  _whereValue: any;
 
   /**
    * Where value comparison operator (=, <, etc)
    */
-  _whereOperator: string
+  _whereOperator: string;
 
   /**
    * Constructor
@@ -49,11 +49,11 @@ export class MappedColumn {
    * @param defaultValue default value
    * @param dataType data type
    */
-  constructor (toColumn: string, fromColumn: string, defaultValue: any, dataType: GeoPackageDataType) {
-    this._toColumn = toColumn
-    this._fromColumn = fromColumn
-    this._defaultValue = defaultValue
-    this._dataType = dataType
+  constructor(toColumn: string, fromColumn: string, defaultValue: any, dataType: GeoPackageDataType) {
+    this._toColumn = toColumn;
+    this._fromColumn = fromColumn;
+    this._defaultValue = defaultValue;
+    this._dataType = dataType;
   }
 
   /**
@@ -61,7 +61,7 @@ export class MappedColumn {
    * @return to column
    */
   get toColumn(): string {
-    return this._toColumn
+    return this._toColumn;
   }
 
   /**
@@ -69,7 +69,7 @@ export class MappedColumn {
    * @param toColumn to column
    */
   set toColumn(toColumn: string) {
-    this._toColumn = toColumn
+    this._toColumn = toColumn;
   }
 
   /**
@@ -78,7 +78,7 @@ export class MappedColumn {
    * @return true if the to and from column names are different
    */
   hasNewName(): boolean {
-    return !isNil(this._fromColumn) && !isEqual(this._fromColumn, this._toColumn)
+    return !isNil(this._fromColumn) && !isEqual(this._fromColumn, this._toColumn);
   }
 
   /**
@@ -86,7 +86,7 @@ export class MappedColumn {
    * @return from column
    */
   get fromColumn(): string {
-    return this._fromColumn
+    return this._fromColumn;
   }
 
   /**
@@ -94,7 +94,7 @@ export class MappedColumn {
    * @param fromColumn to column
    */
   set fromColumn(fromColumn: string) {
-    this._fromColumn = fromColumn
+    this._fromColumn = fromColumn;
   }
 
   /**
@@ -102,7 +102,7 @@ export class MappedColumn {
    * @return true if has a default value
    */
   hasDefaultValue(): boolean {
-    return !isNil(this._defaultValue)
+    return !isNil(this._defaultValue);
   }
 
   /**
@@ -110,7 +110,7 @@ export class MappedColumn {
    * @return default value
    */
   get defaultValue(): any {
-    return this._defaultValue
+    return this._defaultValue;
   }
 
   /**
@@ -118,7 +118,7 @@ export class MappedColumn {
    * @return default value as string
    */
   getDefaultValueAsString(): string {
-    return GeoPackageDataType.columnDefaultValue(this._defaultValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._defaultValue, this._dataType);
   }
 
   /**
@@ -126,7 +126,7 @@ export class MappedColumn {
    * @param defaultValue default value
    */
   set defaultValue(defaultValue: any) {
-    this._defaultValue = defaultValue
+    this._defaultValue = defaultValue;
   }
 
   /**
@@ -134,7 +134,7 @@ export class MappedColumn {
    * @return data type
    */
   get dataType(): GeoPackageDataType {
-    return this._dataType
+    return this._dataType;
   }
 
   /**
@@ -142,7 +142,7 @@ export class MappedColumn {
    * @param dataType data type
    */
   set dataType(dataType: GeoPackageDataType) {
-    this._dataType = dataType
+    this._dataType = dataType;
   }
 
   /**
@@ -150,7 +150,7 @@ export class MappedColumn {
    * @return true if has a constant value
    */
   hasConstantValue(): boolean {
-    return !isNil(this._constantValue)
+    return !isNil(this._constantValue);
   }
 
   /**
@@ -158,7 +158,7 @@ export class MappedColumn {
    * @return constant value
    */
   get constantValue(): any {
-    return this._constantValue
+    return this._constantValue;
   }
 
   /**
@@ -166,7 +166,7 @@ export class MappedColumn {
    * @return constant value as string
    */
   getConstantValueAsString(): string {
-    return GeoPackageDataType.columnDefaultValue(this._constantValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._constantValue, this._dataType);
   }
 
   /**
@@ -174,7 +174,7 @@ export class MappedColumn {
    * @param constantValue constant value
    */
   set constantValue(constantValue: any) {
-    this._constantValue = constantValue
+    this._constantValue = constantValue;
   }
 
   /**
@@ -182,7 +182,7 @@ export class MappedColumn {
    * @return true if has a where value
    */
   hasWhereValue(): boolean {
-    return !isNil(this._whereValue)
+    return !isNil(this._whereValue);
   }
 
   /**
@@ -190,7 +190,7 @@ export class MappedColumn {
    * @return where value
    */
   get whereValue(): any {
-    return this._whereValue
+    return this._whereValue;
   }
 
   /**
@@ -198,7 +198,7 @@ export class MappedColumn {
    * @return where value as string
    */
   getWhereValueAsString(): string {
-    return GeoPackageDataType.columnDefaultValue(this._whereValue, this._dataType)
+    return GeoPackageDataType.columnDefaultValue(this._whereValue, this._dataType);
   }
 
   /**
@@ -206,7 +206,7 @@ export class MappedColumn {
    * @param whereValue where value
    */
   set whereValue(whereValue: any) {
-    this._whereValue = whereValue
+    this._whereValue = whereValue;
   }
 
   /**
@@ -215,8 +215,8 @@ export class MappedColumn {
    * @param whereOperator where operator
    */
   setWhereValueAndOperator(whereValue: any, whereOperator: string) {
-    this._whereValue = whereValue
-    this.whereOperator = whereOperator
+    this._whereValue = whereValue;
+    this.whereOperator = whereOperator;
   }
 
   /**
@@ -224,7 +224,7 @@ export class MappedColumn {
    * @return where operator
    */
   get whereOperator(): string {
-    return !isNil(this._whereOperator) ? this._whereOperator : '='
+    return !isNil(this._whereOperator) ? this._whereOperator : '=';
   }
 
   /**
@@ -232,6 +232,6 @@ export class MappedColumn {
    * @param whereOperator where operator
    */
   set whereOperator(whereOperator: string) {
-    this._whereOperator = whereOperator
+    this._whereOperator = whereOperator;
   }
 }

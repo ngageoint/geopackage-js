@@ -1,7 +1,7 @@
 import { default as testSetup } from './testSetup'
 
 // @ts-nocheck
-var GeoPackageAPI = require('../../').GeoPackageAPI;
+var GeoPackageManager = require('../../index').GeoPackageManager;
 var isNode = typeof(process) !== 'undefined' && process.version;
 
 var should = require('chai').should();
@@ -32,7 +32,7 @@ global.mochaAsync = module.exports.mochaAsync = (fn) => {
 };
 
 global.openGeoPackage = async (path) => {
-  let geopackage = await GeoPackageAPI.open(path);
+  let geopackage = await GeoPackageManager.open(path);
   should.exist(geopackage);
   should.exist(geopackage.database.getDBConnection());
   geopackage.path.should.be.equal(path);

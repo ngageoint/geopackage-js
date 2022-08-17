@@ -1,8 +1,8 @@
 export class CanvasUtils {
-  static base64toUInt8Array(data) {
+  static base64toUInt8Array(data): Uint8Array {
     const bytes = Buffer.from(data, 'base64').toString('binary');
     let length = bytes.length;
-    let out = new Uint8Array(length);
+    const out = new Uint8Array(length);
 
     // Loop and convert.
     while (length--) {
@@ -10,5 +10,5 @@ export class CanvasUtils {
     }
 
     return out;
-  };
+  }
 }

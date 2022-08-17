@@ -1,17 +1,19 @@
-import { Dao } from '../../dao/dao';
-import { GeoPackage } from '../../geoPackage';
-
 import { TileMatrixSet } from './tileMatrixSet';
-import { Contents } from '../../core/contents/contents';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { Contents } from '../../contents/contents';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { DBValue } from '../../db/dbAdapter';
+import { GeoPackageDao } from '../../db/geoPackageDao';
+import { GeoPackageConnection } from '../../db/geoPackageConnection';
+import { SpatialReferenceSystemDao } from "../../srs/spatialReferenceSystemDao";
+import { Projection } from "@ngageoint/projections-js";
+import { ContentsDao } from "../../contents/contentsDao";
 
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixSetDao
  * @extends Dao
  */
-export class TileMatrixSetDao extends Dao<TileMatrixSet> {
+export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
   public static readonly TABLE_NAME: string = 'gpkg_tile_matrix_set';
   public static readonly COLUMN_PK: string = 'table_name';
   public static readonly COLUMN_TABLE_NAME: string = 'table_name';
@@ -34,14 +36,22 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
 
   columnToPropertyMap: { [key: string]: string } = {};
 
-  constructor(geoPackage: GeoPackage) {
-    super(geoPackage);
+  constructor(geoPackageConnection: GeoPackageConnection) {
+    super(geoPackageConnection, TileMatrixSet.TABLE_NAME);
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_TABLE_NAME] = TileMatrixSet.TABLE_NAME;
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_SRS_ID] = TileMatrixSet.SRS_ID;
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_X] = TileMatrixSet.MIN_X;
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MIN_Y] = TileMatrixSet.MIN_Y;
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_X] = TileMatrixSet.MAX_X;
     this.columnToPropertyMap[TileMatrixSetDao.COLUMN_MAX_Y] = TileMatrixSet.MAX_Y;
+  }
+
+  public static createDao(geoPackageConnection: GeoPackageConnection): TileMatrixSetDao {
+    return new TileMatrixSetDao(geoPackageConnection);
+  }
+
+  queryForIdWithKey(key: string): TileMatrixSet {
+    return this.queryForId(key);
   }
 
   createObject(results?: Record<string, DBValue>): TileMatrixSet {
@@ -62,29 +72,30 @@ export class TileMatrixSetDao extends Dao<TileMatrixSet> {
    */
   getTileTables(): string[] {
     const tableNames = [];
-    for (const result of this.connection.each(
+    for (const result of this.db.each(
       'select ' + TileMatrixSetDao.COLUMN_TABLE_NAME + ' from ' + TileMatrixSetDao.TABLE_NAME,
     )) {
       tableNames.push(result[TileMatrixSetDao.COLUMN_TABLE_NAME]);
     }
     return tableNames;
   }
-  getProjection(tileMatrixSet: TileMatrixSet): proj4.Converter {
+
+  getProjection(tileMatrixSet: TileMatrixSet): Projection {
     const srs = this.getSrs(tileMatrixSet);
     if (!srs) return;
-    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
+    return SpatialReferenceSystemDao.createDao(this.db).getProjection(srs);
   }
   /**
    * Get the Spatial Reference System of the Tile Matrix set
    * @param  {TileMatrixSet}   tileMatrixSet tile matrix set
    */
   getSrs(tileMatrixSet: TileMatrixSet): SpatialReferenceSystem {
-    return this.geoPackage.spatialReferenceSystemDao.queryForId(tileMatrixSet.srs_id);
+    return SpatialReferenceSystemDao.createDao(this.db).queryForId(tileMatrixSet.srs_id);
   }
   /**
    * @param {TileMatrixSet} tileMatrixSet
    */
   getContents(tileMatrixSet: TileMatrixSet): Contents {
-    return this.geoPackage.contentsDao.queryForId(tileMatrixSet.table_name);
+    return ContentsDao.createDao(this.db).queryForId(tileMatrixSet.table_name);
   }
 }

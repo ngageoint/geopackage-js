@@ -12,6 +12,7 @@ export class ConstraintParser {
   /**
    * Constraint name pattern
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   static NAME_PATTERN = (s: string) => s.match(/CONSTRAINT\s+("[\s\S]+"|\S+)\s/i);
 
   /**
@@ -61,19 +62,19 @@ export class ConstraintParser {
       let sqlStart = 0;
 
       for (let i = 0; i < definitions.length; i++) {
-        let character = definitions.charAt(i);
+        const character = definitions.charAt(i);
         if (character === '(') {
           openParentheses++;
         } else if (character === ')') {
           openParentheses--;
         } else if (character === ',' && openParentheses === 0) {
-          let constraintSql = definitions.substring(sqlStart, i);
+          const constraintSql = definitions.substring(sqlStart, i);
           ConstraintParser.addConstraints(constraints, constraintSql);
           sqlStart = i + 1;
         }
       }
       if (sqlStart < definitions.length) {
-        let constraintSql = definitions.substring(sqlStart, definitions.length);
+        const constraintSql = definitions.substring(sqlStart, definitions.length);
         ConstraintParser.addConstraints(constraints, constraintSql);
       }
     }
@@ -86,7 +87,7 @@ export class ConstraintParser {
    * @param constraints constraints to add to
    * @param constraintSql constraint SQL statement
    */
-  static addConstraints(constraints: TableConstraints, constraintSql: string) {
+  static addConstraints(constraints: TableConstraints, constraintSql: string): void {
     const constraint = ConstraintParser.getTableConstraint(constraintSql);
     if (constraint !== null && constraint !== undefined) {
       constraints.addTableConstraint(constraint);
@@ -135,7 +136,9 @@ export class ConstraintParser {
       }
     }
     if (constraintType !== null && constraintType !== undefined) {
-      constraints.addConstraint(ConstraintParser.createConstraint(parts, constraintIndex, parts.length, constraintType));
+      constraints.addConstraint(
+        ConstraintParser.createConstraint(parts, constraintIndex, parts.length, constraintType),
+      );
     }
     return constraints;
   }
@@ -175,7 +178,6 @@ export class ConstraintParser {
       let type;
       if (table) {
         type = ConstraintType.getTableType(prefix);
-
       } else {
         type = ConstraintType.getColumnType(prefix);
       }
@@ -211,7 +213,7 @@ export class ConstraintParser {
    */
   static getTableType(constraintSql: string): ConstraintType {
     let type = null;
-    let constraint = ConstraintParser.getTableConstraint(constraintSql);
+    const constraint = ConstraintParser.getTableConstraint(constraintSql);
     if (constraint != null) {
       type = constraint.type;
     }
@@ -338,7 +340,7 @@ export class ConstraintParser {
    */
   static getName(constraintSql: string): string {
     let name = null;
-    let matches = ConstraintParser.NAME_PATTERN(constraintSql);
+    const matches = ConstraintParser.NAME_PATTERN(constraintSql);
     if (matches !== null && matches.length > ConstraintParser.NAME_PATTERN_NAME_GROUP) {
       name = StringUtils.quoteUnwrap(matches[ConstraintParser.NAME_PATTERN_NAME_GROUP]);
     }
@@ -366,5 +368,4 @@ export class ConstraintParser {
     }
     return parts;
   }
-
 }

@@ -1,20 +1,20 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
-var GeoPackageExtensions = require('../../../lib/extension/geoPackageExtensions').GeoPackageExtensions
+var ExtensionManager = require('../../../lib/extension/extensionManager').ExtensionManager
   , FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
   , Canvas = require('../../../lib/canvas/canvas').Canvas
-  , ExtensionDao = require('../../../lib/extension/extensionDao').ExtensionDao
+  , ExtensionDao = require('../../../lib/extension/extensionsDao').ExtensionsDao
   , SchemaExtension = require('../../../lib/extension/schema').SchemaExtension
-  , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
-  , FeatureStyleExtension = require('../../../lib/extension/style').FeatureStyleExtension
+  , FeatureTableStyles = require('../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
+  , FeatureStyleExtension = require('../../../lib/extension/nga/style/featureStyleExtension').FeatureStyleExtension
   , GeometryColumns = require('../../../lib/features/columns/geometryColumns').GeometryColumns
   , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , GeometryData = require('../../../lib/geom/geometryData').GeometryData
-  , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
+  , GeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , ImageUtils = require('../../../lib/tiles/imageUtils').ImageUtils
-  , RTreeIndex = require('../../../lib/extension/rtree/rtreeIndex').RTreeIndex
-  , FeatureTableIndex = require('../../../lib/extension/index/featureTableIndex').FeatureTableIndex
-  , MetadataExtension = require('../../../lib/extension/metadata').MetadataExtension
+  , RTreeIndex = require('../../../lib/extension/rtree/rtreeIndexExtension').RTreeIndex
+  , FeatureTableIndex = require('../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex
+  , MetadataExtension = require('../../../lib/extension/metadata/metadataExtension').MetadataExtension
   , should = require('chai').should()
   , expect = require('chai').expect
   , wkx = require('wkx')
@@ -200,13 +200,13 @@ describe('GeoPackage Extensions tests', function() {
   });
 
   it('should delete extensions for table', function() {
-    GeoPackageExtensions.deleteTableExtensions(geopackage, tableName);
+    new ExtensionManager(geopackage).deleteTableExtensions(tableName);
     new FeatureStyleExtension(geopackage).has(tableName).should.be.equal(false);
   });
 
   it('should delete extensions', function() {
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
-    GeoPackageExtensions.deleteExtensions(geopackage);
+    new ExtensionManager(geopackage).deleteExtensions();
     geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
   });
 

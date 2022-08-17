@@ -3,101 +3,82 @@
  * GeometryColumns module.
  * @module features/columns
  */
-import proj4 from 'proj4';
-import { Dao } from '../../dao/dao';
 import { GeometryColumns } from './geometryColumns';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
-import { Contents } from '../../core/contents/contents';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
+import { Contents } from '../../contents/contents';
 import { DBValue } from '../../db/dbAdapter';
+import { Projection } from '@ngageoint/projections-js';
+import { GeoPackageDao } from '../../db/geoPackageDao';
+import { GeometryType } from '@ngageoint/simple-features-js';
+import { GeoPackageConnection } from '../../db/geoPackageConnection';
+import { SpatialReferenceSystemDao } from '../../srs/spatialReferenceSystemDao';
+import { TableColumnKey } from '../../db/tableColumnKey';
+import { ContentsDao } from '../../contents/contentsDao';
 /**
  * Geometry Columns Data Access Object
  * @class GeometryColumnsDao
  * @extends Dao
  */
-export class GeometryColumnsDao extends Dao<GeometryColumns> {
-  /**
-   * tableName field name
-   * @type {String}
-   */
-  public static readonly COLUMN_TABLE_NAME: string = 'table_name';
-
-  /**
-   * columnName field name
-   * @type {String}
-   */
-  public static readonly COLUMN_COLUMN_NAME: string = 'column_name';
-
-  /**
-   * id 1 field name, tableName
-   * @type {String}
-   */
-  public static readonly COLUMN_ID_1: string = GeometryColumnsDao.COLUMN_TABLE_NAME;
-
-  /**
-   * id 2 field name, columnName
-   * @type {String}
-   */
-  public static readonly COLUMN_ID_2: string = GeometryColumnsDao.COLUMN_COLUMN_NAME;
-
-  /**
-   * geometryTypeName field name
-   * @type {String}
-   */
-  public static readonly COLUMN_GEOMETRY_TYPE_NAME: string = 'geometry_type_name';
-
-  /**
-   * srsId field name
-   * @type {String}
-   */
-  public static readonly COLUMN_SRS_ID: string = 'srs_id';
-
-  /**
-   * z field name
-   * @type {String}
-   */
-  public static readonly COLUMN_Z: string = 'z';
-
-  /**
-   * m field name
-   * @type {String}
-   */
-  public static readonly COLUMN_M: string = 'm';
-
+export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColumnKey> {
   /**
    * Table Name
    * @type {String}
    */
   readonly gpkgTableName: string = 'gpkg_geometry_columns';
 
-  readonly idColumns: string[] = [GeometryColumnsDao.COLUMN_ID_1, GeometryColumnsDao.COLUMN_ID_2];
+  /**
+   *
+   * @param geoPackage GeoPackage object this dao belongs to
+   */
+  constructor(readonly geoPackageConnection: GeoPackageConnection) {
+    super(geoPackageConnection, GeometryColumns.TABLE_NAME);
+  }
+
+  /**
+   * Create the DAO
+   * @param geoPackage GeoPackage
+   * @return dao
+   */
+  public static createDao(geoPackageConnection: GeoPackageConnection): GeometryColumnsDao {
+    return new GeometryColumnsDao(geoPackageConnection);
+  }
+
+  readonly idColumns: string[] = [GeometryColumns.COLUMN_ID_1, GeometryColumns.COLUMN_ID_2];
   readonly columns: string[] = [
-    GeometryColumnsDao.COLUMN_TABLE_NAME,
-    GeometryColumnsDao.COLUMN_COLUMN_NAME,
-    GeometryColumnsDao.COLUMN_GEOMETRY_TYPE_NAME,
-    GeometryColumnsDao.COLUMN_SRS_ID,
-    GeometryColumnsDao.COLUMN_Z,
-    GeometryColumnsDao.COLUMN_M,
+    GeometryColumns.COLUMN_TABLE_NAME,
+    GeometryColumns.COLUMN_COLUMN_NAME,
+    GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
+    GeometryColumns.COLUMN_SRS_ID,
+    GeometryColumns.COLUMN_Z,
+    GeometryColumns.COLUMN_M,
   ];
 
+  /**
+   * Creates a GeometryColumns object from a Record
+   * @param results
+   * @override
+   */
   createObject(results?: Record<string, DBValue>): GeometryColumns {
     const gc = new GeometryColumns();
     if (results) {
-      gc.table_name = results.table_name as string;
-      gc.column_name = results.column_name as string;
-      gc.geometry_type_name = results.geometry_type_name as string;
-      gc.srs_id = results.srs_id as number;
-      gc.z = results.z as number;
-      gc.m = results.m as number;
+      gc.setTableName(results.table_name as string);
+      gc.setColumnName(results.column_name as string);
+      gc.setGeometryType(GeometryType.fromName(results.geometry_type_name as string));
+      gc.setZ(results.z as number);
+      gc.setM(results.m as number);
+      gc.setSrs(SpatialReferenceSystemDao.createDao(this.db).getBySrsId(results.srs_id as number));
+      gc.setSrsId(results.srs_id as number);
     }
     return gc;
   }
+
   /**
    *  Query for the table name
    *
    *  @param {string} tableName table name
    */
   queryForTableName(tableName: string): GeometryColumns {
-    const results = this.queryForAllEq(GeometryColumnsDao.COLUMN_TABLE_NAME, tableName);
+    const results = this.queryForAllEq(GeometryColumns.COLUMN_TABLE_NAME, tableName);
     if (results && results.length) {
       return this.createObject(results[0]);
     }
@@ -109,10 +90,8 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
    */
   getFeatureTables(): string[] {
     const tableNames = [];
-    for (const result of this.connection.each(
-      'select ' + GeometryColumnsDao.COLUMN_TABLE_NAME + ' from ' + this.gpkgTableName,
-    )) {
-      tableNames.push(result[GeometryColumnsDao.COLUMN_TABLE_NAME]);
+    for (const result of this.db.each('select ' + GeometryColumns.COLUMN_TABLE_NAME + ' from ' + this.gpkgTableName)) {
+      tableNames.push(result[GeometryColumns.COLUMN_TABLE_NAME]);
     }
     return tableNames;
   }
@@ -122,7 +101,7 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
    *  @param {module:dao/geometryColumns~GeometryColumns} geometryColumns geometry columns
    */
   getSrs(geometryColumns: GeometryColumns): SpatialReferenceSystem {
-    return this.geoPackage.spatialReferenceSystemDao.queryForId(geometryColumns.srs_id);
+    return SpatialReferenceSystemDao.createDao(this.db).queryForId(geometryColumns.getSrsId());
   }
   /**
    *  Get the Contents of the Geometry Columns
@@ -131,10 +110,14 @@ export class GeometryColumnsDao extends Dao<GeometryColumns> {
    *  @return {ContentsDao} contents dao
    */
   getContents(geometryColumns: GeometryColumns): Contents {
-    return this.geoPackage.contentsDao.queryForId(geometryColumns.table_name);
+    return ContentsDao.createDao(this.db).queryForId(geometryColumns.getTableName());
   }
-  getProjection(projectionObject: GeometryColumns): proj4.Converter {
+  getProjection(projectionObject: GeometryColumns): Projection {
     const srs = this.getSrs(projectionObject);
-    return this.geoPackage.spatialReferenceSystemDao.getProjection(srs);
+    return SpatialReferenceSystemDao.createDao(this.db).getProjection(srs);
+  }
+
+  queryForIdWithKey(key: TableColumnKey): GeometryColumns {
+    return this.queryForMultiId([key.getTableName(), key.getColumnName()]);
   }
 }

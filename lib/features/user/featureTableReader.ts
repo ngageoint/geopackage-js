@@ -1,54 +1,67 @@
-/**
- * featureTableReader module.
- * @module features/user/featureTableReader
- */
-import { GeometryColumnsDao } from '../columns/geometryColumnsDao';
-import { FeatureTable } from './featureTable';
 import { UserTableReader } from '../../user/userTableReader';
 import { FeatureColumn } from './featureColumn';
+import { FeatureTable } from './featureTable';
 import { GeometryColumns } from '../columns/geometryColumns';
-import { GeoPackage } from '../../geoPackage';
 import { TableColumn } from '../../db/table/tableColumn';
 
 /**
  * Reads the metadata from an existing feature table
- * @class FeatureTableReader
  */
 export class FeatureTableReader extends UserTableReader<FeatureColumn, FeatureTable> {
-  /*
-   * GeometryColumn name
+  /**
+   * Geometry column name
    */
-  columnName: string
+  private readonly columnName: string;
 
-  constructor(tableNameOrGeometryColumns: string | GeometryColumns) {
-    super(
-      tableNameOrGeometryColumns instanceof GeometryColumns
-        ? tableNameOrGeometryColumns.table_name
-        : tableNameOrGeometryColumns,
-    );
-    tableNameOrGeometryColumns instanceof GeometryColumns
-      ? (this.columnName = tableNameOrGeometryColumns.column_name)
-      : undefined;
-  }
-  readFeatureTable(geoPackage: GeoPackage): FeatureTable {
-    if (this.columnName === null || this.columnName === undefined) {
-      const gcd = new GeometryColumnsDao(geoPackage);
-      this.columnName = gcd.queryForTableName(this.table_name).column_name;
+  /**
+   * Constructor
+   * @param geometryColumns geometry columns
+   */
+  public constructor(geometryColumns: GeometryColumns);
+
+  /**
+   * Constructor
+   * @param tableName table name
+   * @param geometryColumnName geometry column name
+   */
+  public constructor(tableName: string, geometryColumnName: string);
+
+  /**
+   * Constructor, uses first or only found geometry column
+   * @param tableName table name
+   */
+  public constructor(tableName: string);
+
+  /**
+   * Constructor
+   * @param args
+   */
+  public constructor(...args) {
+    if (args.length === 1) {
+      if (typeof args[0] === 'string') {
+        super(args[0]);
+      } else if (args[0] instanceof GeometryColumns) {
+        const geometryColumns = args[0];
+        super(geometryColumns.getTableName());
+        this.columnName = geometryColumns.getColumnName();
+      }
+    } else if (args.length === 2) {
+      super(args[0]);
+      this.columnName = args[1];
     }
-    return this.readTable(geoPackage.database) as FeatureTable;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
-  createTable(tableName: string, columns: FeatureColumn[]): FeatureTable {
-    return new FeatureTable(tableName, this.columnName, columns);
+  public createTable(tableName: string, columnList: FeatureColumn[]): FeatureTable {
+    return new FeatureTable(tableName, this.columnName, columnList);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
-  createColumn(tableColumn: TableColumn): FeatureColumn {
-    return new FeatureColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, FeatureColumn.getGeometryTypeFromTableColumn(tableColumn), tableColumn.autoincrement);
+  public createColumn(tableColumn: TableColumn): FeatureColumn {
+    return FeatureColumn.createColumnWithTableColumn(tableColumn);
   }
 }

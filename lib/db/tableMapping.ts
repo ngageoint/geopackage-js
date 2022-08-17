@@ -1,10 +1,10 @@
-import isNil from 'lodash/isNil'
-import isEqual from 'lodash/isEqual'
-import keys from 'lodash/keys'
-import values from 'lodash/values'
-import { MappedColumn } from './mappedColumn'
-import { UserColumn } from '../user/userColumn'
-import { TableInfo } from './table/tableInfo'
+import isNil from 'lodash/isNil';
+import isEqual from 'lodash/isEqual';
+import keys from 'lodash/keys';
+import values from 'lodash/values';
+import { MappedColumn } from './mappedColumn';
+import { UserColumn } from '../user/userColumn';
+import { TableInfo } from './table/tableInfo';
 
 /**
  * Mapping between column names being mapped to and the mapped column
@@ -17,32 +17,32 @@ export class TableMapping {
   /**
    * From table name
    */
-  _fromTable: string
+  _fromTable: string;
 
   /**
    * To table name
    */
-  _toTable: string
+  _toTable: string;
 
   /**
    * Transfer row content to new table
    */
-  _transferContent: boolean = true
+  _transferContent = true;
 
   /**
    * Mapping between column names and mapped columns
    */
-  _columns = {}
+  _columns = {};
 
   /**
    * Dropped columns from the previous table version
    */
-  _droppedColumns = new Set<string>()
+  _droppedColumns = new Set<string>();
 
   /**
    * Custom where clause (in addition to column where mappings)
    */
-  _where: string
+  _where: string;
 
   /**
    * Constructor
@@ -50,18 +50,22 @@ export class TableMapping {
    * @param toTableName table name
    * @param columns user columns
    */
-  constructor (fromTableName: string, toTableName: string, columns: UserColumn[]) {
-    this._fromTable = fromTableName
-    this._toTable = toTableName
+  constructor(fromTableName: string, toTableName: string, columns: UserColumn[]) {
+    this._fromTable = fromTableName;
+    this._toTable = toTableName;
     columns.forEach(column => {
-      this.addMappedColumn(new MappedColumn(column.name, column.name, column.defaultValue, column.dataType))
-    })
+      this.addMappedColumn(
+        new MappedColumn(column.getName(), column.getName(), column.getDefaultValue(), column.getDataType()),
+      );
+    });
   }
 
   static fromTableInfo(tableInfo: TableInfo): TableMapping {
-    let tableMapping = new TableMapping(tableInfo.getTableName(), tableInfo.getTableName(), []);
+    const tableMapping = new TableMapping(tableInfo.getTableName(), tableInfo.getTableName(), []);
     tableInfo.getColumns().forEach(column => {
-      tableMapping.addMappedColumn(new MappedColumn(column.getName(), column.getName(), column.getDefaultValue(), column.getDataType()));
+      tableMapping.addMappedColumn(
+        new MappedColumn(column.getName(), column.getName(), column.getDefaultValue(), column.getDataType()),
+      );
     });
     return tableMapping;
   }
@@ -71,7 +75,7 @@ export class TableMapping {
    * @return from table name
    */
   get fromTable(): string {
-    return this._fromTable
+    return this._fromTable;
   }
 
   /**
@@ -79,7 +83,7 @@ export class TableMapping {
    * @param fromTable from table name
    */
   set fromTable(fromTable: string) {
-    this._fromTable = fromTable
+    this._fromTable = fromTable;
   }
 
   /**
@@ -87,7 +91,7 @@ export class TableMapping {
    * @return to table name
    */
   get toTable(): string {
-    return this._toTable
+    return this._toTable;
   }
 
   /**
@@ -95,7 +99,7 @@ export class TableMapping {
    * @param toTable to table name
    */
   set toTable(toTable: string) {
-    this._toTable = toTable
+    this._toTable = toTable;
   }
 
   /**
@@ -103,7 +107,7 @@ export class TableMapping {
    * @return true if a new table
    */
   isNewTable(): boolean {
-    return !isNil(this._toTable) && !isEqual(this._toTable, this._fromTable)
+    return !isNil(this._toTable) && !isEqual(this._toTable, this._fromTable);
   }
 
   /**
@@ -111,7 +115,7 @@ export class TableMapping {
    * @return true if data should be transfered to the new table
    */
   isTransferContent(): boolean {
-    return this._transferContent
+    return this._transferContent;
   }
 
   /**
@@ -119,23 +123,23 @@ export class TableMapping {
    * @param transferContent true if data should be transfered to the new table
    */
   set transferContent(transferContent: boolean) {
-    this._transferContent = transferContent
+    this._transferContent = transferContent;
   }
 
   /**
    * Add a column
    * @param column mapped column
    */
-   addMappedColumn(column: MappedColumn) {
-    this._columns[column.toColumn] = column
+  addMappedColumn(column: MappedColumn): void {
+    this._columns[column.toColumn] = column;
   }
 
   /**
    * Add a column
    * @param columnName column name
    */
-  addColumnWithName(columnName: string) {
-    this._columns[columnName] = new MappedColumn(columnName, null, null, null)
+  addColumnWithName(columnName: string): void {
+    this._columns[columnName] = new MappedColumn(columnName, null, null, null);
   }
 
   /**
@@ -146,9 +150,9 @@ export class TableMapping {
    * @return removed mapped column or null
    */
   removeColumn(columnName: string): UserColumn {
-    const removedColumn = this._columns[columnName]
-    delete this._columns[columnName]
-    return removedColumn
+    const removedColumn = this._columns[columnName];
+    delete this._columns[columnName];
+    return removedColumn;
   }
 
   /**
@@ -156,7 +160,7 @@ export class TableMapping {
    * @return column names
    */
   getColumnNames(): string[] {
-    return keys(this._columns)
+    return keys(this._columns);
   }
 
   /**
@@ -164,7 +168,7 @@ export class TableMapping {
    * @return columns
    */
   getColumns(): any {
-    return this._columns
+    return this._columns;
   }
 
   /**
@@ -172,7 +176,7 @@ export class TableMapping {
    * @return columns
    */
   getMappedColumns(): MappedColumn[] {
-    return values(this._columns)
+    return values(this._columns);
   }
 
   /**
@@ -181,15 +185,15 @@ export class TableMapping {
    * @return mapped column
    */
   getColumn(columnName: string): MappedColumn {
-    return this._columns[columnName]
+    return this._columns[columnName];
   }
 
   /**
    * Add a dropped column
    * @param columnName column name
    */
-  addDroppedColumn(columnName: string) {
-    this._droppedColumns.add(columnName)
+  addDroppedColumn(columnName: string): void {
+    this._droppedColumns.add(columnName);
   }
 
   /**
@@ -197,8 +201,8 @@ export class TableMapping {
    * @param columnName column name
    * @return true if removed
    */
-  removeDroppedColumn(columnName: string) {
-    return this._droppedColumns.delete(columnName)
+  removeDroppedColumn(columnName: string): boolean {
+    return this._droppedColumns.delete(columnName);
   }
 
   /**
@@ -206,7 +210,7 @@ export class TableMapping {
    * @return dropped columns
    */
   get droppedColumns(): Set<string> {
-    return this._droppedColumns
+    return this._droppedColumns;
   }
 
   /**
@@ -214,8 +218,8 @@ export class TableMapping {
    * @param columnName column name
    * @return true if a dropped column
    */
-  isDroppedColumn(columnName: string) {
-    return this._droppedColumns.has(columnName)
+  isDroppedColumn(columnName: string): boolean {
+    return this._droppedColumns.has(columnName);
   }
 
   /**
@@ -223,7 +227,7 @@ export class TableMapping {
    * @return true if where clause
    */
   hasWhere(): boolean {
-    return !isNil(this._where)
+    return !isNil(this._where);
   }
 
   /**
@@ -231,7 +235,7 @@ export class TableMapping {
    * @return where clause
    */
   get where(): string {
-    return this._where
+    return this._where;
   }
 
   /**
@@ -239,6 +243,6 @@ export class TableMapping {
    * @param where where clause
    */
   set where(where: string) {
-    this._where = where
+    this._where = where;
   }
 }

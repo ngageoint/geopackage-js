@@ -2,7 +2,7 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 
 var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , Canvas = require('../../../../lib/canvas/canvas').Canvas
-  , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
   , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
@@ -10,7 +10,7 @@ var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
   , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
+  , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , should = require('chai').should()
   , path = require('path')
   , wkx = require('wkx');

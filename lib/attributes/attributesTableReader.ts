@@ -17,7 +17,7 @@ import { GeoPackage } from '../geoPackage';
  * @classdesc Reads the metadata from an existing attributes table
  */
 export class AttributesTableReader extends UserTableReader<AttributesColumn, AttributesTable> {
-
+  // eslint-disable-next-line @typescript-eslint/camelcase
   constructor(table_name: string) {
     super(table_name);
   }

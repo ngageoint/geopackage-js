@@ -1,6 +1,6 @@
 var ConstraintParser = require('../../../../lib/db/table/constraintParser').ConstraintParser
   , ConstraintType = require('../../../../lib/db/table/constraintType').ConstraintType
-  , TableCreator = require('../../../../lib/db/tableCreator').TableCreator
+  , TableCreator = require('../../../../lib/db/tableCreator').GeoPackageTableCreator
   , should = require('chai').should()
   , assert = require('assert');
 

@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
+import { SQLUtils } from "./sqlUtils";
+import { GeoPackageUtilities } from "../io/geoPackageUtilities";
 
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
@@ -80,18 +82,35 @@ export class SqliteAdapter implements DBAdapter {
       throw err;
     }
   }
-  // /**
-  //  * Creates an adapter from an already established better-sqlite3 database connection
-  //  * @param  {*} db better-sqlite3 database connection
-  //  * @return {module:db/sqliteAdapter~Adapter}
-  //  */
-  // static createAdapterFromDb(db) {
-  //   return new SqliteAdapter(db);
-  // };
 
+  /**
+   *
+   * @param filePath
+   */
   constructor(filePath?: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
+
+  /**
+   * Returns the size in bytes
+   */
+  public size(): number {
+    if (typeof this.filePath === 'string') {
+      const stats = fs.statSync(this.filePath);
+      return stats.size;
+    }
+  }
+
+  /**
+   * Returns the size in bytes
+   */
+  public readableSize(): string {
+    if (typeof this.filePath === 'string') {
+      const stats = fs.statSync(this.filePath);
+      return GeoPackageUtilities.formatBytes(stats.size);
+    }
+  }
+
   /**
    * Closes the connection to the GeoPackage
    */

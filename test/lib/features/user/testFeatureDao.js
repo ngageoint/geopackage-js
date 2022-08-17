@@ -3,12 +3,12 @@ import { default as testSetup } from '../../../fixtures/testSetup'
 var FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
-  , GeometryData = require('../../../../lib/geom/geometryData').GeometryData
-  , GeometryType = require('../../../../lib/features/user/geometryType').GeometryType
+  , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
-  , SimpleAttributesTable = require('../../../../lib/extension/relatedTables/simpleAttributesTable').SimpleAttributesTable
+  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
+  , SimpleAttributesTable = require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable
   , wkx = require('wkx')
   , helpers = require('@turf/helpers')
   , path = require('path')

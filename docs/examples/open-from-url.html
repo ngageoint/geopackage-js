@@ -69,7 +69,7 @@
   <script type="text/javascript" src="https://unpkg.com/@ngageoint/geopackage/dist/geopackage.min.js"></script>
   <script type="text/javascript">
 
-  var GeoPackageAPI = window.geopackage;
+  var GeoPackageManager = window.geopackage;
 
   window.onload = function() {
     loadUrl('http://ngageoint.github.io/GeoPackage/examples/rivers.gpkg');
@@ -81,7 +81,7 @@
     });
     fileName = url.split('/').pop();
     urlToUint8Array(url, function(err, uInt8Array) {
-      GeoPackageAPI.open(uInt8Array).then(geoPackage => {
+      GeoPackageManager.open(uInt8Array).then(geoPackage => {
         displayGeoPackageInfo(geoPackage, function() {
           console.log('done');
           $('#loaded').toggle();

@@ -5,7 +5,6 @@ import { ConstraintType } from './constraintType';
  * Table raw or unparsed constraint
  */
 export class RawConstraint extends Constraint {
-
   /**
    * Constructor
    * @param type constraint type

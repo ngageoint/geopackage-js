@@ -13,10 +13,83 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
    */
   requiredColumns: string[];
 
-  constructor(tableName: string, columns: UserCustomColumn[], requiredColumns: string[], custom: boolean) {
-    super(tableName, columns, custom);
-    this.requiredColumns = requiredColumns === null || requiredColumns === undefined ? [] : requiredColumns.slice();
-    this.updateColumns();
+  /**
+   * Constructor
+   * @param tableName table name
+   * @param columns columns
+   */
+  public constructor(tableName: string, columns: UserCustomColumn[]);
+
+  /**
+   * Constructor
+   * @param tableName table name
+   * @param columns columns
+   * @param requiredColumns list of required columns
+   */
+  public constructor(tableName: string, columns: UserCustomColumn[], requiredColumns: string[]);
+
+  /**
+   * Constructor
+   * @param tableName table name
+   * @param columns columns
+   * @param custom custom column specification
+   */
+  public constructor(tableName: string, columns: UserCustomColumn[], custom: boolean);
+
+  /**
+   * Constructor
+   * @param tableName table name
+   * @param columns columns
+   * @param requiredColumns list of required columns
+   * @param custom custom column specification
+   */
+  public constructor(
+    tableName: string,
+    columns: UserCustomColumn[],
+    requiredColumns: string[],
+    custom: boolean,
+  );
+
+  /**
+   * Copy Constructor
+   * @param userCustomColumns user custom columns
+   */
+  public constructor(userCustomColumns: UserCustomColumns);
+
+  /**
+   * Constructor
+   * @param args
+   */
+  public constructor(...args) {
+    if (args.length === 1 && args[0] instanceof UserCustomColumns) {
+      const userCustomColumns = args[0];
+      super(userCustomColumns);
+      if (userCustomColumns.requiredColumns != null) {
+        this.requiredColumns = userCustomColumns.requiredColumns.slice();
+      }
+    } else if (args.length === 2) {
+      const tableName = args[0];
+      const columns = args[1];
+      super(tableName, columns, false);
+      this.requiredColumns = null;
+      this.updateColumns();
+    } else if (args.length === 3) {
+      const tableName = args[0];
+      const columns = args[1];
+      const custom = typeof args[2] === 'boolean' ? args[2] : false;
+      const requiredColumns = args[2].length != null ? args[2] : null;
+      super(tableName, columns, custom);
+      this.requiredColumns = requiredColumns;
+      this.updateColumns();
+    } else if (args.length === 4) {
+      const tableName = args[0];
+      const columns = args[1];
+      const requiredColumns = args[2];
+      const custom = args[3];
+      super(tableName, columns, custom);
+      this.requiredColumns = requiredColumns;
+      this.updateColumns();
+    }
   }
 
   copy(): UserCustomColumns {
@@ -35,25 +108,24 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
    * Set the required columns
    * @param requiredColumns required columns
    */
-  setRequiredColumns(requiredColumns: string[] = []) {
+  setRequiredColumns(requiredColumns: string[] = []): void {
     this.requiredColumns = requiredColumns.slice();
   }
 
   /**
    * {@inheritDoc}
    */
-  updateColumns() {
+  updateColumns(): void {
     super.updateColumns();
-
     if (!this.isCustom() && this.requiredColumns !== null && this.requiredColumns.length !== 0) {
-      let search = new Set<string>(this.requiredColumns);
-      let found = {};
+      const search = new Set<string>(this.requiredColumns);
+      const found = {};
       // Find the required columns
       this.getColumns().forEach(column => {
-        let columnName = column.getName();
-        let columnIndex = column.getIndex();
+        const columnName = column.getName();
+        const columnIndex = column.getIndex();
         if (search.has(columnName)) {
-          let previousIndex = found[columnName];
+          const previousIndex = found[columnName];
           this.duplicateCheck(columnIndex, previousIndex, columnName);
           found[columnName] = columnIndex;
         }

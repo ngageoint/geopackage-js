@@ -6,38 +6,47 @@
 import { UserColumn } from './userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 
-export class UserColumns<TColumn extends UserColumn> {
-
+export abstract class UserColumns<TColumn extends UserColumn> {
   /**
    * Table name, null when a pre-ordered subset of columns for a query
    */
-  _tableName: string;
+  private tableName: string;
 
   /**
    * Array of column names
    */
-  _columnNames: string[];
+  private columnNames: string[];
 
   /**
    * List of columns
    */
-  _columns: TColumn[];
+  private readonly columns: TColumn[];
 
   /**
    * Custom column specification flag (subset of table columns or different
    * ordering)
    */
-  _custom: boolean;
+  private custom: boolean;
 
   /**
    * Mapping between (lower cased) column names and their index
    */
-  _nameToIndex: Map<string, number>;
+  private readonly nameToIndex: Map<string, number>;
 
   /**
    * Primary key column index
    */
-  _pkIndex: number = -1;
+  private pkIndex: number;
+
+  /**
+   * Indicates if the primary key is modifiable
+   */
+  private pkModifiable = false;
+
+  /**
+   * Indicates if values are validated against column types
+   */
+  private valueValidation = true;
 
   /**
    * Constructor
@@ -45,45 +54,65 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param columns columns
    * @param custom custom column specification
    */
-  protected constructor(tableName: string, columns: TColumn[], custom: boolean = false) {
-    this._tableName = tableName;
-    this._columns = columns;
-    this._custom = custom;
-    this._nameToIndex = new Map<string, number>();
-    this._columnNames = [];
+  protected constructor(tableName: string, columns: TColumn[], custom: boolean);
+
+  /**
+   * Copy Constructor
+   *
+   * @param userColumns
+   *            user columns
+   */
+  protected constructor(userColumns: UserColumns<TColumn>);
+
+  /**
+   * Constructor
+   * @param args
+   * @protected
+   */
+  protected constructor(...args) {
+    if (args.length === 1) {
+      const userColumns = args[0];
+      this.tableName = userColumns.tableName;
+      this.columnNames = userColumns.columnNames.slice();
+      this.columns = [];
+      for (const column of userColumns.columns) {
+        const copiedColumn = column.copy() as TColumn;
+        this.columns.push(copiedColumn);
+      }
+      this.nameToIndex = new Map<string, number>(userColumns.nameToIndex);
+      this.pkIndex = userColumns.pkIndex;
+      this.pkModifiable = userColumns.pkModifiable;
+      this.valueValidation = userColumns.valueValidation;
+    } else if (args.length === 3) {
+      this.tableName = args[0];
+      this.columns = args[1];
+      this.custom = args[2];
+      this.nameToIndex = new Map<string, number>();
+    }
   }
 
   /**
    * Copy the user columns
+   *
    * @return copied user columns
    */
-  copy(): UserColumns<TColumn> {
-    const columns = [];
-    this._columns.forEach(column => {
-      columns.push(column.copy());
-    });
-    const copy = new UserColumns<TColumn>(this._tableName, columns, this._custom);
-    copy._columnNames = Array.from(this._columnNames);
-    copy._nameToIndex = new Map<string, number>(this._nameToIndex);
-    copy._pkIndex = this._pkIndex;
-    return copy;
-  }
+  public abstract copy(): UserColumns<TColumn>;
 
   /**
    * Update the table columns
    */
-  updateColumns() {
-    this._nameToIndex.clear();
-    if (!this._custom) {
+  updateColumns(): void {
+    this.nameToIndex.clear();
+    if (!this.custom) {
       const indices = new Set<number>();
 
       // Check for missing indices and duplicates
-      let needsIndex = [];
-      this._columns.forEach(column => {
+      const needsIndex = [];
+      this.columns.forEach(column => {
         if (column.hasIndex()) {
           const index = column.getIndex();
           if (indices.has(index)) {
-            throw new Error("Duplicate index: " + index + ", Table Name: " + this._tableName);
+            throw new Error('Duplicate index: ' + index + ', Table Name: ' + this.tableName);
           } else {
             indices.add(index);
           }
@@ -95,60 +124,94 @@ export class UserColumns<TColumn extends UserColumn> {
       // Update columns that need an index
       let currentIndex = -1;
       needsIndex.forEach(column => {
-        while (indices.has(++currentIndex)) {
-        }
+        while (indices.has(++currentIndex)) {}
         column.setIndex(currentIndex);
       });
 
       // Sort the columns by index
-      this._columns.sort((a, b) => {
-        return a.index - b.index;
+      this.columns.sort((a, b) => {
+        return a.getIndex() - b.getIndex();
       });
     }
 
-    this._pkIndex = -1;
-    this._columnNames = [];
+    this.pkIndex = -1;
+    this.columnNames = [];
 
-    for (let index = 0; index < this._columns.length; index++) {
-      const column = this._columns[index];
+    for (let index = 0; index < this.columns.length; index++) {
+      const column = this.columns[index];
       const columnName = column.getName();
       const lowerCaseColumnName = columnName.toLowerCase();
 
-      if (!this._custom) {
+      if (!this.custom) {
         if (column.getIndex() != index) {
-          throw new Error("No column found at index: "
-            + index + ", Table Name: " + this._tableName);
+          throw new Error('No column found at index: ' + index + ', Table Name: ' + this.tableName);
         }
 
-        if (this._nameToIndex.has(lowerCaseColumnName)) {
+        if (this.nameToIndex.has(lowerCaseColumnName)) {
           throw new Error(
-            'Duplicate column found at index: ' + index
-            + ', Table Name: ' + this._tableName + ', Name: '
-            + columnName);
+            'Duplicate column found at index: ' + index + ', Table Name: ' + this.tableName + ', Name: ' + columnName,
+          );
         }
       }
 
       if (column.isPrimaryKey()) {
-        if (this._pkIndex != -1) {
+        if (this.pkIndex != -1) {
           let error = 'More than one primary key column was found for ';
-          if (this._custom) {
+          if (this.custom) {
             error = error.concat('custom specified table columns');
           } else {
             error = error.concat('table');
           }
-         error = error.concat('. table: ' + this._tableName + ', index1: '
-            + this._pkIndex + ', index2: ' + index);
-          if (this._custom) {
-            error = error.concat(', columns: ' + this._columnNames);
+          error = error.concat('. table: ' + this.tableName + ', index1: ' + this.pkIndex + ', index2: ' + index);
+          if (this.custom) {
+            error = error.concat(', columns: ' + this.columnNames);
           }
           throw new Error(error);
         }
-        this._pkIndex = index;
+        this.pkIndex = index;
       }
 
-      this._columnNames[index] = columnName;
-      this._nameToIndex.set(lowerCaseColumnName, index);
+      this.columnNames[index] = columnName;
+      this.nameToIndex.set(lowerCaseColumnName, index);
     }
+  }
+
+  /**
+   * Is the primary key modifiable
+   *
+   * @return true if the primary key is modifiable
+   */
+  public isPkModifiable(): boolean {
+    return this.pkModifiable;
+  }
+
+  /**
+   * Set if the primary key can be modified
+   *
+   * @param pkModifiable
+   *            primary key modifiable flag
+   */
+  public setPkModifiable(pkModifiable: boolean): void {
+    this.pkModifiable = pkModifiable;
+  }
+
+  /**
+   * Is value validation against column types enabled
+   *
+   * @return true if values are validated against column types
+   */
+  public isValueValidation(): boolean {
+    return this.valueValidation;
+  }
+
+  /**
+   * Set if values should validated against column types
+   *
+   * @param valueValidation
+   *            value validation flag
+   */
+  public setValueValidation(valueValidation: boolean): void {
+    this.valueValidation = valueValidation;
   }
 
   /**
@@ -158,9 +221,18 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param previousIndex previous index
    * @param column column
    */
-  duplicateCheck(index: number, previousIndex: number, column: string) {
+  duplicateCheck(index: number, previousIndex: number, column: string): void {
     if (previousIndex !== null && previousIndex !== undefined) {
-      throw new Error('More than one ' + column + ' column was found for table \'' + this._tableName + '\'. Index ' + previousIndex + ' and ' + index);
+      throw new Error(
+        'More than one ' +
+          column +
+          " column was found for table '" +
+          this.tableName +
+          "'. Index " +
+          previousIndex +
+          ' and ' +
+          index,
+      );
     }
   }
 
@@ -169,13 +241,19 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param expected expected data type
    * @param column user column
    */
-  typeCheck(expected: GeoPackageDataType, column: TColumn) {
+  typeCheck(expected: GeoPackageDataType, column: TColumn): void {
     const actual = column.getDataType();
     if (actual === null || actual === undefined || actual !== expected) {
-      throw new Error('Unexpected ' + column.getName()
-        + ' column data type was found for table \'' + this._tableName
-        + '\', expected: ' + GeoPackageDataType.nameFromType(expected) + ', actual: '
-        + (actual !== null && actual !== undefined ? GeoPackageDataType.nameFromType(actual) : 'null'));
+      throw new Error(
+        'Unexpected ' +
+          column.getName() +
+          " column data type was found for table '" +
+          this.tableName +
+          "', expected: " +
+          GeoPackageDataType.nameFromType(expected) +
+          ', actual: ' +
+          (actual !== null && actual !== undefined ? GeoPackageDataType.nameFromType(actual) : 'null'),
+      );
     }
   }
 
@@ -184,9 +262,9 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param index column index
    * @param column user column
    */
-  missingCheck(index: number, column: string) {
+  missingCheck(index: number, column: string): void {
     if (index === null || index === undefined) {
-      throw new Error('No ' + column + ' column was found for table \'' + this._tableName + '\'');
+      throw new Error('No ' + column + " column was found for table '" + this.tableName + "'");
     }
   }
 
@@ -206,17 +284,17 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return column index
    */
   getColumnIndex(columnName: string, required: boolean): number {
-    let index = this._nameToIndex.get(columnName.toLowerCase());
-    if (required && (index === null  || index === undefined)) {
+    const index = this.nameToIndex.get(columnName.toLowerCase());
+    if (required && (index === null || index === undefined)) {
       let error = 'Column does not exist in ';
-      if (this._custom) {
+      if (this.custom) {
         error = error.concat('custom specified table columns');
       } else {
         error = error.concat('table');
       }
-      error = error.concat('. table: ' + this._tableName + ', column: ' + columnName);
-      if (this._custom) {
-        error = error.concat(', columns: ' + this._columnNames);
+      error = error.concat('. table: ' + this.tableName + ', column: ' + columnName);
+      if (this.custom) {
+        error = error.concat(', columns: ' + this.columnNames);
       }
       throw new Error(error);
     }
@@ -228,7 +306,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return column names
    */
   getColumnNames(): string[] {
-    return this._columnNames;
+    return this.columnNames;
   }
 
   /**
@@ -237,7 +315,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return column name
    */
   getColumnName(index: number): string {
-    return this._columnNames[index];
+    return this.columnNames[index];
   }
 
   /**
@@ -245,7 +323,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return columns
    */
   getColumns(): TColumn[] {
-    return this._columns;
+    return this.columns;
   }
 
   /**
@@ -254,7 +332,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return column
    */
   getColumnForIndex(index: number): TColumn {
-    return this._columns[index];
+    return this.columns[index];
   }
 
   /**
@@ -272,7 +350,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return true if has the column
    */
   hasColumn(columnName: string): boolean {
-    return this._nameToIndex.has(columnName.toLowerCase());
+    return this.nameToIndex.has(columnName.toLowerCase());
   }
 
   /**
@@ -280,7 +358,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return column count
    */
   columnCount(): number {
-    return this._columns.length;
+    return this.columns.length;
   }
 
   /**
@@ -288,15 +366,15 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return table name
    */
   getTableName(): string {
-    return this._tableName;
+    return this.tableName;
   }
 
   /**
    * Set the table name
    * @param tableName table name
    */
-  setTableName(tableName: string) {
-    this._tableName = tableName;
+  setTableName(tableName: string): void {
+    this.tableName = tableName;
   }
 
   /**
@@ -304,15 +382,15 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return custom flag
    */
   isCustom(): boolean {
-    return this._custom;
+    return this.custom;
   }
 
   /**
    * Set the custom column specification flag
    * @param custom custom flag
    */
-  setCustom(custom: boolean) {
-    this._custom = custom;
+  setCustom(custom: boolean): void {
+    this.custom = custom;
   }
 
   /**
@@ -320,7 +398,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return true if has a primary key
    */
   hasPkColumn(): boolean {
-    return this._pkIndex >= 0;
+    return this.pkIndex >= 0;
   }
 
   /**
@@ -328,7 +406,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return primary key column index
    */
   getPkColumnIndex(): number {
-    return this._pkIndex;
+    return this.pkIndex;
   }
 
   /**
@@ -338,7 +416,7 @@ export class UserColumns<TColumn extends UserColumn> {
   getPkColumn(): TColumn {
     let column = null;
     if (this.hasPkColumn()) {
-      column = this._columns[this._pkIndex];
+      column = this.columns[this.pkIndex];
     }
     return column;
   }
@@ -357,15 +435,15 @@ export class UserColumns<TColumn extends UserColumn> {
    * @return columns
    */
   columnsOfType(type: GeoPackageDataType): TColumn[] {
-    return this._columns.filter(column => column.getDataType() === type);
+    return this.columns.filter(column => column.getDataType() === type);
   }
 
   /**
    * Add a new column
    * @param column new column
    */
-  addColumn(column: TColumn) {
-    this._columns.push(column);
+  addColumn(column: TColumn): void {
+    this.columns.push(column);
     this.updateColumns();
   }
 
@@ -374,7 +452,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param column column
    * @param newColumnName new column name
    */
-  renameColumn(column: TColumn, newColumnName: string) {
+  renameColumn(column: TColumn, newColumnName: string): void {
     this.renameColumnWithName(column.getName(), newColumnName);
     column.setName(newColumnName);
   }
@@ -384,7 +462,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param columnName column name
    * @param newColumnName new column name
    */
-  renameColumnWithName(columnName: string, newColumnName: string) {
+  renameColumnWithName(columnName: string, newColumnName: string): void {
     this.renameColumnWithIndex(this.getColumnIndexForColumnName(columnName), newColumnName);
   }
 
@@ -393,8 +471,8 @@ export class UserColumns<TColumn extends UserColumn> {
    * @param index column index
    * @param newColumnName new column name
    */
-  renameColumnWithIndex(index: number, newColumnName: string) {
-    this._columns[index].setName(newColumnName);
+  renameColumnWithIndex(index: number, newColumnName: string): void {
+    this.columns[index].setName(newColumnName);
     this.updateColumns();
   }
 
@@ -402,7 +480,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * Drop a column
    * @param column column to drop
    */
-  dropColumn(column: TColumn) {
+  dropColumn(column: TColumn): void {
     this.dropColumnWithIndex(column.getIndex());
   }
 
@@ -410,7 +488,7 @@ export class UserColumns<TColumn extends UserColumn> {
    * Drop a column
    * @param columnName column name
    */
-  dropColumnWithName(columnName: string) {
+  dropColumnWithName(columnName: string): void {
     this.dropColumnWithIndex(this.getColumnIndexForColumnName(columnName));
   }
 
@@ -418,9 +496,9 @@ export class UserColumns<TColumn extends UserColumn> {
    * Drop a column
    * @param index column index
    */
-  dropColumnWithIndex(index: number) {
-    this._columns.splice(index, 1);
-    this._columns.forEach(column => column.resetIndex());
+  dropColumnWithIndex(index: number): void {
+    this.columns.splice(index, 1);
+    this.columns.forEach(column => column.resetIndex());
     this.updateColumns();
   }
 
@@ -428,11 +506,10 @@ export class UserColumns<TColumn extends UserColumn> {
    * Alter a column
    * @param column altered column
    */
-  alterColumn(column: TColumn) {
-    let existingColumn = this.getColumn(column.getName());
+  alterColumn(column: TColumn): void {
+    const existingColumn = this.getColumn(column.getName());
     const index = existingColumn.getIndex();
     column.setIndex(index);
-    this._columns[index] = column;
+    this.columns[index] = column;
   }
-
 }

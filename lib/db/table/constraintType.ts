@@ -53,12 +53,40 @@ export namespace ConstraintType {
   /**
    * Table constraints
    */
-  export const TABLE_CONSTRAINTS = new Set<ConstraintType>([ConstraintType.PRIMARY_KEY, ConstraintType.UNIQUE, ConstraintType.CHECK, ConstraintType.FOREIGN_KEY]);
+  export const TABLE_CONSTRAINTS = new Set<ConstraintType>([
+    ConstraintType.PRIMARY_KEY,
+    ConstraintType.UNIQUE,
+    ConstraintType.CHECK,
+    ConstraintType.FOREIGN_KEY,
+  ]);
 
   /**
    * Column constraints
    */
-  export const COLUMN_CONSTRAINTS = new Set<ConstraintType>([ConstraintType.PRIMARY_KEY, ConstraintType.NOT_NULL, ConstraintType.UNIQUE, ConstraintType.CHECK, ConstraintType.DEFAULT, ConstraintType.COLLATE, ConstraintType.FOREIGN_KEY, ConstraintType.AUTOINCREMENT]);
+  export const COLUMN_CONSTRAINTS = new Set<ConstraintType>([
+    ConstraintType.PRIMARY_KEY,
+    ConstraintType.NOT_NULL,
+    ConstraintType.UNIQUE,
+    ConstraintType.CHECK,
+    ConstraintType.DEFAULT,
+    ConstraintType.COLLATE,
+    ConstraintType.FOREIGN_KEY,
+    ConstraintType.AUTOINCREMENT,
+  ]);
+
+  /**
+   * Add constraint lookup values
+   * @param lookup lookup map
+   * @param type constraint type
+   */
+  function addLookups(lookup: Map<string, ConstraintType>, type: ConstraintType): void {
+    const name = ConstraintType.nameFromType(type);
+    const parts = name.split('_');
+    lookup.set(parts[0], type);
+    if (parts.length > 0) {
+      lookup.set(name.replace('_', ' '), type);
+    }
+  }
 
   /**
    * Table constraint parsing lookup values
@@ -75,20 +103,6 @@ export namespace ConstraintType {
   Array.from(COLUMN_CONSTRAINTS).forEach(type => {
     addLookups(columnLookup, type);
   });
-
-  /**
-   * Add constraint lookup values
-   * @param lookup lookup map
-   * @param type constraint type
-   */
- function addLookups(lookup: Map<string, ConstraintType>, type: ConstraintType) {
-    const name = ConstraintType.nameFromType(type);
-    const parts = name.split('_');
-    lookup.set(parts[0], type);
-    if (parts.length > 0) {
-      lookup.set(name.replace('_', ' '), type);
-    }
-  }
 
   /**
    * Get a matching table constraint type from the value
@@ -124,5 +138,4 @@ export namespace ConstraintType {
     }
     return type;
   }
-
 }

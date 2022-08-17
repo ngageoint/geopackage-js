@@ -1,9 +1,9 @@
 import { default as testSetup } from '../fixtures/testSetup'
 
-var { GeoPackageAPI } = require('../../')
+var { GeoPackageManager } = require('../../')
   , should = require('chai').should();
 
-describe('GeoPackageAPI Create tests', function() {
+describe('GeoPackageManager Create tests', function() {
 
   var testGeoPackage;
   var geopackage;
@@ -21,7 +21,7 @@ describe('GeoPackageAPI Create tests', function() {
 
   it('should not allow a file without a gpkg extension', async function() {
     try {
-      let gp = await GeoPackageAPI.create('/tmp/test.g');
+      let gp = await GeoPackageManager.create('/tmp/test.g');
       should.fail(gp, null, 'Error should have been thrown')
     } catch (e) {
       should.exist(e);

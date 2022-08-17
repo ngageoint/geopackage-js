@@ -1,10 +1,8 @@
 import sortedIndex from 'lodash/sortedIndex';
-
 import { ConstraintType } from './constraintType';
 import { Constraint } from './constraint';
 
 export class Constraints {
-
   /**
    * Constraints
    */
@@ -18,19 +16,23 @@ export class Constraints {
   /**
    * Constructor
    */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
   /**
    * Add constraint
    * @param constraint constraint
    */
-  add(constraint: Constraint) {
+  add(constraint: Constraint): void {
     const orders = this.constraints.map(c => c.order);
 
     const lastIndex = orders.lastIndexOf(constraint.order);
     let insertLocation = lastIndex + 1;
     if (lastIndex === -1) {
-      insertLocation = sortedIndex(this.constraints.map(c => c.order), constraint.order);
+      insertLocation = sortedIndex(
+        this.constraints.map(c => c.order),
+        constraint.order,
+      );
     }
 
     if (insertLocation === this.constraints.length) {
@@ -38,7 +40,10 @@ export class Constraints {
     } else {
       this.constraints.splice(insertLocation, 0, constraint);
     }
-    if (this.typedConstraints[constraint.getType()] === null || this.typedConstraints[constraint.getType()] === undefined) {
+    if (
+      this.typedConstraints[constraint.getType()] === null ||
+      this.typedConstraints[constraint.getType()] === undefined
+    ) {
       this.typedConstraints[constraint.getType()] = [];
     }
     this.typedConstraints[constraint.getType()].push(constraint);
@@ -48,7 +53,7 @@ export class Constraints {
    * Add constraints
    * @param constraints constraints
    */
-  addConstraintArray(constraints: Constraint[]) {
+  addConstraintArray(constraints: Constraint[]): void {
     for (let i = 0; i < constraints.length; i++) {
       this.add(constraints[i]);
     }
@@ -58,7 +63,7 @@ export class Constraints {
    * Add constraints
    * @param constraints constraints
    */
-  addConstraints(constraints: Constraints) {
+  addConstraints(constraints: Constraints): void {
     this.addConstraintArray(constraints.all());
   }
 
@@ -114,7 +119,7 @@ export class Constraints {
    * @return cleared constraints
    */
   clear(): Constraint[] {
-    let constraintsCopy = this.constraints.slice();
+    const constraintsCopy = this.constraints.slice();
     this.constraints = [];
     this.typedConstraints = {};
     return constraintsCopy;

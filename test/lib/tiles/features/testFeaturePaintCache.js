@@ -1,6 +1,6 @@
 var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
-  , StyleRow = require('../../../../lib/extension/style/styleRow').StyleRow
-  , StyleTable = require('../../../../lib/extension/style/styleTable').StyleTable
+  , StyleRow = require('../../../../lib/extension/nga/style/styleRow').StyleRow
+  , StyleTable = require('../../../../lib/extension/nga/style/styleTable').StyleTable
   , Paint = require('../../../../lib/tiles/features/paint').Paint
   , FeatureDrawType = require('../../../../lib/tiles/features/featureDrawType').FeatureDrawType
   , should = require('chai').should();

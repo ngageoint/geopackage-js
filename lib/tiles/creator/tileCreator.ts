@@ -5,23 +5,22 @@ import ProjectTile from './projectTile';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { BoundingBox } from '../../boundingBox';
 import { Canvas } from '../../canvas/canvas';
 import { ImageUtils } from '../imageUtils';
 import { TileUtilities } from './tileUtilities';
-import { Projection } from '../../projection/projection';
-import { ProjectionConstants } from '../../projection/projectionConstants';
+import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 
 export class TileCreator {
-  dispose: boolean = false;
+  dispose = false;
   canvas: any = null;
   ctx: any;
   image: any;
   tileCanvas: any;
   tileContext: any;
   imageData: any;
-  pixelsAdded: boolean = false;
+  pixelsAdded = false;
   width: number;
   height: number;
   tileMatrix: TileMatrix;
@@ -36,7 +35,7 @@ export class TileCreator {
   tileWidthUnitsPerPixel: number;
   sameProjection: boolean;
 
-  constructor (
+  constructor(
     width: number,
     height: number,
     tileMatrix: TileMatrix,
@@ -53,18 +52,19 @@ export class TileCreator {
     this.projectionFrom = srs.organization.toUpperCase() + ':' + srs.organization_coordsys_id;
     this.projectionFromDefinition = srs.definition;
     this.projectionTo = projectionTo.toUpperCase();
-    this.projectionToDefinition = projectionToDefinition
+    this.projectionToDefinition = projectionToDefinition;
     this.tileBoundingBox = tileBoundingBox;
     this.tileMatrixSet = tileMatrixSet;
     this.chunks = [];
-    this.tileHeightUnitsPerPixel = (tileBoundingBox.height) / height;
-    this.tileWidthUnitsPerPixel = (tileBoundingBox.width) / width;
+    this.tileHeightUnitsPerPixel = tileBoundingBox.height / height;
+    this.tileWidthUnitsPerPixel = tileBoundingBox.width / width;
     // use this as a quick check if the projections are equal.  If they are we can shortcut some math
     // special cases 'EPSG:900913' =='EPSG:3857' == 'EPSG:102113'
     this.sameProjection =
       this.projectionFrom === this.projectionTo ||
-      (this.projectionTo === ProjectionConstants.EPSG_3857 &&
-        (this.projectionFrom === ProjectionConstants.EPSG_900913 || this.projectionFrom === ProjectionConstants.EPSG_102113));
+      (this.projectionTo === ProjectionConstants.EPSG_WEB_MERCATOR &&
+        (this.projectionFrom === ProjectionConstants.EPSG_900913 ||
+          this.projectionFrom === ProjectionConstants.EPSG_102113));
 
     this.canvas = canvas;
   }
@@ -133,7 +133,7 @@ export class TileCreator {
   addPixel(targetX: number, targetY: number, sourceX: number, sourceY: number): void {
     const color = this.tileContext.getImageData(sourceX, sourceY, 1, 1);
     this.imageData.data.set(color.data, targetY * this.width * 4 + targetX * 4);
-    this.pixelsAdded = true
+    this.pixelsAdded = true;
   }
 
   /**
@@ -237,7 +237,8 @@ export class TileCreator {
         this.tileMatrix.pixel_y_size,
       );
       const job = {
-        sourceImageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height).data.buffer,
+        sourceImageData: this.tileContext.getImageData(0, 0, this.tileMatrix.tile_width, this.tileMatrix.tile_height)
+          .data.buffer,
         height: this.height,
         width: this.width,
         projectionTo: this.projectionTo,
@@ -260,7 +261,9 @@ export class TileCreator {
           const work = require('webworkify');
           const worker = work(require('./tileWorker.js'));
           worker.onmessage = (e: { data: any }): void => {
-            this.canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(e.data), this.height, this.width), 0, 0);
+            this.canvas
+              .getContext('2d')
+              .putImageData(new ImageData(new Uint8ClampedArray(e.data), this.height, this.width), 0, 0);
             resolve();
           };
           worker.postMessage(job, [
@@ -269,7 +272,9 @@ export class TileCreator {
         } catch (e) {
           const worker = ProjectTile;
           const data = worker(job);
-          this.canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(data), this.height, this.width), 0, 0);
+          this.canvas
+            .getContext('2d')
+            .putImageData(new ImageData(new Uint8ClampedArray(data), this.height, this.width), 0, 0);
           resolve();
         }
       });
@@ -281,10 +286,10 @@ export class TileCreator {
       let conversion;
       try {
         if (Projection.hasProjection(this.projectionTo) == null) {
-          Projection.loadProjection(this.projectionTo, this.projectionToDefinition)
+          Projection.loadProjection(this.projectionTo, this.projectionToDefinition);
         }
         if (Projection.hasProjection(this.projectionFrom) == null) {
-          Projection.loadProjection(this.projectionFrom, this.projectionFromDefinition)
+          Projection.loadProjection(this.projectionFrom, this.projectionFromDefinition);
         }
         conversion = proj4(this.projectionTo, this.projectionFrom);
       } catch (e) {}
@@ -294,7 +299,8 @@ export class TileCreator {
         for (let column = 0; column < width; column++) {
           const longitude = this.tileBoundingBox.minLongitude + column * this.tileWidthUnitsPerPixel;
           const projected = conversion.forward([longitude, latitude]);
-          const xPixel = tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projected[0]) / this.tileMatrix.pixel_x_size);
+          const xPixel =
+            tileWidth - Math.round((tilePieceBoundingBox.maxLongitude - projected[0]) / this.tileMatrix.pixel_x_size);
           const yPixel = Math.round((tilePieceBoundingBox.maxLatitude - projected[1]) / this.tileMatrix.pixel_y_size);
           if (xPixel >= 0 && xPixel < tileWidth && yPixel >= 0 && yPixel < tileHeight) {
             this.addPixel(column, row, xPixel, yPixel);
@@ -316,7 +322,7 @@ export class TileCreator {
   /**
    * Cleans up any canvases that may have been created
    */
-  cleanup () {
+  cleanup(): void {
     if (this.dispose) {
       Canvas.disposeCanvas(this.canvas);
     }

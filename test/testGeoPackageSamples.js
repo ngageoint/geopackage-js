@@ -1,4 +1,4 @@
-import { GeoPackageAPI } from '../.'
+import { GeoPackageManager } from '../.'
 import { default as GeoPackageUtils } from './geopackageUtils'
 
 var path = require('path')
@@ -27,7 +27,7 @@ describe('Create GeoPackage samples', function() {
       this.timeout(60000);
       console.log('Create GeoPackage');
 
-      return GeoPackageAPI.create(testGeoPackage)
+      return GeoPackageManager.create(testGeoPackage)
       .then(async function(gp) {
         console.log('Created GeoPackage');
         GeoPackageUtils.createCRSWKTExtension(gp);
@@ -76,7 +76,7 @@ describe('Create GeoPackage samples', function() {
     it('output an attributes GeoPackage', function() {
       this.timeout(60000);
       console.log('Create GeoPackage');
-      return GeoPackageAPI.create(testGeoPackage)
+      return GeoPackageManager.create(testGeoPackage)
       .then(function(gp) {
         console.log('Created GeoPackage');
         GeoPackageUtils.createCRSWKTExtension(gp);

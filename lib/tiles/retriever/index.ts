@@ -4,10 +4,9 @@ import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { BoundingBox } from '../../boundingBox';
 import { TileCreator } from '../creator/tileCreator';
 import { TileRow } from '../user/tileRow';
-import { TileScaling } from '../../extension/scale/tileScaling';
-import { TileScalingType } from '../../extension/scale/tileScalingType';
-import { Projection } from '../../projection/projection';
-import { ProjectionConstants } from '../../projection/projectionConstants';
+import { TileScaling } from '../../extension/nga/scale/tileScaling';
+import { TileScalingType } from '../../extension/nga/scale/tileScalingType';
+import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 
 export class GeoPackageTileRetriever {
   tileDao: TileDao<TileRow>;
@@ -30,7 +29,7 @@ export class GeoPackageTileRetriever {
     if (this.setWebMercatorBoundingBox == null) {
       this.setWebMercatorBoundingBox = this.tileDao.tileMatrixSet.boundingBox.projectBoundingBox(
         this.tileDao.projection,
-        ProjectionConstants.EPSG_3857,
+        ProjectionConstants.EPSG_WEB_MERCATOR,
       );
     }
     return this.setWebMercatorBoundingBox;
@@ -46,7 +45,7 @@ export class GeoPackageTileRetriever {
     let hasTile = false;
     if (x >= 0 && y >= 0 && zoom >= 0) {
       const tilesBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-      hasTile = this.hasTileForBoundingBox(tilesBoundingBox, ProjectionConstants.EPSG_3857);
+      hasTile = this.hasTileForBoundingBox(tilesBoundingBox, ProjectionConstants.EPSG_WEB_MERCATOR);
     }
     return hasTile;
   }
@@ -71,23 +70,23 @@ export class GeoPackageTileRetriever {
 
   async getTile(x: number, y: number, zoom: number): Promise<any> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_WEB_MERCATOR);
   }
 
   async getWebMercatorTile(x: number, y: number, zoom: number): Promise<any> {
     // need to determine the geoPackage zoom level from the web mercator zoom level
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_WEB_MERCATOR);
   }
 
   async drawTileIn(x: number, y: number, zoom: number, canvas?: any): Promise<any> {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBoxFromXYZ(x, y, zoom);
-    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857, canvas);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_WEB_MERCATOR, canvas);
   }
 
   async getTileWithWgs84Bounds(wgs84BoundingBox: BoundingBox, canvas?: any): Promise<any> {
-    const webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox(ProjectionConstants.EPSG_4326, ProjectionConstants.EPSG_3857);
-    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_3857, canvas);
+    const webMercatorBoundingBox = wgs84BoundingBox.projectBoundingBox(ProjectionConstants.EPSG_4326, ProjectionConstants.EPSG_WEB_MERCATOR);
+    return this.getTileWithBounds(webMercatorBoundingBox, ProjectionConstants.EPSG_WEB_MERCATOR, canvas);
   }
 
   async getTileWithWgs84BoundsInProjection(

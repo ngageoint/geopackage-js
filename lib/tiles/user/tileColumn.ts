@@ -38,14 +38,32 @@ export class TileColumn extends UserColumn {
    * @param  {boolean} autoincrement Autoincrement
    */
   static createIdColumn(index: number, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_ID, GeoPackageDataType.INTEGER, null, false, null, true, autoincrement);
+    return new TileColumn(
+      index,
+      TileColumn.COLUMN_ID,
+      GeoPackageDataType.INTEGER,
+      null,
+      false,
+      null,
+      true,
+      autoincrement,
+    );
   }
   /**
    * Create a zoom level column
    * @param  {number} index Index
    */
   static createZoomLevelColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_ZOOM_LEVEL, GeoPackageDataType.INTEGER, null, true, null, false, false);
+    return new TileColumn(
+      index,
+      TileColumn.COLUMN_ZOOM_LEVEL,
+      GeoPackageDataType.INTEGER,
+      null,
+      true,
+      null,
+      false,
+      false,
+    );
   }
   /**
    *  Create a tile column column
@@ -53,7 +71,16 @@ export class TileColumn extends UserColumn {
    *  @param {number} index column index
    */
   static createTileColumnColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_TILE_COLUMN, GeoPackageDataType.INTEGER, null, true, null, false, false);
+    return new TileColumn(
+      index,
+      TileColumn.COLUMN_TILE_COLUMN,
+      GeoPackageDataType.INTEGER,
+      null,
+      true,
+      null,
+      false,
+      false,
+    );
   }
   /**
    *  Create a tile row column
@@ -62,7 +89,16 @@ export class TileColumn extends UserColumn {
    *
    */
   static createTileRowColumn(index: number): TileColumn {
-    return new TileColumn(index, TileColumn.COLUMN_TILE_ROW, GeoPackageDataType.INTEGER, null, true, null, false, false);
+    return new TileColumn(
+      index,
+      TileColumn.COLUMN_TILE_ROW,
+      GeoPackageDataType.INTEGER,
+      null,
+      true,
+      null,
+      false,
+      false,
+    );
   }
   /**
    *  Create a tile data column
@@ -93,5 +129,18 @@ export class TileColumn extends UserColumn {
     autoincrement?: boolean,
   ): TileColumn {
     return new TileColumn(index, name, type, max, notNull, defaultValue, false, autoincrement);
+  }
+
+  public copy(): TileColumn {
+    return new TileColumn(
+      this.getIndex(),
+      this.getName(),
+      this.getDataType(),
+      this.getMax(),
+      this.isNotNull(),
+      this.getDefaultValue(),
+      this.isPrimaryKey(),
+      this.isAutoincrement(),
+    );
   }
 }

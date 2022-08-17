@@ -1,10 +1,11 @@
 import { Dao } from '../../dao/dao';
-import { RTreeIndex } from './rtreeIndex';
+import { RTreeIndex } from './rtreeIndexExtension';
 import { FeatureDao } from '../../features/user/featureDao';
 import { GeoPackage } from '../../geoPackage';
 import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder';
 import { FeatureRow } from '../../features/user/featureRow';
 import { DBValue } from '../../db/dbAdapter';
+import { GeoPackageDao } from "../../db/geoPackageDao";
 /**
  * RTree module.
  */
@@ -14,7 +15,7 @@ import { DBValue } from '../../db/dbAdapter';
  * @class
  * @extends Dao
  */
-export class RTreeIndexDao extends Dao<RTreeIndex> {
+export class RTreeIndexDao extends GeoPackageDao<RTreeIndex> {
   public static readonly TABLE_NAME: string = 'rtree';
   public static readonly PREFIX: string = 'rtree_';
   public static readonly COLUMN_TABLE_NAME: string = RTreeIndexDao.TABLE_NAME + '.table_name';
@@ -34,11 +35,9 @@ export class RTreeIndexDao extends Dao<RTreeIndex> {
   public static readonly EXTENSION_RTREE_INDEX_DEFINITION: string = 'http://www.geopackage.org/spec/#extension_rtree';
 
   gpkgTableName = RTreeIndexDao.TABLE_NAME;
-  featureDao: FeatureDao<FeatureRow>;
 
-  constructor(geoPackage: GeoPackage, featureDao: FeatureDao<FeatureRow>) {
+  constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.featureDao = featureDao;
   }
   createObject(results?: Record<string, DBValue>): RTreeIndex {
     const rti = new RTreeIndex(this.geoPackage, this.featureDao);

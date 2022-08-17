@@ -1,7 +1,8 @@
 import { GeoPackage } from '../geoPackage';
 import { GeoPackageConnection } from '../db/geoPackageConnection';
-import { Extension } from './extension';
-import { ExtensionDao } from './extensionDao';
+import { Extensions } from './extensions';
+import { ExtensionsDao } from './extensionsDao';
+import { ExtensionScopeType } from './extensionScopeType';
 /**
  * Base Extension
  */
@@ -11,13 +12,18 @@ import { ExtensionDao } from './extensionDao';
  */
 export abstract class BaseExtension {
   /**
+   * GeoPackage
+   */
+  readonly geoPackage: GeoPackage;
+
+  /**
    * Connection to the GeoPackage
    */
   protected readonly connection: GeoPackageConnection;
   /**
    * ExtensionDao
    */
-  readonly extensionsDao: ExtensionDao;
+  readonly extensionsDao: ExtensionsDao;
   /**
    * Name of the extension
    */
@@ -35,9 +41,10 @@ export abstract class BaseExtension {
    *
    * @param geoPackage GeoPackage object
    */
-  constructor(public readonly geoPackage: GeoPackage) {
-    this.connection = geoPackage.connection;
-    this.extensionsDao = geoPackage.extensionDao;
+  constructor(geoPackage: GeoPackage) {
+    this.geoPackage = geoPackage;
+    this.connection = geoPackage.getConnection();
+    this.extensionsDao = ExtensionsDao.createDao(this.connection);
   }
   /**
    * Get the extension or create as needed
@@ -46,31 +53,62 @@ export abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @param  {String}   definition    extension definition
    * @param  {String}   scopeType     extension scope type
-   * @return {Extension}
+   * @return {Extensions}
    */
   getOrCreate(
     extensionName: string,
     tableName: string | null,
     columnName: string | null,
     definition: string,
-    scopeType: string,
-  ): Extension {
-    const extension = this.getExtension(extensionName, tableName, columnName);
-    if (extension.length) {
-      return extension[0];
+    scopeType: ExtensionScopeType,
+  ): Extensions {
+    let extension = this.get(extensionName, tableName, columnName);
+    if (extension == null) {
+      if (!this.extensionsDao.isTableExists()) {
+        this.geoPackage.createExtensionsTable();
+      }
+      extension = new Extensions();
+      extension.setTableName(tableName);
+      extension.setColumnName(columnName);
+      extension.setExtensionName(extensionName);
+      extension.setDefinition(definition);
+      extension.setScope(scopeType);
+      this.createExtension(extensionName, tableName, columnName, definition, scopeType);
+      extension = this.get(extensionName, tableName, columnName);
     }
-    this.extensionsDao.createTable();
-    this.createExtension(extensionName, tableName, columnName, definition, scopeType);
-    return this.getExtension(extensionName, tableName, columnName)[0];
+    return extension;
   }
+
   /**
    * Get the extension for the name, table name and column name
    * @param  {String}   extensionName extension name
    * @param  {String}   tableName     table name
    * @param  {String}   columnName    column name
-   * @return {Extension[]}
+   * @return {Extensions[]}
    */
-  getExtension(extensionName: string, tableName: string | null, columnName: string | null): Extension[] {
+  get(extensionName: string, tableName: string, columnName: string): Extensions {
+    let extension = null;
+    if (this.extensionsDao.isTableExists()) {
+      const extensions = this.extensionsDao.queryByExtensionAndTableNameAndColumnName(
+        extensionName,
+        tableName,
+        columnName,
+      );
+      if (extensions.length > 0) {
+        extension = extensions[0];
+      }
+    }
+    return extension;
+  }
+
+  /**
+   * Get the extension for the name, table name and column name
+   * @param  {String}   extensionName extension name
+   * @param  {String}   tableName     table name
+   * @param  {String}   columnName    column name
+   * @return {Extensions[]}
+   */
+  getExtension(extensionName: string, tableName: string | null, columnName: string | null): Extensions[] {
     if (!this.extensionsDao.isTableExists()) {
       return [];
     }
@@ -92,6 +130,13 @@ export abstract class BaseExtension {
   }
 
   /**
+   * Verify the GeoPackage is writable and throw an exception if it is not
+   */
+  public verifyWritable(): void {
+    this.geoPackage.verifyWritable();
+  }
+
+  /**
    * Create the extension
    * @param {string} extensionName
    * @param {string} tableName
@@ -106,7 +151,7 @@ export abstract class BaseExtension {
     definition: string,
     scopeType: string,
   ): number {
-    const extension = new Extension();
+    const extension = new Extensions();
     extension.table_name = tableName;
     extension.column_name = columnName;
     extension.extension_name = extensionName;

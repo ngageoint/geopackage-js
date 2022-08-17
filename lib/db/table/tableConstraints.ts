@@ -6,7 +6,6 @@ import { Constraint } from './constraint';
 import { Constraints } from './constraints';
 
 export class TableConstraints {
-
   /**
    * Table constraints
    */
@@ -21,7 +20,7 @@ export class TableConstraints {
    * Add a table constraint
    * @param constraint constraint
    */
-  addTableConstraint(constraint: Constraint) {
+  addTableConstraint(constraint: Constraint): void {
     this.constraints.add(constraint);
   }
 
@@ -29,7 +28,7 @@ export class TableConstraints {
    * Add table constraints
    * @param constraints constraints
    */
-  addTableConstraints(constraints: Constraints) {
+  addTableConstraints(constraints: Constraints): void {
     this.constraints.addConstraints(constraints);
   }
 
@@ -66,7 +65,7 @@ export class TableConstraints {
    * @param columnName column name
    * @param constraint constraint
    */
-  addColumnConstraint(columnName: string, constraint: Constraint) {
+  addColumnConstraint(columnName: string, constraint: Constraint): void {
     this.getOrCreateColumnConstraints(columnName).addConstraint(constraint);
   }
 
@@ -75,7 +74,7 @@ export class TableConstraints {
    * @param columnName column name
    * @param constraints constraints
    */
-  addConstraints(columnName: string, constraints: Constraints) {
+  addConstraints(columnName: string, constraints: Constraints): void {
     this.getOrCreateColumnConstraints(columnName).addConstraints(constraints);
   }
 
@@ -83,7 +82,7 @@ export class TableConstraints {
    * Add column constraints
    * @param constraints constraints
    */
-  addColumnConstraints(constraints: ColumnConstraints) {
+  addColumnConstraints(constraints: ColumnConstraints): void {
     this.getOrCreateColumnConstraints(constraints.name).addColumnConstraints(constraints);
   }
 
@@ -105,17 +104,17 @@ export class TableConstraints {
    * Add column constraints
    * @param constraints column constraints
    */
-  addColumnConstraintsMap(constraints: Map<string, ColumnConstraints>) {
-    constraints.forEach((columnConstraints) => {
+  addColumnConstraintsMap(constraints: Map<string, ColumnConstraints>): void {
+    constraints.forEach(columnConstraints => {
       this.addColumnConstraints(columnConstraints);
-    })
+    });
   }
 
   /**
    * Get the column constraints
    * @return column constraints
    */
-  getColumnConstraintsMap(): any  {
+  getColumnConstraintsMap(): any {
     return this.columnConstraints;
   }
 
@@ -144,7 +143,7 @@ export class TableConstraints {
    */
   getColumnConstraint(columnName: string, index: number): Constraint {
     let constraint = null;
-    let columnConstraints = this.getColumnConstraints(columnName);
+    const columnConstraints = this.getColumnConstraints(columnName);
     if (columnConstraints !== null && columnConstraints !== undefined) {
       constraint = columnConstraints.getConstraint(index);
     }
@@ -169,7 +168,7 @@ export class TableConstraints {
    * Add table constraints
    * @param constraints table constraints
    */
-  addAllConstraints(constraints: TableConstraints) {
+  addAllConstraints(constraints: TableConstraints): void {
     if (constraints != null) {
       this.addTableConstraints(constraints.getTableConstraints());
       this.addColumnConstraintsMap(constraints.getColumnConstraintsMap());

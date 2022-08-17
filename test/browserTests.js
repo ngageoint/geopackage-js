@@ -33,10 +33,10 @@ require('./lib/tiles/features/testFeaturePaintCache');
 require('./lib/tiles/features/testFeatureTiles');
 require('./lib/extension/index/testFeatureTableIndex');
 require('./lib/extension/testExtensionDao');
-require('./lib/extension/contents/testContentsIdDao');
-require('./lib/extension/style/testIconCache');
-require('./lib/extension/style/testStyleExtension');
-require('./lib/extension/scale/testTileScalingExtension');
+require('./lib/extension/nga/contents/testContentsIdDao');
+require('./lib/extension/nga/style/testIconCache');
+require('./lib/extension/nga/style/testStyleExtension');
+require('./lib/extension/nga/scale/testTileScalingExtension');
 
 describe('Array', function() {
   describe('#indexOf()', function() {

@@ -38,6 +38,21 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 5.0.0
+- GeoPackageExtensions is now ExtensionManager
+- GeoPackageAPI is now GeoPackageManager
+- Added FeatureTileTableLink extension
+- Added Coverage extension
+- Added Properties extension
+- Added ZoomOther extension
+- Added support for drawing extended geometry types
+- Updated to use NGA simple features javascript libraries
+- Updated to use NGA projections javascript library
+- Added UserCustomRow
+- Reworked UserRow, UserTable, and UserColumn and updated all super types
+- Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
+- Added GeoPackageCache
+
 ##### 4.2.2
 
 - fix simplify error
@@ -321,7 +336,7 @@ GeoPackage.setSqljsWasmLocateFile(file => '/path/to/geopackage/dist/' + file);
 onmessage = function(e) {
   // open geopackage connection to fileData provided in message
   if (e.data.type === 'load') {
-    GeoPackage.GeoPackageAPI.open(e.data.file).then(gp => {
+    GeoPackage.GeoPackageManager.open(e.data.file).then(gp => {
       self.gp = gp;
     });
     // close the geopackage connection
@@ -384,8 +399,8 @@ onmessage = function(e) {
 #### NodeJS Usage ####
 
 ```javascript
-var { 
-  GeoPackageAPI,
+var {
+  GeoPackageManager,
   GeoPackageTileRetriever,
   FeatureTiles,
   setCanvasKitWasmLocateFile,
@@ -396,7 +411,7 @@ var {
 setCanvasKitWasmLocateFile(file => 'path/to/geopackage/dist/canvaskit/' + file);
 
 // open the .gpkg file
-GeoPackageAPI.open('filename.gpkg').then(geoPackage => {
+GeoPackageManager.open('filename.gpkg').then(geoPackage => {
   // get the tile table names
   const tileTables = geoPackage.getTileTables();
   

@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import {RelatedTablesExtension} from '../../../../lib/extension/related'
 
-var UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
+var UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
   , path = require('path');

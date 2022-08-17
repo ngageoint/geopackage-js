@@ -2,7 +2,7 @@ import { UserColumn } from './userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { Constraint } from '../db/table/constraint';
 import { ConstraintType } from '../db/table/constraintType';
-import { Contents } from '../core/contents/contents';
+import { Contents } from '../contents/contents';
 import { UserColumns } from './userColumns';
 import { Constraints } from '../db/table/constraints';
 
@@ -15,7 +15,17 @@ import { Constraints } from '../db/table/constraints';
  * @param  {module:user/userColumn~UserColumn[]} columns user columns
  * @param  {string[]} [requiredColumns] required columns
  */
-export class UserTable<TColumn extends UserColumn> {
+export abstract class UserTable<TColumn extends UserColumn> {
+  /**
+   * Default id autoincrement setting
+   */
+  public static DEFAULT_AUTOINCREMENT = true;
+
+  /**
+   * Default primary key not null setting
+   */
+  public static DEFAULT_PK_NOT_NULL = true;
+
   /**
    * Columns
    */
@@ -32,273 +42,480 @@ export class UserTable<TColumn extends UserColumn> {
   contents: Contents;
 
   /**
-   *
-   * @param columns
+   * Constructor
+   * @param columns columns
    */
-  constructor(columns: UserColumns<TColumn>) {
-    this.columns = columns;
-    this.constraints = new Constraints();
-  }
+  constructor(columns: UserColumns<TColumn>);
 
-  copy(): UserTable<TColumn> {
-    const userTableCopy = new UserTable<TColumn>(this.columns.copy());
-    userTableCopy.constraints.addConstraints(this.constraints);
-    if (this.contents !== null && this.contents !== undefined) {
-      userTableCopy.contents = this.contents.copy();
+  /**
+   * Constructor
+   * @param userTable UserTable
+   */
+  constructor(userTable: UserTable<TColumn>);
+
+  /**
+   * Contructor
+   * @param args
+   */
+  constructor(...args) {
+    if (args.length === 1) {
+      if (args[0] instanceof UserColumns) {
+        this.columns = args[0];
+        this.constraints = new Constraints();
+      } else if (args[0] instanceof UserTable) {
+        const userTable = args[0];
+        this.columns = userTable.columns.copy();
+        this.constraints = userTable.constraints.copy();
+        this.contents = userTable.contents;
+      }
     }
-    return userTableCopy;
   }
 
-  getTableName(): string {
-    return this.columns.getTableName();
+  /**
+   * Copy the table
+   * @return copied table
+   */
+  public abstract copy(): UserTable<TColumn>;
+
+  /**
+   * Get the contents data type
+   * @return data type
+   */
+  public abstract getDataType(): string;
+
+  /**
+   * Get the contents data type from the contents or use the default
+   *
+   * @param defaultType default data type
+   * @return contents or default data type
+   */
+  protected getDataTypeOrDefault(defaultType: string): string {
+    let dataType = null;
+    if (this.contents != null) {
+      dataType = this.contents.getDataTypeName();
+    }
+    if (dataType == null) {
+      dataType = defaultType;
+    }
+    return dataType;
   }
 
-  get tableType(): string {
-    return 'userTable';
+  /**
+   * Create user columns for a subset of table columns
+   * @param columns columns
+   * @return user columns
+   */
+  public abstract createUserColumns(columns: TColumn[]): UserColumns<TColumn>;
+
+  /**
+   * Create user columns for a subset of table columns
+   * @param columnNames column names
+   * @return user columns
+   */
+  public createUserColumnsFromColumnNames(columnNames: string[]): UserColumns<TColumn> {
+    return this.createUserColumns(this.getColumnsForColumnNames(columnNames));
   }
 
   /**
    * Get the user columns
    * @return user columns
    */
-  getUserColumns(): UserColumns<TColumn> {
+  public getUserColumns(): UserColumns<TColumn> {
     return this.columns;
   }
 
   /**
    * Get the column index of the column name
-   * @param  {string} columnName column name
-   * @return {Number} the column index
-   * @throws Will throw an error if the column is not found in the table
+   * @param columnName column name
+   * @return column index
    */
-  getColumnIndex(columnName: string): number {
+  public getColumnIndex(columnName: string): number {
     return this.columns.getColumnIndexForColumnName(columnName);
   }
+
   /**
-   * Check if the table has the column
-   * @param  {string} columnName name of the column
-   * @return {Boolean}            true if the column exists in the table
+   * Get the array of column names
+   * @return column names
    */
-  hasColumn(columnName: string): boolean {
-    try {
-      this.getColumnIndex(columnName);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  public getColumnNames(): string[] {
+    return this.columns.getColumnNames();
   }
+
   /**
-   * Get the column name from the index
-   * @param  {Number} index index
-   * @return {string} the column name
+   * Get the column name at the index
+   * @param index column index
+   * @return column name
    */
-  getColumnNameWithIndex(index: number): string {
+  public getColumnName(index: number): string {
     return this.columns.getColumnName(index);
   }
+
   /**
-   * Get the column from the index
-   * @param  {Number} index index
-   * @return {module:user/userColumn~UserColumn} column at the index
+   * Get the list of columns
+   * @return columns
    */
-  getColumnWithIndex(index: number): UserColumn {
+  public getColumns(): TColumn[] {
+    return this.columns.getColumns();
+  }
+
+  /**
+   * Get the columns from the column names
+   * @param columnNames column names
+   * @return columns
+   */
+  public getColumnsForColumnNames(columnNames: string[]): TColumn[] {
+    const columns = [];
+    for (const columnName of columnNames) {
+      columns.push(this.getColumn(columnName));
+    }
+    return columns;
+  }
+
+  /**
+   * Get the column at the index
+   * @param index column index
+   * @return column
+   */
+  public getColumnForIndex(index: number): TColumn {
     return this.columns.getColumnForIndex(index);
   }
+
   /**
-   * Get column with the column name
-   * @param  {string} columnName column name
-   * @return {module:user/userColumn~UserColumn}            column at the index
+   * Get the column of the column name
+   * @param columnName column name
+   * @return column
    */
-  getColumnWithColumnName(columnName: string): UserColumn {
-    return this.getColumnWithIndex(this.getColumnIndex(columnName));
+  public getColumn(columnName: string): TColumn {
+    return this.columns.getColumn(columnName);
   }
+
+  /**
+   * Check if the table has the column
+   *
+   * @param columnName
+   *            column name
+   * @return true if has the column
+   */
+  public hasColumn(columnName: string): boolean {
+    return this.columns.hasColumn(columnName);
+  }
+
   /**
    * Get the column count
-   * @return {Number} the count of the columns
+   *
+   * @return column count
    */
-  getColumnCount(): number {
+  public columnCount(): number {
     return this.columns.columnCount();
   }
+
+  /**
+   * Get the table name
+   *
+   * @return table name
+   */
+  public getTableName(): string {
+    return this.columns.getTableName();
+  }
+
+  /**
+   * Set the table name
+   *
+   * @param tableName
+   *            table name
+   */
+  public setTableName(tableName: string): void {
+    this.columns.setTableName(tableName);
+  }
+
+  /**
+   * Check if the table has a primary key column
+   *
+   * @return true if has a primary key
+   */
+  public hasPkColumn(): boolean {
+    return this.columns.hasPkColumn();
+  }
+
+  /**
+   * Get the primary key column index
+   *
+   * @return primary key column index
+   */
+  public getPkColumnIndex(): number {
+    return this.columns.getPkColumnIndex();
+  }
+
   /**
    * Get the primary key column
-   * @return {module:user/userColumn~UserColumn} the primary key column
+   *
+   * @return primary key column
    */
-  getPkColumn(): UserColumn {
+  public getPkColumn(): TColumn {
     return this.columns.getPkColumn();
   }
 
   /**
    * Get the primary key column name
+   *
    * @return primary key column name
    */
-  getPkColumnName(): string {
+  public getPkColumnName(): string {
     return this.columns.getPkColumnName();
   }
 
   /**
-   * Get the column index of the id column
-   * @return {Number}
-   */
-  getIdColumnIndex(): number {
-    return this.columns.getPkColumnIndex();
-  }
-  /**
-   * Get the primary key id column
-   * @return {module:user/userColumn~UserColumn}
-   */
-  getIdColumn(): UserColumn {
-    return this.getPkColumn();
-  }
-
-  /**
    * Add constraint
-   * @param constraint constraint
+   *
+   * @param constraint
+   *            constraint
    */
-  addConstraint(constraint: Constraint) {
+  public addConstraint(constraint: Constraint): void {
     this.constraints.add(constraint);
   }
 
   /**
    * Add constraints
-   * @param constraints constraints
+   *
+   * @param constraints
+   *            constraints
    */
-  addConstraints(constraints: Constraints) {
-    this.constraints.addConstraints(constraints);
+  public addConstraints(constraints: Constraint[]): void {
+    this.constraints.addConstraintArray(constraints);
+  }
+
+  /**
+   * Add constraints
+   *
+   * @param constraints
+   *            constraints
+   */
+  public addConstraintsWithConstraints(constraints: Constraints): void {
+    this.addConstraints(constraints.all());
   }
 
   /**
    * Check if has constraints
+   *
    * @return true if has constraints
    */
-  hasConstraints(): boolean {
+  public hasConstraints(): boolean {
     return this.constraints.has();
   }
 
   /**
+   * Check if has constraints of the provided type
+   *
+   * @param type
+   *            constraint type
+   * @return true if has constraints
+   */
+  public hasConstraintsForType(type: ConstraintType): boolean {
+    return this.constraints.hasType(type);
+  }
+
+  /**
    * Get the constraints
+   *
    * @return constraints
    */
-  getConstraints(): Constraints {
+  public getConstraints(): Constraints {
     return this.constraints;
   }
 
   /**
    * Get the constraints of the provided type
-   * @param type  constraint type
+   *
+   * @param type
+   *            constraint type
    * @return constraints
    */
-  getConstraintsByType(type: ConstraintType): Constraint[] {
+  public getConstraintsForType(type: ConstraintType): Constraint[] {
     return this.constraints.getConstraintsForType(type);
   }
 
   /**
    * Clear the constraints
+   *
    * @return cleared constraints
    */
-  clearConstraints(): Constraint[] {
+  public clearConstraints(): Constraint[] {
     return this.constraints.clear();
   }
 
   /**
+   * Clear the constraints of the provided type
+   *
+   * @param type
+   *            constraint type
+   * @return cleared constraints
+   */
+  public clearConstraintsByType(type: ConstraintType): Constraint[] {
+    return this.constraints.clearConstraintsByType(type);
+  }
+
+  /**
    * Get the columns with the provided data type
-   * @param type data type
+   *
+   * @param type
+   *            data type
    * @return columns
    */
-  columnsOfType(type: GeoPackageDataType): UserColumn[] {
+  public columnsOfType(type: GeoPackageDataType): TColumn[] {
     return this.columns.columnsOfType(type);
   }
 
   /**
    * Get the contents
+   *
    * @return contents
    */
-  getContents(): Contents {
+  public getContents(): Contents {
     return this.contents;
   }
 
   /**
    * Set the contents
-   * @param contents contents
+   *
+   * @param contents
+   *            contents
    */
-  setContents(contents: Contents) {
+  public setContents(contents: Contents): void {
     this.contents = contents;
-    if (contents !== null && contents !== undefined) {
+    if (contents != null) {
       this.validateContents(contents);
     }
   }
 
   /**
    * Validate that the set contents are valid
+   *
    * @param contents contents
    */
-  validateContents(contents: Contents) {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected validateContents(contents: Contents): void {}
 
+  /**
+   * Is the primary key modifiable
+   *
+   * @return true if the primary key is modifiable
+   */
+  public isPkModifiable(): boolean {
+    return this.columns.isPkModifiable();
+  }
+
+  /**
+   * Set if the primary key can be modified
+   *
+   * @param pkModifiable
+   *            primary key modifiable flag
+   */
+  public setPkModifiable(pkModifiable: boolean): void {
+    this.columns.setPkModifiable(pkModifiable);
+  }
+
+  /**
+   * Is value validation against column types enabled
+   *
+   * @return true if values are validated against column types
+   */
+  public isValueValidation(): boolean {
+    return this.columns.isValueValidation();
+  }
+
+  /**
+   * Set if values should validated against column types
+   *
+   * @param valueValidation
+   *            value validation flag
+   */
+  public setValueValidation(valueValidation: boolean): void {
+    this.columns.setValueValidation(valueValidation);
   }
 
   /**
    * Add a new column
-   * @param column new column
+   *
+   * @param column
+   *            new column
    */
-  addColumn(column: TColumn) {
+  public addColumn(column: TColumn): void {
     this.columns.addColumn(column);
   }
 
   /**
    * Rename a column
-   * @param column column
-   * @param newColumnName new column name
+   *
+   * @param column
+   *            column
+   * @param newColumnName
+   *            new column name
    */
-  renameColumn(column: TColumn, newColumnName: string) {
+  public renameColumn(column: TColumn, newColumnName: string): void {
     this.columns.renameColumn(column, newColumnName);
   }
 
   /**
    * Rename a column
-   * @param columnName column name
-   * @param newColumnName new column name
+   *
+   * @param columnName
+   *            column name
+   * @param newColumnName
+   *            new column name
    */
-  renameColumnWithName(columnName: string, newColumnName: string) {
+  public renameColumnWithName(columnName: string, newColumnName: string): void {
     this.columns.renameColumnWithName(columnName, newColumnName);
   }
 
   /**
    * Rename a column
-   * @param index column index
-   * @param newColumnName new column name
+   *
+   * @param index
+   *            column index
+   * @param newColumnName
+   *            new column name
    */
-  renameColumnAtIndex(index: number, newColumnName: string) {
+  public renameColumnWithIndex(index: number, newColumnName: string): void {
     this.columns.renameColumnWithIndex(index, newColumnName);
   }
 
   /**
    * Drop a column
-   * @param column column to drop
+   *
+   * @param column
+   *            column to drop
    */
-  dropColumn(column: TColumn) {
+  public dropColumn(column: TColumn): void {
     this.columns.dropColumn(column);
   }
 
   /**
    * Drop a column
-   * @param columnName column name
+   *
+   * @param columnName
+   *            column name
    */
-  dropColumnWithName(columnName: string) {
+  public dropColumnWithName(columnName: string): void {
     this.columns.dropColumnWithName(columnName);
   }
 
   /**
    * Drop a column
-   * @param index column index
+   *
+   * @param index
+   *            column index
    */
-  dropColumnWithIndex(index: number) {
+  public dropColumnWithIndex(index: number): void {
     this.columns.dropColumnWithIndex(index);
   }
 
   /**
    * Alter a column
-   * @param column altered column
+   *
+   * @param column
+   *            altered column
    */
-  alterColumn(column: TColumn) {
+  public alterColumn(column: TColumn): void {
     this.columns.alterColumn(column);
   }
-
 }

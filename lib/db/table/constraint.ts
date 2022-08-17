@@ -1,15 +1,14 @@
 import { ConstraintType } from './constraintType';
 import { StringUtils } from '../stringUtils';
+import { Comparable } from '@ngageoint/simple-features-js';
 
-export class Constraint {
-
+export class Constraint implements Comparable<Constraint> {
   /**
    * Constraint keyword
    */
   static CONSTRAINT = 'CONSTRAINT';
 
-  constructor(public type: ConstraintType, public name?: string, public order: number = Number.MAX_SAFE_INTEGER) {
-  }
+  constructor(public type: ConstraintType, public name?: string, public order: number = Number.MAX_SAFE_INTEGER) {}
 
   /**
    * Build the name SQL
@@ -43,12 +42,15 @@ export class Constraint {
     return this.type;
   }
 
-  compareTo(constraint: Constraint) {
+  setOrder(order: number): void {
+    this.order = order;
+  }
+
+  compareTo(constraint: Constraint): number {
     return this.getOrder(this.order) - this.getOrder(constraint.order) <= 0 ? -1 : 1;
   }
 
-  private getOrder(order: number): number {
+  public getOrder(order: number): number {
     return order !== null && order !== undefined ? order : Number.MAX_VALUE;
   }
 }
-

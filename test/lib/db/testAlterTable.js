@@ -1,19 +1,19 @@
 import { default as testSetup } from '../../fixtures/testSetup'
-import {TileScaling} from "../../../lib/extension/scale/tileScaling";
-import {TileScalingType} from "../../../lib/extension/scale/tileScalingType";
+import {TileScaling} from "../../../lib/extension/nga/scale/tileScaling";
+import {TileScalingType} from "../../../lib/extension/nga/scale/tileScalingType";
 
 var FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
-  , FeatureTableStyles = require('../../../lib/extension/style/featureTableStyles').FeatureTableStyles
+  , FeatureTableStyles = require('../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , GeometryColumns = require('../../../lib/features/columns/geometryColumns').GeometryColumns
   , AlterTable = require('../../../lib/db/alterTable').AlterTable
   , TableInfo = require('../../../lib/db/table/tableInfo').TableInfo
-  , CoreSQLUtils = require('../../../lib/db/coreSQLUtils').CoreSQLUtils
+  , CoreSQLUtils = require('../../../lib/db/sqlUtils').SQLUtils
   , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , GeometryData = require('../../../lib/geom/geometryData').GeometryData
-  , GeometryType = require('../../../lib/features/user/geometryType').GeometryType
+  , GeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatrixDao
   , TileMatrixSetDao = require('../../../lib/tiles/matrixset/tileMatrixSetDao').TileMatrixSetDao
-  , NGAExtensions = require('../../../lib/extension/ngaExtensions').NGAExtensions
+  , NGAExtensions = require('../../../lib/extension/nga/ngaExtensions').NGAExtensions
   , should = require('chai').should()
   , wkx = require('wkx')
   , path = require('path')
@@ -140,7 +140,7 @@ describe('AlterTable tests', function() {
     featureDao.count().should.be.equal(6);
 
     // check if extensions were copied successfully
-    NGAExtensions.getFeatureStyleExtension(geopackage).has(copyTableName).should.equal(true);
+    new NGAExtensions(geopackage).getFeatureStyleExtension().has(copyTableName).should.equal(true);
   });
 
   it('should copy a feature table and not it\'s content', function() {

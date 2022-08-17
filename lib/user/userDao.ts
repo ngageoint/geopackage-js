@@ -1,378 +1,829 @@
-import { Dao } from '../dao/dao';
-import { GeoPackage } from '../geoPackage';
-import { UserMappingTable } from '../extension/relatedTables/userMappingTable';
-import { MediaTable } from '../extension/relatedTables/mediaTable';
-import { SimpleAttributesTable } from '../extension/relatedTables/simpleAttributesTable';
 import { UserRow } from './userRow';
-import { RelationType } from '../extension/relatedTables/relationType';
 import { UserTable } from './userTable';
-import { MediaRow } from '../extension/relatedTables/mediaRow';
-import { SimpleAttributesRow } from '../extension/relatedTables/simpleAttributesRow';
-import { FeatureRow } from '../features/user/featureRow';
-import { ExtendedRelation } from '../extension/relatedTables/extendedRelation';
-import { DBValue } from '../db/dbAdapter';
-import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { UserColumn } from './userColumn';
-import { AlterTable } from '../db/alterTable';
-import { CoreSQLUtils } from '../db/coreSQLUtils';
+import { GeoPackageConnection } from '../db/geoPackageConnection';
+import { UserConnection } from './userConnection';
+import { Projection, ProjectionConstants, Projections } from '@ngageoint/projections-js';
+import { BoundingBox } from '../boundingBox';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { Contents } from '../contents/contents';
+import { GeoPackageException } from '../geoPackageException';
+import { TileBoundingBoxUtils } from '../tiles/tileBoundingBoxUtils';
+import { SQLUtils } from '../db/sqlUtils';
+import { UserResultSet } from './userResultSet';
+import { ColumnValue } from "./columnValue";
+import { AlterTable } from "../db/alterTable";
+import { ColumnValues } from "../dao/columnValues";
+import { DBValue } from "../db/dbAdapter";
+import { ContentValues } from "./contentValues";
 
 /**
- * Abstract User DAO for reading user tables
- * @class UserDao
- * @extends Dao
- * @param  {module:db/geoPackageConnection~GeoPackageConnection} geoPackage        connection
- * @param  {string} table table name
+ * Abstract UserDao
  */
-export class UserDao<T extends UserRow> extends Dao<UserRow> {
-  table_name: string;
-  columns: string[];
-  protected _table: UserTable<UserColumn>;
-  protected constructor(geoPackage: GeoPackage, table: UserTable<UserColumn>) {
-    super(geoPackage);
-    this._table = table;
-    this.table_name = table.getTableName();
-    this.gpkgTableName = table.getTableName();
-    if (table.getPkColumn()) {
-      this.idColumns = [table.getPkColumn().getName()];
+export abstract class UserDao<
+  TColumn extends UserColumn,
+  TTable extends UserTable<TColumn>,
+  TRow extends UserRow<TColumn, TTable>,
+  TResult extends UserResultSet<TColumn, TTable, TRow>
+> {
+  /**
+   * Connection
+   */
+  private readonly db: GeoPackageConnection;
+
+  /**
+   * Database
+   */
+  private readonly database: string;
+
+  /**
+   * User Database connection
+   */
+  private readonly userDb: UserConnection<TColumn, TTable, TRow, TResult>;
+
+  /**
+   * User table
+   */
+  private readonly table: TTable;
+
+  /**
+   * Projection
+   */
+  protected projection: Projection;
+
+  protected constructor(
+    database: string,
+    db: GeoPackageConnection,
+    userDb: UserConnection<TColumn, TTable, TRow, TResult>,
+    table: TTable,
+  ) {
+    this.database = database;
+    this.userDb = userDb;
+    this.table = table;
+    this.db = db;
+    userDb.setTable(table);
+  }
+
+  /**
+   * Get a new empty row
+   * @return row
+   */
+  public abstract newRow(): TRow;
+
+  /**
+   * Get the bounding box of the user table data
+   *
+   * @return bounding box of user table data
+   */
+  protected abstract getBoundingBox(): BoundingBox;
+
+  /**
+   * Get the bounding box of the user table data
+   *
+   * @param projection desired projection
+   *
+   * @return bounding box of user table data
+   */
+  protected abstract getBoundingBoxWithProjection(projection: Projection): BoundingBox;
+
+  /**
+   * Project the provided bounding box in the declared projection to the user
+   * DAO projection
+   *
+   * @param boundingBox
+   *            bounding box
+   * @param projection
+   *            projection
+   * @return projected bounding box
+   */
+  public projectBoundingBox(boundingBox: BoundingBox, projection: Projection): BoundingBox {
+    const projectionTransform = GeometryTransform.create(projection, this.getProjection());
+    const projectedBoundingBox = boundingBox.transform(projectionTransform);
+    return projectedBoundingBox;
+  }
+
+  /**
+   * Prepare the result before returning
+   * @param result result
+   * @return prepared result
+   */
+  protected prepareResult(result: TResult): TResult  {
+    return result;
+  }
+
+  /**
+   * Get the database
+   *
+   * @return database
+   */
+  public getDatabase(): string {
+    return this.database;
+  }
+
+  /**
+   * Get the database connection
+   *
+   * @return database connection
+   */
+  public getDb(): GeoPackageConnection {
+    return this.db;
+  }
+
+  /**
+   * Get the user database connection
+   *
+   * @return user database connection
+   */
+  public getUserDb(): UserConnection<TColumn, TTable, TRow, TResult> {
+    return this.userDb;
+  }
+
+  /**
+   * Get the table name
+   *
+   * @return table name
+   */
+  public getTableName(): string {
+    return this.table.getTableName();
+  }
+
+  /**
+   * Get the table
+   *
+   * @return table
+   */
+  public getTable(): TTable {
+    return this.table;
+  }
+
+  /**
+   * Check if the table has a primary key column
+   *
+   * @return true if has a primary key
+   */
+  public hasPkColumn(): boolean {
+    return this.table.getUserColumns().hasPkColumn();
+  }
+
+  /**
+   * Get the primary key column index
+   *
+   * @return primary key column index
+   */
+  public getPkColumnIndex(): number {
+    return this.table.getPkColumnIndex();
+  }
+
+  /**
+   * Get the primary key column
+   *
+   * @return primary key column
+   */
+  public getPkColumn(): TColumn {
+    return this.table.getPkColumn();
+  }
+
+  /**
+   * Get the primary key column name
+   *
+   * @return primary key column name
+   */
+  public getPkColumnName(): string {
+    return this.table.getPkColumnName();
+  }
+
+  /**
+   * Get the table columns
+   * @return columns
+   */
+  public getColumns(): TColumn[] {
+    return this.table.getColumns();
+  }
+
+  /**
+   * Get the table column names
+   *
+   * @return column names
+   */
+  public getColumnNames(): string[] {
+    return this.table.getColumnNames();
+  }
+
+  /**
+   * Get the column count
+   *
+   * @return column count
+   */
+  public columnCount(): number {
+    return this.table.columnCount();
+  }
+
+  /**
+   * Get the contents
+   *
+   * @return contents
+   */
+  public getContents(): Contents {
+    return this.table.getContents();
+  }
+
+  /**
+   * Get the projection
+   *
+   * @return projection
+   */
+  public getProjection(): Projection {
+    return this.projection;
+  }
+
+  /**
+   * Is the primary key modifiable
+   *
+   * @return true if the primary key is modifiable
+   */
+  public isPkModifiable(): boolean {
+    return this.table.isPkModifiable();
+  }
+
+  /**
+   * Set if the primary key can be modified
+   *
+   * @param pkModifiable primary key modifiable flag
+   */
+  public setPkModifiable(pkModifiable: boolean): void {
+    this.table.setPkModifiable(pkModifiable);
+  }
+
+  /**
+   * Is value validation against column types enabled
+   *
+   * @return true if values are validated against column types
+   */
+  public isValueValidation(): boolean {
+    return this.table.isValueValidation();
+  }
+
+  /**
+   * Set if values should validated against column types
+   *
+   * @param valueValidation
+   *            value validation flag
+   */
+  public setValueValidation(valueValidation: boolean): void {
+    this.table.setValueValidation(valueValidation);
+  }
+
+  /**
+   * Drop the user table
+   */
+  public dropTable(): void {
+    SQLUtils.dropTable(this.db, this.getTableName());
+  }
+
+  /**
+   * Raw query
+   * @param sql SQL
+   * @param selectionArgs selection args
+   * @return result
+   */
+  public rawQueryWithArgs(sql: string, selectionArgs: [] = null): TResult {
+    return this.userDb.rawQuery(sql, selectionArgs);
+  }
+
+  /**
+   * Raw query
+   * @param sql SQL
+   * @param columns subset of table columns defined in the SQL
+   * @param selectionArgs selection args
+   * @return result
+   */
+  public rawQueryWithColumns(sql: string, columns: string[], selectionArgs: []): TResult {
+    return this.userDb.rawQueryWithColumns(sql, columns, selectionArgs);
+  }
+
+  /**
+   * Query for all rows
+   * @return result
+   */
+  public queryForAll(): TResult {
+    return this.query();
+  }
+
+  /**
+   * Query
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public query(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+    this.prepareResult(result);
+    return result;
+  }
+
+  /**
+   * Get a count of results
+   * @param distinct
+   * @param column
+   * @param where
+   * @param whereArgs
+   */
+  public countColumn(distinct: boolean, column: string, where: string, whereArgs: any[]) {
+    return this.userDb.countColumn(this.getTableName(), distinct, column, where, whereArgs);
+  }
+
+  /**
+   * Count
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public count(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Get the count in the nested SQL query
+   * @param column count column name
+   * @param nestedSQL nested SQL
+   * @return count
+   */
+  public countColumnIn(column: string, nestedSQL: string): number {
+    return this.countIn(false, column, nestedSQL);
+  }
+
+  /**
+   * Get the count in the nested SQL query
+   *
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countIn(distinct: boolean, column: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+    const whereClause = this.buildWhereIn(nestedSQL, where);
+    const args = this.buildWhereInArgs(nestedArgs, whereArgs);
+    return this.db.countColumn(this.getTableName(), distinct, column, where, args);
+  }
+
+  /**
+   * Query for the row with the provided id
+   * @param id id
+   * @return result
+   */
+  public queryForId(id: number): TResult {
+    const where = this.getPkWhere(id);
+    const whereArgs = this.getPkWhereArgs(id);
+    const result = this.userDb.query(false, this.getTableName(), this.getColumnNames(), where, whereArgs, undefined, undefined, undefined);
+    this.prepareResult(result);
+    return result;
+  }
+
+  /**
+   * Query for the row with the provided id
+   * @param id id
+   * @return row
+   */
+  public queryForIdRow(id: number): TRow {
+    let row = null;
+    let readCursor = this.queryForId(id);
+    if (readCursor.moveToNext()) {
+      row = readCursor.getRow();
+    }
+    return row;
+  }
+
+  /**
+   * Query the SQL for a single result object in the first column
+   * @param sql sql statement
+   * @param args sql arguments
+   * @return single result object
+   */
+  public querySingleResult(sql: string, args: string[]): any {
+    let value = null;
+    const result = this.db.get(sql, args);
+    if (result != null) {
+      const keys = Object.keys(result);
+      if (keys.length > 0) {
+        value = result[keys[0]];
+      }
+    }
+    return value;
+  }
+
+
+  /**
+   * Get the primary key where clause
+   * @param id  id
+   * @return primary key where clause
+   */
+  protected getPkWhere(id: number): string {
+    return this.buildWhere(this.table.getPkColumnName(), id);
+  }
+
+  /**
+   * Get the primary key where args
+   * @param id  id
+   * @return primary key where args
+   */
+  protected getPkWhereArgs(id: number): [] {
+    return this.buildWhereArgs(id);
+  }
+
+  /**
+   * Build where (or selection) statement for a single field
+   * @param field field name
+   * @param value field value
+   * @return where clause
+   */
+  public buildWhere(field: string, value: any): string {
+    return this.buildWhereWithOp(field, value, '=');
+  }
+
+  /**
+   * Build where or selection statement for fields
+   * @param  fields    columns and values
+   * @param  [operation=AND] AND or OR
+   * @return where clause
+   */
+  buildWhereWithFields(fields: ColumnValues, operation = 'and'): string {
+    let whereString = '';
+    for (let i = 0; i < fields.columns.length; i++) {
+      const column = fields.columns[i];
+      if (i) {
+        whereString += ' ' + operation + ' ';
+      }
+      whereString += this.buildWhere(column, fields.getValue(column));
+    }
+    return whereString;
+  }
+
+  /**
+   * Builds a where args array
+   * @param {any[]|ColumnValues|any} values argument values to push
+   * @returns {any[]}
+   */
+  buildWhereArgsWithValues(values: DBValue[] | ColumnValues | DBValue): any[] | null {
+    let args = [];
+    if (Array.isArray(values)) {
+      args = this._buildWhereArgsWithArray(values);
+    } else if (values instanceof ColumnValues) {
+      args = this._buildWhereArgsWithColumnValues(values);
     } else {
-      this.idColumns = [];
+      if (values !== undefined && values !== null) {
+        args.push(values);
+      }
     }
-    this.columns = table.getUserColumns().getColumnNames();
-  }
-  /**
-   * Creates a UserRow
-   * @param  {Object} [results] results to create the row from if not specified, an empty row is created
-   * @return {module:user/userRow~UserRow}
-   */
-  createObject(results: Record<string, DBValue>): UserRow {
-    if (results) {
-      return this.getRow(results);
-    }
-    return this.newRow();
-  }
-  /**
-   * Sets the value in the row
-   * @param  {module:user/userRow~UserRow} object      user row
-   * @param  {Number} columnIndex index
-   * @param  {Object} value       value
-   */
-  setValueInObject(object: T, columnIndex: number, value: any): void {
-    object.setValueNoValidationWithIndex(columnIndex, value);
-  }
-  /**
-   * Get a user row from the current results
-   * @param  {Object} results result to create the row from
-   * @return {module:user/userRow~UserRow}         the user row
-   */
-  getRow(results: Record<string, DBValue>): UserRow {
-    if (results instanceof UserRow) {
-      return results;
-    }
-    if (!this.table) return undefined;
-    const columns = this.table.getColumnCount();
-    const columnTypes: { [key: string]: GeoPackageDataType } = {};
-    for (let i = 0; i < columns; i++) {
-      const column = this.table.getColumnWithIndex(i);
-      columnTypes[column.name] = column.dataType;
-    }
-    return this.newRow(columnTypes, results);
-  }
-  /**
-   * Get the table for this dao
-   * @return {module:user/userTable~UserTable}
-   */
-  get table(): UserTable<UserColumn> {
-    return this._table;
-  }
-  /**
-   * Create a user row
-   * @param  {module:db/geoPackageDataType[]} columnTypes  column types
-   * @param  {module:dao/columnValues~ColumnValues[]} values      values
-   * @return {module:user/userRow~UserRow}             user row
-   */
-  newRow(columnTypes?: { [key: string]: GeoPackageDataType }, values?: Record<string, DBValue>): UserRow {
-    return new UserRow(this.table, columnTypes, values);
+    return args.length ? args : null;
   }
 
   /**
-   * Links related rows together
-   * @param  {module:user/userRow~UserRow} userRow             user row
-   * @param  {module:user/userRow~UserRow} relatedRow          related row
-   * @param  {string} relationType        relation type
-   * @param  {string|UserMappingTable} [mappingTable]        mapping table
-   * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {number}
+   * Builds a where args array
+   * @param {any[]} values argument values to push
+   * @returns {any[]}
    */
-  linkRelatedRow(
-    userRow: UserRow,
-    relatedRow: UserRow,
-    relationType: RelationType,
-    mappingTable?: string | UserMappingTable,
-    mappingColumnValues?: Record<string, any>,
-  ): number {
-    const rte = this.geoPackage.relatedTablesExtension;
-    const baseTableName = userRow.table.getTableName();
-    const relatedTableName = relatedRow.table.getTableName();
-    const relationship = rte
-      .getRelationshipBuilder()
-      .setBaseTableName(baseTableName)
-      .setRelatedTableName(relatedTableName)
-      .setRelationType(relationType);
-    let mappingTableName: string;
-    if (!mappingTable || typeof mappingTable === 'string') {
-      mappingTable = mappingTable || baseTableName + '_' + relatedTableName;
-      relationship.setMappingTableName(mappingTable);
-      mappingTableName = mappingTable as string;
+  _buildWhereArgsWithArray(values: DBValue[]): DBValue[] {
+    const args = [];
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i];
+      if (value !== undefined && value !== null) {
+        args.push(value);
+      }
+    }
+    return args;
+  }
+
+  /**
+   * Builds a where args array
+   * @param {ColumnValues} values argument values to push
+   * @returns {any[]}
+   */
+  _buildWhereArgsWithColumnValues(values: ColumnValues): DBValue[] {
+    const args = [];
+    for (let i = 0; i < values.columns.length; i++) {
+      const column = values.columns[i];
+      const value = values.getValue(column);
+      if (value !== undefined && value !== null) {
+        args.push(value);
+      }
+    }
+    return args;
+  }
+
+  /**
+   * Build where (or selection) LIKE statement for a single field
+   * @param field field name
+   * @param value field value
+   * @return where clause
+   */
+  public buildWhereLike(field: string, value: any): string {
+    return this.buildWhereWithOp(field, value, 'LIKE');
+  }
+
+  /**
+   * Build where statement for ids in the nested SQL query
+   * @param nestedSQL nested SQL
+   * @param where where clause
+   * @return where clause
+   */
+  public buildWhereIn(nestedSQL: string, where: string): string {
+    const nestedWhere = SQLUtils.quoteWrap(this.table.getPkColumnName()) + " IN (" + nestedSQL + ")";
+    let whereClause;
+    if (where == null) {
+      whereClause = nestedWhere;
     } else {
-      relationship.setUserMappingTable(mappingTable);
-      mappingTableName = mappingTable.getTableName();
+      whereClause = "(" + where + ") AND (" + nestedWhere + ")";
     }
-    rte.addRelationship(relationship);
-    const userMappingDao = rte.getMappingDao(mappingTableName);
-    const userMappingRow = userMappingDao.newRow();
-    userMappingRow.baseId = userRow.id;
-    userMappingRow.relatedId = relatedRow.id;
-    for (const column in mappingColumnValues) {
-      userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
-    }
-    return userMappingDao.create(userMappingRow);
-  }
-  /**
-   * Links a user row to a feature row
-   * @param  {module:user/userRow~UserRow} userRow             user row
-   * @param  {module:features/user/featureRow~FeatureRow} featureRow          feature row
-   * @param  {string|UserMappingTable} [mappingTable]        mapping table
-   * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {number}
-   */
-  linkFeatureRow(
-    userRow: UserRow,
-    featureRow: FeatureRow,
-    mappingTable?: string | UserMappingTable,
-    mappingColumnValues?: Record<string, any>,
-  ): number {
-    return this.linkRelatedRow(userRow, featureRow, RelationType.FEATURES, mappingTable, mappingColumnValues);
-  }
-  /**
-   * Links a user row to a media row
-   * @param  {module:user/userRow~UserRow} userRow             user row
-   * @param  {module:extension/relatedTables~MediaRow} mediaRow          media row
-   * @param  {string|UserMappingTable} [mappingTable]        mapping table
-   * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {number}
-   */
-  linkMediaRow(
-    userRow: UserRow,
-    mediaRow: MediaRow,
-    mappingTable?: string | UserMappingTable,
-    mappingColumnValues?: Record<string, any>,
-  ): number {
-    return this.linkRelatedRow(userRow, mediaRow, RelationType.MEDIA, mappingTable, mappingColumnValues);
-  }
-  /**
-   * Links a user row to a simpleAttributes row
-   * @param  {module:user/userRow~UserRow} userRow             user row
-   * @param  {module:extension/relatedTables~SimpleAttributesRow} simpleAttributesRow          simple attributes row
-   * @param  {string|UserMappingTable} [mappingTable]        mapping table
-   * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
-   * @return {number}
-   */
-  linkSimpleAttributesRow(
-    userRow: UserRow,
-    simpleAttributesRow: SimpleAttributesRow,
-    mappingTable?: string | UserMappingTable,
-    mappingColumnValues?: Record<string, any>,
-  ): number {
-    return this.linkRelatedRow(
-      userRow,
-      simpleAttributesRow,
-      RelationType.SIMPLE_ATTRIBUTES,
-      mappingTable,
-      mappingColumnValues,
-    );
-  }
-  /**
-   * Get all media rows that are linked to this user row
-   * @param  {module:user/userRow~UserRow} userRow user row
-   * @return {module:extension/relatedTables~MediaRow[]}
-   */
-  getLinkedMedia(userRow: UserRow): MediaRow[] {
-    const mediaRelations = this.mediaRelations;
-    const rte = this.geoPackage.relatedTablesExtension;
-    const linkedMedia: MediaRow[] = [];
-    for (let i = 0; i < mediaRelations.length; i++) {
-      const mediaRelation = mediaRelations[i];
-      const mediaDao = rte.getMediaDao(mediaRelation);
-      const userMappingDao = rte.getMappingDao(mediaRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.id);
-      for (let m = 0; m < mappings.length; m++) {
-        const relatedId = mappings[m].related_id;
-        linkedMedia.push(mediaDao.queryForId(relatedId) as MediaRow);
-      }
-    }
-    return linkedMedia;
-  }
-  /**
-   * Get all simple attribute rows that are linked to this user row
-   * @param  {module:user/userRow~UserRow} userRow user row
-   * @return {module:extension/relatedTables~SimpleAttributeRow[]}
-   */
-  getLinkedSimpleAttributes(userRow: UserRow): SimpleAttributesRow[] {
-    const simpleRelations = this.simpleAttributesRelations;
-    const rte = this.geoPackage.relatedTablesExtension;
-    const linkedSimpleAttributes: SimpleAttributesRow[] = [];
-    for (let i = 0; i < simpleRelations.length; i++) {
-      const simpleRelation = simpleRelations[i];
-      const simpleDao = rte.getSimpleAttributesDao(simpleRelation);
-      const userMappingDao = rte.getMappingDao(simpleRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.id);
-      for (let m = 0; m < mappings.length; m++) {
-        const relatedId = mappings[m].related_id;
-        linkedSimpleAttributes.push(simpleDao.queryForId(relatedId) as SimpleAttributesRow);
-      }
-    }
-    return linkedSimpleAttributes;
-  }
-  /**
-   * Get all feature rows that are linked to this user row
-   * @param  {module:user/userRow~UserRow} userRow user row
-   * @return {module:features/user/featureRow~FeatureRow[]}
-   */
-  getLinkedFeatures(userRow: UserRow): FeatureRow[] {
-    const featureRelations = this.featureRelations;
-    const rte = this.geoPackage.relatedTablesExtension;
-    const linkedFeatures: FeatureRow[] = [];
-    for (let i = 0; i < featureRelations.length; i++) {
-      const featureRelation = featureRelations[i];
-      const featureDao = this.geoPackage.getFeatureDao(featureRelation.base_table_name);
-      const userMappingDao = rte.getMappingDao(featureRelation.mapping_table_name);
-      const mappings = userMappingDao.queryByBaseId(userRow.id);
-      for (let m = 0; m < mappings.length; m++) {
-        const relatedId = mappings[m].related_id;
-        linkedFeatures.push(featureDao.queryForId(relatedId) as FeatureRow);
-      }
-    }
-    return linkedFeatures;
-  }
-  /**
-   * Get all simple attribute relations to this table
-   * @return {Object[]}
-   */
-  get simpleAttributesRelations(): ExtendedRelation[] {
-    return this.getRelationsWithName(SimpleAttributesTable.RELATION_TYPE.name);
-  }
-  /**
-   * Get all feature relations to this table
-   * @return {Object[]}
-   */
-  get featureRelations(): ExtendedRelation[] {
-    return this.getRelationsWithName(RelationType.FEATURES.name);
-  }
-  /**
-   * Get all media relations to this table
-   * @return {Object[]}
-   */
-  get mediaRelations(): ExtendedRelation[] {
-    return this.getRelationsWithName(MediaTable.RELATION_TYPE.name);
-  }
-  /**
-   * Get all relations to this table with the specified name
-   * @param {string} name
-   * @return {Object[]}
-   */
-  getRelationsWithName(name: string): ExtendedRelation[] {
-    return this.geoPackage.extendedRelationDao.getBaseTableRelationsWithName(this.table_name, name);
-  }
-  /**
-   * Get all relations to this table
-   * @return {Object[]}
-   */
-  get relations(): ExtendedRelation[] {
-    return this.geoPackage.extendedRelationDao.getBaseTableRelations(this.table_name);
-  }
-  /**
-   * Gets the rows in this table by id
-   * @param  {Number[]} ids ids to query for
-   * @return {Object[]}
-   */
-  getRows(ids: number[]): T[] {
-    const rows: T[] = [];
-    for (let i = 0; i < ids.length; i++) {
-      const row = this.queryForId(ids[i]);
-      if (row) {
-        rows.push(row as T);
-      }
-    }
-    return rows;
-  }
-  /**
-   * Get count of all rows in this table
-   * @return {Number}
-   */
-  getCount(): number {
-    return this.connection.count(this.table_name);
-  }
-
-  getTableName(): string {
-    return this.table_name;
+    return whereClause;
   }
 
   /**
-   * Rename column
-   * @param columnName column name
-   * @param newColumnName  new column name
+   * Build where args for ids in the nested SQL query
+   * @param nestedArgs nested SQL args
+   * @param whereArgs where arguments
+   * @return where args
    */
-  renameColumn(columnName: string, newColumnName: string) {
-    AlterTable.renameColumn(this.connection, this.table_name, columnName, newColumnName);
-    this._table.renameColumnWithName(columnName, newColumnName);
+  public buildWhereInArgs(nestedArgs: any[], whereArgs: any[]): any[] {
+    let args = [];
+    if (whereArgs != null && whereArgs.length > 0) {
+      args.push(...whereArgs);
+    }
+    if (nestedArgs != null && nestedArgs.length > 0) {
+      args.push(...nestedArgs);
+    }
+    return args;
+  }
+
+  /**
+   * Build where (or selection) statement for a single field using the
+   * provided operation
+   *
+   * @param field field
+   * @param value value
+   * @param operation operation
+   * @return where clause
+   */
+  public buildWhereWithOp(field: string, value: any, operation: string): string {
+    return SQLUtils.quoteWrap(field) + " " + (value != null ? operation + " ?" : "IS NULL");
+  }
+
+  /**
+   * Build where (or selection) args for the value
+   * @param value value
+   * @return where args
+   */
+  public buildWhereArgs(value: any): [] {
+    let args = null;
+    if (value != null) {
+      args = [value]
+    }
+    return args;
+  }
+
+  /**
+   * Get the approximate zoom level of where the bounding box of the user data
+   * fits into the world
+   *
+   * @return zoom level
+   */
+  public getZoomLevel(): number {
+    const projection = this.getProjection();
+    if (projection == null) {
+      throw new GeoPackageException(
+        "No projection was set which is required to determine the zoom level");
+    }
+    let zoomLevel = 0;
+    let boundingBox = this.getBoundingBox();
+    if (boundingBox != null) {
+      if (Projections.getUnits(projection.toString()) === 'degrees') {
+        boundingBox = TileBoundingBoxUtils.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
+      }
+      const webMercatorTransform = GeometryTransform.create(projection, ProjectionConstants.EPSG_WEB_MERCATOR);
+      const webMercatorBoundingBox = boundingBox.transform(webMercatorTransform);
+      zoomLevel = TileBoundingBoxUtils.getZoomLevel(webMercatorBoundingBox);
+    }
+    return zoomLevel;
+  }
+
+  /**
+   * Query for the row where the field equals the value
+   * @param fieldName field name
+   * @param value value
+   * @return result
+   */
+  public queryForEqWithFieldAndValue(fieldName: string, value: any): TResult {
+    return this.queryForEq(false, this.table.getColumnNames(), fieldName, value);
+  }
+
+  /**
+   * Query for the row where the field equals the value
+   * @param distinct
+   * @param columns
+   * @param fieldName
+   * @param value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   */
+  public queryForEq(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
+    const where = this.buildWhere(fieldName, value);
+    const whereArgs = this.buildWhereArgs(value);
+    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs, undefined, groupBy, having, orderBy);
+    this.prepareResult(result);
+    return result;
+  }
+
+  /**
+   * Count where all fields match their values
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param fieldValues field values
+   * @return count
+   */
+  public countForFieldValues(fieldValues: ColumnValues): number {
+    const where = this.buildWhereWithFields(fieldValues);
+    const whereArgs = this.buildWhereArgsWithValues(fieldValues);
+    return this.count(false, this.table.getColumnNames(), where, whereArgs);
+  }
+
+  /**
+   * Query for the row where the field equals the value
+   * @param distinct
+   * @param columns
+   * @param fieldName
+   * @param value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   */
+  public countForEq(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): number {
+    const where = this.buildWhere(fieldName, value);
+    const whereArgs = this.buildWhereArgs(value);
+    return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, undefined, groupBy, having, orderBy);
+  }
+
+  /**
+   * Query for ordered rows starting at the offset and returning no more than
+   * the limit.
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryForChunk(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.query(distinct, columns, where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Build a limit String with the limit and offset
+   * @param limit limit
+   * @param offset offset
+   * @return limit
+   */
+  public buildLimit(limit: number, offset: number): string {
+    return offset + "," + limit;
+  }
+
+  /**
+   * Build a columns name array from the list of columns
+   * @param columns column list
+   * @return column names array
+   */
+  private buildColumnsArray(columns: TColumn[]): string[] {
+    const columnsArray = []
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
+      columnsArray[i] = column.getName();
+    }
+    return columnsArray;
+  }
+
+  /**
+   * Get the value tolerance range min and max values
+   * @param value
+   * @return tolerance range
+   */
+  private getValueToleranceRange(value: ColumnValue): string[] {
+    const doubleValue = Number.parseFloat(value.getValue());
+    const tolerance = value.getTolerance();
+    return [(doubleValue - tolerance).toString(), (doubleValue + tolerance).toString()]
   }
 
   /**
    * Add a new column
    * @param column new column
    */
-  addColumn(column: UserColumn) {
-    AlterTable.addColumn(this.connection, this.table_name, column.getName(), CoreSQLUtils.columnDefinition(column));
-    this._table.addColumn(column);
+  public addColumn(column: TColumn): void {
+    SQLUtils.addColumn(this.db, this.table.getTableName(), column);
+    this.table.addColumn(column);
   }
 
   /**
-   * Drop a colum
+   * Rename column
+   * @param column column
+   * @param newColumnName new column name
+   */
+  public renameColumn(column: TColumn, newColumnName: string): void {
+    this.renameTableColumn(column.getName(), newColumnName);
+    this.table.renameColumn(column, newColumnName);
+  }
+
+  /**
+   * Rename column
+   * @param columnName column name
+   * @param newColumnName new column name
+   */
+  public renameColumnWithName(columnName: string, newColumnName: string): void {
+    this.renameTableColumn(columnName, newColumnName);
+    this.table.renameColumnWithName(columnName, newColumnName);
+  }
+
+  /**
+   * Rename column
+   * @param index column index
+   * @param newColumnName new column name
+   */
+  public renameColumnWithIndex(index: number, newColumnName: string): void {
+    this.renameTableColumn(this.table.getColumnName(index), newColumnName);
+    this.table.renameColumnWithIndex(index, newColumnName);
+  }
+
+  /**
+   * Rename a table column
+   * @param columnName column name
+   * @param newColumnName new column name
+   */
+  protected renameTableColumn(columnName: string, newColumnName: string): void {
+    AlterTable.renameColumn(this.db, this.table.getTableName(), columnName, newColumnName);
+  }
+
+  /**
+   * Drop a column
+   * @param column column
+   */
+  public dropColumn(column: TColumn): void {
+    AlterTable.dropColumn(this.db, this.table.getTableName(), column.getName());
+  }
+
+  /**
+   * Drop a column
    * @param index column index
    */
-   dropColumnWithIndex(index: number) {
-    this.dropColumn(this._table.getColumnNameWithIndex(index));
+  public dropColumnWithIndex(index: number): void {
+    AlterTable.dropColumn(this.db, this.table.getTableName(), this.table.getColumnName(index));
   }
 
   /**
    * Drop a column
    * @param columnName column name
    */
-   dropColumn(columnName: string) {
-    AlterTable.dropColumnForUserTable(this.connection, this.table, columnName);
+  public dropColumnWithName(columnName: string): void {
+    AlterTable.dropColumn(this.db, this.table.getTableName(), columnName);
   }
 
   /**
    * Drop columns
    * @param columns columns
    */
-   dropColumns(columns: UserColumn[]) {
-    let columnNames = [];
-    columns.forEach(column => {
+  public dropColumns(columns: TColumn[]): void {
+    const columnNames = [];
+    for (const column of columns) {
       columnNames.push(column.getName());
-    });
+    }
     this.dropColumnNames(columnNames);
   }
 
   /**
    * Drop columns
-   * @param indices column indexes
+   * @param indexes column indexes
    */
-   dropColumnIndexes(indices: number[]) {
-    let columnNames = [];
-    indices.forEach(idx => {
-      columnNames.push(this._table.getColumnNameWithIndex(idx));
-    });
+  public dropColumnIndexes(indexes: number[]): void {
+    const columnNames = [];
+    for (const index of indexes) {
+      columnNames.push(this.table.getColumnName(index));
+    }
     this.dropColumnNames(columnNames);
   }
 
@@ -380,23 +831,129 @@ export class UserDao<T extends UserRow> extends Dao<UserRow> {
    * Drop columns
    * @param columnNames column names
    */
-   dropColumnNames(columnNames: string[]) {
-    AlterTable.dropColumnsForUserTable(this.connection, this.table, columnNames);
+  public dropColumnNames(columnNames: string[]): void {
+    AlterTable.dropColumns(this.db, this.table.getTableName(), columnNames);
   }
 
   /**
    * Alter a column
    * @param column column
    */
-   alterColumn(column: UserColumn) {
-    AlterTable.alterColumnForTable(this.connection, this.table, column);
+  public alterColumn(column: TColumn): void {
+    AlterTable.alterColumn(this.db, this.table.getTableName(), column);
   }
 
   /**
    * Alter columns
    * @param columns columns
    */
-   alterColumns(columns: UserColumn[]) {
-    AlterTable.alterColumnsForTable(this.connection, this.table, columns);
+  public alterColumns(columns: TColumn[]): void {
+    AlterTable.alterColumns(this.db, this.table.getTableName(), columns);
+  }
+
+  /**
+   * Delete rows matching the where clause
+   * @param whereClause where clause
+   * @param whereArgs where arguments
+   * @return deleted count
+   */
+  public delete(whereClause?: string, whereArgs?: any[]): number {
+    return this.db.delete(this.getTableName(), whereClause, whereArgs);
+  }
+
+  /**
+   * Delete a row by id
+   *
+   * @param id
+   *            id
+   * @return number of rows affected, should be 0 or 1
+   */
+  public deleteById(id: number): number {
+    return this.db.delete(this.getTableName(), this.getPkWhere(id), this.getPkWhereArgs(id));
+  }
+
+  /**
+   * Delete rows matching the field values
+   * @param fieldValues field values
+   * @return deleted count
+   */
+  public deleteWithFieldValues(fieldValues: ColumnValues): number {
+    const whereClause = this.buildWhereWithFields(fieldValues);
+    const whereArgs = this.buildWhereArgsWithValues(fieldValues);
+    return this.delete(whereClause, whereArgs);
+  }
+
+  /**
+   * Query for typed values from the first column
+   * @param sql sql statement
+   * @param args sql arguments
+   * @return single column values
+   */
+  public querySingleColumnTypedResults(sql: string, args: string[]): Record<string, DBValue>[] {
+    return this.db.query(sql, args).results;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public update(row: TRow): number {
+    const contentValues = row.toContentValues();
+    let updated = 0;
+    if (contentValues.size() > 0) {
+      updated = SQLUtils.update(this.getDb(), this.getTableName(), contentValues, this.getPkWhere(row.getId()), this.getPkWhereArgs(row.getId()));
+    }
+    return updated;
+  }
+
+  /**
+   * Update all rows matching the where clause with the provided values
+   *
+   * @param values
+   *            content values
+   * @param whereClause
+   *            where clause
+   * @param whereArgs
+   *            where arguments
+   * @return updated count
+   */
+  public updateWithContentValues(values: ContentValues, whereClause: string, whereArgs: []): number {
+    return SQLUtils.update(this.getDb(), this.getTableName(), values, whereClause, whereArgs);
+  }
+
+  public create(row: TRow): number {
+    return this.insert(row);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public insert(row: TRow): number {
+    const id = this.insertWithContentValues(row.toContentValues(false));
+    if (row.hasIdColumn()) {
+      row.setId(id, true);
+    }
+    return id;
+  }
+
+  /**
+   * Inserts a new row
+   *
+   * @param values
+   *            content values
+   * @return row id, -1 on error
+   */
+  public insertWithContentValues(values: ContentValues): number {
+    return SQLUtils.insert(this.getDb(), this.getTableName(), values);
+  }
+
+  /**
+   * Inserts a new row
+   *
+   * @param values
+   *            content values
+   * @return row id
+   */
+  public insertOrThrow(values: ContentValues): number {
+    return SQLUtils.insertOrThrow(this.getDb(), this.getTableName(), values);
   }
 }

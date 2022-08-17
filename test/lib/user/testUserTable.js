@@ -2,7 +2,7 @@ import { UserTable } from '../../../lib/user/userTable';
 import { UserColumns } from '../../../lib/user/userColumns';
 import { UserColumn } from '../../../lib/user/userColumn';
 import { GeoPackageDataType } from '../../../lib/db/geoPackageDataType';
-import { Contents } from '../../../lib/core/contents/contents';
+import { Contents } from '../../../lib/contents/contents';
 import { UniqueConstraint } from '../../../lib/db/table/uniqueConstraint';
 import { ConstraintType } from '../../../lib/db/table/constraintType';
 import { RawConstraint } from "../../../lib/db/table/rawConstraint";

@@ -4,8 +4,8 @@
 import { UserCustomTable } from './userCustomTable';
 import { UserTableReader } from '../userTableReader';
 import { UserCustomColumn } from './userCustomColumn';
-import { GeoPackage } from '../../geoPackage';
 import { TableColumn } from '../../db/table/tableColumn';
+import { GeoPackageConnection } from '../../db/geoPackageConnection';
 
 /**
  * User custom table reader
@@ -14,12 +14,13 @@ import { TableColumn } from '../../db/table/tableColumn';
  * @param  {string[]} requiredColumns required columns
  */
 export class UserCustomTableReader extends UserTableReader<UserCustomColumn, UserCustomTable> {
-  constructor(table_name: string) {
-    super(table_name);
+  constructor(tableName: string) {
+    super(tableName);
   }
 
-  readUserCustomTable(geoPackage: GeoPackage): UserCustomTable {
-    return this.readTable(geoPackage.database) as UserCustomTable;
+  public static readUserCustomTable(connection: GeoPackageConnection, tableName: string): UserCustomTable {
+    const tableReader = new UserCustomTableReader(tableName);
+    return tableReader.readTable(connection);
   }
 
   /**
@@ -33,6 +34,6 @@ export class UserCustomTableReader extends UserTableReader<UserCustomColumn, Use
    * @inheritDoc
    */
   createColumn(tableColumn: TableColumn): UserCustomColumn {
-    return new UserCustomColumn(tableColumn.index, tableColumn.name, tableColumn.dataType, tableColumn.max, tableColumn.notNull, tableColumn.defaultValue, tableColumn.primaryKey, tableColumn.autoincrement);
+    return UserCustomColumn.createColumnWithTableColumn(tableColumn);
   }
 }

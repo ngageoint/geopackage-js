@@ -96,7 +96,7 @@ export class TableColumn {
    *
    * @return column name
    */
-  getName() {
+  getName(): string {
     return this.name;
   }
 
@@ -105,7 +105,7 @@ export class TableColumn {
    *
    * @return column type
    */
-  getType() {
+  getType(): string {
     return this.type;
   }
 
@@ -114,7 +114,7 @@ export class TableColumn {
    *
    * @return column data type, may be null
    */
-  getDataType() {
+  getDataType(): GeoPackageDataType {
     return this.dataType;
   }
 

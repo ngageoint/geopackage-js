@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
-  , Contents = require('../../../../lib/core/contents/contents').Contents
+  , Contents = require('../../../../lib/contents/contents').Contents
   , should = require('chai').should()
   , path = require('path');
 

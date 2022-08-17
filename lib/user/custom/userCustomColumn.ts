@@ -6,6 +6,7 @@ import { UserColumn } from '../userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { UserTableDefaults } from '../userTableDefaults';
+import { TableColumn } from '../../db/table/tableColumn';
 
 /**
  * Create a new user custom columnd
@@ -19,25 +20,8 @@ import { UserTableDefaults } from '../userTableDefaults';
  *  @param {Boolean} autoincrement autoincrement
  */
 export class UserCustomColumn extends UserColumn {
-  constructor(
-    index: number,
-    name: string,
-    dataType: GeoPackageDataType,
-    max?: number,
-    notNull?: boolean,
-    defaultValue?: DBValue,
-    primaryKey?: boolean,
-    autoincrement?: boolean,
-  ) {
-    super(index, name, dataType, max, notNull, defaultValue, primaryKey, autoincrement);
-    // eslint-disable-next-line eqeqeq
-    if (dataType == null) {
-      throw new Error('Data type is required to create column: ' + name);
-    }
-  }
   /**
    *  Create a new column
-   *
    *  @param {Number} index        column index
    *  @param {string} name         column name
    *  @param {GeoPackageDataType} type data type
@@ -72,6 +56,37 @@ export class UserCustomColumn extends UserColumn {
     name: string,
     autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
   ): UserCustomColumn {
-    return new UserCustomColumn(index, name, GeoPackageDataType.INTEGER, undefined, undefined, undefined, true, autoincrement);
+    return new UserCustomColumn(
+      index,
+      name,
+      GeoPackageDataType.INTEGER,
+      undefined,
+      undefined,
+      undefined,
+      true,
+      autoincrement,
+    );
+  }
+
+  /**
+   * Create a new column
+   * @param tableColumn table column
+   * @return user custom column
+   */
+  public static createColumnWithTableColumn(tableColumn: TableColumn): UserCustomColumn {
+    return new UserCustomColumn(tableColumn);
+  }
+
+  copy(): UserCustomColumn {
+    return new UserCustomColumn(
+      this.getIndex(),
+      this.getName(),
+      this.getDataType(),
+      this.getMax(),
+      this.isNotNull(),
+      this.getDefaultValue(),
+      this.isPrimaryKey(),
+      this.isAutoincrement(),
+    );
   }
 }

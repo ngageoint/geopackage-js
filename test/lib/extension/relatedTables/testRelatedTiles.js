@@ -1,12 +1,12 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
+import {RelatedTablesExtension} from '../../../../lib/extension/related'
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , Verification = require('../../../fixtures/verification')
-  , ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
-  , UserMappingTable = require('../../../../lib/extension/relatedTables/userMappingTable').UserMappingTable
-  , MediaTable = require('../../../../lib/extension/relatedTables/mediaTable').MediaTable
-  , MediaRow = require('../../../../lib/extension/relatedTables/mediaRow').MediaRow
+  , ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
+  , UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
+  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
+  , MediaRow = require('../../../../lib/extension/related/media/mediaRow').MediaRow
   // , testSetup = require('../../../fixtures/testSetup')
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox

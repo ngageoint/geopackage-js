@@ -6,7 +6,7 @@ var path = require('path')
   , crypto = require('crypto')
   , ImageUtils = require('../../lib/tiles/imageUtils').ImageUtils
   , CanvasCompare = require('canvas-compare');
-var GeoPackageAPI = require('../../').GeoPackageAPI;
+var GeoPackageManager = require('../../').GeoPackageManager;
 var isNode = typeof(process) !== 'undefined' && process.version;
 
 var module = {
@@ -46,10 +46,10 @@ module.exports.createGeoPackage = async function(gppath) {
     var fs = require('fs-extra');
     await fs.mkdirp(path.dirname(gppath));
     await fs.open(gppath, 'w');
-    return await GeoPackageAPI.create(gppath)
+    return await GeoPackageManager.create(gppath)
   }
   else {
-    return await GeoPackageAPI.create();
+    return await GeoPackageManager.create();
   }
 };
 

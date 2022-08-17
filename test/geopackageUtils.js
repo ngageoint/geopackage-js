@@ -1,7 +1,7 @@
 import * as GP from '../index';
 const GeoPackageDataType = GP.GeoPackageDataType,
   GeometryColumns = GP.GeometryColumns,
-  GeometryData = GP.GeometryData,
+  GeoPackageGeometryData = GP.GeoPackageGeometryData,
   BoundingBox = GP.BoundingBox,
   FeatureColumn = GP.FeatureColumn,
   DataColumns = GP.DataColumns,
@@ -15,7 +15,7 @@ const GeoPackageDataType = GP.GeoPackageDataType,
   WebPExtension = GP.WebPExtension,
   DataColumnConstraintsDao = GP.DataColumnConstraintsDao,
   Constraints = GP.Constraints,
-  TableCreator = GP.TableCreator,
+  TableCreator = GP.GeoPackageTableCreator,
   MediaTable = GP.MediaTable,
   UserMappingTable = GP.UserMappingTable,
   DublinCoreType = GP.DublinCoreType,
@@ -232,7 +232,7 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
 GeoPackageUtils.createFeature = function(geopackage, geoJson, name, featureDao) {
   const srs = featureDao.srs;
   const featureRow = featureDao.newRow();
-  const geometryData = new GeometryData();
+  const geometryData = new GeoPackageGeometryData();
   geometryData.setSrsId(srs.srs_id);
   const geometry = wkx.Geometry.parseGeoJSON(geoJson);
   geometryData.setGeometry(geometry);

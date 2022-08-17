@@ -1,83 +1,85 @@
 import { Db } from './db';
 import { DBAdapter } from './dbAdapter';
 import { GeoPackageConstants } from '../geoPackageConstants';
+import { SQLiteMaster } from "./master/sqliteMaster";
+import { SQLiteMasterType } from "./master/sqliteMasterType";
+import { TableInfo } from "./table/tableInfo";
+import { SQLiteMasterQuery } from "./master/sqliteMasterQuery";
+import { SQLiteMasterColumn } from "./master/sqliteMasterColumn";
+import { SQLUtils } from './sqlUtils';
+import { ResultSet } from "./resultSet";
 
 /**
  * Represents a connection to the GeoPackage database
  */
 export class GeoPackageConnection {
-  filePath: string | Buffer | Uint8Array | undefined;
-  adapter: DBAdapter;
+  connection: DBAdapter;
   registeredFunctions: string[];
   /**
    * Construct a new connection to the GeoPackage SQLite file
-   * @param filePath path to the sqlite file
+   * @param connection the database adapter
    */
-  constructor(filePath: string | Buffer | Uint8Array | undefined) {
-    this.filePath = filePath;
+  constructor(connection: DBAdapter) {
     this.registeredFunctions = [];
+    this.connection = connection;
   }
-  /**
-   * Creates a connection to the SQLite file and when connected, returns a promise that resolves the connection.
-   * This will create a {module:db/sqliteAdapter~Adapter} if running in node.
-   * This will create a {module:db/sqljsAdapter~Adapter} if running in the browser
-   * @return {Promise<GeoPackageConnection>}
-   */
-  async init(): Promise<GeoPackageConnection> {
-    try {
-      this.adapter = Db.create(this.filePath);
-      await this.adapter.initialize();
-    } catch (e) {
-      console.log('Failed to create adapter', e);
-      throw e;
-    }
-    return this;
+
+  getDbAdapter(): DBAdapter {
+    return this.connection;
   }
 
   transaction(func: Function): void {
-    this.adapter.transaction(func);
+    this.connection.transaction(func);
+  }
+
+  size(): number {
+    return this.connection.size();
+  }
+
+  readableSize(): string {
+    return this.connection.readableSize();
   }
 
   /**
    * Close the database.
    */
   close(): void {
-    this.adapter.close();
+    this.connection.close();
   }
   /**
    * exports the GeoPackage as a file
    * @param  {Function} callback called with an err and the buffer containing the contents of the file
    */
   async export(): Promise<any> {
-    return this.adapter.export();
+    return this.connection.export();
   }
   /**
    * Gets the raw connection to the database
    * @return {any}
    */
   getDBConnection(): any {
-    return this.adapter.db;
+    return this.connection.db;
   }
   /**
    * Connects to a GeoPackage database
    * @param  {any} db database to connect to
    */
   setDBConnection(db: any): void {
-    this.adapter = Db.create();
-    this.adapter.db = db;
+    this.connection = Db.create();
+    this.connection.db = db;
   }
   /**
    * Registers the given function so that it can be used by SQL statements
    * @param  {string} name name of function to register
    * @param  {Function} functionDefinition function to register
-   * @return {DBAdapter} the adapter in use
+   * @return {DBAdapter} the connection in use
    */
   registerFunction(name: string, functionDefinition: Function): DBAdapter {
     if (this.registeredFunctions.indexOf(name) === -1) {
       this.registeredFunctions.push(name);
-      this.adapter.registerFunction(name, functionDefinition);
+      this.connection.registerFunction(name, functionDefinition);
     }
-    return this.adapter;
+    return this.connection;
   }
   /**
    * Gets the first result from the query
@@ -85,8 +87,17 @@ export class GeoPackageConnection {
    * @param  {Array|Object} [params] array of substitution parameters
    * @return {any}
    */
-  get(sql: string, params?: [] | Record<string, any>): any {
-    return this.adapter.get(sql, params);
+  get(sql: string, params?: [] | Record<string, any>): Record<string, any> {
+    return this.connection.get(sql, params);
+  }
+  /**
+   * Gets the first result from the query
+   * @param  {string} sql    sql query to run
+   * @param  {Array|Object} [params] array of substitution parameters
+   * @return {any}
+   */
+  query(sql: string, params?: [] | Record<string, any>): ResultSet {
+    return new ResultSet(this.connection.all(sql, params));
   }
   /**
    * Checks if table exists in database
@@ -94,7 +105,7 @@ export class GeoPackageConnection {
    * @returns {Boolean}
    */
   isTableExists(tableName: string): boolean {
-    return this.adapter.isTableExists(tableName);
+    return this.connection.isTableExists(tableName);
   }
   /**
    * Run the given SQL and return the results.
@@ -105,7 +116,7 @@ export class GeoPackageConnection {
    * * `lastInsertROWID`: ID of the last inserted row
    */
   run(sql: string, params?: Record<string, any> | []): { changes: number; lastInsertRowid: number } {
-    return this.adapter.run(sql, params);
+    return this.connection.run(sql, params);
   }
   /**
    * Executes the query and returns all results in an array
@@ -114,7 +125,7 @@ export class GeoPackageConnection {
    * @return {any[]}
    */
   all(sql: string, params?: [] | Record<string, any> | null): any[] {
-    return this.adapter.all(sql, params);
+    return this.connection.all(sql, params);
   }
   /**
    * Executes the query and returns an Iterable object of results
@@ -123,7 +134,7 @@ export class GeoPackageConnection {
    * @return {IterableIterator<Object>}
    */
   each(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
-    return this.adapter.each(sql, params);
+    return this.connection.each(sql, params);
   }
   /**
    * Gets the minimum value from the column
@@ -142,7 +153,7 @@ export class GeoPackageConnection {
       }
       minStatement += where;
     }
-    return this.adapter.get(minStatement, whereArgs).min;
+    return this.connection.get(minStatement, whereArgs).min as number;
   }
   /**
    * Gets the maximum value from the column
@@ -161,7 +172,7 @@ export class GeoPackageConnection {
       }
       maxStatement += where;
     }
-    return this.adapter.get(maxStatement, whereArgs).max;
+    return this.connection.get(maxStatement, whereArgs).max as number;
   }
   /**
    * Return the count of objects in the table
@@ -171,7 +182,19 @@ export class GeoPackageConnection {
    * @return {number}
    */
   count(table: string, where?: string, whereArgs?: [] | Record<string, any>): number {
-    return this.adapter.count(table, where, whereArgs);
+    return this.connection.count(table, where, whereArgs);
+  }
+
+  /**
+   * Get a count of results
+   * @param table
+   * @param distinct
+   * @param column
+   * @param where
+   * @param whereArgs
+   */
+  countColumn(table: string, distinct = false, column: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+    return this.aggregateFunction('COUNT', table, distinct, column, where, whereArgs);
   }
   /**
    * Executes an insert statement and returns the last id inserted
@@ -180,7 +203,7 @@ export class GeoPackageConnection {
    * @return {Object} last row id inserted
    */
   insert(sql: string, params: [] | Record<string, any>): number {
-    return this.adapter.insert(sql, params);
+    return this.connection.insert(sql, params);
   }
   /**
    * Delete from the table
@@ -194,74 +217,154 @@ export class GeoPackageConnection {
     if (where) {
       deleteStatement += ' WHERE ' + where;
     }
-    return this.adapter.delete(deleteStatement, whereArgs);
+    return this.connection.delete(deleteStatement, whereArgs);
   }
+
   /**
    * Drops the table specified
    * @param  {string} tableName table to drop
    * @return {Boolean} results of table drop
    */
   dropTable(tableName: string): boolean {
-    return this.adapter.dropTable(tableName);
+    return this.connection.dropTable(tableName);
   }
+
   /**
-   * Gets information about the table specified.  If data is returned, the table exists
-   * @param  {string} tableName table to check
-   * @return {Object}
+   * Check if the table exists
+   *
+   * @param tableName
+   *            table name
+   * @return true if exists
    */
-  tableExists(tableName: string): boolean {
-    return this.adapter.isTableExists(tableName);
+  public tableExists(tableName: string): boolean {
+    return SQLiteMaster.count(this, [SQLiteMasterType.TABLE], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, tableName)) > 0;
   }
+
   /**
-   * Checks if a table and column exist
-   * @param  {string} tableName  table to check
-   * @param  {string} columnName column to check
-   * @return {Boolean}
+   * Check if the view exists
+   * @param viewName view name
+   * @return true if exists
    */
-  columnAndTableExists(tableName: string, columnName: string): boolean {
-    const columns = this.adapter.all("PRAGMA table_info('" + tableName + "')");
-    for (let i = 0; i < columns.length; i++) {
-      if (columns[i].name === columnName) {
-        return true;
-      }
+  public viewExists(viewName: string): boolean {
+    return SQLiteMaster.count(this, [SQLiteMasterType.VIEW], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, viewName)) > 0;
+  }
+
+  /**
+   * Check if a table or view exists with the name
+   * @param name table or view name
+   * @return true if exists
+   */
+  public tableOrViewExists(name: string): boolean {
+    return SQLiteMaster.count(this, [SQLiteMasterType.TABLE, SQLiteMasterType.VIEW], SQLiteMasterQuery.createForColumnValue(SQLiteMasterColumn.TBL_NAME, name)) > 0;
+  }
+
+  /**
+   * Check if the table column exists
+   *
+   * @param tableName table name
+   * @param columnName column name
+   * @return true if column exists
+   */
+  public columnExists(tableName: string, columnName: string): boolean {
+    let exists = false;
+    const tableInfo = TableInfo.info(this, tableName);
+    if (tableInfo != null) {
+      exists = tableInfo.hasColumn(columnName);
     }
-    return false;
+    return exists;
   }
+
   /**
    * Sets the APPLICATION_ID and user_version for GeoPackage
    */
   setApplicationId(): void {
     const buff = Buffer.from(GeoPackageConstants.APPLICATION_ID);
     const applicationId = buff.readUInt32BE(0);
-    this.adapter.run('PRAGMA application_id = ' + applicationId);
-    this.adapter.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
+    this.connection.run('PRAGMA application_id = ' + applicationId);
+    this.connection.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
   }
   /**
    * gets the application_id from the sqlite file
    * @return {number}
    */
   getApplicationId(): string {
-    return this.adapter.get('PRAGMA application_id').application_id;
+    return this.connection.get('PRAGMA application_id').application_id;
   }
+
+
   /**
-   * Convenience method
-   * @see {module:db/geoPackageConnection~GeoPackageConnection}
-   * @see {module:db/sqliteAdapter~Adapter}
-   * @see {module:db/sqljsAdapter~Adapter}
-   * @param  {string|Buffer|Uint8Array} filePath string path to an existing file or a path to where a new file will be created or a Buffer containing the contents of the file, if undefined, an in memory database is created
-   * @return {Promise} that resolves
+   * Query for the foreign keys value
+   *
+   * @return true if enabled, false if disabled
+   * @since 3.3.0
    */
-  static connect(filePath: string | Buffer | Uint8Array): Promise<GeoPackageConnection> {
-    return new GeoPackageConnection(filePath).init();
+  public foreignKeys(): boolean {
+    return SQLUtils.foreignKeys(this);
   }
+
   /**
-   * Convenience method
-   * @param  {Object}   db       open database to connect to
-   * @return {Promise}
+   * Change the foreign keys state
+   *
+   * @param on
+   *            true to turn on, false to turn off
+   * @return previous foreign keys value
    */
-  static async connectWithDatabase(db: any): Promise<GeoPackageConnection> {
-    const connection = await new GeoPackageConnection(undefined).init();
-    connection.setDBConnection(db);
-    return connection;
+  public setForeignKeys(on: boolean) {
+    return SQLUtils.setForeignKeys(this, on);
+  }
+
+  /**
+   * Perform a foreign key check
+   *
+   * @return empty list if valid or violation errors, 4 column values for each
+   *         violation. see SQLite PRAGMA foreign_key_check
+   */
+  public foreignKeyCheck(): any[] {
+    return SQLUtils.foreignKeyCheck(this);
+  }
+
+  /**
+   * Perform a foreign key check
+   *
+   * @param tableName
+   *            table name
+   * @return empty list if valid or violation errors, 4 column values for each
+   *         violation. see SQLite PRAGMA foreign_key_check
+   */
+  public foreignKeyCheckForTable(tableName: string): any[] {
+    return SQLUtils.foreignKeyCheckForTable(this, tableName);
+  }
+
+  /**
+   * Execute an aggregate function
+   * @param func aggregate function
+   * @param table able name
+   * @param distinct distinct column flag
+   * @param column column name
+   * @param where where clause
+   * @param args arguments
+   * @return value or null
+   */
+  public aggregateFunction(func: string, table: string, distinct: boolean, column: string, where: string, args: [] | Record<string, any>): any {
+    const query = [];
+    query.push("SELECT ");
+    query.push(func);
+    query.push("(");
+    if (column != null) {
+      if (distinct) {
+        query.push("DISTINCT ");
+      }
+      query.push(SQLUtils.quoteWrap(column));
+    } else {
+      query.push("*");
+    }
+    query.push(") FROM ");
+    query.push(SQLUtils.quoteWrap(table));
+    if (where != null) {
+      query.push(" WHERE ");
+      query.push(where);
+    }
+    const sql = query.join('');
+    return SQLUtils.querySingleResult(this, sql, args, column);
   }
 }

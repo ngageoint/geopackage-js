@@ -1,11 +1,11 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
-var DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
-  , DataColumnConstraints = require('../../../lib/dataColumnConstraints/dataColumnConstraints').DataColumnConstraints
-  , TableCreator = require('../../../lib/db/tableCreator').TableCreator
-  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnsDao
-  , DataColumnConstraintsDao = require('../../../lib/dataColumnConstraints/dataColumnConstraintsDao').DataColumnConstraintsDao
-  , Contents = require('../../../lib/core/contents/contents').Contents
+var DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns
+  , DataColumnConstraints = require('../../../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints
+  , TableCreator = require('../../../lib/db/tableCreator').GeoPackageTableCreator
+  , DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
+  , DataColumnConstraintsDao = require('../../../lib/extension/schema/constraints/dataColumnConstraintsDao').DataColumnConstraintsDao
+  , Contents = require('../../../lib/contents/contents').Contents
   , path = require('path')
   , should = require('chai').should();
 

@@ -51,7 +51,7 @@ export class UniqueConstraint extends Constraint {
    * Add columns
    * @param columns columns
    */
-  add(...columns: UserColumn[]) {
+  add(...columns: UserColumn[]): void {
     columns.forEach(column => {
       this.columns.push(column);
     });
@@ -65,5 +65,4 @@ export class UniqueConstraint extends Constraint {
   getColumns(): UserColumn[] {
     return this.columns;
   }
-
 }

@@ -26,6 +26,12 @@
   },
   "bin": "./cli",
   "dependencies": {
+    "@ngageoint/projections-js": "^1.0.0",
+    "@ngageoint/simple-features-geojson-js": "^1.0.2",
+    "@ngageoint/simple-features-js": "^1.0.2",
+    "@ngageoint/simple-features-proj-js": "^1.0.2",
+    "@ngageoint/simple-features-wkb-js": "^1.0.2",
+    "@ngageoint/simple-features-wkt-js": "^1.0.2",
     "@turf/bbox": "6.3.0",
     "@turf/boolean-clockwise": "6.5.0",
     "@turf/boolean-point-in-polygon": "6.5.0",
@@ -36,17 +42,14 @@
     "@turf/line-intersect": "6.5.0",
     "@turf/point-to-line-distance": "6.5.0",
     "@turf/polygon-to-line": "6.5.0",
-    "@types/geojson": "7946.0.8",
-    "@types/proj4": "2.5.2",
     "file-type": "12.4.0",
     "image-size": "0.8.3",
     "lodash": "4.17.21",
     "reproject": "1.2.5",
-    "proj4": "2.8.0",
     "rtree-sql.js": "1.7.0",
     "simplify-js": "1.2.4",
-    "webworkify": "1.5.0",
-    "wkx": "0.4.8"
+    "ulp": "^1.0.1",
+    "webworkify": "1.5.0"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "0.1.3",

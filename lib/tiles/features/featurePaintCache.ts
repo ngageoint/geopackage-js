@@ -1,4 +1,4 @@
-import { StyleRow } from '../../extension/style/styleRow';
+import { StyleRow } from '../../extension/nga/style/styleRow';
 import { FeaturePaint } from './featurePaint';
 import { FeatureDrawType } from './featureDrawType';
 import { Paint } from './paint';
@@ -16,7 +16,7 @@ export class FeaturePaintCache {
   constructor(public cacheSize = FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE) {}
   /**
    * Get the cached featurePaint for the style row or null if not cached
-   * @param {module:extension/style~StyleRow} styleRow style row
+   * @param {module:extension/nga/style~StyleRow} styleRow style row
    * @return {module:tiles/features~FeaturePaint} feature paint or null
    */
   getFeaturePaintForStyleRow(styleRow: StyleRow): FeaturePaint {
@@ -40,7 +40,7 @@ export class FeaturePaintCache {
   }
   /**
    * Get the paint for the style row and draw type
-   * @param {module:extension/style~StyleRow} styleRow style row
+   * @param {module:extension/nga/style~StyleRow} styleRow style row
    * @param {module:tiles/features~FeatureDrawType} type feature draw type
    * @return {module:tiles/features~Paint} paint
    */
@@ -63,7 +63,7 @@ export class FeaturePaintCache {
   }
   /**
    * Cache the featurePaint for the style row
-   * @param {module:extension/style~StyleRow} styleRow style row
+   * @param {module:extension/nga/style~StyleRow} styleRow style row
    * @param {module:tiles/features~FeatureDrawType} type feature draw type
    * @param {module:tiles/features~Paint} paint paint
    */

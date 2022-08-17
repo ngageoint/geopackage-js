@@ -1,16 +1,18 @@
 /**
  * @module user/userColumn
  */
-import isEqual from 'lodash/isEqual';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
-import { DBValue } from '../db/dbAdapter';
 import { Constraint } from '../db/table/constraint';
 import { RawConstraint } from '../db/table/rawConstraint';
-import { ConstraintParser } from '../db/table/constraintParser';
 import { ColumnConstraints } from '../db/table/columnConstraints';
 import { ConstraintType } from '../db/table/constraintType';
-import { UserTableDefaults } from './userTableDefaults';
 import { Constraints } from '../db/table/constraints';
+import { TableColumn } from '../db/table/tableColumn';
+import { UserTable } from './userTable';
+import { GeoPackageException } from '../geoPackageException';
+import { Comparable } from '@ngageoint/simple-features-js';
+import { ConstraintParser } from '../db/table/constraintParser';
+import { SQLUtils } from '../db/sqlUtils';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -24,7 +26,10 @@ import { Constraints } from '../db/table/constraints';
  * @param {?Object} defaultValue default value or null
  * @param {Boolean} primaryKey `true` if this column is part of the table's primary key
  */
-export class UserColumn {
+export abstract class UserColumn implements Comparable<UserColumn> {
+  /**
+   * User Column index value
+   */
   static readonly NO_INDEX = -1;
   /**
    * Not Null Constraint Order
@@ -51,62 +56,246 @@ export class UserColumn {
    */
   static readonly UNIQUE_CONSTRAINT_ORDER = 5;
 
-  constraints: Constraints = new Constraints();
-  type: string;
-  min: number;
-  constructor(
-    public index: number,
-    public name: string,
-    public dataType: GeoPackageDataType,
-    public max?: number,
-    public notNull?: boolean,
-    public defaultValue?: DBValue,
-    public primaryKey?: boolean,
-    public autoincrement?: boolean,
-    public unique?: boolean,
-  ) {
-    this.validateMax();
-    this.type = this.getTypeName(name, dataType);
-    this.addDefaultConstraints();
+  /**
+   * Column index
+   */
+  private index: number;
+
+  /**
+   * Column name
+   */
+  private name: string;
+
+  /**
+   * Max size
+   */
+  private max: number;
+
+  /**
+   * True if a not null column
+   */
+  private notNull: boolean;
+
+  /**
+   * Default column value
+   */
+  private defaultValue: any;
+
+  /**
+   * True if a primary key column
+   */
+  private primaryKey: boolean;
+
+  /**
+   * True if primary key is autoincrement
+   */
+  private autoincrement: boolean;
+
+  /**
+   * True if unique column
+   */
+  private unique: boolean;
+
+  /**
+   * Type
+   */
+  private type: string;
+
+  /**
+   * Data type
+   */
+  private dataType: GeoPackageDataType;
+
+  /**
+   * List of column constraints
+   */
+  private readonly constraints: Constraints;
+
+  /**
+   * Constructor
+   * @param index column index
+   * @param name column name
+   * @param dataType data type
+   * @param max  max value
+   * @param notNull not null flag
+   * @param defaultValue default value
+   * @param primaryKey primary key flag
+   * @param autoincrement autoincrement flag
+   */
+  protected constructor(
+    index: number,
+    name: string,
+    dataType: GeoPackageDataType,
+    max: number,
+    notNull: boolean,
+    defaultValue: any,
+    primaryKey: boolean,
+    autoincrement: boolean,
+  );
+
+  /**
+   * Constructor
+   * @param index column index
+   * @param name column name
+   * @param type string type
+   * @param dataType data type
+   * @param max max value
+   * @param notNull not null flag
+   * @param defaultValue default value
+   * @param primaryKey primary key flag
+   * @param autoincrement autoincrement flag
+   */
+  protected constructor(
+    index: number,
+    name: string,
+    type: string,
+    dataType: GeoPackageDataType,
+    max: number,
+    notNull: boolean,
+    defaultValue: any,
+    primaryKey: boolean,
+    autoincrement: boolean,
+  );
+
+  /**
+   * Constructor
+   *
+   * @param tableColumn
+   *            table column
+   */
+  protected constructor(tableColumn: TableColumn);
+  protected constructor(userColumn: UserColumn);
+
+  /**
+   * Constructor
+   * @param args
+   */
+  protected constructor(...args) {
+    if (args.length === 1) {
+      if (args[0] instanceof TableColumn) {
+        const tableColumn = args[0];
+        this.index = tableColumn.index != null ? tableColumn.index : UserColumn.NO_INDEX;
+        this.name = tableColumn.name;
+        this.max = tableColumn.max;
+        this.notNull = tableColumn.isNotNull() || tableColumn.isPrimaryKey();
+        this.defaultValue = tableColumn.defaultValue;
+        this.primaryKey = tableColumn.primaryKey;
+        this.autoincrement = tableColumn.isPrimaryKey() && UserTable.DEFAULT_AUTOINCREMENT;
+        this.type = tableColumn.type;
+        this.dataType = tableColumn.dataType;
+        this.constraints = new Constraints();
+        UserColumn.validateDataType(this.name, this.dataType);
+        this.validateMax();
+        this.addDefaultConstraints();
+      } else if (args[0] instanceof UserColumn) {
+        const userColumn = args[0];
+        this.index = userColumn.index != null ? userColumn.index : UserColumn.NO_INDEX;
+        this.name = userColumn.name;
+        this.max = userColumn.max;
+        this.notNull = userColumn.notNull;
+        this.defaultValue = userColumn.defaultValue;
+        this.primaryKey = userColumn.primaryKey;
+        this.autoincrement = userColumn.autoincrement;
+        this.type = userColumn.type;
+        this.dataType = userColumn.dataType;
+        this.constraints = userColumn.constraints.copy();
+      }
+    } else if (args.length === 8) {
+      this.index = args[0] != null ? args[0] : UserColumn.NO_INDEX;
+      this.name = args[1];
+      this.type = UserColumn.getTypeName(args[1], args[2]);
+      this.dataType = args[2];
+      this.max = args[3];
+      this.notNull = args[4];
+      this.defaultValue = args[5];
+      this.primaryKey = args[6];
+      this.autoincrement = args[7];
+      this.constraints = new Constraints();
+      UserColumn.validateDataType(this.name, this.dataType);
+      this.validateMax();
+      this.addDefaultConstraints();
+    } else if (args.length === 9) {
+      this.index = args[0] != null ? args[0] : UserColumn.NO_INDEX;
+      this.name = args[1];
+      this.type = args[2];
+      this.dataType = args[3];
+      this.max = args[4];
+      this.notNull = args[5];
+      this.defaultValue = args[6];
+      this.primaryKey = args[7];
+      this.autoincrement = args[8];
+      this.constraints = new Constraints();
+      UserColumn.validateDataType(this.name, this.dataType);
+      this.validateMax();
+      this.addDefaultConstraints();
+    }
+  }
+
+  /**
+   * Get the type name from the data type
+   *
+   * @param name
+   *            column name
+   * @param dataType
+   *            data type
+   * @return type name
+
+   */
+  protected static getTypeName(name: string, dataType: GeoPackageDataType): string {
+    UserColumn.validateDataType(name, dataType);
+    return GeoPackageDataType.nameFromType(dataType);
   }
 
   /**
    * Validate the data type
-   * @param name column name
-   * @param dataType  data type
+   *
+   * @param name
+   *            column name
+   *
+   * @param dataType
+   *            data type
    */
-  static validateDataType(name: string, dataType: GeoPackageDataType) {
-    if (dataType === null || dataType === undefined) {
-      throw new Error('Data Type is required to create column: ' + name);
+  protected static validateDataType(name: string, dataType: GeoPackageDataType): void {
+    if (dataType == null) {
+      console.error('Column is missing a data type: ' + name);
     }
   }
 
   /**
    * Copy the column
+   *
    * @return copied column
    */
-  copy(): UserColumn {
-    const userColumnCopy = new UserColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.unique);
-    userColumnCopy.min = this.min;
-    userColumnCopy.constraints = this.constraints.copy();
-    return userColumnCopy;
+  public abstract copy(): UserColumn;
+
+  /**
+   * Check if the column has a valid index
+   *
+   * @return true if has a valid index
+   */
+  public hasIndex(): boolean {
+    return this.index > UserColumn.NO_INDEX;
   }
 
   /**
-   * Clears the constraints
+   * Set the column index. Only allowed when {@link #hasIndex()} is false (
+   * {@link #getIndex()} is {@link #NO_INDEX}). Setting a valid index to an
+   * existing valid index does nothing.
+   *
+   * @param index
+   *            column index
    */
-  clearConstraints() {
-    return this.constraints.clear();
-  }
-
-  getConstraints() {
-    return this.constraints;
-  }
-
-  setIndex(index: number) {
+  public setIndex(index: number): void {
     if (this.hasIndex()) {
-      if (!isEqual(index, this.index)) {
-        throw new Error('User Column with a valid index may not be changed. Column Name: ' + this.name + ', Index: ' + this.index + ', Attempted Index: ' + this.index);
+      if (index != this.index) {
+        throw new GeoPackageException(
+          'User Column with a valid index may not be changed. Column Name: ' +
+            this.name +
+            ', Index: ' +
+            this.index +
+            ', Attempted Index: ' +
+            index,
+        );
       }
     } else {
       this.index = index;
@@ -114,17 +303,11 @@ export class UserColumn {
   }
 
   /**
-   * Check if the column has a valid index
-   * @return true if has a valid index
-   */
-  hasIndex(): boolean {
-    return this.index > UserColumn.NO_INDEX;
-  }
-
-  /**
    * Reset the column index
+   *
+
    */
-  resetIndex() {
+  public resetIndex(): void {
     this.index = UserColumn.NO_INDEX;
   }
 
@@ -133,69 +316,82 @@ export class UserColumn {
    *
    * @return index
    */
-  getIndex(): number {
+  public getIndex(): number {
     return this.index;
   }
 
   /**
    * Set the name
-   * @param name column name
+   *
+   * @param name
+   *            column name
    */
-  setName(name: string) {
+  public setName(name: string): void {
     this.name = name;
   }
 
   /**
    * Get the name
+   *
    * @return name
    */
-  getName(): string {
+  public getName(): string {
     return this.name;
   }
 
   /**
    * Determine if this column is named the provided name
-   * @param name column name
+   *
+   * @param name
+   *            column name
    * @return true if named the provided name
    */
-  isNamed(name: string): boolean {
+  public isNamed(name: string): boolean {
     return this.name === name;
   }
 
   /**
    * Determine if the column has a max value
+   *
    * @return true if has max value
    */
-  hasMax(): boolean {
+  public hasMax(): boolean {
     return this.max != null;
   }
 
   /**
    * Set the max
-   * @param max max
+   *
+   * @param max
+   *            max
+
    */
-  setMax(max: number) {
+  public setMax(max: number): void {
     this.max = max;
   }
 
   /**
    * Get the max
+   *
    * @return max
    */
-  getMax(): number {
+  public getMax(): number {
     return this.max;
   }
 
   /**
    * Set the not null flag
-   * @param notNull not null flag
+   *
+   * @param notNull
+   *            not null flag
+
    */
-  setNotNull(notNull: boolean) {
-    if (this.notNull !== notNull) {
+  public setNotNull(notNull: boolean): void {
+    if (this.notNull != notNull) {
       if (notNull) {
         this.addNotNullConstraint();
       } else {
-        this.removeConstraintByType(ConstraintType.NOT_NULL);
+        this.removeNotNullConstraint();
       }
     }
     this.notNull = notNull;
@@ -203,27 +399,31 @@ export class UserColumn {
 
   /**
    * Get the is not null flag
+   *
    * @return not null flag
    */
-  isNotNull(): boolean {
+  public isNotNull(): boolean {
     return this.notNull;
   }
 
   /**
    * Determine if the column has a default value
+   *
    * @return true if has default value
    */
-  hasDefaultValue(): boolean {
-    return this.defaultValue !== null && this.defaultValue !== undefined;
+  public hasDefaultValue(): boolean {
+    return this.defaultValue != null;
   }
 
   /**
    * Set the default value
-   * @param defaultValue default value
+   *
+   * @param defaultValue
+   *            default value
    */
-  setDefaultValue(defaultValue: any) {
-    this.removeConstraintByType(ConstraintType.DEFAULT);
-    if (defaultValue !== null && defaultValue !== undefined) {
+  public setDefaultValue(defaultValue: any): void {
+    this.removeDefaultValueConstraint();
+    if (defaultValue != null) {
       this.addDefaultValueConstraint(defaultValue);
     }
     this.defaultValue = defaultValue;
@@ -231,24 +431,26 @@ export class UserColumn {
 
   /**
    * Get the default value
+   *
    * @return default value
    */
-  getDefaultValue(): any {
+  public getDefaultValue(): any {
     return this.defaultValue;
   }
 
   /**
    * Set the primary key flag
-   * @param primaryKey primary key flag
+   *
+   * @param primaryKey
+   *            primary key flag
    */
-  setPrimaryKey(primaryKey: boolean) {
-    if (this.primaryKey !== primaryKey) {
+  public setPrimaryKey(primaryKey: boolean): void {
+    if (this.primaryKey != primaryKey) {
       if (primaryKey) {
         this.addPrimaryKeyConstraint();
       } else {
-        this.autoincrement = false;
-        this.removeConstraintByType(ConstraintType.AUTOINCREMENT);
-        this.removeConstraintByType(ConstraintType.PRIMARY_KEY);
+        this.removeAutoincrementConstraint();
+        this.removePrimaryKeyConstraint();
       }
     }
     this.primaryKey = primaryKey;
@@ -256,22 +458,25 @@ export class UserColumn {
 
   /**
    * Get the primary key flag
+   *
    * @return primary key flag
    */
-  isPrimaryKey() {
+  public isPrimaryKey(): boolean {
     return this.primaryKey;
   }
 
   /**
    * Set the autoincrement flag
-   * @param autoincrement autoincrement flag
+   *
+   * @param autoincrement
+   *            autoincrement flag
    */
-  setAutoincrement(autoincrement: boolean) {
-    if (this.autoincrement !== autoincrement) {
+  public setAutoincrement(autoincrement: boolean): void {
+    if (this.autoincrement != autoincrement) {
       if (autoincrement) {
         this.addAutoincrementConstraint();
       } else {
-        this.removeConstraintByType(ConstraintType.AUTOINCREMENT);
+        this.removeAutoincrementConstraint();
       }
     }
     this.autoincrement = autoincrement;
@@ -279,115 +484,171 @@ export class UserColumn {
 
   /**
    * Get the autoincrement flag
+   *
    * @return autoincrement flag
    */
-  isAutoincrement(): boolean {
+  public isAutoincrement(): boolean {
     return this.autoincrement;
   }
 
-
   /**
    * Set the unique flag
-   * @param unique autoincrement flag
+   *
+   * @param unique
+   *            unique flag
    */
-  protected setUnique(unique: boolean) {
-    if (this.unique !== unique) {
+  public setUnique(unique: boolean): void {
+    if (this.unique != unique) {
       if (unique) {
         this.addUniqueConstraint();
       } else {
-        this.removeConstraintByType(ConstraintType.UNIQUE);
+        this.removeUniqueConstraint();
       }
     }
     this.unique = unique;
   }
 
   /**
-   * Get the autoincrement flag
-   * @return autoincrement flag
+   * Get the unique flag
+   *
+   * @return unique flag
    */
-  isUnique(): boolean {
+  public isUnique(): boolean {
     return this.unique;
   }
 
   /**
    * Set the data type
-   * @param dataType data type
+   *
+   * @param dataType
+   *            data type
    */
-  setDataType(dataType: GeoPackageDataType) {
+  public setDataType(dataType: GeoPackageDataType): void {
     this.dataType = dataType;
   }
 
   /**
    * Get the data type
+   *
    * @return data type
    */
-  getDataType(): GeoPackageDataType {
+  public getDataType(): GeoPackageDataType {
     return this.dataType;
   }
 
-  getTypeName(name: string, dataType: GeoPackageDataType): string {
-    UserColumn.validateDataType(name, dataType);
-    return GeoPackageDataType.nameFromType(dataType);
+  /**
+   * Set the database type
+   *
+   * @param type
+   *            database type
+   */
+  public setType(type: string): void {
+    this.type = type;
   }
 
   /**
-   * Validate that if max is set, the data type is text or blob
+   * Get the database type
+   *
+   * @return type
    */
-  validateMax(): boolean {
-    if (this.max && this.dataType !== GeoPackageDataType.TEXT && this.dataType !== GeoPackageDataType.BLOB) {
-      throw new Error(
-        'Column max is only supported for TEXT and BLOB columns. column: ' +
-          this.name +
-          ', max: ' +
-          this.max +
-          ', type: ' +
-          this.dataType,
-      );
+  public getType(): string {
+    return this.type;
+  }
+
+  /**
+   * Check if has constraints
+   *
+   * @return true if has constraints
+   */
+  public hasConstraints(): boolean {
+    return this.constraints.has();
+  }
+
+  /**
+   * Check if has constraints of the provided type
+   *
+   * @param type
+   *            constraint type
+   * @return true if has constraints
+   */
+  public hasConstraintsForType(type: ConstraintType): boolean {
+    return this.constraints.hasType(type);
+  }
+
+  /**
+   * Get the constraints
+   *
+   * @return constraints
+   */
+  public getConstraints(): Constraints {
+    return this.constraints;
+  }
+
+  /**
+   * Get the constraints of the provided type
+   *
+   * @param type
+   *            constraint type
+   * @return constraints
+
+   */
+  public getConstraintsForType(type: ConstraintType): Constraint[] {
+    return this.constraints.getConstraintsForType(type);
+  }
+
+  /**
+   * Clear the constraints
+   *
+   * @param reset true to reset constraint settings
+   * @return cleared constraints
+   */
+  public clearConstraints(reset = true): Constraint[] {
+    if (reset) {
+      this.primaryKey = false;
+      this.unique = false;
+      this.notNull = false;
+      this.defaultValue = null;
+      this.autoincrement = false;
     }
-    return true;
+
+    return this.constraints.clear();
   }
 
   /**
-   *  Create a new primary key column
+   * Clear the constraints of the provided type
    *
-   *  @param {Number} index column index
-   *  @param {string} name  column name
-   *  @param {boolean} autoincrement column autoincrement
-   *
-   *  @return {UserColumn} created column
+   * @param type
+   *            constraint type
+   * @return cleared constraints
    */
-  static createPrimaryKeyColumn(index: number, name: string, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): UserColumn {
-    return new UserColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, autoincrement);
-  }
+  public clearConstraintsForType(type: ConstraintType): Constraint[] {
+    switch (type) {
+      case ConstraintType.PRIMARY_KEY:
+        this.primaryKey = false;
+        break;
+      case ConstraintType.UNIQUE:
+        this.unique = false;
+        break;
+      case ConstraintType.NOT_NULL:
+        this.notNull = false;
+        break;
+      case ConstraintType.DEFAULT:
+        this.defaultValue = null;
+        break;
+      case ConstraintType.AUTOINCREMENT:
+        this.autoincrement = false;
+        break;
+      default:
+    }
 
-  /**
-   *  Create a new column
-   *
-   *  @param {Number} index        column index
-   *  @param {string} name         column name
-   *  @param {module:db/geoPackageDataType~GPKGDataType} type         data type
-   *  @param {Number} max max value
-   *  @param {Boolean} notNull      not null
-   *  @param {Object} defaultValue default value or nil
-   *
-   *  @return {module:user/userColumn~UserColumn} created column
-   */
-  static createColumn(
-    index: number,
-    name: string,
-    type: GeoPackageDataType,
-    notNull = false,
-    defaultValue?: DBValue,
-    max?: number,
-  ): UserColumn {
-    return new UserColumn(index, name, type, max, notNull, defaultValue, false);
+    return this.constraints.clearConstraintsByType(type);
   }
 
   /**
    * Add the default constraints that are enabled (not null, default value,
-   * primary key, autoincrement) from the column properties
+   * primary key) from the column properties
    */
-  protected addDefaultConstraints() {
+  public addDefaultConstraints(): void {
     if (this.isNotNull()) {
       this.addNotNullConstraint();
     }
@@ -396,32 +657,51 @@ export class UserColumn {
     }
     if (this.isPrimaryKey()) {
       this.addPrimaryKeyConstraint();
-      if (this.isAutoincrement()) {
-        this.addAutoincrementConstraint();
-      }
     }
-    if (this.isUnique()) {
-      this.addUniqueConstraint();
+    if (this.isAutoincrement()) {
+      this.addAutoincrementConstraint();
     }
   }
 
   /**
    * Add a constraint
-   * @param constraint constraint
+   *
+   * @param constraint
+   *            constraint
    */
-  addConstraint(constraint: Constraint) {
-    if (constraint.order === null || constraint.order === undefined) {
+  public addConstraint(constraint: Constraint): void {
+    if (constraint.order == null) {
       this.setConstraintOrder(constraint);
     }
 
     this.constraints.add(constraint);
+
+    switch (constraint.getType()) {
+      case ConstraintType.PRIMARY_KEY:
+        this.primaryKey = true;
+        break;
+      case ConstraintType.UNIQUE:
+        this.unique = true;
+        break;
+      case ConstraintType.NOT_NULL:
+        this.notNull = true;
+        break;
+      case ConstraintType.DEFAULT:
+        break;
+      case ConstraintType.AUTOINCREMENT:
+        this.autoincrement = true;
+        break;
+      default:
+    }
   }
 
   /**
    * Set the constraint order by constraint type
-   * @param constraint constraint
+   *
+   * @param constraint
+   *            constraint
    */
-  setConstraintOrder(constraint: Constraint) {
+  public setConstraintOrder(constraint: Constraint): void {
     let order = null;
     switch (constraint.getType()) {
       case ConstraintType.PRIMARY_KEY:
@@ -441,100 +721,210 @@ export class UserColumn {
         break;
       default:
     }
-    constraint.order = order;
+
+    constraint.setOrder(order);
   }
 
   /**
    * Add a constraint
-   * @param constraint constraint
+   * @param constraint  constraint
    */
-  addConstraintSql(constraint: string) {
+  public addConstraintSql(constraint: string): void {
     const type = ConstraintParser.getType(constraint);
     const name = ConstraintParser.getName(constraint);
     this.constraints.add(new RawConstraint(type, name, constraint));
   }
 
   /**
-   * Add constraints
-   * @param constraints constraints
+   * Add a constraint
+   *
+   * @param type
+   *            constraint type
+   * @param constraint
+   *            constraint
+   * @param order
+   *            constraint order
    */
-  addConstraints(constraints: Constraints) {
-    this.constraints.addConstraints(constraints);
+  public addConstraintFrom(type: ConstraintType, constraint: string, order: number = null): void {
+    const name = ConstraintParser.getName(constraint);
+    this.addConstraint(new RawConstraint(type, name, constraint, order));
   }
 
   /**
    * Add constraints
+   *
    * @param constraints constraints
    */
-  addColumnConstraints(constraints: ColumnConstraints) {
+  public addConstraintsArray(constraints: Constraint[]): void {
+    for (const constraint of constraints) {
+      this.addConstraint(constraint);
+    }
+  }
+
+  /**
+   * Add constraints
+   *
+   * @param constraints
+   *            constraints
+   */
+  public addConstraintsFromColumnConstraints(constraints: ColumnConstraints): void {
     this.addConstraints(constraints.getConstraints());
   }
 
   /**
-   * Add a not null constraint
+   * Add constraints
+   *
+   * @param constraints
+   *            constraints
+
    */
-  private addNotNullConstraint() {
-    this.addConstraint(new RawConstraint(ConstraintType.NOT_NULL, null, "NOT NULL", UserColumn.NOT_NULL_CONSTRAINT_ORDER));
+  public addConstraints(constraints: Constraints): void {
+    this.addConstraintsArray(constraints.all());
+  }
+
+  /**
+   * Add a not null constraint
+   *
+
+   */
+  public addNotNullConstraint(): void {
+    this.addConstraintFrom(ConstraintType.NOT_NULL, 'NOT NULL', UserColumn.NOT_NULL_CONSTRAINT_ORDER);
+  }
+
+  /**
+   * Remove a not null constraint
+   *
+
+   */
+  public removeNotNullConstraint(): void {
+    this.clearConstraintsForType(ConstraintType.NOT_NULL);
   }
 
   /**
    * Add a default value constraint
-   * @param defaultValue default value
+   *
+   * @param defaultValue
+   *            default value
+   *
+
    */
-  private addDefaultValueConstraint(defaultValue: any) {
-    this.addConstraint(new RawConstraint(ConstraintType.DEFAULT, null, "DEFAULT " + GeoPackageDataType.columnDefaultValue(defaultValue, this.getDataType()), UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER));
+  public addDefaultValueConstraint(defaultValue: any): void {
+    this.addConstraintFrom(
+      ConstraintType.DEFAULT,
+      'DEFAULT ' + SQLUtils.columnDefaultValue(defaultValue, this.getDataType()),
+      UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
+    );
+  }
+
+  /**
+   * Remove a default value constraint
+   *
+
+   */
+  public removeDefaultValueConstraint(): void {
+    this.clearConstraintsForType(ConstraintType.DEFAULT);
   }
 
   /**
    * Add a primary key constraint
+   *
+
    */
-  private addPrimaryKeyConstraint() {
-    this.addConstraint(new RawConstraint(ConstraintType.PRIMARY_KEY, null, "PRIMARY KEY", UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER));
+  public addPrimaryKeyConstraint(): void {
+    this.addConstraintFrom(ConstraintType.PRIMARY_KEY, 'PRIMARY KEY', UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER);
+  }
+
+  /**
+   * Remove a primary key constraint
+   *
+
+   */
+  public removePrimaryKeyConstraint(): void {
+    this.clearConstraintsForType(ConstraintType.PRIMARY_KEY);
   }
 
   /**
    * Add an autoincrement constraint
+   *
+
    */
-  private addAutoincrementConstraint() {
-    if (this.isPrimaryKey()) {
-      this.addConstraint(new RawConstraint(ConstraintType.AUTOINCREMENT, null, "AUTOINCREMENT", UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER));
-    } else {
-      throw new Error('Autoincrement may only be set on a primary key column');
-    }
+  public addAutoincrementConstraint(): void {
+    this.addConstraintFrom(ConstraintType.AUTOINCREMENT, 'AUTOINCREMENT', UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER);
+  }
+
+  /**
+   * Remove an autoincrement constraint
+   *
+
+   */
+  public removeAutoincrementConstraint(): void {
+    this.clearConstraintsForType(ConstraintType.AUTOINCREMENT);
   }
 
   /**
    * Add a unique constraint
+   *
+
    */
-  private addUniqueConstraint() {
-    this.addConstraint(new RawConstraint(ConstraintType.UNIQUE, null, "UNIQUE", UserColumn.UNIQUE_CONSTRAINT_ORDER));
+  public addUniqueConstraint(): void {
+    this.addConstraintFrom(ConstraintType.UNIQUE, 'UNIQUE', UserColumn.UNIQUE_CONSTRAINT_ORDER);
   }
 
   /**
-   * Removes constraints by type
+   * Remove a unique constraint
+   *
+
    */
-  removeConstraintByType(type: ConstraintType) {
-    this.constraints.clearConstraintsByType(type);
-  }
-
-  getType(): string {
-    return this.type;
-  }
-
-  hasConstraints() {
-    return this.constraints.has();
+  public removeUniqueConstraint(): void {
+    this.clearConstraintsForType(ConstraintType.UNIQUE);
   }
 
   /**
    * Build the SQL for the constraint
-   * @param constraint constraint
+   *
+   * @param constraint
+   *            constraint
    * @return SQL or null
+
    */
-  buildConstraintSql(constraint: Constraint): string {
+  public buildConstraintSql(constraint: Constraint): string {
     let sql = null;
-    if (UserTableDefaults.DEFAULT_PK_NOT_NULL || !this.isPrimaryKey() || constraint.getType() !== ConstraintType.NOT_NULL) {
+    if (UserTable.DEFAULT_PK_NOT_NULL || !this.isPrimaryKey() || constraint.getType() != ConstraintType.NOT_NULL) {
       sql = constraint.buildSql();
     }
     return sql;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p>
+   * Sort by index
+   */
+  public compareTo(another: UserColumn): number {
+    return this.index - another.index;
+  }
+
+  /**
+   * Validate that if max is set, the data type is text or blob
+   */
+  private validateMax(): void {
+    if (this.max != null) {
+      if (this.dataType == null) {
+        console.error('Column max set on a column without a data type. column: ' + name + ', max: ' + this.max);
+      } else if (this.dataType !== GeoPackageDataType.TEXT && this.dataType !== GeoPackageDataType.BLOB) {
+        throw new GeoPackageException(
+          'Column max is only supported for ' +
+            GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT) +
+            ' and ' +
+            GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB) +
+            ' columns. column: ' +
+            this.name +
+            ', max: ' +
+            this.max +
+            ', type: ' +
+            GeoPackageDataType.nameFromType(this.dataType),
+        );
+      }
+    }
   }
 }

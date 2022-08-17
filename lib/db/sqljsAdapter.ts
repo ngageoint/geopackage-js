@@ -1,5 +1,6 @@
 import { DBAdapter, DBValue } from './dbAdapter';
 import initSqlJs from 'rtree-sql.js';
+import { GeoPackageException } from "../geoPackageException";
 
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
@@ -109,6 +110,15 @@ export class SqljsAdapter implements DBAdapter {
   constructor(filePath?: string | Buffer | Uint8Array) {
     this.filePath = filePath;
   }
+
+  size(): number {
+      throw new GeoPackageException('Method not implemented.');
+  }
+
+  readableSize(): string {
+      throw new GeoPackageException('Method not implemented.');
+  }
+
   /**
    * Closes the connection to the GeoPackage
    */

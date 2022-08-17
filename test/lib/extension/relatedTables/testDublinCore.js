@@ -5,8 +5,8 @@ import { GeoPackageDataType } from '../../../../lib/db/geoPackageDataType';
 import {UserColumns} from "../../../../lib/user/userColumns";
 import {UserCustomTable} from "../../../../lib/user/custom/userCustomTable";
 
-var DublinCoreMetadata = require('../../../../lib/extension/relatedTables/dublinCoreMetadata').DublinCoreMetadata
-  , DublinCoreType = require('../../../../lib/extension/relatedTables/dublinCoreType').DublinCoreType
+var DublinCoreMetadata = require('../../../../lib/extension/related/dublin/dublinCoreMetadata').DublinCoreMetadata
+  , DublinCoreType = require('../../../../lib/extension/related/dublin/dublinCoreType').DublinCoreType
   , should = require('chai').should();
 
 describe('Dublin Core tests', function() {

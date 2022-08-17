@@ -20,7 +20,7 @@ export class ColumnConstraints {
    * Add a constraint
    * @param constraint constraint
    */
-  addConstraint(constraint: Constraint) {
+  addConstraint(constraint: Constraint): void {
     this.constraints.add(constraint);
   }
 
@@ -28,7 +28,7 @@ export class ColumnConstraints {
    * Add constraints
    * @param constraints constraints
    */
-  addConstraints(constraints: Constraints) {
+  addConstraints(constraints: Constraints): void {
     this.constraints.addConstraints(constraints);
   }
 
@@ -64,7 +64,7 @@ export class ColumnConstraints {
    * Add constraints
    * @param constraints constraints
    */
-  addColumnConstraints(constraints: ColumnConstraints) {
+  addColumnConstraints(constraints: ColumnConstraints): void {
     if (constraints !== null && constraints !== undefined) {
       this.addConstraints(constraints.getConstraints());
     }
@@ -77,5 +77,4 @@ export class ColumnConstraints {
   hasConstraints(): boolean {
     return this.constraints.has();
   }
-
 }

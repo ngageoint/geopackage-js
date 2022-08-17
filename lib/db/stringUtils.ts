@@ -3,7 +3,6 @@
  */
 
 export class StringUtils {
-
   /**
    * Wrap the name in double quotes
    * @param name  name

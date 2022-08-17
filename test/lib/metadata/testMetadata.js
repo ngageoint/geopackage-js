@@ -1,8 +1,8 @@
 import {GeoPackage} from '../../../lib/geoPackage';
 
 var should = require('chai').should()
-  , Metadata = require('../../../lib/metadata/metadata').Metadata
-  , MetadataDao = require('../../../lib/metadata/metadataDao').MetadataDao;
+  , Metadata = require('../../../lib/extension/metadata/metadata').Metadata
+  , MetadataDao = require('../../../lib/extension/metadata/metadataDao').MetadataDao;
 
 describe('Metadata tests', function() {
 

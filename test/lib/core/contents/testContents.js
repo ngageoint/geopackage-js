@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var ContentsDataType = require('../../../../lib/core/contents/contentsDataType').ContentsDataType
-  , ContentsDao = require('../../../../lib/core/contents/contentsDao').ContentsDao
+var ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
+  , ContentsDao = require('../../../../lib/contents/contentsDao').ContentsDao
   , TileMatrix = require('../../../../lib/tiles/matrix/tileMatrix').TileMatrix
   , should = require('chai').should()
   , path = require('path');
@@ -13,12 +13,16 @@ describe('Contents tests', function() {
   var filename;
 
   beforeEach('should open the geopackage', async function() {
-    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
-    // @ts-ignore
-    let result = await copyAndOpenGeopackage(originalFilename);
-    filename = result.path;
-    geoPackage = result.geopackage;
-    contentsDao = new ContentsDao(geoPackage);
+    try {
+      var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
+      // @ts-ignore
+      let result = await copyAndOpenGeopackage(originalFilename);
+      filename = result.path;
+      geoPackage = result.geopackage;
+      contentsDao = new ContentsDao(geoPackage);
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   afterEach('should close the geopackage', async function() {

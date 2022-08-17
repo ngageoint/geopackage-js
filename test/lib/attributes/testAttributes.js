@@ -1,13 +1,13 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
 var Verification = require('../../fixtures/verification')
-  , DataColumns = require('../../../lib/dataColumns/dataColumns').DataColumns
-  , DataColumnsDao = require('../../../lib/dataColumns/dataColumnsDao').DataColumnsDao
+  , DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns
+  , DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
   , AttributesDao = require('../../../lib/attributes/attributesDao').AttributesDao
   , AttributesTableReader = require('../../../lib/attributes/attributesTableReader').AttributesTableReader
   , AttributesTable = require('../../../lib/attributes/attributesTable').AttributesTable
   , GeoPackageDataType = require('../../../lib/db/geoPackageDataType').GeoPackageDataType
-  , Contents = require('../../../lib/core/contents/contents').Contents
+  , Contents = require('../../../lib/contents/contents').Contents
   , ConstraintType = require('../../../lib/db/table/constraintType').ConstraintType
   , Constraints = require('../../../lib/db/table/constraints').Constraints
   , UserCustomTableReader = require('../../../lib/user/custom/userCustomTableReader').UserCustomTableReader

@@ -13,17 +13,17 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   private static initialized = false;
 
   // default wasm locator
-  static canvasKitWasmLocateFile: (filename: string) => string = (filename) => {
+  static canvasKitWasmLocateFile: (filename: string) => string = filename => {
     return path.join(__dirname, '..', '..', 'canvaskit', filename);
   };
 
   // allow user to set the locate file function, if they place it somewhere else
-  static setCanvasKitWasmLocateFile(locateFile: (filename: string) => string) {
+  static setCanvasKitWasmLocateFile(locateFile: (filename: string) => string): void {
     CanvasKitCanvasAdapter.canvasKitWasmLocateFile = locateFile;
   }
 
   // Let user set CanvasKit from outside of this module. i.e. they load it into their context and then pass the CanvasKit object to this adapter.
-  static setCanvasKit (CanvasKit) {
+  static setCanvasKit(CanvasKit): void {
     CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
     CanvasKitCanvasAdapter.initialized = true;
   }
@@ -32,16 +32,26 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return new Promise((resolve, reject) => {
       try {
         CanvasKitInit({
-          locateFile: CanvasKitCanvasAdapter.canvasKitWasmLocateFile
-        }).then(CanvasKit => {
-          CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
-          CanvasKitCanvasAdapter.initialized = true;
-          resolve();
-        }).catch(() => {
-          reject('Failed to load the CanvasKit WebAssembly file at ' + CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
-        });
+          locateFile: CanvasKitCanvasAdapter.canvasKitWasmLocateFile,
+        })
+          .then(CanvasKit => {
+            CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
+            CanvasKitCanvasAdapter.initialized = true;
+            resolve();
+          })
+          .catch(() => {
+            reject(
+              'Failed to load the CanvasKit WebAssembly file at ' +
+                CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') +
+                '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.',
+            );
+          });
       } catch (e) {
-        reject('Failed to load the CanvasKit WebAssembly file at ' + CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') + '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.');
+        reject(
+          'Failed to load the CanvasKit WebAssembly file at ' +
+            CanvasKitCanvasAdapter.canvasKitWasmLocateFile('canvaskit.wasm') +
+            '.\nUpdate file locator function using NodeCanvasAdapter.setCanvasKitWasmLocateFile.',
+        );
       }
     });
   }
@@ -59,7 +69,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param imageData
    * @param contentType
    */
-  async createImage(imageData: any, contentType: string): Promise<{image: any, width: number, height: number}> {
+  async createImage(imageData: any, contentType: string): Promise<{ image: any; width: number; height: number }> {
     let src = imageData;
     let image;
     let width;
@@ -73,17 +83,20 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
             http.get(imageData, res => {
               const data = [];
               if (res.statusCode === 200) {
-                res.on('data', function(chunk) {
-                  data.push(chunk);
-                }).on('end', function() {
-                  resolve(Buffer.concat(data).buffer);
-                }).on('error', function(e) {
-                  reject(e);
-                });
+                res
+                  .on('data', function(chunk) {
+                    data.push(chunk);
+                  })
+                  .on('end', function() {
+                    resolve(Buffer.concat(data).buffer);
+                  })
+                  .on('error', function(e) {
+                    reject(e);
+                  });
               } else {
                 reject('Code: ' + res.statusCode);
               }
-            })
+            });
           });
         } else {
           // imageData is a file path
@@ -94,7 +107,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
               } else {
                 resolve(data);
               }
-            })
+            });
           });
         }
       }
@@ -111,14 +124,14 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
       throw new Error('Failed to create image.');
     }
 
-    return {image: image, width: width, height: height};
+    return { image: image, width: width, height: height };
   }
 
   createImageData(width, height): any {
     return new CanvasKitCanvasAdapter.CanvasKit.ImageData(width, height);
   }
 
-  disposeCanvas(canvas: any) {
+  disposeCanvas(canvas: any): void {
     if (canvas != null) {
       canvas.dispose();
       canvas = null;
@@ -130,34 +143,48 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     const ids = font.getGlyphIDs(text);
     const paint = new CanvasKitCanvasAdapter.CanvasKit.Paint();
     paint.setStyle(CanvasKitCanvasAdapter.CanvasKit.PaintStyle.Fill);
-    const size = font.getGlyphWidths(ids, paint).reduce(function(a, b){
+    const size = font.getGlyphWidths(ids, paint).reduce(function(a, b) {
       return a + b;
     }, 0);
     paint.delete();
     return size;
   }
 
-  drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string): void {
+  drawText(
+    context: any,
+    text: string,
+    location: number[],
+    fontFace: string,
+    fontSize: number,
+    fontColor: string,
+  ): void {
     context.save();
     context.fillStyle = fontColor;
-    context.font = fontSize + 'px \'' + fontFace + '\'';
+    context.font = fontSize + "px '" + fontFace + "'";
     context.textBaseline = 'middle';
     const textWidth = this.measureText(context, fontFace, fontSize, text);
     context.fillText(text, location[0] - textWidth / 2, location[1] + fontSize / 4);
     context.restore();
   }
 
-  toDataURL(canvas: any, format: string = 'image/png'): Promise<string> {
+  toDataURL(canvas: any, format = 'image/png'): Promise<string> {
     return Promise.resolve(canvas.toDataURL(format));
   }
 
-  async scaleImage(image: { image: any; width: number; height: number }, scale: number): Promise<{ image: any; width: number; height: number }> {
+  async scaleImage(
+    image: { image: any; width: number; height: number },
+    scale: number,
+  ): Promise<{ image: any; width: number; height: number }> {
     const scaledWidth = Math.round(scale * image.width);
     const scaledHeight = Math.round(scale * image.height);
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
-  async scaleImageToDimensions(image: { image: any; width: number; height: number }, scaledWidth: number, scaledHeight: number): Promise<{ image: any; width: number; height: number }> {
+  async scaleImageToDimensions(
+    image: { image: any; width: number; height: number },
+    scaledWidth: number,
+    scaledHeight: number,
+  ): Promise<{ image: any; width: number; height: number }> {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
@@ -166,7 +193,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return result;
   }
 
-  disposeImage(image: {image: any, width: number, height: number}): void {
+  disposeImage(image: { image: any; width: number; height: number }): void {
     if (image != null && image.image && image.image.delete) {
       image.image.delete();
       image.image = null;

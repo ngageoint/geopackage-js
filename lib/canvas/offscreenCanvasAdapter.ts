@@ -26,24 +26,26 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return new OffscreenCanvas(width, height);
   }
 
-  createImage(data: any, contentType: string = 'image/png'): Promise<{image: any, width: number, height: number}> {
+  createImage(data: any, contentType = 'image/png'): Promise<{ image: any; width: number; height: number }> {
     return new Promise((resolve, reject) => {
       let blob = data;
       if (data instanceof Buffer || Object.prototype.toString.call(data) === '[object Uint8Array]') {
-        blob = new Blob([data], {type: contentType});
+        blob = new Blob([data], { type: contentType });
       } else if (typeof data === 'string') {
-        blob = new Blob([CanvasUtils.base64toUInt8Array(data.split(',')[1])], {type: contentType});
+        blob = new Blob([CanvasUtils.base64toUInt8Array(data.split(',')[1])], { type: contentType });
       }
-      createImageBitmap(blob).then(image => {
-        resolve({
-          image: image,
-          width: image.width,
-          height: image.height,
+      createImageBitmap(blob)
+        .then(image => {
+          resolve({
+            image: image,
+            width: image.width,
+            height: image.height,
+          });
+        })
+        .catch(error => {
+          reject(error);
         });
-      }).catch(error => {
-        reject(error);
-      });
-    })
+    });
   }
 
   createImageData(width, height) {
@@ -56,7 +58,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
 
   measureText(context: any, fontFace: string, fontSize: number, text: string): number {
     context.save();
-    context.font = fontSize + 'px' + (fontFace != null ? (' \'' + fontFace + '\'') : '');
+    context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
     context.textBaseline = 'middle';
     context.textAlign = 'center';
     const width = context.measureText(text).width;
@@ -66,7 +68,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
 
   drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string) {
     context.save();
-    context.font = fontSize + 'px' + (fontFace != null ? (' \'' + fontFace + '\'') : '');
+    context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
     context.fillStyle = fontColor;
     context.textBaseline = 'middle';
     context.textAlign = 'center';
@@ -74,7 +76,10 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
-  async scaleImage(image: { image: any; width: number; height: number }, scale: number): Promise<{ image: any; width: number; height: number }> {
+  async scaleImage(
+    image: { image: any; width: number; height: number },
+    scale: number,
+  ): Promise<{ image: any; width: number; height: number }> {
     if (scale === 1.0) {
       return image;
     }
@@ -83,33 +88,36 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
-  async scaleImageToDimensions(image: { image: any; width: number; height: number }, scaledWidth: number, scaledHeight: number): Promise<{ image: any; width: number; height: number }> {
+  async scaleImageToDimensions(
+    image: { image: any; width: number; height: number },
+    scaledWidth: number,
+    scaledHeight: number,
+  ): Promise<{ image: any; width: number; height: number }> {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
     const result = {
       image: canvas.transferToImageBitmap(),
       width: scaledWidth,
-      height: scaledHeight
+      height: scaledHeight,
     };
     this.disposeCanvas(canvas);
     return result;
   }
 
-  toDataURL(canvas: any, format: string = 'image/png'): Promise<string> {
+  toDataURL(canvas: any, format = 'image/png'): Promise<string> {
     // @ts-ignore
-    return new Promise((resolve) => {
-      canvas.convertToBlob({type: format}).then(blob => {
+    return new Promise(resolve => {
+      canvas.convertToBlob({ type: format }).then(blob => {
         const reader = new FileReader();
         reader.addEventListener('load', () => {
           const result: string = reader.result as string;
-          resolve(result)
+          resolve(result);
         });
         reader.readAsDataURL(blob);
-      })
-    })
+      });
+    });
   }
 
-  disposeImage(image: {image: any, width: number, height: number}): void {
-  }
+  disposeImage(image: { image: any; width: number; height: number }): void {}
 }

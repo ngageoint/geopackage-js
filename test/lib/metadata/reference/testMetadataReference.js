@@ -1,8 +1,8 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 var should = require('chai').should()
-  , MetadataReference = require('../../../../lib/metadata/reference/metadataReference').MetadataReference
-  , Metadata = require('../../../../lib/metadata/metadata').Metadata
+  , MetadataReference = require('../../../../lib/extension/metadata/reference/metadataReference').MetadataReference
+  , Metadata = require('../../../../lib/extension/metadata/metadata').Metadata
   , Verification = require('../../../fixtures/verification');
 
 describe('Metadata Reference tests', function() {

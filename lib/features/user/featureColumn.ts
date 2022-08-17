@@ -5,8 +5,8 @@
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
-import { GeometryType } from './geometryType';
-import { TableColumn  } from '../../db/table/tableColumn';
+import { GeometryType } from '@ngageoint/simple-features-js';
+import { TableColumn } from '../../db/table/tableColumn';
 import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
@@ -30,8 +30,29 @@ export class FeatureColumn extends UserColumn {
   ) {
     super(index, name, dataType, max, notNull, defaultValue, primaryKey, autoincrement);
     this.geometryType = geometryType;
-    this.type = this.getTypeName(name, dataType, geometryType);
+    this.setType(this.getTypeName(name, dataType, geometryType));
   }
+
+  /**
+   * Create a new column
+   *
+   * @param tableColumn table column
+   * @return feature column
+   */
+  public static createColumnWithTableColumn(tableColumn: TableColumn): FeatureColumn {
+    return new FeatureColumn(
+      tableColumn.getIndex(),
+      tableColumn.getName(),
+      tableColumn.getDataType(),
+      tableColumn.getMax(),
+      tableColumn.isNotNull(),
+      tableColumn.getDefaultValue(),
+      tableColumn.isPrimaryKey(),
+      FeatureColumn.getGeometryTypeFromTableColumn(tableColumn),
+      tableColumn.isAutoIncrement(),
+    );
+  }
+
   /**
    *  Create a new primary key column
    *
@@ -42,11 +63,21 @@ export class FeatureColumn extends UserColumn {
    *  @return feature column
    */
   static createPrimaryKeyColumn(
-    index: number,
+    index: number = FeatureColumn.NO_INDEX,
     name: string,
-    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
   ): FeatureColumn {
-    return new FeatureColumn(index, name, GeoPackageDataType.INTEGER, undefined, true, undefined, true, undefined, autoincrement);
+    return new FeatureColumn(
+      index,
+      name,
+      GeoPackageDataType.INTEGER,
+      undefined,
+      true,
+      undefined,
+      true,
+      undefined,
+      autoincrement,
+    );
   }
   /**
    *  Create a new geometry column
@@ -63,13 +94,23 @@ export class FeatureColumn extends UserColumn {
     index: number,
     name: string,
     type: GeometryType,
-    notNull: boolean,
+    notNull?: boolean,
     defaultValue?: DBValue,
   ): FeatureColumn {
-    if ((type === null || type === undefined)) {
+    if (type === null || type === undefined) {
       throw new Error('Geometry Type is required to create column: ' + name);
     }
-    return new FeatureColumn(index, name, GeoPackageDataType.BLOB, undefined, notNull, defaultValue, false, type, false);
+    return new FeatureColumn(
+      index,
+      name,
+      GeoPackageDataType.BLOB,
+      undefined,
+      notNull,
+      defaultValue,
+      false,
+      type,
+      false,
+    );
   }
 
   /**
@@ -106,7 +147,7 @@ export class FeatureColumn extends UserColumn {
     if (geometryType !== null && geometryType !== undefined) {
       type = GeometryType.nameFromType(geometryType);
     } else {
-      type = super.getTypeName(name, dataType);
+      type = UserColumn.getTypeName(name, dataType);
     }
     return type;
   }
@@ -129,7 +170,17 @@ export class FeatureColumn extends UserColumn {
    * @return copied column
    */
   copy(): FeatureColumn {
-    return new FeatureColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.geometryType, this.autoincrement);
+    return new FeatureColumn(
+      this.getIndex(),
+      this.getName(),
+      this.getDataType(),
+      this.getMax(),
+      this.isNotNull(),
+      this.getDefaultValue(),
+      this.isPrimaryKey(),
+      this.getGeometryType(),
+      this.isAutoincrement(),
+    );
   }
 
   /**
@@ -148,5 +199,4 @@ export class FeatureColumn extends UserColumn {
   getGeometryType(): GeometryType {
     return this.geometryType;
   }
-
 }

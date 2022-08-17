@@ -74,13 +74,12 @@ export class TileColumns extends UserColumns<TileColumn> {
    * {@inheritDoc}
    */
   copy(): TileColumns {
-    let tileColumns = new TileColumns(this._tableName, this._columns, this._custom);
+    const tileColumns = new TileColumns(this._tableName, this._columns, this._custom);
     tileColumns.zoomLevelIndex = this.zoomLevelIndex;
     tileColumns.tileColumnIndex = this.tileColumnIndex;
     tileColumns.tileRowIndex = this.tileRowIndex;
     tileColumns.tileDataIndex = this.tileDataIndex;
     return tileColumns;
-
   }
 
   /**

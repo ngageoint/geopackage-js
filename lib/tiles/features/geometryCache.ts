@@ -1,7 +1,5 @@
 import { FeatureRow } from '../../features/user/featureRow';
-import { Geometry } from 'geojson';
-import { CrsGeometry } from '../../types/CrsGeometry';
-
+import { Geometry } from "@ngageoint/simple-features-js";
 /**
  * Feature Paint Cache.
  * @module tiles/features
@@ -13,7 +11,7 @@ import { CrsGeometry } from '../../types/CrsGeometry';
  */
 export class GeometryCache {
   public static readonly DEFAULT_GEOMETRY_CACHE_SIZE = 100;
-  geometryCache: Record<number, Geometry & CrsGeometry>;
+  geometryCache: Record<number, Geometry>;
   accessHistory: number[];
 
   constructor(public cacheSize: number = GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE) {
@@ -27,7 +25,7 @@ export class GeometryCache {
    * @param featureRow
    * @returns {module:tiles/features~Geometry}
    */
-  getGeometryForFeatureRow(featureRow: FeatureRow): Geometry & CrsGeometry {
+  getGeometryForFeatureRow(featureRow: FeatureRow): Geometry {
     return this.getGeometry(featureRow.id);
   }
 
@@ -36,7 +34,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @return {module:tiles/features~Geometry} geometry or null
    */
-  getGeometry(featureRowId: number): Geometry & CrsGeometry {
+  getGeometry(featureRowId: number): Geometry {
     const Geometry = this.geometryCache[featureRowId];
     if (!!Geometry) {
       const index = this.accessHistory.indexOf(featureRowId);
@@ -53,7 +51,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @param {Object} geometry geometry
    */
-  setGeometry(featureRowId: number, geometry: Geometry & CrsGeometry): void {
+  setGeometry(featureRowId: number, geometry: Geometry): void {
     const index = this.accessHistory.indexOf(featureRowId);
     if (index > -1) {
       this.accessHistory.splice(index, 1);
@@ -73,7 +71,7 @@ export class GeometryCache {
    * @param {Number} featureRowId style row id
    * @return {module:tiles/features~Geometry} removed feature paint or null
    */
-  remove(featureRowId: number): Geometry & CrsGeometry {
+  remove(featureRowId: number): Geometry {
     const removed = this.geometryCache[featureRowId];
     delete this.geometryCache[featureRowId];
     if (!!removed) {

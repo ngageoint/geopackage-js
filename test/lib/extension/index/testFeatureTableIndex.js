@@ -1,7 +1,7 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
 
-var FeatureTableIndex = require('../../../../lib/extension/index/featureTableIndex').FeatureTableIndex
+var FeatureTableIndex = require('../../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex
   , sqliteQueryBuilder = require('../../../../lib/db/sqliteQueryBuilder').SqliteQueryBuilder
   , should = require('chai').should()
   , path = require('path');

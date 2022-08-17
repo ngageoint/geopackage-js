@@ -1,4 +1,3 @@
-import proj4 from 'proj4';
 import { UserDao } from '../../user/userDao';
 import { TileMatrixDao } from '../matrix/tileMatrixDao';
 import { TileMatrixSetDao } from '../matrixset/tileMatrixSetDao';
@@ -9,15 +8,14 @@ import { ColumnValues } from '../../dao/columnValues';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { BoundingBox } from '../../boundingBox';
-import { SpatialReferenceSystem } from '../../core/srs/spatialReferenceSystem';
+import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { GeoPackage } from '../../geoPackage';
 import { TileTable } from './tileTable';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
 import { TileDaoUtils } from './tileDaoUtils';
-import { Projection } from '../../projection/projection';
-import { ProjectionConstants } from '../../projection/projectionConstants';
+import { Projection, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 
 /**
  * `TileDao` is a {@link module:dao/dao~Dao} subclass for reading
@@ -37,7 +35,7 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
   minZoom: number;
   maxZoom: number;
   srs: SpatialReferenceSystem;
-  projection: string;
+  projection: Projection;
   minWebMapZoom: number;
   maxWebMapZoom: number;
   webZoomToGeoPackageZooms: Record<number, number>;
@@ -68,18 +66,16 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
   initialize(): void {
     const tileMatrixSetDao = this.geoPackage.tileMatrixSetDao;
     this.srs = tileMatrixSetDao.getSrs(this.tileMatrixSet);
-    this.projection = [this.srs.organization.toUpperCase(), this.srs.organization_coordsys_id].join(':');
-    Projection.loadProjection(this.projection, this.srs.definition);
+    this.projection = this.srs.projection;
 
     // Populate the zoom level to tile matrix and the sorted tile widths and heights
     for (let i = this.tileMatrices.length - 1; i >= 0; i--) {
       const tileMatrix = this.tileMatrices[i];
       let width = tileMatrix.pixel_x_size * tileMatrix.tile_width;
       let height = tileMatrix.pixel_y_size * tileMatrix.tile_height;
-      const proj4Projection: proj4.Converter & { to_meter?: number } = Projection.getConverter(this.projection);
-      if (proj4Projection.to_meter) {
-        width = proj4Projection.to_meter * tileMatrix.pixel_x_size * tileMatrix.tile_width;
-        height = proj4Projection.to_meter * tileMatrix.pixel_y_size * tileMatrix.tile_height;
+      if (this.projection.getDefinition().to_meter) {
+        width = this.projection.getDefinition().to_meter * tileMatrix.pixel_x_size * tileMatrix.tile_width;
+        height = this.projection.getDefinition().to_meter * tileMatrix.pixel_y_size * tileMatrix.tile_height;
       }
       this.widths.push(width);
       this.heights.push(height);
@@ -106,9 +102,9 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
         this.tileMatrixSet.min_y,
         this.tileMatrixSet.min_y + singleTileHeight,
       );
-      const proj4Projection = Projection.getConverter(this.projection, ProjectionConstants.EPSG_4326);
-      const ne = proj4Projection.forward([tileBox.maxLongitude, tileBox.maxLatitude]);
-      const sw = proj4Projection.forward([tileBox.minLongitude, tileBox.minLatitude]);
+      const transform = new ProjectionTransform(this.projection, Projections.getWGS84Projection());
+      const ne = transform.transform(tileBox.getMaxLongitude(), tileBox.getMaxLatitude());
+      const sw = transform.transform(tileBox.getMinLongitude(), tileBox.getMinLatitude());
       const width = ne[0] - sw[0];
       const zoom = Math.ceil(Math.log2(360 / width));
       if (this.minWebMapZoom > zoom) {
@@ -120,9 +116,16 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
       this.webZoomToGeoPackageZooms[zoom] = tileMatrix.zoom_level;
     }
   }
+
+  /**
+   * Determines GeoPackage Zoom Level
+   * @param webMercatorBoundingBox
+   * @param zoom
+   */
   determineGeoPackageZoomLevel(webMercatorBoundingBox: BoundingBox, zoom: number): number {
     return this.webZoomToGeoPackageZooms[zoom];
   }
+
   /**
    * Get the bounding box of tiles at the zoom level
    * @param  {Number} zoomLevel zoom level
@@ -219,7 +222,6 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
     return this.zoomLevelToTileMatrix[zoomLevel];
   }
 
-
   /**
    * Get the zoom level for the provided width and height in the default units
    * @param length in default units
@@ -260,7 +262,13 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    * @since 1.2.1
    */
   getClosestZoomLevelForWidthAndHeight(width: number, height: number): number {
-    return TileDaoUtils.getClosestZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+    return TileDaoUtils.getClosestZoomLevelForWidthAndHeight(
+      this.widths,
+      this.heights,
+      this.tileMatrices,
+      width,
+      height,
+    );
   }
 
   /**
@@ -287,7 +295,13 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
    * @since 2.0.2
    */
   getApproximateZoomLevelForWidthAndHeight(width: number, height: number): number {
-    return TileDaoUtils.getApproximateZoomLevelForWidthAndHeight(this.widths, this.heights, this.tileMatrices, width, height);
+    return TileDaoUtils.getApproximateZoomLevelForWidthAndHeight(
+      this.widths,
+      this.heights,
+      this.tileMatrices,
+      width,
+      height,
+    );
   }
 
   /**
@@ -514,6 +528,7 @@ export class TileDao<T extends TileRow> extends UserDao<TileRow> {
     const whereArgs = this.buildWhereArgs([zoomLevel, column, row]);
     return this.deleteWhere(where, whereArgs);
   }
+
   dropTable(): boolean {
     const tileMatrixDao = this.geoPackage.tileMatrixDao;
     const dropResult = UserDao.prototype.dropTable.call(this);

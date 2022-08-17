@@ -2,7 +2,7 @@ import { default as testSetup } from '../fixtures/testSetup'
 
 var Verification = require('../fixtures/verification')
   , TileTable = require('../../lib/tiles/user/tileTable').TileTable
-  , GeometryType = require('../../lib/features/user/geometryType').GeometryType
+  , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , SetupFeatureTable = require('../fixtures/setupFeatureTable')
   , should = require('chai').should();
 

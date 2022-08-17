@@ -1,5 +1,5 @@
-import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox, GeometryType } from '../index';
-import {Canvas} from "../lib/canvas/canvas";
+import { GeoPackageManager, GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox, GeometryType } from '../index';
+import { Canvas } from "../lib/canvas/canvas";
 const testSetup = require('./fixtures/testSetup').default;
 
 const path = require('path'),
@@ -9,7 +9,7 @@ const path = require('path'),
   mock = require('xhr-mock').default,
   should = require('chai').should();
 
-describe('GeoPackageAPI tests', function() {
+describe('GeoPackageManager tests', function() {
   const existingPath = path.join(__dirname, 'fixtures', 'rivers.gpkg');
   const geopackageToCreate = path.join(__dirname, 'fixtures', 'tmp', 'tmp.gpkg');
   const tilePath = path.join(__dirname, 'fixtures', 'tiles', '0', '0', '0.png');
@@ -37,7 +37,7 @@ describe('GeoPackageAPI tests', function() {
   it('should open the geopackage', async function() {
     // @ts-ignore
     const newPath = await testSetup.copyGeopackage(existingPath);
-    const geopackage = await GeoPackageAPI.open(newPath);
+    const geopackage = await GeoPackageManager.open(newPath);
     should.exist(geopackage);
     should.exist(geopackage.getTables);
     geopackage.close();
@@ -52,7 +52,7 @@ describe('GeoPackageAPI tests', function() {
       .copyGeopackage(existingPath)
       .then(function(newPath) {
         gppath = newPath;
-        return GeoPackageAPI.open(gppath);
+        return GeoPackageManager.open(gppath);
       })
       .then(function(geopackage) {
         should.exist(geopackage);
@@ -79,7 +79,7 @@ describe('GeoPackageAPI tests', function() {
         });
       })
       .then(function() {
-        return GeoPackageAPI.open(url);
+        return GeoPackageManager.open(url);
       })
       .then(function(geopackage) {
         should.exist(geopackage);
@@ -103,7 +103,7 @@ describe('GeoPackageAPI tests', function() {
       return Promise.reject(new Error());
     });
     return (
-      GeoPackageAPI.open(errorUrl)
+      GeoPackageManager.open(errorUrl)
         // @ts-ignore
         .then(function(geopackage) {
           should.fail(true, false, 'Should have failed');
@@ -122,7 +122,7 @@ describe('GeoPackageAPI tests', function() {
       status: 404,
     });
     return (
-      GeoPackageAPI.open(badUrl)
+      GeoPackageManager.open(badUrl)
         // @ts-ignore
         .then(function(geopackage) {
           should.fail(false, true);
@@ -137,7 +137,7 @@ describe('GeoPackageAPI tests', function() {
     // @ts-ignore
     await testSetup.createBareGeoPackage(geopackageToCreate);
     try {
-      const geopackage = await GeoPackageAPI.open(geopackageToCreate);
+      const geopackage = await GeoPackageManager.open(geopackageToCreate);
       should.not.exist(geopackage);
     } catch (e) {
       should.exist(e);
@@ -148,7 +148,7 @@ describe('GeoPackageAPI tests', function() {
 
   it('should not open a file without the correct extension', async function() {
     try {
-      const geopackage = await GeoPackageAPI.open(tilePath);
+      const geopackage = await GeoPackageManager.open(tilePath);
       should.not.exist(geopackage);
     } catch (e) {
       should.exist(e);
@@ -156,7 +156,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should not open a file without the correct extension via promise', function() {
-    GeoPackageAPI.open(tilePath).catch(function(error) {
+    GeoPackageManager.open(tilePath).catch(function(error) {
       should.exist(error);
     });
   });
@@ -164,7 +164,7 @@ describe('GeoPackageAPI tests', function() {
   it('should open the geopackage byte array', async function() {
     // @ts-ignore
     const data = await fs.readFile(existingPath);
-    const geopackage = await GeoPackageAPI.open(data);
+    const geopackage = await GeoPackageManager.open(data);
     should.exist(geopackage);
   });
 
@@ -172,7 +172,7 @@ describe('GeoPackageAPI tests', function() {
     // @ts-ignore
     const data = await fs.readFile(tilePath);
     try {
-      const geopackage = await GeoPackageAPI.open(data);
+      const geopackage = await GeoPackageManager.open(data);
       should.not.exist(geopackage);
     } catch (err) {
       should.exist(err);
@@ -181,7 +181,7 @@ describe('GeoPackageAPI tests', function() {
 
   it('should not create a geopackage without the correct extension', async function() {
     try {
-      const gp = await GeoPackageAPI.create(tilePath);
+      const gp = await GeoPackageManager.create(tilePath);
       should.fail(gp, null, 'Error should have been thrown');
     } catch (e) {
       should.exist(e);
@@ -191,7 +191,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should not create a geopackage without the correct extension return promise', function(done) {
-    GeoPackageAPI.create(tilePath)
+    GeoPackageManager.create(tilePath)
       // @ts-ignore
       .then(function(geopackage) {
         // should not get called
@@ -204,14 +204,14 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should create a geopackage', async function() {
-    const gp = await GeoPackageAPI.create(geopackageToCreate);
+    const gp = await GeoPackageManager.create(geopackageToCreate);
     should.exist(gp);
     should.exist(gp.getTables);
     await testSetup.deleteGeoPackage(geopackageToCreate);
   });
 
   it('should create a geopackage with a promise', function() {
-    GeoPackageAPI.create(geopackageToCreate).then(async function(geopackage) {
+    GeoPackageManager.create(geopackageToCreate).then(async function(geopackage) {
       should.exist(geopackage);
       should.exist(geopackage.getTables);
       await testSetup.deleteGeoPackage(geopackageToCreate);
@@ -219,7 +219,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should create a geopackage and export it', async function() {
-    const gp = await GeoPackageAPI.create(geopackageToCreate);
+    const gp = await GeoPackageManager.create(geopackageToCreate);
     should.exist(gp);
     const buffer = await gp.export();
     should.exist(buffer);
@@ -227,7 +227,7 @@ describe('GeoPackageAPI tests', function() {
   });
 
   it('should create a geopackage in memory', async function() {
-    const gp = await GeoPackageAPI.create();
+    const gp = await GeoPackageManager.create();
     should.exist(gp);
   });
 
@@ -469,7 +469,7 @@ describe('GeoPackageAPI tests', function() {
 
     beforeEach(function(done) {
       fs.unlink(geopackageToCreate, async function() {
-        geopackage = await GeoPackageAPI.create(geopackageToCreate);
+        geopackage = await GeoPackageManager.create(geopackageToCreate);
         done();
       });
     });

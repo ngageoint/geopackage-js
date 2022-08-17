@@ -1,6 +1,6 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/relatedTables'
-import {UserMappingTable} from '../../../../lib/extension/relatedTables/userMappingTable';
+import {RelatedTablesExtension} from '../../../../lib/extension/related'
+import {UserMappingTable} from '../../../../lib/extension/related/userMappingTable';
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , RelatedTablesUtils = require('./relatedTablesUtils')

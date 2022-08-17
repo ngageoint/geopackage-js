@@ -10,23 +10,6 @@ import { UserTableDefaults } from '../user/userTableDefaults';
  * Attribute Column
  */
 export class AttributesColumn extends UserColumn {
-  constructor(
-    index: number,
-    name: string,
-    dataType: GeoPackageDataType,
-    max?: number,
-    notNull?: boolean,
-    defaultValue?: DBValue,
-    primaryKey?: boolean,
-    autoincrement?: boolean,
-  ) {
-    super(index, name, dataType, max, notNull, defaultValue, primaryKey, autoincrement);
-    // eslint-disable-next-line eqeqeq
-    if (dataType === null) {
-      throw new Error('Data type is required to create column: ' + name);
-    }
-  }
-
   /**
    * Create a new column
    * @param index
@@ -60,10 +43,28 @@ export class AttributesColumn extends UserColumn {
     name: string,
     autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
   ): AttributesColumn {
-    return new AttributesColumn(index, name, GeoPackageDataType.INTEGER, undefined, undefined, undefined, true, autoincrement);
+    return new AttributesColumn(
+      index,
+      name,
+      GeoPackageDataType.INTEGER,
+      undefined,
+      undefined,
+      undefined,
+      true,
+      autoincrement,
+    );
   }
 
   copy(): AttributesColumn {
-    return new AttributesColumn(this.index, this.name, this.dataType, this.max, this.notNull, this.defaultValue, this.primaryKey, this.autoincrement);
+    return new AttributesColumn(
+      this.getIndex(),
+      this.getName(),
+      this.getDataType(),
+      this.getMax(),
+      this.isNotNull(),
+      this.getDefaultValue(),
+      this.isPrimaryKey(),
+      this.isAutoincrement(),
+    );
   }
 }
