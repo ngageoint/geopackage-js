@@ -1,148 +1,106 @@
-import { FeatureIndexResults } from "./featureIndexResults";
-import { FeatureRow } from "../user/featureRow";
+import { FeatureIndexResults } from './featureIndexResults';
+import { FeatureRow } from '../user/featureRow';
 
 /**
  * Iterable Feature Index Results to iterate on feature rows from a combination
  * of multiple Feature Index Results
  */
-public class MultipleFeatureIndexResults implements FeatureIndexResults {
+export class MultipleFeatureIndexResults implements FeatureIndexResults {
+  /**
+   * List of multiple Feature Index Results
+   */
+  private readonly results: FeatureIndexResults[] = [];
 
-	/**
-	 * List of multiple Feature Index Results
-	 */
-	private readonly results: FeatureIndexResults[] = [];
+  /**
+   * Total feature row result count
+   */
+  private readonly _count: number;
 
-	/**
-	 * Total feature row result count
-	 */
-	private readonly _count: number;
+  /**
+   * Private index for the result set
+   * @private
+   */
+  private resultSetIdx = -1;
 
-	/**
-	 * Constructor
-	 * @param results multiple results
-	 */
-	public constructor(results: FeatureIndexResults[]) {
-		this.results.push(...results);
-		let totalCount = 0;
-		for (const result of results) {
-			totalCount += result.count();
-		}
-		this._count = totalCount;
-	}
+  /**
+   * private result set holder
+   * @private
+   */
+  private currentResultSet = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public count(): number {
-		return this._count;
-	}
+  /**
+   * private ids result set holder
+   * @private
+   */
+  private currentIdsResultSet = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	[Symbol.iterator](): IterableIterator<FeatureRow> {
-		return new Iterator<FeatureRow>() {
+  /**
+   * Constructor
+   * @param results multiple results
+   */
+  public constructor(results: FeatureIndexResults[]) {
+    this.results.push(...results);
+    let totalCount = 0;
+    for (const result of results) {
+      totalCount += result.count();
+    }
+    this._count = totalCount;
+  }
 
-			int index = -1;
-			private Iterator<FeatureRow> currentResults = null;
+  /**
+   * {@inheritDoc}
+   */
+  public count(): number {
+    return this._count;
+  }
 
-			/**
-			 * {@inheritDoc}
-			 */
-			public boolean hasNext() {
-				boolean hasNext = false;
+  /**
+   * {@inheritDoc}
+   */
+  public ids(): IterableIterator<number> {
+    return {
+      [Symbol.iterator](): IterableIterator<number> {
+        return this;
+      },
+      next(): IteratorResult<number> {
+        if (this.currentIdResultSet == null && this.resultSetIdx + 1 < this.results.length) {
+          this.currentIdResultSet = this.results[++this.resultSetIdx].ids();
+        }
+        const result = this.currentIdResultSet.next();
+        if (result.done) {
+          this.currentIdResultSet = null;
+          if (this.currentIdResultSet == null && this.resultSetIdx + 1 < this.results.length) {
+            this.currentIdResultSet = this.results[++this.resultSetIdx];
+          }
+        }
+        result.done = this.currentIdResultSet != null;
+        return result;
+      },
+    };
+  }
 
-				if (currentResults != null) {
-					hasNext = currentResults.hasNext();
-				}
+  /**
+   * {@inheritDoc}
+   */
+  [Symbol.iterator](): IterableIterator<FeatureRow> {
+    return this;
+  }
 
-				if (!hasNext) {
-
-					while (!hasNext && ++index < results.size()) {
-
-						// Get an iterator from the next feature index results
-						currentResults = results.get(index).iterator();
-						hasNext = currentResults.hasNext();
-
-					}
-
-				}
-
-				return hasNext;
-			}
-
-			/**
-			 * {@inheritDoc}
-			 */
-			public FeatureRow next() {
-				FeatureRow row = null;
-				if (currentResults != null) {
-					row = currentResults.next();
-				}
-				return row;
-			}
-		};
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ids(): IterableIterator<number> {
-		return new Iterable<Long>() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public Iterator<Long> iterator() {
-				return new Iterator<Long>() {
-
-					int index = -1;
-					private Iterator<Long> currentResults = null;
-
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public boolean hasNext() {
-						boolean hasNext = false;
-
-						if (currentResults != null) {
-							hasNext = currentResults.hasNext();
-						}
-
-						if (!hasNext) {
-
-							while (!hasNext && ++index < results.size()) {
-
-								// Get an iterator from the next feature index
-								// results
-								currentResults = results.get(index).ids()
-										.iterator();
-								hasNext = currentResults.hasNext();
-
-							}
-
-						}
-
-						return hasNext;
-					}
-
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public Long next() {
-						Long id = null;
-						if (currentResults != null) {
-							id = currentResults.next();
-						}
-						return id;
-					}
-
-				};
-			}
-		};
-	}
-
+  /**
+   * {@inheritDoc}
+   */
+  public next(): { value: FeatureRow; done: boolean } {
+    if (this.currentResultSet == null && this.resultSetIdx + 1 < this.results.length) {
+      this.currentResultSet = this.results[++this.resultSetIdx];
+    }
+    const result = this.currentResultSet.next();
+    if (result.done) {
+      this.currentResultSet = null;
+      if (this.currentResultSet == null && this.resultSetIdx + 1 < this.results.length) {
+        this.currentResultSet = this.results[++this.resultSetIdx];
+      }
+    }
+    result.done = this.currentResultSet != null;
+    return result;
+  }
 }

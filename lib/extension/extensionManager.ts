@@ -4,7 +4,7 @@ import { NGAExtensions } from './nga/ngaExtensions';
 import { GeoPackageConstants } from '../geoPackageConstants';
 import { GeoPackageException } from '../geoPackageException';
 import { TableInfo } from '../db/table/tableInfo';
-import { RTreeIndexExtension } from './rtree/rtreeIndexExtension';
+import { RTreeIndexExtension } from './rtree/rTreeIndexExtension';
 import { RelatedTablesExtension } from './related/relatedTablesExtension';
 import { SQLUtils } from '../db/sqlUtils';
 import { UserCustomTableReader } from '../user/custom/userCustomTableReader';

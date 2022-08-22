@@ -138,6 +138,33 @@ export abstract class Dao<T, ID> {
   }
 
   /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue> {
+    return this.db.get(sql, params)
+  }
+
+  /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryAllRaw(sql: string, params?: [] | Record<string, any>): Record<string, DBValue>[] {
+    return this.db.all(sql, params)
+  }
+
+  /**
+   * Performs a raw query
+   * @param sql
+   * @param params
+   */
+  queryEachRaw(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
+    return this.db.each(sql, params)
+  }
+
+  /**
    * Queries for all matches and returns them in the callback.  Be aware this pulls all results into memory
    * @param  {string} [where]     Optional where clause
    * @param  {object[]} [whereArgs] Optional where args array

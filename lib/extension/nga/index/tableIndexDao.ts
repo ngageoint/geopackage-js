@@ -19,7 +19,7 @@ export class TableIndexDao extends GeoPackageDao<TableIndex, string> {
    * @param geoPackageOrConnection GeoPackage | GeoPackageConnection
    * @return dao
    */
-  public static create(geoPackageOrConnection: GeoPackage | GeoPackageConnection): TableIndexDao {
+  public static createDao(geoPackageOrConnection: GeoPackage | GeoPackageConnection): TableIndexDao {
     return new TableIndexDao(
       geoPackageOrConnection instanceof GeoPackage ? geoPackageOrConnection.getDatabase() : geoPackageOrConnection,
     );

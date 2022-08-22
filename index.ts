@@ -47,7 +47,7 @@ import { Paint } from './lib/tiles/features/paint';
 import { Projection } from './lib/projection/projection';
 import { ProjectionConstants } from './lib/projection/projectionConstants';
 import { RelatedTablesExtension } from './lib/extension/related';
-import { RTreeIndex } from './lib/extension/rtree/rtreeIndexExtension';
+import { RTreeIndex } from './lib/extension/rtree/rTreeIndexExtension';
 import { RTreeIndexDao } from './lib/extension/rtree/rtreeIndexDao';
 import { SchemaExtension } from './lib/extension/schema';
 import { ShadedFeaturesTile } from './lib/tiles/features/custom/shadedFeaturesTile';

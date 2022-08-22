@@ -286,7 +286,7 @@ export abstract class UserDao<
    * @param selectionArgs selection args
    * @return result
    */
-  public rawQueryWithArgs(sql: string, selectionArgs: [] = null): TResult {
+  public rawQueryWithArgs(sql: string, selectionArgs?: []): TResult {
     return this.userDb.rawQuery(sql, selectionArgs);
   }
 
@@ -307,6 +307,45 @@ export abstract class UserDao<
    */
   public queryForAll(): TResult {
     return this.query();
+  }
+
+  /**
+   * Query for rows by ids in the nested SQL query
+   *
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return result
+   */
+  public queryIn(distinct?: boolean, columns?: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
+    const whereClause = this.buildWhereIn(nestedSQL, where);
+    const args = this.buildWhereInArgs(nestedArgs, whereArgs);
+    return this.query(distinct, columns, whereClause, args);
+  }
+
+  /**
+   * Query for ordered rows by ids in the nested SQL query, starting at the
+   * offset and returning no more than the limit.
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param groupBy group by
+   * @param having having
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk offset
+   * @return result
+   */
+  public queryInForChunk(distinct: boolean, columns: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    const whereClause = this.buildWhereIn(nestedSQL, where);
+    const args = this.buildWhereInArgs(nestedArgs, whereArgs);
+    return this.queryForChunk(distinct, columns, whereClause, args, groupBy, having, orderBy, limit, offset);
   }
 
   /**
@@ -377,10 +416,10 @@ export abstract class UserDao<
    * @param whereArgs where arguments
    * @return count
    */
-  public countIn(distinct: boolean, column: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+  public countIn(distinct?: boolean, column?: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
     const whereClause = this.buildWhereIn(nestedSQL, where);
     const args = this.buildWhereInArgs(nestedArgs, whereArgs);
-    return this.db.countColumn(this.getTableName(), distinct, column, where, args);
+    return this.db.countColumn(this.getTableName(), distinct, column, whereClause, args);
   }
 
   /**
@@ -428,6 +467,27 @@ export abstract class UserDao<
     return value;
   }
 
+  /**
+   * Query SQL for all row ids
+   * @param distinct distinct rows
+   * @param where where
+   * @return SQL
+   */
+  public queryIdsSQL(distinct = false, where?: string): string {
+    return this.querySQL(distinct, [this.table.getPkColumnName()], where);
+  }
+
+  /**
+   * Query SQL for all rows
+   *
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param where where
+   * @return SQL
+   */
+  public querySQL(distinct: boolean, columns: string[], where?: string): string {
+   return this.userDb.querySQL(distinct, this.getTableName(), columns, where);
+  }
 
   /**
    * Get the primary key where clause

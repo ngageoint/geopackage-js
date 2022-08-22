@@ -193,7 +193,7 @@ export class GeoPackageConnection {
    * @param where
    * @param whereArgs
    */
-  countColumn(table: string, distinct = false, column: string, where?: string, whereArgs?: [] | Record<string, any>): number {
+  countColumn(table: string, distinct = false, column?: string, where?: string, whereArgs?: [] | Record<string, any>): number {
     return this.aggregateFunction('COUNT', table, distinct, column, where, whereArgs);
   }
   /**

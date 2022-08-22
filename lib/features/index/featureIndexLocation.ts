@@ -1,4 +1,5 @@
 import { FeatureIndexType } from './featureIndexType';
+import { FeatureIndexManager } from './featureIndexManager';
 
 /**
  * Feature Index Location to iterate over indexed feature index types
@@ -25,7 +26,7 @@ export class FeatureIndexLocation implements IterableIterator<FeatureIndexType> 
    */
   public constructor(manager: FeatureIndexManager) {
     this.manager = manager;
-    this.order = this.manager.getIndexLocationQueryOrder().iterator();
+    this.order = this.manager.getIndexLocationQueryOrder()[Symbol.iterator]();
   }
 
   [Symbol.iterator](): IterableIterator<FeatureIndexType> {
@@ -36,7 +37,7 @@ export class FeatureIndexLocation implements IterableIterator<FeatureIndexType> 
     const nextType = this.type;
     this.type = null;
     const next = this.order.next();
-    if (next != null && next.value != null && this.manager.isIndexed(next.value)) {
+    if (next != null && next.value != null && this.manager.isIndexedForType(next.value)) {
       this.type = next.value;
     }
     return { value: nextType, done: this.type != null };

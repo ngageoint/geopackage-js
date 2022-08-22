@@ -1,5 +1,5 @@
 import { UserCustomRow } from '../../user/custom/userCustomRow';
-import { RTreeIndexExtension } from './rtreeIndexExtension';
+import { RTreeIndexExtension } from './rTreeIndexExtension';
 
 /**
  * RTree Index Table Row containing the values from a single result set row

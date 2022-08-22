@@ -1,5 +1,5 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
-import {RTreeIndex} from '../../../../lib/extension/rtree/rtreeIndexExtension'
+import {RTreeIndex} from '../../../../lib/extension/rtree/rTreeIndexExtension'
 import {FeatureTableIndex} from '../../../../lib/extension/nga/index/featureTableIndex'
 import {RTreeIndexDao} from '../../../../lib/extension/rtree/rtreeIndexDao'
 

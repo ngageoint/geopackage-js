@@ -127,13 +127,13 @@ export class ManualFeatureQuery {
 
 	/**
 	 * Get a count of results
-	 * 
+	 *
+	 * @param distinct
 	 * @param column count column name
 	 * @return count
-	 * @since 4.0.0
 	 */
-	public countColumn(column: string): number {
-		return this.featureDao.countColumn(false, column, undefined, undefined);
+	public countColumn(distinct = false, column: string): number {
+		return this.featureDao.countColumn(distinct, column, undefined, undefined);
 	}
 
 	/**
@@ -145,7 +145,7 @@ export class ManualFeatureQuery {
 	 */
 	public queryWithFieldValues(distinct: boolean, columns: string[], fieldValues: ColumnValues): FeatureResultSet {
 		const where: string = this.featureDao.buildWhereWithFields(fieldValues);
-		const whereArgs: [] = this.featureDao.buildWhereArgs(fieldValues);
+		const whereArgs: any[] = this.featureDao.buildWhereArgs(fieldValues);
 		return this.featureDao.query(distinct, columns, where, whereArgs);
 	}
 
@@ -158,7 +158,7 @@ export class ManualFeatureQuery {
 	 */
 	public countWithFieldValues(distinct: boolean = false, column: string, fieldValues: ColumnValues): number {
 		const where: string = this.featureDao.buildWhereWithFields(fieldValues);
-		const whereArgs: [] = this.featureDao.buildWhereArgs(fieldValues);
+		const whereArgs: any[] = this.featureDao.buildWhereArgs(fieldValues);
 		return this.featureDao.countColumn(distinct, column, where, whereArgs);
 	}
 
@@ -330,7 +330,7 @@ export class ManualFeatureQuery {
 	 * @return results
 	 * @since 4.0.0
 	 */
-	public queryWhereWithBoundingBoxAndProjection(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: []): ManualFeatureQueryResults {
+	public queryWhereWithBoundingBoxAndProjection(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): ManualFeatureQueryResults {
 		const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
 		return this.queryWhereWithBoundingBox(distinct, columns, featureBoundingBox, where, whereArgs);
 	}
@@ -346,7 +346,7 @@ export class ManualFeatureQuery {
 	 * @return count
 	 * @since 3.4.0
 	 */
-	public countWhereWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: []): number {
+	public countWhereWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): number {
 		const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
 		return this.countWhereWithBoundingBox(featureBoundingBox, where, whereArgs);
 	}
@@ -368,10 +368,12 @@ export class ManualFeatureQuery {
 	 * Manually count the rows within the geometry envelope
 	 *
 	 * @param envelope geometry envelope
+	 * @param where where clause
+	 * @param whereArgs where args
 	 * @return count
 	 */
-	public countWithGeometryEnvelope(envelope: GeometryEnvelope): number {
-		return this.countWithBounds(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY);
+	public countWithGeometryEnvelope(envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): number {
+		return this.countWithBounds(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs);
 	}
 	
 	/**
@@ -410,7 +412,7 @@ export class ManualFeatureQuery {
 	 * @return results
 	 * @since 4.0.0
 	 */
-	public queryWhereWithBoundingBox(distinct: boolean, columns: string[], boundingBox: BoundingBox, where: string, whereArgs: []): ManualFeatureQueryResults {
+	public queryWhereWithBoundingBox(distinct: boolean, columns: string[], boundingBox: BoundingBox, where: string, whereArgs: any[]): ManualFeatureQueryResults {
 		return this.queryWhereWithGeometryEnvelope(distinct, columns, boundingBox.buildEnvelope(), where, whereArgs);
 	}
 
@@ -424,7 +426,7 @@ export class ManualFeatureQuery {
 	 * @return results
 	 * @since 4.0.0
 	 */
-	public queryWhereWithGeometryEnvelope(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: []): ManualFeatureQueryResults {
+	public queryWhereWithGeometryEnvelope(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[]): ManualFeatureQueryResults {
 		return this.queryWithBounds(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs);
 	}
 
@@ -435,7 +437,7 @@ export class ManualFeatureQuery {
 	 * @param whereArgs where arguments
 	 * @return count
 	 */
-	public countWhereWithBoundingBox(boundingBox: BoundingBox, where: string, whereArgs: []): number {
+	public countWhereWithBoundingBox(boundingBox: BoundingBox, where: string, whereArgs: any[]): number {
 		return this.countWhereWithGeometryEnvelope(boundingBox.buildEnvelope(), where, whereArgs);
 	}
 
@@ -448,7 +450,7 @@ export class ManualFeatureQuery {
 	 * @return count
 	 * @since 3.4.0
 	 */
-	public countWhereWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: []): number {
+	public countWhereWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
 		return this.countWithBounds(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs);
 	}
 
@@ -617,7 +619,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return feature results
 	 */
-	public queryForChunk(distinct: boolean, columns: string[], where: string, whereArgs: [], orderBy: string, limit: number, offset: number): FeatureResultSet {
+	public queryForChunk(distinct: boolean, columns: string[], where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
 		return this.featureDao.queryForChunk(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);
 	}
 
@@ -639,7 +641,7 @@ export class ManualFeatureQuery {
 	 * @return results
 	 * @since 6.2.0
 	 */
-	public queryForChunkWithEnvelope(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: [], orderBy: string, limit: number, offset: number): ManualFeatureQueryResults {
+	public queryForChunkWithGeometryEnvelope(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): ManualFeatureQueryResults {
 		return this.queryForChunkWithBounds(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs, orderBy, limit, offset);
 	}
 
@@ -663,7 +665,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return results
 	 */
-	public queryForChunkWithBounds(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: [], orderBy: string, limit: number, offset: number): ManualFeatureQueryResults {
+	public queryForChunkWithBounds(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): ManualFeatureQueryResults {
 		let index = 0;
 		let featureIds = [];
 

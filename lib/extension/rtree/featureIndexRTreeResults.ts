@@ -1,118 +1,75 @@
-package mil.nga.geopackage.extension.rtree;
-
-import java.util.Iterator;
-
-import mil.nga.geopackage.features.index.FeatureIndexResults;
-import mil.nga.geopackage.features.user.FeatureRow;
-import mil.nga.geopackage.user.custom.UserCustomResultSet;
+import { FeatureIndexResults } from '../../features/index/featureIndexResults';
+import { RTreeIndexTableDao } from './rTreeIndexTableDao';
+import { UserCustomResultSet } from '../../user/custom/userCustomResultSet';
+import { FeatureRow } from '../../features/user/featureRow';
 
 /**
  * Iterable Feature Index Results to iterate on feature rows retrieved from
  * RTree results
- *
- * @author osbornb
- * @since 3.1.0
  */
-public class FeatureIndexRTreeResults implements FeatureIndexResults {
+export class FeatureIndexRTreeResults implements FeatureIndexResults {
+  /**
+   * RTree Index Table DAO
+   */
+  private readonly dao: RTreeIndexTableDao;
 
-	/**
-	 * RTree Index Table DAO
-	 */
-	private final RTreeIndexTableDao dao;
+  /**
+   * Result Set
+   */
+  private readonly resultSet: UserCustomResultSet;
 
-	/**
-	 * Result Set
-	 */
-	private final UserCustomResultSet resultSet;
+  /**
+   * Constructor
+   * @param dao RTree Index Table DAO
+   * @param resultSet result set
+   */
+  public constructor(dao: RTreeIndexTableDao, resultSet: UserCustomResultSet) {
+    this.dao = dao;
+    this.resultSet = resultSet;
+  }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param dao
-	 *            RTree Index Table DAO
-	 * @param resultSet
-	 *            result set
-	 */
-	public FeatureIndexRTreeResults(RTreeIndexTableDao dao,
-			UserCustomResultSet resultSet) {
-		this.dao = dao;
-		this.resultSet = resultSet;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  [Symbol.iterator](): IterableIterator<FeatureRow> {
+    return this;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Iterator<FeatureRow> iterator() {
-		return new Iterator<FeatureRow>() {
+  /**
+   * {@inheritDoc}
+   */
+  public next(): { value: FeatureRow; done: boolean } {
+    const { value, done } = this.resultSet.next();
+    const featureRow = this.dao.getFeatureRowWithUserCustomRow(value);
+    return { value: featureRow, done };
+  }
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public boolean hasNext() {
-				return resultSet.moveToNext();
-			}
+  public count(): number {
+    return this.resultSet.getCount();
+  }
 
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public FeatureRow next() {
-				return dao.getFeatureRow(resultSet);
-			}
-		};
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public ids(): IterableIterator<number> {
+    const dao = this.dao;
+    return {
+      [Symbol.iterator](): IterableIterator<number> {
+        return this;
+      },
+      next(): IteratorResult<number> {
+        const { value, done } = this.resultSet.next();
+        return {
+          value: dao.getRow(value).getId(),
+          done: done,
+        };
+      },
+    };
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public long count() {
-		return resultSet.getCount();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void close() {
-		resultSet.close();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Iterable<Long> ids() {
-		return new Iterable<Long>() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public Iterator<Long> iterator() {
-				return new Iterator<Long>() {
-
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public boolean hasNext() {
-						return resultSet.moveToNext();
-					}
-
-					/**
-					 * {@inheritDoc}
-					 */
-					@Override
-					public Long next() {
-						return dao.getRow(resultSet).getId();
-					}
-
-				};
-			}
-		};
-	}
-
+  /**
+   * {@inheritDoc}
+   */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  public close(): void {}
 }

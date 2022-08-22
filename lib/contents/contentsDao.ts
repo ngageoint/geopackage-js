@@ -203,7 +203,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
             if (tileMatrixSetDao.isTableExists()) {
               const tileMatrixSet = contents.getTileMatrixSet();
               if (tileMatrixSet !== null && tileMatrixSet !== undefined) {
-                tileMatrixSetDao.deleteById(tileMatrixSet.table_name);
+                tileMatrixSetDao.deleteById(tileMatrixSet.getTableName());
               }
             }
             break;

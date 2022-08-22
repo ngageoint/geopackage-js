@@ -46,6 +46,14 @@ export abstract class BaseExtension {
     this.connection = geoPackage.getConnection();
     this.extensionsDao = ExtensionsDao.createDao(this.connection);
   }
+
+  /**
+   * Get the geopackage
+   */
+  getGeoPackage(): GeoPackage {
+    return this.geoPackage;
+  }
+
   /**
    * Get the extension or create as needed
    * @param  {String}   extensionName extension name

@@ -1,8 +1,8 @@
-import { Dao } from '../../../dao/dao';
 import { TileScaling } from './tileScaling';
 import { DBValue } from '../../../db/dbAdapter';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';
+import { GeoPackage } from '../../../geoPackage';
 
 /**
  * Tile Scaling Data Access Object
@@ -21,8 +21,10 @@ export class TileScalingDao extends GeoPackageDao<TileScaling, string> {
     super(geoPackageConnection, TileScaling.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): TileScalingDao {
-    return new TileScalingDao(geoPackageConnection);
+  public static createDao(geoPackageOrConnection: GeoPackage | GeoPackageConnection): TileScalingDao {
+    return new TileScalingDao(
+      geoPackageOrConnection instanceof GeoPackage ? geoPackageOrConnection.getDatabase() : geoPackageOrConnection,
+    );
   }
 
   /**

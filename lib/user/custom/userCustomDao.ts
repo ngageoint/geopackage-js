@@ -104,4 +104,8 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
   public countOfResultSet(resultSet: UserCustomResultSet): number {
     return resultSet != null ? resultSet.getCount() : 0;
   }
+
+  protected getBoundingBoxWithProjection(projection: Projection): BoundingBox {
+    throw new Error('Method not implemented.');
+  }
 }

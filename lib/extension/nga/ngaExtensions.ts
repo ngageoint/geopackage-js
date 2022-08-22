@@ -1,7 +1,6 @@
 import { ExtensionManagement } from '../ExtensionManagement';
 import { GeoPackage } from '../../geoPackage';
 import { FeatureTableIndex } from './index/featureTableIndex';
-import { GeometryIndexDao } from './index/geometryIndexDao';
 import { SQLUtils } from '../../db/sqlUtils';
 import { RelatedTablesExtension } from '../related/relatedTablesExtension';
 import { UserCustomTableReader } from '../../user/custom/userCustomTableReader';
@@ -9,13 +8,14 @@ import { AlterTable } from '../../db/alterTable';
 import { TableMapping } from '../../db/tableMapping';
 import { UserMappingTable } from '../related/userMappingTable';
 import { TableInfo } from '../../db/table/tableInfo';
-import { ExtendedRelationsDao } from '../related/extendedRelationsDao';
 import { FeatureStyleExtension } from './style/featureStyleExtension';
 import { ContentsIdExtension } from './contents/contentsIdExtension';
 import { TileTableScaling } from './scale/tileTableScaling';
-import { TileScalingDao } from './scale/tileScalingDao';
-import { ContentsIdDao } from './contents/contentsIdDao';
 import { GeoPackageException } from '../../geoPackageException';
+import { TileScaling } from './scale/tileScaling';
+import { GeometryIndex } from './index/geometryIndex';
+import { ExtendedRelation } from '../related/extendedRelation';
+import { ContentsId } from './contents/contentsId';
 
 /**
  * NGA Extensions
@@ -142,7 +142,7 @@ export class NGAExtensions extends ExtensionManagement {
    */
   public copyGeometryIndex(table: string, newTable: string): void {
     try {
-      const extensionsDao = this.geoPackage.extensionDao;
+      const extensionsDao = this.geoPackage.getExtensionsDao();
 
       if (extensionsDao.isTableExists()) {
         const extensions = extensionsDao.queryByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, table);
@@ -150,17 +150,17 @@ export class NGAExtensions extends ExtensionManagement {
           const extension = extensions[0];
           extension.table_name = newTable;
           extensionsDao.create(extension);
-          const tableIndexDao = this.geoPackage.tableIndexDao;
+          const tableIndexDao = this.geoPackage.getTableIndexDao();
           if (tableIndexDao.isTableExists()) {
             const tableIndex = tableIndexDao.queryForId(table);
             if (tableIndex !== null && tableIndex !== undefined) {
-              tableIndex.table_name = newTable;
+              tableIndex.setTableName(newTable);
               tableIndexDao.create(tableIndex);
-              if (this.geoPackage.isTable(GeometryIndexDao.TABLE_NAME)) {
+              if (this.geoPackage.isTable(GeometryIndex.TABLE_NAME)) {
                 SQLUtils.transferTableContent(
-                  this.geoPackage.connection,
-                  GeometryIndexDao.TABLE_NAME,
-                  GeometryIndexDao.COLUMN_TABLE_NAME_FIELD,
+                  this.geoPackage.getConnection(),
+                  GeometryIndex.TABLE_NAME,
+                  GeometryIndex.COLUMN_TABLE_NAME,
                   newTable,
                   table,
                 );
@@ -179,18 +179,18 @@ export class NGAExtensions extends ExtensionManagement {
    * @param table table name
    */
   public deleteTileScaling(table: string): void {
-    const tileScalingDao = this.geoPackage.tileScalingDao;
-    const extensionsDao = this.geoPackage.extensionDao;
+    const tileScalingDao = this.geoPackage.getTileScalingDao();
+    const extensionsDao = this.geoPackage.getExtensionsDao();
 
     try {
       if (tileScalingDao.isTableExists()) {
         tileScalingDao.deleteByTableName(table);
       }
       if (extensionsDao.isTableExists()) {
-        extensionsDao.deleteByExtensionAndTableName(TileScalingExtension.EXTENSION_NAME, table);
+        extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, table);
       }
     } catch (e) {
-      throw new Error('Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.name + ', Table: ' + table);
+      throw new Error('Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table);
     }
   }
 
@@ -199,17 +199,17 @@ export class NGAExtensions extends ExtensionManagement {
    * custom tables
    */
   public deleteTileScalingExtension(): void {
-    const tileScalingDao = this.geoPackage.tileScalingDao;
-    const extensionsDao = this.geoPackage.extensionDao;
+    const tileScalingDao = this.geoPackage.getTileScalingDao();
+    const extensionsDao = this.geoPackage.getExtensionsDao();
     try {
       if (tileScalingDao.isTableExists()) {
         this.geoPackage.dropTable(tileScalingDao.gpkgTableName);
       }
       if (extensionsDao.isTableExists()) {
-        extensionsDao.deleteByExtension(TileScalingExtension.EXTENSION_NAME);
+        extensionsDao.deleteByExtension(TileTableScaling.EXTENSION_NAME);
       }
     } catch (e) {
-      throw new Error('Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.name);
+      throw new Error('Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.getName());
     }
   }
 
@@ -220,17 +220,17 @@ export class NGAExtensions extends ExtensionManagement {
    */
   public copyTileScaling(table: string, newTable: string): void {
     try {
-      const tileTableScaling = new TileScalingExtension(this.geoPackage, table);
+      const tileTableScaling = new TileTableScaling(this.geoPackage, table);
       if (tileTableScaling.has()) {
         const extension = tileTableScaling.getOrCreateExtension();
         if (extension !== null && extension !== undefined) {
           extension.setTableName(newTable);
           tileTableScaling.extensionsDao.create(extension);
-          if (this.geoPackage.isTable(TileScalingDao.TABLE_NAME)) {
+          if (this.geoPackage.isTable(TileScaling.TABLE_NAME)) {
             SQLUtils.transferTableContent(
-              this.geoPackage.connection,
-              TileScalingDao.TABLE_NAME,
-              TileScalingDao.COLUMN_TABLE_NAME,
+              this.geoPackage.getConnection(),
+              TileScaling.TABLE_NAME,
+              TileScaling.COLUMN_TABLE_NAME,
               newTable,
               table,
             );
@@ -334,20 +334,17 @@ export class NGAExtensions extends ExtensionManagement {
   ): void {
     const geoPackage: GeoPackage = featureStyleExtension.geoPackage;
     const mappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, table);
-    const extensionsDao = geoPackage.extensionDao;
+    const extensionsDao = geoPackage.getExtensionsDao();
     const extensions = extensionsDao
       .queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME, mappingTableName)
       .concat(
-        extensionsDao.queryByExtensionAndTableName(
-          RelatedTablesExtension.EXTENSION_RELATED_TABLES_NAME_NO_AUTHOR,
-          mappingTableName,
-        ),
+        extensionsDao.queryByExtensionAndTableName(RelatedTablesExtension.EXTENSION_NAME_NO_AUTHOR, mappingTableName),
       );
 
     if (extensions.length > 0) {
       const newMappingTableName = featureStyleExtension.getMappingTableName(mappingTablePrefix, newTable);
-      const userTable = new UserCustomTableReader(mappingTableName).readTable(geoPackage.connection);
-      AlterTable.copyTable(geoPackage.connection, userTable, newMappingTableName, false);
+      const userTable = new UserCustomTableReader(mappingTableName).readTable(geoPackage.getConnection());
+      AlterTable.copyTable(geoPackage.getConnection(), userTable, newMappingTableName, false);
       const mappingTableTableMapping = new TableMapping(
         userTable.getTableName(),
         newMappingTableName,
@@ -356,20 +353,20 @@ export class NGAExtensions extends ExtensionManagement {
       const baseIdColumn = mappingTableTableMapping.getColumn(UserMappingTable.COLUMN_BASE_ID);
       baseIdColumn.constantValue = newContentsId;
       baseIdColumn.whereValue = contentsId;
-      SQLUtils.transferTableContentForTableMapping(geoPackage.connection, mappingTableTableMapping);
+      SQLUtils.transferTableContentForTableMapping(geoPackage.getConnection(), mappingTableTableMapping);
       const extension = extensions[0];
       extension.setTableName(newMappingTableName);
       extensionsDao.create(extension);
       const extendedRelationTableMapping = TableMapping.fromTableInfo(
-        TableInfo.info(geoPackage.connection, ExtendedRelationsDao.TABLE_NAME),
+        TableInfo.info(geoPackage.getConnection(), ExtendedRelation.TABLE_NAME),
       );
-      extendedRelationTableMapping.removeColumn(ExtendedRelationsDao.ID);
-      const baseTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationsDao.BASE_TABLE_NAME);
-      baseTableNameColumn.whereValue = ContentsIdDao.TABLE_NAME;
-      const mappingTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelationsDao.MAPPING_TABLE_NAME);
+      extendedRelationTableMapping.removeColumn(ExtendedRelation.COLUMN_ID);
+      const baseTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelation.COLUMN_BASE_TABLE_NAME);
+      baseTableNameColumn.whereValue = ContentsId.TABLE_NAME;
+      const mappingTableNameColumn = extendedRelationTableMapping.getColumn(ExtendedRelation.COLUMN_MAPPING_TABLE_NAME);
       mappingTableNameColumn.constantValue = newMappingTableName;
       mappingTableNameColumn.whereValue = mappingTableName;
-      SQLUtils.transferTableContentForTableMapping(geoPackage.connection, extendedRelationTableMapping);
+      SQLUtils.transferTableContentForTableMapping(geoPackage.getConnection(), extendedRelationTableMapping);
     }
   }
 
@@ -412,7 +409,7 @@ export class NGAExtensions extends ExtensionManagement {
     try {
       const contentsIdExtension = new ContentsIdExtension(this.geoPackage);
       if (contentsIdExtension.has()) {
-        const contentsId = contentsIdExtension.getByTableName(table);
+        const contentsId = contentsIdExtension.getWithTableName(table);
         if (contentsId !== null && contentsId !== undefined) {
           contentsIdExtension.createWithTableName(newTable);
         }

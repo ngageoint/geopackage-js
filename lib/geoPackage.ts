@@ -12,7 +12,7 @@ import { ContentsDao } from "./contents/contentsDao";
 import { SpatialReferenceSystemDao } from "./srs/spatialReferenceSystemDao";
 import { TileMatrixSet } from "./tiles/matrixset/tileMatrixSet";
 import { TileDao } from "./tiles/user/tileDao";
-import { RTreeIndexExtension } from "./extension/rtree/rtreeIndexExtension";
+import { RTreeIndexExtension } from "./extension/rtree/rTreeIndexExtension";
 import { ResultSet } from "./db/resultSet";
 import { SQLUtils } from "./db/sqlUtils";
 import { UserCustomDao } from "./user/custom/userCustomDao";
@@ -36,6 +36,8 @@ import { ExtensionManager } from "./extension/extensionManager";
 import { UserTable } from "./user/userTable";
 import { UserColumn } from "./user/userColumn";
 import { AttributesTableMetadata } from "./attributes/attributesTableMetadata";
+import { TableIndexDao } from "./extension/nga/index/tableIndexDao";
+import { TileScalingDao } from "./extension/nga/scale/tileScalingDao";
 
 /**
  *  A single GeoPackage database connection implementation
@@ -1139,10 +1141,25 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the ExtensionsDao
    */
   public getExtensionsDao(): ExtensionsDao {
     return ExtensionsDao.createDao(this.getConnection());
+  }
+
+  /**
+   * Returns the TableIndexDao
+   */
+  public getTableIndexDao(): TableIndexDao {
+    return TableIndexDao.createDao(this.getConnection());
+  }
+
+
+  /**
+   * Returns the TileScalingDao
+   */
+  public getTileScalingDao(): TileScalingDao {
+    return TileScalingDao.createDao(this.getConnection());
   }
 
   /**

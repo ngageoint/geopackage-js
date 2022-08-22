@@ -165,7 +165,7 @@ export namespace ContentsDataType {
    * @return true if a tiles type or matched unknown
    * @since 5.0.0
    */
-  export function isTilesType(name: string, matchUnknown: boolean = false): boolean {
+  export function isTilesType(name: string, matchUnknown = false): boolean {
     return ContentsDataType.isType(name, ContentsDataType.TILES, matchUnknown);
   }
 
@@ -179,7 +179,7 @@ export namespace ContentsDataType {
    * @return true if an attributes type or matched unknown
    * @since 5.0.0
    */
-  export function isAttributesType(name: string, matchUnknown: boolean = false): boolean {
+  export function isAttributesType(name: string, matchUnknown = false): boolean {
     return ContentsDataType.isType(name, ContentsDataType.ATTRIBUTES, matchUnknown);
   }
 }
