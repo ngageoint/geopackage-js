@@ -103,4 +103,7 @@ export class MultipleFeatureIndexResults implements FeatureIndexResults {
     result.done = this.currentResultSet != null;
     return result;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  close(): void {}
 }

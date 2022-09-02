@@ -64,7 +64,7 @@ export class TileTable extends UserTable<TileColumn> {
    * {@inheritDoc}
    */
   copy(): TileTable {
-    return new TileTable(this.getTableName(), this.columns._columns);
+    return new TileTable(this.getTableName(), this.columns.getColumns());
   }
 
   /**
@@ -155,15 +155,16 @@ export class TileTable extends UserTable<TileColumn> {
   /**
    * Create the required table columns, starting at the provided index
    * @param startingIndex starting index
+   * @param autoincrement defaults to false
    * @return tile columns
    */
-  static createRequiredColumns(startingIndex = 0): TileColumn[] {
+  static createRequiredColumns(autoincrement = false): TileColumn[] {
     const columns: TileColumn[] = [];
-    columns.push(TileColumn.createIdColumn(startingIndex++));
-    columns.push(TileColumn.createZoomLevelColumn(startingIndex++));
-    columns.push(TileColumn.createTileColumnColumn(startingIndex++));
-    columns.push(TileColumn.createTileRowColumn(startingIndex++));
-    columns.push(TileColumn.createTileDataColumn(startingIndex));
+    columns.push(TileColumn.createIdColumn(autoincrement));
+    columns.push(TileColumn.createZoomLevelColumn());
+    columns.push(TileColumn.createTileColumnColumn());
+    columns.push(TileColumn.createTileRowColumn());
+    columns.push(TileColumn.createTileDataColumn());
     return columns;
   }
 

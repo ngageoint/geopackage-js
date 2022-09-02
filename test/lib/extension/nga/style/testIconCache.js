@@ -4,7 +4,7 @@ var FeatureTableStyles = require('../../../../../lib/extension/nga/style/feature
   , IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache
   , should = require('chai').should()
   , path = require('path')
-  , ImageUtils = require('../../../../../lib/tiles/imageUtils').ImageUtils
+  , ImageUtils = require('../../../../../lib/image/imageUtils').ImageUtils
   , Canvas = require('../../../../../lib/canvas/canvas').Canvas;
 
 var isWeb = !(typeof(process) !== 'undefined' && process.version);

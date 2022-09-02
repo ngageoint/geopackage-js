@@ -2,7 +2,12 @@
   "compilerOptions": {
       "module": "commonjs",
       "moduleResolution": "node",
-      "lib": ["dom", "es2015", "es2017", "es2015.iterable"],
+      "lib": [
+        "dom",
+        "es2015",
+        "es2017",
+        "es2015.iterable"
+      ],
       "jsx": "react", // uses typescript to transpile jsx to js
       "target": "es5", // specify ECMAScript target version
       "allowJs": true, // allows a partial TypeScript and JavaScript codebase
@@ -21,8 +26,10 @@
   "include": [
       "index.ts",
       "./lib", // type-checks all js files as well not just .ts extension
+      "@types/@turf/distance.index.d.ts",
       "@types/reproject/index.d.ts",
-      "@types/@turf/distance/index.d.ts"
+      "@types/canvaskit/index.d.ts",
+      "@types/offscreencanvas/index.d.ts"
   ],
   "exclude": [
       "./lib/wkb",

@@ -6,8 +6,6 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 
 /**
  * Metadata Reference Data Access Object
- * @class
- * @extends Dao
  */
 export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void> {
   readonly gpkgTableName: string = MetadataReference.TABLE_NAME;

@@ -14,7 +14,6 @@ import { FeatureTileLinkTableCreator } from './featureTileLinkTableCreator';
  * together when the tiles represent the feature data
  * <p>
  * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html">http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html</a>
- * @since 5.0.0
  */
 export abstract class FeatureTileTableLinker extends BaseExtension {
   /**

@@ -61,15 +61,9 @@ export class FeatureTableStyles {
   /**
    * Create style, icon, table style, and table icon relationships for the
    * feature table
-   * @return {Promise}
    */
-  createRelationships(): {
-    styleRelationship: ExtendedRelation;
-    tableStyleRelationship: ExtendedRelation;
-    iconRelationship: ExtendedRelation;
-    tableIconRelationship: ExtendedRelation;
-  } {
-    return this.featureStyleExtension.createRelationships(this.tableName);
+  createRelationships(): void {
+    this.featureStyleExtension.createRelationships(this.tableName);
   }
   /**
    * Check if feature table has a style, icon, table style, or table icon
@@ -83,8 +77,8 @@ export class FeatureTableStyles {
    * Create a style relationship for the feature table
    * @return {Promise}
    */
-  createStyleRelationship(): ExtendedRelation {
-    return this.featureStyleExtension.createStyleRelationship(this.tableName);
+  createStyleRelationship(): void {
+    this.featureStyleExtension.createStyleRelationship(this.tableName);
   }
   /**
    * Determine if a style relationship exists for the feature table
@@ -97,8 +91,8 @@ export class FeatureTableStyles {
    * Create a feature table style relationship
    * @return {Promise}
    */
-  createTableStyleRelationship(): ExtendedRelation {
-    return this.featureStyleExtension.createTableStyleRelationship(this.tableName);
+  createTableStyleRelationship(): void {
+    this.featureStyleExtension.createTableStyleRelationship(this.tableName);
   }
   /**
    * Determine if feature table style relationship exists
@@ -112,8 +106,8 @@ export class FeatureTableStyles {
    * Create an icon relationship for the feature table
    * @return {Promise}
    */
-  createIconRelationship(): ExtendedRelation {
-    return this.featureStyleExtension.createIconRelationship(this.tableName);
+  createIconRelationship(): void {
+    this.featureStyleExtension.createIconRelationship(this.tableName);
   }
   /**
    * Determine if an icon relationship exists for the feature table
@@ -126,8 +120,8 @@ export class FeatureTableStyles {
    * Create a feature table icon relationship
    * @return {Promise}
    */
-  createTableIconRelationship(): ExtendedRelation {
-    return this.featureStyleExtension.createTableIconRelationship(this.tableName);
+  createTableIconRelationship(): void {
+    this.featureStyleExtension.createTableIconRelationship(this.tableName);
   }
   /**
    * Determine if feature table icon relationship exists
@@ -328,7 +322,7 @@ export class FeatureTableStyles {
    * @return {module:extension/nga/style.FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
-    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Get the feature style (style and icon) of the feature row with the
@@ -410,7 +404,7 @@ export class FeatureTableStyles {
    * @return {module:extension/nga/style.StyleRow} style row
    */
   getStyleForFeatureRow(featureRow: FeatureRow): StyleRow {
-    return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Get the style of the feature row with the provided geometry type,
@@ -491,7 +485,7 @@ export class FeatureTableStyles {
    * @return {module:extension/nga/style.IconRow} icon row
    */
   getIconForFeatureRow(featureRow: FeatureRow): IconRow {
-    return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Get the icon of the feature row with the provided geometry type,

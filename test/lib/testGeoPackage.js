@@ -1,4 +1,4 @@
-var GeoPackageTileRetriever = require('../../lib/tiles/retriever').GeoPackageTileRetriever
+var GeoPackageTileRetriever = require('../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , GeoPackage = require('../../lib/geoPackage').GeoPackage
   , Projection = require('../../lib/projection/projection').Projection
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection').GeoPackageConnection

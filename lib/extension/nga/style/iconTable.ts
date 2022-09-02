@@ -11,11 +11,6 @@ import { UserCustomTable } from '../../../user/custom/userCustomTable';
 
 /**
  * Icon Requirements Class Media Table
- * @class
- * @extends {MediaTable}
- * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns   media columns
- * @param {string[]} requiredColumns required column names
  */
 export class IconTable extends MediaTable {
   public static readonly TABLE_NAME = 'nga_icon';

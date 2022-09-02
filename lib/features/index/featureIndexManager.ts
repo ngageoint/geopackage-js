@@ -10,7 +10,6 @@ import { FeatureRow } from '../user/featureRow';
 import { FeatureIndexLocation } from './featureIndexLocation';
 import { FeatureIndexResults } from './featureIndexResults';
 import { BoundingBox } from '../../boundingBox';
-import { FeatureResultSet } from '../user/featureResultSet';
 import { Projection } from '@ngageoint/projections-js';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { ColumnValues } from '../../dao/columnValues';
@@ -899,8 +898,8 @@ export class FeatureIndexManager {
     distinct: boolean,
     column: string,
     boundingBox: BoundingBox,
-    where: string,
-    whereArgs: any[],
+    where?: string,
+    whereArgs?: any[],
   ): number {
     return this.countWithGeometryEnvelope(distinct, column, boundingBox.buildEnvelope(), where, whereArgs);
   }
@@ -1015,8 +1014,8 @@ export class FeatureIndexManager {
     distinct: boolean,
     column: string,
     envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
+    where?: string,
+    whereArgs?: any[],
   ): number {
     let count = null;
     for (const type of this.getLocation()) {
@@ -1122,8 +1121,8 @@ export class FeatureIndexManager {
     columns: string[],
     boundingBox: BoundingBox,
     projection: Projection,
-    where: string,
-    whereArgs: any[],
+    where?: string,
+    whereArgs?: any[],
   ): FeatureIndexResults {
     const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
     return this.queryWithBoundingBox(distinct, columns, featureBoundingBox, where, whereArgs);
@@ -1145,8 +1144,8 @@ export class FeatureIndexManager {
     column: string,
     boundingBox: BoundingBox,
     projection: Projection,
-    where: string,
-    whereArgs: any[],
+    where?: string,
+    whereArgs?: any[],
   ): number {
     const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
     return this.countWithBoundingBox(distinct, column, featureBoundingBox, where, whereArgs);

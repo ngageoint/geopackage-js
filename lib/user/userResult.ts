@@ -1,16 +1,16 @@
-/**
- * Abstract User Cursor
- *
- * @param <TColumn> column type
- * @param <TTable> table type
- * @param <TRow> row type
- */
 import { UserColumn } from './userColumn';
 import { UserTable } from './userTable';
 import { UserRow } from './userRow';
 import { Result } from '../db/result';
 import { UserColumns } from './userColumns';
+import { GeoPackageConnection } from '../db/geoPackageConnection';
 
+/**
+ * Abstract User Cursor
+ * @param <TColumn> column type
+ * @param <TTable> table type
+ * @param <TRow> row type
+ */
 export interface UserResult<
   TColumn extends UserColumn,
   TTable extends UserTable<TColumn>,
@@ -86,7 +86,7 @@ export interface UserResult<
    *
    * @return count, -1 if not able to determine
    */
-  getCount(): number;
+  getCount(connection: GeoPackageConnection): number;
 
   /**
    * Get the SQL statement (if available)
@@ -100,7 +100,7 @@ export interface UserResult<
    *
    * @return selection arguments
    */
-  getSelectionArgs(): [];
+  getSelectionArgs(): any[];
 
   /**
    * Iterable for iterating over result ids in place of rows

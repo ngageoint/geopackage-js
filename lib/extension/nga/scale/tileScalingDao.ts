@@ -6,8 +6,6 @@ import { GeoPackage } from '../../../geoPackage';
 
 /**
  * Tile Scaling Data Access Object
- * @constructor
- * @extends Dao
  */
 export class TileScalingDao extends GeoPackageDao<TileScaling, string> {
   readonly gpkgTableName: string = TileScaling.TABLE_NAME;

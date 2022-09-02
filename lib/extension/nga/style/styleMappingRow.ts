@@ -9,11 +9,6 @@ import { StyleTable } from './styleTable';
 
 /**
  * User Mapping Row containing the values from a single result set row
- * @extends UserMappingRow
- * @param  {module:extension/nga/style.StyleMappingTable} styleMappingTable style mapping table
- * @param  {module:db/geoPackageDataType[]} columnTypes  column types
- * @param  {module:dao/columnValues~ColumnValues[]} values      values
- * @constructor
  */
 export class StyleMappingRow extends UserMappingRow {
   /**

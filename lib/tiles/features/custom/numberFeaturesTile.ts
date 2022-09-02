@@ -1,5 +1,10 @@
 import { Canvas } from '../../../canvas/canvas';
-import { CustomFeaturesTile } from './customFeaturesTile';
+import { CustomFeaturesTile } from '../customFeaturesTile';
+import { GeoPackageException } from '../../../geoPackageException';
+import { FeatureIndexResults } from '../../../features/index/featureIndexResults';
+import { GeoPackageImage } from '../../../image/geoPackageImage';
+import { FeatureResultSet } from '../../../features/user/featureResultSet';
+import { EmulatedCanvas2D } from '../../../../@types/canvaskit';
 
 /**
  * Draws a tile indicating the number of features that exist within the tile,
@@ -9,205 +14,293 @@ import { CustomFeaturesTile } from './customFeaturesTile';
  * paint objects for each draw type can be modified to or set to null (except
  * for the text paint object).
  */
-export class NumberFeaturesTile extends CustomFeaturesTile {
-  textSize: number;
-  textFont: string;
-  textColor: string;
-  circleStrokeWidth: number;
-  circleBorderColor: string;
-  circleFillColor: string;
-  circlePaddingPercentage: number;
-  defaultFontRegistered: boolean;
-  constructor() {
-    super();
-    this.textSize = 18;
-    this.textFont = 'Noto Mono';
+export class NumberFeaturesTile implements CustomFeaturesTile {
+  /**
+   * Text size
+   */
+  protected textSize: number;
+
+  /**
+   * Text font
+   */
+  protected textFont: string;
+
+  /**
+   * Text color
+   */
+  protected textColor: string;
+
+  /**
+   * Circle stroke width
+   */
+  protected circleStrokeWidth: number;
+
+  /**
+   * Circle color
+   */
+  protected circleColor: string;
+
+  /**
+   * Circle fill color
+   */
+  protected circleFillColor: string;
+
+  /**
+   * Tile Border stroke width
+   */
+  protected tileBorderStrokeWidth: number;
+
+  /**
+   * Tile Border color
+   */
+  protected tileBorderColor: string;
+
+  /**
+   * Tile fill color
+   */
+  protected tileFillColor: string;
+
+  /**
+   * The percentage of border to include around the edges of the text in the
+   * circle
+   */
+  private circlePaddingPercentage: number;
+
+  /**
+   * Flag indicating whether tiles should be drawn for feature tables that are
+   * not indexed
+   */
+  private drawUnindexedTiles: boolean;
+
+  /**
+   * Constructor
+   */
+  public constructor() {
+    // Set the default text values
+    this.textSize = 30;
+    this.textFont = 'Serif'; // Noto Mono
     this.textColor = 'rgba(255, 255, 255, 1.0)';
-    this.circleStrokeWidth = 3;
-    this.circleBorderColor = 'rgba(0, 0, 0, 0.25)';
+
+    // Set the default circle paint values
+    this.circleStrokeWidth = 3.0;
+    this.circleColor = 'rgba(0, 0, 0, 0.25)';
+
+    // Set the default circle fill paint values
     this.circleFillColor = 'rgba(0, 0, 0, 1.0)';
-    this.circlePaddingPercentage = 0.25;
-    this.defaultFontRegistered = false;
+
+    // Set the default tile border paint values
+    this.tileBorderStrokeWidth = 2.0;
+    this.tileBorderColor = 'rgba(0, 0, 0, 1.0)';
+
+    // Set the default tile fill paint values
+    this.tileFillColor = 'rgba(0, 0, 0, 0.0625)';
+
+    // Set the default circle padding percentage
+    this.circlePaddingPercentage = 0.2;
+
+    // Set the default draw unindexed tiles value
+    this.drawUnindexedTiles = true;
   }
 
   /**
    * Get the text size
-   * @return {Number} text size
+   *
+   * @return text size
    */
-  getTextSize(): number {
+  public getTextSize(): number {
     return this.textSize;
   }
+
   /**
    * Set the text size
-   * @param {Number} textSize text size
+   * @param textSize text size
    */
-  setTextSize(textSize: number): void {
+  public setTextSize(textSize: number): void {
     this.textSize = textSize;
   }
+
   /**
    * Get the text color
-   * @return {String} text color
+   * @return text color
    */
-  getTextColor(): string {
+  public getTextColor(): string {
     return this.textColor;
   }
+
   /**
    * Set the text color
-   * @param {String} textColor text color
+   * @param textColor text color
    */
-  setTextColor(textColor: string): void {
+  public setTextColor(textColor: string): void {
     this.textColor = textColor;
   }
+
   /**
    * Get the circle stroke width
-   * @return {Number} circle stroke width
+   * @return circle stroke width
    */
-  getCircleStrokeWidth(): number {
+  public getCircleStrokeWidth(): number {
     return this.circleStrokeWidth;
   }
+
   /**
    * Set the circle stroke width
-   * @param {Number} circleStrokeWidth circle stroke width
+   * @param circleStrokeWidth circle stroke width
    */
-  setCircleStrokeWidth(circleStrokeWidth: number): void {
+  public setCircleStrokeWidth(circleStrokeWidth: number): void {
     this.circleStrokeWidth = circleStrokeWidth;
   }
+
   /**
    * Get the circle color
-   * @return {String} circle color
+   * @return circle color
    */
-  getCircleColor(): string {
-    return this.circleBorderColor;
+  public getCircleColor(): string {
+    return this.circleColor;
   }
+
   /**
    * Set the circle color
-   * @param {String} circleBorderColor circle color
+   * @param circleColor circle color
    */
-  setCircleColor(circleBorderColor: string): void {
-    this.circleBorderColor = circleBorderColor;
+  public setCircleColor(circleColor: string): void {
+    this.circleColor = circleColor;
   }
+
   /**
    * Get the circle fill color
-   * @return {String} circle fill color
+   * @return circle fill color
    */
-  getCircleFillColor(): string {
+  public getCircleFillColor(): string {
     return this.circleFillColor;
   }
+
   /**
    * Set the circle fill color
-   * @param {String} circleFillColor circle fill color
+   * @param circleFillColor circle fill color
    */
-  setCircleFillColor(circleFillColor: string): void {
+  public setCircleFillColor(circleFillColor: string): void {
     this.circleFillColor = circleFillColor;
   }
+
   /**
    * Get the circle padding percentage around the text
-   * @return {Number} circle padding percentage, 0.0 to 1.0
+   * @return circle padding percentage, 0.0 to 1.0
    */
-  getCirclePaddingPercentage(): number {
+  public getCirclePaddingPercentage(): number {
     return this.circlePaddingPercentage;
   }
+
   /**
    * Set the circle padding percentage to pad around the text, value between
    * 0.0 and 1.0
-   * @param {Number} circlePaddingPercentage circle padding percentage
+   * @param circlePaddingPercentage circle padding percentage
    */
-  setCirclePaddingPercentage(circlePaddingPercentage: number): void {
+  public setCirclePaddingPercentage(circlePaddingPercentage: number): void {
     if (circlePaddingPercentage < 0.0 || circlePaddingPercentage > 1.0) {
-      throw new Error('Circle padding percentage must be between 0.0 and 1.0: ' + circlePaddingPercentage);
+      throw new GeoPackageException(
+        'Circle padding percentage must be between 0.0 and 1.0: ' + circlePaddingPercentage,
+      );
     }
     this.circlePaddingPercentage = circlePaddingPercentage;
   }
+
   /**
    * Get the tile border stroke width
-   * @return {Number} tile border stroke width
+   * @return tile border stroke width
    */
-  getTileBorderStrokeWidth(): number {
+  public getTileBorderStrokeWidth(): number {
     return this.tileBorderStrokeWidth;
   }
+
   /**
    * Set the tile border stroke width
-   *
-   * @param {Number} tileBorderStrokeWidth tile border stroke width
+   * @param tileBorderStrokeWidth tile border stroke width
    */
-  setTileBorderStrokeWidth(tileBorderStrokeWidth: number): void {
+  public setTileBorderStrokeWidth(tileBorderStrokeWidth: number): void {
     this.tileBorderStrokeWidth = tileBorderStrokeWidth;
   }
+
   /**
    * Get the tile border color
-   * @return {String} tile border color
+   * @return tile border color
    */
-  getTileBorderColor(): string {
+  public getTileBorderColor(): string {
     return this.tileBorderColor;
   }
+
   /**
    * Set the tile border color
-   * @param {String} tileBorderColor tile border color
+   * @param tileBorderColor tile border color
    */
-  setTileBorderColor(tileBorderColor: string): void {
+  public setTileBorderColor(tileBorderColor: string): void {
     this.tileBorderColor = tileBorderColor;
   }
+
   /**
    * Get the tile fill color
-   * @return {String} tile fill color
+   * @return tile fill color
    */
-  getTileFillColor(): string {
+  public getTileFillColor(): string {
     return this.tileFillColor;
   }
+
   /**
    * Set the tile fill color
-   * @param {String} tileFillColor tile fill color
+   * @param tileFillColor tile fill color
    */
-  setTileFillColor(tileFillColor: string): void {
+  public setTileFillColor(tileFillColor: string): void {
     this.tileFillColor = tileFillColor;
   }
+
   /**
    * Is the draw unindexed tiles option enabled
-   * @return {Boolean} true if drawing unindexed tiles
+   * @return true if drawing unindexed tiles
    */
-  isDrawUnindexedTiles(): boolean {
+  public isDrawUnindexedTiles(): boolean {
     return this.drawUnindexedTiles;
   }
+
   /**
    * Set the draw unindexed tiles option
-   * @param {Boolean} drawUnindexedTiles draw unindexed tiles flag
+   * @param drawUnindexedTiles draw unindexed tiles flag
    */
-  setDrawUnindexedTiles(drawUnindexedTiles: boolean): void {
+  public setDrawUnindexedTiles(drawUnindexedTiles: boolean): void {
     this.drawUnindexedTiles = drawUnindexedTiles;
   }
+
   /**
-   * Get the compression format
-   * @return {String} the compression format (either png or jpeg)
+   * {@inheritDoc}
    */
-  getCompressFormat(): string {
-    return this.compressFormat;
-  }
-  /**
-   * Set the compression format
-   * @param {String} compressFormat either 'png' or 'jpeg'
-   */
-  setCompressFormat(compressFormat: string): void {
-    this.compressFormat = compressFormat;
-  }
-  /**
-   * Draw unindexed tile
-   * @param tileWidth
-   * @param tileHeight
-   * @param canvas
-   * @returns {Promise<String|Buffer>}
-   */
-  async drawUnindexedTile(
+  public async drawTile(
     tileWidth: number,
     tileHeight: number,
-    canvas: any = null,
-  ): Promise<string | Buffer | Uint8Array> {
+    tileFeatureCount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    featureIndexResults: FeatureIndexResults,
+    canvas?: EmulatedCanvas2D | HTMLCanvasElement,
+  ): Promise<GeoPackageImage> {
+    const featureText = tileFeatureCount.toString();
+    return this.drawNumberFeaturesTile(tileWidth, tileHeight, featureText, canvas);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public async drawUnindexedTile(
+    tileWidth: number,
+    tileHeight: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    totalFeatureCount: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    allFeatureResults: FeatureResultSet,
+    canvas?: EmulatedCanvas2D | HTMLCanvasElement,
+  ): Promise<GeoPackageImage> {
     let image = null;
     if (this.drawUnindexedTiles) {
-      // Draw a tile indicating we have no idea if there are features
-      // inside.
-      // The table is not indexed and more features exist than the max
-      // feature count set.
-      image = this.drawTile(tileWidth, tileHeight, '?', canvas);
+      // Draw a tile indicating we have no idea if there are features inside.
+      // The table is not indexed and more features exist than the max feature count set.
+      image = this.drawNumberFeaturesTile(tileWidth, tileHeight, '?', canvas);
     }
     return image;
   }
@@ -216,25 +309,22 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
    * @param {Number} tileWidth
    * @param {Number} tileHeight
    * @param {String} text
-   * @param tileCanvas
+   * @param {EmulatedCanvas2D | HTMLCanvasElement} tileCanvas
    * @return {Promise<String|Buffer>}
    */
-  async drawTile(
+  private async drawNumberFeaturesTile(
     tileWidth: number,
     tileHeight: number,
     text: string,
-    tileCanvas: null,
-  ): Promise<string | Buffer | Uint8Array> {
+    tileCanvas,
+  ): Promise<GeoPackageImage> {
     // eslint-disable-next-line complexity
     await Canvas.initializeAdapter();
     return new Promise(resolve => {
-      let canvas;
-      let dispose = false;
-      if (tileCanvas !== undefined && tileCanvas !== null) {
-        canvas = tileCanvas;
-      } else {
+      const canvasProvided = tileCanvas != null;
+      let canvas = tileCanvas;
+      if (!canvasProvided) {
         canvas = Canvas.create(tileWidth, tileHeight);
-        dispose = true;
       }
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, tileWidth, tileHeight);
@@ -254,37 +344,37 @@ export class NumberFeaturesTile extends CustomFeaturesTile {
       // Determine the center of the tile
       const centerX = Math.round(tileWidth / 2.0);
       const centerY = Math.round(tileHeight / 2.0);
+
       // Draw the circle
-      if (this.circleBorderColor != null || this.circleFillColor != null) {
+      if (this.circleColor != null || this.circleFillColor != null) {
         const diameter = Math.max(textWidth, textHeight);
         let radius = Math.round(diameter / 2.0);
         radius = Math.round(radius + diameter * this.circlePaddingPercentage);
-        // Draw the circle
+        const paddedDiameter = Math.round(radius * 2);
+
+        // Draw the filled circle
         if (this.circleFillColor != null) {
           context.fillStyle = this.circleFillColor;
           context.beginPath();
-          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+          context.arc(centerX, centerY, paddedDiameter, 0, 2 * Math.PI, true);
           context.closePath();
           context.fill();
         }
-        // Draw the circle border
-        if (this.circleBorderColor != null) {
-          context.strokeStyle = this.circleBorderColor;
+
+        // Draw the circle
+        if (this.circleColor != null) {
+          context.strokeStyle = this.circleColor;
           context.lineWidth = this.circleStrokeWidth;
           context.beginPath();
-          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+          context.arc(centerX, centerY, paddedDiameter, 0, 2 * Math.PI, true);
           context.closePath();
           context.stroke();
         }
       }
-
       Canvas.drawText(context, text, [centerX, centerY], this.textFont, this.textSize, this.textColor);
-
-      Canvas.toDataURL(canvas, 'image/' + this.compressFormat).then(result => {
-        if (dispose) {
-          Canvas.disposeCanvas(canvas);
-        }
-        resolve(result);
+      Canvas.toDataURL(canvas, 'image/png').then(result => {
+        Canvas.disposeCanvas(canvas);
+        resolve(Canvas.createImage(result));
       });
     });
   }

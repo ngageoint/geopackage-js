@@ -304,8 +304,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Reset the column index
-   *
-
    */
   public resetIndex(): void {
     this.index = UserColumn.NO_INDEX;
@@ -784,8 +782,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Add a not null constraint
-   *
-
    */
   public addNotNullConstraint(): void {
     this.addConstraintFrom(ConstraintType.NOT_NULL, 'NOT NULL', UserColumn.NOT_NULL_CONSTRAINT_ORDER);
@@ -793,8 +789,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Remove a not null constraint
-   *
-
    */
   public removeNotNullConstraint(): void {
     this.clearConstraintsForType(ConstraintType.NOT_NULL);
@@ -805,8 +799,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
    *
    * @param defaultValue
    *            default value
-   *
-
    */
   public addDefaultValueConstraint(defaultValue: any): void {
     this.addConstraintFrom(
@@ -818,8 +810,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Remove a default value constraint
-   *
-
    */
   public removeDefaultValueConstraint(): void {
     this.clearConstraintsForType(ConstraintType.DEFAULT);
@@ -827,8 +817,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Add a primary key constraint
-   *
-
    */
   public addPrimaryKeyConstraint(): void {
     this.addConstraintFrom(ConstraintType.PRIMARY_KEY, 'PRIMARY KEY', UserColumn.PRIMARY_KEY_CONSTRAINT_ORDER);
@@ -836,8 +824,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Remove a primary key constraint
-   *
-
    */
   public removePrimaryKeyConstraint(): void {
     this.clearConstraintsForType(ConstraintType.PRIMARY_KEY);
@@ -845,8 +831,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Add an autoincrement constraint
-   *
-
    */
   public addAutoincrementConstraint(): void {
     this.addConstraintFrom(ConstraintType.AUTOINCREMENT, 'AUTOINCREMENT', UserColumn.AUTOINCREMENT_CONSTRAINT_ORDER);
@@ -854,8 +838,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Remove an autoincrement constraint
-   *
-
    */
   public removeAutoincrementConstraint(): void {
     this.clearConstraintsForType(ConstraintType.AUTOINCREMENT);
@@ -863,8 +845,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Add a unique constraint
-   *
-
    */
   public addUniqueConstraint(): void {
     this.addConstraintFrom(ConstraintType.UNIQUE, 'UNIQUE', UserColumn.UNIQUE_CONSTRAINT_ORDER);
@@ -872,8 +852,6 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
   /**
    * Remove a unique constraint
-   *
-
    */
   public removeUniqueConstraint(): void {
     this.clearConstraintsForType(ConstraintType.UNIQUE);

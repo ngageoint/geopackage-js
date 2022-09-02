@@ -21,7 +21,6 @@ import { ContentsId } from './contents/contentsId';
  * NGA Extensions
  * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/">http://ngageoint.github.io/GeoPackage/docs/extensions/</a>
  *
- * @since 5.0.0
  */
 export class NGAExtensions extends ExtensionManagement {
   /**

@@ -19,7 +19,6 @@ export class GeoPackageConstants {
   /**
    * GeoPackage Media Type (MIME type)
    *
-   * @since 3.5.0
    */
   public static readonly MEDIA_TYPE = 'application/geopackage+sqlite3';
 
@@ -31,7 +30,6 @@ export class GeoPackageConstants {
   /**
    * GeoPackage user version
    *
-   * @since 1.2.1
    */
   public static readonly USER_VERSION = 10200;
 
@@ -53,7 +51,6 @@ export class GeoPackageConstants {
   /**
    * SQLite default application id
    *
-   * @since 4.0.0
    */
   public static readonly SQLITE_APPLICATION_ID = 'SQLite';
 

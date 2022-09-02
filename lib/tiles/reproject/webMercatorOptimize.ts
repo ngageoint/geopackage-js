@@ -6,7 +6,6 @@ import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 
 /**
  * Web Mercator XYZ tiling optimizations
- * @since 5.0.0
  */
 export class WebMercatorOptimize extends TileReprojectionOptimize {
   /**
@@ -59,6 +58,6 @@ export class WebMercatorOptimize extends TileReprojectionOptimize {
    * {@inheritDoc}
    */
   public getBoundingBoxFromTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
-    return TileBoundingBoxUtils.getWebMercatorBoundingBoxFromTileGrid(tileGrid, zoom);
+    return TileBoundingBoxUtils.getWebMercatorBoundingBoxWithTileGrid(tileGrid, zoom);
   }
 }

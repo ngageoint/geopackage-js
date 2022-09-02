@@ -1,7 +1,3 @@
-/**
- * @module features/user/featureColumn
- */
-
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
@@ -11,14 +7,12 @@ import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
  * Represents a user feature column
- * @class
- * @extends UserColumn
  */
 export class FeatureColumn extends UserColumn {
   geometryType: GeometryType;
 
   constructor(
-    index: number,
+    index: number = UserColumn.NO_INDEX,
     name: string,
     dataType: GeoPackageDataType,
     max?: number,
@@ -63,9 +57,9 @@ export class FeatureColumn extends UserColumn {
    *  @return feature column
    */
   static createPrimaryKeyColumn(
-    index: number = FeatureColumn.NO_INDEX,
     name: string,
     autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
+    index: number = FeatureColumn.NO_INDEX,
   ): FeatureColumn {
     return new FeatureColumn(
       index,
@@ -91,11 +85,11 @@ export class FeatureColumn extends UserColumn {
    *  @return feature column
    */
   static createGeometryColumn(
-    index: number,
     name: string,
     type: GeometryType,
     notNull?: boolean,
     defaultValue?: DBValue,
+    index?: number,
   ): FeatureColumn {
     if (type === null || type === undefined) {
       throw new Error('Geometry Type is required to create column: ' + name);
@@ -124,13 +118,13 @@ export class FeatureColumn extends UserColumn {
    * @param autoincrement
    */
   static createColumn(
-    index: number,
     name: string,
     type: GeoPackageDataType,
     notNull = false,
     defaultValue?: DBValue,
     max?: number,
     autoincrement?: boolean,
+    index?: number,
   ): FeatureColumn {
     return new FeatureColumn(index, name, type, max, notNull, defaultValue, false, undefined, autoincrement);
   }

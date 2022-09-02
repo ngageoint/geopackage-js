@@ -2,10 +2,6 @@ import { UserTableMetadata } from '../../user/userTableMetadata';
 import { FeatureColumn } from './featureColumn';
 import { ContentsDataType } from '../../contents/contentsDataType';
 import { GeometryType } from '@ngageoint/simple-features-js';
-import { AttributesColumn } from '../../attributes/attributesColumn';
-import { Constraints } from '../../db/table/constraints';
-import { AttributesColumns } from '../../attributes/attributesColumns';
-import { AttributesTable } from '../../attributes/attributesTable';
 import { BoundingBox } from '../../boundingBox';
 import { GeometryColumns } from '../columns/geometryColumns';
 import { FeatureTable } from './featureTable';
@@ -189,12 +185,8 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
     let featureColumns = this.getColumns();
     if (featureColumns == null) {
       featureColumns = [];
-      featureColumns.push(
-        FeatureColumn.createPrimaryKeyColumn(FeatureColumn.NO_INDEX, this.getIdColumnName(), this.isAutoincrement()),
-      );
-      featureColumns.push(
-        FeatureColumn.createGeometryColumn(FeatureColumn.NO_INDEX, this.getColumnName(), this.getGeometryType()),
-      );
+      featureColumns.push(FeatureColumn.createPrimaryKeyColumn(this.getIdColumnName(), this.isAutoincrement()));
+      featureColumns.push(FeatureColumn.createGeometryColumn(this.getColumnName(), this.getGeometryType()));
       const additional = this.getAdditionalColumns();
       if (additional != null) {
         featureColumns.push(...additional);

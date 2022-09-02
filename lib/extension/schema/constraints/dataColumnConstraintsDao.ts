@@ -11,9 +11,6 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 
 /**
  * Data Column Constraints Data Access Object
- * @class
- * @extends Dao
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
 export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraints, DataColumnConstraintsKey> {
   private dataColumnsDao: DataColumnsDao = null;

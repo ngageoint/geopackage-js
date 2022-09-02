@@ -129,7 +129,6 @@ export class Metadata {
    * Get the metadata scope name
    *
    * @return metadata scope name
-   * @since 4.0.0
    */
   public getMetadataScopeName(): string {
     return this.md_scope;
@@ -140,7 +139,6 @@ export class Metadata {
    *
    * @param metadataScope
    *            metadata scope name
-   * @since 4.0.0
    */
   public setMetadataScope(metadataScope: string): void {
     this.md_scope = metadataScope;

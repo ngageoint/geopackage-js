@@ -17,8 +17,8 @@ export class GeoPackageValidate {
     return (
       extension &&
       extension !== '' &&
-      (extension.toLowerCase() === '.' + GeoPackageConstants.GEOPACKAGE_EXTENSION.toLowerCase() ||
-        extension.toLowerCase() === '.' + GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION.toLowerCase())
+      (extension.toLowerCase() === '.' + GeoPackageConstants.EXTENSION.toLowerCase() ||
+        extension.toLowerCase() === '.' + GeoPackageConstants.EXTENDED_EXTENSION.toLowerCase())
     );
   }
 
@@ -33,9 +33,9 @@ export class GeoPackageValidate {
         "GeoPackage database file '" +
           filePath +
           "' does not have a valid extension of '" +
-          GeoPackageConstants.GEOPACKAGE_EXTENSION +
+          GeoPackageConstants.EXTENSION +
           "' or '" +
-          GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION +
+          GeoPackageConstants.EXTENDED_EXTENSION +
           "'",
         true,
       );
@@ -44,8 +44,8 @@ export class GeoPackageValidate {
 
   static validateMinimumTables(geoPackage: GeoPackage): GeoPackageValidationError[] {
     const errors: GeoPackageValidationError[] = [];
-    const srsExists = geoPackage.spatialReferenceSystemDao.isTableExists();
-    const contentsExists = geoPackage.contentsDao.isTableExists();
+    const srsExists = geoPackage.getSpatialReferenceSystemDao().isTableExists();
+    const contentsExists = geoPackage.getContentsDao().isTableExists();
     if (!srsExists) {
       errors.push(new GeoPackageValidationError('gpkg_spatial_ref_sys table does not exist', true));
     }

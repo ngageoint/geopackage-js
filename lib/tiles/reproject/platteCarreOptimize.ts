@@ -8,7 +8,6 @@ import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
  * Platte Carre (WGS84) XYZ tiling optimizations
  *
  * @author osbornb
- * @since 5.0.0
  */
 export class PlatteCarreOptimize extends TileReprojectionOptimize {
   /**
@@ -54,13 +53,13 @@ export class PlatteCarreOptimize extends TileReprojectionOptimize {
    * {@inheritDoc}
    */
   public getTileGridFromBoundingBox(boundingBox: BoundingBox, zoom: number): TileGrid {
-    return TileBoundingBoxUtils.getTileGridWGS84FromBoundingBox(boundingBox, zoom);
+    return TileBoundingBoxUtils.getTileGridWGS84(boundingBox, zoom);
   }
 
   /**
    * {@inheritDoc}
    */
   public getBoundingBoxFromTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
-    return TileBoundingBoxUtils.getWGS84BoundingBoxFromTileGrid(tileGrid, zoom);
+    return TileBoundingBoxUtils.getBoundingBoxWGS84(tileGrid, zoom);
   }
 }

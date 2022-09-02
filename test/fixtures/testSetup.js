@@ -1,13 +1,12 @@
-import {Canvas} from "../../lib/canvas/canvas";
-
 var path = require('path')
+  , Canvas = require('../../lib/canvas/canvas').Canvas
   , GeoPackage = require('../../lib/geoPackage').GeoPackage
   , GeoPackageConnection = require('../../lib/db/geoPackageConnection').GeoPackageConnection
   , crypto = require('crypto')
-  , ImageUtils = require('../../lib/tiles/imageUtils').ImageUtils
-  , CanvasCompare = require('canvas-compare');
-var GeoPackageManager = require('../../').GeoPackageManager;
-var isNode = typeof(process) !== 'undefined' && process.version;
+  , ImageUtils = require('../../lib/image/imageUtils').ImageUtils
+  , CanvasCompare = require('canvas-compare')
+  , GeoPackageManager = require('../../').GeoPackageManager
+  , isNode = typeof(process) !== 'undefined' && process.version;
 
 var module = {
   exports: {},

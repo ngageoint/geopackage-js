@@ -341,7 +341,6 @@ export class SpatialReferenceSystem {
    * Get the projection definition
    *
    * @return definition
-   * @since 5.0.0
    */
   public getProjectionDefinition(): string {
     let definition = this.getDefinition_12_063();
@@ -369,7 +368,6 @@ export class SpatialReferenceSystem {
    * @param projection
    *            from projection
    * @return projection transform
-   * @since 3.0.0
    */
   public getTransformation(projection: Projection): GeometryTransform {
     return GeometryTransform.create(projection, this.getProjection());

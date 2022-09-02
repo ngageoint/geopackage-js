@@ -25,7 +25,7 @@ export class UserCustomResultSet extends UserResultSet<UserCustomColumn, UserCus
     columns: string[] | UserColumns<UserCustomColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: [],
+    selectionArgs: any[],
   ) {
     super(table, columns, resultSet, sql, selectionArgs);
   }

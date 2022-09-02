@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
-import { SQLUtils } from "./sqlUtils";
 import { GeoPackageUtilities } from "../io/geoPackageUtilities";
+import { ResultSet } from "./resultSet";
 
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database
@@ -307,5 +307,26 @@ export class SqliteAdapter implements DBAdapter {
 
   transaction(func: Function): void {
     this.db.transaction(func)();
+  }
+
+  /**
+   * Returns a result set for the given query
+   */
+  query(sql: string, params?: [] | Record<string, DBValue>): ResultSet {
+    let statement = this.db.prepare(sql);
+    let iterator;
+    if (params) {
+      iterator = statement.iterate(params);
+    } else {
+      iterator = statement.iterate();
+    }
+    return new ResultSet(iterator, {
+      close: () => {
+        try {
+          statement = null;
+          iterator = null;
+        } catch (e) {}
+      }
+    }, this);
   }
 }

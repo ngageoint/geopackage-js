@@ -9,8 +9,6 @@ import { UserCustomRow } from '../../user/custom/userCustomRow';
 
 /**
  * User Mapping Row containing the values from a single result set row
- * @class
- * @extends UserCustomRow
  */
 export class UserMappingRow extends UserCustomRow {
   /**

@@ -46,6 +46,19 @@ export class ResultSetResult implements Result {
   /**
    * {@inheritDoc}
    */
+  public getValueWithIndex(columnIdx: number): any {
+    let value;
+    try {
+      value = this.resultSet.getValueWithIndex(columnIdx);
+    } catch (e) {
+      throw new GeoPackageException('Failed to get value for column at index: ' + columnIdx);
+    }
+    return value;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public moveToNext(): boolean {
     let next = false;
     try {
@@ -54,27 +67,6 @@ export class ResultSetResult implements Result {
       throw new GeoPackageException('Failed to move ResultSet cursor to next');
     }
     return next;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public moveToFirst(): boolean {
-    return this.resultSet.moveToFirst();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public getPosition(): number {
-    return this.resultSet.getPosition();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public moveToPosition(position: number): boolean {
-    return this.resultSet.moveToPosition(position);
   }
 
   /**
@@ -150,6 +142,17 @@ export class ResultSetResult implements Result {
       return this.resultSet.wasNull();
     } catch (e) {
       throw new GeoPackageException('Failed to determine if previous value retrieved was null');
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public close(): void {
+    try {
+      this.resultSet.close();
+    } catch (e) {
+      throw new GeoPackageException('Failed to close ResultSet Statement');
     }
   }
 }

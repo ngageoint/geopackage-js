@@ -57,7 +57,6 @@ export namespace ContentsDataType {
    * @param name
    *            type name
    * @return contents data type if core, null if not
-   * @since 5.0.0
    */
   export function fromCoreName(name: string): ContentsDataType {
     let dataType = null;
@@ -73,7 +72,6 @@ export namespace ContentsDataType {
    * @param name
    *            type name
    * @return true if a core contents data type
-   * @since 5.0.0
    */
   export function isCoreType(name: string): boolean {
     return name != null && coreTypes[name.toLowerCase()] != null;
@@ -83,7 +81,6 @@ export namespace ContentsDataType {
    * Set the type for the contents data type name
    * @param name contents data type name
    * @param type contents data type
-   * @since 5.0.0
    */
   export function setType(name: string, type: ContentsDataType): void {
     if (name != null) {
@@ -128,7 +125,6 @@ export namespace ContentsDataType {
    * @param matchUnknown
    *            true to match unknown data types
    * @return true if matching core types or matched unknown
-   * @since 5.0.0
    */
   export function isType(name: string, type: ContentsDataType, matchUnknown = false): boolean {
     let isType;
@@ -149,7 +145,6 @@ export namespace ContentsDataType {
    * @param matchUnknown
    *            true to match unknown data types
    * @return true if a features type or matched unknown
-   * @since 5.0.0
    */
   export function isFeaturesType(name: string, matchUnknown = false): boolean {
     return ContentsDataType.isType(name, ContentsDataType.FEATURES, matchUnknown);
@@ -163,7 +158,6 @@ export namespace ContentsDataType {
    * @param matchUnknown
    *            true to match unknown data types
    * @return true if a tiles type or matched unknown
-   * @since 5.0.0
    */
   export function isTilesType(name: string, matchUnknown = false): boolean {
     return ContentsDataType.isType(name, ContentsDataType.TILES, matchUnknown);
@@ -177,7 +171,6 @@ export namespace ContentsDataType {
    * @param matchUnknown
    *            true to match unknown data types
    * @return true if an attributes type or matched unknown
-   * @since 5.0.0
    */
   export function isAttributesType(name: string, matchUnknown = false): boolean {
     return ContentsDataType.isType(name, ContentsDataType.ATTRIBUTES, matchUnknown);

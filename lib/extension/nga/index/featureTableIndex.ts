@@ -988,9 +988,7 @@ export class FeatureTableIndex extends BaseExtension {
           this.progress.addProgress(1);
         }
       } catch (e) {
-        console.error(
-          'Failed to index feature. Table: ' + tableIndex.getTableName() + ', Position: ' + resultSet.getPosition(),
-        );
+        console.error('Failed to index feature. Table: ' + tableIndex.getTableName());
       }
     }
     return count;

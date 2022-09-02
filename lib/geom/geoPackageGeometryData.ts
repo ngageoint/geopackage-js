@@ -91,7 +91,6 @@ export class GeoPackageGeometryData {
    * Get geometry filter
    *
    * @return geometry filter
-   * @since 5.0.0
    */
   public static getGeometryFilter(): GeometryFilter {
     return GeoPackageGeometryData.geometryFilter;
@@ -100,7 +99,6 @@ export class GeoPackageGeometryData {
   /**
    * Set the geometry filter
    * @param geometryFilter geometry filter
-   * @since 5.0.0
    */
   public static setGeometryFilter(geometryFilter: GeometryFilter): void {
     GeoPackageGeometryData.geometryFilter = geometryFilter;
@@ -109,7 +107,6 @@ export class GeoPackageGeometryData {
   /**
    * Get the default SRS id
    * @return SRS id
-   * @since 5.0.0
    */
   public static getDefaultSrsId(): number {
     return GeoPackageGeometryData.defaultSrsId;
@@ -120,7 +117,6 @@ export class GeoPackageGeometryData {
    *
    * @param defaultSrsId
    *            SRS id
-   * @since 5.0.0
    */
   public static setDefaultSrsId(defaultSrsId: number): void {
     GeoPackageGeometryData.defaultSrsId = defaultSrsId;
@@ -130,7 +126,6 @@ export class GeoPackageGeometryData {
    * Get the default byte order
    *
    * @return byte order
-   * @since 5.0.0
    */
   public static getDefaultByteOrder(): ByteOrder {
     return GeoPackageGeometryData.defaultByteOrder;
@@ -141,7 +136,6 @@ export class GeoPackageGeometryData {
    *
    * @param defaultByteOrder
    *            byte order
-   * @since 5.0.0
    */
   public static setDefaultByteOrder(defaultByteOrder: ByteOrder): void {
     GeoPackageGeometryData.defaultByteOrder = defaultByteOrder;
@@ -153,7 +147,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static create(geometry: Geometry): GeoPackageGeometryData {
     return new GeoPackageGeometryData(geometry);
@@ -166,7 +159,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createAndBuildEnvelope(geometry: Geometry): GeoPackageGeometryData {
     return new GeoPackageGeometryData(geometry, true);
@@ -180,7 +172,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createWithSrsId(
     srsId: number = GeoPackageGeometryData.defaultSrsId,
@@ -197,7 +188,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createAndBuildEnvelopeWithSrsId(srsId: number, geometry: Geometry): GeoPackageGeometryData {
     return new GeoPackageGeometryData(srsId, geometry, true);
@@ -210,7 +200,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createAndWrite(geometry: Geometry): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.create(geometry));
@@ -223,7 +212,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createBuildEnvelopeAndWrite(geometry: Geometry): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createAndBuildEnvelope(geometry));
@@ -237,7 +225,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createAndWriteWithSrsId(srsId: number, geometry: Geometry): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createWithSrsId(srsId, geometry));
@@ -252,7 +239,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry data
-   * @since 5.0.0
    */
   public static createBuildEnvelopeAndWriteWithSrsId(srsId: number, geometry: Geometry): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createAndBuildEnvelopeWithSrsId(srsId, geometry));
@@ -264,7 +250,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            GeoPackage geometry buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createWithBuffer(buffer: Buffer): GeoPackageGeometryData {
     return new GeoPackageGeometryData(buffer);
@@ -278,7 +263,6 @@ export class GeoPackageGeometryData {
    * @param envelope
    *            geometry envelope
    * @return geometry data
-   * @since 5.0.0
    */
   public static createWithEnvelope(geometry: Geometry, envelope: GeometryEnvelope): GeoPackageGeometryData {
     return new GeoPackageGeometryData(geometry, envelope);
@@ -294,7 +278,6 @@ export class GeoPackageGeometryData {
    * @param envelope
    *            geometry envelope
    * @return geometry data
-   * @since 5.0.0
    */
   public static createWithSrsIdAndEnvelope(
     srsId: number,
@@ -310,7 +293,6 @@ export class GeoPackageGeometryData {
    * @param geometryData
    *            geometry data
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromGeometryData(geometryData: GeoPackageGeometryData): GeoPackageGeometryData {
     return new GeoPackageGeometryData(geometryData);
@@ -323,7 +305,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkb(buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.createFromWkbWithSrsId(GeoPackageGeometryData.defaultSrsId, buffer);
@@ -336,7 +317,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbAndBuildEnvelope(buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.createFromWkbAndBuildEnvelopeWithSrsId(GeoPackageGeometryData.defaultSrsId, buffer);
@@ -350,7 +330,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbWithSrsId(srsId: number, buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.createWithSrsId(srsId, GeoPackageGeometryData.createGeometryFromWkb(buffer));
@@ -364,7 +343,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbAndBuildEnvelopeWithSrsId(srsId: number, buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.createAndBuildEnvelopeWithSrsId(
@@ -380,7 +358,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbAndWrite(buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWkb(buffer));
@@ -394,7 +371,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbBuildEnvelopeAndWrite(buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWkbAndBuildEnvelope(buffer));
@@ -409,7 +385,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbAndWriteWithSrsId(srsId: number, buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWkbWithSrsId(srsId, buffer));
@@ -424,7 +399,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkbBuildEnvelopeAndWriteWithSrsId(srsId: number, buffer: Buffer): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(
@@ -438,7 +412,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return geometry
-   * @since 5.0.0
    */
   public static createGeometryFromWkb(buffer: Buffer): Geometry {
     return GeometryReader.readGeometry(buffer, GeoPackageGeometryData.geometryFilter);
@@ -451,7 +424,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWkt(text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.createFromWktWithSrsId(GeoPackageGeometryData.defaultSrsId, text);
@@ -464,7 +436,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktAndBuildEnvelope(text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.createFromWktAndBuildEnvelopeWithSrsId(GeoPackageGeometryData.defaultSrsId, text);
@@ -478,7 +449,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktWithSrsId(srsId: number, text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.createWithSrsId(srsId, GeoPackageGeometryData.createGeometryFromWkt(text));
@@ -492,7 +462,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktAndBuildEnvelopeWithSrsId(srsId: number, text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.createAndBuildEnvelopeWithSrsId(
@@ -508,7 +477,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktAndWrite(text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWkt(text));
@@ -522,7 +490,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktBuildEnvelopeAndWrite(text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWktAndBuildEnvelope(text));
@@ -537,7 +504,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktAndWriteWithSrsId(srsId: number, text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(GeoPackageGeometryData.createFromWktWithSrsId(srsId, text));
@@ -552,7 +518,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry data
-   * @since 5.0.0
    */
   public static createFromWktBuildEnvelopeAndWriteWithSrsId(srsId: number, text: string): GeoPackageGeometryData {
     return GeoPackageGeometryData.writeBuffer(
@@ -566,7 +531,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return geometry
-   * @since 5.0.0
    */
   public static createGeometryFromWkt(text: string): Geometry {
     return WKTGeometryReader.readGeometry(new StringReader(text), GeoPackageGeometryData.geometryFilter);
@@ -579,7 +543,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static buffer(geometry: Geometry): Buffer {
     return GeoPackageGeometryData.createAndWrite(geometry).getBuffer();
@@ -592,7 +555,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferAndBuildEnvelope(geometry: Geometry): Buffer {
     return GeoPackageGeometryData.createBuildEnvelopeAndWrite(geometry).getBuffer();
@@ -606,7 +568,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferWithSrsIdWithSrsId(srsId: number, geometry: Geometry): Buffer {
     return GeoPackageGeometryData.createAndWriteWithSrsId(srsId, geometry).getBuffer();
@@ -620,7 +581,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferAndBuildEnvelopeWithSrsId(srsId: number, geometry: Geometry): Buffer {
     return GeoPackageGeometryData.createBuildEnvelopeAndWriteWithSrsId(srsId, geometry).getBuffer();
@@ -633,7 +593,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWkb(buffer: Buffer): Buffer {
     return GeoPackageGeometryData.createFromWkbAndWrite(buffer).getBuffer();
@@ -646,7 +605,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWkbAndBuildEnvelope(buffer: Buffer): Buffer {
     return GeoPackageGeometryData.createFromWkbBuildEnvelopeAndWrite(buffer).getBuffer();
@@ -660,7 +618,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWkbWithSrsId(srsId: number, buffer: Buffer): Buffer {
     return GeoPackageGeometryData.createFromWkbAndWriteWithSrsId(srsId, buffer).getBuffer();
@@ -674,7 +631,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWkbAndBuildEnvelopeWithSrsId(srsId: number, buffer: Buffer): Buffer {
     return GeoPackageGeometryData.createFromWkbBuildEnvelopeAndWriteWithSrsId(srsId, buffer).getBuffer();
@@ -687,7 +643,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWkt(text: string): Buffer {
     return GeoPackageGeometryData.createFromWktAndWrite(text).getBuffer();
@@ -700,7 +655,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWktAndBuildEnvelope(text: string): Buffer {
     return GeoPackageGeometryData.createFromWktBuildEnvelopeAndWrite(text).getBuffer();
@@ -714,7 +668,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWktWithSrsId(srsId: number, text: string): Buffer {
     return GeoPackageGeometryData.createFromWktAndWriteWithSrsId(srsId, text).getBuffer();
@@ -728,7 +681,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return GeoPackage geometry buffer
-   * @since 5.0.0
    */
   public static bufferFromWktAndBuildEnvelopeWithSrsId(srsId: number, text: string): Buffer {
     return GeoPackageGeometryData.createFromWktBuildEnvelopeAndWriteWithSrsId(srsId, text).getBuffer();
@@ -740,7 +692,6 @@ export class GeoPackageGeometryData {
    * @param geometryData
    *            geometry data
    * @return well-known buffer
-   * @since 5.0.0
    */
   public static wkb(geometryData: GeoPackageGeometryData): Buffer {
     return geometryData.getWkb();
@@ -752,7 +703,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return well-known buffer
-   * @since 5.0.0
    */
   public static wkbFromGeometry(geometry: Geometry): Buffer {
     return GeoPackageGeometryData.createAndWrite(geometry).getWkb();
@@ -764,7 +714,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            GeoPackage geometry buffer
    * @return well-known buffer
-   * @since 5.0.0
    */
   public static wkbFromBuffer(buffer: Buffer): Buffer {
     return GeoPackageGeometryData.createWithBuffer(buffer).getWkb();
@@ -776,7 +725,6 @@ export class GeoPackageGeometryData {
    * @param text
    *            well-known text
    * @return well-known buffer
-   * @since 5.0.0
    */
   public static wkbFromWkt(text: string): Buffer {
     return GeoPackageGeometryData.createFromWktAndWrite(text).getWkb();
@@ -788,7 +736,6 @@ export class GeoPackageGeometryData {
    * @param geometryData
    *            geometry data
    * @return well-known text
-   * @since 5.0.0
    */
   public static wkt(geometryData: GeoPackageGeometryData): string {
     return geometryData.getWkt();
@@ -800,7 +747,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return well-known text
-   * @since 5.0.0
    */
   public static wktFromGeometry(geometry: Geometry): string {
     return GeoPackageGeometryData.create(geometry).getWkt();
@@ -812,7 +758,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            GeoPackage geometry buffer
    * @return well-known text
-   * @since 5.0.0
    */
   public static wktFromBuffer(buffer: Buffer): string {
     return GeoPackageGeometryData.createWithBuffer(buffer).getWkt();
@@ -824,7 +769,6 @@ export class GeoPackageGeometryData {
    * @param buffer
    *            well-known buffer
    * @return well-known text
-   * @since 5.0.0
    */
   public static wktFromWkb(buffer: Buffer): string {
     return GeoPackageGeometryData.createFromWkb(buffer).getWkt();
@@ -845,7 +789,6 @@ export class GeoPackageGeometryData {
   /**
    * Default Constructor, default SRS Id of {@link #getDefaultSrsId}
    *
-   * @since 5.0.0
    */
   public constructor(...args) {
     if (args.length === 0) {
@@ -1280,7 +1223,6 @@ export class GeoPackageGeometryData {
    * Get the bounding box of the geometry envelope
    *
    * @return bounding box
-   * @since 6.2.0
    */
   public getBoundingBox(): BoundingBox {
     let boundingBox = null;
@@ -1303,7 +1245,6 @@ export class GeoPackageGeometryData {
    * Get the geometry or read it from geometry buffer
    *
    * @return geometry
-   * @since 6.3.0
    */
   public getOrReadGeometry(): Geometry {
     if (this.geometry == null && this.geometryBuffer != null) {
@@ -1431,7 +1372,6 @@ export class GeoPackageGeometryData {
    *
    * @param buffer
    *            geometry buffer
-   * @since 6.3.0
    */
   public setGeometryBytes(buffer: Buffer): void {
     this.clearBuffer();
@@ -1446,7 +1386,6 @@ export class GeoPackageGeometryData {
    * @param geometry
    *            geometry
    * @return geometry buffer
-   * @since 5.0.0
    */
   public setGeometryAndBuildEnvelopeToBytes(geometry: Geometry): Buffer {
     return this.setGeometryToBuffer(geometry, true);
@@ -1460,7 +1399,6 @@ export class GeoPackageGeometryData {
    * @param buildEnvelope
    *            true to build and set the envelope
    * @return geometry buffer
-   * @since 5.0.0
    */
   private setGeometryToBuffer(geometry: Geometry, buildEnvelope = false): Buffer {
     this.setGeometry(geometry);
@@ -1475,7 +1413,6 @@ export class GeoPackageGeometryData {
    *
    * @param buffer
    *            well-known buffer
-   * @since 5.0.0
    */
   public setGeometryFromWkb(buffer: Buffer): void {
     this.setGeometry(GeoPackageGeometryData.createGeometryFromWkb(buffer));
@@ -1502,7 +1439,6 @@ export class GeoPackageGeometryData {
   /**
    * Clear the geometry buffer and overall buffer
    *
-   * @since 6.3.0
    */
   public clearGeometryBuffer(): void {
     this.clearBuffer();
@@ -1535,7 +1471,6 @@ export class GeoPackageGeometryData {
    * Get the Well-Known Binary Geometry buffer
    *
    * @return buffer
-   * @since 5.0.0
    */
   public getWkb(): Buffer {
     if (this.geometryBuffer == null && this.toBuffer() != null) {
@@ -1557,7 +1492,6 @@ export class GeoPackageGeometryData {
    * Get a Well-Known text string from the geometry
    *
    * @return well-known text string
-   * @since 5.0.0
    */
   public getWkt(): string {
     let wkt = null;
@@ -1577,7 +1511,6 @@ export class GeoPackageGeometryData {
    * geometry
    *
    * @return geometry envelope
-   * @since 3.1.0
    */
   public getOrBuildEnvelope(): GeometryEnvelope {
     let envelope: GeometryEnvelope = this.getEnvelope();
@@ -1591,7 +1524,6 @@ export class GeoPackageGeometryData {
    * Build, set, and retrieve the envelope from the geometry
    *
    * @return geometry envelope
-   * @since 5.0.0
    */
   public buildEnvelope(): GeometryEnvelope {
     let envelope: GeometryEnvelope = null;
@@ -1608,7 +1540,6 @@ export class GeoPackageGeometryData {
    * and retrieve it from the geometry
    *
    * @return bounding box
-   * @since 6.2.0
    */
   public getOrBuildBoundingBox(): BoundingBox {
     let boundingBox = null;

@@ -31,9 +31,6 @@ import { NGAExtensions } from '../ngaExtensions';
 
 /**
  * Style extension
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
- * @extends BaseExtension
- * @constructor
  */
 export class FeatureStyleExtension extends BaseExtension {
   /**
@@ -754,8 +751,8 @@ export class FeatureStyleExtension extends BaseExtension {
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.getTable().getTableName(), featureRow.id, featureRow.geometryType, true),
-      this.getIcon(featureRow.getTable().getTableName(), featureRow.id, featureRow.geometryType, true),
+      this.getStyle(featureRow.getTable().getTableName(), featureRow.id, featureRow.getGeometryType(), true),
+      this.getIcon(featureRow.getTable().getTableName(), featureRow.id, featureRow.getGeometryType(), true),
     );
   }
   /**
@@ -1054,7 +1051,7 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   } {
-    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, featureStyle);
+    return this.setFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), featureStyle);
   }
   /**
    * Set the feature style (style and icon) of the feature row for the
@@ -1210,7 +1207,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {Promise}
    */
   setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
-    return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, style);
+    return this.setStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), style);
   }
   /**
    * Set the style of the feature row for the specified geometry type
@@ -1316,7 +1313,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @return {number}
    */
   setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
-    return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType, icon);
+    return this.setIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType(), icon);
   }
   /**
    * Set the icon of the feature row for the specified geometry type
@@ -1620,7 +1617,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteStyleForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Delete the feature row style for the geometry type
@@ -1712,7 +1709,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {module:features/user/featureRow} featureRow feature row
    */
   deleteIconForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.geometryType);
+    return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Delete the feature row icon for the geometry type

@@ -3,7 +3,6 @@ import { GeoPackageManager } from './geoPackageManager';
 
 /**
  * GeoPackage Cache
- * @since 5.0.0
  */
 export class GeoPackageCache {
   /**
@@ -21,7 +20,6 @@ export class GeoPackageCache {
    *
    * @param gppathOrByteArray GeoPackage buffer, Uint8Array or filePath
    * @return GeoPackage
-   * @since 3.1.0
    */
   public async getOrNoCacheOpen(gppathOrByteArray: string | Uint8Array | Buffer): Promise<GeoPackage> {
     return this.getOrOpen(undefined, gppathOrByteArray, false);
@@ -188,7 +186,6 @@ export class GeoPackageCache {
    * Close the GeoPackage with name
    * @param name GeoPackage name
    * @return true if found and closed
-   * @since 1.0.1
    */
   public closeWithName(name: string): boolean {
     const geoPackage = this.remove(name);
@@ -258,7 +255,6 @@ export class GeoPackageCache {
    * @param geoPackage
    *            GeoPackage
    * @return true if closed
-   * @since 3.1.0
    */
   public closeIfNotCached(geoPackage: GeoPackage): boolean {
     let closed = false;

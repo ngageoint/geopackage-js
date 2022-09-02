@@ -1,6 +1,5 @@
 /**
  * Optional Tile Reprojection configuration for a zoom level
- * @since 5.0.0
  */
 export class TileReprojectionZoom {
   /**

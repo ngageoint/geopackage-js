@@ -6,6 +6,7 @@ import { ResultSetResult } from '../db/resultSetResult';
 import { ResultSet } from '../db/resultSet';
 import { UserColumns } from './userColumns';
 import { GeoPackageException } from '../geoPackageException';
+import { SQLUtils } from '../db/sqlUtils';
 
 /**
  * Abstract User Result Set. The column index of the GeoPackage core is 0
@@ -46,7 +47,7 @@ export abstract class UserResultSet<
   /**
    * Selection arguments
    */
-  private selectionArgs: [];
+  private selectionArgs: any[];
 
   /**
    * Constructor
@@ -62,7 +63,7 @@ export abstract class UserResultSet<
     columns: string[] | UserColumns<TColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: [],
+    selectionArgs: any[],
   ) {
     super(resultSet);
     this.table = table;
@@ -73,7 +74,6 @@ export abstract class UserResultSet<
     } else {
       this.columns = table.getUserColumns();
     }
-    this.count = resultSet.getCount();
     this.sql = sql;
     this.selectionArgs = selectionArgs;
   }
@@ -191,7 +191,7 @@ export abstract class UserResultSet<
   public getCount(): number {
     if (this.count == null) {
       if (this.sql != null) {
-        this.count = this.resultSet.getCount();
+        this.count = SQLUtils.countSqlQuery(this.resultSet.getConnection(), this.sql, this.selectionArgs);
       } else {
         this.count = -1;
       }
@@ -228,7 +228,7 @@ export abstract class UserResultSet<
   /**
    * {@inheritDoc}
    */
-  public getSelectionArgs(): [] {
+  public getSelectionArgs(): any[] {
     return this.selectionArgs;
   }
 

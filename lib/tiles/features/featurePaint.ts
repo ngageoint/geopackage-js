@@ -6,19 +6,19 @@ import { Paint } from './paint';
  * @module tiles/features
  */
 export class FeaturePaint {
-  featurePaints: { [key: string]: Paint } = {};
+  private featurePaints = {};
   /**
    * Get the feature paint for the featureDrawType
-   * @param {module:tiles/features~FeatureDrawType} featureDrawType
-   * @return {module:tiles/features~FeaturePaint} paint
+   * @param featureDrawType
+   * @return paint
    */
   getPaint(featureDrawType: FeatureDrawType): Paint {
     return this.featurePaints[featureDrawType];
   }
   /**
    * Set the feature paint for the featureDrawType
-   * @param {module:tiles/features~FeatureDrawType} featureDrawType
-   * @param {module:tiles/features~Paint} paint
+   * @param featureDrawType
+   * @param paint
    */
   setPaint(featureDrawType: FeatureDrawType, paint: Paint): void {
     this.featurePaints[featureDrawType] = paint;

@@ -40,7 +40,7 @@ export abstract class UserPaginatedResults<
   /**
    * SQL arguments
    */
-  private readonly args: [];
+  private readonly args: any[];
 
   /**
    * SQL column names
@@ -129,63 +129,63 @@ export abstract class UserPaginatedResults<
     return this;
   }
 
-	/**
-	 * Private function for handling end of page and moving to next page and verifying when results have run out.
-	 * @private
-	 */
-	private hasNext(): boolean  {
-		let hasNext;
-		if (this.results.moveToNext()) {
-			hasNext = true
-		} else {
-			this.close();
-			if (this.pagination.hasLimit()) {
-				this.pagination.incrementOffset();
-				const query = this.pagination.replace(this.sql);
-				this.results = this.dao.rawQueryWithColumns(query, this.columns, this.args);
-				hasNext = this.results.moveToNext();
-				if (!hasNext) {
-					this.close();
-				}
-			}
-		}
-		return hasNext
-	}
+  /**
+   * Private function for handling end of page and moving to next page and verifying when results have run out.
+   * @private
+   */
+  private hasNext(): boolean {
+    let hasNext;
+    if (this.results.moveToNext()) {
+      hasNext = true;
+    } else {
+      this.close();
+      if (this.pagination.hasLimit()) {
+        this.pagination.incrementOffset();
+        const query = this.pagination.replace(this.sql);
+        this.results = this.dao.rawQueryWithColumns(query, this.columns, this.args);
+        hasNext = this.results.moveToNext();
+        if (!hasNext) {
+          this.close();
+        }
+      }
+    }
+    return hasNext;
+  }
 
   public next(): { value: TRow; done: boolean } {
     const value = this.results.getRow();
     const done = !this.hasNext();
-		return {
-			value,
-			done
-		}
+    return {
+      value,
+      done,
+    };
   }
 
-	/**
-	 * Next function for id
-	 * @private
-	 */
-	private idNext(): { value: number; done: boolean } {
-		const value = this.results.getId();
-		const done = !this.hasNext();
-		return {
-			value,
-			done
-		}
-	}
+  /**
+   * Next function for id
+   * @private
+   */
+  private idNext(): { value: number; done: boolean } {
+    const value = this.results.getId();
+    const done = !this.hasNext();
+    return {
+      value,
+      done,
+    };
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public ids(): IterableIterator<number> {
-		const idNext = this.idNext;
-		return {
-			[Symbol.iterator](): IterableIterator<number> {
-				return this;
-			},
-			next: idNext,
-		};
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public ids(): IterableIterator<number> {
+    const idNext = this.idNext;
+    return {
+      [Symbol.iterator](): IterableIterator<number> {
+        return this;
+      },
+      next: idNext,
+    };
+  }
 
   /**
    * Close the current results

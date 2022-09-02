@@ -1,13 +1,13 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var FeatureTiles = require('../../../../lib/tiles/features').FeatureTiles
+var FeatureTiles = require('../../../../lib/tiles/features/featureTiles').FeatureTiles
   , Canvas = require('../../../../lib/canvas/canvas').Canvas
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
   , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
   , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
-  , ImageUtils = require('../../../../lib/tiles/imageUtils').ImageUtils
+  , ImageUtils = require('../../../../lib/image/imageUtils').ImageUtils
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData

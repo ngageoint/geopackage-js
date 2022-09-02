@@ -1,4 +1,7 @@
 import { CanvasAdapter } from './canvasAdapter';
+import { GeoPackageImage } from '../image/geoPackageImage';
+import { ImageType } from '../image/imageType';
+import { CanvasUtils } from './canvasUtils';
 
 /**
  * Browser based canvas adapter
@@ -24,19 +27,20 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return c;
   }
 
-  createImage(data: any, contentType: string): Promise<{ image: any; width: number; height: number }> {
+  createImage(data: Uint8Array | Buffer | string | Blob, contentType: string): Promise<GeoPackageImage> {
     return new Promise((resolve, reject) => {
-      let src = data;
+      let src: string = null;
       if (data instanceof Buffer || Object.prototype.toString.call(data) === '[object Uint8Array]') {
         src = URL.createObjectURL(new Blob([data], { type: contentType }));
+      } else if (typeof data === 'string') {
+        src = data as string;
+      } else if (data instanceof Blob) {
+        src = URL.createObjectURL(data as Blob);
       }
       const image = new Image();
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
       image.onload = () => {
-        const result = {
-          image: image,
-          width: image.width,
-          height: image.height,
-        };
+        const result = new GeoPackageImage(image, image.width, image.height);
         resolve(result);
       };
       image.onerror = (error: any): void => {
@@ -47,11 +51,11 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     });
   }
 
-  createImageData(width, height) {
+  createImageData(width, height): ImageData {
     return new ImageData(width, height);
   }
 
-  disposeCanvas(canvas: any) {
+  disposeCanvas(canvas: any): void {
     canvas = null;
   }
 
@@ -65,7 +69,14 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return width;
   }
 
-  drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string) {
+  drawText(
+    context: any,
+    text: string,
+    location: number[],
+    fontFace: string,
+    fontSize: number,
+    fontColor: string,
+  ): void {
     context.save();
     context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
     context.fillStyle = fontColor;
@@ -75,26 +86,23 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
-  async scaleImage(
-    image: { image: any; width: number; height: number },
-    scale: number,
-  ): Promise<{ image: any; width: number; height: number }> {
+  async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
     if (scale === 1.0) {
       return image;
     }
-    const scaledWidth = Math.round(scale * image.width);
-    const scaledHeight = Math.round(scale * image.height);
+    const scaledWidth = Math.round(scale * image.getWidth());
+    const scaledHeight = Math.round(scale * image.getHeight());
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
   async scaleImageToDimensions(
-    image: { image: any; width: number; height: number },
+    image: GeoPackageImage,
     scaledWidth: number,
     scaledHeight: number,
-  ): Promise<{ image: any; width: number; height: number }> {
+  ): Promise<GeoPackageImage> {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
+    ctx.drawImage(image.getImage(), 0, 0, scaledWidth, scaledHeight);
     const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
@@ -104,5 +112,33 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
     return Promise.resolve(canvas.toDataURL(format));
   }
 
-  disposeImage(image: { image: any; width: number; height: number }): void {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  disposeImage(image: GeoPackageImage): void {}
+
+  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array> {
+    const canvas: any = this.create(image.getWidth(), image.getHeight());
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image.getImage(), 0, 0);
+    if (imageFormat === ImageType.TIFF) {
+      // TODO: do something different
+    }
+    const dataUrl = canvas.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality);
+    return Promise.resolve(CanvasUtils.base64toUInt8Array(dataUrl));
+  }
+
+  getImageData(image: GeoPackageImage): ImageData {
+    const canvas = this.create(image.getWidth(), image.getHeight());
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image.getImage(), 0, 0);
+    return ctx.getImageData(0, 0, image.getWidth(), image.getHeight());
+  }
+
+  /**
+   * Draw content of fromCanvas into the toContext
+   * @param fromCanvas
+   * @param toContext
+   */
+  mergeCanvas(fromCanvas: any, toContext: any): void {
+    toContext.drawImage(fromCanvas, 0, 0);
+  }
 }

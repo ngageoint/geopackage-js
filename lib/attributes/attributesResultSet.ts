@@ -25,7 +25,7 @@ export class AttributesResultSet extends UserResultSet<AttributesColumn, Attribu
     columns: string[] | UserColumns<AttributesColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: [],
+    selectionArgs: any[],
   ) {
     super(table, columns, resultSet, sql, selectionArgs);
   }

@@ -65,4 +65,11 @@ export class FeatureIndexFeatureResults implements FeatureIndexResults {
       };
     }
   }
+
+  /**
+   * Close the result set
+   */
+  public close(): void {
+    this.resultSet.close();
+  }
 }

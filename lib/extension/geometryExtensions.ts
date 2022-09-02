@@ -49,7 +49,6 @@ export class GeometryExtensions extends BaseExtension {
    * @param geometryType
    *            geometry type
    * @return true if non standard
-   * @since 2.0.1
    */
   public static isNonStandard(geometryType: GeometryType): boolean {
     return (
@@ -82,7 +81,6 @@ export class GeometryExtensions extends BaseExtension {
    * @param author
    *            user defined author
    * @return extension
-   * @since 5.0.0
    * @deprecated as of 5.0.0, On August 15, 2016 the GeoPackage SWG voted to
    *             remove this extension from the standard due to
    *             interoperability concerns. (GeoPackage version 1.2)
@@ -112,7 +110,6 @@ export class GeometryExtensions extends BaseExtension {
    * @param geometryType
    *            geometry type
    * @return true if has extension
-   * @since 1.1.8
    * @deprecated as of 1.2.1, On August 15, 2016 the GeoPackage SWG voted to
    *             remove this extension from the standard due to
    *             interoperability concerns. (GeoPackage version 1.2)

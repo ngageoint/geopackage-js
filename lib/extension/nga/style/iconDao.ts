@@ -12,10 +12,6 @@ import { StyleMappingRow } from './styleMappingRow';
 
 /**
  * Icon DAO for reading user icon data tables
- * @extends MediaDao
- * @param  {module:db/geoPackageConnection~GeoPackageConnection} geoPackage connection
- * @param  {string} table table name
- * @constructor
  */
 export class IconDao extends MediaDao {
   constructor(dao: UserCustomDao) {

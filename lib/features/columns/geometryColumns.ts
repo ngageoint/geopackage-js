@@ -312,7 +312,6 @@ export class GeometryColumns {
    * Get the projection
    *
    * @return projection
-   * @since 3.1.0
    */
   public getProjection(): Projection {
     return this.getSrs() != null ? this.getSrs().getProjection() : null;

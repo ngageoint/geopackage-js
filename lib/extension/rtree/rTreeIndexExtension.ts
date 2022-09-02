@@ -27,7 +27,6 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * RTree table and trigger name prefix
    *
-   * @since 3.3.0
    */
   public static readonly RTREE_PREFIX = 'rtree_';
 
@@ -64,7 +63,6 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Table SQL property
    *
-   * @since 3.1.0
    */
   public static readonly TABLE_PROPERTY = 'table';
 
@@ -81,7 +79,6 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Drop Force SQL property
    *
-   * @since 3.2.0
    */
   public static readonly DROP_FORCE_PROPERTY = 'drop_force';
 
@@ -123,35 +120,30 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * ID column name
    *
-   * @since 3.1.0
    */
   public static readonly COLUMN_ID = 'id';
 
   /**
    * Min X column name
    *
-   * @since 3.1.0
    */
   public static readonly COLUMN_MIN_X = 'minx';
 
   /**
    * Max X column name
    *
-   * @since 3.1.0
    */
   public static readonly COLUMN_MAX_X = 'maxx';
 
   /**
    * Min Y column name
    *
-   * @since 3.1.0
    */
   public static readonly COLUMN_MIN_Y = 'miny';
 
   /**
    * Max Y column name
    *
-   * @since 3.1.0
    */
   public static readonly COLUMN_MAX_Y = 'maxy';
 
@@ -452,7 +444,6 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param featureDao
    *            feature DAO
    * @return RTree Index Table DAO
-   * @since 3.1.0
    */
   public getTableDao(featureDao: FeatureDao): RTreeIndexTableDao {
     const connection = this.getGeoPackage().getConnection();
@@ -764,7 +755,6 @@ export class RTreeIndexExtension extends BaseExtension {
   /**
    * Delete all RTree Index extensions for the table. Drops the triggers, RTree tables, and deletes the extensions.
    * @param tableName table name
-   * @since 3.2.0
    */
   public deleteWithTableName(tableName: string): void {
     try {
@@ -791,7 +781,6 @@ export class RTreeIndexExtension extends BaseExtension {
    * Delete all RTree Index extensions. Drops the triggers, RTree tables, and
    * deletes the extensions.
    *
-   * @since 3.2.0
    */
   public deleteAll(): void {
     try {

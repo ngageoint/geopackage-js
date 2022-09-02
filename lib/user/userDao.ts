@@ -16,6 +16,8 @@ import { AlterTable } from "../db/alterTable";
 import { ColumnValues } from "../dao/columnValues";
 import { DBValue } from "../db/dbAdapter";
 import { ContentValues } from "./contentValues";
+import { ResultUtils } from "../db/resultUtils";
+import { ResultSetResult } from "../db/resultSetResult";
 
 /**
  * Abstract UserDao
@@ -297,7 +299,7 @@ export abstract class UserDao<
    * @param selectionArgs selection args
    * @return result
    */
-  public rawQueryWithColumns(sql: string, columns: string[], selectionArgs: []): TResult {
+  public rawQueryWithColumns(sql: string, columns: string[], selectionArgs: any[]): TResult {
     return this.userDb.rawQueryWithColumns(sql, columns, selectionArgs);
   }
 
@@ -663,7 +665,7 @@ export abstract class UserDao<
    *
    * @return zoom level
    */
-  public getZoomLevel(): number {
+  public getZoomLevelForBoundingBox(): number {
     const projection = this.getProjection();
     if (projection == null) {
       throw new GeoPackageException(
@@ -922,6 +924,14 @@ export abstract class UserDao<
   }
 
   /**
+   * Delete all rows
+   * @return deleted count
+   */
+  public deleteAll(): number {
+    return this.db.delete(this.getTableName());
+  }
+
+  /**
    * Delete a row by id
    *
    * @param id
@@ -947,10 +957,26 @@ export abstract class UserDao<
    * Query for typed values from the first column
    * @param sql sql statement
    * @param args sql arguments
+   * @param columnName
+   * @param limit
    * @return single column values
    */
-  public querySingleColumnTypedResults(sql: string, args: string[]): Record<string, DBValue>[] {
-    return this.db.query(sql, args).results;
+  public querySingleColumnTypedResults(sql: string, args: string[], columnName: string, limit?: number): any[] {
+    const resultSet = this.db.query(sql, args);
+    return ResultUtils.buildSingleColumnResults(new ResultSetResult(resultSet), columnName, limit);
+  }
+
+  /**
+   * Query for typed values from the first column
+   * @param sql sql statement
+   * @param args sql arguments
+   * @param columnIndex
+   * @param limit
+   * @return single column values
+   */
+  public querySingleColumnTypedResultsWithColumnIndex(sql: string, args: string[], columnIndex = 0, limit?: number): any[] {
+    const resultSet = this.db.query(sql, args);
+    return ResultUtils.buildSingleColumnResultsWithColumnIndex(new ResultSetResult(resultSet), columnIndex, limit);
   }
 
   /**
@@ -1015,5 +1041,43 @@ export abstract class UserDao<
    */
   public insertOrThrow(values: ContentValues): number {
     return SQLUtils.insertOrThrow(this.getDb(), this.getTableName(), values);
+  }
+
+  /**
+   * Get the min result of the column
+   * @param column  column name
+   * @param where  where clause
+   * @param args where arugments
+   * @return min or null
+   */
+  public min(column: string, where?: string, args?: any): number {
+    return this.db.min(this.getTableName(), column, where, args);
+  }
+
+  /**
+   * Get the max result of the column
+   * @param column  column name
+   * @param where  where clause
+   * @param args where arugments
+   * @return max or null
+   */
+  public max(column: string, where?: string, args?: any): number {
+    return this.db.max(this.getTableName(), column, where, args);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param fieldValues field values
+   * @return result
+   */
+  public queryForFieldValues(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
+    const where = this.buildWhereWithFields(fieldValues);
+    const whereArgs = this.buildWhereArgs(fieldValues);
+    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs);
+    this.prepareResult(result);
+    return result;
   }
 }

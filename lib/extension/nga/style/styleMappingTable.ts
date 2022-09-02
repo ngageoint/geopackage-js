@@ -10,10 +10,6 @@ import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
 
 /**
  * Contains style mapping table factory and utility methods
- * @extends UserMappingTable
- * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns   style mapping columns
- * @constructor
  */
 export class StyleMappingTable extends UserMappingTable {
   public static readonly COLUMN_GEOMETRY_TYPE_NAME = 'geometry_type_name';

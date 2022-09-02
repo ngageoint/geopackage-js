@@ -1,3 +1,6 @@
+/**
+ * Canvas utility functions
+ */
 export class CanvasUtils {
   static base64toUInt8Array(data): Uint8Array {
     const bytes = Buffer.from(data, 'base64').toString('binary');

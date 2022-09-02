@@ -1,8 +1,5 @@
 /**
  * Tile Reprojection Optimizations
- *
- * @author osbornb
- * @since 5.0.0
  */
 import { Projection } from '@ngageoint/projections-js';
 import { BoundingBox } from '../../boundingBox';

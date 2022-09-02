@@ -3,7 +3,7 @@ import { TileScaling } from '../../../../../lib/extension/nga/scale/tileScaling'
 import { TileScalingType } from '../../../../../lib/extension/nga/scale/tileScalingType';
 var should = require('chai').should();
 
-var GeoPackageTileRetriever = require('../../../../../lib/tiles/retriever').GeoPackageTileRetriever
+var GeoPackageTileRetriever = require('../../../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , path = require('path');
 
 var isLinux = process.platform === 'linux';

@@ -10,7 +10,7 @@ import { SQLUtils } from '../db/sqlUtils';
 import { UserCustomTableReader } from '../user/custom/userCustomTableReader';
 import { AlterTable } from '../db/alterTable';
 import { TableMapping } from '../db/tableMapping';
-import { SchemaExtension } from './schema';
+import { SchemaExtension } from './schema/schemaExtension';
 import { DataColumnsDao } from './schema/columns/dataColumnsDao';
 import { GeoPackageTableCreator } from '../db/geoPackageTableCreator';
 import { ConstraintParser } from '../db/table/constraintParser';
@@ -23,7 +23,6 @@ import { ExtendedRelation } from './related/extendedRelation';
 
 /**
  * GeoPackage Extension Manager for deleting and copying extensions
- * @since 5.0.0
  */
 export class ExtensionManager extends ExtensionManagement {
   /**
@@ -161,8 +160,8 @@ export class ExtensionManager extends ExtensionManagement {
    */
   public deleteRTreeSpatialIndex(table: string): void {
     const rTreeIndexExtension = this.getRTreeIndexExtension();
-    if (rTreeIndexExtension.has(table)) {
-      rTreeIndexExtension.deleteTable(table);
+    if (rTreeIndexExtension.hasExtensionWithTable(table)) {
+      rTreeIndexExtension.deleteWithTableName(table);
     }
   }
 
@@ -185,7 +184,7 @@ export class ExtensionManager extends ExtensionManagement {
   public copyRTreeSpatialIndex(table: string, newTable: string): void {
     try {
       const rTreeIndexExtension = this.getRTreeIndexExtension();
-      if (rTreeIndexExtension.has(table)) {
+      if (rTreeIndexExtension.hasExtensionWithTable(table)) {
         const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
 
         const geometryColumns = geometryColumnsDao.queryForTableName(newTable);
@@ -193,7 +192,7 @@ export class ExtensionManager extends ExtensionManagement {
           const tableInfo = TableInfo.info(this.geoPackage.getDatabase(), newTable);
           if (tableInfo != null) {
             const pk = tableInfo.getPrimaryKey().name;
-            rTreeIndexExtension.createWithParameters(newTable, geometryColumns.getColumnName(), pk);
+            rTreeIndexExtension.create(newTable, geometryColumns.getColumnName(), pk);
           }
         }
       }

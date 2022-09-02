@@ -4,6 +4,9 @@ import fs from 'fs';
 import http from 'http';
 import CanvasKitInit from '../../canvaskit/canvaskit.js';
 import { CanvasUtils } from './canvasUtils';
+import { GeoPackageImage } from '../image/geoPackageImage';
+import { EmulatedCanvas2D, EmulatedImageData, Image, ImageFormatEnumValues } from '../../@types/canvaskit';
+import { ImageType } from '../image/imageType';
 
 /**
  * Node based canvas creation
@@ -60,7 +63,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return CanvasKitCanvasAdapter.initialized;
   }
 
-  create(width: number, height: number): any {
+  create(width: number, height: number): EmulatedCanvas2D {
     return CanvasKitCanvasAdapter.CanvasKit.MakeCanvas(width, height);
   }
 
@@ -69,18 +72,19 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param imageData
    * @param contentType
    */
-  async createImage(imageData: any, contentType: string): Promise<{ image: any; width: number; height: number }> {
+  async createImage(imageData: Uint8Array | Buffer | string | Blob, contentType: string): Promise<GeoPackageImage> {
     let src = imageData;
     let image;
     let width;
     let height;
     try {
       if (typeof imageData === 'string') {
+        const imageString = imageData as string;
         if (/^\s*data:/.test(imageData)) {
-          src = CanvasUtils.base64toUInt8Array(imageData.split(',')[1]);
-        } else if (/^\s*https?:\/\//.test(imageData)) {
+          src = CanvasUtils.base64toUInt8Array(imageString.split(',')[1]);
+        } else if (/^\s*https?:\/\//.test(imageString)) {
           src = await new Promise((resolve, reject) => {
-            http.get(imageData, res => {
+            http.get(imageString, res => {
               const data = [];
               if (res.statusCode === 200) {
                 res
@@ -88,7 +92,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
                     data.push(chunk);
                   })
                   .on('end', function() {
-                    resolve(Buffer.concat(data).buffer);
+                    resolve(Buffer.concat(data).buffer as Buffer);
                   })
                   .on('error', function(e) {
                     reject(e);
@@ -124,14 +128,14 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
       throw new Error('Failed to create image.');
     }
 
-    return { image: image, width: width, height: height };
+    return new GeoPackageImage(image, width, height);
   }
 
-  createImageData(width, height): any {
+  createImageData(width, height): EmulatedImageData {
     return new CanvasKitCanvasAdapter.CanvasKit.ImageData(width, height);
   }
 
-  disposeCanvas(canvas: any): void {
+  disposeCanvas(canvas: EmulatedCanvas2D): void {
     if (canvas != null) {
       canvas.dispose();
       canvas = null;
@@ -171,32 +175,85 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     return Promise.resolve(canvas.toDataURL(format));
   }
 
-  async scaleImage(
-    image: { image: any; width: number; height: number },
-    scale: number,
-  ): Promise<{ image: any; width: number; height: number }> {
-    const scaledWidth = Math.round(scale * image.width);
-    const scaledHeight = Math.round(scale * image.height);
+  async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
+    const scaledWidth = Math.round(scale * image.getWidth());
+    const scaledHeight = Math.round(scale * image.getHeight());
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
   async scaleImageToDimensions(
-    image: { image: any; width: number; height: number },
+    image: GeoPackageImage,
     scaledWidth: number,
     scaledHeight: number,
-  ): Promise<{ image: any; width: number; height: number }> {
-    const canvas: any = this.create(scaledWidth, scaledHeight);
+  ): Promise<GeoPackageImage> {
+    const canvas = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
+    ctx.drawImage(image.getImage() as CanvasImageSource, 0, 0, scaledWidth, scaledHeight);
     const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
   }
 
-  disposeImage(image: { image: any; width: number; height: number }): void {
-    if (image != null && image.image && image.image.delete) {
-      image.image.delete();
-      image.image = null;
+  disposeImage(image: GeoPackageImage): void {
+    if (image != null && image.getImage() && image.getImage() instanceof Image) {
+      (image.getImage() as Image).delete();
+      image = null;
     }
+  }
+
+  /**
+   * Writes the GeoPackageImage to a buffer
+   * @param image
+   * @param imageFormat
+   * @param compressionQuality
+   */
+  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array> {
+    const internalImage = image.getImage() as Image;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    let type = ImageFormatEnumValues.PNG;
+    switch (imageFormat) {
+      case ImageType.PNG:
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        type = ImageFormatEnumValues.PNG;
+        break;
+      case ImageType.JPG:
+      case ImageType.JPEG:
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        type = ImageFormatEnumValues.JPEG;
+        break;
+      case ImageType.WEBP:
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        type = ImageFormatEnumValues.WEBP;
+        break;
+    }
+    // need to do something else here
+    if (imageFormat === ImageType.TIFF) {
+      // TODO: figure out how to enclode geotiff
+    }
+    return Promise.resolve(internalImage.encodeToBytes(type, compressionQuality));
+  }
+
+  /**
+   * Gets the image data
+   */
+  getImageData(image: GeoPackageImage): ImageData {
+    const canvas = this.create(image.getWidth(), image.getHeight());
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image.getImage() as CanvasImageSource, 0, 0);
+    return ctx.getImageData(0, 0, image.getWidth(), image.getHeight());
+  }
+
+  /**
+   * Draw content of fromCanvas into the toContext
+   * @param fromCanvas
+   * @param toContext
+   */
+  mergeCanvas(fromCanvas: any, toContext: any): void {
+    const image = fromCanvas.bf.makeImageSnapshot();
+    toContext.drawImage(image, 0, 0);
   }
 }

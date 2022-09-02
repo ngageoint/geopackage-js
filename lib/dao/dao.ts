@@ -76,6 +76,15 @@ export abstract class Dao<T, ID> {
     return this.db.isTableExists(this.gpkgTableName);
   }
 
+
+  /**
+   * Checks if the ID exists
+   * @param id
+   */
+  idExists(id: ID) {
+    return this.queryForIdWithKey(id) != null;
+  }
+
   /**
    * Refreshes the object by id
    * @param object object to refresh

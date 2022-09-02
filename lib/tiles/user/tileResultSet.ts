@@ -18,14 +18,13 @@ export class TileResultSet extends UserResultSet<TileColumn, TileTable, TileRow>
    * @param resultSet result set
    * @param sql SQL statement
    * @param selectionArgs selection arguments
-   * @since 4.0.0
    */
   public constructor(
     table: TileTable,
     columns: string[] | UserColumns<TileColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: [],
+    selectionArgs: any[],
   ) {
     super(table, columns, resultSet, sql, selectionArgs);
   }

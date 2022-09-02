@@ -12,11 +12,6 @@ import { UserCustomTable } from '../../../user/custom/userCustomTable';
 
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table
- * @class
- * @extends UserRelatedTable
- * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns   attribute columns
- * @param {string[]} requiredColumns required column names
  */
 export class SimpleAttributesTable extends UserRelatedTable {
   public static readonly RELATION_TYPE: RelationType = RelationType.SIMPLE_ATTRIBUTES;

@@ -6,8 +6,6 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 
 /**
  * Contents Id Data Access Object
- * @constructor
- * @extends Dao
  */
 export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
   private contentsDao;

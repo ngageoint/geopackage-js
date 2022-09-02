@@ -1,7 +1,3 @@
-/**
- * @module tiles/user/tileColumn
- */
-
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbAdapter';
@@ -9,9 +5,6 @@ import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
  * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
- *
- * @class
- * @extends UserColumn
  */
 export class TileColumn extends UserColumn {
   public static readonly COLUMN_ID: string = 'id';
@@ -21,7 +14,7 @@ export class TileColumn extends UserColumn {
   public static readonly COLUMN_TILE_DATA: string = 'tile_data';
 
   constructor(
-    index: number,
+    index: number = UserColumn.NO_INDEX,
     name: string,
     dataType: GeoPackageDataType,
     max?: number,
@@ -37,7 +30,7 @@ export class TileColumn extends UserColumn {
    * @param  {number} index Index
    * @param  {boolean} autoincrement Autoincrement
    */
-  static createIdColumn(index: number, autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT): TileColumn {
+  static createIdColumn(autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT, index?: number): TileColumn {
     return new TileColumn(
       index,
       TileColumn.COLUMN_ID,
@@ -53,7 +46,7 @@ export class TileColumn extends UserColumn {
    * Create a zoom level column
    * @param  {number} index Index
    */
-  static createZoomLevelColumn(index: number): TileColumn {
+  static createZoomLevelColumn(index?: number): TileColumn {
     return new TileColumn(
       index,
       TileColumn.COLUMN_ZOOM_LEVEL,
@@ -70,7 +63,7 @@ export class TileColumn extends UserColumn {
    *
    *  @param {number} index column index
    */
-  static createTileColumnColumn(index: number): TileColumn {
+  static createTileColumnColumn(index?: number): TileColumn {
     return new TileColumn(
       index,
       TileColumn.COLUMN_TILE_COLUMN,
@@ -88,7 +81,7 @@ export class TileColumn extends UserColumn {
    *  @param {number} index column index
    *
    */
-  static createTileRowColumn(index: number): TileColumn {
+  static createTileRowColumn(index?: number): TileColumn {
     return new TileColumn(
       index,
       TileColumn.COLUMN_TILE_ROW,
@@ -105,7 +98,7 @@ export class TileColumn extends UserColumn {
    *
    *  @param {number} index column index
    */
-  static createTileDataColumn(index: number): TileColumn {
+  static createTileDataColumn(index?: number): TileColumn {
     return new TileColumn(index, TileColumn.COLUMN_TILE_DATA, GeoPackageDataType.BLOB, null, true, null, false, false);
   }
 

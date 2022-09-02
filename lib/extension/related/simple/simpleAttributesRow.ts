@@ -9,8 +9,6 @@ import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
 
 /**
  * User Simple Attributes Row containing the values from a single result set row
- * @class
- * @extends UserRow
  */
 export class SimpleAttributesRow extends UserCustomRow {
   /**

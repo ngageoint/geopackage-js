@@ -1,10 +1,8 @@
-/**
- * Extension Management for deleting and copying extensions
- *
- * @since 5.0.0
- */
 import { GeoPackage } from '../geoPackage';
 
+/**
+ * Extension Management for deleting and copying extensions
+ */
 export abstract class ExtensionManagement {
   /**
    * GeoPackage

@@ -1,5 +1,5 @@
-import { GeoPackageManager, GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox, GeometryType } from '../index';
-import { Canvas } from "../lib/canvas/canvas";
+import { GeoPackageManager, GeometryColumns, FeatureColumn, GeoPackageDataType, BoundingBox } from '../index';
+import { Canvas } from '../lib/canvas/canvas';
 const testSetup = require('./fixtures/testSetup').default;
 
 const path = require('path'),

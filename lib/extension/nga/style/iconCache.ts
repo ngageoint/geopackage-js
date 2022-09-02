@@ -1,6 +1,7 @@
 import { IconRow } from './iconRow';
 import { Canvas } from '../../../canvas/canvas';
-import { ImageUtils } from '../../../tiles/imageUtils';
+import { ImageUtils } from '../../../image/imageUtils';
+import { GeoPackageImage } from '../../../image/geoPackageImage';
 
 /**
  * @memberOf module:extension/nga/style
@@ -12,7 +13,7 @@ import { ImageUtils } from '../../../tiles/imageUtils';
  */
 export class IconCache {
   public static DEFAULT_CACHE_SIZE = 100;
-  iconCache: { [key: number]: { image: any; width: number; height: number } } = {};
+  iconCache: { [key: number]: GeoPackageImage } = {};
   accessHistory: number[] = [];
 
   constructor(public cacheSize = IconCache.DEFAULT_CACHE_SIZE) {}
@@ -20,17 +21,17 @@ export class IconCache {
   /**
    * Get the cached image for the icon row or null if not cached
    * @param {module:extension/nga/style.IconRow} iconRow icon row
-   * @return {Image} icon image or null
+   * @return {GeoPackageImage} icon image or null
    */
-  getIconForIconRow(iconRow: IconRow): { image: any; width: number; height: number } {
+  getIconForIconRow(iconRow: IconRow): GeoPackageImage {
     return this.get(iconRow.id);
   }
   /**
    * Get the cached image for the icon row id or null if not cached
    * @param {Number} iconRowId icon row id
-   * @return {Image} icon image or null
+   * @return {GeoPackageImage} icon image or null
    */
-  get(iconRowId: number): { image: any; width: number; height: number } {
+  get(iconRowId: number): GeoPackageImage {
     const image = this.iconCache[iconRowId];
     if (image) {
       const index = this.accessHistory.indexOf(iconRowId);
@@ -44,25 +45,19 @@ export class IconCache {
   /**
    * Cache the icon image for the icon row
    * @param {module:extension/nga/style.IconRow} iconRow icon row
-   * @param {Image} image icon image
-   * @return {Image} previous cached icon image or null
+   * @param {GeoPackageImage} image icon image
+   * @return {GeoPackageImage} previous cached icon image or null
    */
-  putIconForIconRow(
-    iconRow: IconRow,
-    image: { image: any; width: number; height: number },
-  ): { image: any; width: number; height: number } {
+  putIconForIconRow(iconRow: IconRow, image: GeoPackageImage): GeoPackageImage {
     return this.put(iconRow.getId(), image);
   }
   /**
    * Cache the icon image for the icon row id
    * @param {Number} iconRowId icon row id
-   * @param {Image} image icon image
-   * @return {Image} previous cached icon image or null
+   * @param {GeoPackageImage} image icon image
+   * @return {GeoPackageImage} previous cached icon image or null
    */
-  put(
-    iconRowId: number,
-    image: { image: any; width: number; height: number },
-  ): { image: any; width: number; height: number } {
+  put(iconRowId: number, image: GeoPackageImage): GeoPackageImage {
     const previous = this.iconCache[iconRowId];
     this.iconCache[iconRowId] = image;
     if (previous) {
@@ -87,17 +82,17 @@ export class IconCache {
   /**
    * Remove the cached image for the icon row, if using CanvasKitCanvasAdapter, dispose of returned image to free up memory using Canvas.dispose(icon.image)
    * @param {module:extension/nga/style.IconRow} iconRow icon row
-   * @return {Image} removed icon image or null
+   * @return {GeoPackageImage} removed icon image or null
    */
-  removeIconForIconRow(iconRow: IconRow): { image: any; width: number; height: number } {
+  removeIconForIconRow(iconRow: IconRow): GeoPackageImage {
     return this.remove(iconRow.id);
   }
   /**
    * Remove the cached image for the icon row id
    * @param {Number} iconRowId icon row id
-   * @return {Image} removed icon image or null
+   * @return {GeoPackageImage} removed icon image or null
    */
-  remove(iconRowId: number): { image: any; width: number; height: number } {
+  remove(iconRowId: number): GeoPackageImage {
     const removed = this.iconCache[iconRowId];
     delete this.iconCache[iconRowId];
     if (removed) {
@@ -139,47 +134,44 @@ export class IconCache {
   /**
    * Create or retrieve from cache an icon image for the icon row
    * @param {module:extension/nga/style.IconRow} icon icon row
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createIcon(icon: IconRow): Promise<{ image: any; width: number; height: number }> {
+  async createIcon(icon: IconRow): Promise<GeoPackageImage> {
     return this.createAndCacheIcon(icon, this);
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
    * @param {module:extension/nga/style.IconRow} icon icon row
    * @param {Number} scale scale factor
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createScaledIcon(icon: IconRow, scale: number): Promise<{ image: any; width: number; height: number }> {
+  async createScaledIcon(icon: IconRow, scale: number): Promise<GeoPackageImage> {
     return this.createAndCacheScaledIcon(icon, scale, this);
   }
   /**
    * Create an icon image for the icon row without caching
    * @param {module:extension/nga/style.IconRow} icon icon row
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createIconNoCache(icon: IconRow): Promise<{ image: any; width: number; height: number }> {
+  async createIconNoCache(icon: IconRow): Promise<GeoPackageImage> {
     return this.createScaledIconNoCache(icon, 1.0);
   }
   /**
    * Create an icon image for the icon row without caching
    * @param icon icon row
    * @param scale scale factor
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<{ image: any; width: number; height: number }> {
+  async createScaledIconNoCache(icon: IconRow, scale: number): Promise<GeoPackageImage> {
     return this.createAndCacheScaledIcon(icon, scale, null);
   }
   /**
    * Create or retrieve from cache an icon image for the icon row
    * @param {module:extension/nga/style.IconRow} icon icon row
    * @param {module:extension/nga/style.IconCache} iconCache icon cache
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createAndCacheIcon(
-    icon: IconRow,
-    iconCache: IconCache,
-  ): Promise<{ image: any; width: number; height: number }> {
+  async createAndCacheIcon(icon: IconRow, iconCache: IconCache): Promise<GeoPackageImage> {
     return this.createAndCacheScaledIcon(icon, 1.0, iconCache);
   }
   /**
@@ -187,13 +179,9 @@ export class IconCache {
    * @param {module:extension/nga/style.IconRow} icon icon row
    * @param {Number} scale scale factor
    * @param {module:extension/nga/style.IconCache} iconCache icon cache
-   * @return {Promise<Image>} icon image
+   * @return {Promise<GeoPackageImage>} icon image
    */
-  async createAndCacheScaledIcon(
-    icon: IconRow,
-    scale: number,
-    iconCache: IconCache,
-  ): Promise<{ image: any; width: number; height: number }> {
+  async createAndCacheScaledIcon(icon: IconRow, scale: number, iconCache: IconCache): Promise<GeoPackageImage> {
     let iconImage = null;
     if (icon != null) {
       const iconId = icon.getId();

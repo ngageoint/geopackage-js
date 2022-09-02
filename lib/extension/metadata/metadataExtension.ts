@@ -13,9 +13,6 @@ import { Metadata } from './metadata';
 
 /**
  * Metadata extension
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
- * @class
- * @extends BaseExtension
  */
 export class MetadataExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_metadata';

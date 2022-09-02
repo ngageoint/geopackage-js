@@ -14,9 +14,6 @@ import { GeoPackageDao } from '../../../db/geoPackageDao';
  * Contents object. Provides identifying and descriptive information that an
  * application can display to a user in a menu of geospatial data that is
  * available for access and/or update.
- * @class
- * @extends Dao
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
  */
 export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   readonly gpkgTableName: string = DataColumns.TABLE_NAME;

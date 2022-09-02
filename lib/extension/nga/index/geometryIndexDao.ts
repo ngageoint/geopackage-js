@@ -11,8 +11,6 @@ import { GeoPackageException } from '../../../geoPackageException';
 import { TableIndexDao } from './tableIndexDao';
 /**
  * Geometry Index Data Access Object
- * @class
- * @extends Dao
  */
 export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndexKey> {
   constructor(db: GeoPackageConnection) {

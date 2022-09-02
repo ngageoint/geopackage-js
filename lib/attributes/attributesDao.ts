@@ -14,10 +14,6 @@ import { Projection } from '@ngageoint/projections-js';
 
 /**
  * Attribute DAO for reading attribute user data tables
- * @class AttributesDao
- * @extends UserDao
- * @param  {module:geoPackage~GeoPackage} geoPackage              geopackage object
- * @param  {module:attributes/attributesTable~AttributeTable} table           attribute table
  */
 export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, AttributesRow, AttributesResultSet> {
   /**

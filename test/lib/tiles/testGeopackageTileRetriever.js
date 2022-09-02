@@ -1,6 +1,6 @@
 import { default as testSetup } from '../../fixtures/testSetup'
 
-var GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
+var GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
   , should = require('chai').should()
   , path = require('path');

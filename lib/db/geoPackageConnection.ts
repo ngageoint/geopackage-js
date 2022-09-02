@@ -97,7 +97,7 @@ export class GeoPackageConnection {
    * @return {any}
    */
   query(sql: string, params?: [] | Record<string, any>): ResultSet {
-    return new ResultSet(this.connection.all(sql, params));
+    return this.connection.query(sql, params);
   }
   /**
    * Checks if table exists in database
@@ -296,7 +296,6 @@ export class GeoPackageConnection {
    * Query for the foreign keys value
    *
    * @return true if enabled, false if disabled
-   * @since 3.3.0
    */
   public foreignKeys(): boolean {
     return SQLUtils.foreignKeys(this);
@@ -345,7 +344,7 @@ export class GeoPackageConnection {
    * @param args arguments
    * @return value or null
    */
-  public aggregateFunction(func: string, table: string, distinct: boolean, column: string, where: string, args: [] | Record<string, any>): any {
+  public aggregateFunction(func: string, table: string, distinct: boolean, column: string, where: string, args: any[] | Record<string, any>): any {
     const query = [];
     query.push("SELECT ");
     query.push(func);
@@ -366,5 +365,28 @@ export class GeoPackageConnection {
     }
     const sql = query.join('');
     return SQLUtils.querySingleResult(this, sql, args, column);
+  }
+
+ /**
+  * Get the min result of the column
+  * @param table table name
+  * @param column column name
+  * @param where where clause
+  * @param args where arguments
+  * @return min or null
+  */
+    public min(table: string, column: string, where: string, args: any[]): number {
+    return this.aggregateFunction('MIN', table, false, column, where, args) as number;
+  }
+  /**
+   * Get the max result of the column
+   * @param table table name
+   * @param column column name
+   * @param where where clause
+   * @param args where arguments
+   * @return max or null
+   */
+  public  max(table: string, column: string, where: string, args: any[]): number {
+    return this.aggregateFunction('MAX', table, false, column, where, args) as number;
   }
 }

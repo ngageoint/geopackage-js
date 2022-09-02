@@ -11,7 +11,6 @@ import { DBValue } from "../db/dbAdapter";
 /**
  * GeoPackage Connection used to define common functionality within different
  * connection types
- * 
  * @param <TColumn> column type
  * @param <TTable> table type
  * @param <TRow> row type
@@ -42,7 +41,6 @@ export abstract class UserConnection<TColumn extends UserColumn,
 
 	/**
 	 * Get the table
-	 * 
 	 * @return table
 	 */
 	public getTable(): TTable {
@@ -51,7 +49,6 @@ export abstract class UserConnection<TColumn extends UserColumn,
 
 	/**
 	 * Set the table
-	 * 
 	 * @param table table
 	 */
 	public setTable(table: TTable): void {
@@ -84,7 +81,7 @@ export abstract class UserConnection<TColumn extends UserColumn,
 	 * @param columns
 	 * @param selectionArgs
 	 */
-	public rawQueryWithColumns(sql: string, columns: string[], selectionArgs: []): TResult {
+	public rawQueryWithColumns(sql: string, columns: string[], selectionArgs: any[]): TResult {
 		const resultSet = SQLUtils.query(this.connection, sql, selectionArgs);
 		return this.createResult(columns, resultSet, sql, selectionArgs);
 	}

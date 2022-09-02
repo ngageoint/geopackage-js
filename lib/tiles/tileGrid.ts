@@ -4,55 +4,87 @@
  * @class
  */
 export class TileGrid {
-  constructor(public min_x: number, public max_x: number, public min_y: number, public max_y: number) {}
+  /**
+   * Min x
+   */
+  private minX: number;
+
+  /**
+   * Max x
+   */
+  private maxX: number;
+
+  /**
+   * Min y
+   */
+  private minY: number;
+
+  /**
+   * Max y
+   */
+  private maxY: number;
+
+  /**
+   * Constructor
+   * @param minX
+   * @param maxX
+   * @param minY
+   * @param maxY
+   */
+  constructor(minX: number, maxX: number, minY: number, maxY: number) {
+    this.minX = minX;
+    this.maxX = maxX;
+    this.minY = minY;
+    this.maxY = maxY;
+}
 
   /**
    * Get count of tiles
    */
   count(): number {
-    return (this.max_x + 1 - this.min_x) * (this.max_y + 1 - this.min_y);
+    return (this.maxX + 1 - this.minX) * (this.maxY + 1 - this.minY);
   }
 
   /**
    * Get min x
    */
   public getMinX(): number {
-    return this.min_x;
+    return this.minX;
   }
 
   /**
    * Get max x
    */
   public getMaxX(): number {
-    return this.max_x;
+    return this.maxX;
   }
 
   /**
    * Get min y
    */
   public getMinY(): number {
-    return this.min_y;
+    return this.minY;
   }
 
   /**
    * Get max y
    */
   public getMaxY(): number {
-    return this.max_y;
+    return this.maxY;
   }
 
   /**
    * Get width
    */
   public getWidth(): number {
-    return this.max_x - this.min_x;
+    return this.maxX - this.minX;
   }
 
   /**
    * Get height
    */
   public getHeight(): number {
-    return this.max_y - this.min_y;
+    return this.maxY - this.minY;
   }
 
   /**
@@ -62,10 +94,10 @@ export class TileGrid {
   equals(tileGrid: TileGrid): boolean {
     if (!tileGrid) return false;
     return (
-      this.min_x === tileGrid.min_x &&
-      this.max_x === tileGrid.max_x &&
-      this.min_y === tileGrid.min_y &&
-      this.max_y === tileGrid.max_y
+      this.minX === tileGrid.minX &&
+      this.maxX === tileGrid.maxX &&
+      this.minY === tileGrid.minY &&
+      this.maxY === tileGrid.maxY
     );
   }
 }

@@ -3,13 +3,12 @@ import { ColumnValues } from '../dao/columnValues';
 import { DBValue } from '../db/dbAdapter';
 import { GeoPackageDao } from '../db/geoPackageDao';
 import { GeoPackageConnection } from '../db/geoPackageConnection';
+import { ExtensionsKey } from './extensionsKey';
 
 /**
  * Extension Data Access Object
- * @class
- * @extends Dao
  */
-export class ExtensionsDao extends GeoPackageDao<Extensions, void> {
+export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
   readonly gpkgTableName: string = Extensions.TABLE_NAME;
   readonly idColumns: string[] = [
     Extensions.COLUMN_TABLE_NAME,
@@ -161,7 +160,20 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, void> {
     return this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
   }
 
-  queryForIdWithKey(key: void): Extensions {
-    return undefined;
+  /**
+   * Query using the key
+   * @param key
+   */
+  queryForIdWithKey(key: ExtensionsKey): Extensions {
+    let extensions = null;
+    const results = this.queryByExtensionAndTableNameAndColumnName(
+      key.getExtensionName(),
+      key.getTableName(),
+      key.getColumnName(),
+    );
+    if (results.length > 0) {
+      extensions = results[0];
+    }
+    return extensions;
   }
 }

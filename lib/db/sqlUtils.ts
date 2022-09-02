@@ -13,11 +13,11 @@ import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { GeoPackageDataType } from './geoPackageDataType';
 import { ResultSet } from './resultSet';
 import { AlterTable } from "./alterTable";
-import { DBAdapter } from "./dbAdapter";
 import { ResultSetResult } from './resultSetResult';
 import { ResultUtils } from "./resultUtils";
 import { ContentValues } from "../user/contentValues";
 import { GeoPackageException } from "../geoPackageException";
+import { DBAdapter } from "./dbAdapter";
 
 export class SQLUtils {
   /**
@@ -112,7 +112,6 @@ export class SQLUtils {
    * @param db
    *            connection
    * @return true if enabled, false if disabled
-   * @since 3.3.0
    */
   static foreignKeys(db: GeoPackageConnection): boolean {
     const foreignKeys = db.get('PRAGMA foreign_keys', null)[0] as boolean;
@@ -530,7 +529,6 @@ export class SQLUtils {
    * @param defaultValue default value
    * @param dataType data type
    * @return default value
-   * @since 3.3.0
    */
   public static columnDefaultValue(defaultValue: any, dataType: GeoPackageDataType): string {
     return GeoPackageDataType.columnDefaultValue(defaultValue, dataType);
@@ -564,12 +562,7 @@ export class SQLUtils {
    * @return result set
    */
   public static query(connection: GeoPackageConnection, sql: string, selectionArgs: [] | Record<string, any>): ResultSet {
-    const results = [];
-    const result = connection.connection.get(sql, selectionArgs);
-    if (result != null) {
-      results.push(result);
-    }
-    return new ResultSet(results);
+    return connection.connection.query(sql, selectionArgs);
   }
 
   /**
@@ -582,6 +575,99 @@ export class SQLUtils {
    */
   public static count(connection: GeoPackageConnection, tableName: string, where: string, whereArgs: [] | Record<string, any>): number {
     return connection.connection.count(tableName, where, whereArgs);
+  }
+
+  /**
+   * Attempt to count the results of the query
+   * @param connection connection
+   * @param sql SQL statement
+   * @param selectionArgs selection arguments
+   * @return count if known, -1 if not able to determine
+   */
+  public static countSqlQuery(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: any[]): number {
+    let sqlCommands = [];
+
+    const upperCaseSQL = sql.toUpperCase();
+    let afterSelectIndex = upperCaseSQL.indexOf("SELECT") + "SELECT".length;
+    let upperCaseAfterSelect = upperCaseSQL.substring(afterSelectIndex).trim();
+
+    if (upperCaseAfterSelect.startsWith("COUNT")) {
+      sqlCommands.push(sql);
+    } else {
+
+      let fromIndex = upperCaseSQL.indexOf("FROM");
+      if (upperCaseAfterSelect.startsWith("DISTINCT")) {
+
+        let commaIndex = upperCaseSQL.indexOf(",");
+        if (commaIndex < 0 || commaIndex >= fromIndex) {
+
+          sqlCommands.push(SQLUtils.adjustCount("SELECT COUNT("
+            + sql.substring(afterSelectIndex, fromIndex) + ") "
+            + sql.substring(fromIndex)));
+
+          const isNull = ["SELECT COUNT(*) > 0 "];
+          const columnIsNull = sql.substring(upperCaseSQL.indexOf("DISTINCT") + "DISTINCT".length, fromIndex) + "IS NULL";
+          const whereIndex = upperCaseSQL.indexOf("WHERE");
+          let endIndex = sql.indexOf(";");
+          if (endIndex < 0) {
+            endIndex = sql.length;
+          }
+          if (whereIndex >= 0) {
+            isNull.push(sql.substring(fromIndex, whereIndex + "WHERE".length));
+            isNull.push(columnIsNull);
+            isNull.push(" AND ( ");
+            isNull.push(sql.substring(whereIndex + "WHERE".length, endIndex));
+            isNull.push(" )");
+          } else {
+            isNull.push(sql.substring(fromIndex, endIndex));
+            isNull.push(" WHERE");
+            isNull.push(columnIsNull);
+          }
+          sqlCommands.push(SQLUtils.adjustCount(isNull.join('')));
+        }
+
+      } else if (fromIndex != -1) {
+        sqlCommands.push(SQLUtils.adjustCount("SELECT COUNT(*) " + sql.substring(fromIndex)));
+      }
+    }
+
+    let count = -1;
+    if (sqlCommands.length === 0) {
+      // Unable to count
+      console.info("Unable to count query without result iteration. SQL: " + sql + ", args: " + selectionArgs);
+    } else {
+      count = 0;
+      for (const sqlCommand of sqlCommands) {
+        try {
+          const geoPackageConnection = connection instanceof GeoPackageConnection ? connection : new GeoPackageConnection(connection);
+          const value = SQLUtils.querySingleResultWithColumnIndex(geoPackageConnection, sqlCommand, selectionArgs, 0);
+          if (value != null) {
+            count += value as number;
+          }
+        } catch (e) {
+          console.warn("Unable to count query without result iteration. SQL: " + sql + ", args: " + selectionArgs);
+          count = -1;
+        }
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Adjust the count statement as needed
+   * @param sql sql statement
+   * @return adjusted or original statement
+   */
+  private static adjustCount(sql: string): string {
+    const upperCase = sql.toUpperCase();
+    let limitIndex = upperCase.indexOf(" LIMIT ");
+    if (limitIndex >= 0) {
+      let lastParenthesis = sql.lastIndexOf(')');
+      if (lastParenthesis == -1 || limitIndex > lastParenthesis) {
+        sql = sql.substring(0, limitIndex);
+      }
+    }
+    return sql;
   }
 
   /**
@@ -616,6 +702,19 @@ export class SQLUtils {
   public static querySingleResult(connection: GeoPackageConnection, sql: string, args: [] | Record<string, any>, columnName: string): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
     return ResultUtils.buildSingleResult(result, columnName);
+  }
+
+  /**
+   * Query the SQL for a single result object with the expected data type
+   * @param connection connection
+   * @param sql sql statement
+   * @param args arguments
+   * @param columnIdx column index
+   * @return result, null if no result
+   */
+  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection, sql: string, args: [] | Record<string, any>, columnIdx: number): any {
+    const result = SQLUtils.wrapQuery(connection, sql, args);
+    return ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
   }
 
   /**

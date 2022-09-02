@@ -1,5 +1,5 @@
 import { FeatureRow } from '../../features/user/featureRow';
-import { Geometry } from "@ngageoint/simple-features-js";
+import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
 /**
  * Feature Paint Cache.
  * @module tiles/features
@@ -11,7 +11,7 @@ import { Geometry } from "@ngageoint/simple-features-js";
  */
 export class GeometryCache {
   public static readonly DEFAULT_GEOMETRY_CACHE_SIZE = 100;
-  geometryCache: Record<number, Geometry>;
+  geometryCache: Record<number, GeoPackageGeometryData>;
   accessHistory: number[];
 
   constructor(public cacheSize: number = GeometryCache.DEFAULT_GEOMETRY_CACHE_SIZE) {
@@ -25,8 +25,8 @@ export class GeometryCache {
    * @param featureRow
    * @returns {module:tiles/features~Geometry}
    */
-  getGeometryForFeatureRow(featureRow: FeatureRow): Geometry {
-    return this.getGeometry(featureRow.id);
+  getGeometryDataForFeatureRow(featureRow: FeatureRow): GeoPackageGeometryData {
+    return this.getGeometryData(featureRow.id);
   }
 
   /**
@@ -34,7 +34,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @return {module:tiles/features~Geometry} geometry or null
    */
-  getGeometry(featureRowId: number): Geometry {
+  getGeometryData(featureRowId: number): GeoPackageGeometryData {
     const Geometry = this.geometryCache[featureRowId];
     if (!!Geometry) {
       const index = this.accessHistory.indexOf(featureRowId);
@@ -51,7 +51,7 @@ export class GeometryCache {
    * @param {Number} featureRowId feature row id
    * @param {Object} geometry geometry
    */
-  setGeometry(featureRowId: number, geometry: Geometry): void {
+  setGeometryData(featureRowId: number, geometry: GeoPackageGeometryData): void {
     const index = this.accessHistory.indexOf(featureRowId);
     if (index > -1) {
       this.accessHistory.splice(index, 1);
@@ -71,7 +71,7 @@ export class GeometryCache {
    * @param {Number} featureRowId style row id
    * @return {module:tiles/features~Geometry} removed feature paint or null
    */
-  remove(featureRowId: number): Geometry {
+  remove(featureRowId: number): GeoPackageGeometryData {
     const removed = this.geometryCache[featureRowId];
     delete this.geometryCache[featureRowId];
     if (!!removed) {

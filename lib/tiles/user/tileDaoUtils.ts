@@ -2,6 +2,7 @@ import sortedIndexOf from 'lodash/sortedIndexOf';
 import sortedIndex from 'lodash/sortedIndex';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
+import { ProjectionConstants, Projections } from '@ngageoint/projections-js';
 
 export class TileDaoUtils {
   /**
@@ -12,16 +13,16 @@ export class TileDaoUtils {
    * @param tileMatrices tile matrices
    */
   public static adjustTileMatrixLengths(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): void {
-    const tileMatrixWidth = tileMatrixSet.max_x - tileMatrixSet.min_x;
-    const tileMatrixHeight = tileMatrixSet.max_y - tileMatrixSet.min_y;
+    const tileMatrixWidth = tileMatrixSet.getMaxX() - tileMatrixSet.getMinX();
+    const tileMatrixHeight = tileMatrixSet.getMaxY() - tileMatrixSet.getMinY();
     tileMatrices.forEach(tileMatrix => {
-      const tempMatrixWidth = Math.floor(tileMatrixWidth / (tileMatrix.pixel_x_size * tileMatrix.tile_width));
-      const tempMatrixHeight = Math.floor(tileMatrixHeight / (tileMatrix.pixel_y_size * tileMatrix.tile_height));
-      if (tempMatrixWidth > tileMatrix.matrix_width) {
-        tileMatrix.matrix_width = tempMatrixWidth;
+      const tempMatrixWidth = Math.floor(tileMatrixWidth / (tileMatrix.getPixelXSize() * tileMatrix.getTileWidth()));
+      const tempMatrixHeight = Math.floor(tileMatrixHeight / (tileMatrix.getPixelYSize() * tileMatrix.getTileHeight()));
+      if (tempMatrixWidth > tileMatrix.getMatrixWidth()) {
+        tileMatrix.setMatrixWidth(tempMatrixWidth);
       }
-      if (tempMatrixHeight > tileMatrix.matrix_height) {
-        tileMatrix.matrix_height = tempMatrixHeight;
+      if (tempMatrixHeight > tileMatrix.getMatrixHeight()) {
+        tileMatrix.setMatrixHeight(tempMatrixHeight);
       }
     });
   }
@@ -51,7 +52,6 @@ export class TileDaoUtils {
    * @param width in default units
    * @param height in default units
    * @return tile matrix zoom level
-   * @since 1.2.1
    */
   public static getZoomLevelForWidthAndHeight(
     widths: number[],
@@ -71,7 +71,6 @@ export class TileDaoUtils {
    * @param tileMatrices tile matrices
    * @param length in default units
    * @return tile matrix zoom level
-   * @since 1.2.1
    */
   public static getClosestZoomLevelForLength(
     widths: number[],
@@ -91,7 +90,6 @@ export class TileDaoUtils {
    * @param width in default units
    * @param height in default units
    * @return tile matrix zoom level
-   * @since 1.2.1
    */
   public static getClosestZoomLevelForWidthAndHeight(
     widths: number[],
@@ -131,7 +129,6 @@ export class TileDaoUtils {
    * @param height height in default units
    * @param lengthChecks perform length checks for values too far away from the zoom level
    * @return tile matrix zoom level
-   * @since 1.2.1
    */
   private static _getZoomLevelForWidthAndHeight(
     widths: number[],
@@ -196,7 +193,7 @@ export class TileDaoUtils {
       } else {
         index = Math.min(widthIndex, heightIndex);
       }
-      zoomLevel = TileDaoUtils.getTileMatrixAtLengthIndex(tileMatrices, index).zoom_level;
+      zoomLevel = TileDaoUtils.getTileMatrixAtLengthIndex(tileMatrices, index).getZoomLevel();
     }
     return zoomLevel;
   }
@@ -238,7 +235,6 @@ export class TileDaoUtils {
    * @param tileMatrices tile matrices
    * @param length length in default units
    * @return actual or approximate tile matrix zoom level
-   * @since 2.0.2
    */
   static getApproximateZoomLevelForLength(
     widths: number[],
@@ -261,7 +257,6 @@ export class TileDaoUtils {
    * @param width width in default units
    * @param height height in default units
    * @return actual or approximate tile matrix zoom level
-   * @since 2.0.2
    */
   static getApproximateZoomLevelForWidthAndHeight(
     widths: number[],
@@ -306,7 +301,7 @@ export class TileDaoUtils {
       const zoomBelow = Math.ceil(levelsIn);
       const lengthAbove = minLength * Math.pow(0.5, zoomAbove);
       const lengthBelow = minLength * Math.pow(0.5, zoomBelow);
-      lengthZoomLevel = tileMatrices[tileMatrices.length - 1].zoom_level;
+      lengthZoomLevel = tileMatrices[tileMatrices.length - 1].getZoomLevel();
       if (lengthAbove - length <= length - lengthBelow) {
         lengthZoomLevel += zoomAbove;
       } else {
@@ -320,7 +315,7 @@ export class TileDaoUtils {
       const zoomBelow = Math.floor(levelsOut);
       const lengthAbove = maxLength * Math.pow(2, zoomAbove);
       const lengthBelow = maxLength * Math.pow(2, zoomBelow);
-      lengthZoomLevel = tileMatrices[0].zoom_level;
+      lengthZoomLevel = tileMatrices[0].getZoomLevel();
       if (length - lengthBelow <= lengthAbove - length) {
         lengthZoomLevel -= zoomBelow;
       } else {
@@ -334,7 +329,7 @@ export class TileDaoUtils {
         lengthIndex = (lengthIndex + 1) * -1;
       }
       const zoomDistance = Math.log(length / lengths[lengthIndex]) / Math.log(0.5);
-      let zoomLevelAbove = TileDaoUtils.getTileMatrixAtLengthIndex(tileMatrices, lengthIndex).zoom_level;
+      let zoomLevelAbove = TileDaoUtils.getTileMatrixAtLengthIndex(tileMatrices, lengthIndex).getZoomLevel();
       zoomLevelAbove += Math.round(zoomDistance);
       lengthZoomLevel = zoomLevelAbove;
     }
@@ -347,7 +342,6 @@ export class TileDaoUtils {
    * @param widths sorted tile matrix widths
    * @param heights sorted tile matrix heights
    * @return max length
-   * @since 1.2.0
    */
   static getMaxLengthForTileWidthsAndHeights(widths: number[], heights: number[]): number {
     const maxWidth = TileDaoUtils.getMaxLength(widths);
@@ -359,7 +353,6 @@ export class TileDaoUtils {
    * @param widths sorted tile matrix widths
    * @param heights sorted tile matrix heights
    * @return min length
-   * @since 1.2.0
    */
   static getMinLengthForTileWidthsAndHeights(widths: number[], heights: number[]): number {
     const maxWidth = TileDaoUtils.getMinLength(widths);
@@ -381,5 +374,76 @@ export class TileDaoUtils {
    */
   static getMinLength(lengths: number[]): number {
     return lengths[0] * 0.51;
+  }
+
+  /**
+   * Get the map zoom level range
+   * @param tileMatrixSet tile matrix set
+   * @param tileMatrices tile matrices
+   * @return map zoom level range, min at index 0, max at index 1
+   */
+  public static getMapZoomRange(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number[] {
+    const min = TileDaoUtils.getMapMinZoom(tileMatrixSet, tileMatrices);
+    const max = TileDaoUtils.getMapMaxZoom(tileMatrixSet, tileMatrices);
+    return [min, max];
+  }
+
+  /**
+   * Get the map min zoom level
+   * @param tileMatrixSet tile matrix set
+   * @param tileMatrices tile matrices
+   * @return map min zoom level
+   */
+  public static getMapMinZoom(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet, tileMatrices[0]);
+  }
+
+  /**
+   * Get the map max zoom level
+   * @param tileMatrixSet tile matrix set
+   * @param tileMatrices tile matrices
+   * @return map max zoom level
+   */
+  public static getMapMaxZoom(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet, tileMatrices[tileMatrices.length - 1]);
+  }
+
+  /**
+   * Get the map zoom level
+   * @param tileMatrixSet tile matrix set
+   * @param tileMatrix tile matrix
+   * @return map zoom level
+   */
+  public static getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet: TileMatrixSet, tileMatrix: TileMatrix): number {
+    const boundingBox = tileMatrixSet.getBoundingBoxWithProjection(Projections.getWebMercatorProjection());
+    let zoom = TileDaoUtils.getMapZoom(
+      boundingBox.getMinLongitude(),
+      boundingBox.getMaxLongitude(),
+      tileMatrix.getMatrixWidth(),
+    );
+    if (Projections.getUnits(tileMatrixSet.getProjection().toString()) !== 'degrees') {
+      zoom = Math.min(
+        zoom,
+        TileDaoUtils.getMapZoom(
+          boundingBox.getMinLatitude(),
+          boundingBox.getMaxLatitude(),
+          tileMatrix.getMatrixHeight(),
+        ),
+      );
+    }
+    return zoom;
+  }
+
+  /**
+   * Get the map zoom level
+   * @param min min bounds
+   * @param max max bounds
+   * @param matrixLength matrix length
+   * @return zoom level
+   */
+  private static getMapZoom(min: number, max: number, matrixLength: number): number {
+    return Math.round(
+      Math.log((2 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / ((max - min) / matrixLength)) / Math.log(2),
+    );
   }
 }

@@ -5,7 +5,6 @@ import { GeoPackage } from '../../../geoPackage';
  * Properties Manager Core using the Properties Extension on a group of cached
  * GeoPackages
  *
- * @since 5.0.0
  */
 export class PropertiesManager {
   /**

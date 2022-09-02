@@ -8,7 +8,6 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 
 /**
  * Feature Tile Link Data Access Object
- * @since 5.0.0
  */
 export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTileLinkKey> {
   /**

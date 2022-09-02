@@ -11,8 +11,6 @@ import { GeoPackageConnection } from '../../db/geoPackageConnection';
 
 /**
  * Metadata Data Access Object
- * @class
- * @extends Dao
  */
 export class MetadataDao extends GeoPackageDao<Metadata, number> {
   readonly gpkgTableName: string = Metadata.TABLE_NAME;

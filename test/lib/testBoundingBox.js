@@ -1,10 +1,10 @@
 import proj4 from 'proj4';
+import { Projections } from '@ngageoint/projections-js';
 var should = require('chai').should()
   , TileBoundingBoxUtils = require('../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
   , BoundingBox = require('../../lib/boundingBox').BoundingBox;
 
 describe('BoundingBox tests', function() {
-
   it('should create a BoundingBox', function() {
     var bb = new BoundingBox(0, 1, 2, 3);
     bb.minLongitude.should.be.equal(0);
@@ -99,4 +99,32 @@ describe('BoundingBox tests', function() {
     projectionBox.maxLatitude.should.be.equal(162649.66124618147)
   })
 
+  it('should test centroid', function() {
+    const boundingBox = new BoundingBox(5.0, 10.0, 30.0, 55.0);
+
+    const centroid = boundingBox.getCentroid();
+    centroid.x.should.be.equal(17.5);
+    centroid.y.should.be.equal(32.5);
+
+    const centroid2 = boundingBox.getCentroidInProjection(Projections.getWebMercatorProjection());
+    centroid.x.should.be.equal(centroid2.x);
+    centroid.y.should.be.equal(centroid2.y);
+
+    const geometryCentroid = boundingBox.buildGeometry().getCentroid();
+    centroid.x.should.be.equal(geometryCentroid.x);
+    centroid.y.should.be.equal(geometryCentroid.y);
+
+    const degreesCentroid = boundingBox.getDegreesCentroid();
+    degreesCentroid.x.should.be.gte(17.5 + 0.00000000000001);
+    degreesCentroid.x.should.be.lte(17.5 - 0.00000000000001);
+    degreesCentroid.y.should.be.equal(33.12597587060761);
+
+    const degreesCentroid2 = boundingBox.getCentroidInProjection(Projections.getWGS84Projection());
+    degreesCentroid.x.should.be.equal(degreesCentroid2.x);
+    degreesCentroid.y.should.be.equal(degreesCentroid2.y);
+
+    const geometryDegreesCentroid = boundingBox.buildGeometry().getDegreesCentroid();
+    geometryDegreesCentroid.x.should.be.equal(degreesCentroid.x);
+    geometryDegreesCentroid.y.should.be.equal(degreesCentroid.y);
+  })
 });

@@ -237,7 +237,6 @@ export class TileMatrixSet {
    * Get the projection
    *
    * @return projection
-   * @since 3.1.0
    */
   public getProjection(): Projection {
     return this.getSrs().getProjection();

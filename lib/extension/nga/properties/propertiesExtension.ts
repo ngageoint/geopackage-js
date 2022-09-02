@@ -160,7 +160,7 @@ export class PropertiesExtension extends BaseExtension {
     let properties = [];
     if (this.has()) {
       properties = this.getDao()
-        .querySingleColumnTypedResults(
+        .querySingleColumnTypedResultsWithColumnIndex(
           'SELECT DISTINCT ' + PropertiesExtension.COLUMN_PROPERTY + ' FROM ' + PropertiesExtension.TABLE_NAME,
           null,
         )

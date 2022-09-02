@@ -1,6 +1,4 @@
 import { GeoPackageDataType } from './geoPackageDataType';
-import isNil from 'lodash/isNil';
-import isEqual from 'lodash/isEqual';
 
 /**
  * Mapped column, to a column and potentially from a differently named column
@@ -78,7 +76,7 @@ export class MappedColumn {
    * @return true if the to and from column names are different
    */
   hasNewName(): boolean {
-    return !isNil(this._fromColumn) && !isEqual(this._fromColumn, this._toColumn);
+    return this._fromColumn != null && this._fromColumn !== this._toColumn;
   }
 
   /**
@@ -102,7 +100,7 @@ export class MappedColumn {
    * @return true if has a default value
    */
   hasDefaultValue(): boolean {
-    return !isNil(this._defaultValue);
+    return this._defaultValue != null;
   }
 
   /**
@@ -114,19 +112,19 @@ export class MappedColumn {
   }
 
   /**
-   * Get the default value as a string
-   * @return default value as string
-   */
-  getDefaultValueAsString(): string {
-    return GeoPackageDataType.columnDefaultValue(this._defaultValue, this._dataType);
-  }
-
-  /**
    * Set the default value
    * @param defaultValue default value
    */
   set defaultValue(defaultValue: any) {
     this._defaultValue = defaultValue;
+  }
+
+  /**
+   * Get the default value as a string
+   * @return default value as string
+   */
+  getDefaultValueAsString(): string {
+    return GeoPackageDataType.columnDefaultValue(this._defaultValue, this._dataType);
   }
 
   /**
@@ -150,7 +148,7 @@ export class MappedColumn {
    * @return true if has a constant value
    */
   hasConstantValue(): boolean {
-    return !isNil(this._constantValue);
+    return this._constantValue != null;
   }
 
   /**
@@ -162,14 +160,6 @@ export class MappedColumn {
   }
 
   /**
-   * Get the constant value as a string
-   * @return constant value as string
-   */
-  getConstantValueAsString(): string {
-    return GeoPackageDataType.columnDefaultValue(this._constantValue, this._dataType);
-  }
-
-  /**
    * Set the constant value
    * @param constantValue constant value
    */
@@ -178,11 +168,19 @@ export class MappedColumn {
   }
 
   /**
+   * Get the constant value as a string
+   * @return constant value as string
+   */
+  getConstantValueAsString(): string {
+    return GeoPackageDataType.columnDefaultValue(this._constantValue, this._dataType);
+  }
+
+  /**
    * Check if the column has a where value
    * @return true if has a where value
    */
   hasWhereValue(): boolean {
-    return !isNil(this._whereValue);
+    return this._whereValue != null;
   }
 
   /**
@@ -191,6 +189,14 @@ export class MappedColumn {
    */
   get whereValue(): any {
     return this._whereValue;
+  }
+
+  /**
+   * Set the where value
+   * @param whereValue where value
+   */
+  set whereValue(whereValue: any) {
+    this._whereValue = whereValue;
   }
 
   /**
@@ -204,17 +210,9 @@ export class MappedColumn {
   /**
    * Set the where value
    * @param whereValue where value
-   */
-  set whereValue(whereValue: any) {
-    this._whereValue = whereValue;
-  }
-
-  /**
-   * Set the where value
-   * @param whereValue where value
    * @param whereOperator where operator
    */
-  setWhereValueAndOperator(whereValue: any, whereOperator: string) {
+  setWhereValueAndOperator(whereValue: any, whereOperator: string): void {
     this._whereValue = whereValue;
     this.whereOperator = whereOperator;
   }
@@ -224,7 +222,7 @@ export class MappedColumn {
    * @return where operator
    */
   get whereOperator(): string {
-    return !isNil(this._whereOperator) ? this._whereOperator : '=';
+    return this._whereOperator != null ? this._whereOperator : '=';
   }
 
   /**

@@ -12,10 +12,6 @@ import { StyleMappingRow } from './styleMappingRow';
 
 /**
  * Style DAO for reading style tables
- * @extends {AttributesDao}
- * @param  {module:db/geoPackageConnection~GeoPackageConnection} geoPackage connection
- * @param  {string} table table name
- * @constructor
  */
 export class StyleDao extends AttributesDao {
   constructor(dao: AttributesDao) {

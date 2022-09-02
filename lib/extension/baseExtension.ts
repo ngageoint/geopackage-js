@@ -20,6 +20,7 @@ export abstract class BaseExtension {
    * Connection to the GeoPackage
    */
   protected readonly connection: GeoPackageConnection;
+
   /**
    * ExtensionDao
    */

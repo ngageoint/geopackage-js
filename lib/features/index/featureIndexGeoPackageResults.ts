@@ -79,4 +79,7 @@ export class FeatureIndexGeoPackageResults implements FeatureIndexResults {
       },
     };
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  close(): void {}
 }

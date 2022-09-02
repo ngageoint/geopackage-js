@@ -1,9 +1,7 @@
 import { CanvasAdapter } from './canvasAdapter';
 import { CanvasUtils } from './canvasUtils';
-
-declare class OffscreenCanvas {
-  constructor(width: number, height: number);
-}
+import { GeoPackageImage } from '../image/geoPackageImage';
+import { ImageType } from '../image/imageType';
 
 /**
  * OffscreenCanvas canvas adapter. This can only run inside a web worker.
@@ -22,25 +20,25 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return OffscreenCanvasAdapter.initialized;
   }
 
-  create(width: number, height: number): any {
+  create(width: number, height: number): OffscreenCanvas {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     return new OffscreenCanvas(width, height);
   }
 
-  createImage(data: any, contentType = 'image/png'): Promise<{ image: any; width: number; height: number }> {
+  createImage(data: Uint8Array | Buffer | string | Blob, contentType = 'image/png'): Promise<GeoPackageImage> {
     return new Promise((resolve, reject) => {
-      let blob = data;
+      let blob;
       if (data instanceof Buffer || Object.prototype.toString.call(data) === '[object Uint8Array]') {
         blob = new Blob([data], { type: contentType });
       } else if (typeof data === 'string') {
         blob = new Blob([CanvasUtils.base64toUInt8Array(data.split(',')[1])], { type: contentType });
+      } else {
+        blob = data as Blob;
       }
       createImageBitmap(blob)
         .then(image => {
-          resolve({
-            image: image,
-            width: image.width,
-            height: image.height,
-          });
+          resolve(new GeoPackageImage(image, image.width, image.height));
         })
         .catch(error => {
           reject(error);
@@ -48,11 +46,11 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     });
   }
 
-  createImageData(width, height) {
+  createImageData(width, height): ImageData {
     return new ImageData(width, height);
   }
 
-  disposeCanvas(canvas: any) {
+  disposeCanvas(canvas: OffscreenCanvas): void {
     canvas = null;
   }
 
@@ -66,7 +64,14 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     return width;
   }
 
-  drawText(context: any, text: string, location: number[], fontFace: string, fontSize: number, fontColor: string) {
+  drawText(
+    context: any,
+    text: string,
+    location: number[],
+    fontFace: string,
+    fontSize: number,
+    fontColor: string,
+  ): void {
     context.save();
     context.font = fontSize + 'px' + (fontFace != null ? " '" + fontFace + "'" : '');
     context.fillStyle = fontColor;
@@ -76,39 +81,31 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     context.restore();
   }
 
-  async scaleImage(
-    image: { image: any; width: number; height: number },
-    scale: number,
-  ): Promise<{ image: any; width: number; height: number }> {
+  async scaleImage(image: GeoPackageImage, scale: number): Promise<GeoPackageImage> {
     if (scale === 1.0) {
       return image;
     }
-    const scaledWidth = Math.round(scale * image.width);
-    const scaledHeight = Math.round(scale * image.height);
+    const scaledWidth = Math.round(scale * image.getWidth());
+    const scaledHeight = Math.round(scale * image.getHeight());
     return this.scaleImageToDimensions(image, scaledWidth, scaledHeight);
   }
 
   async scaleImageToDimensions(
-    image: { image: any; width: number; height: number },
+    image: GeoPackageImage,
     scaledWidth: number,
     scaledHeight: number,
-  ): Promise<{ image: any; width: number; height: number }> {
+  ): Promise<GeoPackageImage> {
     const canvas: any = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.image, 0, 0, scaledWidth, scaledHeight);
-    const result = {
-      image: canvas.transferToImageBitmap(),
-      width: scaledWidth,
-      height: scaledHeight,
-    };
+    ctx.drawImage(image.getImage(), 0, 0, scaledWidth, scaledHeight);
+    const result = new GeoPackageImage(canvas.transferToImageBitmap(), scaledWidth, scaledHeight);
     this.disposeCanvas(canvas);
     return result;
   }
 
-  toDataURL(canvas: any, format = 'image/png'): Promise<string> {
-    // @ts-ignore
+  toDataURL(canvas: any, format = 'image/png', compressionQuality?: number): Promise<string> {
     return new Promise(resolve => {
-      canvas.convertToBlob({ type: format }).then(blob => {
+      canvas.convertToBlob({ type: format, quality: compressionQuality }).then(blob => {
         const reader = new FileReader();
         reader.addEventListener('load', () => {
           const result: string = reader.result as string;
@@ -119,5 +116,45 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
     });
   }
 
-  disposeImage(image: { image: any; width: number; height: number }): void {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  disposeImage(image: GeoPackageImage): void {}
+
+  /**
+   * Write image to bytes
+   * @param image
+   * @param imageFormat
+   * @param compressionQuality
+   */
+  writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
+    return new Promise(resolve => {
+      const canvas: any = this.create(image.getWidth(), image.getHeight());
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image.getImage(), 0, 0);
+      if (imageFormat === ImageType.TIFF) {
+        // TODO: do something different
+      }
+      this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then(result => {
+        resolve(CanvasUtils.base64toUInt8Array(result));
+      });
+    });
+  }
+
+  /**
+   * Gets the image data
+   */
+  getImageData(image: GeoPackageImage): ImageData {
+    const canvas: any = this.create(image.getWidth(), image.getHeight());
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image.getImage(), 0, 0);
+    return ctx.getImageData(0, 0, image.getWidth(), image.getHeight());
+  }
+
+  /**
+   * Draw content of fromCanvas into the toContext
+   * @param fromCanvas
+   * @param toContext
+   */
+  mergeCanvas(fromCanvas: any, toContext: any): void {
+    toContext.drawImage(fromCanvas, 0, 0);
+  }
 }

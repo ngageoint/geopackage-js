@@ -1,3 +1,5 @@
+import { ResultSet } from "./resultSet";
+
 export type DBValue = boolean | string | number | Buffer | Uint8Array;
 
 export interface DBAdapter {
@@ -14,7 +16,7 @@ export interface DBAdapter {
   get(sql: string, params?: [] | Record<string, any>): Record<string, any>;
   isTableExists(tableName: string): boolean;
   all(sql: string, params?: [] | Record<string, any> | null): Record<string, any>[];
-  each(sql: string, params?: [] | Record<string, any>): IterableIterator<any>;
+  each(sql: string, params?: [] | Record<string, any>): IterableIterator<Record<string, DBValue>>;
   run(sql: string, params?: [] | Record<string, any>): { changes: number; lastInsertRowid: number };
   insert(sql: string, params?: [] | Record<string, any>): number;
   prepareStatement(sql: string): any;
@@ -26,4 +28,5 @@ export interface DBAdapter {
   transaction(func: Function): void;
   size(): number;
   readableSize(): string;
+  query(sql: string, params: [] | Record<string, any>): ResultSet;
 }

@@ -1,6 +1,5 @@
 /**
  * Pre-defined property names for defining GeoPackage properties
- * @since 5.0.0
  */
 export class PropertyNames {
   /**

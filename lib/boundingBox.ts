@@ -2,7 +2,6 @@ import { Projection, ProjectionConstants, Projections, ProjectionTransform } fro
 import { Geometry, GeometryEnvelope, GeometryUtils, Point } from '@ngageoint/simple-features-js';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
-import { ulp } from 'ulp';
 
 /**
  * Bounding Box with longitude and latitude ranges in degrees
@@ -32,7 +31,6 @@ export class BoundingBox {
    * Create a new WGS84 bounding box with world bounds (degrees)
    *
    * @return new bounding box
-   * @since 5.0.0
    */
   public static worldWGS84(): BoundingBox {
     return new BoundingBox();
@@ -42,7 +40,6 @@ export class BoundingBox {
    * Create a new Web Mercator bounding box with world bounds (meters)
    *
    * @return new bounding box
-   * @since 5.0.0
    */
   public static worldWebMercator(): BoundingBox {
     return new BoundingBox(
@@ -175,7 +172,6 @@ export class BoundingBox {
    * Get the longitude range
    *
    * @return longitude range
-   * @since 5.0.0
    */
   public getLongitudeRange(): number {
     return this.getMaxLongitude() - this.getMinLongitude();
@@ -185,7 +181,6 @@ export class BoundingBox {
    * Get the latitude range
    *
    * @return latitude range
-   * @since 5.0.0
    */
   public getLatitudeRange(): number {
     return this.getMaxLatitude() - this.getMinLatitude();
@@ -195,7 +190,6 @@ export class BoundingBox {
    * Get the bounding box centroid point
    *
    * @return centroid point
-   * @since 5.0.0
    */
   public getCentroid(): Point {
     return BoundingBox.getCentroidForBoundingBox(this);
@@ -208,7 +202,6 @@ export class BoundingBox {
    *            bounding box
    *
    * @return centroid point
-   * @since 5.0.0
    */
   public static getCentroidForBoundingBox(boundingBox: BoundingBox): Point {
     const x = (boundingBox.getMinLongitude() + boundingBox.getMaxLongitude()) / 2.0;
@@ -222,7 +215,6 @@ export class BoundingBox {
    * @param projection
    *            projection of the bounding box
    * @return centroid point
-   * @since 5.0.0
    */
   public getCentroidInProjection(projection: Projection): Point {
     return BoundingBox.getCentroidForBoundingBoxInProjection(this, projection);
@@ -236,7 +228,6 @@ export class BoundingBox {
    * @param projection
    *            projection of the bounding box
    * @return centroid point
-   * @since 5.0.0
    */
   public static getCentroidForBoundingBoxInProjection(boundingBox: BoundingBox, projection: Projection): Point {
     let centroid;
@@ -252,7 +243,6 @@ export class BoundingBox {
    * Get the centroid for the bounding box in degrees
    *
    * @return centroid point
-   * @since 5.0.0
    */
   public getDegreesCentroid(): Point {
     return BoundingBox.getDegreesCentroidForBoundingBox(this);
@@ -264,7 +254,6 @@ export class BoundingBox {
    * @param boundingBox
    *            bounding box in degrees
    * @return centroid point
-   * @since 5.0.0
    */
   public static getDegreesCentroidForBoundingBox(boundingBox: BoundingBox): Point {
     return GeometryUtils.getDegreesCentroid(BoundingBox.buildGeometryFromBoundingBox(boundingBox));
@@ -274,7 +263,6 @@ export class BoundingBox {
    * Build a Geometry Envelope from the bounding box
    *
    * @return geometry envelope
-   * @since 5.0.0
    */
   public buildEnvelope(): GeometryEnvelope {
     return BoundingBox.buildEnvelopeFromBoundingBox(this);
@@ -286,7 +274,6 @@ export class BoundingBox {
    * @param boundingBox
    *            bounding box
    * @return geometry envelope
-   * @since 5.0.0
    */
   public static buildEnvelopeFromBoundingBox(boundingBox: BoundingBox): GeometryEnvelope {
     const envelope = new GeometryEnvelope();
@@ -301,7 +288,6 @@ export class BoundingBox {
    * Build a geometry representation of the bounding box
    *
    * @return geometry, polygon or point
-   * @since 5.0.0
    */
   public buildGeometry(): Geometry {
     return BoundingBox.buildGeometryFromBoundingBox(this);
@@ -314,7 +300,6 @@ export class BoundingBox {
    *            bounding box
    *
    * @return geometry, polygon or point
-   * @since 5.0.0
    */
   public static buildGeometryFromBoundingBox(boundingBox: BoundingBox): Geometry {
     return BoundingBox.buildEnvelopeFromBoundingBox(boundingBox).buildGeometry();
@@ -328,7 +313,6 @@ export class BoundingBox {
    *            max longitude of the world for the current bounding box units
    *
    * @return complementary bounding box or nil if none
-   * @since 5.0.0
    */
   public complementary(maxProjectionLongitude: number): BoundingBox {
     let complementary = null;
@@ -359,7 +343,6 @@ export class BoundingBox {
    * complementary WGS84 bounding box
    *
    * @return complementary bounding box or nil if none
-   * @since 5.0.0
    */
   public complementaryWgs84(): BoundingBox {
     return this.complementary(ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH);
@@ -370,7 +353,6 @@ export class BoundingBox {
    * complementary Web Mercator bounding box
    *
    * @return complementary bounding box or nil if none
-   * @since 5.0.0
    */
   public complementaryWebMercator(): BoundingBox {
     return this.complementary(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
@@ -384,7 +366,6 @@ export class BoundingBox {
    * @param maxProjectionLongitude
    *            max longitude of the world for the current bounding box units
    * @return bounded bounding box
-   * @since 5.0.0
    */
   public boundCoordinates(maxProjectionLongitude: number): BoundingBox {
     const bounded = this.copy();
@@ -404,7 +385,6 @@ export class BoundingBox {
    * Bound the bounding box coordinates within WGS84 range values
    *
    * @return bounded bounding box
-   * @since 5.0.0
    */
   public boundWgs84Coordinates(): BoundingBox {
     return this.boundCoordinates(ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH);
@@ -414,7 +394,6 @@ export class BoundingBox {
    * Bound the bounding box coordinates within Web Mercator range values
    *
    * @return bounded bounding box
-   * @since 5.0.0
    */
   public boundWebMercatorCoordinates(): BoundingBox {
     return this.boundCoordinates(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
@@ -428,7 +407,6 @@ export class BoundingBox {
    * @param maxProjectionLongitude
    *            max longitude of the world for the current bounding box units
    * @return expanded bounding box
-   * @since 5.0.0
    */
   public expandCoordinates(maxProjectionLongitude: number): BoundingBox {
     const expanded = this.copy();
@@ -451,7 +429,6 @@ export class BoundingBox {
    * numerically larger than the min longitude.
    *
    * @return expanded bounding box
-   * @since 5.0.0
    */
   public expandWgs84Coordinates(): BoundingBox {
     return this.expandCoordinates(ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH);
@@ -463,7 +440,6 @@ export class BoundingBox {
    * longitude is numerically larger than the min longitude.
    *
    * @return expanded bounding box
-   * @since 5.0.0
    */
   public expandWebMercatorCoordinates(): BoundingBox {
     return this.expandCoordinates(ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
@@ -475,14 +451,13 @@ export class BoundingBox {
    * @param transform
    *            geometry transform
    * @return transformed bounding box
-   * @since 5.0.0
    */
   public transform(transform: GeometryTransform | ProjectionTransform): BoundingBox {
     const geometryTransform = transform instanceof GeometryTransform ? transform : GeometryTransform.create(transform);
     let transformed = this.copy();
     if (!transform.getFromProjection().equalsProjection(transform.getToProjection())) {
       if (
-        Projections.getUnits(geometryTransform.getFromProjection()) === 'degrees' &&
+        Projections.getUnits(geometryTransform.getFromProjection().toString()) === 'degrees' &&
         geometryTransform
           .getToProjection()
           .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())
@@ -505,7 +480,6 @@ export class BoundingBox {
    *            allow empty ranges when determining intersection
    *
    * @return true if intersects
-   * @since 5.0.0
    */
   public intersects(boundingBox: BoundingBox, allowEmpty = false): boolean {
     return this.overlap(boundingBox, allowEmpty) != null;
@@ -517,7 +491,6 @@ export class BoundingBox {
    * @param allowEmpty allow empty ranges when determining overlap
    *
    * @return bounding box
-   * @since 5.0.0
    */
   public overlap(boundingBox: BoundingBox, allowEmpty = false): BoundingBox {
     const minLongitude = Math.max(this.getMinLongitude(), boundingBox.getMinLongitude());
@@ -541,7 +514,6 @@ export class BoundingBox {
    * Get the union bounding box with the provided bounding box
    * @param boundingBox bounding box
    * @return bounding box
-   * @since 5.0.0
    */
   public union(boundingBox: BoundingBox): BoundingBox {
     const minLongitude = Math.min(this.getMinLongitude(), boundingBox.getMinLongitude());
@@ -564,7 +536,6 @@ export class BoundingBox {
    * @param boundingBox
    *            bounding box
    * @return true if contains
-   * @since 5.0.0
    */
   public contains(boundingBox: BoundingBox): boolean {
     return (
@@ -576,6 +547,37 @@ export class BoundingBox {
   }
 
   /**
+   * Function taken from https://gist.github.com/Yaffle/4654250
+   * @param x
+   * @private
+   */
+  private static nextUp(x: number): number {
+    const EPSILON = Math.pow(2, -52);
+    const MIN_VALUE = Math.pow(2, -1022);
+    if (x !== x) return x;
+    if (x === -1 / 0) return -Number.MAX_VALUE;
+    if (x === 1 / 0) return +1 / 0;
+    if (x === Number.MAX_VALUE) return +1 / 0;
+    let y = x * (x < 0 ? 1 - EPSILON / 2 : 1 + EPSILON);
+    if (y === x) y = MIN_VALUE * EPSILON > 0 ? x + MIN_VALUE * EPSILON : x + MIN_VALUE;
+    if (y === +1 / 0) y = +Number.MAX_VALUE;
+    const b = x + (y - x) / 2;
+    if (x < b && b < y) y = b;
+    const c = (y + x) / 2;
+    if (x < c && c < y) y = c;
+    return y === 0 ? -0 : y;
+  }
+
+  /**
+   * Function taken from https://gist.github.com/Yaffle/4654250
+   * @param x
+   * @private
+   */
+  private static ulp(x): number {
+    return x < 0 ? BoundingBox.nextUp(x) - x : x - -BoundingBox.nextUp(-x);
+  }
+
+  /**
    * Expand the bounding box to an equally sized width and height bounding box
    * with optional empty edge buffer
    *
@@ -583,17 +585,15 @@ export class BoundingBox {
    *            bounding box edge buffer percentage. A value of 0.1 adds a 10%
    *            buffer on each side of the squared bounding box.
    * @return new square expanded bounding box
-   * @since 5.0.0
    */
   public squareExpand(bufferPercentage = 0.0): BoundingBox {
     const boundingBox: BoundingBox = this.copy();
-
     if (boundingBox.isPoint() && bufferPercentage > 0.0) {
-      const longitudeExpand = ulp(boundingBox.getMinLongitude());
+      const longitudeExpand = BoundingBox.ulp(boundingBox.getMinLongitude());
       boundingBox.setMinLongitude(boundingBox.getMinLongitude() - longitudeExpand);
       boundingBox.setMaxLongitude(boundingBox.getMaxLongitude() + longitudeExpand);
 
-      const latitudeExpand = ulp(boundingBox.getMinLatitude());
+      const latitudeExpand = BoundingBox.ulp(boundingBox.getMinLatitude());
       boundingBox.setMinLatitude(boundingBox.getMinLatitude() - latitudeExpand);
       boundingBox.setMaxLatitude(boundingBox.getMaxLatitude() + latitudeExpand);
     }
@@ -626,7 +626,6 @@ export class BoundingBox {
    * Determine if the bounding box is of a single point
    *
    * @return true if a single point bounds
-   * @since 5.0.0
    */
   public isPoint(): boolean {
     return this.minLongitude === this.maxLongitude && this.minLatitude === this.maxLatitude;
@@ -636,7 +635,6 @@ export class BoundingBox {
    * Copy the bounding box
    *
    * @return bounding box copy
-   * @since 5.0.0
    */
   public copy(): BoundingBox {
     return new BoundingBox(this);

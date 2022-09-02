@@ -1,40 +1,45 @@
-import { DBValue } from './dbAdapter';
+import { DBAdapter, DBValue } from './dbAdapter';
+import { Statement } from './statement';
 
 /**
  * Wrapper for Database Results
  */
 export class ResultSet {
-  position: number;
-  results: Record<string, DBValue>[];
-  lastValueRetrieved: any;
+  /**
+   * Iterable results from a query
+   */
+  results: IterableIterator<Record<string, DBValue>>;
+
+  /**
+   * Value stored after calling next
+   */
+  nextValue: any;
+
+  /**
+   * Track if result set is done
+   */
+  done = false;
+
+  /**
+   * Statement
+   */
+  statement: Statement;
+
+  /**
+   * Connection
+   */
+  readonly connection: DBAdapter;
+
   /**
    * Constructor
    * @param results
+   * @param statement
+   * @param connection
    */
-  constructor(results: Record<string, DBValue>[]) {
+  constructor(results: IterableIterator<Record<string, DBValue>>, statement: Statement, connection: DBAdapter) {
     this.results = results;
-    this.position = -1;
-  }
-
-  /**
-   * Get results
-   */
-  public getResults(): Record<string, DBValue>[] {
-    return this.results;
-  }
-
-  /**
-   * Get count of results
-   */
-  public getCount(): number {
-    return this.results.length;
-  }
-
-  /**
-   * Get position in ResultSet
-   */
-  public getPosition(): number {
-    return this.position;
+    this.statement = statement;
+    this.connection = connection;
   }
 
   /**
@@ -42,8 +47,17 @@ export class ResultSet {
    * @param columnName
    */
   public getValue(columnName: string): DBValue {
-    const record = this.results[this.position];
-    this.lastValueRetrieved = record[columnName];
+    const record = this.nextValue;
+    return record[columnName];
+  }
+
+  /**
+   * Get value for column
+   * @param columnIndex
+   */
+  public getValueWithIndex(columnIndex: number): DBValue {
+    const record = this.nextValue;
+    const columnName = Object.keys(record)[columnIndex];
     return record[columnName];
   }
 
@@ -51,45 +65,33 @@ export class ResultSet {
    * Move position to next position
    */
   public next(): boolean {
-    this.position++;
-    return this.position < this.results.length;
-  }
-
-  /**
-   * Move to first entry in result
-   */
-  public moveToFirst(): boolean {
-    return this.moveToPosition(0);
-  }
-
-  /**
-   * Move to a specific position
-   * @param position
-   */
-  public moveToPosition(position: number): boolean {
-    this.position = position;
-    return this.position >= 0 && this.position < this.results.length;
+    if (!this.done) {
+      const nextResult = this.results.next();
+      this.nextValue = nextResult.value;
+      this.done = nextResult.done;
+    }
+    return this.done;
   }
 
   /**
    * Get column count
    */
   public getColumnCount(): number {
-    return this.results.length > 0 ? Object.keys(this.results[0]).length : 0;
+    return Object.keys(this.nextValue).length;
   }
 
   /**
    * Get column count
    */
   public getColumnNames(): string[] {
-    return this.results.length > 0 ? Object.keys(this.results[0]) : [];
+    return Object.keys(this.nextValue);
   }
 
   /**
    * Was the last value retrieved null
    */
   public wasNull(): boolean {
-    return this.lastValueRetrieved === null;
+    return this.nextValue === null;
   }
 
   /**
@@ -98,7 +100,7 @@ export class ResultSet {
    */
   public getBuffer(columnName: string): Buffer {
     let buffer: Buffer = null;
-    const value: DBValue = this.results[this.position][columnName];
+    const value: DBValue = this.nextValue[columnName];
     if (value != null) {
       if (value instanceof Buffer) {
         buffer = value;
@@ -115,7 +117,7 @@ export class ResultSet {
    */
   public getNumber(columnName: string): number {
     let number: number = null;
-    const value: DBValue = this.results[this.position][columnName];
+    const value: DBValue = this.nextValue[columnName];
     if (value != null) {
       if (typeof value === 'number') {
         number = value;
@@ -130,7 +132,7 @@ export class ResultSet {
    */
   public getString(columnName: string): string {
     let str: string = null;
-    const value: DBValue = this.results[this.position][columnName];
+    const value: DBValue = this.nextValue[columnName];
     if (value != null) {
       if (typeof value === 'string') {
         str = value;
@@ -145,10 +147,10 @@ export class ResultSet {
    */
   public getStringAtIndex(index: number): string {
     let str: string = null;
-    const result = this.results[this.position];
+    const result = this.nextValue;
     const keys = Object.keys(result);
     if (index < keys.length) {
-      const value: DBValue = this.results[this.position][keys[index]];
+      const value: DBValue = this.nextValue[keys[index]];
       if (value != null) {
         if (typeof value === 'string') {
           str = value;
@@ -164,7 +166,7 @@ export class ResultSet {
    */
   public getBoolean(columnName: string): boolean {
     let bool: boolean = null;
-    const value: DBValue = this.results[this.position][columnName];
+    const value: DBValue = this.nextValue[columnName];
     if (value != null) {
       if (typeof value === 'boolean') {
         bool = value;
@@ -175,5 +177,22 @@ export class ResultSet {
       }
     }
     return bool;
+  }
+
+  /**
+   * Close the statement
+   */
+  close(): void {
+    try {
+      this.results = null;
+      this.statement.close();
+    } catch (e) {}
+  }
+
+  /**
+   * Get the GeoPackageConnection for this result set
+   */
+  getConnection(): DBAdapter {
+    return this.connection;
   }
 }

@@ -1,6 +1,6 @@
 var GeoPackage = require('../../../lib/geoPackage').GeoPackage
   , GeoPackageConnection = require('../../../lib/db/geoPackageConnection').GeoPackageConnection
-  , GeoPackageTileRetriever = require('../../../lib/tiles/retriever').GeoPackageTileRetriever
+  , GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , path = require('path')
   , should = require('chai').should();
 

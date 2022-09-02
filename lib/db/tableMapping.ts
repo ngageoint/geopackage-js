@@ -1,7 +1,3 @@
-import isNil from 'lodash/isNil';
-import isEqual from 'lodash/isEqual';
-import keys from 'lodash/keys';
-import values from 'lodash/values';
 import { MappedColumn } from './mappedColumn';
 import { UserColumn } from '../user/userColumn';
 import { TableInfo } from './table/tableInfo';
@@ -11,7 +7,6 @@ import { TableInfo } from './table/tableInfo';
  * information
  *
  * @author osbornb
- * @since 3.3.0
  */
 export class TableMapping {
   /**
@@ -107,7 +102,7 @@ export class TableMapping {
    * @return true if a new table
    */
   isNewTable(): boolean {
-    return !isNil(this._toTable) && !isEqual(this._toTable, this._fromTable);
+    return this._toTable != null && this._toTable !== this._fromTable;
   }
 
   /**
@@ -160,7 +155,7 @@ export class TableMapping {
    * @return column names
    */
   getColumnNames(): string[] {
-    return keys(this._columns);
+    return Object.keys(this._columns);
   }
 
   /**
@@ -176,7 +171,7 @@ export class TableMapping {
    * @return columns
    */
   getMappedColumns(): MappedColumn[] {
-    return values(this._columns);
+    return Object.values(this._columns);
   }
 
   /**
@@ -227,7 +222,7 @@ export class TableMapping {
    * @return true if where clause
    */
   hasWhere(): boolean {
-    return !isNil(this._where);
+    return this._where != null;
   }
 
   /**

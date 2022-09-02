@@ -7,9 +7,17 @@ import { GeoPackageConnection } from './geoPackageConnection';
 /**
  * Abstract GeoPackage DAO
  * @param <T> The class that the code will be operating on.
- * @since 5.0.0
  */
 export abstract class GeoPackageDao<T, ID> extends Dao<T, ID> {
+  /**
+   * Constructor
+   * @param db GeoPackageConnection object
+   * @param tableName tableName
+   */
+  constructor(db: GeoPackageConnection, tableName?: string) {
+    super(db, tableName);
+  }
+
   /**
    * {@inheritDoc}
    * <p>
@@ -57,7 +65,6 @@ export abstract class GeoPackageDao<T, ID> extends Dao<T, ID> {
   /**
    * Verify the DAO is backed by a table or view
    *
-   * @since 4.0.0
    */
   public verifyExists(): void {
     if (!this.isTableOrView()) {

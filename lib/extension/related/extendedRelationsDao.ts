@@ -1,4 +1,3 @@
-import { Dao } from '../../dao/dao';
 import { ColumnValues } from '../../dao/columnValues';
 import { ExtendedRelation } from './extendedRelation';
 import { DBValue } from '../../db/dbAdapter';
@@ -8,8 +7,6 @@ import { Contents } from '../../contents/contents';
 
 /**
  * Extended Relations Data Access Object
- * @class ExtendedRelationsDao
- * @extends Dao
  */
 export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number> {
   readonly gpkgTableName: string = ExtendedRelation.TABLE_NAME;

@@ -3,33 +3,19 @@
  * @see module:dao/dao
  */
 import { TileMatrix } from './tileMatrix';
-import { Contents } from '../../contents/contents';
-import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { DBValue } from '../../db/dbAdapter';
-import { SqliteQueryBuilder } from '../../db/sqliteQueryBuilder';
-import { TileColumn } from '../user/tileColumn';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { TileMatrixKey } from './tileMatrixKey';
+import { ColumnValues } from '../../dao/columnValues';
 
 /**
  * Tile Matrix Set Data Access Object
  * @class TileMatrixDao
- * @extends Dao
  */
 export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   readonly gpkgTableName: string = 'gpkg_tile_matrix';
   readonly idColumns: string[] = [TileMatrix.COLUMN_ID_1, TileMatrix.COLUMN_ID_2];
-  readonly columns: string[] = [
-    TileMatrix.COLUMN_TABLE_NAME,
-    TileMatrix.COLUMN_ZOOM_LEVEL,
-    TileMatrix.COLUMN_MATRIX_WIDTH,
-    TileMatrix.COLUMN_MATRIX_HEIGHT,
-    TileMatrix.COLUMN_TILE_WIDTH,
-    TileMatrix.COLUMN_TILE_HEIGHT,
-    TileMatrix.COLUMN_PIXEL_X_SIZE,
-    TileMatrix.COLUMN_PIXEL_Y_SIZE,
-  ];
 
   constructor(geoPackageConnection: GeoPackageConnection) {
     super(geoPackageConnection, TileMatrix.TABLE_NAME);
@@ -57,27 +43,112 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
     }
     return tm;
   }
+
   /**
-   * get the Contents of the Tile matrix
-   * @param  {TileMatrix} tileMatrix the tile matrix
+   * {@inheritDoc}
    */
-  getContents(tileMatrix: TileMatrix): Contents {
-    return this.geoPackage.getContentsDao().queryForId(tileMatrix.getTableName());
+  public extractId(data: TileMatrix): TileMatrixKey {
+    return data.getId();
   }
-  getTileMatrixSet(tileMatrix: TileMatrix): TileMatrixSet {
-    return this.geoPackage.tileMatrixSetDao.queryForId(tileMatrix.getTableName());
+
+  /**
+   * {@inheritDoc}
+   */
+  public idExists(id: TileMatrixKey): boolean {
+    return this.queryForIdWithKey(id) != null;
   }
-  tileCount(tileMatrix: TileMatrix): number {
-    const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, tileMatrix.getZoomLevel());
-    const whereArgs = this.buildWhereArgs([tileMatrix.getZoomLevel()]);
-    const query = SqliteQueryBuilder.buildCount("'" + tileMatrix.getTableName() + "'", where);
-    const result = this.db.get(query, whereArgs);
-    return result?.count;
+
+  /**
+   * {@inheritDoc}
+   */
+  public queryForSameId(data: TileMatrix): TileMatrix {
+    return this.queryForIdWithKey(data.getId());
   }
-  hasTiles(tileMatrix: TileMatrix): boolean {
-    const where = this.buildWhereWithFieldAndValue(TileColumn.COLUMN_ZOOM_LEVEL, tileMatrix.zoom_level);
-    const whereArgs = this.buildWhereArgs([tileMatrix.zoom_level]);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + tileMatrix.table_name + "'", undefined, where);
-    return this.connection.get(query, whereArgs) != null;
+
+  /**
+   * Query tile matrices for a table name
+   *
+   * @param tableName table name
+   * @return tile matrices
+   */
+  public queryForTableName(tableName: string): TileMatrix[] {
+    const where = this.buildWhereWithFieldAndValue(TileMatrix.COLUMN_TABLE_NAME, tableName);
+    const orderBy =
+      TileMatrix.COLUMN_ZOOM_LEVEL +
+      ', ' +
+      TileMatrix.COLUMN_PIXEL_X_SIZE +
+      ' DESC, ' +
+      TileMatrix.COLUMN_PIXEL_Y_SIZE +
+      ' DESC';
+    const tileMatrices = [];
+    for (const result of this.queryWhere(where, [tableName], undefined, undefined, orderBy)) {
+      tileMatrices.push(this.createObject(result));
+    }
+    return tileMatrices;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public updateId(data: TileMatrix, newId: TileMatrixKey): number {
+    let count = 0;
+    const readData = this.queryForIdWithKey(data.getId());
+    if (readData != null && newId != null) {
+      readData.setId(newId);
+      count = this.update(readData).changes;
+    }
+    return count;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public delete(data: TileMatrix): number {
+    const columnValues = new ColumnValues();
+    columnValues.addColumn(TileMatrix.COLUMN_TABLE_NAME, data.getTableName());
+    columnValues.addColumn(TileMatrix.COLUMN_ZOOM_LEVEL, data.getZoomLevel());
+    const where = this.buildWhere(columnValues);
+    const whereArgs = this.buildWhereArgs(columnValues);
+    return this.deleteWhere(where, whereArgs);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public deleteByIdWithKey(id: TileMatrixKey): number {
+    let count = 0;
+    if (id != null) {
+      const tileMatrix = this.queryForIdWithKey(id);
+      if (tileMatrix != null) {
+        count = this.delete(tileMatrix);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public deleteIds(idCollection: TileMatrixKey[]): number {
+    let count = 0;
+    if (idCollection != null) {
+      for (const id of idCollection) {
+        count += this.deleteByIdWithKey(id);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Delete Tile Matrices for a table name
+   * @param table table name
+   * @return rows deleted
+   */
+  public deleteByTableName(table: string): number {
+    const columnValues = new ColumnValues();
+    columnValues.addColumn(TileMatrix.COLUMN_TABLE_NAME, table);
+    const where = this.buildWhere(columnValues);
+    const whereArgs = this.buildWhereArgs(columnValues);
+    return this.deleteWhere(where, whereArgs);
   }
 }

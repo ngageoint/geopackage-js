@@ -1,7 +1,5 @@
-/**
- * FeatureTilePointIcon module.
- * @memberOf tiles/features
- */
+import { GeoPackageImage } from '../../image/geoPackageImage';
+
 /**
  * Constructor
  * @class FeatureTilePointIcon
@@ -9,15 +7,15 @@
  * @constructor
  */
 export class FeatureTilePointIcon {
-  icon: any;
+  icon: GeoPackageImage;
   width: number;
   height: number;
   xOffset: number;
   yOffset: number;
-  constructor(icon: any) {
+  constructor(icon: GeoPackageImage) {
     this.icon = icon;
-    this.width = icon.width;
-    this.height = icon.height;
+    this.width = icon.getWidth();
+    this.height = icon.getHeight();
     this.pinIconDefault();
   }
   /**
@@ -36,9 +34,9 @@ export class FeatureTilePointIcon {
   }
   /**
    * Get the icon
-   * @returns {Image} icon
+   * @returns {GeoPackageImage} icon
    */
-  getIcon(): {image: any, width: number, height: number} {
+  getIcon(): GeoPackageImage {
     return this.icon;
   }
   /**

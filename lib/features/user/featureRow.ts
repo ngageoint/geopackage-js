@@ -17,7 +17,6 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
    * @param columns columns
    * @param columnTypes column types
    * @param values values
-   * @since 3.5.0
    */
   constructor(table: FeatureTable, columns: FeatureColumns, columnTypes: number[], values: any[]);
 

@@ -16,10 +16,6 @@ import { DBValue } from '../../db/dbAdapter';
 
 /**
  * User Custom Dao
- * @class
- * @extends UserDao
- * @param  {module:geoPackage~GeoPackage} geoPackage      geopackage object
- * @param  {module:user/custom~UserCustomTable} userCustomTable user custom table
  */
 export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, UserCustomRow, UserCustomResultSet> {
   /**

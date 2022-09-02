@@ -1,6 +1,7 @@
 import { DBAdapter, DBValue } from './dbAdapter';
 import initSqlJs from 'rtree-sql.js';
 import { GeoPackageException } from "../geoPackageException";
+import { ResultSet } from "./resultSet";
 
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database
@@ -350,5 +351,35 @@ export class SqljsAdapter implements DBAdapter {
       this.db.exec('ROLLBACK TRANSACTION');
       throw e;
     }
+  }
+  /**
+   * Returns a result set for the given query
+   */
+  query(sql: string, params?: [] | Record<string, DBValue>): ResultSet {
+    const statement = this.db.prepare(sql);
+    statement.bind(params);
+    return new ResultSet({
+      [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
+        return this;
+      },
+      next: function(): { value: Record<string, DBValue>; done: boolean } {
+        if (statement.step()) {
+          return {
+            value: statement.getAsObject(),
+            done: false,
+          };
+        } else {
+          statement.free();
+          return {
+            value: undefined,
+            done: true,
+          };
+        }
+      },
+    }, {
+      close: () => {
+        statement.free();
+      }
+    }, this);
   }
 }

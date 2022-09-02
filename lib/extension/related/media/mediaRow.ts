@@ -1,11 +1,8 @@
-/**
- * MediaRow module.
- * @module extension/relatedTables
- */
 import { MediaTable } from './mediaTable';
-import { ImageUtils } from '../../../tiles/imageUtils';
+import { ImageUtils } from '../../../image/imageUtils';
 import { UserCustomRow } from '../../../user/custom/userCustomRow';
 import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
+import { GeoPackageImage } from '../../../image/geoPackageImage';
 
 /**
  * User Media Row containing the values from a single result set row
@@ -125,16 +122,16 @@ export class MediaRow extends UserCustomRow {
    * Get the data image
    * @return image
    */
-  public async getDataImage(): Promise<{ image: any; width: number; height: number }> {
+  public async getDataImage(): Promise<GeoPackageImage> {
     return ImageUtils.getImage(this.getData(), this.getContentType());
   }
 
   /**
    * Get the scaled data image
    * @param {number} scale
-   * @return {Promise<Image>}
+   * @return {Promise<GeoPackageImage>}
    */
-  getScaledDataImage(scale: number): Promise<{ image: any; width: number; height: number }> {
+  getScaledDataImage(scale: number): Promise<GeoPackageImage> {
     return ImageUtils.getScaledImage(this.getData(), scale);
   }
 

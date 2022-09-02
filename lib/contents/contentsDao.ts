@@ -20,8 +20,6 @@ import { SpatialReferenceSystemDao } from '../srs/spatialReferenceSystemDao';
  * Contents object. Provides identifying and descriptive information that an
  * application can display to a user in a menu of geospatial data that is
  * available for access and/or update.
- * @class ContentsDao
- * @extends Dao
  */
 export class ContentsDao extends GeoPackageDao<Contents, string> {
   /**
@@ -138,7 +136,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    */
   private getAndSetTileMatrixSet(contents: Contents): TileMatrixSet {
     const dao = this.getTileMatrixSetDao();
-    const results = dao.queryForAllEq(TileMatrixSetDao.COLUMN_TABLE_NAME, contents.getTableName());
+    const results = dao.queryForAllEq(TileMatrixSet.COLUMN_TABLE_NAME, contents.getTableName());
     if (results?.length) {
       contents.setTileMatrixSet(dao.createObject(results[0]));
     }

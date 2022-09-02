@@ -1,6 +1,6 @@
 import { default as testSetup } from '../../../fixtures/testSetup'
 
-var SchemaExtension = require('../../../../lib/extension/schema').SchemaExtension;
+var SchemaExtension = require('../../../../lib/extension/schema/schemaExtension').SchemaExtension;
 
 describe('GeoPackage Schema Extension tests', function() {
   var testGeoPackage;

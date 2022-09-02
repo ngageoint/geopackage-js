@@ -15,4 +15,9 @@ export interface FeatureIndexResults extends IterableIterator<FeatureRow> {
    * @return iterable ids
    */
   ids(): IterableIterator<number>;
+
+  /**
+   * Close results
+   */
+  close(): void;
 }

@@ -31,6 +31,21 @@ export class ResultUtils {
   }
 
   /**
+   * Build single result value from the column
+   *
+   * @param result result
+   * @param columnIdx column index
+   * @return value
+   */
+  public static buildSingleResultWithColumnIndex(result: Result, columnIdx: number): any {
+    let value = null;
+    if (result.moveToNext()) {
+      value = result.getValueWithIndex(columnIdx);
+    }
+    return value;
+  }
+
+  /**
    * Build single column result rows from the result and the optional limit
    *
    * @param result  result
@@ -38,10 +53,30 @@ export class ResultUtils {
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResults(result: Result, columnName: string, limit: number): unknown[] {
+  public static buildSingleColumnResults(result: Result, columnName: string, limit?: number): unknown[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValue(columnName);
+      results.push(value);
+      if (limit != null && results.length >= limit) {
+        break;
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Build single column result rows from the result and the optional limit
+   *
+   * @param result  result
+   * @param columnIndex column name
+   * @param limit  result row limit
+   * @return single column results
+   */
+  public static buildSingleColumnResultsWithColumnIndex(result: Result, columnIndex = 0, limit?: number): unknown[] {
+    const results = [];
+    while (result.moveToNext()) {
+      const value = result.getValueWithIndex(columnIndex);
       results.push(value);
       if (limit != null && results.length >= limit) {
         break;
@@ -59,8 +94,11 @@ export class ResultUtils {
    */
   public static buildResults(result: Result, limit: number): unknown[][] {
     const results = [];
-    const columns = result.getColumnNames();
+    let columns = null;
     while (result.moveToNext()) {
+      if (columns == null) {
+        columns = result.getColumnNames();
+      }
       const row = [];
       for (const column of columns) {
         row.push(result.getValue(column));

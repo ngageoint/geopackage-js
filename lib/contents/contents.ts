@@ -262,7 +262,6 @@ export class Contents {
    * Determine if the contents data type is features
    *
    * @return true if features type
-   * @since 4.0.0
    */
   public isFeaturesType(): boolean {
     return ContentsDataType.isFeaturesType(this.data_type);
@@ -272,7 +271,6 @@ export class Contents {
    * Determine if the contents data type is features or unknown
    *
    * @return true if features type or unknown
-   * @since 4.0.0
    */
   public isFeaturesTypeOrUnknown(): boolean {
     return ContentsDataType.isFeaturesType(this.data_type, true);
@@ -282,7 +280,6 @@ export class Contents {
    * Determine if the contents data type is tiles
    *
    * @return true if tiles type
-   * @since 4.0.0
    */
   public isTilesType(): boolean {
     return ContentsDataType.isTilesType(this.data_type);
@@ -292,7 +289,6 @@ export class Contents {
    * Determine if the contents data type is tiles or unknown
    *
    * @return true if tiles type or unknown
-   * @since 4.0.0
    */
   public isTilesTypeOrUnknown(): boolean {
     return ContentsDataType.isTilesType(this.data_type, true);
@@ -302,7 +298,6 @@ export class Contents {
    * Determine if the contents data type is attributes
    *
    * @return true if attributes type
-   * @since 4.0.0
    */
   public isAttributesType(): boolean {
     return ContentsDataType.isAttributesType(this.data_type);
@@ -312,7 +307,6 @@ export class Contents {
    * Determine if the contents data type is attributes or unknown
    *
    * @return true if attributes type or unknown
-   * @since 4.0.0
    */
   public isAttributesTypeOrUnknown(): boolean {
     return ContentsDataType.isAttributesType(this.data_type, true);
@@ -578,7 +572,6 @@ export class Contents {
    * Get the projection
    *
    * @return projection
-   * @since 3.1.0
    */
   public getProjection(): Projection {
     let projection = null;

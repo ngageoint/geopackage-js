@@ -13,7 +13,7 @@ import { SQLiteMaster } from './master/sqliteMaster';
 import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLiteMasterType } from './master/sqliteMasterType';
 import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
-import { RTreeIndexDao } from '../extension/rtree/rtreeIndexDao';
+import { RTreeIndexExtension } from '../extension/rtree/rTreeIndexExtension';
 /**
  * Builds and performs alter table statements
  */
@@ -23,7 +23,7 @@ export class AlterTable {
    * @param table table name
    * @return alter table SQL prefix
    */
-  static alterTableSQL(table: string) {
+  static alterTableSQL(table: string): string {
     return 'ALTER TABLE ' + StringUtils.quoteWrap(table);
   }
 
@@ -33,7 +33,7 @@ export class AlterTable {
    * @param tableName table name
    * @param newTableName  new table name
    */
-  static renameTable(db: GeoPackageConnection, tableName: string, newTableName: string) {
+  static renameTable(db: GeoPackageConnection, tableName: string, newTableName: string): void {
     const sql = AlterTable.renameTableSQL(tableName, newTableName);
     db.run(sql);
   }
@@ -44,7 +44,7 @@ export class AlterTable {
    * @param newTableName new table name
    * @return rename table SQL
    */
-  static renameTableSQL(tableName: string, newTableName: string) {
+  static renameTableSQL(tableName: string, newTableName: string): string {
     return AlterTable.alterTableSQL(tableName) + ' RENAME TO ' + StringUtils.quoteWrap(newTableName);
   }
 
@@ -55,7 +55,7 @@ export class AlterTable {
    * @param columnName column name
    * @param newColumnName new column name
    */
-  static renameColumn(db: GeoPackageConnection, tableName: string, columnName: string, newColumnName: string) {
+  static renameColumn(db: GeoPackageConnection, tableName: string, columnName: string, newColumnName: string): void {
     const sql = AlterTable.renameColumnSQL(tableName, columnName, newColumnName);
     db.run(sql);
   }
@@ -67,7 +67,7 @@ export class AlterTable {
    * @param newColumnName new column name
    * @return rename table SQL
    */
-  static renameColumnSQL(tableName: string, columnName: string, newColumnName: string) {
+  static renameColumnSQL(tableName: string, columnName: string, newColumnName: string): string {
     return (
       AlterTable.alterTableSQL(tableName) +
       ' RENAME COLUMN ' +
@@ -84,7 +84,7 @@ export class AlterTable {
    * @param columnName column name
    * @param columnDef column definition
    */
-  static addColumn(db: GeoPackageConnection, tableName: string, columnName: string, columnDef: string) {
+  static addColumn(db: GeoPackageConnection, tableName: string, columnName: string, columnDef: string): void {
     const sql = AlterTable.addColumnSQL(tableName, columnName, columnDef);
     db.run(sql);
   }
@@ -96,7 +96,7 @@ export class AlterTable {
    * @param columnDef column definition
    * @return add column SQL
    */
-  static addColumnSQL(tableName: string, columnName: string, columnDef: string) {
+  static addColumnSQL(tableName: string, columnName: string, columnDef: string): string {
     return AlterTable.alterTableSQL(tableName) + ' ADD COLUMN ' + StringUtils.quoteWrap(columnName) + ' ' + columnDef;
   }
 
@@ -106,7 +106,7 @@ export class AlterTable {
    * @param table table
    * @param columnName  column name
    */
-  static dropColumnForUserTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columnName: string) {
+  static dropColumnForUserTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columnName: string): void {
     AlterTable.dropColumnsForUserTable(db, table, [columnName]);
   }
 
@@ -117,7 +117,7 @@ export class AlterTable {
    * @param table table
    * @param columnNames column names
    */
-  static dropColumnsForUserTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columnNames: string[]) {
+  static dropColumnsForUserTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columnNames: string[]): void {
     const newTable: UserTable<UserColumn> = table.copy();
     columnNames.forEach(columnName => {
       newTable.dropColumnWithName(columnName);
@@ -145,7 +145,7 @@ export class AlterTable {
    * @param tableName table name
    * @param columnName column name
    */
-  static dropColumn(db: GeoPackageConnection, tableName: string, columnName: string) {
+  static dropColumn(db: GeoPackageConnection, tableName: string, columnName: string): void {
     AlterTable.dropColumns(db, tableName, [columnName]);
   }
 
@@ -168,7 +168,7 @@ export class AlterTable {
    * @param column column
    * @param user column type
    */
-  static alterColumnForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, column: any) {
+  static alterColumnForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, column: any): void {
     AlterTable.alterColumnsForTable(db, table, [column]);
   }
 
@@ -178,7 +178,7 @@ export class AlterTable {
    * @param table table
    * @param columns columns
    */
-  static alterColumnsForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columns: UserColumn[]) {
+  static alterColumnsForTable(db: GeoPackageConnection, table: UserTable<UserColumn>, columns: UserColumn[]): void {
     const newTable: UserTable<UserColumn> = table.copy();
 
     columns.forEach(column => {
@@ -198,7 +198,7 @@ export class AlterTable {
    * @param tableName table name
    * @param column column
    */
-  static alterColumn(db: GeoPackageConnection, tableName: string, column: UserColumn) {
+  static alterColumn(db: GeoPackageConnection, tableName: string, column: UserColumn): void {
     AlterTable.alterColumns(db, tableName, [column]);
   }
 
@@ -208,7 +208,7 @@ export class AlterTable {
    * @param tableName table name
    * @param columns columns
    */
-  static alterColumns(db: GeoPackageConnection, tableName: string, columns: UserColumn[]) {
+  static alterColumns(db: GeoPackageConnection, tableName: string, columns: UserColumn[]): void {
     const userTable: UserCustomTable = new UserCustomTableReader(tableName).readTable(db);
     AlterTable.alterColumnsForTable(db, userTable, columns);
   }
@@ -225,7 +225,7 @@ export class AlterTable {
     table: UserTable<UserColumn>,
     newTableName: string,
     transferContent = true,
-  ) {
+  ): void {
     // Build the table mapping
     const tableMapping = new TableMapping(table.getTableName(), newTableName, table.getUserColumns().getColumns());
     tableMapping.transferContent = transferContent;
@@ -239,7 +239,12 @@ export class AlterTable {
    * @param newTableName new table name
    * @param transferContent transfer row content to the new table
    */
-  static copyTableWithName(db: GeoPackageConnection, tableName: string, newTableName: string, transferContent = true) {
+  static copyTableWithName(
+    db: GeoPackageConnection,
+    tableName: string,
+    newTableName: string,
+    transferContent = true,
+  ): void {
     const userTable: UserCustomTable = new UserCustomTableReader(tableName).readTable(db);
     AlterTable.copyTable(db, userTable, newTableName, transferContent);
   }
@@ -258,7 +263,7 @@ export class AlterTable {
    * @param db connection
    * @param newTable  new table schema
    */
-  static alterTable(db: GeoPackageConnection, newTable: UserTable<UserColumn>) {
+  static alterTable(db: GeoPackageConnection, newTable: UserTable<UserColumn>): void {
     // Build the table mapping
     const tableMapping = new TableMapping(
       newTable.getTableName(),
@@ -293,7 +298,7 @@ export class AlterTable {
     db: GeoPackageConnection,
     newTable: UserTable<UserColumn>,
     tableMapping: TableMapping,
-  ) {
+  ): void {
     // Update column constraints
     newTable
       .getUserColumns()
@@ -348,7 +353,7 @@ export class AlterTable {
    * @param tableMapping
    *            table mapping
    */
-  static alterTableWithSQLAndTableMapping(db: GeoPackageConnection, sql: string, tableMapping: TableMapping) {
+  static alterTableWithSQLAndTableMapping(db: GeoPackageConnection, sql: string, tableMapping: TableMapping): void {
     const tableName = tableMapping.fromTable;
 
     // Determine if a new table copy vs an alter table
@@ -417,7 +422,7 @@ export class AlterTable {
             // Don't create rtree triggers for new tables
             create =
               indexesAndTriggers.getType(i) != SQLiteMasterType.TRIGGER ||
-              !indexesAndTriggers.getName(i).startsWith(RTreeIndexDao.PREFIX);
+              !indexesAndTriggers.getName(i).startsWith(RTreeIndexExtension.RTREE_PREFIX);
           }
           if (create) {
             let tableSql = indexesAndTriggers.getSql(i);
@@ -483,7 +488,7 @@ export class AlterTable {
    * Perform a foreign key check for violations
    * @param db connection
    */
-  static foreignKeyCheck(db: GeoPackageConnection) {
+  static foreignKeyCheck(db: GeoPackageConnection): void {
     const violations = SQLUtils.foreignKeyCheck(db);
 
     if (violations.length > 0) {

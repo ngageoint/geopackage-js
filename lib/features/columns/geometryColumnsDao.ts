@@ -16,8 +16,6 @@ import { TableColumnKey } from '../../db/tableColumnKey';
 import { ContentsDao } from '../../contents/contentsDao';
 /**
  * Geometry Columns Data Access Object
- * @class GeometryColumnsDao
- * @extends Dao
  */
 export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColumnKey> {
   /**

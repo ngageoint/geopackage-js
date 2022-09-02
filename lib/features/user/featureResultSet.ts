@@ -26,7 +26,7 @@ export class FeatureResultSet extends UserResultSet<FeatureColumn, FeatureTable,
     columns: string[] | UserColumns<FeatureColumn>,
     resultSet: ResultSet,
     sql: string,
-    selectionArgs: [],
+    selectionArgs: any[],
   ) {
     super(table, columns, resultSet, sql, selectionArgs);
   }

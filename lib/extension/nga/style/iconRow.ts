@@ -5,7 +5,7 @@
 
 import { IconTable } from './iconTable';
 import { MediaRow } from '../../related/media/mediaRow';
-import { ImageUtils } from '../../../tiles/imageUtils';
+import { ImageUtils } from '../../../image/imageUtils';
 import { UserColumn } from '../../../user/userColumn';
 import { StyleTable } from './styleTable';
 import { UserCustomRow } from '../../../user/custom/userCustomRow';
