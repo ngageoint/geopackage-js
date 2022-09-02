@@ -1,6 +1,6 @@
 import { ColumnValues } from '../../dao/columnValues';
 import { ExtendedRelation } from './extendedRelation';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { Contents } from '../../contents/contents';

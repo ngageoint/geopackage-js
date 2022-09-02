@@ -3,7 +3,7 @@
  * @see module:dao/dao
  */
 import { TileMatrix } from './tileMatrix';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { TileMatrixKey } from './tileMatrixKey';

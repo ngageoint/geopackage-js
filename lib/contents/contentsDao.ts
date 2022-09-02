@@ -8,7 +8,7 @@ import { GeometryColumns } from '../features/columns/geometryColumns';
 import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../tiles/matrix/tileMatrix';
 import { BoundingBox } from '../boundingBox';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { ContentsDataType } from './contentsDataType';
 import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../geoPackageException';

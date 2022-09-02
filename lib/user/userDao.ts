@@ -14,7 +14,7 @@ import { UserResultSet } from './userResultSet';
 import { ColumnValue } from './columnValue';
 import { AlterTable } from '../db/alterTable';
 import { ColumnValues } from '../dao/columnValues';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { ContentValues } from './contentValues';
 import { ResultUtils } from '../db/resultUtils';
 import { ResultSetResult } from '../db/resultSetResult';

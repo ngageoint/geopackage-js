@@ -1,5 +1,6 @@
-import { DBAdapter, DBValue } from './dbAdapter';
+import { DBAdapter } from './dbAdapter';
 import { Statement } from './statement';
+import { DBValue } from './dbValue';
 
 /**
  * Wrapper for Database Results

@@ -5,7 +5,7 @@
 import { ContentsDao } from '../../../contents/contentsDao';
 import { DataColumns } from './dataColumns';
 import { Contents } from '../../../contents/contents';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { TableColumnKey } from '../../../db/tableColumnKey';
 import { GeoPackageDao } from '../../../db/geoPackageDao';

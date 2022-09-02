@@ -5,7 +5,7 @@
 
 import { UserTable } from './userTable';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { UserColumn } from './userColumn';
 import { UserColumns } from './userColumns';
 import { GeoPackageException } from '../geoPackageException';

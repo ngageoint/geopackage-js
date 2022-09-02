@@ -140,7 +140,7 @@ import { GeometryColumns } from './lib/features/columns/geometryColumns';
 import { GeometryColumnsDao } from './lib/features/columns/geometryColumnsDao';
 
 // extension
-import { BaseExtension } from './lib/extension/baseExtension';
+// import { BaseExtension } from './lib/extension/baseExtension';
 import { CrsWktExtension } from './lib/extension/crsWktExtension';
 import { ExtensionManagement } from './lib/extension/extensionManagement';
 import { ExtensionManager } from './lib/extension/extensionManager';
@@ -450,7 +450,7 @@ export {
   MultipleFeatureIndexResults,
   GeometryColumns,
   GeometryColumnsDao,
-  BaseExtension,
+  // BaseExtension,
   CrsWktExtension,
   ExtensionManagement,
   ExtensionManager,

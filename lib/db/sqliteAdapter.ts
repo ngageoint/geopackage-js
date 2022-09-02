@@ -1,4 +1,5 @@
-import { DBAdapter, DBValue } from './dbAdapter';
+import { DBAdapter } from './dbAdapter';
+import { DBValue } from '../db/dbValue';
 import fs from 'fs';
 import path from 'path';
 import http from 'http';

@@ -7,7 +7,7 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { GeometryColumns } from '../features/columns/geometryColumns';
 import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../tiles/matrix/tileMatrix';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 
 /**
  * Contents object. Provides identifying and descriptive information that an

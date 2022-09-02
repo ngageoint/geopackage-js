@@ -2,7 +2,7 @@ import { UserRow } from '../userRow';
 import { UserCustomColumn } from './userCustomColumn';
 import { UserCustomTable } from './userCustomTable';
 import { UserCustomColumns } from './userCustomColumns';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 
 /**
  * User Custom Row containing the values from a single result set row

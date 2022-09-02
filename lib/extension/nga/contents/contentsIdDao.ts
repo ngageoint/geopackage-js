@@ -1,5 +1,5 @@
 import { ContentsId } from './contentsId';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { ContentsDao } from '../../../contents/contentsDao';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';

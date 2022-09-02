@@ -5,7 +5,7 @@ import { SQLUtils } from '../../db/sqlUtils';
 import { FeatureDao } from './featureDao';
 import { FeatureResultSet } from './featureResultSet';
 import { ManualFeatureQueryResults } from './manualFeatureQueryResults';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { FeatureRow } from './featureRow';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';

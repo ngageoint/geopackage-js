@@ -5,9 +5,7 @@ var fs = require('fs');
 var chalk = require('chalk');
 var path = require('path');
 
-var geopackage = require('./dist/index')
-  , GeoPackageManager = geopackage.GeoPackageManager
-  , setCanvasKitWasmLocateFile = geopackage.setCanvasKitWasmLocateFile;
+var { GeoPackageManager, setCanvasKitWasmLocateFile } = require('./dist/index')
 
 setCanvasKitWasmLocateFile(file => path.join(__dirname, 'dist', 'canvaskit', file));
 

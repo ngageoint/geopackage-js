@@ -2,7 +2,7 @@ import { UserResultSet } from '../../user/userResultSet';
 import { FeatureColumn } from './featureColumn';
 import { FeatureRow } from './featureRow';
 import { FeatureTable } from './featureTable';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { FeatureColumns } from './featureColumns';
 import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
 import { UserColumns } from '../../user/userColumns';

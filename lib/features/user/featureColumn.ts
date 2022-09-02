@@ -1,6 +1,6 @@
 import { UserColumn } from '../../user/userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { TableColumn } from '../../db/table/tableColumn';
 import { UserTableDefaults } from '../../user/userTableDefaults';

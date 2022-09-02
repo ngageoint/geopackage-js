@@ -3,7 +3,7 @@ import { GeoPackage } from '../../../geoPackage';
 import { TableIndex } from './tableIndex';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { GeometryIndexDao } from './geometryIndexDao';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageException } from '../../../geoPackageException';
 import { ColumnValues } from '../../../dao/columnValues';
 import { GeometryIndex } from './geometryIndex';

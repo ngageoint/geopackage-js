@@ -4,7 +4,7 @@
  * @see module:dao/dao
  */
 import { Metadata } from './metadata';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { MetadataReferenceDao } from './reference/metadataReferenceDao';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';

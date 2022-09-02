@@ -12,7 +12,7 @@ import { BoundingBox } from '../../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { UserCustomConnection } from './userCustomConnection';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 
 /**
  * User Custom Dao

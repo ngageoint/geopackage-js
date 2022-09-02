@@ -3,7 +3,7 @@ import { AttributesColumn } from './attributesColumn';
 import { AttributesTable } from './attributesTable';
 import { AttributesRow } from './attributesRow';
 import { AttributesColumns } from './attributesColumns';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { UserColumns } from '../user/userColumns';
 import { ResultSet } from '../db/resultSet';
 

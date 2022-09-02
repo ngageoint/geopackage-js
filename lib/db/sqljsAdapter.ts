@@ -1,4 +1,5 @@
-import { DBAdapter, DBValue } from './dbAdapter';
+import { DBAdapter } from './dbAdapter';
+import { DBValue } from './dbValue';
 import initSqlJs from 'rtree-sql.js';
 import { GeoPackageException } from '../geoPackageException';
 import { ResultSet } from './resultSet';

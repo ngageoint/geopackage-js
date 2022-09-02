@@ -3,7 +3,7 @@
  * @module dataColumnConstraints
  */
 import { DataColumnConstraints } from './dataColumnConstraints';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { DataColumnConstraintsKey } from './dataColumnConstraintsKey';
 import { DataColumnsDao } from '../columns/dataColumnsDao';

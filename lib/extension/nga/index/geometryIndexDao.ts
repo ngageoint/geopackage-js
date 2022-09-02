@@ -2,7 +2,7 @@ import { GeometryIndex } from './geometryIndex';
 import { GeoPackage } from '../../../geoPackage';
 import { TableIndex } from './tableIndex';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeometryIndexKey } from './geometryIndexKey';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';

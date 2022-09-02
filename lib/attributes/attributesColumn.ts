@@ -3,7 +3,7 @@
  */
 import { UserColumn } from '../user/userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { UserTableDefaults } from '../user/userTableDefaults';
 import { TableColumn } from '../db/table/tableColumn';
 

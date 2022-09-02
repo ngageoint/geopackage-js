@@ -4,7 +4,7 @@
  * @see module:dao/dao
  */
 import { Metadata } from '../metadata';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { ReferenceScopeType } from './referenceScopeType';
 
 type MetadataReferenceKeys =

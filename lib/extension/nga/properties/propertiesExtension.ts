@@ -9,7 +9,7 @@ import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { AttributesDao } from '../../../attributes/attributesDao';
 import { AttributesRow } from '../../../attributes/attributesRow';
 import { GeoPackageException } from '../../../geoPackageException';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { ColumnValues } from '../../../dao/columnValues';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { AttributesTableMetadata } from '../../../attributes/attributesTableMetadata';

@@ -5,7 +5,7 @@ import { UserCustomRow } from './userCustomRow';
 import { UserColumns } from '../userColumns';
 import { ResultSet } from '../../db/resultSet';
 import { UserCustomColumns } from './userCustomColumns';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 
 /**
  * User Custom Result Set to wrap a database ResultSet for tile queries

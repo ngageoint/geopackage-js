@@ -6,7 +6,7 @@ import { ResultSet } from '../db/resultSet';
 import { SQLUtils } from '../db/sqlUtils';
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
 import { UserResultSet } from './userResultSet';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 
 /**
  * GeoPackage Connection used to define common functionality within different

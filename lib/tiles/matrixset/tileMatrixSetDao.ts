@@ -1,7 +1,7 @@
 import { TileMatrixSet } from './tileMatrixSet';
 import { Contents } from '../../contents/contents';
 import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { SpatialReferenceSystemDao } from '../../srs/spatialReferenceSystemDao';

@@ -1,5 +1,5 @@
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { ColumnValues } from '../dao/columnValues';
 import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 import { GeoPackageDao } from '../db/geoPackageDao';

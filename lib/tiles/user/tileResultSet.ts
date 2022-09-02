@@ -5,7 +5,7 @@ import { TileRow } from './tileRow';
 import { TileColumns } from './tileColumns';
 import { UserColumns } from '../../user/userColumns';
 import { ResultSet } from '../../db/resultSet';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 
 /**
  * Tile Result Set to wrap a database ResultSet for tile queries

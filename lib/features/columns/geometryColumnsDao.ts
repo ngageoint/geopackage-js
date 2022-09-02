@@ -6,7 +6,7 @@
 import { GeometryColumns } from './geometryColumns';
 import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { Contents } from '../../contents/contents';
-import { DBValue } from '../../db/dbAdapter';
+import { DBValue } from '../../db/dbValue';
 import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeometryType } from '@ngageoint/simple-features-js';

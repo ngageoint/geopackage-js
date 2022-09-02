@@ -1,4 +1,4 @@
-import { DBValue } from './dbAdapter';
+import { DBValue } from './dbValue';
 
 /**
  * SQLite query builder module.

@@ -1,5 +1,5 @@
 import { TileScaling } from './tileScaling';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { GeoPackage } from '../../../geoPackage';

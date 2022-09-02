@@ -1,6 +1,6 @@
 import { ColumnValues } from '../../../dao/columnValues';
 import { MetadataReference } from './metadataReference';
-import { DBValue } from '../../../db/dbAdapter';
+import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 

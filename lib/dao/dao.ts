@@ -1,7 +1,7 @@
 import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { ColumnValues } from './columnValues';
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
-import { DBValue } from '../db/dbAdapter';
+import { DBValue } from '../db/dbValue';
 import { SQLUtils } from '../db/sqlUtils';
 
 /**

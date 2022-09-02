@@ -1,6 +1,5 @@
 import { ResultSet } from './resultSet';
-
-export type DBValue = boolean | string | number | Buffer | Uint8Array;
+import { DBValue } from './dbValue';
 
 export interface DBAdapter {
   db: any;
