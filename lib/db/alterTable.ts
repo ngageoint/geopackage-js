@@ -14,6 +14,7 @@ import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLiteMasterType } from './master/sqliteMasterType';
 import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
 import { RTreeIndexExtension } from '../extension/rtree/rTreeIndexExtension';
+
 /**
  * Builds and performs alter table statements
  */

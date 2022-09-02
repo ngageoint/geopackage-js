@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import os from 'os';
-import { GeoPackageUtilities } from "../io/geoPackageUtilities";
-import { ResultSet } from "./resultSet";
+import { GeoPackageUtilities } from '../io/geoPackageUtilities';
+import { ResultSet } from './resultSet';
 
 /**
  * This adapter uses better-sqlite3 to execute queries against the GeoPackage database

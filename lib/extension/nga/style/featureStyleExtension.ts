@@ -22,8 +22,6 @@ import { ContentsIdExtension } from '../contents/contentsIdExtension';
 import { GeoPackage } from '../../../geoPackage';
 import { ExtendedRelation } from '../../related/extendedRelation';
 import { StyleRow } from './styleRow';
-import { StyleMappingRow } from './styleMappingRow';
-import { UserCustomTableReader } from '../../../user/custom/userCustomTableReader';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { ContentsId } from '../contents/contentsId';

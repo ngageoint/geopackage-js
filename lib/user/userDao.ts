@@ -11,13 +11,13 @@ import { GeoPackageException } from '../geoPackageException';
 import { TileBoundingBoxUtils } from '../tiles/tileBoundingBoxUtils';
 import { SQLUtils } from '../db/sqlUtils';
 import { UserResultSet } from './userResultSet';
-import { ColumnValue } from "./columnValue";
-import { AlterTable } from "../db/alterTable";
-import { ColumnValues } from "../dao/columnValues";
-import { DBValue } from "../db/dbAdapter";
-import { ContentValues } from "./contentValues";
-import { ResultUtils } from "../db/resultUtils";
-import { ResultSetResult } from "../db/resultSetResult";
+import { ColumnValue } from './columnValue';
+import { AlterTable } from '../db/alterTable';
+import { ColumnValues } from '../dao/columnValues';
+import { DBValue } from '../db/dbAdapter';
+import { ContentValues } from './contentValues';
+import { ResultUtils } from '../db/resultUtils';
+import { ResultSetResult } from '../db/resultSetResult';
 
 /**
  * Abstract UserDao

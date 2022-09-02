@@ -1,5 +1,6 @@
 import { FeatureRow } from '../../features/user/featureRow';
 import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
+
 /**
  * Feature Paint Cache.
  * @module tiles/features

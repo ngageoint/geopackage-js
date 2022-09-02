@@ -1,4 +1,5 @@
 import { FeatureRow } from '../user/featureRow';
+
 /**
  * Iterable Feature Index Results to iterate on feature rows
  */

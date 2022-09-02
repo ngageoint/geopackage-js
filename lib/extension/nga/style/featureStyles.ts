@@ -1,5 +1,6 @@
 import { Styles } from './styles';
 import { Icons } from './icons';
+
 /**
  * FeatureStyles constructor
  * @param {module:extension/nga/style.Styles} styles

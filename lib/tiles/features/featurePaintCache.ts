@@ -2,6 +2,7 @@ import { StyleRow } from '../../extension/nga/style/styleRow';
 import { FeaturePaint } from './featurePaint';
 import { FeatureDrawType } from './featureDrawType';
 import { Paint } from './paint';
+
 /**
  * Constructor, created with cache size of {@link #DEFAULT_CACHE_SIZE}
  * @constructor

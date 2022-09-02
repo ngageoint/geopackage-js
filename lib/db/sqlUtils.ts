@@ -12,12 +12,11 @@ import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
 import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { GeoPackageDataType } from './geoPackageDataType';
 import { ResultSet } from './resultSet';
-import { AlterTable } from "./alterTable";
+import { AlterTable } from './alterTable';
 import { ResultSetResult } from './resultSetResult';
-import { ResultUtils } from "./resultUtils";
-import { ContentValues } from "../user/contentValues";
-import { GeoPackageException } from "../geoPackageException";
-import { DBAdapter } from "./dbAdapter";
+import { ResultUtils } from './resultUtils';
+import { ContentValues } from '../user/contentValues';
+import { DBAdapter } from './dbAdapter';
 
 export class SQLUtils {
   /**

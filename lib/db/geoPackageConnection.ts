@@ -1,13 +1,13 @@
 import { Db } from './db';
 import { DBAdapter } from './dbAdapter';
 import { GeoPackageConstants } from '../geoPackageConstants';
-import { SQLiteMaster } from "./master/sqliteMaster";
-import { SQLiteMasterType } from "./master/sqliteMasterType";
-import { TableInfo } from "./table/tableInfo";
-import { SQLiteMasterQuery } from "./master/sqliteMasterQuery";
-import { SQLiteMasterColumn } from "./master/sqliteMasterColumn";
+import { SQLiteMaster } from './master/sqliteMaster';
+import { SQLiteMasterType } from './master/sqliteMasterType';
+import { TableInfo } from './table/tableInfo';
+import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
+import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLUtils } from './sqlUtils';
-import { ResultSet } from "./resultSet";
+import { ResultSet } from './resultSet';
 
 /**
  * Represents a connection to the GeoPackage database

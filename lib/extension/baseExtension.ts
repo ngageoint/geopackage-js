@@ -3,6 +3,7 @@ import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { Extensions } from './extensions';
 import { ExtensionsDao } from './extensionsDao';
 import { ExtensionScopeType } from './extensionScopeType';
+
 /**
  * Base Extension
  */

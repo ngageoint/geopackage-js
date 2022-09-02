@@ -1,7 +1,6 @@
 import { Dao } from '../dao/dao';
 import { SQLiteMaster } from './master/sqliteMaster';
 import { GeoPackageException } from '../geoPackageException';
-import { GeoPackage } from '../geoPackage';
 import { GeoPackageConnection } from './geoPackageConnection';
 
 /**

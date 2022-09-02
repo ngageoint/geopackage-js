@@ -32,7 +32,7 @@ import {
   Polygon,
   PolyhedralSurface,
   TIN,
-  Triangle,
+  Triangle
 } from '@ngageoint/simple-features-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';

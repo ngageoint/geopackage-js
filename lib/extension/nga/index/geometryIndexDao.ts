@@ -9,6 +9,7 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { ColumnValues } from '../../../dao/columnValues';
 import { GeoPackageException } from '../../../geoPackageException';
 import { TableIndexDao } from './tableIndexDao';
+
 /**
  * Geometry Index Data Access Object
  */

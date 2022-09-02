@@ -8,7 +8,6 @@ import { Styles } from './styles';
 import { Icons } from './icons';
 import { FeatureStyleExtension } from './featureStyleExtension';
 import { GeoPackage } from '../../../geoPackage';
-import { ExtendedRelation } from '../../related/extendedRelation';
 import { StyleMappingDao } from './styleMappingDao';
 import { StyleDao } from './styleDao';
 import { IconDao } from './iconDao';

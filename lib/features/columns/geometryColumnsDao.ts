@@ -14,6 +14,7 @@ import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { SpatialReferenceSystemDao } from '../../srs/spatialReferenceSystemDao';
 import { TableColumnKey } from '../../db/tableColumnKey';
 import { ContentsDao } from '../../contents/contentsDao';
+
 /**
  * Geometry Columns Data Access Object
  */

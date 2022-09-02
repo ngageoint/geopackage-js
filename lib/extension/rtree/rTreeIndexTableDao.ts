@@ -14,7 +14,6 @@ import { BoundingBox } from '../../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { SQLUtils } from '../../db/sqlUtils';
-import { GeometryIndex } from '../nga/index/geometryIndex';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 
 /**

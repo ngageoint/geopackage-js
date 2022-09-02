@@ -1,7 +1,7 @@
 import { DBAdapter, DBValue } from './dbAdapter';
 import initSqlJs from 'rtree-sql.js';
-import { GeoPackageException } from "../geoPackageException";
-import { ResultSet } from "./resultSet";
+import { GeoPackageException } from '../geoPackageException';
+import { ResultSet } from './resultSet';
 
 /**
  * This adapter uses sql.js to execute queries against the GeoPackage database

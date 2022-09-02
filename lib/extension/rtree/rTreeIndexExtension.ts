@@ -15,6 +15,7 @@ import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
+
 /**
  * RTreeIndex extension
  */

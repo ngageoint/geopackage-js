@@ -1,14 +1,14 @@
-import { Projection } from "@ngageoint/projections-js";
-import { BoundingBox } from "../../boundingBox";
-import { ColumnValues } from "../../dao/columnValues";
-import { SQLUtils } from "../../db/sqlUtils";
-import { FeatureDao } from "./featureDao";
-import { FeatureResultSet } from "./featureResultSet";
-import { ManualFeatureQueryResults } from "./manualFeatureQueryResults";
-import { DBValue } from "../../db/dbAdapter";
-import { GeometryEnvelope } from "@ngageoint/simple-features-js";
-import { FeatureRow } from "./featureRow";
-import { GeometryTransform } from "@ngageoint/simple-features-proj-js";
+import { Projection } from '@ngageoint/projections-js';
+import { BoundingBox } from '../../boundingBox';
+import { ColumnValues } from '../../dao/columnValues';
+import { SQLUtils } from '../../db/sqlUtils';
+import { FeatureDao } from './featureDao';
+import { FeatureResultSet } from './featureResultSet';
+import { ManualFeatureQueryResults } from './manualFeatureQueryResults';
+import { DBValue } from '../../db/dbAdapter';
+import { GeometryEnvelope } from '@ngageoint/simple-features-js';
+import { FeatureRow } from './featureRow';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 
 /**
  * Performs manual brute force queries against feature rows. See

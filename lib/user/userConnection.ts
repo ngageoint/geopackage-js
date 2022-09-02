@@ -1,12 +1,12 @@
-import { UserColumn } from "./userColumn";
-import { UserRow } from "./userRow";
-import { UserTable } from "./userTable";
-import { GeoPackageConnection } from "../db/geoPackageConnection";
-import { ResultSet } from "../db/resultSet";
-import { SQLUtils } from "../db/sqlUtils";
-import { SqliteQueryBuilder } from "../db/sqliteQueryBuilder";
-import { UserResultSet } from "./userResultSet";
-import { DBValue } from "../db/dbAdapter";
+import { UserColumn } from './userColumn';
+import { UserRow } from './userRow';
+import { UserTable } from './userTable';
+import { GeoPackageConnection } from '../db/geoPackageConnection';
+import { ResultSet } from '../db/resultSet';
+import { SQLUtils } from '../db/sqlUtils';
+import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
+import { UserResultSet } from './userResultSet';
+import { DBValue } from '../db/dbAdapter';
 
 /**
  * GeoPackage Connection used to define common functionality within different
