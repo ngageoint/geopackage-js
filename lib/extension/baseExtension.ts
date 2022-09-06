@@ -1,12 +1,8 @@
-import { GeoPackage } from '../geoPackage';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { Extensions } from './extensions';
 import { ExtensionsDao } from './extensionsDao';
 import { ExtensionScopeType } from './extensionScopeType';
-
-/**
- * Base Extension
- */
+import type { GeoPackage } from '../geoPackage';
+import type { GeoPackageConnection } from '../db/geoPackageConnection';
 
 /**
  * Abstract base GeoPackage extension
@@ -46,7 +42,7 @@ export abstract class BaseExtension {
   constructor(geoPackage: GeoPackage) {
     this.geoPackage = geoPackage;
     this.connection = geoPackage.getConnection();
-    this.extensionsDao = ExtensionsDao.createDao(this.connection);
+    this.extensionsDao = geoPackage.getExtensionsDao();
   }
 
   /**

@@ -1,30 +1,28 @@
 import { ContentsId } from './contentsId';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
-import { ContentsDao } from '../../../contents/contentsDao';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Contents Id Data Access Object
  */
 export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
-  private contentsDao;
   readonly gpkgTableName: string = ContentsId.TABLE_NAME;
   readonly idColumns: string[] = ['id'];
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, ContentsId.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, ContentsId.TABLE_NAME);
   }
 
   /**
    * Creates a ContentsIdDao
-   * @param geoPackageConnection
+   * @param geoPackage
    */
-  public static createDao(geoPackageConnection: GeoPackageConnection): ContentsIdDao {
-    return new ContentsIdDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): ContentsIdDao {
+    return new ContentsIdDao(geoPackage);
   }
 
   /**
@@ -35,11 +33,17 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
     const c = new ContentsId();
     if (results) {
       c.setId(results.id as number);
-      const tableName = results.table_name as string;
-      const contents = this.getContentsDao().queryForIdWithKey(tableName);
-      c.setContents(contents);
+      c.setTableName(results.table_name as string);
     }
     return c;
+  }
+
+  /**
+   * Get the contents for the contents id table
+   * @param contentsId
+   */
+  public getContents(contentsId: ContentsId) {
+    return this.geoPackage.getContentsDao().queryForIdWithKey(contentsId.getTableName());
   }
 
   queryForIdWithKey(key: number): ContentsId {
@@ -84,12 +88,5 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
       this.buildWhereWithFieldAndValue(ContentsId.COLUMN_TABLE_NAME, tableName),
       this.buildWhereArgs(tableName),
     );
-  }
-
-  private getContentsDao(): ContentsDao {
-    if (this.contentsDao == null) {
-      this.contentsDao = ContentsDao.createDao(this.db);
-    }
-    return this.contentsDao;
   }
 }

@@ -43,6 +43,8 @@ export class Context {
   static setupNodeContext(): void {
     Context.registerSqliteAdapter();
     Canvas.registerCanvasAdapter(CanvasKitCanvasAdapter);
+    // TODO: think about catching an uncaught error
+    // process.on('uncaughtException', () => {});
   }
 
   /**

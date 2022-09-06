@@ -1,10 +1,8 @@
-import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
-import { Contents } from '../../contents/contents';
 import { GeoPackageException } from '../../geoPackageException';
 import { TableColumnKey } from '../../db/tableColumnKey';
-import { ContentsDataType } from '../../contents/contentsDataType';
 import { GeometryType } from '@ngageoint/simple-features-js';
-import { Projection } from '@ngageoint/projections-js';
+import { SpatialReferenceSystemConstants } from '../../srs/spatialReferenceSystemConstants';
+import { Contents } from '../../contents/contents';
 
 /**
  * Geometry Columns object. Identifies the geometry columns in tables that contain user data representing features.
@@ -44,7 +42,7 @@ export class GeometryColumns {
   /**
    * srsId field name
    */
-  public static readonly COLUMN_SRS_ID = SpatialReferenceSystem.COLUMN_SRS_ID;
+  public static readonly COLUMN_SRS_ID = SpatialReferenceSystemConstants.COLUMN_SRS_ID;
 
   /**
    * z field name
@@ -55,11 +53,6 @@ export class GeometryColumns {
    * m field name
    */
   public static readonly COLUMN_M = 'm';
-
-  /**
-   * Foreign key to Contents by table name
-   */
-  private contents: Contents;
 
   /**
    * Name of the table containing the geometry column
@@ -76,11 +69,6 @@ export class GeometryColumns {
    * in Geometry Types (Normative)
    */
   private geometry_type_name: string;
-
-  /**
-   * Spatial Reference System ID: gpkg_spatial_ref_sys.srs_id
-   */
-  private srs: SpatialReferenceSystem;
 
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
@@ -103,11 +91,9 @@ export class GeometryColumns {
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof GeometryColumns) {
       const geometryColumns = args[0];
-      this.contents = geometryColumns.contents;
       this.table_name = geometryColumns.table_name;
       this.column_name = geometryColumns.column_name;
       this.geometry_type_name = geometryColumns.geometry_type_name;
-      this.srs = geometryColumns.srs;
       this.srs_id = geometryColumns.srs_id;
       this.z = geometryColumns.z;
       this.m = geometryColumns.m;
@@ -132,41 +118,6 @@ export class GeometryColumns {
   public setId(id: TableColumnKey): void {
     this.table_name = id.getTableName();
     this.column_name = id.getColumnName();
-  }
-
-  /**
-   * Get the contents
-   *
-   * @return contents
-   */
-  public getContents(): Contents {
-    return this.contents;
-  }
-
-  /**
-   * Set the contents
-   *
-   * @param contents
-   *            contents
-   */
-  public setContents(contents: Contents): void {
-    this.contents = contents;
-    if (contents != null) {
-      // Verify the Contents have a features data type (Spec Requirement 23)
-      if (!contents.isFeaturesTypeOrUnknown()) {
-        throw new GeoPackageException(
-          'The ' +
-            'Contents of a GeometryColumns' +
-            ' must have a data type of ' +
-            ContentsDataType.nameFromType(ContentsDataType.FEATURES) +
-            '. actual type: ' +
-            contents.getDataTypeName(),
-        );
-      }
-      this.table_name = contents.getId();
-    } else {
-      this.table_name = null;
-    }
   }
 
   /**
@@ -232,25 +183,6 @@ export class GeometryColumns {
   }
 
   /**
-   * Get the srs
-   *
-   * @return srs
-   */
-  public getSrs(): SpatialReferenceSystem {
-    return this.srs;
-  }
-
-  /**
-   * Set the srs
-   *
-   * @param srs srs
-   */
-  public setSrs(srs: SpatialReferenceSystem): void {
-    this.srs = srs;
-    this.srs_id = srs != null ? srs.getId() : -1;
-  }
-
-  /**
    * Get the srs id
    *
    * @return srs id
@@ -306,15 +238,6 @@ export class GeometryColumns {
   public setM(m: number): void {
     this.validateValues(GeometryColumns.COLUMN_M, m);
     this.m = m;
-  }
-
-  /**
-   * Get the projection
-   *
-   * @return projection
-   */
-  public getProjection(): Projection {
-    return this.getSrs() != null ? this.getSrs().getProjection() : null;
   }
 
   /**

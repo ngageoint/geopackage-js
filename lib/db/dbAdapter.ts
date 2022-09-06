@@ -1,5 +1,5 @@
-import { ResultSet } from './resultSet';
 import { DBValue } from './dbValue';
+import type { ResultSet } from './resultSet';
 
 export interface DBAdapter {
   db: any;

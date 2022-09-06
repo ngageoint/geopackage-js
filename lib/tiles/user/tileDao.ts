@@ -6,7 +6,6 @@ import { TileResultSet } from './tileResultSet';
 import { TileRow } from './tileRow';
 import { TileTable } from './tileTable';
 import { TileMatrix } from '../matrix/tileMatrix';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { BoundingBox } from '../../boundingBox';
 import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../../geoPackageException';
@@ -18,6 +17,7 @@ import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { ColumnValues } from '../../dao/columnValues';
 import { TileMatrixSetDao } from '../matrixset/tileMatrixSetDao';
 import { TileMatrixDao } from '../matrix/tileMatrixDao';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Tile DAO for reading tile user tables
@@ -67,26 +67,26 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * Constructor
    *
    * @param database database
-   * @param db GeoPackage connection
+   * @param geoPackage GeoPackage
    * @param tileMatrixSet tile matrix set
    * @param tileMatrices tile matrices
    * @param table tile table
    */
   public constructor(
     database: string,
-    db: GeoPackageConnection,
+    geoPackage: GeoPackage,
     tileMatrixSet: TileMatrixSet,
     tileMatrices: TileMatrix[],
     table: TileTable,
   ) {
-    super(database, db, new TileConnection(db), table);
+    super(database, geoPackage, new TileConnection(geoPackage.getConnection()), table);
     this.tileDb = this.getUserDb() as TileConnection;
     this.tileMatrixSet = tileMatrixSet;
     this.tileMatrices = tileMatrices;
     this.widths = [];
     this.heights = [];
 
-    this.projection = tileMatrixSet.getProjection();
+    this.projection = this.geoPackage.getTileMatrixSetDao().getProjection(tileMatrixSet);
 
     // Set the min and max zoom levels
     if (tileMatrices.length != 0) {
@@ -107,10 +107,10 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
       this.heights = this.heights.sort();
     }
 
-    if (tileMatrixSet.getContents() == null) {
+    if (this.geoPackage.getTileMatrixSetDao().getContents(tileMatrixSet) == null) {
       throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null Contents');
     }
-    if (tileMatrixSet.getSrs() == null) {
+    if (this.geoPackage.getTileMatrixSetDao().getSrs(tileMatrixSet.getSrsId()) == null) {
       throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null SpatialReferenceSystem');
     }
   }
@@ -126,7 +126,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * {@inheritDoc}
    */
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
-    return this.tileMatrixSet.getBoundingBoxWithProjection(projection);
+    return this.geoPackage.getTileMatrixSetDao().getBoundingBoxWithProjection(this.tileMatrixSet, projection);
   }
 
   /**
@@ -259,7 +259,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return srs
    */
   public getSrs(): SpatialReferenceSystem {
-    return this.tileMatrixSet.getSrs();
+    return this.geoPackage.getSpatialReferenceSystemDao().queryForIdWithKey(this.tileMatrixSet.getSrsId());
   }
 
   /**
@@ -576,7 +576,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return map zoom level range, min at index 0, max at index 1
    */
   public getMapZoomRange(): number[] {
-    return TileDaoUtils.getMapZoomRange(this.tileMatrixSet, this.tileMatrices);
+    return TileDaoUtils.getMapZoomRange(this, this.tileMatrixSet, this.tileMatrices);
   }
 
   /**
@@ -585,7 +585,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return map min zoom level
    */
   public getMapMinZoom(): number {
-    return TileDaoUtils.getMapMinZoom(this.tileMatrixSet, this.tileMatrices);
+    return TileDaoUtils.getMapMinZoom(this, this.tileMatrixSet, this.tileMatrices);
   }
 
   /**
@@ -594,7 +594,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return map max zoom level
    */
   public getMapMaxZoom(): number {
-    return TileDaoUtils.getMapMaxZoom(this.tileMatrixSet, this.tileMatrices);
+    return TileDaoUtils.getMapMaxZoom(this, this.tileMatrixSet, this.tileMatrices);
   }
 
   /**
@@ -604,7 +604,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return map zoom level
    */
   public getMapZoomWithTileMatrix(tileMatrix: TileMatrix): number {
-    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(this.tileMatrixSet, tileMatrix);
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(this, this.tileMatrixSet, tileMatrix);
   }
 
   /**
@@ -622,7 +622,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile matrix set DAO
    */
   public getTileMatrixSetDao(): TileMatrixSetDao {
-    return TileMatrixSetDao.createDao(this.getDb());
+    return this.geoPackage.getTileMatrixSetDao();
   }
 
   /**
@@ -631,6 +631,6 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile matrix DAO
    */
   public getTileMatrixDao(): TileMatrixDao {
-    return TileMatrixDao.createDao(this.getDb());
+    return this.geoPackage.getTileMatrixDao();
   }
 }

@@ -1,14 +1,10 @@
-/**
- * simpleAttributesTable module.
- * @module extension/relatedTables
- */
 import { UserRelatedTable } from '../userRelatedTable';
 import { RelationType } from '../relationType';
 import { UserColumn } from '../../../user/userColumn';
 import { GeoPackageDataType } from '../../../db/geoPackageDataType';
-import { SimpleAttributesTableMetadata } from './simpleAttributesTableMetadata';
 import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
 import { UserCustomTable } from '../../../user/custom/userCustomTable';
+import type { SimpleAttributesTableMetadata } from './simpleAttributesTableMetadata';
 
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table

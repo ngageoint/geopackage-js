@@ -1,7 +1,7 @@
 import { Contents } from '../../../contents/contents';
 import { TableColumnKey } from '../../../db/tableColumnKey';
 import { DataColumnConstraints } from '../constraints/dataColumnConstraints';
-import { DataColumnConstraintsDao } from '../constraints/dataColumnConstraintsDao';
+import type { DataColumnConstraintsDao } from '../constraints/dataColumnConstraintsDao';
 
 /**
  * Stores minimal application schema identifying, descriptive and MIME type
@@ -107,11 +107,6 @@ export class DataColumns {
   constraint_name: string;
 
   /**
-   * Contents
-   */
-  contents: Contents;
-
-  /**
    * Default Constructor
    */
   public constructor();
@@ -136,7 +131,6 @@ export class DataColumns {
       this.description = dataColumns.description;
       this.mime_type = dataColumns.mime_type;
       this.constraint_name = dataColumns.constraint_name;
-      this.contents = dataColumns.contents;
     }
   }
 
@@ -158,21 +152,12 @@ export class DataColumns {
     this.column_name = id.getColumnName();
   }
 
-  public getContents(): Contents {
-    return this.contents;
-  }
-
-  public setContents(contents: Contents): void {
-    this.contents = contents;
-    if (contents != null) {
-      this.table_name = contents.getId();
-    } else {
-      this.table_name = null;
-    }
-  }
-
   public getTableName(): string {
     return this.table_name;
+  }
+
+  public setTableName(tableName: string): void {
+    this.table_name = tableName;
   }
 
   public getColumnName(): string {

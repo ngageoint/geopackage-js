@@ -1,11 +1,10 @@
-import { GeoPackage } from '../geoPackage';
 import { Extensions } from './extensions';
 import { BaseExtension } from './baseExtension';
 import { ExtensionScopeType } from './extensionScopeType';
 import { GeoPackageConstants } from '../geoPackageConstants';
-import { SpatialReferenceSystem } from '../srs/spatialReferenceSystem';
 import { AlterTable } from '../db/alterTable';
 import { SpatialReferenceSystemConstants } from '../srs/spatialReferenceSystemConstants';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * OGC Well known text representation of Coordinate Reference Systems extensionName
@@ -70,13 +69,13 @@ export class CrsWktExtension extends BaseExtension {
   public updateDefinition(srsId: number, definition: string): void {
     this.connection.run(
       'UPDATE ' +
-        SpatialReferenceSystem.TABLE_NAME +
+        SpatialReferenceSystemConstants.TABLE_NAME +
         ' SET ' +
         CrsWktExtension.COLUMN_NAME +
         " = '" +
         definition +
         "' WHERE " +
-        SpatialReferenceSystem.COLUMN_SRS_ID +
+        SpatialReferenceSystemConstants.COLUMN_SRS_ID +
         ' = ' +
         srsId,
     );
@@ -93,9 +92,9 @@ export class CrsWktExtension extends BaseExtension {
       'SELECT ' +
         CrsWktExtension.COLUMN_NAME +
         ' FROM ' +
-        SpatialReferenceSystem.TABLE_NAME +
+        SpatialReferenceSystemConstants.TABLE_NAME +
         ' WHERE ' +
-        SpatialReferenceSystem.COLUMN_SRS_ID +
+        SpatialReferenceSystemConstants.COLUMN_SRS_ID +
         ' = ?',
       [srsId.toString()],
     );
@@ -111,7 +110,7 @@ export class CrsWktExtension extends BaseExtension {
   private createColumn(): void {
     AlterTable.addColumn(
       this.connection,
-      SpatialReferenceSystem.TABLE_NAME,
+      SpatialReferenceSystemConstants.TABLE_NAME,
       CrsWktExtension.COLUMN_NAME,
       CrsWktExtension.COLUMN_DEF,
     );
@@ -141,7 +140,7 @@ export class CrsWktExtension extends BaseExtension {
    * @return
    */
   private hasColumn(): boolean {
-    return this.connection.columnExists(SpatialReferenceSystem.TABLE_NAME, CrsWktExtension.COLUMN_NAME);
+    return this.connection.columnExists(SpatialReferenceSystemConstants.TABLE_NAME, CrsWktExtension.COLUMN_NAME);
   }
 
   /**

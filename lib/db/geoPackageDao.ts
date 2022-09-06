@@ -1,7 +1,7 @@
 import { Dao } from '../dao/dao';
 import { SQLiteMaster } from './master/sqliteMaster';
 import { GeoPackageException } from '../geoPackageException';
-import { GeoPackageConnection } from './geoPackageConnection';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Abstract GeoPackage DAO
@@ -10,11 +10,11 @@ import { GeoPackageConnection } from './geoPackageConnection';
 export abstract class GeoPackageDao<T, ID> extends Dao<T, ID> {
   /**
    * Constructor
-   * @param db GeoPackageConnection object
+   * @param geoPackage GeoPackageConnection object
    * @param tableName tableName
    */
-  constructor(db: GeoPackageConnection, tableName?: string) {
-    super(db, tableName);
+  constructor(geoPackage: GeoPackage, tableName?: string) {
+    super(geoPackage, tableName);
   }
 
   /**

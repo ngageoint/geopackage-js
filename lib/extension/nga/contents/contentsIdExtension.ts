@@ -1,16 +1,13 @@
-/**
- * @module extension/nga/contents
- */
 import { BaseExtension } from '../../baseExtension';
-import { GeoPackage } from '../../../geoPackage';
 import { Extensions } from '../../extensions';
 import { ContentsIdDao } from './contentsIdDao';
 import { Contents } from '../../../contents/contents';
 import { ContentsId } from './contentsId';
 import { ExtensionScopeType } from '../../extensionScopeType';
-import { ContentsIdTableCreator } from './contentsIdTableCreator';
 import { GeoPackageException } from '../../../geoPackageException';
-import { NGAExtensions } from '../ngaExtensions';
+import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
+import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Contents ID extension
@@ -19,7 +16,7 @@ export class ContentsIdExtension extends BaseExtension {
   /**
    * Extension author
    */
-  public static readonly EXTENSION_AUTHOR = NGAExtensions.EXTENSION_AUTHOR;
+  public static readonly EXTENSION_AUTHOR = NGAExtensionsConstants.EXTENSION_AUTHOR;
 
   /**
    * Extension name without the author
@@ -48,7 +45,7 @@ export class ContentsIdExtension extends BaseExtension {
    */
   constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.contentsIdDao = ContentsIdDao.createDao(geoPackage.getConnection());
+    this.contentsIdDao = geoPackage.getContentsIdDao();
   }
   /**
    * Get or create the contents id extension
@@ -163,8 +160,9 @@ export class ContentsIdExtension extends BaseExtension {
     }
 
     const contentsId = new ContentsId();
+    // verify the contents exist before setting the table name
     const contents = this.geoPackage.getTableContents(tableName);
-    contentsId.setContents(contents);
+    contentsId.setTableName(contents.getTableName());
     try {
       this.contentsIdDao.create(contentsId);
     } catch (e) {
@@ -385,8 +383,8 @@ export class ContentsIdExtension extends BaseExtension {
 
     try {
       if (!this.contentsIdDao.isTableExists()) {
-        const tableCreator = new ContentsIdTableCreator(this.geoPackage);
-        created = tableCreator.createContentsId();
+        const tableCreator = new GeoPackageTableCreator(this.geoPackage);
+        created = tableCreator.execScript('contents_id');;
       }
     } catch (e) {
       throw new GeoPackageException('Failed to check if ContentsId table exists and create it');

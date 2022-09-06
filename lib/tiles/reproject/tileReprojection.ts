@@ -1153,7 +1153,7 @@ export class TileReprojection {
         }
 
         const contents = this.reprojectTileDao.getContents();
-        contents.setSrs(srs);
+        contents.setSrsId(srs.getSrsId());
         contents.setMinX(contentsBoundingBox.getMinLongitude());
         contents.setMinY(contentsBoundingBox.getMinLatitude());
         contents.setMaxX(contentsBoundingBox.getMaxLongitude());
@@ -1169,7 +1169,7 @@ export class TileReprojection {
           );
         }
 
-        tileMatrixSet.setSrs(srs);
+        tileMatrixSet.setSrsId(srs.getSrsId());
         tileMatrixSet.setMinX(boundingBox.getMinLongitude());
         tileMatrixSet.setMinY(boundingBox.getMinLatitude());
         tileMatrixSet.setMaxX(boundingBox.getMaxLongitude());
@@ -1354,7 +1354,7 @@ export class TileReprojection {
     let toTileMatrix = this.getTileMatrix(true, toZoom);
     if (toTileMatrix == null) {
       toTileMatrix = new TileMatrix();
-      toTileMatrix.setContents(this.reprojectTileDao.getContents());
+      toTileMatrix.setTableName(this.reprojectTileDao.getContents().getId());
       toTileMatrix.setZoomLevel(toZoom);
     } else if (
       toTileMatrix.getMatrixHeight() != matrixHeight ||

@@ -1,15 +1,10 @@
-/**
- * MetadataExtension module.
- * @module extension/metadata
- */
-
 import { BaseExtension } from '../baseExtension';
-import { GeoPackage } from '../../geoPackage';
 import { Extensions } from '../extensions';
 import { ExtensionScopeType } from '../extensionScopeType';
 import { GeoPackageException } from '../../geoPackageException';
 import { MetadataReference } from './reference/metadataReference';
 import { Metadata } from './metadata';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Metadata extension

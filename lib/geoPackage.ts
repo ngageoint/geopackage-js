@@ -45,6 +45,10 @@ import { FeatureIndexManager } from './features/index/featureIndexManager';
 import { FeatureTableMetadata } from './features/user/featureTableMetadata';
 import { TileTableMetadata } from './tiles/user/tileTableMetadata';
 import { SchemaExtension } from './extension/schema/schemaExtension';
+import { GeometryIndexDao } from './extension/nga/index/geometryIndexDao';
+import { ExtendedRelationsDao } from './extension/related/extendedRelationsDao';
+import { MetadataReferenceDao } from './extension/metadata/reference/metadataReferenceDao';
+import { ContentsIdDao } from './extension/nga/contents/contentsIdDao';
 
 /**
  *  A single GeoPackage database connection implementation
@@ -74,6 +78,89 @@ export class GeoPackage {
    * Writable GeoPackage flag
    */
   protected readonly writable: boolean;
+
+  /**
+   * Extension Manager
+   * @private
+   */
+  private extensionManager: ExtensionManager;
+
+  /**
+   * GeometryIndexDao
+   */
+  private geometryIndexDao: GeometryIndexDao;
+
+  /**
+   * Data ColumnsDao
+   * @private
+   */
+  private dataColumnsDao: DataColumnsDao;
+
+  /**
+   * Extended Relations Dao
+   * @private
+   */
+  private extendedRelationsDao: ExtendedRelationsDao;
+
+  /**
+   * Metadata Relations Dao
+   * @private
+   */
+  private metadataReferenceDao: MetadataReferenceDao;
+
+  /**
+   * Contents Id Dao
+   * @private
+   */
+  private contentsIdDao: ContentsIdDao;
+
+  /**
+   * Contents Dao
+   * @private
+   */
+  private contentsDao: ContentsDao;
+
+  /**
+   * Geometry Columns Dao
+   * @private
+   */
+  private geometryColumnsDao: GeometryColumnsDao;
+
+  /**
+   * Spatial Reference System Dao
+   * @private
+   */
+  private spatialReferenceSystemDao: SpatialReferenceSystemDao;
+
+  /**
+   * Tile Matrix Set Dao
+   * @private
+   */
+  private tileMatrixSetDao: TileMatrixSetDao;
+
+  /**
+   * Tile Matrix Dao
+   * @private
+   */
+  private tileMatrixDao: TileMatrixDao;
+
+  /**
+   * Extensions Dao
+   * @private
+   */
+  private extensionsDao: ExtensionsDao;
+
+  /**
+   * Table Index Dao
+   * @private
+   */
+  private tableIndexDao: TableIndexDao;
+
+  /**
+   * Tile Scaling Dao
+   * @private
+   */
+  private tileScalingDao: TileScalingDao;
 
   /**
    * Constructor
@@ -119,8 +206,9 @@ export class GeoPackage {
     // Read the existing table and create the dao
     const tableReader = new FeatureTableReader(geometryColumns);
     const featureTable = tableReader.readTable(this.database);
-    featureTable.setContents(geometryColumns.getContents());
-    const dao = new FeatureDao(this.getName(), this.database, geometryColumns, featureTable);
+    const contents = this.getContentsDao().queryForIdWithKey(geometryColumns.getTableName());
+    featureTable.setContents(contents);
+    const dao = new FeatureDao(this.getName(), this, geometryColumns, featureTable);
 
     // If the GeoPackage is writable and the feature table has a RTree Index
     // extension, create the SQL functions
@@ -152,7 +240,7 @@ export class GeoPackage {
       throw new GeoPackageException('No GeometryColumns exists for Contents ' + contents.getId());
     }
 
-    return this.getFeatureDao(geometryColumns);
+    return this.getFeatureDaoForGeometryColumns(geometryColumns);
   }
 
   /**
@@ -185,7 +273,7 @@ export class GeoPackage {
           geometryColumnsList.length,
       );
     }
-    return this.getFeatureDao(geometryColumnsList[0]);
+    return this.getFeatureDaoForGeometryColumns(geometryColumnsList[0]);
   }
 
   /**
@@ -214,8 +302,8 @@ export class GeoPackage {
     // Read the existing table and create the dao
     const tableReader = new TileTableReader(tableName);
     const tileTable = tableReader.readTable(this.database);
-    tileTable.setContents(tileMatrixSet.getContents());
-    return new TileDao(this.getName(), this.database, tileMatrixSet, tileMatrices, tileTable);
+    tileTable.setContents(this.getContentsDao().queryForIdWithKey(tableName));
+    return new TileDao(this.getName(), this, tileMatrixSet, tileMatrices, tileTable);
   }
 
   /**
@@ -298,9 +386,7 @@ export class GeoPackage {
     const tableReader = new AttributesTableReader(contents.getTableName());
     const attributesTable = tableReader.readTable(this.database);
     attributesTable.setContents(contents);
-    const dao = new AttributesDao(this.getName(), this.database, attributesTable);
-
-    return dao;
+    return new AttributesDao(this.getName(), this, attributesTable);
   }
 
   /**
@@ -475,48 +561,6 @@ export class GeoPackage {
   public getApplicationId(): string {
     return this.database.getApplicationId();
   }
-
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getApplicationIdInteger(): number {
-  //   return this.database.getApplicationIdInteger();
-  // }
-  //
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getApplicationIdHex(): string {
-  //   return this.database.getApplicationIdHex();
-  // }
-  //
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getUserVersion(): number {
-  //   return this.database.getUserVersion();
-  // }
-  //
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getUserVersionMajor(): number {
-  //   return this.database.getUserVersionMajor();
-  // }
-  //
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getUserVersionMinor(): number {
-  //   return this.database.getUserVersionMinor();
-  // }
-  //
-  // /**
-  //  * {@inheritDoc}
-  //  */
-  // public getUserVersionPatch(): number {
-  //   return this.database.getUserVersionPatch();
-  // }
 
   /**
    * {@inheritDoc}
@@ -799,7 +843,7 @@ export class GeoPackage {
     if (contents == null) {
       throw new GeoPackageException('Failed to retrieve for: Contents table: ' + table);
     }
-    return contents.getProjection();
+    return this.contentsDao.getProjection(contents);
   }
 
   /**
@@ -843,29 +887,6 @@ export class GeoPackage {
   /**
    * {@inheritDoc}
    */
-  public getSpatialReferenceSystemDao(): SpatialReferenceSystemDao {
-    const dao = SpatialReferenceSystemDao.createDao(this.getConnection());
-    dao.setCrsWktExtension(new CrsWktExtension(this));
-    return dao;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public getContentsDao(): ContentsDao {
-    return ContentsDao.createDao(this.getConnection());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public getGeometryColumnsDao(): GeometryColumnsDao {
-    return GeometryColumnsDao.createDao(this.getConnection());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   public createGeometryColumnsTable(): boolean {
     this.verifyWritable();
 
@@ -897,13 +918,6 @@ export class GeoPackage {
       throw new GeoPackageException('Geometry Columns are required to create a feature table');
     }
 
-    // Get the SRS
-    let srs = geometryColumns.getSrs();
-    if (srs == null) {
-      srs = this.getSrs(geometryColumns.getSrsId());
-      geometryColumns.setSrs(srs);
-    }
-
     // Create the Geometry Columns table
     this.createGeometryColumnsTable();
 
@@ -926,13 +940,13 @@ export class GeoPackage {
         contents.setMaxX(boundingBox.getMaxLongitude());
         contents.setMaxY(boundingBox.getMaxLatitude());
       }
-      contents.setSrs(srs);
+      contents.setSrsId(geometryColumns.getSrsId());
       this.getContentsDao().create(contents);
 
       table.setContents(contents);
 
       // Create new geometry columns
-      geometryColumns.setContents(contents);
+      geometryColumns.setTableName(contents.getId());
       this.getGeometryColumnsDao().create(geometryColumns);
     } catch (e) {
       this.deleteTableQuietly(tableName);
@@ -946,7 +960,10 @@ export class GeoPackage {
    * {@inheritDoc}
    */
   public getTileMatrixSetDao(): TileMatrixSetDao {
-    return TileMatrixSetDao.createDao(this.getConnection());
+    if (this.tileMatrixSetDao == null) {
+      this.tileMatrixSetDao = TileMatrixSetDao.createDao(this);
+    }
+    return this.tileMatrixSetDao;
   }
 
   /**
@@ -971,7 +988,10 @@ export class GeoPackage {
    * {@inheritDoc}
    */
   public getTileMatrixDao(): TileMatrixDao {
-    return TileMatrixDao.createDao(this.getConnection());
+    if (this.tileMatrixDao == null) {
+      this.tileMatrixDao = TileMatrixDao.createDao(this);
+    }
+    return this.tileMatrixDao;
   }
 
   /**
@@ -1003,10 +1023,6 @@ export class GeoPackage {
    * {@inheritDoc}
    */
   public createTileTableWithMetadata(metadata: TileTableMetadata): TileTable {
-    // Get the SRS
-    const contentsSrs = this.getSrs(metadata.getContentsSrsId());
-    const tileMatrixSetSrs = this.getSrs(metadata.getTileSrsId());
-
     // Create the Tile Matrix Set and Tile Matrix tables
     this.createTileMatrixSetTable();
     this.createTileMatrixTable();
@@ -1028,20 +1044,16 @@ export class GeoPackage {
       contents.setMinY(contentsBoundingBox.getMinLatitude());
       contents.setMaxX(contentsBoundingBox.getMaxLongitude());
       contents.setMaxY(contentsBoundingBox.getMaxLatitude());
-      contents.setSrs(contentsSrs);
+      contents.setSrsId(metadata.getContentsSrsId());
       this.getContentsDao().create(contents);
 
       table.setContents(contents);
 
       // Create new matrix tile set
       const tileMatrixSet = new TileMatrixSet();
-      tileMatrixSet.setContents(contents);
-      tileMatrixSet.setSrs(tileMatrixSetSrs);
-      const tileMatrixSetBoundingBox = metadata.getTileBoundingBox();
-      tileMatrixSet.setMinX(tileMatrixSetBoundingBox.getMinLongitude());
-      tileMatrixSet.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
-      tileMatrixSet.setMaxX(tileMatrixSetBoundingBox.getMaxLongitude());
-      tileMatrixSet.setMaxY(tileMatrixSetBoundingBox.getMaxLatitude());
+      tileMatrixSet.setTableName(contents.getId())
+      tileMatrixSet.setSrsId(metadata.getTileSrsId());
+      tileMatrixSet.setBoundingBox(metadata.getTileBoundingBox());
       this.getTileMatrixSetDao().create(tileMatrixSet);
     } catch (e) {
       this.deleteTableQuietly(tableName);
@@ -1109,27 +1121,6 @@ export class GeoPackage {
     }
 
     return table;
-  }
-
-  /**
-   * Returns the ExtensionsDao
-   */
-  public getExtensionsDao(): ExtensionsDao {
-    return ExtensionsDao.createDao(this.getConnection());
-  }
-
-  /**
-   * Returns the TableIndexDao
-   */
-  public getTableIndexDao(): TableIndexDao {
-    return TableIndexDao.createDao(this.getConnection());
-  }
-
-  /**
-   * Returns the TileScalingDao
-   */
-  public getTileScalingDao(): TileScalingDao {
-    return TileScalingDao.createDao(this.getConnection());
   }
 
   /**
@@ -1418,13 +1409,6 @@ export class GeoPackage {
   /**
    * {@inheritDoc}
    */
-  public getExtensionManager(): ExtensionManager {
-    return new ExtensionManager(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   public createUserTable(table: UserTable<UserColumn>): void {
     this.verifyWritable();
     this.tableCreator.createUserTable(table);
@@ -1516,9 +1500,9 @@ export class GeoPackage {
     }
     let contents: Contents;
     if (tableDao instanceof FeatureDao) {
-      contents = tableDao.getGeometryColumns().getContents();
+      contents = this.getContentsDao().queryForIdWithKey(tableDao.getGeometryColumns().getTableName());
     } else if (tableDao instanceof TileDao) {
-      contents = tableDao.getTileMatrixSet().getContents();
+      contents = this.getContentsDao().queryForIdWithKey(tableDao.getTileMatrixSet().getTableName());
       info.tileMatrixSet = {
         srsId: tableDao.getTileMatrixSet().getSrsId(),
         minX: tableDao.getTileMatrixSet().getMinX(),
@@ -1528,7 +1512,7 @@ export class GeoPackage {
       };
     }
 
-    const contentsSrs = contents.getSrs();
+    const contentsSrs = this.getSpatialReferenceSystemDao().getBySrsId(contents.getSrsId());
     info.contents = {
       tableName: contents.getTableName(),
       dataType: contents.getDataType(),
@@ -1567,7 +1551,7 @@ export class GeoPackage {
     };
     info.columns = [];
     info.columnMap = {};
-    const dcd = DataColumnsDao.createDao(this.getConnection());
+    const dcd = DataColumnsDao.createDao(this);
     tableDao
       .getTable()
       .getUserColumns()
@@ -1606,5 +1590,126 @@ export class GeoPackage {
     crs.getOrCreateExtension();
     const schema = new SchemaExtension(this);
     schema.getOrCreateExtension();
+  }
+
+  /**
+   * Gets the extension manager
+   */
+  public getExtensionManager(): ExtensionManager {
+    if (this.extensionManager == null) {
+      this.extensionManager = new ExtensionManager(this);
+    }
+    return this.extensionManager;
+  }
+
+  /**
+   * Returns the ExtensionsDao
+   */
+  public getExtensionsDao(): ExtensionsDao {
+    if (this.extensionsDao == null) {
+      this.extensionsDao = ExtensionsDao.createDao(this);
+    }
+    return this.extensionsDao;
+  }
+
+  /**
+   * Returns the TableIndexDao
+   */
+  public getTableIndexDao(): TableIndexDao {
+    if (this.tableIndexDao == null) {
+      this.tableIndexDao = TableIndexDao.createDao(this);
+    }
+    return this.tableIndexDao;
+  }
+
+  /**
+   * Returns the TileScalingDao
+   */
+  public getTileScalingDao(): TileScalingDao {
+    if (this.tileScalingDao == null) {
+      this.tileScalingDao = TileScalingDao.createDao(this);
+    }
+    return this.tileScalingDao;
+  }
+
+  /**
+   * Get the Geometry Index Dao
+   */
+  getGeometryIndexDao(): GeometryIndexDao {
+    if (this.geometryIndexDao == null) {
+      this.geometryIndexDao = GeometryIndexDao.createDao(this);
+    }
+    return this.geometryIndexDao;
+  }
+
+  /**
+   * Get the data columns dao
+   */
+  getDataColumnsDao(): DataColumnsDao {
+    if (this.dataColumnsDao == null) {
+      this.dataColumnsDao = DataColumnsDao.createDao(this);
+    }
+    return this.dataColumnsDao;
+  }
+
+  /**
+   * Get the extended relations dao
+   */
+  getExtendedRelationsDao(): ExtendedRelationsDao {
+    if (this.extendedRelationsDao == null) {
+      this.extendedRelationsDao = ExtendedRelationsDao.createDao(this);
+    }
+    return this.extendedRelationsDao;
+  }
+
+  /**
+   * Get the metadata reference dao
+   */
+  getMetadataReferenceDao(): MetadataReferenceDao {
+    if (this.metadataReferenceDao == null) {
+      this.metadataReferenceDao = MetadataReferenceDao.createDao(this);
+    }
+    return this.metadataReferenceDao;
+  }
+
+  /**
+   * Get the contents id dao
+   */
+  getContentsIdDao(): ContentsIdDao {
+    if (this.contentsIdDao == null) {
+      this.contentsIdDao = ContentsIdDao.createDao(this);
+    }
+    return this.contentsIdDao;
+  }
+
+  /**
+   * Get the SpatialReferenceSystemDao
+   */
+  public getSpatialReferenceSystemDao(): SpatialReferenceSystemDao {
+    if (this.spatialReferenceSystemDao == null) {
+      this.spatialReferenceSystemDao = SpatialReferenceSystemDao.createDao(this);
+      this.spatialReferenceSystemDao.setCrsWktExtension(new CrsWktExtension(this));
+    }
+    return this.spatialReferenceSystemDao;
+  }
+
+  /**
+   * Get the Contents Dao
+   */
+  public getContentsDao(): ContentsDao {
+    if (this.contentsDao == null) {
+      this.contentsDao = ContentsDao.createDao(this);
+    }
+    return this.contentsDao;
+  }
+
+  /**
+   * Get the GeometryColumnsDao
+   */
+  public getGeometryColumnsDao(): GeometryColumnsDao {
+    if (this.geometryColumnsDao == null) {
+      this.geometryColumnsDao = GeometryColumnsDao.createDao(this);
+    }
+    return this.geometryColumnsDao;
   }
 }

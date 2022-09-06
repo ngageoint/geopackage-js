@@ -1,10 +1,10 @@
 import { Projection, Projections } from '@ngageoint/projections-js';
 import { BoundingBox } from '../boundingBox';
-import { GeoPackage } from '../geoPackage';
 import { TileFormatType } from '../io/tileFormatType';
 import { TileGenerator } from './tileGenerator';
 import { GeoPackageException } from '../geoPackageException';
 import { TileBoundingBoxUtils } from './tileBoundingBoxUtils';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a

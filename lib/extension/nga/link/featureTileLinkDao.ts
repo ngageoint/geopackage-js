@@ -4,7 +4,7 @@ import { ColumnValues } from '../../../dao/columnValues';
 import { GeoPackageException } from '../../../geoPackageException';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Feature Tile Link Data Access Object
@@ -12,14 +12,18 @@ import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTileLinkKey> {
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): FeatureTileLinkDao {
-    return new FeatureTileLinkDao(geoPackageConnection);
+  /**
+   * Create the dao
+   * @param geoPackage
+   */
+  public static createDao(geoPackage: GeoPackage): FeatureTileLinkDao {
+    return new FeatureTileLinkDao(geoPackage);
   }
 
   /**

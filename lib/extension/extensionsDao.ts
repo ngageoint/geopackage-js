@@ -2,8 +2,8 @@ import { Extensions } from './extensions';
 import { ColumnValues } from '../dao/columnValues';
 import { DBValue } from '../db/dbValue';
 import { GeoPackageDao } from '../db/geoPackageDao';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { ExtensionsKey } from './extensionsKey';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Extension Data Access Object
@@ -18,18 +18,18 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
 
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, Extensions.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, Extensions.TABLE_NAME);
   }
 
   /**
    * Create extensions dao
-   * @param geoPackageConnection
+   * @param geoPackage
    */
-  public static createDao(geoPackageConnection: GeoPackageConnection): ExtensionsDao {
-    return new ExtensionsDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): ExtensionsDao {
+    return new ExtensionsDao(geoPackage);
   }
 
   /**

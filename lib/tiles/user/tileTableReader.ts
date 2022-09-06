@@ -5,8 +5,8 @@
 import { UserTableReader } from '../../user/userTableReader';
 import { TileTable } from './tileTable';
 import { TileColumn } from './tileColumn';
-import { GeoPackage } from '../../geoPackage';
 import { TableColumn } from '../../db/table/tableColumn';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Reads the metadata from an existing tile table

@@ -1,7 +1,3 @@
-/**
- * featureDao module.
- * @module features/user/featureDao
- */
 import { FeatureTableIndex } from '../../extension/nga/index/featureTableIndex';
 import { UserDao } from '../../user/userDao';
 import { DataColumnsDao } from '../../extension/schema/columns/dataColumnsDao';
@@ -14,9 +10,9 @@ import { Projection } from '@ngageoint/projections-js';
 import { FeatureColumn } from './featureColumn';
 import { FeatureResultSet } from './featureResultSet';
 import { FeatureConnection } from './featureConnection';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { GeoPackageException } from '../../geoPackageException';
 import { GeometryType } from '@ngageoint/simple-features-js';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Feature DAO for reading feature user data tables
@@ -39,26 +35,28 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
   /**
    * Constructor
    * @param database database name
-   * @param db GeoPackage connection
+   * @param geoPackage GeoPackage
    * @param geometryColumns geometry columns
    * @param table feature table
    */
   public constructor(
     database: string,
-    db: GeoPackageConnection,
+    geoPackage: GeoPackage,
     geometryColumns: GeometryColumns,
     table: FeatureTable,
   ) {
-    super(database, db, new FeatureConnection(db), table);
+    super(database, geoPackage, new FeatureConnection(geoPackage.getConnection()), table);
     this.featureDb = this.getUserDb() as FeatureConnection;
     this.geometryColumns = geometryColumns;
-    if (geometryColumns.getContents() == null) {
+    const contents = this.geoPackage.getContentsDao().getContentsWithGeometryColumns(geometryColumns);
+    if (contents == null) {
       throw new GeoPackageException('GeometryColumns ' + geometryColumns.getId() + ' has null Contents');
     }
-    if (geometryColumns.getSrs() == null) {
+    const srs = this.geoPackage.getSpatialReferenceSystemDao().getBySrsId(geometryColumns.getSrsId());
+    if (srs == null) {
       throw new GeoPackageException('GeometryColumns ' + geometryColumns.getId() + ' has null SpatialReferenceSystem');
     }
-    this.projection = geometryColumns.getProjection();
+    this.projection = srs.getProjection();
   }
 
   /**
@@ -72,9 +70,8 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
    * {@inheritDoc}
    */
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
-    const contents = this.geometryColumns.getContents();
-    const boundingBox = contents.getBoundingBoxWithProjection(projection);
-    return boundingBox;
+    const contents = this.geoPackage.getContentsDao().getContentsWithGeometryColumns(this.geometryColumns);
+    return this.geoPackage.getContentsDao().getBoundingBoxWithContentsAndProjection(contents, projection);
   }
 
   /**
@@ -126,7 +123,7 @@ export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow,
    * @return srs
    */
   public getSrs(): SpatialReferenceSystem {
-    return this.geometryColumns.getSrs();
+    return this.geoPackage.getSpatialReferenceSystemDao().getBySrsId(this.geometryColumns.getSrsId());
   }
 
   /**

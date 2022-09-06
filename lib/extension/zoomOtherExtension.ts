@@ -1,9 +1,9 @@
 import { BaseExtension } from './baseExtension';
 import { Extensions } from './extensions';
 import { GeoPackageConstants } from '../geoPackageConstants';
-import { GeoPackage } from '../geoPackage';
 import { TileTable } from '../tiles/user/tileTable';
 import { ExtensionScopeType } from './extensionScopeType';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Zoom Other Intervals extension

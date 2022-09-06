@@ -1,8 +1,8 @@
 import { DataColumnConstraintType } from './dataColumnConstraintType';
 import { GeoPackageException } from '../../../geoPackageException';
-import { DataColumnsDao } from '../columns/dataColumnsDao';
-import { DataColumns } from '../columns/dataColumns';
 import { DataColumnConstraintsKey } from './dataColumnConstraintsKey';
+import type { DataColumnsDao } from '../columns/dataColumnsDao';
+import type { DataColumns } from '../columns/dataColumns';
 
 /**
  * Contains data to specify restrictions on basic data type column values

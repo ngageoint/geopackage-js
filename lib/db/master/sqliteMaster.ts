@@ -5,8 +5,8 @@ import { SQLiteMasterColumn } from './sqliteMasterColumn';
 import { SQLiteMasterType } from './sqliteMasterType';
 import { TableConstraints } from '../table/tableConstraints';
 import { ConstraintParser } from '../table/constraintParser';
-import { GeoPackageConnection } from '../geoPackageConnection';
 import { SQLiteMasterQuery } from './sqliteMasterQuery';
+import type { GeoPackageConnection } from '../geoPackageConnection';
 
 export class SQLiteMaster {
   /**

@@ -1,5 +1,6 @@
 import { UserColumn } from './userColumn';
 import { UserTable } from './userTable';
+import { UserTableMetadataConstants } from './userTableMetadataConstants';
 
 /**
  * User Table Metadata for defining table creation information
@@ -8,11 +9,6 @@ import { UserTable } from './userTable';
  *            user column type
  */
 export abstract class UserTableMetadata<TColumn extends UserColumn> {
-  /**
-   * Default ID column name
-   */
-  public static readonly DEFAULT_ID_COLUMN_NAME = 'id';
-
   /**
    * Table name
    */
@@ -107,7 +103,7 @@ export abstract class UserTableMetadata<TColumn extends UserColumn> {
    * @return id column name
    */
   public getIdColumnName(): string {
-    return this.idColumnName != null ? this.idColumnName : UserTableMetadata.DEFAULT_ID_COLUMN_NAME;
+    return this.idColumnName != null ? this.idColumnName : UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME;
   }
 
   /**

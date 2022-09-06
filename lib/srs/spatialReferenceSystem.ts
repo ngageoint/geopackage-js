@@ -3,9 +3,6 @@
  * @module core/srs
  */
 import { Projection, ProjectionConstants, Projections } from '@ngageoint/projections-js';
-import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
-import { GeometryColumns } from '../features/columns/geometryColumns';
-import { Contents } from '../contents/contents';
 import { GeoPackageConstants } from '../geoPackageConstants';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 
@@ -14,53 +11,6 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
  * @class SpatialReferenceSystem
  */
 export class SpatialReferenceSystem {
-  /**
-   * Spatial Reference System Table Name
-   * @type {String}
-   */
-  public static readonly TABLE_NAME: string = 'gpkg_spatial_ref_sys';
-
-  /**
-   * srsName field name
-   * @type {String}
-   */
-  public static readonly COLUMN_SRS_NAME: string = 'srs_name';
-
-  /**
-   * srsId field name
-   * @type {String}
-   */
-  public static readonly COLUMN_SRS_ID: string = 'srs_id';
-
-  /**
-   * id field name, srsId
-   * @type {String}
-   */
-  public static readonly COLUMN_ID: string = SpatialReferenceSystem.COLUMN_SRS_ID;
-
-  /**
-   * organization field name
-   * @type {String}
-   */
-  public static readonly COLUMN_ORGANIZATION: string = 'organization';
-
-  /**
-   * organizationCoordsysId field name
-   * @type {String}
-   */
-  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID: string = 'organization_coordsys_id';
-
-  /**
-   * definition field name
-   * @type {String}
-   */
-  public static readonly COLUMN_DEFINITION: string = 'definition';
-
-  /**
-   * description field name
-   * @type {String}
-   */
-  public static readonly COLUMN_DESCRIPTION: string = 'description';
   /**
    * Human readable name of this SRS
    * @type {string}
@@ -96,21 +46,6 @@ export class SpatialReferenceSystem {
    * @type {string}
    */
   definition_12_063: string;
-
-  /**
-   * Contents
-   */
-  private contents: Contents[];
-
-  /**
-   * Geometry Columns
-   */
-  private geometryColumns: GeometryColumns[];
-
-  /**
-   * Matrix Tile Set
-   */
-  private tileMatrixSet: TileMatrixSet[];
 
   /**
    * Default Constructor
@@ -281,33 +216,6 @@ export class SpatialReferenceSystem {
   }
 
   /**
-   * Get the contents
-   *
-   * @return contents
-   */
-  public getContents(): Contents[] {
-    return this.contents;
-  }
-
-  /**
-   * Get the geometry columns
-   *
-   * @return geometry columns
-   */
-  public getGeometryColumns(): GeometryColumns[] {
-    return this.geometryColumns;
-  }
-
-  /**
-   * Get the tile matrix set
-   *
-   * @return tile matrix set
-   */
-  public getTileMatrixSet(): TileMatrixSet[] {
-    return this.tileMatrixSet;
-  }
-
-  /**
    * Get the projection for the Spatial Reference System
    *
    * @return projection
@@ -392,29 +300,5 @@ export class SpatialReferenceSystem {
       return Projections.getProjection(this.organization, this.organization_coordsys_id, this.definition);
     }
     return null;
-  }
-
-  /**
-   * Sets the contents
-   * @param contents
-   */
-  public setContents(contents: Contents[]): void {
-    this.contents = contents;
-  }
-
-  /**
-   * Sets the geometry columns
-   * @param geometryColumns
-   */
-  public setGeometryColumns(geometryColumns: GeometryColumns[]): void {
-    this.geometryColumns = geometryColumns;
-  }
-
-  /**
-   * Sets the tile matrix set
-   * @param tileMatrixSet
-   */
-  public setTileMatrixSet(tileMatrixSet: TileMatrixSet[]): void {
-    this.tileMatrixSet = tileMatrixSet;
   }
 }

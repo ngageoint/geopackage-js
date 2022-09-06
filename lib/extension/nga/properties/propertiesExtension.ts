@@ -1,7 +1,6 @@
-import { GeoPackage } from '../../../geoPackage';
 import { BaseExtension } from '../../baseExtension';
 import { Extensions } from '../../extensions';
-import { NGAExtensions } from '../ngaExtensions';
+import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
 import { Constraints } from '../../../db/table/constraints';
 import { UniqueConstraint } from '../../../db/table/uniqueConstraint';
 import { AttributesColumn } from '../../../attributes/attributesColumn';
@@ -13,6 +12,7 @@ import { DBValue } from '../../../db/dbValue';
 import { ColumnValues } from '../../../dao/columnValues';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { AttributesTableMetadata } from '../../../attributes/attributesTableMetadata';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * GeoPackage properties core extension for defining GeoPackage specific
@@ -26,7 +26,7 @@ export class PropertiesExtension extends BaseExtension {
   /**
    * Extension author
    */
-  public static readonly EXTENSION_AUTHOR: string = NGAExtensions.EXTENSION_AUTHOR;
+  public static readonly EXTENSION_AUTHOR: string = NGAExtensionsConstants.EXTENSION_AUTHOR;
 
   /**
    * Extension name without the author

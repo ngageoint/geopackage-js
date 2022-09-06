@@ -1,5 +1,4 @@
-import { GeoPackage } from '../geoPackage';
-import { ExtensionManagement } from './ExtensionManagement';
+import { ExtensionManagement } from './extensionManagement';
 import { NGAExtensions } from './nga/ngaExtensions';
 import { GeoPackageConstants } from '../geoPackageConstants';
 import { GeoPackageException } from '../geoPackageException';
@@ -11,15 +10,14 @@ import { UserCustomTableReader } from '../user/custom/userCustomTableReader';
 import { AlterTable } from '../db/alterTable';
 import { TableMapping } from '../db/tableMapping';
 import { SchemaExtension } from './schema/schemaExtension';
-import { DataColumnsDao } from './schema/columns/dataColumnsDao';
 import { GeoPackageTableCreator } from '../db/geoPackageTableCreator';
 import { ConstraintParser } from '../db/table/constraintParser';
 import { MetadataExtension } from './metadata/metadataExtension';
 import { CrsWktExtension } from './crsWktExtension';
-import { MetadataReferenceDao } from './metadata/reference/metadataReferenceDao';
 import { DataColumns } from './schema/columns/dataColumns';
 import { MetadataReference } from './metadata/reference/metadataReference';
 import { ExtendedRelation } from './related/extendedRelation';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * GeoPackage Extension Manager for deleting and copying extensions
@@ -445,7 +443,7 @@ export class ExtensionManager extends ExtensionManagement {
    *            table name
    */
   public deleteSchema(table: string): void {
-    const dataColumnsDao = DataColumnsDao.createDao(this.geoPackage.getConnection());
+    const dataColumnsDao = this.geoPackage.getDataColumnsDao();
     try {
       if (dataColumnsDao.isTableExists()) {
         dataColumnsDao.deleteByTableName(table);
@@ -512,7 +510,7 @@ export class ExtensionManager extends ExtensionManagement {
    * @param table table name
    */
   public deleteMetadata(table: string): void {
-    const metadataReferenceDao = MetadataReferenceDao.createDao(this.geoPackage.getConnection());
+    const metadataReferenceDao = this.geoPackage.getMetadataReferenceDao()
     try {
       if (metadataReferenceDao.isTableExists()) {
         metadataReferenceDao.deleteByTableName(table);

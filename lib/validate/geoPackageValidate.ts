@@ -1,6 +1,6 @@
 import path from 'path';
-import { GeoPackage } from '../geoPackage';
 import { GeoPackageConstants } from '../geoPackageConstants';
+import type { GeoPackage } from '../geoPackage';
 
 export class GeoPackageValidationError {
   constructor(public error: string, public fatal?: boolean) {}

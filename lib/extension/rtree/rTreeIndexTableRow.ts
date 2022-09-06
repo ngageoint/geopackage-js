@@ -1,5 +1,5 @@
 import { UserCustomRow } from '../../user/custom/userCustomRow';
-import { RTreeIndexExtension } from './rTreeIndexExtension';
+import { RTreeIndexExtensionConstants } from './rTreeIndexExtensionConstants';
 
 /**
  * RTree Index Table Row containing the values from a single result set row
@@ -24,7 +24,7 @@ export class RTreeIndexTableRow extends UserCustomRow {
    * @return ID
    */
   public getId(): number {
-    return this.getValueWithColumnName(RTreeIndexExtension.COLUMN_ID) as number;
+    return this.getValueWithColumnName(RTreeIndexExtensionConstants.COLUMN_ID) as number;
   }
 
   /**
@@ -33,7 +33,7 @@ export class RTreeIndexTableRow extends UserCustomRow {
    * @return min x
    */
   public getMinX(): number {
-    return this.getValueWithColumnName(RTreeIndexExtension.COLUMN_MIN_X) as number;
+    return this.getValueWithColumnName(RTreeIndexExtensionConstants.COLUMN_MIN_X) as number;
   }
 
   /**
@@ -42,7 +42,7 @@ export class RTreeIndexTableRow extends UserCustomRow {
    * @return max x
    */
   public getMaxX(): number {
-    return this.getValueWithColumnName(RTreeIndexExtension.COLUMN_MAX_X) as number;
+    return this.getValueWithColumnName(RTreeIndexExtensionConstants.COLUMN_MAX_X) as number;
   }
 
   /**
@@ -51,7 +51,7 @@ export class RTreeIndexTableRow extends UserCustomRow {
    * @return min y
    */
   public getMinY(): number {
-    return this.getValueWithColumnName(RTreeIndexExtension.COLUMN_MIN_Y) as number;
+    return this.getValueWithColumnName(RTreeIndexExtensionConstants.COLUMN_MIN_Y) as number;
   }
 
   /**
@@ -60,6 +60,6 @@ export class RTreeIndexTableRow extends UserCustomRow {
    * @return max y
    */
   public getMaxY(): number {
-    return this.getValueWithColumnName(RTreeIndexExtension.COLUMN_MAX_Y) as number;
+    return this.getValueWithColumnName(RTreeIndexExtensionConstants.COLUMN_MAX_Y) as number;
   }
 }

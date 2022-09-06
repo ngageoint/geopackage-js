@@ -1,9 +1,3 @@
-/**
- * RelatedTablesExtension module.
- * @module extension/relatedTables
- * @see module:extension/BaseExtension
- */
-
 import { BaseExtension } from '../baseExtension';
 import { Extensions } from '../extensions';
 import { MediaTable } from './media/mediaTable';
@@ -13,18 +7,17 @@ import { ExtendedRelationsDao } from './extendedRelationsDao';
 import { RelationType } from './relationType';
 import { Contents } from '../../contents/contents';
 import { ExtendedRelation } from './extendedRelation';
-import { GeoPackage } from '../../geoPackage';
 import { UserRelatedTable } from './userRelatedTable';
 import { UserCustomTableReader } from '../../user/custom/userCustomTableReader';
 import { ExtensionScopeType } from '../extensionScopeType';
 import { GeoPackageConstants } from '../../geoPackageConstants';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { GeoPackageException } from '../../geoPackageException';
 import { UserTable } from '../../user/userTable';
 import { UserColumn } from '../../user/userColumn';
 import { AttributesTable } from '../../attributes/attributesTable';
 import { TileTable } from '../../tiles/user/tileTable';
 import { UserCustomDao } from '../../user/custom/userCustomDao';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Related Tables Extension
@@ -146,16 +139,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return extended relations dao
    */
   public static getExtendedRelationsDaoFromGeoPackage(geoPackage: GeoPackage): ExtendedRelationsDao {
-    return ExtendedRelationsDao.createDao(geoPackage.getConnection());
-  }
-
-  /**
-   * Get a Extended Relations DAO
-   * @param db database connection
-   * @return extended relations dao
-   */
-  public static getExtendedRelationsDaoFromGeoPackageConnection(db: GeoPackageConnection): ExtendedRelationsDao {
-    return ExtendedRelationsDao.createDao(db);
+    return geoPackage.getExtendedRelationsDao();
   }
 
   /**

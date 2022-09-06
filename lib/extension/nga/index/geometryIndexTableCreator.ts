@@ -1,6 +1,6 @@
 import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
-import { GeoPackage } from '../../../geoPackage';
-import { FeatureTableIndex } from './featureTableIndex';
+import { FeatureTableIndexConstants } from './featureTableIndexConstants';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Geometry Index Extension Table Creator
@@ -39,14 +39,14 @@ export class GeometryIndexTableCreator extends GeoPackageTableCreator {
    * {@inheritDoc}
    */
   public getAuthor(): string {
-    return FeatureTableIndex.EXTENSION_AUTHOR;
+    return FeatureTableIndexConstants.EXTENSION_AUTHOR;
   }
 
   /**
    * {@inheritDoc}
    */
   public getName(): string {
-    return FeatureTableIndex.EXTENSION_NAME_NO_AUTHOR;
+    return FeatureTableIndexConstants.EXTENSION_NAME_NO_AUTHOR;
   }
 
   /**

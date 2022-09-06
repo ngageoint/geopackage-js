@@ -1,12 +1,12 @@
 import path from 'path';
 import fs from 'fs';
-import { GeoPackage } from './geoPackage';
-import { GeoPackageValidate } from './validate/geoPackageValidate';
-import { Canvas } from './canvas/canvas';
-import { GeoPackageConnection } from './db/geoPackageConnection';
 import { Db } from './db/db';
 import { DBAdapter } from './db/dbAdapter';
+import { GeoPackage } from './geoPackage';
+import { GeoPackageConnection } from './db/geoPackageConnection';
 import { GeoPackageException } from './geoPackageException';
+import { GeoPackageValidate } from './validate/geoPackageValidate';
+import { Canvas } from './canvas/canvas';
 
 /**
  * GeoPackage Manager used to create and open GeoPackages

@@ -1,9 +1,9 @@
 import { BaseExtension } from '../baseExtension';
 import { Extensions } from '../extensions';
-import { GeoPackage } from '../../geoPackage';
 import { ExtensionScopeType } from '../extensionScopeType';
 import { DataColumns } from './columns/dataColumns';
 import { DataColumnConstraints } from './constraints/dataColumnConstraints';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * SchemaExtension module.

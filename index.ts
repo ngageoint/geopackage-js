@@ -4,7 +4,7 @@ import { GeoPackage } from './lib/geoPackage';
 import { GeoPackageCache } from './lib/geoPackageCache';
 import { GeoPackageConstants } from './lib/geoPackageConstants';
 import { GeoPackageException } from './lib/geoPackageException';
-import { GeoPackageManager } from './lib/GeoPackageManager';
+import { GeoPackageManager } from './lib/geoPackageManager';
 import { GeoPackageValidationError } from './lib/validate/geoPackageValidate';
 import { GeoPackageValidate } from './lib/validate/geoPackageValidate';
 
@@ -140,7 +140,7 @@ import { GeometryColumns } from './lib/features/columns/geometryColumns';
 import { GeometryColumnsDao } from './lib/features/columns/geometryColumnsDao';
 
 // extension
-// import { BaseExtension } from './lib/extension/baseExtension';
+import { BaseExtension } from './lib/extension/baseExtension';
 import { CrsWktExtension } from './lib/extension/crsWktExtension';
 import { ExtensionManagement } from './lib/extension/extensionManagement';
 import { ExtensionManager } from './lib/extension/extensionManager';
@@ -221,7 +221,6 @@ import { StyleTable } from './lib/extension/nga/style/styleTable';
 // extension/nga/scale
 import { TileScaling } from './lib/extension/nga/scale/tileScaling';
 import { TileScalingDao } from './lib/extension/nga/scale/tileScalingDao';
-import { TileScalingTableCreator } from './lib/extension/nga/scale/tileScalingTableCreator';
 import { TileScalingType } from './lib/extension/nga/scale/tileScalingType';
 import { TileTableScaling } from './lib/extension/nga/scale/tileTableScaling';
 
@@ -234,7 +233,6 @@ import { PropertyNames } from './lib/extension/nga/properties/propertyNames';
 import { FeatureTileLink } from './lib/extension/nga/link/featureTileLink';
 import { FeatureTileLinkDao } from './lib/extension/nga/link/featureTileLinkDao';
 import { FeatureTileLinkKey } from './lib/extension/nga/link/featureTileLinkKey';
-import { FeatureTileLinkTableCreator } from './lib/extension/nga/link/featureTileLinkTableCreator';
 import { FeatureTileTableLinker } from './lib/extension/nga/link/featureTileTableLinker';
 
 // extension/nga/index
@@ -250,7 +248,6 @@ import { TableIndexDao } from './lib/extension/nga/index/tableIndexDao';
 import { ContentsId } from './lib/extension/nga/contents/contentsId';
 import { ContentsIdDao } from './lib/extension/nga/contents/contentsIdDao';
 import { ContentsIdExtension } from './lib/extension/nga/contents/contentsIdExtension';
-import { ContentsIdTableCreator } from './lib/extension/nga/contents/contentsIdTableCreator';
 
 // extension/metadata
 import { Metadata } from './lib/extension/metadata/metadata';
@@ -450,7 +447,7 @@ export {
   MultipleFeatureIndexResults,
   GeometryColumns,
   GeometryColumnsDao,
-  // BaseExtension,
+  BaseExtension,
   CrsWktExtension,
   ExtensionManagement,
   ExtensionManager,
@@ -509,7 +506,6 @@ export {
   StyleTable,
   TileScaling,
   TileScalingDao,
-  TileScalingTableCreator,
   TileScalingType,
   TileTableScaling,
   PropertiesExtension,
@@ -518,7 +514,6 @@ export {
   FeatureTileLink,
   FeatureTileLinkDao,
   FeatureTileLinkKey,
-  FeatureTileLinkTableCreator,
   FeatureTileTableLinker,
   FeatureTableIndex,
   GeometryIndex,
@@ -530,7 +525,6 @@ export {
   ContentsId,
   ContentsIdDao,
   ContentsIdExtension,
-  ContentsIdTableCreator,
   Metadata,
   MetadataDao,
   MetadataExtension,

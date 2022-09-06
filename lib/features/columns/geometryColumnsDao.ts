@@ -1,19 +1,12 @@
 /* eslint-disable camelcase */
-/**
- * GeometryColumns module.
- * @module features/columns
- */
 import { GeometryColumns } from './geometryColumns';
 import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
-import { Contents } from '../../contents/contents';
 import { DBValue } from '../../db/dbValue';
 import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeometryType } from '@ngageoint/simple-features-js';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
-import { SpatialReferenceSystemDao } from '../../srs/spatialReferenceSystemDao';
 import { TableColumnKey } from '../../db/tableColumnKey';
-import { ContentsDao } from '../../contents/contentsDao';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Geometry Columns Data Access Object
@@ -29,8 +22,8 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
    *
    * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(readonly geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, GeometryColumns.TABLE_NAME);
+  constructor(readonly geoPackage: GeoPackage) {
+    super(geoPackage, GeometryColumns.TABLE_NAME);
   }
 
   /**
@@ -38,8 +31,8 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
    * @param geoPackage GeoPackage
    * @return dao
    */
-  public static createDao(geoPackageConnection: GeoPackageConnection): GeometryColumnsDao {
-    return new GeometryColumnsDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): GeometryColumnsDao {
+    return new GeometryColumnsDao(geoPackage);
   }
 
   readonly idColumns: string[] = [GeometryColumns.COLUMN_ID_1, GeometryColumns.COLUMN_ID_2];
@@ -65,7 +58,6 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
       gc.setGeometryType(GeometryType.fromName(results.geometry_type_name as string));
       gc.setZ(results.z as number);
       gc.setM(results.m as number);
-      gc.setSrs(SpatialReferenceSystemDao.createDao(this.db).getBySrsId(results.srs_id as number));
       gc.setSrsId(results.srs_id as number);
     }
     return gc;
@@ -100,20 +92,12 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
    *  @param {module:dao/geometryColumns~GeometryColumns} geometryColumns geometry columns
    */
   getSrs(geometryColumns: GeometryColumns): SpatialReferenceSystem {
-    return SpatialReferenceSystemDao.createDao(this.db).queryForId(geometryColumns.getSrsId());
+    return this.geoPackage.getSpatialReferenceSystemDao().queryForId(geometryColumns.getSrsId());
   }
-  /**
-   *  Get the Contents of the Geometry Columns
-   *
-   *  @param {module:dao/geometryColumns~GeometryColumns} geometryColumns geometry columns
-   *  @return {ContentsDao} contents dao
-   */
-  getContents(geometryColumns: GeometryColumns): Contents {
-    return ContentsDao.createDao(this.db).queryForId(geometryColumns.getTableName());
-  }
+
   getProjection(projectionObject: GeometryColumns): Projection {
     const srs = this.getSrs(projectionObject);
-    return SpatialReferenceSystemDao.createDao(this.db).getProjection(srs);
+    return this.geoPackage.getSpatialReferenceSystemDao().getProjection(srs);
   }
 
   queryForIdWithKey(key: TableColumnKey): GeometryColumns {

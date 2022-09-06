@@ -1,13 +1,9 @@
-/**
- * DataColumnConstraints module.
- * @module dataColumnConstraints
- */
 import { DataColumnConstraints } from './dataColumnConstraints';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { DataColumnConstraintsKey } from './dataColumnConstraintsKey';
-import { DataColumnsDao } from '../columns/dataColumnsDao';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
+import type { DataColumnsDao } from '../columns/dataColumnsDao';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Data Column Constraints Data Access Object
@@ -23,10 +19,10 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
 
   /**
    * Create DataColumns Dao from GeoPackageConnection
-   * @param geoPackageConnection
+   * @param geoPackage
    */
-  public static createDao(geoPackageConnection: GeoPackageConnection): DataColumnConstraintsDao {
-    return new DataColumnConstraintsDao(geoPackageConnection, DataColumnConstraints.TABLE_NAME);
+  public static createDao(geoPackage: GeoPackage): DataColumnConstraintsDao {
+    return new DataColumnConstraintsDao(geoPackage, DataColumnConstraints.TABLE_NAME);
   }
 
   /**
@@ -121,7 +117,7 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
    */
   private getDataColumnsDao(): DataColumnsDao {
     if (this.dataColumnsDao == null) {
-      this.dataColumnsDao = DataColumnsDao.createDao(this.db);
+      this.dataColumnsDao = this.geoPackage.getDataColumnsDao();
     }
     return this.dataColumnsDao;
   }

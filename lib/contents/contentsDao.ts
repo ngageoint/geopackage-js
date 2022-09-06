@@ -1,20 +1,17 @@
+import { Projection } from '@ngageoint/projections-js';
 import { CreateOrUpdateStatus } from '../dao/dao';
-import { TileMatrixDao } from '../tiles/matrix/tileMatrixDao';
-import { TileMatrixSetDao } from '../tiles/matrixset/tileMatrixSetDao';
-import { GeometryColumnsDao } from '../features/columns/geometryColumnsDao';
+import { GeoPackageDao } from '../db/geoPackageDao';
+import { GeoPackageException } from '../geoPackageException';
+import { BoundingBox } from '../boundingBox';
+import { DBValue } from '../db/dbValue';
 import { Contents } from './contents';
 import { ColumnValues } from '../dao/columnValues';
 import { GeometryColumns } from '../features/columns/geometryColumns';
 import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../tiles/matrix/tileMatrix';
-import { BoundingBox } from '../boundingBox';
-import { DBValue } from '../db/dbValue';
 import { ContentsDataType } from './contentsDataType';
-import { Projection } from '@ngageoint/projections-js';
-import { GeoPackageException } from '../geoPackageException';
-import { GeoPackageDao } from '../db/geoPackageDao';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
-import { SpatialReferenceSystemDao } from '../srs/spatialReferenceSystemDao';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -22,34 +19,19 @@ import { SpatialReferenceSystemDao } from '../srs/spatialReferenceSystemDao';
  * available for access and/or update.
  */
 export class ContentsDao extends GeoPackageDao<Contents, string> {
-  /**
-   * Geometry Columns DAO
-   */
-  private geometryColumnsDao: GeometryColumnsDao;
-
-  /**
-   * Tile Matrix Set DAO
-   */
-  private tileMatrixSetDao: TileMatrixSetDao;
-
-  /**
-   * Tile Matrix DAO
-   */
-  private tileMatrixDao: TileMatrixDao;
+  readonly gpkgTableName: string = Contents.TABLE_NAME;
+  readonly idColumns: string[] = [Contents.COLUMN_ID];
 
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, Contents.TABLE_NAME);
-    this.geometryColumnsDao = GeometryColumnsDao.createDao(geoPackageConnection);
-    this.tileMatrixSetDao = TileMatrixSetDao.createDao(geoPackageConnection);
-    this.tileMatrixDao = TileMatrixDao.createDao(geoPackageConnection);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, Contents.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): ContentsDao {
-    return new ContentsDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): ContentsDao {
+    return new ContentsDao(geoPackage);
   }
 
   queryForIdWithKey(key: string): Contents {
@@ -72,10 +54,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
       c.setMaxY(results.max_y as number);
       c.setMinX(results.min_x as number);
       c.setMaxX(results.max_x as number);
-      c.setSrs(SpatialReferenceSystemDao.createDao(this.db).getBySrsId(results.srs_id as number));
-      this.getAndSetGeometryColumns(c);
-      this.getAndSetTileMatrixSet(c);
-      this.getAndSetTileMatrix(c);
+      c.setSrsId(results.srs_id as number);
     }
     return c;
   }
@@ -119,14 +98,14 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param  {module:core/contents~Contents} contents Contents
    * @return {module:features/columns~GeometryColumns}
    */
-  private getAndSetGeometryColumns(contents: Contents): GeometryColumns {
-    const dao: GeometryColumnsDao = this.getGeometryColumnsDao();
-    const results = dao.queryForAllEq(GeometryColumns.COLUMN_TABLE_NAME, contents.getTableName());
+  public getGeometryColumns(contents: Contents): GeometryColumns {
+    const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
+    const results = geometryColumnsDao.queryForAllEq(GeometryColumns.COLUMN_TABLE_NAME, contents.getTableName());
+    let result = null;
     if (results?.length) {
-      const gc: GeometryColumns = dao.createObject(results[0]);
-      contents.setGeometryColumns(gc);
+      result = geometryColumnsDao.createObject(results[0]);
     }
-    return undefined;
+    return result;
   }
 
   /**
@@ -134,30 +113,30 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param  {module:core/contents~Contents} contents Contents
    * @return {module:tiles/matrixset~TileMatrixSet}
    */
-  private getAndSetTileMatrixSet(contents: Contents): TileMatrixSet {
-    const dao = this.getTileMatrixSetDao();
-    const results = dao.queryForAllEq(TileMatrixSet.COLUMN_TABLE_NAME, contents.getTableName());
+  public getTileMatrixSet(contents: Contents): TileMatrixSet {
+    const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
+    const results = tileMatrixSetDao.queryForAllEq(TileMatrixSet.COLUMN_TABLE_NAME, contents.getTableName());
+    let result = null;
     if (results?.length) {
-      contents.setTileMatrixSet(dao.createObject(results[0]));
+      result = tileMatrixSetDao.createObject(results[0]);
     }
-    return undefined;
+    return result;
   }
 
   /**
-   * Get the TileMatrix for the Contents
-   * @param  {module:core/contents~Contents} contents Contents
-   * @return {module:tiles/matrix~TileMatrix}
+   * Get the tile matrix for the provided contents
+   * @param contents
    */
-  private getAndSetTileMatrix(contents: Contents): TileMatrix[] {
-    const dao = this.getTileMatrixDao();
-    const results = dao.queryForAllEq(TileMatrix.COLUMN_TABLE_NAME, contents.getTableName());
+  public getTileMatrix(contents: Contents): TileMatrix[] {
+    const tileMatrixDao = this.geoPackage.getTileMatrixDao();
+    const results = tileMatrixDao.queryForAllEq(TileMatrix.COLUMN_TABLE_NAME, contents.getTableName());
     if (!results || !results.length) return undefined;
     const tileMatrices = [];
     for (let i = 0; i < results.length; i++) {
-      const gc = dao.createObject(results[i]);
+      const gc = tileMatrixDao.createObject(results[i]);
       tileMatrices.push(gc);
     }
-    contents.setTileMatrix(tileMatrices);
+    return tileMatrices;
   }
 
   /**
@@ -172,9 +151,9 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
         switch (dataType) {
           case ContentsDataType.FEATURES:
             // Delete Geometry Columns
-            const geometryColumnsDao = this.getGeometryColumnsDao();
+            const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
             if (geometryColumnsDao.isTableExists()) {
-              const geometryColumns = contents.getGeometryColumns();
+              const geometryColumns = this.getGeometryColumns(contents);
               if (geometryColumns !== null && geometryColumns !== undefined) {
                 geometryColumnsDao.deleteByMultiId([geometryColumns.getTableName(), geometryColumns.getColumnName()]);
               }
@@ -183,9 +162,9 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
           case ContentsDataType.TILES:
             // case GRIDDED_COVERAGE:
             // Delete Tile Matrix collection
-            const tileMatrixDao = this.getTileMatrixDao();
+            const tileMatrixDao = this.geoPackage.getTileMatrixDao();
             if (tileMatrixDao.isTableExists()) {
-              const tileMatrixCollection = contents.getTileMatrix();
+              const tileMatrixCollection = this.getTileMatrix(contents);
               if (
                 tileMatrixCollection !== null &&
                 tileMatrixCollection !== undefined &&
@@ -197,9 +176,9 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
               }
             }
             // Delete Tile Matrix Set
-            const tileMatrixSetDao = this.getTileMatrixSetDao();
+            const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
             if (tileMatrixSetDao.isTableExists()) {
-              const tileMatrixSet = contents.getTileMatrixSet();
+              const tileMatrixSet = this.getTileMatrixSet(contents);
               if (tileMatrixSet !== null && tileMatrixSet !== undefined) {
                 tileMatrixSetDao.deleteById(tileMatrixSet.getTableName());
               }
@@ -219,6 +198,11 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     return count;
   }
 
+  /**
+   * Delete cascade for contents and specify if it is a user table
+   * @param contents
+   * @param userTable
+   */
   deleteCascade(contents: Contents, userTable = false): number {
     const count = this.deleteCascadeContents(contents);
     if (userTable) {
@@ -227,6 +211,11 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     return count;
   }
 
+  /**
+   * Delete cascade using contents id
+   * @param id
+   * @param userTable
+   */
   deleteByIdCascade(id: string, userTable: boolean): number {
     let count = 0;
     if (id !== null && id !== undefined) {
@@ -365,7 +354,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
       throw new GeoPackageException('No contents for table: ' + table);
     }
 
-    boundingBox = contents.getBoundingBoxInProjection(projection);
+    boundingBox = this.getBoundingBoxWithContentsAndProjection(contents, projection);
 
     return boundingBox;
   }
@@ -415,8 +404,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
       switch (dataType) {
         case ContentsDataType.FEATURES:
           // Features require Geometry Columns table (Spec Requirement 21)
-          const geometryColumnsDao = this.getGeometryColumnsDao();
-          if (!geometryColumnsDao.isTableExists()) {
+          if (!this.geoPackage.getGeometryColumnsDao().isTableExists()) {
             throw new GeoPackageException(
               'A data type of ' +
                 ContentsDataType.nameFromType(dataType) +
@@ -446,16 +434,11 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
 
   /**
    * Verify the required tile tables exist
-   *
-   * @param dataType
-   *            data type
-   * @throws SQLException
-   *             upon tiles verification error
+   * @param dataType data type
    */
   private verifyTiles(dataType: ContentsDataType): void {
     // Tiles require Tile Matrix Set table (Spec Requirement 37)
-    const tileMatrixSetDao = this.getTileMatrixSetDao();
-    if (!tileMatrixSetDao.isTableExists()) {
+    if (!this.geoPackage.getTileMatrixSetDao().isTableExists()) {
       throw new GeoPackageException(
         'A data type of ' +
           ContentsDataType.nameFromType(dataType) +
@@ -465,8 +448,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     }
 
     // Tiles require Tile Matrix table (Spec Requirement 41)
-    const tileMatrixDao = this.getTileMatrixDao();
-    if (!tileMatrixDao.isTableExists()) {
+    if (!this.geoPackage.getTileMatrixDao().isTableExists()) {
       throw new GeoPackageException(
         'A data type of ' +
           ContentsDataType.nameFromType(dataType) +
@@ -477,38 +459,41 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
   }
 
   /**
-   * Get or create a Geometry Columns DAO
-   *
-   * @return geometry columns dao
+   * Gets the contents of the GeometryColumns
+   * @param geometryColumns
+   * @return contents
    */
-  private getGeometryColumnsDao(): GeometryColumnsDao {
-    if (this.geometryColumnsDao == null) {
-      this.geometryColumnsDao = GeometryColumnsDao.createDao(this.db);
-    }
-    return this.geometryColumnsDao;
+  getContentsWithGeometryColumns(geometryColumns: GeometryColumns): Contents {
+    return this.queryForId(geometryColumns.getTableName());
   }
 
   /**
-   * Get or create a Tile Matrix Set DAO
-   *
-   * @return tile matrix set dao
+   * Get a bounding box in the provided projection
+   * @param contents desired projection
+   * @param projection desired projection
+   * @return bounding box
    */
-  private getTileMatrixSetDao(): TileMatrixSetDao {
-    if (this.tileMatrixSetDao == null) {
-      this.tileMatrixSetDao = TileMatrixSetDao.createDao(this.db);
+  public getBoundingBoxWithContentsAndProjection(contents: Contents, projection: Projection): BoundingBox {
+    let boundingBox = contents.getBoundingBox();
+    if (boundingBox != null && projection != null) {
+      const transform = GeometryTransform.create(this.getProjection(contents), projection);
+      if (!transform.getToProjection().equalsProjection(transform.getFromProjection())) {
+        boundingBox = boundingBox.transform(transform);
+      }
     }
-    return this.tileMatrixSetDao;
+    return boundingBox;
   }
 
   /**
-   * Get or create a Tile Matrix DAO
-   *
-   * @return tile matrix dao
+   * Get the projection for the contents
+   * @return projection
    */
-  private getTileMatrixDao(): TileMatrixDao {
-    if (this.tileMatrixDao == null) {
-      this.tileMatrixDao = TileMatrixDao.createDao(this.db);
+  public getProjection(contents: Contents): Projection {
+    let projection = null;
+    const srs = this.geoPackage.getSpatialReferenceSystemDao().queryForId(contents.getSrsId());
+    if (srs != null) {
+      projection = srs.getProjection();
     }
-    return this.tileMatrixDao;
+    return projection;
   }
 }

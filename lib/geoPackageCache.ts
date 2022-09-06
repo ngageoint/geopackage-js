@@ -1,5 +1,5 @@
-import { GeoPackage } from './geoPackage';
 import { GeoPackageManager } from './geoPackageManager';
+import type { GeoPackage } from './geoPackage';
 
 /**
  * GeoPackage Cache

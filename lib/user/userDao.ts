@@ -18,6 +18,7 @@ import { DBValue } from '../db/dbValue';
 import { ContentValues } from './contentValues';
 import { ResultUtils } from '../db/resultUtils';
 import { ResultSetResult } from '../db/resultSetResult';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Abstract UserDao
@@ -32,6 +33,11 @@ export abstract class UserDao<
    * Connection
    */
   private readonly db: GeoPackageConnection;
+
+  /**
+   * GeoPackage
+   */
+  protected readonly geoPackage: GeoPackage;
 
   /**
    * Database
@@ -55,14 +61,15 @@ export abstract class UserDao<
 
   protected constructor(
     database: string,
-    db: GeoPackageConnection,
+    geoPackage: GeoPackage,
     userDb: UserConnection<TColumn, TTable, TRow, TResult>,
     table: TTable,
   ) {
+    this.geoPackage = geoPackage;
     this.database = database;
     this.userDb = userDb;
     this.table = table;
-    this.db = db;
+    this.db = geoPackage.getConnection();
     userDb.setTable(table);
   }
 
@@ -120,6 +127,13 @@ export abstract class UserDao<
    */
   public getDatabase(): string {
     return this.database;
+  }
+
+  /**
+   * Get the GeoPackage
+   */
+  public getGeoPackage(): GeoPackage {
+    return this.geoPackage;
   }
 
   /**
@@ -675,7 +689,7 @@ export abstract class UserDao<
     let boundingBox = this.getBoundingBox();
     if (boundingBox != null) {
       if (Projections.getUnits(projection.toString()) === 'degrees') {
-        boundingBox = TileBoundingBoxUtils.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
+        boundingBox = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
       }
       const webMercatorTransform = GeometryTransform.create(projection, ProjectionConstants.EPSG_WEB_MERCATOR);
       const webMercatorBoundingBox = boundingBox.transform(webMercatorTransform);
@@ -798,7 +812,7 @@ export abstract class UserDao<
    * @param column new column
    */
   public addColumn(column: TColumn): void {
-    SQLUtils.addColumn(this.db, this.table.getTableName(), column);
+    AlterTable.addColumn(this.db, this.table.getTableName(), column.getName(), SQLUtils.columnDefinition(column));
     this.table.addColumn(column);
   }
 

@@ -3,6 +3,7 @@ import sortedIndex from 'lodash/sortedIndex';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { TileMatrixSet } from '../matrixset/tileMatrixSet';
 import { ProjectionConstants, Projections } from '@ngageoint/projections-js';
+import { TileDao } from './tileDao';
 
 export class TileDaoUtils {
   /**
@@ -378,50 +379,54 @@ export class TileDaoUtils {
 
   /**
    * Get the map zoom level range
+   * @param tileDao
    * @param tileMatrixSet tile matrix set
    * @param tileMatrices tile matrices
    * @return map zoom level range, min at index 0, max at index 1
    */
-  public static getMapZoomRange(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number[] {
-    const min = TileDaoUtils.getMapMinZoom(tileMatrixSet, tileMatrices);
-    const max = TileDaoUtils.getMapMaxZoom(tileMatrixSet, tileMatrices);
+  public static getMapZoomRange(tileDao: TileDao, tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number[] {
+    const min = TileDaoUtils.getMapMinZoom(tileDao, tileMatrixSet, tileMatrices);
+    const max = TileDaoUtils.getMapMaxZoom(tileDao, tileMatrixSet, tileMatrices);
     return [min, max];
   }
 
   /**
    * Get the map min zoom level
+   * @param tileDao
    * @param tileMatrixSet tile matrix set
    * @param tileMatrices tile matrices
    * @return map min zoom level
    */
-  public static getMapMinZoom(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
-    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet, tileMatrices[0]);
+  public static getMapMinZoom(tileDao: TileDao, tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileDao, tileMatrixSet, tileMatrices[0]);
   }
 
   /**
    * Get the map max zoom level
+   * @param tileDao
    * @param tileMatrixSet tile matrix set
    * @param tileMatrices tile matrices
    * @return map max zoom level
    */
-  public static getMapMaxZoom(tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
-    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet, tileMatrices[tileMatrices.length - 1]);
+  public static getMapMaxZoom(tileDao: TileDao, tileMatrixSet: TileMatrixSet, tileMatrices: TileMatrix[]): number {
+    return TileDaoUtils.getMapZoomWithTileMatrixSetAndTileMatrix(tileDao, tileMatrixSet, tileMatrices[tileMatrices.length - 1]);
   }
 
   /**
    * Get the map zoom level
+   * @param tileDao
    * @param tileMatrixSet tile matrix set
    * @param tileMatrix tile matrix
    * @return map zoom level
    */
-  public static getMapZoomWithTileMatrixSetAndTileMatrix(tileMatrixSet: TileMatrixSet, tileMatrix: TileMatrix): number {
-    const boundingBox = tileMatrixSet.getBoundingBoxWithProjection(Projections.getWebMercatorProjection());
+  public static getMapZoomWithTileMatrixSetAndTileMatrix(tileDao: TileDao, tileMatrixSet: TileMatrixSet, tileMatrix: TileMatrix): number {
+    const boundingBox = tileDao.getGeoPackage().getTileMatrixSetDao().getBoundingBoxWithProjection(tileMatrixSet, Projections.getWebMercatorProjection());
     let zoom = TileDaoUtils.getMapZoom(
       boundingBox.getMinLongitude(),
       boundingBox.getMaxLongitude(),
       tileMatrix.getMatrixWidth(),
     );
-    if (Projections.getUnits(tileMatrixSet.getProjection().toString()) !== 'degrees') {
+    if (Projections.getUnits(tileDao.getGeoPackage().getTileMatrixSetDao().getProjection(tileMatrixSet).toString()) !== 'degrees') {
       zoom = Math.min(
         zoom,
         TileDaoUtils.getMapZoom(

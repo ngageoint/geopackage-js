@@ -1,7 +1,6 @@
 import { Projection, ProjectionConstants, Projections } from '@ngageoint/projections-js';
 import { BoundingBox } from '../boundingBox';
 import { TileScaling } from '../extension/nga/scale/tileScaling';
-import { GeoPackage } from '../geoPackage';
 import { GeoPackageException } from '../geoPackageException';
 import { GeoPackageZoomLevelProgress } from '../io/geoPackageZoomLevelProgress';
 import { TileGrid } from './tileGrid';
@@ -18,6 +17,7 @@ import { TileMatrixKey } from './matrix/tileMatrixKey';
 import { TileTable } from './user/tileTable';
 import { ImageUtils } from '../image/imageUtils';
 import { ImageType } from '../image/imageType';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Creates a set of tiles within a GeoPackage
@@ -595,7 +595,7 @@ export abstract class TileGenerator {
       );
     }
 
-    const tileMatrixProjection = tileMatrixSet.getProjection();
+    const tileMatrixProjection = this.geoPackage.getTileMatrixSetDao().getProjection(tileMatrixSet);
     if (!tileMatrixProjection.equalsProjection(this.projection)) {
       throw new GeoPackageException(
         'Can not update tiles projected at ' +
@@ -605,14 +605,15 @@ export abstract class TileGenerator {
       );
     }
 
-    const contents = tileMatrixSet.getContents();
+    const contents = this.geoPackage.getTileMatrixSetDao().getContents(tileMatrixSet);
+    const contentsProjection = this.geoPackage.getContentsDao().getProjection(contents);
 
     // Combine the existing content and request bounding boxes
     const previousContentsBoundingBox = contents.getBoundingBox();
     if (previousContentsBoundingBox != null) {
-      const transformProjectionToContents = GeometryTransform.create(this.projection, contents.getProjection());
+      const transformProjectionToContents = GeometryTransform.create(this.projection, contentsProjection);
       let contentsBoundingBox = this.boundingBox;
-      if (!this.projection.equalsProjection(contents.getProjection())) {
+      if (!this.projection.equalsProjection(contentsProjection)) {
         contentsBoundingBox = contentsBoundingBox.transform(transformProjectionToContents);
       }
       contentsBoundingBox = contentsBoundingBox.union(previousContentsBoundingBox);
@@ -931,7 +932,7 @@ export abstract class TileGenerator {
           tileHeight;
         // Create the tile matrix for this zoom level
         const tileMatrix = new TileMatrix();
-        tileMatrix.setContents(contents);
+        tileMatrix.setTableName(contents.getId());
         tileMatrix.setZoomLevel(zoomLevel);
         tileMatrix.setMatrixWidth(matrixWidth);
         tileMatrix.setMatrixHeight(matrixHeight);

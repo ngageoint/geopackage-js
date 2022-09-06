@@ -1,8 +1,7 @@
+import type { GeometryIndex } from './geometryIndex';
 /**
  * Table Index object, for indexing data within user tables
  */
-import { GeometryIndex } from './geometryIndex';
-
 export class TableIndex {
   /**
    * Table name

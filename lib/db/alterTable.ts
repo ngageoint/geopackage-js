@@ -1,4 +1,3 @@
-import { GeoPackageConnection } from './geoPackageConnection';
 import { UserTable } from '../user/userTable';
 import { UserCustomTableReader } from '../user/custom/userCustomTableReader';
 import { SQLUtils } from './sqlUtils';
@@ -13,7 +12,8 @@ import { SQLiteMaster } from './master/sqliteMaster';
 import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLiteMasterType } from './master/sqliteMasterType';
 import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
-import { RTreeIndexExtension } from '../extension/rtree/rTreeIndexExtension';
+import type { GeoPackageConnection } from './geoPackageConnection';
+import { RTreeIndexExtensionConstants } from '../extension/rtree/rTreeIndexExtensionConstants';
 
 /**
  * Builds and performs alter table statements
@@ -423,7 +423,7 @@ export class AlterTable {
             // Don't create rtree triggers for new tables
             create =
               indexesAndTriggers.getType(i) != SQLiteMasterType.TRIGGER ||
-              !indexesAndTriggers.getName(i).startsWith(RTreeIndexExtension.RTREE_PREFIX);
+              !indexesAndTriggers.getName(i).startsWith(RTreeIndexExtensionConstants.RTREE_PREFIX);
           }
           if (create) {
             let tableSql = indexesAndTriggers.getSql(i);

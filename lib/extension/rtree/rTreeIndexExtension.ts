@@ -1,4 +1,3 @@
-import { GeoPackage } from '../../geoPackage';
 import { BaseExtension } from '../baseExtension';
 import { Extensions } from '../extensions';
 import { GeoPackageGeometryData } from '../../geom/geoPackageGeometryData';
@@ -6,7 +5,6 @@ import { FeatureTable } from '../../features/user/featureTable';
 import { GeoPackageException } from '../../geoPackageException';
 import { ExtensionScopeType } from '../extensionScopeType';
 import { GeoPackageConnection } from '../../db/geoPackageConnection';
-import { GeoPackageConstants } from '../../geoPackageConstants';
 import { FeatureDao } from '../../features/user/featureDao';
 import { RTreeIndexTableDao } from './rTreeIndexTableDao';
 import { UserCustomDao } from '../../user/custom/userCustomDao';
@@ -15,170 +13,13 @@ import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { UserCustomColumn } from '../../user/custom/userCustomColumn';
 import { UserCustomTable } from '../../user/custom/userCustomTable';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
+import { RTreeIndexExtensionConstants } from './rTreeIndexExtensionConstants';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * RTreeIndex extension
  */
 export class RTreeIndexExtension extends BaseExtension {
-  /**
-   * Name
-   */
-  public static readonly NAME = 'rtree_index';
-
-  /**
-   * RTree table and trigger name prefix
-   *
-   */
-  public static readonly RTREE_PREFIX = 'rtree_';
-
-  /**
-   * Min X Function name
-   */
-  public static readonly MIN_X_FUNCTION = 'ST_MinX';
-
-  /**
-   * Max X Function name
-   */
-  public static readonly MAX_X_FUNCTION = 'ST_MaxX';
-
-  /**
-   * Min Y Function name
-   */
-  public static readonly MIN_Y_FUNCTION = 'ST_MinY';
-
-  /**
-   * Max Y Function name
-   */
-  public static readonly MAX_Y_FUNCTION = 'ST_MaxY';
-
-  /**
-   * Is Empty Function name
-   */
-  public static readonly IS_EMPTY_FUNCTION = 'ST_IsEmpty';
-
-  /**
-   * Create SQL property
-   */
-  public static readonly CREATE_PROPERTY = 'create';
-
-  /**
-   * Table SQL property
-   *
-   */
-  public static readonly TABLE_PROPERTY = 'table';
-
-  /**
-   * Load SQL property
-   */
-  public static readonly LOAD_PROPERTY = 'load';
-
-  /**
-   * Drop SQL property
-   */
-  public static readonly DROP_PROPERTY = 'drop';
-
-  /**
-   * Drop Force SQL property
-   *
-   */
-  public static readonly DROP_FORCE_PROPERTY = 'drop_force';
-
-  /**
-   * Trigger Insert name
-   */
-  public static readonly TRIGGER_INSERT_NAME = 'insert';
-
-  /**
-   * Trigger update 1 name
-   */
-  public static readonly TRIGGER_UPDATE1_NAME = 'update1';
-
-  /**
-   * Trigger update 2 name
-   */
-  public static readonly TRIGGER_UPDATE2_NAME = 'update2';
-
-  /**
-   * Trigger update 3 name
-   */
-  public static readonly TRIGGER_UPDATE3_NAME = 'update3';
-
-  /**
-   * Trigger update 4 name
-   */
-  public static readonly TRIGGER_UPDATE4_NAME = 'update4';
-
-  /**
-   * Trigger delete name
-   */
-  public static readonly TRIGGER_DELETE_NAME = 'delete';
-
-  /**
-   * Trigger drop name
-   */
-  public static readonly TRIGGER_DROP_PROPERTY = 'drop';
-
-  /**
-   * ID column name
-   *
-   */
-  public static readonly COLUMN_ID = 'id';
-
-  /**
-   * Min X column name
-   *
-   */
-  public static readonly COLUMN_MIN_X = 'minx';
-
-  /**
-   * Max X column name
-   *
-   */
-  public static readonly COLUMN_MAX_X = 'maxx';
-
-  /**
-   * Min Y column name
-   *
-   */
-  public static readonly COLUMN_MIN_Y = 'miny';
-
-  /**
-   * Max Y column name
-   *
-   */
-  public static readonly COLUMN_MAX_Y = 'maxy';
-
-  /**
-   * Extension name
-   */
-  public static readonly EXTENSION_NAME =
-    GeoPackageConstants.EXTENSION_AUTHOR + Extensions.EXTENSION_NAME_DIVIDER + RTreeIndexExtension.NAME;
-
-  /**
-   * Extension definition URL
-   */
-  public static readonly DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
-
-  /**
-   * Table substitute value
-   */
-  public static readonly TABLE_SUBSTITUTE = '<t>';
-
-  /**
-   * Geometry Column substitute value
-   */
-  public static readonly GEOMETRY_COLUMN_SUBSTITUTE = '<c>';
-
-  /**
-   * Primary Key Column substitute value
-   */
-  public static readonly PK_COLUMN_SUBSTITUTE = '<i>';
-
-  /**
-   * Trigger substitute value
-   */
-  public static readonly TRIGGER_SUBSTITUTE = '<n>';
-
   /**
    * Connection
    */
@@ -284,10 +125,10 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public getOrCreate(tableName: string, columnName: string): Extensions {
     return super.getOrCreate(
-      RTreeIndexExtension.EXTENSION_NAME,
+      RTreeIndexExtensionConstants.EXTENSION_NAME,
       tableName,
       columnName,
-      RTreeIndexExtension.DEFINITION,
+      RTreeIndexExtensionConstants.DEFINITION,
       ExtensionScopeType.WRITE_ONLY,
     );
   }
@@ -308,7 +149,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public hasExtensionWithTableAndColumn(tableName: string, columnName: string): boolean {
     return (
-      super.hasExtension(RTreeIndexExtension.EXTENSION_NAME, tableName, columnName) &&
+      super.hasExtension(RTreeIndexExtensionConstants.EXTENSION_NAME, tableName, columnName) &&
       this.connection.tableOrViewExists(this.getRTreeTableName(tableName, columnName))
     );
   }
@@ -320,7 +161,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @return true if has extension
    */
   public hasExtensionWithTable(tableName: string): boolean {
-    return super.hasExtension(RTreeIndexExtension.EXTENSION_NAME, tableName, undefined);
+    return super.hasExtension(RTreeIndexExtensionConstants.EXTENSION_NAME, tableName, undefined);
   }
 
   /**
@@ -329,7 +170,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @return true if has extension
    */
   public has(): boolean {
-    return super.hasExtensions(RTreeIndexExtension.EXTENSION_NAME);
+    return super.hasExtensions(RTreeIndexExtensionConstants.EXTENSION_NAME);
   }
 
   /**
@@ -472,7 +313,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public createMinXFunction(): void {
     this.createFunction(
-      new GeometryFunction(RTreeIndexExtension.MIN_X_FUNCTION, (data: GeoPackageGeometryData) => {
+      new GeometryFunction(RTreeIndexExtensionConstants.MIN_X_FUNCTION, (data: GeoPackageGeometryData) => {
         let value = null;
         const envelope = RTreeIndexExtension.getEnvelope(data);
         if (envelope != null) {
@@ -488,7 +329,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public createMaxXFunction(): void {
     this.createFunction(
-      new GeometryFunction(RTreeIndexExtension.MAX_X_FUNCTION, (data: GeoPackageGeometryData) => {
+      new GeometryFunction(RTreeIndexExtensionConstants.MAX_X_FUNCTION, (data: GeoPackageGeometryData) => {
         let value = null;
         const envelope = RTreeIndexExtension.getEnvelope(data);
         if (envelope != null) {
@@ -504,7 +345,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public createMinYFunction(): void {
     this.createFunction(
-      new GeometryFunction(RTreeIndexExtension.MIN_Y_FUNCTION, (data: GeoPackageGeometryData) => {
+      new GeometryFunction(RTreeIndexExtensionConstants.MIN_Y_FUNCTION, (data: GeoPackageGeometryData) => {
         let value = null;
         const envelope = RTreeIndexExtension.getEnvelope(data);
         if (envelope != null) {
@@ -520,7 +361,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public createMaxYFunction(): void {
     this.createFunction(
-      new GeometryFunction(RTreeIndexExtension.MAX_Y_FUNCTION, (data: GeoPackageGeometryData) => {
+      new GeometryFunction(RTreeIndexExtensionConstants.MAX_Y_FUNCTION, (data: GeoPackageGeometryData) => {
         let value = null;
         const envelope = RTreeIndexExtension.getEnvelope(data);
         if (envelope != null) {
@@ -536,7 +377,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public createIsEmptyFunction(): void {
     this.createFunction(
-      new GeometryFunction(RTreeIndexExtension.IS_EMPTY_FUNCTION, (data: GeoPackageGeometryData) => {
+      new GeometryFunction(RTreeIndexExtensionConstants.IS_EMPTY_FUNCTION, (data: GeoPackageGeometryData) => {
         let value = null;
         if (data != null) {
           if (data.isEmpty() || data.getGeometry() == null) {
@@ -736,7 +577,7 @@ export class RTreeIndexExtension extends BaseExtension {
       this.drop(tableName, geometryColumnName);
       try {
         this.extensionsDao.deleteByExtensionAndTableNameAndColumnName(
-          RTreeIndexExtension.EXTENSION_NAME,
+          RTreeIndexExtensionConstants.EXTENSION_NAME,
           tableName,
           geometryColumnName,
         );
@@ -761,7 +602,7 @@ export class RTreeIndexExtension extends BaseExtension {
     try {
       if (this.extensionsDao.isTableExists()) {
         const extensions = this.extensionsDao.queryByExtensionAndTableName(
-          RTreeIndexExtension.EXTENSION_NAME,
+          RTreeIndexExtensionConstants.EXTENSION_NAME,
           tableName,
         );
         for (const extension of extensions) {
@@ -786,7 +627,7 @@ export class RTreeIndexExtension extends BaseExtension {
   public deleteAll(): void {
     try {
       if (this.extensionsDao.isTableExists()) {
-        const extensions = this.extensionsDao.queryAllByExtension(RTreeIndexExtension.EXTENSION_NAME);
+        const extensions = this.extensionsDao.queryAllByExtension(RTreeIndexExtensionConstants.EXTENSION_NAME);
         for (const extension of extensions) {
           this.deleteWithTableAndGeometryColumn(extension.getTableName(), extension.getColumnName());
         }
@@ -900,7 +741,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropInsertTrigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_INSERT_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_INSERT_NAME);
   }
 
   /**
@@ -910,7 +751,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropUpdate1Trigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_UPDATE1_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_UPDATE1_NAME);
   }
 
   /**
@@ -920,7 +761,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropUpdate2Trigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_UPDATE2_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_UPDATE2_NAME);
   }
 
   /**
@@ -930,7 +771,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropUpdate3Trigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_UPDATE3_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_UPDATE3_NAME);
   }
 
   /**
@@ -940,7 +781,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropUpdate4Trigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_UPDATE4_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_UPDATE4_NAME);
   }
 
   /**
@@ -950,7 +791,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param geometryColumnName geometry column name
    */
   public dropDeleteTrigger(tableName: string, geometryColumnName: string): void {
-    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtension.TRIGGER_DELETE_NAME);
+    this.dropTrigger(tableName, geometryColumnName, RTreeIndexExtensionConstants.TRIGGER_DELETE_NAME);
   }
 
   /**
@@ -1018,15 +859,15 @@ export class RTreeIndexExtension extends BaseExtension {
   ): string {
     let substituted = sql;
 
-    substituted = substituted.replace(RTreeIndexExtension.TABLE_SUBSTITUTE, tableName);
-    substituted = substituted.replace(RTreeIndexExtension.GEOMETRY_COLUMN_SUBSTITUTE, geometryColumnName);
+    substituted = substituted.replace(RTreeIndexExtensionConstants.TABLE_SUBSTITUTE, tableName);
+    substituted = substituted.replace(RTreeIndexExtensionConstants.GEOMETRY_COLUMN_SUBSTITUTE, geometryColumnName);
 
     if (idColumnName != null) {
-      substituted = substituted.replace(RTreeIndexExtension.PK_COLUMN_SUBSTITUTE, idColumnName);
+      substituted = substituted.replace(RTreeIndexExtensionConstants.PK_COLUMN_SUBSTITUTE, idColumnName);
     }
 
     if (triggerName != null) {
-      substituted = substituted.replace(RTreeIndexExtension.TRIGGER_SUBSTITUTE, triggerName);
+      substituted = substituted.replace(RTreeIndexExtensionConstants.TRIGGER_SUBSTITUTE, triggerName);
     }
 
     return substituted;
@@ -1052,11 +893,11 @@ export class RTreeIndexExtension extends BaseExtension {
   protected getRTreeTable(featureTable: FeatureTable): UserCustomTable {
     const columns = [];
     let idx = 0;
-    columns.push(UserCustomColumn.createPrimaryKeyColumn(idx++, RTreeIndexExtension.COLUMN_ID, false));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtension.COLUMN_MIN_X, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtension.COLUMN_MAX_X, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtension.COLUMN_MIN_Y, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtension.COLUMN_MAX_Y, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createPrimaryKeyColumn(idx++, RTreeIndexExtensionConstants.COLUMN_ID, false));
+    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MIN_X, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MAX_X, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MIN_Y, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MAX_Y, GeoPackageDataType.FLOAT));
     const rTreeTableName = this.getRTreeTableName(featureTable.getTableName(), featureTable.getGeometryColumnName());
     return new UserCustomTable(rTreeTableName, columns);
   }

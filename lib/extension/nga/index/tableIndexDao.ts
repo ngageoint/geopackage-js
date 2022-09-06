@@ -1,13 +1,12 @@
 import { GeoPackageDao } from '../../../db/geoPackageDao';
-import { GeoPackage } from '../../../geoPackage';
 import { TableIndex } from './tableIndex';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { GeometryIndexDao } from './geometryIndexDao';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageException } from '../../../geoPackageException';
 import { ColumnValues } from '../../../dao/columnValues';
 import { GeometryIndex } from './geometryIndex';
 import { DateConverter } from '../../../db/dateConverter';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Table Index Data Access Object
@@ -16,26 +15,19 @@ export class TableIndexDao extends GeoPackageDao<TableIndex, string> {
   /**
    * Create the DAO
    *
-   * @param geoPackageOrConnection GeoPackage | GeoPackageConnection
+   * @param geoPackage GeoPackage
    * @return dao
    */
-  public static createDao(geoPackageOrConnection: GeoPackage | GeoPackageConnection): TableIndexDao {
-    return new TableIndexDao(
-      geoPackageOrConnection instanceof GeoPackage ? geoPackageOrConnection.getDatabase() : geoPackageOrConnection,
-    );
+  public static createDao(geoPackage: GeoPackage): TableIndexDao {
+    return new TableIndexDao(geoPackage);
   }
 
   /**
-   * Geometry Index DAO
-   */
-  private geometryIndexDao: GeometryIndexDao;
-
-  /**
    * Constructor
-   * @param db connection source
+   * @param geoPackage GeoPackage
    */
-  public constructor(db: GeoPackageConnection) {
-    super(db, TableIndex.TABLE_NAME);
+  public constructor(geoPackage: GeoPackage) {
+    super(geoPackage, TableIndex.TABLE_NAME);
   }
 
   /**
@@ -109,15 +101,20 @@ export class TableIndexDao extends GeoPackageDao<TableIndex, string> {
   }
 
   /**
+   * Gets the table index for a given geometry index
+   * @param geometryIndex
+   */
+  getTableIndexForGeometryIndex(geometryIndex: GeometryIndex): TableIndex {
+    return this.queryForId(geometryIndex.getTableName());
+  }
+
+  /**
    * Get or create a Geometry Index DAO
    *
    * @return geometry index dao
    */
   private getGeometryIndexDao(): GeometryIndexDao {
-    if (this.geometryIndexDao == null) {
-      this.geometryIndexDao = GeometryIndexDao.create(this.db);
-    }
-    return this.geometryIndexDao;
+    return this.geoPackage.getGeometryIndexDao();
   }
 
   /**

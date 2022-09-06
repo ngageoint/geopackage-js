@@ -2,13 +2,9 @@
  * @module tiles/matrixset
  * @see module:dao/dao
  */
-import { Projection } from '@ngageoint/projections-js';
 import { BoundingBox } from '../../boundingBox';
 import { Contents } from '../../contents/contents';
-import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
-import { GeoPackageException } from '../../geoPackageException';
-import { ContentsDataType } from '../../contents/contentsDataType';
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { SpatialReferenceSystemConstants } from '../../srs/spatialReferenceSystemConstants';
 
 /**
  * Tile Matrix Set object. Defines the minimum bounding box (min_x, min_y,
@@ -36,7 +32,7 @@ export class TileMatrixSet {
   /**
    * srsId field name
    */
-  public static readonly COLUMN_SRS_ID = SpatialReferenceSystem.COLUMN_SRS_ID;
+  public static readonly COLUMN_SRS_ID = SpatialReferenceSystemConstants.COLUMN_SRS_ID;
 
   /**
    * minX field name
@@ -59,19 +55,9 @@ export class TileMatrixSet {
   public static readonly COLUMN_MAX_Y = 'max_y';
 
   /**
-   * Foreign key to Contents by table name
-   */
-  private contents: Contents;
-
-  /**
    * Tile Pyramid User Data Table Name
    */
   private table_name: string;
-
-  /**
-   * Spatial Reference System ID: gpkg_spatial_ref_sys.srs_id
-   */
-  private srs: SpatialReferenceSystem;
 
   /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
@@ -104,9 +90,7 @@ export class TileMatrixSet {
    */
   public constructor(tileMatrixSet?: TileMatrixSet) {
     if (tileMatrixSet != null) {
-      this.contents = tileMatrixSet.getContents();
       this.table_name = tileMatrixSet.getTableName();
-      this.srs = tileMatrixSet.getSrs();
       this.srs_id = tileMatrixSet.getSrsId();
       this.min_x = tileMatrixSet.getMinX();
       this.min_y = tileMatrixSet.getMinY();
@@ -123,43 +107,20 @@ export class TileMatrixSet {
     this.table_name = id;
   }
 
-  public getContents(): Contents {
-    return this.contents;
-  }
-
-  public setContents(contents: Contents): void {
-    this.contents = contents;
-    if (contents != null) {
-      // Verify the Contents have a tiles data type (Spec Requirement 33)
-      if (!contents.isTilesTypeOrUnknown()) {
-        throw new GeoPackageException(
-          'The Contents of a TileMatrixSet must have a data type of ' +
-            ContentsDataType.nameFromType(ContentsDataType.TILES) +
-            '. actual type: ' +
-            contents.getDataTypeName(),
-        );
-      }
-      this.table_name = contents.getId();
-    } else {
-      this.table_name = null;
-    }
-  }
-
   public getTableName(): string {
     return this.table_name;
   }
 
-  public getSrs(): SpatialReferenceSystem {
-    return this.srs;
-  }
-
-  public setSrs(srs: SpatialReferenceSystem): void {
-    this.srs = srs;
-    this.srs_id = srs != null ? srs.getId() : -1;
+  public setTableName(tableName: string): void {
+    this.table_name = tableName;
   }
 
   public getSrsId(): number {
     return this.srs_id;
+  }
+
+  public setSrsId(srsId: number): void {
+    this.srs_id = srsId;
   }
 
   public getMinX(): number {
@@ -200,24 +161,7 @@ export class TileMatrixSet {
    * @return bounding box
    */
   public getBoundingBox(): BoundingBox {
-    const boundingBox = new BoundingBox(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY());
-    return boundingBox;
-  }
-
-  /**
-   * Get a bounding box in the provided projection
-   * @param projection desired projection
-   * @return bounding box
-   */
-  public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
-    let boundingBox = this.getBoundingBox();
-    if (projection != null) {
-      if (!this.getProjection().equalsProjection(projection)) {
-        const transform = GeometryTransform.create(this.getProjection(), projection);
-        boundingBox = boundingBox.transform(transform);
-      }
-    }
-    return boundingBox;
+    return new BoundingBox(this.getMinX(), this.getMinY(), this.getMaxX(), this.getMaxY());
   }
 
   /**
@@ -231,14 +175,5 @@ export class TileMatrixSet {
     this.setMaxX(boundingBox.getMaxLongitude());
     this.setMinY(boundingBox.getMinLatitude());
     this.setMaxY(boundingBox.getMaxLatitude());
-  }
-
-  /**
-   * Get the projection
-   *
-   * @return projection
-   */
-  public getProjection(): Projection {
-    return this.getSrs().getProjection();
   }
 }

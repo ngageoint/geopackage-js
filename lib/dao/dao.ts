@@ -1,8 +1,9 @@
-import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { ColumnValues } from './columnValues';
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
 import { DBValue } from '../db/dbValue';
 import { SQLUtils } from '../db/sqlUtils';
+import type { GeoPackage } from '../geoPackage';
+import type { GeoPackageConnection } from '../db/geoPackageConnection';
 
 /**
  * Return class for the {@link Dao#createOrUpdate(Object)} method.
@@ -36,6 +37,10 @@ export class CreateOrUpdateStatus {
  */
 export abstract class Dao<T, ID> {
   /**
+   * GeoPackage
+   */
+  readonly geoPackage: GeoPackage;
+  /**
    * Database connection to the sqlite file
    */
   readonly db: GeoPackageConnection;
@@ -52,11 +57,12 @@ export abstract class Dao<T, ID> {
 
   /**
    * Constructor
-   * @param db GeoPackageConnection object
+   * @param geoPackage GeoPackageConnection object
    * @param tableName tableName
    */
-  constructor(db: GeoPackageConnection, tableName?: string) {
-    this.db = db;
+  constructor(geoPackage: GeoPackage, tableName?: string) {
+    this.geoPackage = geoPackage;
+    this.db = geoPackage.getConnection();
     this.gpkgTableName = tableName;
   }
 
@@ -401,6 +407,7 @@ export abstract class Dao<T, ID> {
    * @return {string} primary key where clause
    */
   buildPkWhere(idValue: any[] | any): string {
+    console.log(this.idColumns);
     if (Array.isArray(idValue)) {
       const idValuesArray = idValue;
       const idColumnValues = new ColumnValues();

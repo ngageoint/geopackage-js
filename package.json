@@ -91,6 +91,13 @@
     "cli",
     "converters"
   ],
+  "madge": {
+    "detectiveOptions": {
+      "ts": {
+        "skipTypeImports": true
+      }
+    }
+  },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-typescript",
     "temp-dir": "./.test_run",

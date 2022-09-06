@@ -1,13 +1,13 @@
-import { NGAExtensions } from '../ngaExtensions';
+import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
 import { Extensions } from '../../extensions';
 import { FeatureTileLinkDao } from './featureTileLinkDao';
-import { GeoPackage } from '../../../geoPackage';
 import { FeatureTileLink } from './featureTileLink';
 import { BaseExtension } from '../../baseExtension';
 import { GeoPackageException } from '../../../geoPackageException';
 import { FeatureTileLinkKey } from './featureTileLinkKey';
 import { ExtensionScopeType } from '../../extensionScopeType';
-import { FeatureTileLinkTableCreator } from './featureTileLinkTableCreator';
+import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Abstract Feature Tile Table linker, used to link feature and tile tables
@@ -19,7 +19,7 @@ export abstract class FeatureTileTableLinker extends BaseExtension {
   /**
    * Extension author
    */
-  public static readonly EXTENSION_AUTHOR: string = NGAExtensions.EXTENSION_AUTHOR;
+  public static readonly EXTENSION_AUTHOR: string = NGAExtensionsConstants.EXTENSION_AUTHOR;
 
   /**
    * Extension name without the author
@@ -51,7 +51,7 @@ export abstract class FeatureTileTableLinker extends BaseExtension {
    */
   protected constructor(geoPackage: GeoPackage) {
     super(geoPackage);
-    this.featureTileLinkDao = FeatureTileLinkDao.createDao(geoPackage.getConnection());
+    this.featureTileLinkDao = FeatureTileLinkDao.createDao(geoPackage);
   }
 
   /**
@@ -260,8 +260,8 @@ export abstract class FeatureTileTableLinker extends BaseExtension {
 
     try {
       if (!this.featureTileLinkDao.isTableExists()) {
-        const tableCreator = new FeatureTileLinkTableCreator(this.geoPackage);
-        created = tableCreator.createFeatureTileLink();
+        const tableCreator = new GeoPackageTableCreator(this.geoPackage);
+        created = tableCreator.execScript('feature_tile_link');
       }
     } catch (e) {
       throw new GeoPackageException('Failed to check if FeatureTileLink table exists and create it');

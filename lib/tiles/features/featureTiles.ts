@@ -10,7 +10,6 @@ import { FeatureDrawType } from './featureDrawType';
 import { FeaturePaintCache } from './featurePaintCache';
 import { Paint } from './paint';
 import { FeatureTableStyles } from '../../extension/nga/style/featureTableStyles';
-import { GeoPackage } from '../../geoPackage';
 import { FeatureRow } from '../../features/user/featureRow';
 import { StyleRow } from '../../extension/nga/style/styleRow';
 import { FeatureTilePointIcon } from './featureTilePointIcon';
@@ -43,6 +42,7 @@ import { GeoPackageImage } from '../../image/geoPackageImage';
 import { FeatureIndexResults } from '../../features/index/featureIndexResults';
 import { FeatureTileCanvas } from './featureTileCanvas';
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * FeatureTiles module.

@@ -1,12 +1,6 @@
-/**
- * Feature Table Index
- * @module extension/index
- */
 import { BaseExtension } from '../../baseExtension';
-import { GeoPackage } from '../../../geoPackage';
 import { Extensions } from '../../extensions';
 import { TableIndex } from './tableIndex';
-import { FeatureDao } from '../../../features/user/featureDao';
 import { GeometryIndexDao } from './geometryIndexDao';
 import { TableIndexDao } from './tableIndexDao';
 import { FeatureRow } from '../../../features/user/featureRow';
@@ -16,7 +10,6 @@ import { Projection } from '@ngageoint/projections-js';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { GeometryIndex } from './geometryIndex';
-import { NGAExtensions } from '../ngaExtensions';
 import { GeoPackageException } from '../../../geoPackageException';
 import { GeometryIndexTableCreator } from './geometryIndexTableCreator';
 import { GeoPackageProgress } from '../../../io/geoPackageProgress';
@@ -24,6 +17,9 @@ import { GeoPackageGeometryData } from '../../../geom/geoPackageGeometryData';
 import { FeatureResultSet } from '../../../features/user/featureResultSet';
 import { GeometryIndexKey } from './geometryIndexKey';
 import { ColumnValues } from '../../../dao/columnValues';
+import { FeatureTableIndexConstants } from './featureTableIndexConstants';
+import type { GeoPackage } from '../../../geoPackage';
+import type { FeatureDao } from '../../../features/user/featureDao';
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -31,30 +27,6 @@ import { ColumnValues } from '../../../dao/columnValues';
  * bounding box queries.
  */
 export class FeatureTableIndex extends BaseExtension {
-  /**
-   * Extension author
-   */
-  public static readonly EXTENSION_AUTHOR = NGAExtensions.EXTENSION_AUTHOR;
-
-  /**
-   * Extension name without the author
-   */
-  public static readonly EXTENSION_NAME_NO_AUTHOR = 'geometry_index';
-
-  /**
-   * Extension, with author and name
-   */
-  public static readonly EXTENSION_NAME = Extensions.buildExtensionName(
-    FeatureTableIndex.EXTENSION_AUTHOR,
-    FeatureTableIndex.EXTENSION_NAME_NO_AUTHOR,
-  );
-
-  /**
-   * Extension definition URL
-   */
-  public static readonly EXTENSION_DEFINITION =
-    'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
-
   /**
    * Column name
    */
@@ -92,7 +64,7 @@ export class FeatureTableIndex extends BaseExtension {
 
   /**
    * Constructor
-   * @param this.geoPackage GeoPackage object
+   * @param geoPackage GeoPackage object
    * @param featureDao FeatureDao to index
    */
   constructor(geoPackage: GeoPackage, featureDao: FeatureDao) {
@@ -254,7 +226,7 @@ export class FeatureTableIndex extends BaseExtension {
       // Delete the extensions entry
       if (this.extensionsDao.isTableExists()) {
         deleted =
-          this.extensionsDao.deleteByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, this.tableName) > 0 ||
+          this.extensionsDao.deleteByExtensionAndTableName(FeatureTableIndexConstants.EXTENSION_NAME, this.tableName) > 0 ||
           deleted;
       }
     } catch (e) {
@@ -438,10 +410,10 @@ export class FeatureTableIndex extends BaseExtension {
    */
   private getOrCreateExtension(): Extensions {
     return this.getOrCreate(
-      FeatureTableIndex.EXTENSION_NAME,
+      FeatureTableIndexConstants.EXTENSION_NAME,
       this.tableName,
       this.columnName,
-      FeatureTableIndex.EXTENSION_DEFINITION,
+      FeatureTableIndexConstants.EXTENSION_DEFINITION,
       ExtensionScopeType.READ_WRITE,
     );
   }
@@ -452,7 +424,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @return extensions object or null if one does not exist
    */
   public getExtension(): Extensions[] {
-    return [this.get(FeatureTableIndex.EXTENSION_NAME, this.tableName, this.columnName)];
+    return [this.get(FeatureTableIndexConstants.EXTENSION_NAME, this.tableName, this.columnName)];
   }
 
   /**
@@ -471,7 +443,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @return table index dao
    */
   public static getTableIndexDao(geoPackage: GeoPackage): TableIndexDao {
-    return TableIndexDao.createDao(geoPackage);
+    return geoPackage.getTableIndexDao();
   }
 
   /**
@@ -505,11 +477,11 @@ export class FeatureTableIndex extends BaseExtension {
   /**
    * Get a Geometry Index DAO
    *
-   * @param this.geoPackage GeoPackage
+   * @param geoPackage GeoPackage
    * @return geometry index dao
    */
   public static getGeometryIndexDao(geoPackage: GeoPackage): GeometryIndexDao {
-    return GeometryIndexDao.create(geoPackage);
+    return geoPackage.getGeometryIndexDao();
   }
 
   /**

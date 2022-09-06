@@ -1,15 +1,12 @@
-/**
- * @module extension/nga/scale
- */
 import { BaseExtension } from '../../baseExtension';
-import { GeoPackage } from '../../../geoPackage';
 import { Extensions } from '../../extensions';
 import { TileScalingDao } from './tileScalingDao';
 import { TileScaling } from './tileScaling';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { GeoPackageException } from '../../../geoPackageException';
-import { TileScalingTableCreator } from './tileScalingTableCreator';
-import { NGAExtensions } from '../ngaExtensions';
+import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
+import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Tile Scaling extension
@@ -18,7 +15,7 @@ export class TileTableScaling extends BaseExtension {
   /**
    * Extension author
    */
-  public static readonly EXTENSION_AUTHOR = NGAExtensions.EXTENSION_AUTHOR;
+  public static readonly EXTENSION_AUTHOR = NGAExtensionsConstants.EXTENSION_AUTHOR;
 
   /**
    * Extension name without the author
@@ -44,21 +41,20 @@ export class TileTableScaling extends BaseExtension {
   constructor(geoPackage: GeoPackage, tableName: string) {
     super(geoPackage);
     this.tableName = tableName;
-    this.tileScalingDao = TileScalingDao.createDao(this.geoPackage.getConnection());
+    this.tileScalingDao = this.geoPackage.getTileScalingDao();
   }
   /**
    * Get or create the tileScaling id extension
    * @return {Extensions}
    */
   getOrCreateExtension(): Extensions {
-    const extension = this.getOrCreate(
+    return this.getOrCreate(
       TileTableScaling.EXTENSION_NAME,
       this.tableName,
       null,
       TileTableScaling.EXTENSION_DEFINITION,
       ExtensionScopeType.READ_WRITE,
     );
-    return extension;
   }
 
   /**
@@ -138,7 +134,7 @@ export class TileTableScaling extends BaseExtension {
    * @return tile scaling dao
    */
   public getTileScalingDao(): TileScalingDao {
-    return TileScalingDao.createDao(this.geoPackage.getConnection());
+    return this.geoPackage.getTileScalingDao();
   }
 
   /**
@@ -148,13 +144,12 @@ export class TileTableScaling extends BaseExtension {
    */
   public createTileScalingTable(): boolean {
     this.verifyWritable();
-
     let created = false;
-
     try {
       if (!this.tileScalingDao.isTableExists()) {
-        const tableCreator = new TileScalingTableCreator(this.geoPackage);
-        created = tableCreator.createTileScaling();
+        const tableCreator = new GeoPackageTableCreator(this.geoPackage);
+        created = tableCreator.execScript('tile_scaling');
+
       }
     } catch (e) {
       throw new GeoPackageException('Failed to check if TileScaling table exists and create it');

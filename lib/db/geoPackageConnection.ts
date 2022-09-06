@@ -1,5 +1,4 @@
 import { Db } from './db';
-import { DBAdapter } from './dbAdapter';
 import { GeoPackageConstants } from '../geoPackageConstants';
 import { SQLiteMaster } from './master/sqliteMaster';
 import { SQLiteMasterType } from './master/sqliteMasterType';
@@ -7,13 +6,14 @@ import { TableInfo } from './table/tableInfo';
 import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
 import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLUtils } from './sqlUtils';
-import { ResultSet } from './resultSet';
+import type { ResultSet } from './resultSet';
+import type { DBAdapter } from './dbAdapter';
 
 /**
  * Represents a connection to the GeoPackage database
  */
 export class GeoPackageConnection {
-  connection: DBAdapter;
+  connectionSource: DBAdapter;
   registeredFunctions: string[];
   /**
    * Construct a new connection to the GeoPackage SQLite file
@@ -21,52 +21,52 @@ export class GeoPackageConnection {
    */
   constructor(connection: DBAdapter) {
     this.registeredFunctions = [];
-    this.connection = connection;
+    this.connectionSource = connection;
   }
 
-  getDbAdapter(): DBAdapter {
-    return this.connection;
+  getConnectionSource(): DBAdapter {
+    return this.connectionSource;
   }
 
   transaction(func: Function): void {
-    this.connection.transaction(func);
+    this.connectionSource.transaction(func);
   }
 
   size(): number {
-    return this.connection.size();
+    return this.connectionSource.size();
   }
 
   readableSize(): string {
-    return this.connection.readableSize();
+    return this.connectionSource.readableSize();
   }
 
   /**
    * Close the database.
    */
   close(): void {
-    this.connection.close();
+    this.connectionSource.close();
   }
   /**
    * exports the GeoPackage as a file
    * @param  {Function} callback called with an err and the buffer containing the contents of the file
    */
   async export(): Promise<any> {
-    return this.connection.export();
+    return this.connectionSource.export();
   }
   /**
    * Gets the raw connection to the database
    * @return {any}
    */
   getDBConnection(): any {
-    return this.connection.db;
+    return this.connectionSource.db;
   }
   /**
    * Connects to a GeoPackage database
    * @param  {any} db database to connect to
    */
   setDBConnection(db: any): void {
-    this.connection = Db.create();
-    this.connection.db = db;
+    this.connectionSource = Db.create();
+    this.connectionSource.db = db;
   }
   /**
    * Registers the given function so that it can be used by SQL statements
@@ -77,9 +77,9 @@ export class GeoPackageConnection {
   registerFunction(name: string, functionDefinition: Function): DBAdapter {
     if (this.registeredFunctions.indexOf(name) === -1) {
       this.registeredFunctions.push(name);
-      this.connection.registerFunction(name, functionDefinition);
+      this.connectionSource.registerFunction(name, functionDefinition);
     }
-    return this.connection;
+    return this.connectionSource;
   }
   /**
    * Gets the first result from the query
@@ -88,7 +88,7 @@ export class GeoPackageConnection {
    * @return {any}
    */
   get(sql: string, params?: [] | Record<string, any>): Record<string, any> {
-    return this.connection.get(sql, params);
+    return this.connectionSource.get(sql, params);
   }
   /**
    * Gets the first result from the query
@@ -97,7 +97,7 @@ export class GeoPackageConnection {
    * @return {any}
    */
   query(sql: string, params?: [] | Record<string, any>): ResultSet {
-    return this.connection.query(sql, params);
+    return this.connectionSource.query(sql, params);
   }
   /**
    * Checks if table exists in database
@@ -105,7 +105,7 @@ export class GeoPackageConnection {
    * @returns {Boolean}
    */
   isTableExists(tableName: string): boolean {
-    return this.connection.isTableExists(tableName);
+    return this.connectionSource.isTableExists(tableName);
   }
   /**
    * Run the given SQL and return the results.
@@ -116,7 +116,7 @@ export class GeoPackageConnection {
    * * `lastInsertROWID`: ID of the last inserted row
    */
   run(sql: string, params?: Record<string, any> | []): { changes: number; lastInsertRowid: number } {
-    return this.connection.run(sql, params);
+    return this.connectionSource.run(sql, params);
   }
   /**
    * Executes the query and returns all results in an array
@@ -125,7 +125,7 @@ export class GeoPackageConnection {
    * @return {any[]}
    */
   all(sql: string, params?: [] | Record<string, any> | null): any[] {
-    return this.connection.all(sql, params);
+    return this.connectionSource.all(sql, params);
   }
   /**
    * Executes the query and returns an Iterable object of results
@@ -134,7 +134,7 @@ export class GeoPackageConnection {
    * @return {IterableIterator<Object>}
    */
   each(sql: string, params?: [] | Record<string, any>): IterableIterator<any> {
-    return this.connection.each(sql, params);
+    return this.connectionSource.each(sql, params);
   }
   /**
    * Gets the minimum value from the column
@@ -153,7 +153,7 @@ export class GeoPackageConnection {
       }
       minStatement += where;
     }
-    return this.connection.get(minStatement, whereArgs).min as number;
+    return this.connectionSource.get(minStatement, whereArgs).min as number;
   }
   /**
    * Gets the maximum value from the column
@@ -172,7 +172,7 @@ export class GeoPackageConnection {
       }
       maxStatement += where;
     }
-    return this.connection.get(maxStatement, whereArgs).max as number;
+    return this.connectionSource.get(maxStatement, whereArgs).max as number;
   }
   /**
    * Return the count of objects in the table
@@ -182,7 +182,7 @@ export class GeoPackageConnection {
    * @return {number}
    */
   count(table: string, where?: string, whereArgs?: [] | Record<string, any>): number {
-    return this.connection.count(table, where, whereArgs);
+    return this.connectionSource.count(table, where, whereArgs);
   }
 
   /**
@@ -203,7 +203,7 @@ export class GeoPackageConnection {
    * @return {Object} last row id inserted
    */
   insert(sql: string, params: [] | Record<string, any>): number {
-    return this.connection.insert(sql, params);
+    return this.connectionSource.insert(sql, params);
   }
   /**
    * Delete from the table
@@ -217,7 +217,7 @@ export class GeoPackageConnection {
     if (where) {
       deleteStatement += ' WHERE ' + where;
     }
-    return this.connection.delete(deleteStatement, whereArgs);
+    return this.connectionSource.delete(deleteStatement, whereArgs);
   }
 
   /**
@@ -226,7 +226,7 @@ export class GeoPackageConnection {
    * @return {Boolean} results of table drop
    */
   dropTable(tableName: string): boolean {
-    return this.connection.dropTable(tableName);
+    return this.connectionSource.dropTable(tableName);
   }
 
   /**
@@ -280,15 +280,15 @@ export class GeoPackageConnection {
   setApplicationId(): void {
     const buff = Buffer.from(GeoPackageConstants.APPLICATION_ID);
     const applicationId = buff.readUInt32BE(0);
-    this.connection.run('PRAGMA application_id = ' + applicationId);
-    this.connection.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
+    this.connectionSource.run('PRAGMA application_id = ' + applicationId);
+    this.connectionSource.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
   }
   /**
    * gets the application_id from the sqlite file
    * @return {number}
    */
   getApplicationId(): string {
-    return this.connection.get('PRAGMA application_id').application_id;
+    return this.connectionSource.get('PRAGMA application_id').application_id;
   }
 
 

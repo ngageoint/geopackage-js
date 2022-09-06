@@ -2,12 +2,12 @@
  * Table Info queries (table_info)
  */
 import { TableColumn } from './tableColumn';
-import { GeoPackageConnection } from '../geoPackageConnection';
 import { GeoPackageDataType } from '../geoPackageDataType';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { SQLiteMaster } from '../master/sqliteMaster';
 import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
+import type { GeoPackageConnection } from '../geoPackageConnection';
 
 export class TableInfo {
   /**

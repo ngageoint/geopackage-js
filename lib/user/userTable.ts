@@ -1,10 +1,10 @@
-import { UserColumn } from './userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
 import { Constraint } from '../db/table/constraint';
 import { ConstraintType } from '../db/table/constraintType';
 import { Contents } from '../contents/contents';
-import { UserColumns } from './userColumns';
 import { Constraints } from '../db/table/constraints';
+import type { UserColumns } from './userColumns';
+import type { UserColumn } from './userColumn';
 
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
@@ -59,14 +59,14 @@ export abstract class UserTable<TColumn extends UserColumn> {
    */
   constructor(...args) {
     if (args.length === 1) {
-      if (args[0] instanceof UserColumns) {
-        this.columns = args[0];
-        this.constraints = new Constraints();
-      } else if (args[0] instanceof UserTable) {
+      if (args[0] instanceof UserTable) {
         const userTable = args[0];
         this.columns = userTable.columns.copy();
         this.constraints = userTable.constraints.copy();
         this.contents = userTable.contents;
+      } else {
+        this.columns = args[0];
+        this.constraints = new Constraints();
       }
     }
   }

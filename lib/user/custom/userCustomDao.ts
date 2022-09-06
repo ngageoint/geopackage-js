@@ -7,12 +7,12 @@ import { UserCustomTable } from './userCustomTable';
 import { UserCustomColumn } from './userCustomColumn';
 import { UserCustomRow } from './userCustomRow';
 import { UserCustomResultSet } from './userCustomResultSet';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { BoundingBox } from '../../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { UserCustomConnection } from './userCustomConnection';
 import { DBValue } from '../../db/dbValue';
+import type { GeoPackageConnection } from '../../db/geoPackageConnection';
 
 /**
  * User Custom Dao

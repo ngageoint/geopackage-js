@@ -1,5 +1,5 @@
 import { PropertiesExtension } from './propertiesExtension';
-import { GeoPackage } from '../../../geoPackage';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Properties Manager Core using the Properties Extension on a group of cached
@@ -21,10 +21,10 @@ export class PropertiesManager {
    * @param args
    */
   protected constructor(...args) {
-    if (args.length === 1 && args[0] instanceof GeoPackage) {
-      this.addGeoPackage(args[0]);
-    } else if (args.length === 1 && args[0].length != null) {
+    if (args.length === 1 && args[0].length != null) {
       this.addGeoPackages(args[0]);
+    } else {
+      this.addGeoPackage(args[0]);
     }
   }
 

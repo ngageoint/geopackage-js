@@ -1,13 +1,10 @@
-/**
- * @module tiles/matrix
- * @see module:dao/dao
- */
 import { TileMatrix } from './tileMatrix';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { TileMatrixKey } from './tileMatrixKey';
 import { ColumnValues } from '../../dao/columnValues';
+import type { GeoPackage } from '../../geoPackage';
+import { Contents } from '../../contents/contents';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -17,12 +14,12 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
   readonly gpkgTableName: string = 'gpkg_tile_matrix';
   readonly idColumns: string[] = [TileMatrix.COLUMN_ID_1, TileMatrix.COLUMN_ID_2];
 
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, TileMatrix.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, TileMatrix.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): TileMatrixDao {
-    return new TileMatrixDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): TileMatrixDao {
+    return new TileMatrixDao(geoPackage);
   }
 
   queryForIdWithKey(key: TileMatrixKey): TileMatrix {
@@ -42,6 +39,14 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
       tm.setPixelYSize(results.pixel_y_size as number);
     }
     return tm;
+  }
+
+  /**
+   * Get the contents for this tile matrix
+   * @param tileMatrix
+   */
+  public getContents(tileMatrix: TileMatrix): Contents {
+    return this.geoPackage.getContentsDao().queryForIdWithKey(tileMatrix.getTableName());
   }
 
   /**

@@ -1,5 +1,4 @@
-import { ExtensionManagement } from '../ExtensionManagement';
-import { GeoPackage } from '../../geoPackage';
+import { ExtensionManagement } from '../extensionManagement';
 import { FeatureTableIndex } from './index/featureTableIndex';
 import { SQLUtils } from '../../db/sqlUtils';
 import { RelatedTablesExtension } from '../related/relatedTablesExtension';
@@ -16,6 +15,9 @@ import { TileScaling } from './scale/tileScaling';
 import { GeometryIndex } from './index/geometryIndex';
 import { ExtendedRelation } from '../related/extendedRelation';
 import { ContentsId } from './contents/contentsId';
+import { NGAExtensionsConstants } from './NGAExtensionsConstants';
+import { FeatureTableIndexConstants } from './index/featureTableIndexConstants';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * NGA Extensions
@@ -23,11 +25,6 @@ import { ContentsId } from './contents/contentsId';
  *
  */
 export class NGAExtensions extends ExtensionManagement {
-  /**
-   * Extension author
-   */
-  public static readonly EXTENSION_AUTHOR = 'nga';
-
   /**
    * Constructor
    * @param geoPackage GeoPackage
@@ -40,7 +37,7 @@ export class NGAExtensions extends ExtensionManagement {
    * {@inheritDoc}
    */
   public getAuthor(): string {
-    return NGAExtensions.EXTENSION_AUTHOR;
+    return NGAExtensionsConstants.EXTENSION_AUTHOR;
   }
 
   /**
@@ -99,7 +96,7 @@ export class NGAExtensions extends ExtensionManagement {
         tableIndexDao.deleteByIdCascade(table);
       }
       if (extensionsDao.isTableExists()) {
-        extensionsDao.deleteByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, table);
+        extensionsDao.deleteByExtensionAndTableName(FeatureTableIndexConstants.EXTENSION_NAME, table);
       }
     } catch (e) {
       throw new GeoPackageException(
@@ -125,7 +122,7 @@ export class NGAExtensions extends ExtensionManagement {
         this.geoPackage.dropTable(tableIndexDao.getTableName());
       }
       if (extensionsDao.isTableExists()) {
-        extensionsDao.deleteByExtension(FeatureTableIndex.EXTENSION_NAME);
+        extensionsDao.deleteByExtension(FeatureTableIndexConstants.EXTENSION_NAME);
       }
     } catch (e) {
       throw new GeoPackageException(
@@ -144,7 +141,7 @@ export class NGAExtensions extends ExtensionManagement {
       const extensionsDao = this.geoPackage.getExtensionsDao();
 
       if (extensionsDao.isTableExists()) {
-        const extensions = extensionsDao.queryByExtensionAndTableName(FeatureTableIndex.EXTENSION_NAME, table);
+        const extensions = extensionsDao.queryByExtensionAndTableName(FeatureTableIndexConstants.EXTENSION_NAME, table);
         if (extensions.length > 0) {
           const extension = extensions[0];
           extension.table_name = newTable;

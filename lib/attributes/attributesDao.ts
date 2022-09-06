@@ -8,9 +8,9 @@ import { AttributesConnection } from './attributesConnection';
 import { AttributesColumn } from './attributesColumn';
 import { AttributesResultSet } from './attributesResultSet';
 import { GeoPackageException } from '../geoPackageException';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { BoundingBox } from '../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Attribute DAO for reading attribute user data tables
@@ -21,8 +21,14 @@ export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, At
    */
   private readonly attributesDb: AttributesConnection;
 
-  constructor(database: string, db: GeoPackageConnection, table: AttributesTable) {
-    super(database, db, new AttributesConnection(db), table);
+  /**
+   * Constructor
+   * @param database
+   * @param geoPackage
+   * @param table
+   */
+  constructor(database: string, geoPackage: GeoPackage, table: AttributesTable) {
+    super(database, geoPackage, new AttributesConnection(geoPackage.getConnection()), table);
 
     this.attributesDb = this.getUserDb() as AttributesConnection;
     if (table.getContents() == null) {

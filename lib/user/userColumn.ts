@@ -12,7 +12,6 @@ import { UserTable } from './userTable';
 import { GeoPackageException } from '../geoPackageException';
 import { Comparable } from '@ngageoint/simple-features-js';
 import { ConstraintParser } from '../db/table/constraintParser';
-import { SQLUtils } from '../db/sqlUtils';
 
 /**
  * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
@@ -803,7 +802,7 @@ export abstract class UserColumn implements Comparable<UserColumn> {
   public addDefaultValueConstraint(defaultValue: any): void {
     this.addConstraintFrom(
       ConstraintType.DEFAULT,
-      'DEFAULT ' + SQLUtils.columnDefaultValue(defaultValue, this.getDataType()),
+      'DEFAULT ' + GeoPackageDataType.columnDefaultValue(defaultValue, this.getDataType()),
       UserColumn.DEFAULT_VALUE_CONSTRAINT_ORDER,
     );
   }

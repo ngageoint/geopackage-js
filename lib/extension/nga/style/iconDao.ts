@@ -1,7 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class IconDao
- */
 import { MediaDao } from '../../related/media/mediaDao';
 import { IconRow } from './iconRow';
 import { IconTable } from './iconTable';

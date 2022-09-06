@@ -2,7 +2,6 @@ import { FeatureDao } from '../../features/user/featureDao';
 import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { GeoPackageProgress } from '../../io/geoPackageProgress';
 import { UserCustomDao } from '../../user/custom/userCustomDao';
-import { RTreeIndexExtension } from './rTreeIndexExtension';
 import { Extensions } from '../extensions';
 import { UserCustomResultSet } from '../../user/custom/userCustomResultSet';
 import { FeatureRow } from '../../features/user/featureRow';
@@ -15,6 +14,8 @@ import { Projection } from '@ngageoint/projections-js';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { SQLUtils } from '../../db/sqlUtils';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { RTreeIndexExtensionConstants } from './rTreeIndexExtensionConstants';
+import type { RTreeIndexExtension } from './rTreeIndexExtension';
 
 /**
  * RTree Index Table DAO for reading geometry index ranges
@@ -192,13 +193,13 @@ export class RTreeIndexTableDao extends UserCustomDao {
     try {
       result = this.rawQueryWithArgs(
         'SELECT MIN(' +
-          RTreeIndexExtension.COLUMN_MIN_X +
+          RTreeIndexExtensionConstants.COLUMN_MIN_X +
           '), MIN(' +
-          RTreeIndexExtension.COLUMN_MIN_Y +
+          RTreeIndexExtensionConstants.COLUMN_MIN_Y +
           '), MAX(' +
-          RTreeIndexExtension.COLUMN_MAX_X +
+          RTreeIndexExtensionConstants.COLUMN_MAX_X +
           '), MAX(' +
-          RTreeIndexExtension.COLUMN_MAX_Y +
+          RTreeIndexExtensionConstants.COLUMN_MAX_Y +
           ') FROM ' +
           SQLUtils.quoteWrap(this.getTableName()),
         undefined,
@@ -986,13 +987,13 @@ export class RTreeIndexTableDao extends UserCustomDao {
    */
   private buildWhereForBounds(minX: number, minY: number, maxX: number, maxY: number): string {
     const where = [];
-    where.push(super.buildWhereWithOp(RTreeIndexExtension.COLUMN_MIN_X, maxX, '<='));
+    where.push(super.buildWhereWithOp(RTreeIndexExtensionConstants.COLUMN_MIN_X, maxX, '<='));
     where.push(' AND ');
-    where.push(super.buildWhereWithOp(RTreeIndexExtension.COLUMN_MIN_Y, maxY, '<='));
+    where.push(super.buildWhereWithOp(RTreeIndexExtensionConstants.COLUMN_MIN_Y, maxY, '<='));
     where.push(' AND ');
-    where.push(super.buildWhereWithOp(RTreeIndexExtension.COLUMN_MAX_X, minX, '>='));
+    where.push(super.buildWhereWithOp(RTreeIndexExtensionConstants.COLUMN_MAX_X, minX, '>='));
     where.push(' AND ');
-    where.push(super.buildWhereWithOp(RTreeIndexExtension.COLUMN_MAX_Y, minY, '>='));
+    where.push(super.buildWhereWithOp(RTreeIndexExtensionConstants.COLUMN_MAX_Y, minY, '>='));
 
     return where.join('');
   }

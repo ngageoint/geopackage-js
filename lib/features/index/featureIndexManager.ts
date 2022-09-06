@@ -3,7 +3,6 @@ import { FeatureTableIndex } from '../../extension/nga/index/featureTableIndex';
 import { ManualFeatureQuery } from '../user/manualFeatureQuery';
 import { RTreeIndexTableDao } from '../../extension/rtree/rTreeIndexTableDao';
 import { FeatureIndexType } from './featureIndexType';
-import { GeoPackage } from '../../geoPackage';
 import { RTreeIndexExtension } from '../../extension/rtree/rTreeIndexExtension';
 import { GeoPackageProgress } from '../../io/geoPackageProgress';
 import { FeatureRow } from '../user/featureRow';
@@ -16,6 +15,7 @@ import { ColumnValues } from '../../dao/columnValues';
 import { GeoPackageException } from '../../geoPackageException';
 import { FeatureIndexFeatureResults } from './featureIndexFeatureResults';
 import { FeaturePaginatedResults } from '../user/featurePaginatedResults';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Feature Index Manager to manage indexing of feature geometries within a

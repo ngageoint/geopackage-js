@@ -1021,31 +1021,7 @@ export class TileBoundingBoxUtils {
    * @return bounding box
    */
   public static boundWgs84BoundingBoxWithWebMercatorLimits(boundingBox: BoundingBox): BoundingBox {
-    return TileBoundingBoxUtils.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
-  }
-
-  /**
-   * Bound the upper and lower bounds of the degrees bounding box with web
-   * mercator limits
-   *
-   * @param boundingBox degrees bounding box
-   * @return bounding box
-   */
-  public static boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox: BoundingBox): BoundingBox {
-    const bounded = boundingBox.copy();
-    if (bounded.getMinLatitude() < ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE) {
-      bounded.setMinLatitude(ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
-    }
-    if (bounded.getMaxLatitude() < ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE) {
-      bounded.setMaxLatitude(ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
-    }
-    if (bounded.getMaxLatitude() > ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE) {
-      bounded.setMaxLatitude(ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-    }
-    if (bounded.getMinLatitude() > ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE) {
-      bounded.setMinLatitude(ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-    }
-    return bounded;
+    return BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox);
   }
 
   /**

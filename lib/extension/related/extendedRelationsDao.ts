@@ -2,8 +2,8 @@ import { ColumnValues } from '../../dao/columnValues';
 import { ExtendedRelation } from './extendedRelation';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
 import { Contents } from '../../contents/contents';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Extended Relations Data Access Object
@@ -14,14 +14,14 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
 
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, Contents.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, Contents.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): ExtendedRelationsDao {
-    return new ExtendedRelationsDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): ExtendedRelationsDao {
+    return new ExtendedRelationsDao(geoPackage);
   }
 
   queryForIdWithKey(key: number): ExtendedRelation {

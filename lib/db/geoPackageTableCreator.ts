@@ -1,11 +1,9 @@
-import { SpatialReferenceSystemDao } from '../srs/spatialReferenceSystemDao';
-
 // eslint-disable-next-line no-unused-vars
 import { UserTable } from '../user/userTable';
-import { GeoPackage } from '../geoPackage';
 import { GeoPackageConnection } from './geoPackageConnection';
 import { UserColumn } from '../user/userColumn';
 import { SQLUtils } from './sqlUtils';
+import type { GeoPackage } from '../geoPackage';
 
 type SqlScripts =
   | 'spatial_reference_system'
@@ -30,16 +28,18 @@ type SqlScripts =
 /**
  * `TableCreator` provides methods for creating the various standard tables in
  * a GeoPackage database.
- *
- * @class
- * @param {module:geoPackage~GeoPackage} geopackage GeoPackage object
  */
 export class GeoPackageTableCreator {
-  geopackage: GeoPackage;
+  geoPackage: GeoPackage;
   connection: GeoPackageConnection;
-  constructor(geopackage: GeoPackage) {
-    this.geopackage = geopackage;
-    this.connection = geopackage.getDatabase();
+
+  /**
+   * Constructor
+   * @param geoPackage
+   */
+  constructor(geoPackage: GeoPackage) {
+    this.geoPackage = geoPackage;
+    this.connection = geoPackage.getDatabase();
   }
   /**
    * Creates all required tables and Spatial Reference Systems, in addition to EPSG:3857
@@ -49,7 +49,7 @@ export class GeoPackageTableCreator {
     this.createSpatialReferenceSystem();
     this.createContents();
     // Create the required Spatial Reference Systems (spec Requirement 11)
-    const dao = SpatialReferenceSystemDao.createDao(this.connection);
+    const dao = this.geoPackage.getSpatialReferenceSystemDao();
     dao.createUndefinedGeographic();
     dao.createWgs84();
     dao.createUndefinedCartesian();

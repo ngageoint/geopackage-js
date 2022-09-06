@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SpatialReferenceSystem } from '../srs/spatialReferenceSystem';
 import { ContentsDataType } from './contentsDataType';
-import { Projection } from '@ngageoint/projections-js';
 import { BoundingBox } from '../boundingBox';
-import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
-import { GeometryColumns } from '../features/columns/geometryColumns';
-import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
-import { TileMatrix } from '../tiles/matrix/tileMatrix';
 import { DBValue } from '../db/dbValue';
+import { SpatialReferenceSystemConstants } from '../srs/spatialReferenceSystemConstants';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -73,7 +68,7 @@ export class Contents {
   /**
    * srsId field name
    */
-  public static readonly COLUMN_SRS_ID: string = SpatialReferenceSystem.COLUMN_SRS_ID;
+  public static readonly COLUMN_SRS_ID: string = SpatialReferenceSystemConstants.COLUMN_SRS_ID;
 
   /**
    * The name of the tiles, or feature table
@@ -124,29 +119,9 @@ export class Contents {
   private max_y: number;
 
   /**
-   * Spatial Reference System ID
-   */
-  private srs: SpatialReferenceSystem;
-
-  /**
    * Unique identifier for each Spatial Reference System within a GeoPackage
    */
   private srs_id: number;
-
-  /**
-   * Geometry Columns
-   */
-  private geometryColumns: GeometryColumns;
-
-  /**
-   * Tile Matrix Set
-   */
-  private tileMatrixSet: TileMatrixSet;
-
-  /**
-   * Tile Matrix
-   */
-  private tileMatrix: TileMatrix[];
 
   public constructor();
   public constructor(contents: Contents);
@@ -164,7 +139,6 @@ export class Contents {
       this.max_x = args[0].max_x;
       this.min_y = args[0].min_y;
       this.max_y = args[0].max_y;
-      this.srs = args[0].srs;
       this.srs_id = args[0].srs_id;
     }
   }
@@ -252,7 +226,7 @@ export class Contents {
    * @param data_type core data type
    */
   public setDataTypeName(name: string, data_type: ContentsDataType = undefined): void {
-    this.setDataTypeName(name);
+    this.data_type = name;
     if (data_type != null) {
       ContentsDataType.setType(name, data_type);
     }
@@ -446,28 +420,7 @@ export class Contents {
   }
 
   /**
-   * Get the SRS
-   *
-   * @return srs
-   */
-  public getSrs(): SpatialReferenceSystem {
-    return this.srs;
-  }
-
-  /**
-   * Set the srs
-   *
-   * @param srs
-   *            srs
-   */
-  public setSrs(srs: SpatialReferenceSystem): void {
-    this.srs = srs;
-    this.srs_id = srs != null ? srs.getId() : null;
-  }
-
-  /**
    * Get the srs id
-   *
    * @return srs id
    */
   public getSrsId(): number {
@@ -475,54 +428,11 @@ export class Contents {
   }
 
   /**
-   * Get the Geometry Columns, should only return one or no value
-   *
-   * @return geometry columns
+   * Set srs id
+   * @param srsId
    */
-  public getGeometryColumns(): GeometryColumns {
-    return this.geometryColumns;
-  }
-
-  /**
-   * Set the GeometryColumns
-   * @param geometryColumns
-   */
-  public setGeometryColumns(geometryColumns: GeometryColumns): void {
-    this.geometryColumns = geometryColumns;
-  }
-
-  /**
-   * Get the Tile Matrix Set, should only return one or no value
-   *
-   * @return tile matrix set
-   */
-  public getTileMatrixSet(): TileMatrixSet {
-    return this.tileMatrixSet;
-  }
-
-  /**
-   * Set the tile matrix set
-   * @param tileMatrixSet
-   */
-  public setTileMatrixSet(tileMatrixSet: TileMatrixSet): void {
-    this.tileMatrixSet = tileMatrixSet;
-  }
-
-  /**
-   * Get the Tile Matrix collection
-   *
-   * @return tile matrices
-   */
-  public getTileMatrix(): TileMatrix[] {
-    return this.tileMatrix;
-  }
-
-  /**
-   * Set the tile matrices
-   * @param tileMatrix
-   */
-  public setTileMatrix(tileMatrix: TileMatrix[]): void {
-    this.tileMatrix = tileMatrix;
+  public setSrsId(srsId: number): void {
+    this.srs_id = srsId;
   }
 
   /**
@@ -539,27 +449,8 @@ export class Contents {
   }
 
   /**
-   * Get a bounding box in the provided projection
-   *
-   * @param projection desired projection
-   * @return bounding box
-   */
-  public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
-    let boundingBox = this.getBoundingBox();
-    if (boundingBox != null && projection != null) {
-      const transform = GeometryTransform.create(this.getProjection(), projection);
-      if (!transform.getToProjection().equalsProjection(transform.getFromProjection())) {
-        boundingBox = boundingBox.transform(transform);
-      }
-    }
-    return boundingBox;
-  }
-
-  /**
    * Set a bounding box
-   *
-   * @param boundingBox
-   *            bounding box
+   * @param boundingBox bounding box
    */
   public setBoundingBox(boundingBox: BoundingBox): void {
     this.setMinX(boundingBox.getMinLongitude());
@@ -568,17 +459,4 @@ export class Contents {
     this.setMaxY(boundingBox.getMaxLatitude());
   }
 
-  /**
-   * Get the projection
-   *
-   * @return projection
-   */
-  public getProjection(): Projection {
-    let projection = null;
-    const srs = this.getSrs();
-    if (srs != null) {
-      projection = srs.getProjection();
-    }
-    return projection;
-  }
 }

@@ -3,42 +3,24 @@ import { DBValue } from '../db/dbValue';
 import { ColumnValues } from '../dao/columnValues';
 import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 import { GeoPackageDao } from '../db/geoPackageDao';
-import { ContentsDao } from '../contents/contentsDao';
-import { GeometryColumnsDao } from '../features/columns/geometryColumnsDao';
-import { TileMatrixSetDao } from '../tiles/matrixset/tileMatrixSetDao';
 import { Contents } from '../contents/contents';
 import { GeometryColumns } from '../features/columns/geometryColumns';
 import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
-import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { SpatialReferenceSystemConstants } from './spatialReferenceSystemConstants';
 import { CrsWktExtension } from '../extension/crsWktExtension';
 import { GeoPackageException } from '../geoPackageException';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Spatial Reference System Data Access Object
  */
 export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSystem, number> {
-  readonly idColumns: string[] = [SpatialReferenceSystem.COLUMN_SRS_ID];
+  readonly idColumns: string[] = [SpatialReferenceSystemConstants.COLUMN_SRS_ID];
   /**
    * Table Name
    * @type {String}
    */
-  readonly gpkgTableName: string = SpatialReferenceSystem.TABLE_NAME;
-
-  /**
-   * Contents DAO
-   */
-  private contentsDao: ContentsDao;
-
-  /**
-   * Geometry Columns DAO
-   */
-  private geometryColumnsDao: GeometryColumnsDao;
-
-  /**
-   * Tile Matrix Set DAO
-   */
-  private tileMatrixSetDao: TileMatrixSetDao;
+  readonly gpkgTableName: string = SpatialReferenceSystemConstants.TABLE_NAME;
 
   /**
    * CRS WKT Extension
@@ -47,17 +29,14 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    *
-   * @param geoPackage GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackageConnection object this dao belongs to
    */
-  constructor(readonly geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, SpatialReferenceSystem.TABLE_NAME);
-    this.geometryColumnsDao = GeometryColumnsDao.createDao(geoPackageConnection);
-    this.tileMatrixSetDao = TileMatrixSetDao.createDao(geoPackageConnection);
-    this.contentsDao = ContentsDao.createDao(geoPackageConnection);
+  constructor(readonly geoPackage: GeoPackage) {
+    super(geoPackage, SpatialReferenceSystemConstants.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): SpatialReferenceSystemDao {
-    return new SpatialReferenceSystemDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): SpatialReferenceSystemDao {
+    return new SpatialReferenceSystemDao(geoPackage);
   }
 
   queryForIdWithKey(key: number): SpatialReferenceSystem {
@@ -78,9 +57,6 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
       srs.definition = results.definition as string;
       srs.definition_12_063 = results.definition as string;
       srs.description = results.description as string;
-      this.getAndSetContents(srs);
-      this.getAndSetGeometryColumns(srs);
-      this.getAndSetTileMatrixSet(srs);
     }
     return srs;
   }
@@ -251,55 +227,18 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
   }
 
   /**
-   * Get or create a Contents DAO
-   *
-   * @return contents dao
-   */
-  private getContentsDao(): ContentsDao {
-    if (this.contentsDao == null) {
-      this.contentsDao = ContentsDao.createDao(this.db);
-    }
-    return this.contentsDao;
-  }
-
-  /**
-   * Get or create a Geometry Columns DAO
-   *
-   * @return geometry columns dao
-   */
-  private getGeometryColumnsDao(): GeometryColumnsDao {
-    if (this.geometryColumnsDao == null) {
-      this.geometryColumnsDao = GeometryColumnsDao.createDao(this.db);
-    }
-    return this.geometryColumnsDao;
-  }
-
-  /**
-   * Get or create a Tile Matrix Set DAO
-   *
-   * @return tile matrix set dao
-   */
-  private getTileMatrixSetDao(): TileMatrixSetDao {
-    if (this.tileMatrixSetDao == null) {
-      this.tileMatrixSetDao = TileMatrixSetDao.createDao(this.db);
-    }
-    return this.tileMatrixSetDao;
-  }
-
-  /**
    * Get the Contents for the SpatialReferenceSystem
    * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem
    * @return {module:features/columns~GeometryColumns}
    */
-  private getAndSetContents(spatialReferenceSystem: SpatialReferenceSystem): Contents[] {
-    const dao: ContentsDao = this.getContentsDao();
-    const results = dao.queryForAllEq(Contents.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
+  private getContents(spatialReferenceSystem: SpatialReferenceSystem): Contents[] {
+    const contentsDao = this.geoPackage.getContentsDao();
+    const results = contentsDao.queryForAllEq(Contents.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
     const contents = [];
     if (results?.length) {
       for (let i = 0; i < results.length; i++) {
-        contents.push(dao.createObject(results[i]));
+        contents.push(contentsDao.createObject(results[i]));
       }
-      spatialReferenceSystem.setContents(contents);
     }
     return contents;
   }
@@ -308,15 +247,14 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
    * Get the GeometryColumns for the SpatialReferenceSystem
    * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   * @return {module:features/columns~GeometryColumns}
    */
-  private getAndSetGeometryColumns(spatialReferenceSystem: SpatialReferenceSystem): GeometryColumns[] {
-    const dao: GeometryColumnsDao = this.getGeometryColumnsDao();
-    const results = dao.queryForAllEq(GeometryColumns.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
+  private getGeometryColumns(spatialReferenceSystem: SpatialReferenceSystem): GeometryColumns[] {
+    const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
+    const results = geometryColumnsDao.queryForAllEq(GeometryColumns.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
     const geometryColumns = [];
     if (results?.length) {
       for (let i = 0; i < results.length; i++) {
-        geometryColumns.push(dao.createObject(results[i]));
+        geometryColumns.push(geometryColumnsDao.createObject(results[i]));
       }
-      spatialReferenceSystem.setGeometryColumns(geometryColumns);
     }
     return geometryColumns;
   }
@@ -325,15 +263,14 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
    * Get the TileMatrixSet for the SpatialReferenceSystem
    * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   * @return {module:tiles/matrixset~TileMatrixSet}
    */
-  private getAndSetTileMatrixSet(spatialReferenceSystem: SpatialReferenceSystem): TileMatrixSet[] {
-    const dao = this.getTileMatrixSetDao();
-    const results = dao.queryForAllEq(TileMatrixSet.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
+  private getTileMatrixSet(spatialReferenceSystem: SpatialReferenceSystem): TileMatrixSet[] {
+    const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
+    const results = tileMatrixSetDao.queryForAllEq(TileMatrixSet.COLUMN_SRS_ID, spatialReferenceSystem.getSrsId());
     const tileMatrixSet = [];
     if (results?.length) {
       for (let i = 0; i < results.length; i++) {
-        tileMatrixSet.push(dao.createObject(results[i]));
+        tileMatrixSet.push(tileMatrixSetDao.createObject(results[i]));
       }
-      spatialReferenceSystem.setContents(tileMatrixSet);
     }
     return tileMatrixSet;
   }
@@ -348,18 +285,17 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
     if (srs != null) {
       // Delete Contents
-      const contentsCollection = srs.getContents();
+      const contentsCollection = this.getContents(srs);
       if (contentsCollection.length !== 0) {
-        const dao = this.getContentsDao();
         for (const contents of contentsCollection) {
-          dao.deleteCascade(contents);
+          this.geoPackage.getContentsDao().deleteCascade(contents);
         }
       }
 
       // Delete Geometry Columns
-      const geometryColumnsDao = this.getGeometryColumnsDao();
+      const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
       if (geometryColumnsDao.isTableExists()) {
-        const geometryColumnsCollection = srs.getGeometryColumns();
+        const geometryColumnsCollection = this.getGeometryColumns(srs);
         if (geometryColumnsCollection.length !== 0) {
           for (const geometryColumns of geometryColumnsCollection) {
             geometryColumnsDao.delete(geometryColumns);
@@ -368,9 +304,9 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
       }
 
       // Delete Tile Matrix Set
-      const tileMatrixSetDao = this.getTileMatrixSetDao();
+      const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
       if (tileMatrixSetDao.isTableExists()) {
-        const tileMatrixSetCollection = srs.getTileMatrixSet();
+        const tileMatrixSetCollection = this.getTileMatrixSet(srs);
         if (tileMatrixSetCollection.length !== 0) {
           for (const tileMatrixSet of tileMatrixSetCollection) {
             tileMatrixSetDao.delete(tileMatrixSet);
@@ -446,8 +382,8 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
   public queryForOrganizationCoordsysId(organization: string, organizationCoordsysId: number): SpatialReferenceSystem {
     let srs = null;
     const columnValues = new ColumnValues();
-    columnValues.addColumn(SpatialReferenceSystem.COLUMN_ORGANIZATION, organization);
-    columnValues.addColumn(SpatialReferenceSystem.COLUMN_ORGANIZATION_COORDSYS_ID, organizationCoordsysId);
+    columnValues.addColumn(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION, organization);
+    columnValues.addColumn(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION_COORDSYS_ID, organizationCoordsysId);
     const results = [];
     for (const result of this.queryForFieldValues(columnValues)) {
       results.push(this.createObject(result));

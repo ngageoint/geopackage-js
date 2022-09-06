@@ -1,7 +1,6 @@
 import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 import { Geometry, GeometryEnvelope, GeometryUtils, Point } from '@ngageoint/simple-features-js';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
-import { TileBoundingBoxUtils } from './tiles/tileBoundingBoxUtils';
 
 /**
  * Bounding Box with longitude and latitude ranges in degrees
@@ -462,7 +461,7 @@ export class BoundingBox {
           .getToProjection()
           .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())
       ) {
-        transformed = TileBoundingBoxUtils.boundDegreesBoundingBoxWithWebMercatorLimits(transformed);
+        transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(transformed);
       }
       const envelope = transformed.buildEnvelope();
       const bounds = geometryTransform.transformBounds(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY);
@@ -650,5 +649,29 @@ export class BoundingBox {
       this.maxLongitude === obj.maxLongitude &&
       this.maxLatitude === obj.maxLatitude
     );
+  }
+
+  /**
+   * Bound the upper and lower bounds of the degrees bounding box with web
+   * mercator limits
+   *
+   * @param boundingBox degrees bounding box
+   * @return bounding box
+   */
+  public static boundDegreesBoundingBoxWithWebMercatorLimits(boundingBox: BoundingBox): BoundingBox {
+    const bounded = boundingBox.copy();
+    if (bounded.getMinLatitude() < ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE) {
+      bounded.setMinLatitude(ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
+    }
+    if (bounded.getMaxLatitude() < ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE) {
+      bounded.setMaxLatitude(ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE);
+    }
+    if (bounded.getMaxLatitude() > ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE) {
+      bounded.setMaxLatitude(ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
+    }
+    if (bounded.getMinLatitude() > ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE) {
+      bounded.setMinLatitude(ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
+    }
+    return bounded;
   }
 }

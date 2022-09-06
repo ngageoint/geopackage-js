@@ -1,10 +1,4 @@
 /**
- * @memberOf module:extension/nga/contents
- * @class ContentsId
- */
-import { Contents } from '../../../contents/contents';
-
-/**
  * Contents Id object, for maintaining a unique identifier for contents tables
  * @constructor
  */
@@ -30,11 +24,6 @@ export class ContentsId {
   private id: number;
 
   /**
-   * Foreign key to Contents by table name
-   */
-  private contents: Contents;
-
-  /**
    * The name of the actual content table, foreign key to gpkg_contents
    */
   private table_name: string;
@@ -58,7 +47,6 @@ export class ContentsId {
     if (args.length === 1 && args[0] instanceof ContentsId) {
       const contentsId = args[0];
       this.id = contentsId.id;
-      this.contents = contentsId.contents;
       this.table_name = contentsId.table_name;
     }
   }
@@ -80,31 +68,18 @@ export class ContentsId {
   }
 
   /**
-   * Get the contents
-   * @return contents
-   */
-  public getContents(): Contents {
-    return this.contents;
-  }
-
-  /**
-   * Set the contents
-   * @param contents contents
-   */
-  public setContents(contents: Contents): void {
-    this.contents = contents;
-    if (contents != null) {
-      this.table_name = contents.getId();
-    } else {
-      this.table_name = null;
-    }
-  }
-
-  /**
    * Get the table name
    * @return table name
    */
   public getTableName(): string {
     return this.table_name;
+  }
+
+  /**
+   * Set the table name
+   * @param tableName
+   */
+  public setTableName(tableName: string): void {
+    this.table_name = tableName;
   }
 }

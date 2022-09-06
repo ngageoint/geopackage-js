@@ -4,7 +4,6 @@
 import { StringUtils } from './stringUtils';
 import { UserColumn } from '../user/userColumn';
 import { UserTable } from '../user/userTable';
-import { GeoPackageConnection } from './geoPackageConnection';
 import { TableMapping } from './tableMapping';
 import { TableInfo } from './table/tableInfo';
 import { SQLiteMaster } from './master/sqliteMaster';
@@ -12,11 +11,11 @@ import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
 import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { GeoPackageDataType } from './geoPackageDataType';
 import { ResultSet } from './resultSet';
-import { AlterTable } from './alterTable';
 import { ResultSetResult } from './resultSetResult';
 import { ResultUtils } from './resultUtils';
 import { ContentValues } from '../user/contentValues';
 import { DBAdapter } from './dbAdapter';
+import type { GeoPackageConnection } from './geoPackageConnection';
 
 export class SQLUtils {
   /**
@@ -550,7 +549,7 @@ export class SQLUtils {
    *            sql statement
    */
   public static execSQL(connection: GeoPackageConnection, sql: string): void {
-    connection.connection.run(sql);
+    connection.connectionSource.run(sql);
   }
 
   /**
@@ -560,8 +559,8 @@ export class SQLUtils {
    * @param selectionArgs selection arguments
    * @return result set
    */
-  public static query(connection: GeoPackageConnection, sql: string, selectionArgs: [] | Record<string, any>): ResultSet {
-    return connection.connection.query(sql, selectionArgs);
+  public static query(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: [] | Record<string, any>): ResultSet {
+    return connection.query(sql, selectionArgs);
   }
 
   /**
@@ -573,7 +572,7 @@ export class SQLUtils {
    * @return number the count of rows
    */
   public static count(connection: GeoPackageConnection, tableName: string, where: string, whereArgs: [] | Record<string, any>): number {
-    return connection.connection.count(tableName, where, whereArgs);
+    return connection.connectionSource.count(tableName, where, whereArgs);
   }
 
   /**
@@ -638,8 +637,7 @@ export class SQLUtils {
       count = 0;
       for (const sqlCommand of sqlCommands) {
         try {
-          const geoPackageConnection = connection instanceof GeoPackageConnection ? connection : new GeoPackageConnection(connection);
-          const value = SQLUtils.querySingleResultWithColumnIndex(geoPackageConnection, sqlCommand, selectionArgs, 0);
+          const value = SQLUtils.querySingleResultWithColumnIndex(connection, sqlCommand, selectionArgs, 0);
           if (value != null) {
             count += value as number;
           }
@@ -669,15 +667,15 @@ export class SQLUtils {
     return sql;
   }
 
-  /**
-   * Create SQL for adding a column
-   * @param db connection
-   * @param tableName table name
-   * @param column user column
-   */
-  public static addColumn(db: GeoPackageConnection, tableName: string, column: UserColumn): void {
-    AlterTable.addColumn(db, tableName, column.getName(), this.columnDefinition(column));
-  }
+  // /**
+  //  * Create SQL for adding a column
+  //  * @param db connection
+  //  * @param tableName table name
+  //  * @param column user column
+  //  */
+  // public static addColumn(db: GeoPackageConnection, tableName: string, column: UserColumn): void {
+  //   AlterTable.addColumn(db, tableName, column.getName(), SQLUtils.columnDefinition(column));
+  // }
 
   /**
    * Perform the query and wrap as a result
@@ -686,7 +684,7 @@ export class SQLUtils {
    * @param selectionArgs selection arguments
    * @return result
    */
-  public static wrapQuery(connection: GeoPackageConnection, sql: string, selectionArgs: [] | Record<string, any>): ResultSetResult {
+  public static wrapQuery(connection: GeoPackageConnection | DBAdapter, sql: string, selectionArgs: [] | Record<string, any>): ResultSetResult {
     return new ResultSetResult(this.query(connection, sql, selectionArgs));
   }
 
@@ -711,7 +709,7 @@ export class SQLUtils {
    * @param columnIdx column index
    * @return result, null if no result
    */
-  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection, sql: string, args: [] | Record<string, any>, columnIdx: number): any {
+  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, columnIdx: number): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
     return ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
   }

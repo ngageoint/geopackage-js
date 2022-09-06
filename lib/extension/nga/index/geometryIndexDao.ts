@@ -1,32 +1,28 @@
 import { GeometryIndex } from './geometryIndex';
-import { GeoPackage } from '../../../geoPackage';
 import { TableIndex } from './tableIndex';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeometryIndexKey } from './geometryIndexKey';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { ColumnValues } from '../../../dao/columnValues';
 import { GeoPackageException } from '../../../geoPackageException';
-import { TableIndexDao } from './tableIndexDao';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Geometry Index Data Access Object
  */
 export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndexKey> {
-  constructor(db: GeoPackageConnection) {
-    super(db, GeometryIndex.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, GeometryIndex.TABLE_NAME);
   }
 
   /**
    * Create the DAO
-   * @param geoPackageOrConnection GeoPackage | GeoPackageConnection
+   * @param geoPackage GeoPackageConnection
    * @return dao
    */
-  public static create(geoPackageOrConnection: GeoPackage | GeoPackageConnection): GeometryIndexDao {
-    return new GeometryIndexDao(
-      geoPackageOrConnection instanceof GeoPackage ? geoPackageOrConnection.getDatabase() : geoPackageOrConnection,
-    );
+  public static createDao(geoPackage: GeoPackage): GeometryIndexDao {
+    return new GeometryIndexDao(geoPackage);
   }
 
   /**
@@ -147,16 +143,6 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
       geometryIndex.setMaxM(envelope.maxM);
     }
     return geometryIndex;
-  }
-
-  /**
-   * Get the Table Index of the Geometry Index
-   *
-   * @param {module:extension/index~GeometryIndex} geometryIndex geometry index
-   * @return {module:extension/index~TableIndex}
-   */
-  getTableIndex(geometryIndex: GeometryIndex): TableIndex {
-    return new TableIndexDao(this.db).queryForId(geometryIndex.getTableName());
   }
 
   /**

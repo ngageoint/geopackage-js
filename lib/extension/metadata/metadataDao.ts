@@ -1,13 +1,8 @@
-/**
- * Metadata module.
- * @module metadata
- * @see module:dao/dao
- */
 import { Metadata } from './metadata';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { MetadataReferenceDao } from './reference/metadataReferenceDao';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Metadata Data Access Object
@@ -19,14 +14,14 @@ export class MetadataDao extends GeoPackageDao<Metadata, number> {
 
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, Metadata.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, Metadata.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): MetadataDao {
-    return new MetadataDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): MetadataDao {
+    return new MetadataDao(geoPackage);
   }
 
   createObject(results?: Record<string, DBValue>): Metadata {
@@ -69,7 +64,7 @@ export class MetadataDao extends GeoPackageDao<Metadata, number> {
    */
   private getMetadataReferenceDao(): MetadataReferenceDao {
     if (this.metadataReferenceDao == null) {
-      this.metadataReferenceDao = MetadataReferenceDao.createDao(this.db);
+      this.metadataReferenceDao = this.geoPackage.getMetadataReferenceDao();
     }
     return this.metadataReferenceDao;
   }

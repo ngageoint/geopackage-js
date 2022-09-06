@@ -1,5 +1,4 @@
 import { FeatureDao } from '../../features/user/featureDao';
-import { GeoPackage } from '../../geoPackage';
 import { FeatureTiles } from './featureTiles';
 import { SQLUtils } from '../../db/sqlUtils';
 import { GeoPackageException } from '../../geoPackageException';
@@ -8,6 +7,7 @@ import { Projections } from '@ngageoint/projections-js';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { FeatureResultSet } from '../../features/user/featureResultSet';
 import { EmulatedCanvas2D } from '../../../@types/canvaskit';
+import type { GeoPackage } from '../../geoPackage';
 
 /**
  * Feature Preview for drawing a preview tile from a feature table

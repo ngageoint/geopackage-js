@@ -3,10 +3,10 @@ import { Contents } from '../../contents/contents';
 import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
-import { GeoPackageConnection } from '../../db/geoPackageConnection';
-import { SpatialReferenceSystemDao } from '../../srs/spatialReferenceSystemDao';
 import { Projection } from '@ngageoint/projections-js';
-import { ContentsDao } from '../../contents/contentsDao';
+import type { GeoPackage } from '../../geoPackage';
+import { BoundingBox } from '../../boundingBox';
+import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -15,12 +15,12 @@ export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
   readonly gpkgTableName: string = 'gpkg_tile_matrix_set';
   readonly idColumns: string[] = [TileMatrixSet.COLUMN_ID];
 
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, TileMatrixSet.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, TileMatrixSet.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): TileMatrixSetDao {
-    return new TileMatrixSetDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): TileMatrixSetDao {
+    return new TileMatrixSetDao(geoPackage);
   }
 
   queryForIdWithKey(key: string): TileMatrixSet {
@@ -30,9 +30,8 @@ export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
   createObject(results?: Record<string, DBValue>): TileMatrixSet {
     const tms = new TileMatrixSet();
     if (results) {
-      tms.setContents(this.getContents(results[TileMatrixSet.COLUMN_TABLE_NAME] as string));
       tms.setId(results[TileMatrixSet.COLUMN_ID] as string);
-      tms.setSrs(this.getSrs(results[TileMatrixSet.COLUMN_SRS_ID] as number));
+      tms.setSrsId(results[TileMatrixSet.COLUMN_SRS_ID] as number);
       tms.setMinX(results[TileMatrixSet.COLUMN_MIN_X] as number);
       tms.setMinY(results[TileMatrixSet.COLUMN_MIN_Y] as number);
       tms.setMaxX(results[TileMatrixSet.COLUMN_MAX_X] as number);
@@ -55,21 +54,47 @@ export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
   }
 
   getProjection(tileMatrixSet: TileMatrixSet): Projection {
-    const srs = this.getSrs(tileMatrixSet.getSrsId());
-    if (!srs) return;
-    return SpatialReferenceSystemDao.createDao(this.db).getProjection(srs);
+    const srsId = this.getSrs(tileMatrixSet.getSrsId());
+    return this.geoPackage.getSpatialReferenceSystemDao().getProjection(srsId);
   }
+
   /**
    * Get the Spatial Reference System of the Tile Matrix set
    * @param  {number} srsId tile matrix set
    */
   getSrs(srsId: number): SpatialReferenceSystem {
-    return SpatialReferenceSystemDao.createDao(this.db).queryForId(srsId);
+    return this.geoPackage.getSpatialReferenceSystemDao().queryForId(srsId);
   }
+
   /**
    * @param {string} tableName
    */
-  getContents(tableName: string): Contents {
-    return ContentsDao.createDao(this.db).queryForId(tableName);
+  getContentsWithTableName(tableName: string): Contents {
+    return this.geoPackage.getContentsDao().queryForId(tableName);
+  }
+
+  /**
+   * Get the contents for the tile matrix set
+   * @param {TileMatrixSet} tileMatrixSet
+   */
+  getContents(tileMatrixSet: TileMatrixSet): Contents {
+    return this.getContentsWithTableName(tileMatrixSet.getTableName());
+  }
+
+  /**
+   * Get a bounding box in the provided projection
+   * @param tileMatrixSet tileMatrixSet
+   * @param projection desired projection
+   * @return bounding box
+   */
+  public getBoundingBoxWithProjection(tileMatrixSet: TileMatrixSet, projection: Projection): BoundingBox {
+    let boundingBox = tileMatrixSet.getBoundingBox();
+    if (projection != null) {
+      if (!this.getProjection(tileMatrixSet).equalsProjection(projection)) {
+        const transform = GeometryTransform.create(this.getProjection(tileMatrixSet), projection);
+        boundingBox = boundingBox.transform(transform);
+      }
+    }
+    return boundingBox;
   }
 }

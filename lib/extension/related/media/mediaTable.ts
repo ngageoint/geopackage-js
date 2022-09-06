@@ -8,8 +8,9 @@ import { UserColumn } from '../../../user/userColumn';
 import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
 import { UserCustomTable } from '../../../user/custom/userCustomTable';
-import { MediaTableMetadata } from './mediaTableMetadata';
 import { UserTable } from '../../../user/userTable';
+import type { MediaTableMetadata } from './mediaTableMetadata';
+import { UserTableMetadataConstants } from '../../../user/userTableMetadataConstants';
 
 /**
  * Media Requirements Class User-Defined Related Data Table
@@ -55,7 +56,7 @@ export class MediaTable extends UserRelatedTable {
     } else if (args.length >= 2) {
       const tableName = args[0];
       const columns = args[1];
-      const idColumnName = (args.length === 3 ? args[2] : null) || MediaTableMetadata.DEFAULT_ID_COLUMN_NAME;
+      const idColumnName = (args.length === 3 ? args[2] : null) || UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME;
       super(
         tableName,
         MediaTable.RELATION_TYPE.getName(),
@@ -89,7 +90,7 @@ export class MediaTable extends UserRelatedTable {
     autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
   ): UserCustomColumn[] {
     if (idColumnName == null) {
-      idColumnName = MediaTableMetadata.DEFAULT_ID_COLUMN_NAME;
+      idColumnName = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME;
     }
 
     const columns = [];
@@ -109,7 +110,7 @@ export class MediaTable extends UserRelatedTable {
    */
   public static createIdColumn(
     index = 0,
-    idColumnName: string = MediaTableMetadata.DEFAULT_ID_COLUMN_NAME,
+    idColumnName: string = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME,
     autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
   ): UserCustomColumn {
     return UserCustomColumn.createPrimaryKeyColumn(index, idColumnName, autoincrement);
@@ -149,7 +150,7 @@ export class MediaTable extends UserRelatedTable {
   /**
    * Get the required columns
    */
-  static requiredColumns(idColumnName: string = MediaTableMetadata.DEFAULT_ID_COLUMN_NAME): string[] {
+  static requiredColumns(idColumnName: string = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME): string[] {
     const requiredColumns = [];
     requiredColumns.push(idColumnName);
     requiredColumns.push(MediaTable.COLUMN_DATA);

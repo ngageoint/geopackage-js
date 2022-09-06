@@ -13,4 +13,51 @@ export class SpatialReferenceSystemConstants {
   public static readonly UNDEFINED_CARTESIAN_DEFINITION_12_063 = 'undefined';
   public static readonly UNDEFINED_GEOGRAPHIC_DEFINITION_12_063 = 'undefined';
   public static readonly WGS84_3D_DEFINITION_12_063 = 'GEOGCS["WGS 84",DATUM["World Geodetic System 1984",SPHEROID["WGS 84",6378137.0,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0.0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.017453292519943295],AXIS["Geodetic latitude",NORTH],AXIS["Geodetic longitude",EAST],AXIS["Ellipsoidal height",UP],AUTHORITY["EPSG","4979"]]';
+  /**
+   * Spatial Reference System Table Name
+   * @type {String}
+   */
+  public static readonly TABLE_NAME: string = 'gpkg_spatial_ref_sys';
+
+  /**
+   * srsName field name
+   * @type {String}
+   */
+  public static readonly COLUMN_SRS_NAME: string = 'srs_name';
+
+  /**
+   * srsId field name
+   * @type {String}
+   */
+  public static readonly COLUMN_SRS_ID: string = 'srs_id';
+
+  /**
+   * id field name, srsId
+   * @type {String}
+   */
+  public static readonly COLUMN_ID: string = SpatialReferenceSystemConstants.COLUMN_SRS_ID;
+
+  /**
+   * organization field name
+   * @type {String}
+   */
+  public static readonly COLUMN_ORGANIZATION: string = 'organization';
+
+  /**
+   * organizationCoordsysId field name
+   * @type {String}
+   */
+  public static readonly COLUMN_ORGANIZATION_COORDSYS_ID: string = 'organization_coordsys_id';
+
+  /**
+   * definition field name
+   * @type {String}
+   */
+  public static readonly COLUMN_DEFINITION: string = 'definition';
+
+  /**
+   * description field name
+   * @type {String}
+   */
+  public static readonly COLUMN_DESCRIPTION: string = 'description';
 }

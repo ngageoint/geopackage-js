@@ -1,8 +1,11 @@
-import { GeoPackage } from '../geoPackage';
 import { BaseExtension } from './baseExtension';
 import { Extensions } from './extensions';
 import { ExtensionScopeType } from './extensionScopeType';
+import type { GeoPackage } from '../geoPackage';
 
+/**
+ * WebP Extension to allow for storage of WebP Formatted Images
+ */
 export class WebPExtension extends BaseExtension {
   public static readonly EXTENSION_NAME: string = 'gpkg_webp';
   public static readonly EXTENSION_WEBP_AUTHOR: string = 'gpkg';

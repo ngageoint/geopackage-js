@@ -1,14 +1,9 @@
-/**
- * DataColumns module.
- * @module dataColumns
- */
-import { ContentsDao } from '../../../contents/contentsDao';
 import { DataColumns } from './dataColumns';
 import { Contents } from '../../../contents/contents';
 import { DBValue } from '../../../db/dbValue';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
 import { TableColumnKey } from '../../../db/tableColumnKey';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -18,14 +13,13 @@ import { GeoPackageDao } from '../../../db/geoPackageDao';
 export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   readonly gpkgTableName: string = DataColumns.TABLE_NAME;
   readonly idColumns: string[] = [DataColumns.COLUMN_ID_1, DataColumns.COLUMN_ID_2];
-  contentsDao: ContentsDao;
 
   /**
    * Create DataColumns Dao from GeoPackageConnection
-   * @param geoPackageConnection
+   * @param geoPackage
    */
-  public static createDao(geoPackageConnection: GeoPackageConnection): DataColumnsDao {
-    return new DataColumnsDao(geoPackageConnection, DataColumns.TABLE_NAME);
+  public static createDao(geoPackage: GeoPackage): DataColumnsDao {
+    return new DataColumnsDao(geoPackage, DataColumns.TABLE_NAME);
   }
 
   queryForIdWithKey(key: TableColumnKey): DataColumns {
@@ -53,7 +47,6 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
       dc.description = results.description as string;
       dc.mime_type = results.mime_type as string;
       dc.constraint_name = results.constraint_name as string;
-      this.getAndSetContents(dc);
     }
     return dc;
   }
@@ -62,9 +55,8 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
    * @param  {module:dataColumns~DataColumns} dataColumns data columns
    * @return {module:core/contents~Contents}             contents
    */
-  getAndSetContents(dataColumns: DataColumns): Contents {
-    const cd = this.getContentsDao();
-    return cd.queryForId(dataColumns.table_name);
+  getContents(dataColumns: DataColumns): Contents {
+    return this.geoPackage.getContentsDao().queryForId(dataColumns.getTableName());
   }
   /**
    * Query by constraint name
@@ -163,12 +155,5 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
     const where = this.buildWhereWithFieldAndValue(DataColumns.COLUMN_TABLE_NAME, tableName);
     const whereArgs = this.buildWhereArgs([tableName]);
     return this.deleteWhere(where, whereArgs);
-  }
-
-  public getContentsDao(): ContentsDao {
-    if (this.contentsDao == null) {
-      this.contentsDao = ContentsDao.createDao(this.db);
-    }
-    return this.contentsDao;
   }
 }

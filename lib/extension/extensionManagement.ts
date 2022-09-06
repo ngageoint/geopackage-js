@@ -1,4 +1,4 @@
-import { GeoPackage } from '../geoPackage';
+import type { GeoPackage } from '../geoPackage';
 
 /**
  * Extension Management for deleting and copying extensions

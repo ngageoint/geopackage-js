@@ -7,7 +7,6 @@ import { FeatureStyle } from './featureStyle';
 import { Styles } from './styles';
 import { Icons } from './icons';
 import { FeatureStyleExtension } from './featureStyleExtension';
-import { GeoPackage } from '../../../geoPackage';
 import { StyleMappingDao } from './styleMappingDao';
 import { StyleDao } from './styleDao';
 import { IconDao } from './iconDao';
@@ -16,6 +15,7 @@ import { IconRow } from './iconRow';
 import { FeatureRow } from '../../../features/user/featureRow';
 import { FeatureTable } from '../../../features/user/featureTable';
 import { GeometryType } from '@ngageoint/simple-features-js';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Feature Table Styles, styles and icons for an individual feature table

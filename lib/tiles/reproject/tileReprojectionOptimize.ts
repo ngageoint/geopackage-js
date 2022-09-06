@@ -1,51 +1,11 @@
-/**
- * Tile Reprojection Optimizations
- */
 import { Projection } from '@ngageoint/projections-js';
 import { BoundingBox } from '../../boundingBox';
 import { TileGrid } from '../tileGrid';
-import { PlatteCarreOptimize } from './platteCarreOptimize';
-import { WebMercatorOptimize } from './webMercatorOptimize';
 
+/**
+ * Tile Reprojection Optimizations
+ */
 export abstract class TileReprojectionOptimize {
-  /**
-   * Create a Web Mercator optimization, minimally tile bounded
-   *
-   * @return tile reprojection optimize
-   */
-  public static webMercator(): TileReprojectionOptimize {
-    return WebMercatorOptimize.create();
-  }
-
-  /**
-   * Create a Platte Carre (WGS84) optimization, minimally tile bounded
-   *
-   * @return tile reprojection optimize
-   */
-  public static platteCarre(): TileReprojectionOptimize {
-    return PlatteCarreOptimize.create();
-  }
-
-  /**
-   * Create a Web Mercator optimization, world bounded with XYZ tile
-   * coordinates
-   *
-   * @return tile reprojection optimize
-   */
-  public static webMercatorWorld(): TileReprojectionOptimize {
-    return WebMercatorOptimize.createWorld();
-  }
-
-  /**
-   * Create a Platte Carre (WGS84) optimization, world bounded with XYZ tile
-   * coordinates
-   *
-   * @return tile reprojection optimize
-   */
-  public static platteCarreWorld(): TileReprojectionOptimize {
-    return PlatteCarreOptimize.createWorld();
-  }
-
   /**
    * World tile coordinate bounds (XYZ), as opposed to minimal tile fitting
    * bounds (default)

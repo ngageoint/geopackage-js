@@ -2,7 +2,7 @@ import { ColumnValues } from '../../../dao/columnValues';
 import { MetadataReference } from './metadataReference';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
-import { GeoPackageConnection } from '../../../db/geoPackageConnection';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Metadata Reference Data Access Object
@@ -27,14 +27,14 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
 
   /**
    * Constructor
-   * @param geoPackageConnection GeoPackage object this dao belongs to
+   * @param geoPackage GeoPackage object this dao belongs to
    */
-  constructor(geoPackageConnection: GeoPackageConnection) {
-    super(geoPackageConnection, MetadataReference.TABLE_NAME);
+  constructor(geoPackage: GeoPackage) {
+    super(geoPackage, MetadataReference.TABLE_NAME);
   }
 
-  public static createDao(geoPackageConnection: GeoPackageConnection): MetadataReferenceDao {
-    return new MetadataReferenceDao(geoPackageConnection);
+  public static createDao(geoPackage: GeoPackage): MetadataReferenceDao {
+    return new MetadataReferenceDao(geoPackage);
   }
 
   /**

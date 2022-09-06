@@ -1,5 +1,5 @@
 import { FeatureIndexType } from './featureIndexType';
-import { FeatureIndexManager } from './featureIndexManager';
+import type { FeatureIndexManager } from './featureIndexManager';
 
 /**
  * Feature Index Location to iterate over indexed feature index types

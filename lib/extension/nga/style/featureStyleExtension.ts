@@ -1,7 +1,3 @@
-/**
- * @module extension/nga/style
- */
-
 import { BaseExtension } from '../../baseExtension';
 import { Extensions } from '../../extensions';
 import { IconTable } from './iconTable';
@@ -19,13 +15,13 @@ import { IconRow } from './iconRow';
 import { FeatureRow } from '../../../features/user/featureRow';
 import { RelatedTablesExtension } from '../../related/relatedTablesExtension';
 import { ContentsIdExtension } from '../contents/contentsIdExtension';
-import { GeoPackage } from '../../../geoPackage';
 import { ExtendedRelation } from '../../related/extendedRelation';
 import { StyleRow } from './styleRow';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { ContentsId } from '../contents/contentsId';
-import { NGAExtensions } from '../ngaExtensions';
+import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Style extension
@@ -34,7 +30,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Extension author
    */
-  public static readonly EXTENSION_AUTHOR = NGAExtensions.EXTENSION_AUTHOR;
+  public static readonly EXTENSION_AUTHOR = NGAExtensionsConstants.EXTENSION_AUTHOR;
 
   /**
    * Extension name without the author

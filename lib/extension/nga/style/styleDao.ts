@@ -15,7 +15,7 @@ import { StyleMappingRow } from './styleMappingRow';
  */
 export class StyleDao extends AttributesDao {
   constructor(dao: AttributesDao) {
-    super(dao.getDatabase(), dao.getDb(), new StyleTable(dao.getTable()));
+    super(dao.getDatabase(), dao.getGeoPackage(), new StyleTable(dao.getTable()));
   }
 
   getTable(): StyleTable {
