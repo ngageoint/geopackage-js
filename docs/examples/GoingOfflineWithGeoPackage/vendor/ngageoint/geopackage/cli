@@ -1,0 +1,159 @@
+#!/usr/bin/env node
+
+var inquirer = require('inquirer');
+var fs = require('fs');
+var chalk = require('chalk');
+var path = require('path');
+
+var geopackage = require('./dist/index')
+  , GeoPackageAPI = geopackage.GeoPackageAPI
+  , setCanvasKitWasmLocateFile = geopackage.setCanvasKitWasmLocateFile;
+
+setCanvasKitWasmLocateFile(file => path.join(__dirname, 'dist', 'canvaskit', file));
+
+console.log('GeoPackage Command Line');
+
+var gp;
+
+var tables;
+
+var fileQuestion = {
+  type: 'input',
+  name: 'file',
+  message: 'What is the path to the GeoPackage file?',
+  validate: function(input) {
+    return new Promise((resolve, reject) => {
+      fs.stat(input, function(err, stats) {
+        if (err || !stats || !stats.isFile()) {
+          reject('File does not exist.');
+        } else {
+          GeoPackageAPI.open(input).then(geopackage => {
+            gp = geopackage;
+            tables = {
+              tileTables: gp.getTileTables(),
+              featureTables: gp.getFeatureTables()
+            };
+            resolve(true);
+          }).catch((e) => {
+            reject(e);
+          });
+        }
+      });
+    });
+  }
+};
+
+inquirer.prompt([fileQuestion]).then(function () {
+  var whichTable = {
+    type: 'list',
+    name: 'table',
+    message: 'Which table would you like to get info for?',
+    choices: []
+  };
+  for (var i = 0; i < tables.tileTables.length; i++) {
+    whichTable.choices.push({value: {name: tables.tileTables[i], type: 'tile'}, name: tables.tileTables[i] + ' - Tile Table', type: 'tile'});
+  }
+  for (var i = 0; i < tables.featureTables.length; i++) {
+    whichTable.choices.push({value: {name: tables.featureTables[i], type: 'feature'}, name: tables.featureTables[i] + ' - Feature Table'});
+  }
+  inquirer.prompt([whichTable]).then(function(answers) {
+    console.log(answers);
+    var method;
+    if (answers.table.type === 'feature') {
+      method = 'getFeatureDao';
+    } else if (answers.table.type === 'tile') {
+      method = 'getTileDao';
+    }
+    const dao = gp[method](answers.table.name);
+    const info = gp.getInfoForTable(dao);
+    console.log(info);
+    if (answers.table.type === 'tile') {
+      console.log('\n'+chalk.bold(answers.table.name + ' Tile Table Information'));
+      console.log(chalk.gray('Total Tiles: ') + info.count);
+      console.log(chalk.gray('Zoom Levels: ') + info.zoomLevels);
+      console.log(chalk.gray('Min Zoom: ') + info.minZoom);
+      console.log(chalk.gray('Max Zoom: ') + info.maxZoom);
+
+      console.log('\n' + chalk.bold('Tile Matrix Set Bounds'));
+      console.log(chalk.gray('SRS ID: ') + info.tileMatrixSet.srsId);
+      console.log(chalk.gray('Min X: ') + info.tileMatrixSet.minX);
+      console.log(chalk.gray('Min Y : ') + info.tileMatrixSet.minY);
+      console.log(chalk.gray('Max X: ') + info.tileMatrixSet.maxX);
+      console.log(chalk.gray('Max Y: ') + info.tileMatrixSet.maxY);
+
+      console.log('\n'+chalk.bold('Tile Matrix Spatial Reference System'));
+      console.log(chalk.gray('SRS Name: ') + info.srs.count);
+      console.log(chalk.gray('SRS ID: ') + info.srs.id);
+      console.log(chalk.gray('Organization: ') + info.srs.organization);
+      console.log(chalk.gray('Coordsys ID: ') + info.srs.organization_coordsys_id);
+      console.log(chalk.gray('Definition: ') + info.srs.definition);
+      console.log(chalk.gray('Description: ') + info.srs.description);
+
+      console.log('\n'+chalk.bold('Contents'));
+      console.log(chalk.gray('Table Name: ') + info.contents.tableName);
+      console.log(chalk.gray('Data Type: ') + info.contents.dataType);
+      console.log(chalk.gray('Identifier: ') + info.contents.identifier);
+      console.log(chalk.gray('Description: ') + info.contents.description);
+      console.log(chalk.gray('Last Change: ') + info.contents.lastChange);
+      console.log(chalk.gray('Min X: ') + info.contents.minX);
+      console.log(chalk.gray('Min Y : ') + info.contents.minY);
+      console.log(chalk.gray('Max X: ') + info.contents.maxX);
+      console.log(chalk.gray('Max Y: ') + info.contents.maxY);
+
+      console.log('\n\t'+chalk.bold('Contents Spatial Reference System'));
+      console.log('\t'+chalk.gray('SRS Name: ') + info.contents.srs.count);
+      console.log('\t'+chalk.gray('SRS ID: ') + info.contents.srs.id);
+      console.log('\t'+chalk.gray('Organization: ') + info.contents.srs.organization);
+      console.log('\t'+chalk.gray('Coordsys ID: ') + info.contents.srs.organization_coordsys_id);
+      console.log('\t'+chalk.gray('Definition: ') + info.contents.srs.definition);
+      console.log('\t'+chalk.gray('Description: ') + info.contents.srs.description);
+
+    } else if (answers.table.type === 'feature') {
+      console.log('\n'+chalk.bold(answers.table.name + ' Feature Table Information'));
+      console.log(chalk.gray('Total Features: ') + info.count);
+
+      console.log('\n'+chalk.bold('Features Spatial Reference System'));
+      console.log(chalk.gray('SRS Name: ') + info.srs.count);
+      console.log(chalk.gray('SRS ID: ') + info.srs.id);
+      console.log(chalk.gray('Organization: ') + info.srs.organization);
+      console.log(chalk.gray('Coordsys ID: ') + info.srs.organization_coordsys_id);
+      console.log(chalk.gray('Definition: ') + info.srs.definition);
+      console.log(chalk.gray('Description: ') + info.srs.description);
+
+      console.log('\n'+chalk.bold('Contents'));
+      console.log(chalk.gray('Table Name: ') + info.contents.tableName);
+      console.log(chalk.gray('Data Type: ') + info.contents.dataType);
+      console.log(chalk.gray('Identifier: ') + info.contents.identifier);
+      console.log(chalk.gray('Description: ') + info.contents.description);
+      console.log(chalk.gray('Last Change: ') + info.contents.lastChange);
+      console.log(chalk.gray('Min X: ') + info.contents.minX);
+      console.log(chalk.gray('Min Y : ') + info.contents.minY);
+      console.log(chalk.gray('Max X: ') + info.contents.maxX);
+      console.log(chalk.gray('Max Y: ') + info.contents.maxY);
+
+      console.log('\n\t'+chalk.bold('Contents Spatial Reference System'));
+      console.log('\t'+chalk.gray('SRS Name: ') + info.contents.srs.count);
+      console.log('\t'+chalk.gray('SRS ID: ') + info.contents.srs.id);
+      console.log('\t'+chalk.gray('Organization: ') + info.contents.srs.organization);
+      console.log('\t'+chalk.gray('Coordsys ID: ') + info.contents.srs.organization_coordsys_id);
+      console.log('\t'+chalk.gray('Definition: ') + info.contents.srs.definition);
+      console.log('\t'+chalk.gray('Description: ') + info.contents.srs.description);
+
+      console.log('\n'+chalk.bold('Geometry Columns'));
+      console.log(chalk.gray('Table Name: ') + info.geometryColumns.tableName);
+      console.log(chalk.gray('Column Name ') + info.geometryColumns.columnName);
+      console.log(chalk.gray('Geometry Type Name: ') + info.geometryColumns.geometryTypeName);
+      console.log(chalk.gray('Z: ') + info.geometryColumns.z);
+      console.log(chalk.gray('M: ') + info.geometryColumns.m);
+
+      console.log('\n'+chalk.bold('Columns'));
+      console.log(chalk.underline('Column Name') + '\t' + chalk.underline('Name') + '\t' + chalk.underline('Title'))
+      for (var i = 0; i < info.columns.length; i++) {
+        var column = info.columns[i];
+        console.log(column.name + '\t' + (column.dataColumn ? (column.dataColumn.name + '\t' + column.dataColumn.title) : ''));
+      }
+    }
+  });
+}).catch(err => {
+  console.error(err.message);
+});
