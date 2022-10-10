@@ -4,8 +4,7 @@
 import { RelationType } from './relationType';
 
 /**
- * Describes the relationships between a base table, a related data table, and a
- * mapping table
+ * Describes the relationships between a base table, a related data table, and a mapping table
  * @class ExtendedRelation
  */
 export class ExtendedRelation {

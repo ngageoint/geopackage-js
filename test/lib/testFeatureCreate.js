@@ -1,11 +1,12 @@
-import { default as testSetup } from '../fixtures/testSetup'
+import { default as testSetup } from '../testSetup'
+import { Point } from "@ngageoint/simple-features-js";
 
 var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
   , DataColumns = require('../../lib/extension/schema/columns/dataColumns').DataColumns
   , DataColumnsDao = require('../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
-  , Verification = require('../fixtures/verification')
+  , Verification = require('../verification')
   , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
-  , SetupFeatureTable = require('../fixtures/setupFeatureTable')
+  , SetupFeatureTable = require('../setupFeatureTable')
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , GeoPackageDataType = require('../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
@@ -14,12 +15,11 @@ var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColu
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureTableReader = require('../../lib/features/user/featureTableReader').FeatureTableReader
   , should = require('chai').should()
-  , wkx = require('wkx');
 
 describe('GeoPackage Feature table create tests', function() {
   var testGeoPackage;
   var tableName = 'test_features.test';
-  var geopackage;
+  var geoPackage;
 
   const notNullPrimaryKeyConstraints = {
     constraints: [
@@ -99,11 +99,11 @@ describe('GeoPackage Feature table create tests', function() {
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
@@ -121,12 +121,12 @@ describe('GeoPackage Feature table create tests', function() {
     columns.push(FeatureColumn.createColumn(5, 'test_blob.test', GeoPackageDataType.BLOB, false, null));
     columns.push(FeatureColumn.createColumn(6, 'test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-    var result = geopackage.createFeatureTable('geom.test', geometryColumns, columns);
+    var result = geoPackage.createFeatureTable('geom.test', geometryColumns, columns);
     result.should.be.equal(true);
-    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-    Verification.verifyGeometryColumnsForTable(geopackage, tableName).should.be.equal(true);
+    Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
+    Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+    Verification.verifyGeometryColumnsForTable(geoPackage, tableName).should.be.equal(true);
   });
 
   it('should not create a feature table with two geometry columns', function() {
@@ -155,9 +155,9 @@ describe('GeoPackage Feature table create tests', function() {
       dataType: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
     });
 
-    geopackage.createFeatureTableFromProperties('NewTable', properties);
+    geoPackage.createFeatureTableFromProperties('NewTable', properties);
     var reader = new FeatureTableReader('NewTable');
-    var result = reader.readFeatureTable(geopackage);
+    var result = reader.readFeatureTable(geoPackage);
 
     var columns = result.getUserColumns().getColumns();
 
@@ -240,9 +240,9 @@ describe('GeoPackage Feature table create tests', function() {
     dc.mime_type = 'text/html';
     dc.constraint_name = 'test constraint';
 
-    geopackage.createFeatureTable('geom.test', geometryColumns, columns, boundingBox, 4326, [dc]);
+    geoPackage.createFeatureTable('geom.test', geometryColumns, columns, boundingBox, 4326, [dc]);
     var reader = new FeatureTableReader(tableName);
-    var result = reader.readFeatureTable(geopackage);
+    var result = reader.readFeatureTable(geoPackage);
     var columns = result.getUserColumns().getColumns();
 
     var plainObject = JSON.parse(JSON.stringify(columns));
@@ -357,7 +357,7 @@ describe('GeoPackage Feature table create tests', function() {
         constraints: emptyConstraints,
       }
     ]);
-    var dao = new DataColumnsDao(geopackage);
+    var dao = new DataColumnsDao(geoPackage);
     var dataColumn = dao.getDataColumns('test_features.test', 'test_text_limited.test');
     dataColumn.should.be.deep.equal({
       table_name: 'test_features.test',
@@ -388,20 +388,20 @@ describe('GeoPackage Feature table create tests', function() {
       columns.push(FeatureColumn.createColumn(9, 'test space', GeoPackageDataType.TEXT, false, ""));
       columns.push(FeatureColumn.createColumn(10, 'test-dash', GeoPackageDataType.TEXT, false, ""));
 
-      geopackage.createFeatureTable(tableName, geometryColumns, columns);
-      var verified = Verification.verifyGeometryColumns(geopackage)
-        && Verification.verifyTableExists(geopackage, tableName)
-        && Verification.verifyContentsForTable(geopackage, tableName)
-        && Verification.verifyGeometryColumnsForTable(geopackage, tableName);
+      geoPackage.createFeatureTable(tableName, geometryColumns, columns);
+      var verified = Verification.verifyGeometryColumns(geoPackage)
+        && Verification.verifyTableExists(geoPackage, tableName)
+        && Verification.verifyContentsForTable(geoPackage, tableName)
+        && Verification.verifyGeometryColumnsForTable(geoPackage, tableName);
       verified.should.be.equal(true);
     });
 
     it('should create a feature', function() {
-      var featureDao = geopackage.getFeatureDao(tableName);
+      var featureDao = geoPackage.getFeatureDao(tableName);
       var featureRow = featureDao.newRow();
       var geometryData = new GeometryData();
       geometryData.setSrsId(4326);
-      var point = new wkx.Point(1, 2);
+      var point = new Point(1, 2);
       geometryData.setGeometry(point);
       featureRow.geometry = geometryData;
       featureRow.setValueWithColumnName('test_text.test', 'hello');
@@ -437,11 +437,11 @@ describe('GeoPackage Feature table create tests', function() {
       var featureDao;
 
       beforeEach(function() {
-        featureDao = geopackage.getFeatureDao(tableName);
+        featureDao = geoPackage.getFeatureDao(tableName);
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(4326);
-        var point = new wkx.Point(1, 2);
+        var point = new Point(1, 2);
         geometryData.setGeometry(point);
         featureRow.geometry = geometryData;
         featureRow.setValueWithColumnName('test_text.test', 'hello');

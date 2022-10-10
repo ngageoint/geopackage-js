@@ -1,5 +1,5 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related'
+import { default as testSetup } from '../../../testSetup'
+import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
@@ -23,13 +23,13 @@ describe('Related Media tests', function() {
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
 
     // @ts-ignore
     tileBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', '0', '0', '0.png'));
   });
 
-  afterEach('delete the geopackage', async function() {
+  afterEach('delete the geoPackage', async function() {
     await testSetup.deleteGeoPackage(filename);
   })
 

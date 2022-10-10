@@ -202,12 +202,20 @@ export class FeatureTiles {
    */
   protected geometryCache = new GeometryCache();
 
+  /**
+   * Constructor
+   * @param geoPackage
+   * @param featureDao
+   * @param width
+   * @param height
+   * @param scale
+   */
   constructor(
     geoPackage: GeoPackage,
     featureDao: FeatureDao,
-    scale: number = TileUtils.tileScale(TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH),
     width: number = TileUtils.TILE_PIXELS_HIGH,
     height: number = TileUtils.TILE_PIXELS_HIGH,
+    scale: number = TileUtils.tileScale(TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH),
   ) {
     this.featureDao = featureDao;
     if (featureDao != null) {
@@ -589,7 +597,7 @@ export class FeatureTiles {
         color = style.getFillColor();
         strokeWidth = this.scale * style.getWidthOrDefault();
       } else {
-        throw new Error('Unsupported Draw Type: ' + drawType);
+        throw new GeoPackageException('Unsupported Draw Type: ' + drawType);
       }
       const stylePaint = new Paint();
       stylePaint.setColor(color);
@@ -1023,20 +1031,20 @@ export class FeatureTiles {
   /**
    * {@inheritDoc}
    */
-  public drawTileWithFeatureIndexResults(
+  public async drawTileWithFeatureIndexResults(
     zoom: number,
     boundingBox: BoundingBox,
     results: FeatureIndexResults,
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): GeoPackageImage {
+  ): Promise<GeoPackageImage> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     // Feature projection to tile projection transform
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
     let drawn = false;
     for (const featureRow of results) {
-      if (this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, featureRow)) {
+      if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, featureRow)) {
         drawn = true;
       }
     }
@@ -1055,13 +1063,13 @@ export class FeatureTiles {
   /**
    * {@inheritDoc}
    */
-  public drawTileWithFeatureResultSet(
+  public async drawTileWithFeatureResultSet(
     zoom: number,
     boundingBox: BoundingBox,
     resultSet: FeatureResultSet,
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): GeoPackageImage {
+  ): Promise<GeoPackageImage> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     // Feature projection to tile projection transform
     const transform = GeometryTransform.create(this.projection, projection);
@@ -1069,7 +1077,7 @@ export class FeatureTiles {
     let drawn = false;
     while (resultSet.moveToNext()) {
       const row = resultSet.getRow();
-      if (this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
+      if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
         drawn = true;
       }
     }
@@ -1084,20 +1092,20 @@ export class FeatureTiles {
   /**
    * {@inheritDoc}
    */
-  public drawTileWithFeatures(
+  public async drawTileWithFeatures(
     zoom: number,
     boundingBox: BoundingBox,
     featureRow: FeatureRow[],
     projection: Projection,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): GeoPackageImage {
+  ): Promise<GeoPackageImage> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
     // Feature projection to tile projection transform
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
     let drawn = false;
     for (const row of featureRow) {
-      if (this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
+      if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
         drawn = true;
       }
     }

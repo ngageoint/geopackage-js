@@ -12,7 +12,7 @@ import { Projection } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { UserCustomConnection } from './userCustomConnection';
 import { DBValue } from '../../db/dbValue';
-import type { GeoPackageConnection } from '../../db/geoPackageConnection';
+import { GeoPackage } from '../../geoPackage';
 
 /**
  * User Custom Dao
@@ -29,10 +29,10 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
   /**
    * Constructor
    * @param database
-   * @param db
+   * @param geoPackage
    * @param table
    */
-  constructor(database: string, db: GeoPackageConnection, table: UserCustomTable);
+  constructor(database: string, geoPackage: GeoPackage, table: UserCustomTable);
 
   /**
    * Constructor
@@ -41,15 +41,15 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
    */
   public constructor(...args) {
     if (args.length === 2) {
-      const dao = args[0];
+      const dao = args[0] as UserCustomDao;
       const userCustomTable = args[1];
-      const db = dao.getDb();
-      super(dao.getDatabase(), db, new UserCustomConnection(db), userCustomTable);
+      const geoPackage = dao.getGeoPackage();
+      super(dao.getDatabase(), geoPackage, new UserCustomConnection(dao.getDb()), userCustomTable);
     } else if (args.length === 3) {
       const database = args[0];
-      const db = args[1];
+      const geoPackage = args[1];
       const table = args[2];
-      super(database, db, new UserCustomConnection(db), table);
+      super(database, geoPackage, new UserCustomConnection(geoPackage.getDatabase()), table);
     }
   }
 
@@ -71,13 +71,13 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
   /**
    * Read the table
    * @param database
-   * @param db
+   * @param geoPackage
    * @param tableName
    */
-  static readTable(database: string, db: GeoPackageConnection, tableName: string): UserCustomDao {
+  static readTable(database: string, geoPackage: GeoPackage, tableName: string): UserCustomDao {
     const reader = new UserCustomTableReader(tableName);
-    const userCustomTable = reader.readTable(db);
-    return new UserCustomDao(database, db, userCustomTable);
+    const userCustomTable = reader.readTable(geoPackage.getConnection());
+    return new UserCustomDao(database, geoPackage, userCustomTable);
   }
 
   protected getBoundingBox(): BoundingBox {
@@ -102,6 +102,6 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
   }
 
   protected getBoundingBoxWithProjection(projection: Projection): BoundingBox {
-    throw new Error('Method not implemented.');
+    throw new GeoPackageException('Method not implemented.');
   }
 }

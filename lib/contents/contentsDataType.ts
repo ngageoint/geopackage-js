@@ -1,9 +1,9 @@
 import { GeoPackageException } from '../geoPackageException';
 
 export enum ContentsDataType {
-  FEATURES = 'features',
-  TILES = 'tiles',
-  ATTRIBUTES = 'attributes',
+  FEATURES,
+  TILES,
+  ATTRIBUTES,
 }
 
 const coreTypes = {
@@ -11,6 +11,7 @@ const coreTypes = {
   tiles: ContentsDataType.TILES,
   attributes: ContentsDataType.ATTRIBUTES,
 };
+
 const types = {
   features: ContentsDataType.FEATURES,
   tiles: ContentsDataType.TILES,
@@ -22,14 +23,12 @@ const types = {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ContentsDataType {
   export function nameFromType(type: ContentsDataType): string {
-    return ContentsDataType[type];
+    return ContentsDataType[type].toLowerCase();
   }
 
   /**
    * Get the Data Type from the name
-   *
-   * @param name
-   *            contents data type name
+   * @param name contents data type name
    * @return contents data type or null
    */
   export function fromName(name: string): ContentsDataType {

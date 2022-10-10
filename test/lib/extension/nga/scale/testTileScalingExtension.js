@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../../fixtures/testSetup'
+import { default as testSetup } from '../../../../testSetup'
 import { TileScaling } from '../../../../../lib/extension/nga/scale/tileScaling';
 import { TileScalingType } from '../../../../../lib/extension/nga/scale/tileScalingType';
 var should = require('chai').should();
@@ -18,19 +18,23 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
     var tileScalingExtension;
     var tileScalingDao;
 
-    beforeEach('should open the copied geopackage and setup the tile scaling extension', async function() {
-      var denverfilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'denver_tile.gpkg');
-      // @ts-ignore
-      let result = await copyAndOpenGeopackage(denverfilename);
-      filename = result.path;
-      geoPackage = result.geopackage;
-      tileDao = geoPackage.getTileDao('denver');
-      tileScalingExtension = geoPackage.getTileScalingExtension('denver');
-      tileScalingExtension.getOrCreateExtension();
-      tileScalingDao = tileScalingExtension.dao;
+    beforeEach('should open the copied geoPackage and setup the tile scaling extension', async function() {
+     try {
+       var denverfilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'denver_tile.gpkg');
+       // @ts-ignore
+       let result = await copyAndOpenGeopackage(denverfilename);
+       filename = result.path;
+       geoPackage = result.geoPackage;
+       tileDao = geoPackage.getTileDao('denver');
+       tileScalingExtension = geoPackage.getTileScalingExtension('denver');
+       tileScalingExtension.getOrCreateExtension();
+       tileScalingDao = tileScalingExtension.dao;
+     } catch (e) {
+       console.error(e);
+     }
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -203,15 +207,15 @@ describe('GeoPackage Tile Scaling Extension Tests', function() {
     var geoPackage;
     var tileDao;
     var filename;
-    beforeEach('should open the copied geopackage', async function() {
+    beforeEach('should open the copied geoPackage', async function() {
       var fileName = path.join(__dirname, '..', '..', '..', 'fixtures', 'example.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(fileName);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });

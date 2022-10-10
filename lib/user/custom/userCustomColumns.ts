@@ -46,8 +46,8 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
   public constructor(
     tableName: string,
     columns: UserCustomColumn[],
-    requiredColumns: string[],
-    custom: boolean,
+    requiredColumns?: string[],
+    custom?: boolean,
   );
 
   /**
@@ -76,8 +76,8 @@ export class UserCustomColumns extends UserColumns<UserCustomColumn> {
     } else if (args.length === 3) {
       const tableName = args[0];
       const columns = args[1];
-      const custom = typeof args[2] === 'boolean' ? args[2] : false;
-      const requiredColumns = args[2].length != null ? args[2] : null;
+      const custom = args[2] != null && typeof args[2] === 'boolean' ? args[2] : false;
+      const requiredColumns = args[2] != null && args[2].length != null ? args[2] : null;
       super(tableName, columns, custom);
       this.requiredColumns = requiredColumns;
       this.updateColumns();

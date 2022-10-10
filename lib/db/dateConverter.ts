@@ -1,3 +1,5 @@
+import { GeoPackageDataType } from './geoPackageDataType';
+
 /**
  * Date converter between database date strings and javascript Dates
  */
@@ -9,7 +11,7 @@ export class DateConverter {
       return null;
     }
   }
-  public static stringValue(date: Date): string {
-    return date.toISOString();
+  public static stringValue(date: Date, dataType: GeoPackageDataType): string {
+    return dataType === GeoPackageDataType.DATE ? date.toISOString().substring(0, 10) : date.toISOString();
   }
 }

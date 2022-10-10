@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../../fixtures/testSetup'
+import { default as testSetup } from '../../../../testSetup'
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache
@@ -11,7 +11,7 @@ var isWeb = !(typeof(process) !== 'undefined' && process.version);
 
 describe('IconCache Tests', function() {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
   var featureTableName = 'feature_table';
   // @ts-ignore
   var featureTable;
@@ -61,16 +61,16 @@ describe('IconCache Tests', function() {
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = geopackage.createFeatureTable(featureTableName);
-    geopackage.featureStyleExtension.getOrCreateExtension(featureTableName);
-    geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
-    geopackage.featureStyleExtension.getContentsId().getOrCreateExtension();
-    featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
+    featureTable = geoPackage.createFeatureTable(featureTableName);
+    geoPackage.featureStyleExtension.getOrCreateExtension(featureTableName);
+    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
+    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension();
+    featureTableStyles = new FeatureTableStyles(geoPackage, featureTableName);
     featureTableStyles.createIconRelationship();
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
     // @ts-ignore
@@ -78,7 +78,7 @@ describe('IconCache Tests', function() {
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });

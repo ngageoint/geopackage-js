@@ -8,6 +8,7 @@ import { TileColumns } from './tileColumns';
 import { UniqueConstraint } from '../../db/table/uniqueConstraint';
 import { ContentsDataType } from '../../contents/contentsDataType';
 import { Contents } from '../../contents/contents';
+import { GeoPackageException } from '../../geoPackageException';
 
 /**
  * `TileTable` models [tile pyramid user tables](https://www.geopackage.org/spec121/index.html#tiles_user_tables).
@@ -71,7 +72,7 @@ export class TileTable extends UserTable<TileColumn> {
    * {@inheritDoc}
    */
   getDataType(): string {
-    return ContentsDataType.TILES;
+    return ContentsDataType.nameFromType(ContentsDataType.TILES);
   }
 
   /**
@@ -175,7 +176,7 @@ export class TileTable extends UserTable<TileColumn> {
     // Verify the Contents have a tiles data type
     const dataType = contents.getDataType();
     if (dataType === null || dataType === undefined || dataType !== ContentsDataType.TILES) {
-      throw new Error('The Contents of a TileTable must have a data type of tiles');
+      throw new GeoPackageException('The Contents of a TileTable must have a data type of tiles');
     }
   }
 }

@@ -1,6 +1,7 @@
 import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 import { Geometry, GeometryEnvelope, GeometryUtils, Point } from '@ngageoint/simple-features-js';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { Feature } from 'geojson';
 
 /**
  * Bounding Box with longitude and latitude ranges in degrees
@@ -673,5 +674,36 @@ export class BoundingBox {
       bounded.setMinLatitude(ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
     }
     return bounded;
+  }
+
+  /**
+   * Project bounding box
+   * @param from
+   * @param to
+   */
+  public projectBoundingBox(from: Projection, to: Projection) {
+    return this.transform(new ProjectionTransform(from, to));
+  }
+
+  /**
+   * Returns a GeoJSON representation of this bounding box
+   */
+  public toGeoJSON(): Feature {
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [this.minLongitude, this.minLatitude],
+            [this.maxLongitude, this.minLatitude],
+            [this.maxLongitude, this.maxLatitude],
+            [this.minLongitude, this.maxLatitude],
+            [this.minLongitude, this.minLatitude],
+          ],
+        ],
+      },
+    };
   }
 }

@@ -244,7 +244,6 @@ export class RTreeIndexExtension extends BaseExtension {
     this.createRTreeIndex(tableName, geometryColumnName);
     this.loadRTreeIndex(tableName, geometryColumnName, idColumnName);
     this.createAllTriggers(tableName, geometryColumnName, idColumnName);
-
     return extension;
   }
 
@@ -288,9 +287,8 @@ export class RTreeIndexExtension extends BaseExtension {
    * @return RTree Index Table DAO
    */
   public getTableDao(featureDao: FeatureDao): RTreeIndexTableDao {
-    const connection = this.getGeoPackage().getConnection();
     const userCustomTable = this.getRTreeTable(featureDao.getTable());
-    const userCustomDao = new UserCustomDao(this.geoPackage.getName(), connection, userCustomTable);
+    const userCustomDao = new UserCustomDao(this.geoPackage.getName(), this.geoPackage, userCustomTable);
 
     return new RTreeIndexTableDao(this, userCustomDao, featureDao);
   }
@@ -892,12 +890,11 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   protected getRTreeTable(featureTable: FeatureTable): UserCustomTable {
     const columns = [];
-    let idx = 0;
-    columns.push(UserCustomColumn.createPrimaryKeyColumn(idx++, RTreeIndexExtensionConstants.COLUMN_ID, false));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MIN_X, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MAX_X, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MIN_Y, GeoPackageDataType.FLOAT));
-    columns.push(UserCustomColumn.createColumn(idx++, RTreeIndexExtensionConstants.COLUMN_MAX_Y, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createPrimaryKeyColumn(RTreeIndexExtensionConstants.COLUMN_ID, false));
+    columns.push(UserCustomColumn.createColumn(RTreeIndexExtensionConstants.COLUMN_MIN_X, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(RTreeIndexExtensionConstants.COLUMN_MAX_X, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(RTreeIndexExtensionConstants.COLUMN_MIN_Y, GeoPackageDataType.FLOAT));
+    columns.push(UserCustomColumn.createColumn(RTreeIndexExtensionConstants.COLUMN_MAX_Y, GeoPackageDataType.FLOAT));
     const rTreeTableName = this.getRTreeTableName(featureTable.getTableName(), featureTable.getGeometryColumnName());
     return new UserCustomTable(rTreeTableName, columns);
   }

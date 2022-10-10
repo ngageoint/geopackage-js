@@ -1,13 +1,12 @@
 var GeoPackageTileRetriever = require('../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , GeoPackage = require('../../lib/geoPackage').GeoPackage
-  , Projection = require('../../lib/projection/projection').Projection
-  , GeoPackageConnection = require('../../lib/db/geoPackageConnection').GeoPackageConnection
+  , GeoPackageManager = require('../../lib/geoPackageManager').GeoPackageManager
   , should = require('chai').should()
   , path = require('path');
 
 describe('GeoPackage tests', function() {
   it('should get the feature table names', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
+    GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg')).then(function(geoPackageConnection) {
       var connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
@@ -38,23 +37,23 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the features', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
     .then(function(geoPackageConnection) {
       var connection = geoPackageConnection;
       should.exist(connection);
       var geoPackage = new GeoPackage('', '', connection);
       var featureDao = geoPackage.getFeatureDao('point2d');
-      var each = featureDao.queryForEach();
-      for (var row of each) {
-        var currentRow = featureDao.getRow(row);
-        var geometry = currentRow.geometry;
+      var each = featureDao.queryForAll();
+      while (each.moveToNext()) {
+        const row = each.getRow();
+        const geometry = row.getGeometry();
       }
       connection.close();
     });
   });
 
   it('should get the features from all tables', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'gdal_sample.gpkg'))
     .then(function(connection){
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getFeatureTables();
@@ -63,8 +62,8 @@ describe('GeoPackage tests', function() {
         if (!featureDao) {
           throw new Error('No feature table exists');
         }
-        var srs = featureDao.srs;
-        var each = featureDao.queryForEach();
+        var srs = featureDao.getSrs();
+        var each = featureDao.queryForAll();
         for (var row of each) {
           var currentRow = featureDao.getRow(row);
           var geometry = currentRow.geometry;
@@ -80,7 +79,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the tile table names', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
@@ -95,7 +94,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the srs 3857', function(done) {
-    GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var srs = geoPackage.getSrs(3857);
@@ -107,7 +106,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the feature dao from the contents', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var contents = geoPackage.contentsDao.queryForId('FEATURESriversds');
@@ -120,7 +119,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the TILE dao from the contents', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var contents = geoPackage.contentsDao.queryForId('TILESosmds');
@@ -129,7 +128,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the tiles', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var tables = geoPackage.getTileTables();
@@ -154,7 +153,7 @@ describe('GeoPackage tests', function() {
 
   it('should get the info for the table', function() {
     this.timeout(30000);
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var dao = geoPackage.getFeatureDao('FEATURESriversds');
@@ -167,7 +166,7 @@ describe('GeoPackage tests', function() {
   });
 
   it('should get the info for the Imagery table', function() {
-    return GeoPackageConnection.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', '3857.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
       var tileDao = geoPackage.getTileDao('imagery');
@@ -178,40 +177,4 @@ describe('GeoPackage tests', function() {
       connection.close();
     });
   });
-
-  it('should exists default projection', function() {
-    var result = Projection.hasProjection('EPSG:4326');
-    should.exist(result);
-  });
-
-  it('should throw error on invalid load projections argument', function() {
-    (function() {
-      Projection.loadProjections(null);
-    }).should.throw('Invalid array of projections');
-  });
-
-  it('should throw error on unknown projection item', function() {
-    (function() {
-      Projection.loadProjections([null]);
-    }).should.throw('Invalid projection in array. Valid projection {name: string, definition: string}.');
-  });
-
-  it('should load projections', function() {
-    Projection.loadProjections([{name: 'EPSG:3821', definition: '+proj=longlat +ellps=aust_SA +no_defs '}]);
-    var result = Projection.hasProjection('EPSG:3821');
-    should.exist(result);
-  });
-
-  it('should throw error on empty add projection args', function() {
-    (function() {
-      Projection.loadProjection(null, null);
-    }).should.throw('Invalid projection name/definition');
-  });
-
-  it('should add projection', function() {
-    Projection.loadProjection('EPSG:4001', '+proj=longlat +ellps=airy +no_defs');
-    var result = Projection.hasProjection('EPSG:4001');
-    should.exist(result);
-  });
-
 });

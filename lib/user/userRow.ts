@@ -64,19 +64,20 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         const table: TTable = args[0] as TTable;
         this.table = table;
         this.columns = table.getUserColumns();
-        // Default column types will all be 0 which is null (Cursor.FIELD_TYPE_NULL)
-        this.columnTypes = [];
-        this.values = [];
-        for (let i = 0; i < table.getColumns().length; i++) {
-          this.columnTypes[this.table.getColumnName(i)] = this.table.getColumnForIndex(i).getDataType();
-          this.values[this.table.getColumnName(i)] = this.table.getColumnForIndex(i).getDefaultValue();
+        this.columnTypes = Array(this.columns.getColumns().length).fill(0).map((_, i) => i);
+        this.values = Array(this.columns.getColumns().length).fill(null).map((_, i) => i);
+        const columns = table.getColumns();
+        for (let i = 0; i < columns.length; i++) {
+          const column = columns[i];
+          this.columnTypes[column.getIndex()] = column.getDataType();
+          this.values[column.getIndex()] = column.getDefaultValue();
         }
       } else if (args[0] instanceof UserRow) {
         const userRow: UserRow<TColumn, TTable> = args[0];
         this.table = userRow.table;
         this.columns = userRow.columns;
         this.columnTypes = userRow.columnTypes;
-        this.values = [];
+        this.values = Array(this.columns.getColumns().length).fill(null).map((_, i) => i);
         for (let i = 0; i < userRow.values.length; i++) {
           const value = userRow.values[i];
           if (value != null) {
@@ -199,7 +200,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @return {object}       value
    */
   getValueWithIndex(index: number): any {
-    let value = this.values[this.getColumnNameWithIndex(index)];
+    let value = this.values[index];
     if (value !== undefined) {
       value = this.toObjectValue(index, value);
     }
@@ -211,11 +212,12 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @return {Object}            value
    */
   getValueWithColumnName(columnName: string): any {
-    const value = this.values[columnName];
+    const index = this.getColumnIndexWithColumnName(columnName)
+    const value = this.values[index];
     const dataType = this.getRowColumnTypeWithColumnName(columnName);
     if (value === undefined || value === null) return value;
     if (dataType === GeoPackageDataType.BOOLEAN) {
-      return value === 1 ? true : false;
+      return value === 1;
     } else if (dataType === GeoPackageDataType.BLOB) {
       return Buffer.from(value as Uint8Array);
     }
@@ -230,7 +232,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
     const objectValue = value;
     const column = this.getColumnWithIndex(index);
     if (column.getDataType() === GeoPackageDataType.BOOLEAN && value) {
-      return value === 1 ? true : false;
+      return value === 1;
     }
     return objectValue;
   }
@@ -260,7 +262,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @return {Number}            row column type
    */
   getRowColumnTypeWithColumnName(columnName: string): number {
-    return this.columnTypes[columnName];
+    return this.columnTypes[this.getColumnIndexWithColumnName(columnName)];
   }
   /**
    * Get the column at the index
@@ -294,7 +296,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param {Number} id id
    */
   set id(id: number) {
-    this.values[this.table.getPkColumnName()] = id;
+    this.values[this.table.getPkColumnIndex()] = id;
   }
   /**
    * Get the primary key column Index
@@ -317,7 +319,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    */
   setValueWithIndex(index: number, value: any): void {
     if (index === this.table.getUserColumns().getPkColumnIndex()) {
-      throw new Error(
+      throw new GeoPackageException(
         'Cannot update the primary key of the row.  Table Name: ' +
           this.table.getTableName() +
           ', Index: ' +
@@ -326,7 +328,16 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
           this.table.getPkColumnName(),
       );
     }
-    this.setValueWithColumnName(this.getColumnNameWithIndex(index), value);
+    const dataType = this.getRowColumnTypeWithIndex(index);
+    if (dataType === GeoPackageDataType.BOOLEAN) {
+      value === true ? (this.values[index] = 1) : (this.values[index] = 0);
+    } else if (dataType === GeoPackageDataType.DATE) {
+      this.values[index] = value.toISOString().slice(0, 10);
+    } else if (dataType === GeoPackageDataType.DATETIME) {
+      this.values[index] = value.toISOString();
+    } else {
+      this.values[index] = value;
+    }
   }
   /**
    * Set the value at the index without validation
@@ -334,7 +345,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param {Object} value value
    */
   setValueNoValidationWithIndex(index: number, value: any): void {
-    this.values[this.getColumnNameWithIndex(index)] = value;
+    this.values[index] = value;
   }
   /**
    * Set the value of the column name
@@ -342,16 +353,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param {Object} value      value
    */
   setValueWithColumnName(columnName: string, value: any): void {
-    const dataType = this.getRowColumnTypeWithColumnName(columnName);
-    if (dataType === GeoPackageDataType.BOOLEAN) {
-      value === true ? (this.values[columnName] = 1) : (this.values[columnName] = 0);
-    } else if (dataType === GeoPackageDataType.DATE) {
-      this.values[columnName] = value.toISOString().slice(0, 10);
-    } else if (dataType === GeoPackageDataType.DATETIME) {
-      this.values[columnName] = value.toISOString();
-    } else {
-      this.values[columnName] = value;
-    }
+    const columnIndex = this.getColumnIndexWithColumnName(columnName);
+    this.setValueWithIndex(columnIndex, value);
   }
 
   /**
@@ -472,6 +475,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         }
       }
     }
+
+    console.log(contentValues);
     return contentValues;
   }
 
@@ -531,7 +536,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
       contentValues.put(columnName, value ? 1 : 0);
     } else if (value instanceof Date) {
       this.validateValue(column, value, ['Date', 'string']);
-      const dateString = DateConverter.stringValue(value);
+      const dateString = DateConverter.stringValue(value, column.getDataType());
       contentValues.put(columnName, dateString);
     } else {
       throw new GeoPackageException('Unsupported update column value. column: ' + columnName + ', value: ' + value);

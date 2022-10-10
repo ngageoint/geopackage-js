@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup'
 
 var GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
@@ -16,16 +16,16 @@ describe('GeoPackage Tile Retriever tests', function() {
     var tileDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var riversfilename = path.join(__dirname, '..', '..', 'fixtures', 'rivers.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(riversfilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       tileDao = geoPackage.getTileDao('TILESosmds');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -170,16 +170,16 @@ describe('GeoPackage Tile Retriever tests', function() {
     var geoPackage;
     var tileDao;
     var filename;
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var filename3857 = path.join(__dirname, '..', '..', 'fixtures', '3857.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(filename3857);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       tileDao = geoPackage.getTileDao('imagery');
     });
 
-    afterEach('delete the geopackage', async function() {
+    afterEach('delete the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     })
@@ -234,16 +234,16 @@ describe('GeoPackage Tile Retriever tests', function() {
     var geoPackage;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var wgs84filename = path.join(__dirname, '..', '..', 'fixtures', 'wgs84.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(wgs84filename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       tileDao = geoPackage.getTileDao('imagery');
     });
 
-    afterEach('should delete the geopackage', async function() {
+    afterEach('should delete the geoPackage', async function() {
       await testSetup.deleteGeoPackage(filename);
     });
 

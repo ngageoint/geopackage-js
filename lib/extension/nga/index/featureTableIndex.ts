@@ -160,7 +160,7 @@ export class FeatureTableIndex extends BaseExtension {
    *
    * @return true if indexed
    */
-  protected indexWithGeometryIdAndGeometryData(
+  public indexWithGeometryIdAndGeometryData(
     tableIndex: TableIndex,
     geomId: number,
     geomData: GeoPackageGeometryData,
@@ -193,7 +193,7 @@ export class FeatureTableIndex extends BaseExtension {
   /**
    * Update the last indexed time
    */
-  protected updateLastIndexed(): void {
+  public updateLastIndexed(): void {
     const tableIndex = new TableIndex();
     tableIndex.setTableName(this.tableName);
     tableIndex.setLastIndexed(new Date());
@@ -203,9 +203,26 @@ export class FeatureTableIndex extends BaseExtension {
     } catch (e) {
       throw new GeoPackageException(
         'Failed to update last indexed date. GeoPackage: ' +
-          this.geoPackage.getName() +
-          ', Table Name: ' +
-          this.tableName,
+        this.geoPackage.getName() +
+        ', Table Name: ' +
+        this.tableName,
+      );
+    }
+  }
+
+  /**
+   * Update the last indexed time
+   */
+  public updateLastIndexedWithTableIndex(tableIndex: TableIndex): void {
+    tableIndex.setLastIndexed(new Date());
+    try {
+      this.tableIndexDao.createOrUpdate(tableIndex);
+    } catch (e) {
+      throw new GeoPackageException(
+        'Failed to update last indexed date. GeoPackage: ' +
+        this.geoPackage.getName() +
+        ', Table Name: ' +
+        this.tableName,
       );
     }
   }
@@ -284,6 +301,7 @@ export class FeatureTableIndex extends BaseExtension {
           }
         }
       } catch (e) {
+        console.error(e);
         throw new GeoPackageException(
           'Failed to check if table is indexed, GeoPackage: ' +
             this.geoPackage.getName() +

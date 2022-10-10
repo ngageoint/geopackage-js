@@ -16,6 +16,8 @@ import { GeoPackageException } from '../../geoPackageException';
 import { FeatureIndexFeatureResults } from './featureIndexFeatureResults';
 import { FeaturePaginatedResults } from '../user/featurePaginatedResults';
 import type { GeoPackage } from '../../geoPackage';
+import { GeoJSONResultSet } from '../geojson/geoJSONResultSet';
+import { DataColumnsDao } from '../../extension/schema/columns/dataColumnsDao';
 
 /**
  * Feature Index Manager to manage indexing of feature geometries within a
@@ -26,6 +28,11 @@ export class FeatureIndexManager {
    * Feature DAO
    */
   private readonly featureDao: FeatureDao;
+
+  /**
+   * DataColumns DAO
+   */
+  private readonly dataColumnsDao: DataColumnsDao;
 
   /**
    * Feature Table Index, for indexing within a GeoPackage extension
@@ -70,7 +77,8 @@ export class FeatureIndexManager {
       featureTableNameOrDao instanceof FeatureDao
         ? featureTableNameOrDao
         : geoPackage.getFeatureDao(featureTableNameOrDao);
-    this.featureDao = this.featureDao;
+    this.featureDao = featureDao;
+    this.dataColumnsDao = geoPackage.getDataColumnsDao();
     this.featureTableIndex = new FeatureTableIndex(geoPackage, featureDao);
     const rTreeExtension = new RTreeIndexExtension(geoPackage);
     this.rTreeIndexTableDao = rTreeExtension.getTableDao(featureDao);
@@ -212,7 +220,7 @@ export class FeatureIndexManager {
    * Index the feature table
    * @param type index location type
    * @param force true to force re-indexing
-   * @return this.count
+   * @return count
    */
   public indexType(type: FeatureIndexType = this.verifyIndexLocation(), force = false): number {
     if (type == null) {
@@ -685,7 +693,7 @@ export class FeatureIndexManager {
    * @param whereArgs where arguments
    * @return feature index results, close when done
    */
-  public query(distinct: boolean, columns: string[], where: string, whereArgs: any[]): FeatureIndexResults {
+  public query(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureIndexResults {
     let results = null;
     for (const type of this.getLocation()) {
       try {
@@ -878,8 +886,8 @@ export class FeatureIndexManager {
     distinct: boolean,
     columns: string[],
     boundingBox: BoundingBox,
-    where: string,
-    whereArgs: any[],
+    where?: string,
+    whereArgs?: any[],
   ): FeatureIndexResults {
     return this.queryWithGeometryEnvelope(distinct, columns, boundingBox.buildEnvelope(), where, whereArgs);
   }
@@ -1690,5 +1698,16 @@ export class FeatureIndexManager {
       );
     }
     return this.indexLocation;
+  }
+
+  /**
+   * Query for GeoJSON Results
+   * @param boundingBox
+   * @param where
+   * @param whereArgs
+   */
+  public queryForGeoJSONFeatures(boundingBox?: BoundingBox, where?: string, whereArgs?: any[]): GeoJSONResultSet {
+    const featureIndexResultSet: FeatureIndexResults = boundingBox != null ? this.queryWithBoundingBox(false, undefined, boundingBox, where, whereArgs) : this.query(false, undefined, where, whereArgs);
+    return new GeoJSONResultSet(featureIndexResultSet, this.getFeatureDao(), this.dataColumnsDao);
   }
 }

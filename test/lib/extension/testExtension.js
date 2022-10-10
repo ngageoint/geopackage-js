@@ -1,5 +1,4 @@
-
-import { Extensions } from "../../../lib/extension/extension";
+import { Extensions } from "../../../lib/extension/extensions";
 
 describe('GeoPackage Extension tests', function() {
 

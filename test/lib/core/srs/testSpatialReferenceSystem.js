@@ -6,13 +6,13 @@ describe('SpatialReferenceSystem tests', function() {
 
   var geoPackage;
 
-  beforeEach('should open the geopackage', async function() {
+  beforeEach('should open the geoPackage', async function() {
     var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
     // @ts-ignore
-    geoPackage = (await openGeoPackage(filename)).geopackage;
+    geoPackage = (await openGeoPackage(filename)).geoPackage;
   });
 
-  afterEach('should close the geopackage', function(){
+  afterEach('should close the geoPackage', function(){
     geoPackage.close();
   });
 

@@ -1,6 +1,5 @@
 import { FeatureTableIndex } from '../../extension/nga/index/featureTableIndex';
 import { UserDao } from '../../user/userDao';
-import { DataColumnsDao } from '../../extension/schema/columns/dataColumnsDao';
 import { FeatureRow } from './featureRow';
 import { BoundingBox } from '../../boundingBox';
 import { GeometryColumns } from '../columns/geometryColumns';
@@ -18,7 +17,6 @@ import type { GeoPackage } from '../../geoPackage';
  * Feature DAO for reading feature user data tables
  */
 export class FeatureDao extends UserDao<FeatureColumn, FeatureTable, FeatureRow, FeatureResultSet> {
-  dataColumnsDao: DataColumnsDao;
   featureTableIndex: FeatureTableIndex;
   projection: Projection;
 

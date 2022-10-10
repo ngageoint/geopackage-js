@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
   , ContentsDao = require('../../../../lib/contents/contentsDao').ContentsDao
@@ -12,20 +12,20 @@ describe('Contents tests', function() {
   var contentsDao;
   var filename;
 
-  beforeEach('should open the geopackage', async function() {
+  beforeEach('should open the geoPackage', async function() {
     try {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       contentsDao = new ContentsDao(geoPackage);
     } catch (e) {
       console.error(e);
     }
   });
 
-  afterEach('should close the geopackage', async function() {
+  afterEach('should close the geoPackage', async function() {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });

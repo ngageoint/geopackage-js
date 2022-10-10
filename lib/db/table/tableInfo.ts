@@ -8,6 +8,7 @@ import { SQLiteMaster } from '../master/sqliteMaster';
 import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
 import type { GeoPackageConnection } from '../geoPackageConnection';
+import { GeoPackageException } from '../../geoPackageException';
 
 export class TableInfo {
   /**
@@ -113,7 +114,7 @@ export class TableInfo {
    */
   getColumnAtIndex(index: number): TableColumn {
     if (index < 0 || index >= this.columns.length) {
-      throw new Error('Column index: ' + index + ', not within range 0 to ' + (this.columns.length - 1));
+      throw new GeoPackageException('Column index: ' + index + ', not within range 0 to ' + (this.columns.length - 1));
     }
     return this.columns[index];
   }

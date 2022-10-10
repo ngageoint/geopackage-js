@@ -17,17 +17,17 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
   /**
    * Constructor
    * @param tableName table name
-   * @param idColumnName id column name
    * @param additionalColumns additional columns
    * @param constraints: Constraints
+   * @param idColumnName id column name
    * @param autoincrement autoincrement ids
    * @return metadata
    */
   public static create(
     tableName?: string,
-    idColumnName?: string,
     additionalColumns?: AttributesColumn[],
     constraints?: Constraints,
+    idColumnName?: string,
     autoincrement?: boolean,
   ): AttributesTableMetadata {
     return new AttributesTableMetadata(null, tableName, idColumnName, additionalColumns, constraints, autoincrement);
@@ -199,7 +199,8 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
   }
 
   /**
-   * {@inheritDoc}
+   * Get the default data type
+   * @return default data type
    */
   public getDefaultDataType(): string {
     return AttributesTableMetadata.DEFAULT_DATA_TYPE;
@@ -214,7 +215,7 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     if (attributesColumns == null) {
       attributesColumns = [];
       attributesColumns.push(
-        AttributesColumn.createPrimaryKeyColumn(0, this.getIdColumnName(), this.isAutoincrement()),
+        AttributesColumn.createPrimaryKeyColumn(this.getIdColumnName(), this.isAutoincrement()),
       );
       const additional = this.getAdditionalColumns();
       if (additional != null) {

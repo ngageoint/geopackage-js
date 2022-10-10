@@ -7,6 +7,7 @@ import { TableConstraints } from '../table/tableConstraints';
 import { ConstraintParser } from '../table/constraintParser';
 import { SQLiteMasterQuery } from './sqliteMasterQuery';
 import type { GeoPackageConnection } from '../geoPackageConnection';
+import { GeoPackageException } from '../../geoPackageException';
 
 export class SQLiteMaster {
   /**
@@ -142,7 +143,7 @@ export class SQLiteMaster {
       } else {
         message = 'Row index: ' + row + ', not within range 0 to ' + (this._results.length - 1);
       }
-      throw new Error(message);
+      throw new GeoPackageException(message);
     }
     return this._results[row];
   }

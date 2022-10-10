@@ -1,8 +1,8 @@
-var FeatureColumn = require('../../lib/features/user/featureColumn').FeatureColumn
-  , GeometryColumns = require('../../lib/features/columns/geometryColumns').GeometryColumns
-  , FeatureTable = require('../../lib/features/user/featureTable').FeatureTable
+var FeatureColumn = require('../lib/features/user/featureColumn').FeatureColumn
+  , GeometryColumns = require('../lib/features/columns/geometryColumns').GeometryColumns
+  , FeatureTable = require('../lib/features/user/featureTable').FeatureTable
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
-  , GeoPackageDataType = require('../../lib/db/geoPackageDataType').GeoPackageDataType;
+  , GeoPackageDataType = require('../lib/db/geoPackageDataType').GeoPackageDataType;
 
 module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryType) {
   var columns = [];

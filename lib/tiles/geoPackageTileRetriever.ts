@@ -1,10 +1,11 @@
 import { TileRetriever } from './tileRetriever';
 import { TileCreator } from './tileCreator';
 import { TileDao } from './user/tileDao';
-import { Projections } from '@ngageoint/projections-js';
+import { Projection, Projections } from '@ngageoint/projections-js';
 import { TileBoundingBoxUtils } from './tileBoundingBoxUtils';
 import { GeoPackageTile } from './geoPackageTile';
 import { TileScaling } from '../extension/nga/scale/tileScaling';
+import { BoundingBox } from '../boundingBox';
 
 /**
  * GeoPackage Tile Retriever, retrieves a tile from a GeoPackage from XYZ
@@ -22,15 +23,18 @@ export class GeoPackageTileRetriever implements TileRetriever {
    * @param width width
    * @param height height
    * @param imageFormat image format
+   * @param targetProjection
    */
-  public constructor(tileDao: TileDao, width: number, height: number, imageFormat: string) {
+  public constructor(tileDao: TileDao, width: number, height: number, imageFormat: string = 'image/png', targetProjection: Projection = Projections.getWebMercatorProjection()) {
     tileDao.adjustTileMatrixLengths();
-    const webMercator = Projections.getWebMercatorProjection();
-    this.tileCreator = new TileCreator(tileDao, width, height, webMercator, imageFormat);
+    this.tileCreator = new TileCreator(tileDao, width, height, targetProjection, imageFormat);
   }
 
   /**
-   * {@inheritDoc}
+   * Check if data exists for the web mercator tile specified
+   * @param x
+   * @param y
+   * @param zoom
    */
   public hasTile(x: number, y: number, zoom: number): boolean {
     // Get the bounding box of the requested tile
@@ -39,12 +43,25 @@ export class GeoPackageTileRetriever implements TileRetriever {
   }
 
   /**
-   * {@inheritDoc}
+   * Get web mercator x,y,z tile
+   * @param x
+   * @param y
+   * @param zoom
    */
-  public getTile(x: number, y: number, zoom: number): GeoPackageTile {
+  public async getTile(x: number, y: number, zoom: number): Promise<GeoPackageTile> {
     // Get the bounding box of the requested tile
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
-    return this.tileCreator.getTile(webMercatorBoundingBox);
+    return this.tileCreator.getTile(webMercatorBoundingBox, zoom);
+  }
+
+  /**
+   * Get the tile for the specified bounds
+   * @param boundingBox
+   * @param zoom
+   */
+  public async getTileWithBounds(boundingBox: BoundingBox, zoom?: number): Promise<GeoPackageTile> {
+    // Get the bounding box of the requested tile
+    return this.tileCreator.getTile(boundingBox, zoom);
   }
 
   /**

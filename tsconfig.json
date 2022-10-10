@@ -6,7 +6,7 @@
         "dom",
         "es2015",
         "es2017",
-        "es2015.iterable"
+        "es2015.iterable",
       ],
       "jsx": "react", // uses typescript to transpile jsx to js
       "target": "es5", // specify ECMAScript target version
@@ -26,10 +26,7 @@
   "include": [
       "index.ts",
       "./lib", // type-checks all js files as well not just .ts extension
-      "@types/@turf/distance.index.d.ts",
-      "@types/reproject/index.d.ts",
-      "@types/canvaskit/index.d.ts",
-      "@types/offscreencanvas/index.d.ts"
+      "@types/canvaskit/index.d.ts"
   ],
   "exclude": [
       "./lib/wkb",

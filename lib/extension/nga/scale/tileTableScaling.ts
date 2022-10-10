@@ -5,7 +5,7 @@ import { TileScaling } from './tileScaling';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { GeoPackageException } from '../../../geoPackageException';
 import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
-import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 import type { GeoPackage } from '../../../geoPackage';
 
 /**

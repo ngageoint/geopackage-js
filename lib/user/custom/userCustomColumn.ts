@@ -22,7 +22,6 @@ import { TableColumn } from '../../db/table/tableColumn';
 export class UserCustomColumn extends UserColumn {
   /**
    *  Create a new column
-   *  @param {Number} index        column index
    *  @param {string} name         column name
    *  @param {GeoPackageDataType} type data type
    *  @param {Number} [max] max value
@@ -34,7 +33,31 @@ export class UserCustomColumn extends UserColumn {
    *  @return {UserCustomColumn} created column
    */
   static createColumn(
-    index: number,
+    name: string,
+    type: GeoPackageDataType,
+    notNull = false,
+    defaultValue?: DBValue,
+    max?: number,
+    autoincrement?: boolean,
+  ): UserCustomColumn {
+    return UserCustomColumn.createColumnWithIndex(UserCustomColumn.NO_INDEX, name, type, notNull, defaultValue, max, autoincrement);
+  }
+
+  /**
+   *  Create a new column with a specified column index
+   *  @param {Number} index        column index
+   *  @param {string} name         column name
+   *  @param {GeoPackageDataType} type data type
+   *  @param {Number} [max] max value
+   *  @param {Boolean} [notNull]      not null
+   *  @param {Object} [defaultValue] default value or nil
+   *  @param {Object} [max] max value or nil
+   *  @param {Boolean} [autoincrement] autoincrement or nil
+   *
+   *  @return {UserCustomColumn} created column
+   */
+  static createColumnWithIndex(
+    index: number = UserCustomColumn.NO_INDEX,
     name: string,
     type: GeoPackageDataType,
     notNull = false,
@@ -47,12 +70,24 @@ export class UserCustomColumn extends UserColumn {
 
   /**
    * Create a new primary key column
-   * @param index
    * @param name
    * @param autoincrement
    */
   static createPrimaryKeyColumn(
-    index: number,
+    name: string,
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
+  ): UserCustomColumn {
+    return UserCustomColumn.createPrimaryKeyColumnWithIndex(UserCustomColumn.NO_INDEX, name, autoincrement);
+  }
+
+  /**
+   * Create a new primary key column with a specified column index
+   * @param index
+   * @param name
+   * @param autoincrement
+   */
+  static createPrimaryKeyColumnWithIndex(
+    index: number = UserCustomColumn.NO_INDEX,
     name: string,
     autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
   ): UserCustomColumn {
@@ -61,7 +96,7 @@ export class UserCustomColumn extends UserColumn {
       name,
       GeoPackageDataType.INTEGER,
       undefined,
-      undefined,
+      true,
       undefined,
       true,
       autoincrement,

@@ -1,10 +1,10 @@
-// package mil.nga.geopackage.extension.nga.link;
+// package mil.nga.geoPackage.extension.nga.link;
 //
 // import java.sql.SQLException;
 //
 // import org.junit.Test;
 //
-// import mil.nga.geopackage.CreateGeoPackageTestCase;
+// import mil.nga.geoPackage.CreateGeoPackageTestCase;
 //
 // /**
 //  * Test Feature Tile Table Linker from a created database

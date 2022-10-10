@@ -3,6 +3,7 @@
  */
 import { SQLiteMasterColumn } from './sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
+import { GeoPackageException } from '../../geoPackageException';
 
 export class SQLiteMasterQuery {
   /**
@@ -69,7 +70,7 @@ export class SQLiteMasterQuery {
    */
   validateAdd(): void {
     if ((this.combineOperation === null || this.combineOperation === undefined) && this.queries.length !== 0) {
-      throw new Error('Query without a combination operation supports only a single query');
+      throw new GeoPackageException('Query without a combination operation supports only a single query');
     }
   }
 

@@ -29,7 +29,6 @@ export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, At
    */
   constructor(database: string, geoPackage: GeoPackage, table: AttributesTable) {
     super(database, geoPackage, new AttributesConnection(geoPackage.getConnection()), table);
-
     this.attributesDb = this.getUserDb() as AttributesConnection;
     if (table.getContents() == null) {
       throw new GeoPackageException('AttributesTable ' + table.getTableName() + ' has null Contents');

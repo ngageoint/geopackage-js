@@ -8,10 +8,10 @@ describe('Create GeoPackage samples', function() {
 
   describe('Create a GeoPackage for OGC Certification', function() {
     var testGeoPackage = path.join(__dirname, 'fixtures', 'tmp', 'js-example.gpkg');
-    var geopackage;
+    var geoPackage;
 
     before(function(done) {
-      // remove the created geopackage
+      // remove the created geoPackage
       if (typeof(process) !== 'undefined' && process.version) {
         fs.unlink(testGeoPackage, function() {
           fs.mkdir(path.dirname(testGeoPackage), function() {
@@ -58,10 +58,10 @@ describe('Create GeoPackage samples', function() {
   describe('Create a GeoPackage with an attributes table', function() {
 
     var testGeoPackage = path.join(__dirname, 'fixtures', 'tmp', 'attributes.gpkg');
-    var geopackage;
+    var geoPackage;
 
     before(function(done) {
-      // remove the created geopackage
+      // remove the created geoPackage
       if (typeof(process) !== 'undefined' && process.version) {
         fs.unlink(testGeoPackage, function() {
           fs.mkdir(path.dirname(testGeoPackage), function() {

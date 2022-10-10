@@ -1,7 +1,7 @@
-import { default as testSetup } from '../fixtures/testSetup'
+import { default as testSetup } from '../testSetup'
 
 const
-  Verification = require('../fixtures/verification')
+  Verification = require('../verification')
   , TileTable = require('../../lib/tiles/user/tileTable').TileTable
   , BoundingBox = require('../../lib/boundingBox').BoundingBox
   , path = require('path')
@@ -11,16 +11,16 @@ describe('GeoPackage Tile table create tests', function() {
 
   var testGeoPackage;
   var tableName = 'test_tiles.test';
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
@@ -28,8 +28,8 @@ describe('GeoPackage Tile table create tests', function() {
     var requiredColumns = TileTable.createRequiredColumns();
     var tileTable = new TileTable(tableName, requiredColumns);
 
-    var result = geopackage.createTileTable(tileTable);
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    var result = geoPackage.createTileTable(tileTable);
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
   });
 
   it('should create a tile table with parameters', function() {
@@ -37,10 +37,10 @@ describe('GeoPackage Tile table create tests', function() {
     var contentsSrsId = 4326;
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
-    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
   });
 
   it('should create a tile table, then delete it, then create it again', function() {
@@ -48,16 +48,16 @@ describe('GeoPackage Tile table create tests', function() {
     var contentsSrsId = 4326;
     var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
     var tileMatrixSetSrsId = 4326;
-    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-    geopackage.deleteTable(tableName)
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(false);
-    geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-    Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-    Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+    geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
+    geoPackage.deleteTable(tableName)
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(false);
+    geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+    Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+    Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+    Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
   });
 
   describe('GeoPackage tile create tile matrix tests', function() {
@@ -69,18 +69,18 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geopackage.spatialReferenceSystemDao.createWebMercator();
-      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
     });
 
     it('should create the standard xyz tile matrix for the zoom levels with default tile size of 256', function(){
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
@@ -95,10 +95,10 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should create the standard xyz tile matrix for the zoom levels with a custom tile size', function(){
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, 100);
+      geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, 100);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
@@ -114,7 +114,7 @@ describe('GeoPackage Tile table create tests', function() {
 
     it('should add all of the tiles to the tile matrix', function() {
 
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
 
       var zooms = [0, 1, 2, 3];
 
@@ -138,7 +138,7 @@ describe('GeoPackage Tile table create tests', function() {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
                     console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
+                    resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
               }, Promise.resolve());
@@ -157,18 +157,18 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -90, 90);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 4326;
-      geopackage.spatialReferenceSystemDao.createWebMercator();
-      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
+      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
     });
 
     it('should create the standard WGS84 xyz tile matrix for the zoom levels with default tile size of 256', function(){
-      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
+      geoPackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
       let zoom = 3;
       while (zoom-- > 0) {
-        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
         matrix.matrix_width.should.equal(Math.pow(2, zoom + 1));
@@ -183,10 +183,10 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should create the standard WGS84 xyz tile matrix for the zoom levels with a custom tile size', function(){
-      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2, 100);
+      geoPackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2, 100);
       let zoom = 3;
       while (zoom-- > 0) {
-        const matrix = geopackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
         matrix.table_name.should.equal(tableName);
         matrix.zoom_level.should.equal(zoom);
@@ -203,7 +203,7 @@ describe('GeoPackage Tile table create tests', function() {
 
     it('should add all of the tiles to the WGS84 tile matrix', function() {
 
-      geopackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
+      geoPackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
 
       var zooms = [0, 1, 2];
 
@@ -227,7 +227,7 @@ describe('GeoPackage Tile table create tests', function() {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'wgs84Tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
                     console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
+                    resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
               }, Promise.resolve());
@@ -248,12 +248,12 @@ describe('GeoPackage Tile table create tests', function() {
       var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geopackage.spatialReferenceSystemDao.createWebMercator();
-      tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-      Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-      Verification.verifyContentsForTable(geopackage, tableName).should.be.equal(true);
-      Verification.verifyTableExists(geopackage, tableName).should.be.equal(true);
-      geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
+      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+      Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+      Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
+      Verification.verifyTableExists(geoPackage, tableName).should.be.equal(true);
+      geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
 
       var zooms = [0, 1, 2, 3];
 
@@ -277,7 +277,7 @@ describe('GeoPackage Tile table create tests', function() {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
                     console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                    resolve(geopackage.addTile(image, tableName, zoom, y, x));
+                    resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
               }, Promise.resolve());
@@ -288,7 +288,7 @@ describe('GeoPackage Tile table create tests', function() {
     });
 
     it('should delete the tiles', function() {
-      var tileDao = geopackage.getTileDao(tableName);
+      var tileDao = geoPackage.getTileDao(tableName);
       var count = tileDao.getCount();
       count.should.be.equal(85);
       var result = tileDao.deleteTile(0, 0, 0);

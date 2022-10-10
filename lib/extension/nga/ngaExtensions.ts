@@ -15,7 +15,7 @@ import { TileScaling } from './scale/tileScaling';
 import { GeometryIndex } from './index/geometryIndex';
 import { ExtendedRelation } from '../related/extendedRelation';
 import { ContentsId } from './contents/contentsId';
-import { NGAExtensionsConstants } from './NGAExtensionsConstants';
+import { NGAExtensionsConstants } from './ngaExtensionsConstants';
 import { FeatureTableIndexConstants } from './index/featureTableIndexConstants';
 import type { GeoPackage } from '../../geoPackage';
 
@@ -186,7 +186,7 @@ export class NGAExtensions extends ExtensionManagement {
         extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, table);
       }
     } catch (e) {
-      throw new Error('Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table);
+      throw new GeoPackageException('Failed to delete Tile Scaling. GeoPackage: ' + this.geoPackage.getName() + ', Table: ' + table);
     }
   }
 
@@ -205,7 +205,7 @@ export class NGAExtensions extends ExtensionManagement {
         extensionsDao.deleteByExtension(TileTableScaling.EXTENSION_NAME);
       }
     } catch (e) {
-      throw new Error('Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.getName());
+      throw new GeoPackageException('Failed to delete Tile Scaling extension and table. GeoPackage: ' + this.geoPackage.getName());
     }
   }
 

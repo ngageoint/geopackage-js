@@ -141,12 +141,12 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
    * @return extended relations
    */
   public getRelations(
-    baseTable: string,
-    baseColumn: string,
-    relatedTable: string,
-    relatedColumn: string,
-    relation: string,
-    mappingTable: string,
+    baseTable?: string,
+    baseColumn?: string,
+    relatedTable?: string,
+    relatedColumn?: string,
+    relation?: string,
+    mappingTable?: string,
   ): ExtendedRelation[] {
     const fields = new ColumnValues();
 

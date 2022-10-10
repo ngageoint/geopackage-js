@@ -9,6 +9,7 @@ import { ImageUtils } from '../../../image/imageUtils';
 import { UserColumn } from '../../../user/userColumn';
 import { StyleTable } from './styleTable';
 import { UserCustomRow } from '../../../user/custom/userCustomRow';
+import { GeoPackageException } from '../../../geoPackageException';
 
 /**
  * Icon Row
@@ -262,7 +263,7 @@ export class IconRow extends MediaRow {
    */
   validateAnchor(anchor: number): boolean {
     if (anchor != null && (anchor < 0.0 || anchor > 1.0)) {
-      throw new Error('Anchor must be set inclusively between 0.0 and 1.0, invalid value: ' + anchor);
+      throw new GeoPackageException('Anchor must be set inclusively between 0.0 and 1.0, invalid value: ' + anchor);
     }
     return true;
   }

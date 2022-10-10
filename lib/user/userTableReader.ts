@@ -8,6 +8,7 @@ import { GeoPackageConnection } from '../db/geoPackageConnection';
 import { TableInfo } from '../db/table/tableInfo';
 import { SQLiteMaster } from '../db/master/sqliteMaster';
 import { TableColumn } from '../db/table/tableColumn';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * @class
@@ -45,14 +46,14 @@ export abstract class UserTableReader<TColumn extends UserColumn, TTable extends
 
     const tableInfo = TableInfo.info(db, this.tableName);
     if (tableInfo === null || tableInfo === undefined) {
-      throw new Error('Table does not exist: ' + this.tableName);
+      throw new GeoPackageException('Table does not exist: ' + this.tableName);
     }
 
     const constraints = SQLiteMaster.queryForConstraints(db, this.tableName);
 
     tableInfo.getColumns().forEach(tableColumn => {
       if (tableColumn.getDataType() === null || tableColumn.getDataType() === undefined) {
-        throw new Error('Unsupported column data type ' + tableColumn.getType());
+        throw new GeoPackageException('Unsupported column data type ' + tableColumn.getType());
       }
       const column = this.createColumn(tableColumn);
 

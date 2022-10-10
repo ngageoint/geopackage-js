@@ -1,7 +1,7 @@
 import { default as testSetup } from './testSetup'
 
 // @ts-nocheck
-var GeoPackageManager = require('../../index').GeoPackageManager;
+var GeoPackageManager = require('../index').GeoPackageManager;
 var isNode = typeof(process) !== 'undefined' && process.version;
 
 var should = require('chai').should();
@@ -32,13 +32,13 @@ global.mochaAsync = module.exports.mochaAsync = (fn) => {
 };
 
 global.openGeoPackage = async (path) => {
-  let geopackage = await GeoPackageManager.open(path);
-  should.exist(geopackage);
-  should.exist(geopackage.database.getDBConnection());
-  geopackage.path.should.be.equal(path);
-  geopackage.name.should.be.equal(Path.basename(path));
+  let geoPackage = await GeoPackageManager.open(path);
+  should.exist(geoPackage);
+  should.exist(geoPackage.getDatabase().getDBConnection());
+  geoPackage.getPath().should.be.equal(path);
+  geoPackage.getName().should.be.equal(Path.basename(path));
   return {
-    geopackage,
+    geoPackage,
     path
   };
 };
@@ -52,5 +52,6 @@ global.copyAndOpenGeopackage = async function(original, copy) {
   } else {
     filename = original;
   }
+  console.log(filename);
   return openGeoPackage(filename);
 };

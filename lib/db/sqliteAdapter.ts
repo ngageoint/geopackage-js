@@ -135,7 +135,7 @@ export class SqliteAdapter implements DBAdapter {
   /**
    * Returns a Buffer containing the contents of the database as a file
    */
-  async export(): Promise<any> {
+  async export(): Promise<Uint8Array> {
     return new Promise(resolve => {
       return fs.readFile(this.filePath as string, (err, data) => {
         resolve(data);
@@ -233,6 +233,7 @@ export class SqliteAdapter implements DBAdapter {
    * @return {Number} last inserted row id
    */
   insert(sql: string, params?: [] | Record<string, DBValue>): number {
+    console.log(sql);
     const statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
@@ -282,7 +283,7 @@ export class SqliteAdapter implements DBAdapter {
       vacuum.run();
       return result.changes === 0;
     } catch (e) {
-      console.log('Drop Table Error', e);
+      console.error('Drop Table Error', e);
       return false;
     }
   }

@@ -7,22 +7,22 @@ const should = require('chai').should();
 describe('ZoomOtherExtension tests', function() {
 
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
 
   it('should test the zoom other extension', function() {
-    const zoomOtherExtension = new ZoomOtherExtension(geopackage);
+    const zoomOtherExtension = new ZoomOtherExtension(geoPackage);
 
     const tableName = "table";
 
@@ -37,7 +37,7 @@ describe('ZoomOtherExtension tests', function() {
     Extensions.READ_WRITE.should.be.equal(extension.scope);
     ZoomOtherExtension.DEFINITION.should.be.equal(extension.definition);
 
-    geopackage.getExtensionManager().deleteTableExtensions(tableName);
+    geoPackage.getExtensionManager().deleteTableExtensions(tableName);
     zoomOtherExtension.has(tableName).should.be.false;
   });
 

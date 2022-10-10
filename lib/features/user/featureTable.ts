@@ -8,6 +8,7 @@ import { FeatureColumns } from './featureColumns';
 import { Contents } from '../../contents/contents';
 import { ContentsDataType } from '../../contents/contentsDataType';
 import { GeometryColumns } from '../columns/geometryColumns';
+import { GeoPackageException } from '../../geoPackageException';
 
 /**
  * Represents a user feature table
@@ -132,7 +133,7 @@ export class FeatureTable extends UserTable<FeatureColumn> {
     // Verify the Contents have a features data type
     const dataType = contents.getDataType();
     if (dataType === null || dataType === undefined || dataType !== ContentsDataType.FEATURES) {
-      throw new Error('The Contents of a FeatureTable must have a data type of ' + ContentsDataType.FEATURES);
+      throw new GeoPackageException('The Contents of a FeatureTable must have a data type of ' + ContentsDataType.FEATURES);
     }
   }
 }

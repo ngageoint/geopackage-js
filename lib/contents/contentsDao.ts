@@ -64,14 +64,14 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param tableType
    */
   getContents(tableType?: string | ContentsDataType): Contents[] {
-    return this.getContentsForTypes(tableType != null ? [tableType] : []);
+    return this.getContentsForTypes([tableType]);
   }
 
   /**
    * Gets the Contents matching any of the table types
    * @param tableTypes
    */
-  getContentsForTypes(tableTypes?: string[] | ContentsDataType[]): Contents[] {
+  getContentsForTypes(tableTypes?: (string | ContentsDataType)[]): Contents[] {
     const results: Contents[] = [];
     if (tableTypes && tableTypes.length > 0) {
       const fieldValues = new ColumnValues();
@@ -146,7 +146,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
   deleteCascadeContents(contents: Contents): number {
     let count = 0;
     if (contents !== null && contents !== undefined) {
-      const dataType = ContentsDataType.fromName(contents.getDataType());
+      const dataType = ContentsDataType.fromName(contents.getDataTypeName());
       if (dataType !== null && dataType !== undefined) {
         switch (dataType) {
           case ContentsDataType.FEATURES:
@@ -233,7 +233,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
     try {
       this.deleteByIdCascade(table, true);
     } catch (e) {
-      throw new Error('Failed to delete table: ' + table);
+      throw new GeoPackageException('Failed to delete table: ' + table);
     }
   }
 
@@ -253,7 +253,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @return table names
    */
   public getTables(dataType?: string | ContentsDataType): string[] {
-    return this.getTablesForTypes(dataType != null ? [dataType] : []);
+    return this.getTablesForTypes([dataType]);
   }
 
   /**
@@ -262,7 +262,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param dataTypes data type
    * @return table names
    */
-  public getTablesForTypes(dataTypes?: string[] | ContentsDataType[]): string[] {
+  public getTablesForTypes(dataTypes?: (string | ContentsDataType)[]): string[] {
     let results;
     if (dataTypes != null && dataTypes.length > 0) {
       const fieldValues = new ColumnValues();

@@ -1,6 +1,7 @@
 import { CanvasAdapter } from './canvasAdapter';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { ImageType } from '../image/imageType';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * Canvas Wrapper Class for interacting with HTMLCanvas and CanvasKit
@@ -24,9 +25,9 @@ export class Canvas {
 
   static checkCanvasAdapter(): void {
     if (!Canvas.adapter) {
-      throw new Error('Canvas adapter not registered.');
+      throw new GeoPackageException('Canvas adapter not registered.');
     } else if (!Canvas.adapter.isInitialized()) {
-      throw new Error('Canvas adapter not initialized.');
+      throw new GeoPackageException('Canvas adapter not initialized.');
     }
   }
 

@@ -1,201 +1,201 @@
-import { default as testSetup } from '../fixtures/testSetup'
+import { default as testSetup } from '../testSetup'
 
-var Verification = require('../fixtures/verification')
+var Verification = require('../verification')
   , TileTable = require('../../lib/tiles/user/tileTable').TileTable
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
-  , SetupFeatureTable = require('../fixtures/setupFeatureTable')
+  , SetupFeatureTable = require('../setupFeatureTable')
   , should = require('chai').should();
 
 describe('GeoPackage create tests', function() {
 
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should get return an empty array if asking for tile tables when they do not exist', function() {
-    var tables = geopackage.getTileTables();
+    var tables = geoPackage.getTileTables();
     should.exist(tables);
     tables.length.should.be.equal(0);
   });
 
   it('should create the geometry columns table', function() {
-    let created = geopackage.createGeometryColumnsTable();
+    let created = geoPackage.createGeometryColumnsTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+    Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the geometry columns table already exists', function() {
-    let created =  geopackage.createGeometryColumnsTable();
+    let created =  geoPackage.createGeometryColumnsTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+    Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
     created.should.be.equal(true);
-    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
-    created = geopackage.createGeometryColumnsTable();
+    Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
+    created = geoPackage.createGeometryColumnsTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryColumns(geopackage).should.be.equal(true);
+    Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
   });
 
   it('should create a user feature table', function(done) {
     var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom',  GeometryType.POINT);
-    var result = geopackage.createUserFeatureTable(featureTable);
-    Verification.verifyTableExists(geopackage, 'test_features').should.be.equal(true);
+    var result = geoPackage.createUserFeatureTable(featureTable);
+    Verification.verifyTableExists(geoPackage, 'test_features').should.be.equal(true);
     done();
   });
 
   it('should create the tile matrix set table', function() {
-    let created =  geopackage.createTileMatrixSetTable();
+    let created =  geoPackage.createTileMatrixSetTable();
     created.should.be.equal(true);
-    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
+    Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the tile matrix set table already exists', function() {
-    let created = geopackage.createTileMatrixSetTable();
+    let created = geoPackage.createTileMatrixSetTable();
     created.should.be.equal(true);
-    Verification.verifyTileMatrixSet(geopackage).should.be.equal(true);
-    created = geopackage.createTileMatrixSetTable();
+    Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
+    created = geoPackage.createTileMatrixSetTable();
     created.should.be.equal(true);
   });
 
   it('should create the tile matrix table', function() {
-    let created = geopackage.createTileMatrixTable();
+    let created = geoPackage.createTileMatrixTable();
     created.should.be.equal(true);
-    Verification.verifyTileMatrix(geopackage).should.be.equal(true);
+    Verification.verifyTileMatrix(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the tile matrix table already exists', function() {
-    let created = geopackage.createTileMatrixTable();
+    let created = geoPackage.createTileMatrixTable();
     created.should.be.equal(true);
-    Verification.verifyTileMatrix(geopackage).should.be.equal(true);
-    created = geopackage.createTileMatrixTable();
+    Verification.verifyTileMatrix(geoPackage).should.be.equal(true);
+    created = geoPackage.createTileMatrixTable();
     created.should.be.equal(true);
   });
 
   it('should create a user tile table', function(done) {
     var columns = TileTable.createRequiredColumns();
     var tileTable = new TileTable('test_tiles', columns);
-    var result = geopackage.createTileTable(tileTable);
-    Verification.verifyTableExists(geopackage, 'test_tiles').should.be.equal(true);
+    var result = geoPackage.createTileTable(tileTable);
+    Verification.verifyTableExists(geoPackage, 'test_tiles').should.be.equal(true);
     done();
   });
 
   it('should create the data columns table', function() {
-    let created = geopackage.createDataColumns();
+    let created = geoPackage.createDataColumns();
     created.should.be.equal(true);
-    Verification.verifyDataColumns(geopackage).should.be.equal(true);
+    Verification.verifyDataColumns(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the data columns table already exists', function() {
-    let created = geopackage.createDataColumns();
+    let created = geoPackage.createDataColumns();
     created.should.be.equal(true);
-    Verification.verifyDataColumns(geopackage).should.be.equal(true);
-    created = geopackage.createDataColumns();
+    Verification.verifyDataColumns(geoPackage).should.be.equal(true);
+    created = geoPackage.createDataColumns();
     created.should.be.equal(true);
-    Verification.verifyDataColumns(geopackage).should.be.equal(true);
+    Verification.verifyDataColumns(geoPackage).should.be.equal(true);
   });
 
   it('should create the data column constraints table', function() {
-    let created = geopackage.createDataColumnConstraintsTable();
+    let created = geoPackage.createDataColumnConstraintsTable();
     created.should.be.equal(true);
-    Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
+    Verification.verifyDataColumnConstraints(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the data column constraints table already exists', function() {
-    let created = geopackage.createDataColumnConstraintsTable();
+    let created = geoPackage.createDataColumnConstraintsTable();
     created.should.be.equal(true);
-    Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
-    created = geopackage.createDataColumnConstraintsTable();
+    Verification.verifyDataColumnConstraints(geoPackage).should.be.equal(true);
+    created = geoPackage.createDataColumnConstraintsTable();
     created.should.be.equal(true);
-    Verification.verifyDataColumnConstraints(geopackage).should.be.equal(true);
+    Verification.verifyDataColumnConstraints(geoPackage).should.be.equal(true);
   });
 
   it('should create the metadata reference table', function() {
-    let created = geopackage.createMetadataReferenceTable();
+    let created = geoPackage.createMetadataReferenceTable();
     created.should.be.equal(true);
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the metadata reference table already exists', function() {
-    let created = geopackage.createMetadataReferenceTable();
+    let created = geoPackage.createMetadataReferenceTable();
     created.should.be.equal(true);
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-    created = geopackage.createMetadataReferenceTable();
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
+    created = geoPackage.createMetadataReferenceTable();
     created.should.be.equal(true);
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
   });
 
   it('should create the metadata table', function() {
-    let created = geopackage.createMetadataTable();
+    let created = geoPackage.createMetadataTable();
     created.should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the metadata table already exists', function() {
-    let created = geopackage.createMetadataTable();
+    let created = geoPackage.createMetadataTable();
     created.should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
-    created = geopackage.createMetadataTable();
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
+    created = geoPackage.createMetadataTable();
     created.should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
   });
 
   it('should create the extensions table', function() {
-    let created = geopackage.createExtensionTable();
+    let created = geoPackage.createExtensionTable();
     created.should.be.equal(true);
-    Verification.verifyExtensions(geopackage).should.be.equal(true);
+    Verification.verifyExtensions(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the extensions table already exists', function() {
-    let created = geopackage.createExtensionTable();
+    let created = geoPackage.createExtensionTable();
     created.should.be.equal(true);
-    Verification.verifyExtensions(geopackage).should.be.equal(true);
-    created = geopackage.createExtensionTable();
+    Verification.verifyExtensions(geoPackage).should.be.equal(true);
+    created = geoPackage.createExtensionTable();
     created.should.be.equal(true);
-    Verification.verifyExtensions(geopackage).should.be.equal(true);
+    Verification.verifyExtensions(geoPackage).should.be.equal(true);
   });
 
   it('should create the table index table', function() {
-    let created = geopackage.createTableIndexTable();
+    let created = geoPackage.createTableIndexTable();
     created.should.be.equal(true);
-    Verification.verifyTableIndex(geopackage).should.be.equal(true);
+    Verification.verifyTableIndex(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the table index table already exists', function() {
-    let created = geopackage.createTableIndexTable();
+    let created = geoPackage.createTableIndexTable();
     created.should.be.equal(true);
-    Verification.verifyTableIndex(geopackage).should.be.equal(true);
-    created = geopackage.createTableIndexTable();
+    Verification.verifyTableIndex(geoPackage).should.be.equal(true);
+    created = geoPackage.createTableIndexTable();
     created.should.be.equal(true);
-    Verification.verifyTableIndex(geopackage).should.be.equal(true);
+    Verification.verifyTableIndex(geoPackage).should.be.equal(true);
   });
 
   it('should create the geometry index table', function() {
-    let created = geopackage.createGeometryIndexTable();
+    let created = geoPackage.createGeometryIndexTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
+    Verification.verifyGeometryIndex(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the geometry index table already exists', function() {
-    let created = geopackage.createGeometryIndexTable();
+    let created = geoPackage.createGeometryIndexTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
-    created = geopackage.createGeometryIndexTable();
+    Verification.verifyGeometryIndex(geoPackage).should.be.equal(true);
+    created = geoPackage.createGeometryIndexTable();
     created.should.be.equal(true);
-    Verification.verifyGeometryIndex(geopackage).should.be.equal(true);
+    Verification.verifyGeometryIndex(geoPackage).should.be.equal(true);
   });
 
   it.skip('should create the feature tile link table', function(done) {
-    let created = geopackage.createFeatureTileLink();
+    let created = geoPackage.createFeatureTileLink();
     created.should.be.equal(true);
-    Verification.verifyFeatureTileLink(geopackage).should.be.equal(true);
+    Verification.verifyFeatureTileLink(geoPackage).should.be.equal(true);
   });
 });

@@ -50,7 +50,7 @@ export class GeoPackageConnection {
    * exports the GeoPackage as a file
    * @param  {Function} callback called with an err and the buffer containing the contents of the file
    */
-  async export(): Promise<any> {
+  async export(): Promise<Uint8Array> {
     return this.connectionSource.export();
   }
   /**
@@ -386,7 +386,7 @@ export class GeoPackageConnection {
    * @param args where arguments
    * @return max or null
    */
-  public  max(table: string, column: string, where: string, args: any[]): number {
+  public max(table: string, column: string, where: string, args: any[]): number {
     return this.aggregateFunction('MAX', table, false, column, where, args) as number;
   }
 }

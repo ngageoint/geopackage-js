@@ -18,6 +18,15 @@ import { AttributesTable } from '../../attributes/attributesTable';
 import { TileTable } from '../../tiles/user/tileTable';
 import { UserCustomDao } from '../../user/custom/userCustomDao';
 import type { GeoPackage } from '../../geoPackage';
+import { UserMappingDao } from './userMappingDao';
+import { UserDao } from '../../user/userDao';
+import { UserRow } from '../../user/userRow';
+import { MediaDao } from './media/mediaDao';
+import { SimpleAttributesDao } from './simple/simpleAttributesDao';
+import { TileDao } from '../../tiles/user/tileDao';
+import { FeatureDao } from '../../features/user/featureDao';
+import { AttributesDao } from '../../attributes/attributesDao';
+import { UserMappingRow } from './userMappingRow';
 
 /**
  * Related Tables Extension
@@ -62,7 +71,7 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return user custom dao
    */
   public getUserDao(tableName: string): UserCustomDao {
-    return UserCustomDao.readTable(this.geoPackage.getName(), this.connection, tableName);
+    return UserCustomDao.readTable(this.geoPackage.getName(), this.geoPackage, tableName);
   }
 
   /**
@@ -213,6 +222,82 @@ export class RelatedTablesExtension extends BaseExtension {
       throw new GeoPackageException('Failed to query for relationships in ' + RelatedTablesExtension.EXTENSION_NAME);
     }
     return result;
+  }
+
+  /**
+   * Add relationship using an extended relation
+   * @param extendedRelation
+   */
+  public addRelationshipWithExtendedRelation(extendedRelation: ExtendedRelation): ExtendedRelation {
+    return this.addRelationshipWithMappingTableAndRelationName(
+      extendedRelation.getBaseTableName(),
+      extendedRelation.getRelatedTableName(),
+      UserMappingTable.create(extendedRelation.getMappingTableName()),
+      extendedRelation.getRelationName());
+  }
+
+  /**
+   * Adds a relationship to the GeoPackage
+   * @param relationType
+   * @param relationName
+   * @param baseTableName
+   * @param relatedTableName
+   * @param relationAuthor
+   * @param mappingTableName
+   * @param userMappingTable
+   * @param relatedTable
+   * @return ExtendedRelation
+   */
+  addRelationship(
+    relationType?: RelationType,
+    relationName?: string,
+    baseTableName?: string,
+    relatedTableName?: string,
+    relationAuthor?: string,
+    mappingTableName?: string,
+    userMappingTable?: UserMappingTable,
+    relatedTable?: UserRelatedTable,
+  ): ExtendedRelation {
+    let extendedRelation = new ExtendedRelation();
+    if (relationType != null) {
+      extendedRelation.setRelationName(relationType.getName());
+    } else {
+      extendedRelation.setRelationName(relationName);
+    }
+    if (relationAuthor != null) {
+      extendedRelation.setRelationName(this.buildRelationName(relationAuthor, extendedRelation.getRelationName()));
+    }
+    if (mappingTableName != null) {
+      userMappingTable = UserMappingTable.create(mappingTableName);
+    }
+    if (relatedTableName != null) {
+      extendedRelation.setRelatedTableName(relatedTableName);
+    }
+    if (relatedTable != null) {
+      this.createRelatedTable(relatedTable);
+      extendedRelation.setRelatedTableName(relatedTable.getTableName());
+      extendedRelation.setRelationName(relatedTable.getRelationName());
+    }
+    extendedRelation.setBaseTableName(baseTableName);
+    extendedRelation.setBasePrimaryColumn(this.getPrimaryKeyColumnName(baseTableName));
+    extendedRelation.setRelatedPrimaryColumn(this.getPrimaryKeyColumnName(extendedRelation.getRelatedTableName()));
+    extendedRelation.setMappingTableName(userMappingTable.getTableName());
+    try {
+      this.validateRelationship(
+        extendedRelation.getBaseTableName(),
+        extendedRelation.getRelatedTableName(),
+        extendedRelation.getRelationName(),
+      )
+    } catch (e) {
+      return null;
+    }
+    this.createUserMappingTableWithMappingTable(userMappingTable);
+    const mappingTableRelations = this.getExtendedRelationsDao().queryByMappingTableName(extendedRelation.getMappingTableName());
+    if (mappingTableRelations.length) {
+      return mappingTableRelations[0];
+    }
+    this.getExtendedRelationsDao().create(extendedRelation);
+    return extendedRelation;
   }
 
   /**
@@ -476,7 +561,7 @@ export class RelatedTablesExtension extends BaseExtension {
     relationName: string,
     mappingTableName: string,
   ): ExtendedRelation {
-    const userMappingTable: UserMappingTable = UserMappingTable.create(mappingTableName);
+    const userMappingTable = UserMappingTable.create(mappingTableName);
     return this.addRelationshipWithRelatedTableAndRelationNameAndMappingTable(
       baseTableName,
       relatedTable,
@@ -910,7 +995,6 @@ export class RelatedTablesExtension extends BaseExtension {
         const contentsDao = this.geoPackage.getContentsDao();
         contentsDao.create(contents);
         contentsDao.refresh(contents);
-
         relatedTable.setContents(contents);
       } catch (e) {
         this.geoPackage.deleteTableQuietly(relatedTableName);
@@ -1191,12 +1275,12 @@ export class RelatedTablesExtension extends BaseExtension {
    * @return extended relations
    */
   public getRelations(
-    baseTable: string,
-    baseColumn: string,
-    relatedTable: string,
-    relatedColumn: string,
-    relation: string,
-    mappingTable: string,
+    baseTable?: string,
+    baseColumn?: string,
+    relatedTable?: string,
+    relatedColumn?: string,
+    relation?: string,
+    mappingTable?: string,
   ): ExtendedRelation[] {
     let relations = null;
 
@@ -1313,5 +1397,60 @@ export class RelatedTablesExtension extends BaseExtension {
   public hasTableRelations(table: string): boolean {
     const extendedRelations = this.getTableRelations(table);
     return extendedRelations != null && extendedRelations.length !== 0;
+  }
+
+  /**
+   * Gets the user mapping dao
+   * @param mappingTableName
+   */
+  public getUserMappingDao(mappingTableName: string): UserMappingDao {
+    return new UserMappingDao(this.getUserDao(mappingTableName));
+  }
+
+  /**
+   * Retrieves all rows that are related with a given record
+   * @param baseTableName
+   * @param baseId
+   * @param typeFilter
+   * @return map of extended relation to a map of user mapping row to user row
+   */
+  public getRelatedRows(baseTableName: string, baseId: number, typeFilter?: RelationType[]): Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>> {
+    const relationshipMap = new Map<ExtendedRelation, Map<UserMappingRow, UserRow<any, any>>>();
+    const relationships = this.getBaseTableRelations(baseTableName);
+    for (let i = 0; i < relationships.length; i++) {
+      const relation = relationships[i];
+      if (typeFilter != null && typeFilter.indexOf(relation.getRelationType()) !== -1) {
+        const relationMap = new Map<UserMappingRow, UserRow<any, any>>();
+        let userDao: UserDao<any, any, any, any>;
+        switch (relation.getRelationType()) {
+          case RelationType.MEDIA:
+            userDao = this.geoPackage.getMediaDao(relation.getRelatedTableName());
+            break;
+          case RelationType.ATTRIBUTES:
+            userDao = this.geoPackage.getAttributesDao(relation.getRelatedTableName());
+            break;
+          case RelationType.FEATURES:
+            userDao = this.geoPackage.getFeatureDao(relation.getRelatedTableName());
+            break;
+          case RelationType.TILES:
+            userDao = this.geoPackage.getTileDao(relation.getRelatedTableName());
+            break;
+          case RelationType.SIMPLE_ATTRIBUTES:
+            userDao = this.geoPackage.getSimpleAttributesDao(relation.getRelatedTableName());
+            break;
+          default:
+            throw new GeoPackageException('Relationship Unknown')
+        }
+
+        const userMappingDao = this.getUserMappingDao(relation.getMappingTableName());
+        const mappingResultSet = userMappingDao.queryByBaseId(baseId);
+        for (const row of mappingResultSet) {
+          const userMappingRow = userMappingDao.getRow(row);
+          relationMap.set(userMappingRow, userDao.queryForId(userMappingRow.getRelatedId()))
+        }
+        relationshipMap.set(relation, relationMap);
+      }
+    }
+    return relationshipMap;
   }
 }

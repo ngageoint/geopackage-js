@@ -27,12 +27,12 @@ export class GeoPackageManager {
         (gppathOrByteArray.indexOf('http') === 0 ||
           !GeoPackageValidate.validateGeoPackageExtension(gppathOrByteArray)));
     if (!valid) {
-      throw new Error('Invalid GeoPackage - Invalid GeoPackage Extension');
+      throw new GeoPackageException('Invalid GeoPackage - Invalid GeoPackage Extension');
     }
     try {
       await Canvas.initializeAdapter();
     } catch (e) {
-      throw new Error('Unable to initialize canvas.');
+      throw new GeoPackageException('Unable to initialize canvas.');
     }
     try {
       const connection = await GeoPackageManager.connect(gppathOrByteArray);
@@ -42,7 +42,7 @@ export class GeoPackageManager {
         geoPackage = new GeoPackage(name ? name : 'geopackage', undefined, connection);
       }
     } catch (e) {
-      throw new Error('Unable to open GeoPackage.');
+      throw new GeoPackageException('Unable to open GeoPackage.');
     }
     return geoPackage;
   }
@@ -55,11 +55,10 @@ export class GeoPackageManager {
    */
   static async create(gppath?: string): Promise<GeoPackage> {
     let geoPackage: GeoPackage;
-    const valid =
-      typeof gppath !== 'string' ||
+    const valid = typeof gppath !== 'string' ||
       (typeof gppath === 'string' && !GeoPackageValidate.validateGeoPackageExtension(gppath));
     if (!valid) {
-      throw new Error('Invalid GeoPackage');
+      throw new GeoPackageException('Invalid GeoPackage');
     }
 
     if (typeof process !== 'undefined' && process.version && gppath) {
@@ -73,7 +72,8 @@ export class GeoPackageManager {
     try {
       await Canvas.initializeAdapter();
     } catch (e) {
-      throw new Error('Unable to initialize canvas.');
+      console.error(e);
+      throw new GeoPackageException('Unable to initialize canvas.');
     }
     try {
       const connection = await GeoPackageManager.connect(gppath);
@@ -87,7 +87,7 @@ export class GeoPackageManager {
       geoPackage.createSupportedExtensions();
     } catch (e) {
       console.error(e);
-      throw new Error('Unable to create GeoPackage.');
+      throw new GeoPackageException('Unable to create GeoPackage.');
     }
     return geoPackage;
   }

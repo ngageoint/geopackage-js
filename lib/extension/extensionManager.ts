@@ -214,7 +214,7 @@ export class ExtensionManager extends ExtensionManagement {
    * @param table table name
    */
   public deleteRelatedTables(table: string): void {
-    const relatedTablesExtension = this.getRelatedTableExtension();
+    const relatedTablesExtension = this.getRelatedTablesExtension();
     if (relatedTablesExtension.has()) {
       relatedTablesExtension.removeRelationships(table);
     }
@@ -224,7 +224,7 @@ export class ExtensionManager extends ExtensionManagement {
    * Delete the Related Tables extension
    */
   public deleteRelatedTablesExtension(): void {
-    const relatedTablesExtension = this.getRelatedTableExtension();
+    const relatedTablesExtension = this.getRelatedTablesExtension();
     if (relatedTablesExtension.has()) {
       relatedTablesExtension.removeExtension();
     }
@@ -240,7 +240,7 @@ export class ExtensionManager extends ExtensionManagement {
    */
   public copyRelatedTables(table: string, newTable: string): void {
     try {
-      const relatedTablesExtension = this.getRelatedTableExtension();
+      const relatedTablesExtension = this.getRelatedTablesExtension();
       if (relatedTablesExtension.has()) {
         const extendedRelationsDao = relatedTablesExtension.getExtendedRelationsDao();
         const extensionsDao = this.geoPackage.getExtensionsDao();
@@ -293,7 +293,7 @@ export class ExtensionManager extends ExtensionManagement {
    *
    * @return Related Table Extension
    */
-  private getRelatedTableExtension(): RelatedTablesExtension {
+  public getRelatedTablesExtension(): RelatedTablesExtension {
     return new RelatedTablesExtension(this.geoPackage);
   }
 

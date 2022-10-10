@@ -79,12 +79,34 @@ export class MediaTable extends UserRelatedTable {
 
   /**
    * Create the required table columns with the id column name
-   * @param startingIndex starting index
    * @param idColumnName id column name
    * @param autoincrement autoincrement id values
    * @return user custom columns
    */
   public static createRequiredColumns(
+    idColumnName?: string,
+    autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
+  ): UserCustomColumn[] {
+    if (idColumnName == null) {
+      idColumnName = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME;
+    }
+
+    const columns = [];
+    columns.push(this.createIdColumn(idColumnName, autoincrement));
+    columns.push(this.createDataColumn());
+    columns.push(this.createContentTypeColumn());
+
+    return columns;
+  }
+
+  /**
+   * Create the required table columns with the id column name with a specified starting index
+   * @param startingIndex starting index
+   * @param idColumnName id column name
+   * @param autoincrement autoincrement id values
+   * @return user custom columns
+   */
+  public static createRequiredColumnsWithStartingIndex(
     startingIndex = 0,
     idColumnName?: string,
     autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
@@ -94,48 +116,73 @@ export class MediaTable extends UserRelatedTable {
     }
 
     const columns = [];
-    columns.push(this.createIdColumn(startingIndex++, idColumnName, autoincrement));
-    columns.push(this.createDataColumn(startingIndex++));
-    columns.push(this.createContentTypeColumn(startingIndex++));
+    columns.push(this.createIdColumnWithIndex(startingIndex++, idColumnName, autoincrement));
+    columns.push(this.createDataColumnWithIndex(startingIndex++));
+    columns.push(this.createContentTypeColumnWithIndex(startingIndex++));
 
     return columns;
   }
 
   /**
    * Create the primary key id column
-   * @param index column index
    * @param idColumnName id column name
    * @param autoincrement autoincrement id values
    * @return id column
    */
   public static createIdColumn(
+    idColumnName: string = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME,
+    autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
+  ): UserCustomColumn {
+    return UserCustomColumn.createPrimaryKeyColumn(idColumnName, autoincrement);
+  }
+
+  /**
+   * Create the primary key id column with a specified column index
+   * @param index column index
+   * @param idColumnName id column name
+   * @param autoincrement autoincrement id values
+   * @return id column
+   */
+  public static createIdColumnWithIndex(
     index = 0,
     idColumnName: string = UserTableMetadataConstants.DEFAULT_ID_COLUMN_NAME,
     autoincrement: boolean = UserTable.DEFAULT_AUTOINCREMENT,
   ): UserCustomColumn {
-    return UserCustomColumn.createPrimaryKeyColumn(index, idColumnName, autoincrement);
+    return UserCustomColumn.createPrimaryKeyColumnWithIndex(index, idColumnName, autoincrement);
   }
 
   /**
    * Create a data column
-   *
-   * @param index
-   *            column index
    * @return data column
    */
-  public static createDataColumn(index = UserColumn.NO_INDEX): UserCustomColumn {
-    return UserCustomColumn.createColumn(index, MediaTable.COLUMN_DATA, GeoPackageDataType.BLOB, true);
+  public static createDataColumn(): UserCustomColumn {
+    return UserCustomColumn.createColumn(MediaTable.COLUMN_DATA, GeoPackageDataType.BLOB, true);
+  }
+
+  /**
+   * Create a data column with a specified column index
+   * @param index column index
+   * @return data column
+   */
+  public static createDataColumnWithIndex(index = UserColumn.NO_INDEX): UserCustomColumn {
+    return UserCustomColumn.createColumnWithIndex(index, MediaTable.COLUMN_DATA, GeoPackageDataType.BLOB, true);
   }
 
   /**
    * Create a content type column
-   *
-   * @param index
-   *            column index
    * @return content type column
    */
-  public static createContentTypeColumn(index: number = UserColumn.NO_INDEX): UserCustomColumn {
-    return UserCustomColumn.createColumn(index, MediaTable.COLUMN_CONTENT_TYPE, GeoPackageDataType.TEXT, true);
+  public static createContentTypeColumn(): UserCustomColumn {
+    return UserCustomColumn.createColumn(MediaTable.COLUMN_CONTENT_TYPE, GeoPackageDataType.TEXT, true);
+  }
+
+  /**
+   * Create a content type column with a specified index
+   * @param index column index
+   * @return content type column
+   */
+  public static createContentTypeColumnWithIndex(index: number = UserColumn.NO_INDEX): UserCustomColumn {
+    return UserCustomColumn.createColumnWithIndex(index, MediaTable.COLUMN_CONTENT_TYPE, GeoPackageDataType.TEXT, true);
   }
 
   /**

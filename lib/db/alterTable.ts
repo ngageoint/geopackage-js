@@ -14,6 +14,7 @@ import { SQLiteMasterType } from './master/sqliteMasterType';
 import { SQLiteMasterQuery } from './master/sqliteMasterQuery';
 import type { GeoPackageConnection } from './geoPackageConnection';
 import { RTreeIndexExtensionConstants } from '../extension/rtree/rTreeIndexExtensionConstants';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * Builds and performs alter table statements
@@ -507,7 +508,7 @@ export class AlterTable {
           violationsMessage = violationsMessage.concat(violation.get(j));
         }
       }
-      throw new Error('Foreign Key Check Violations: ' + violationsMessage);
+      throw new GeoPackageException('Foreign Key Check Violations: ' + violationsMessage);
     }
   }
 }

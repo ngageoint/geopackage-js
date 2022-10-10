@@ -38,7 +38,7 @@ export class UserMappingTable extends UserCustomTable {
    * @return {module:extension/relatedTables~UserMappingTable}
    */
   static create(tableName: string, columns?: UserColumn[]): UserMappingTable {
-    let allColumns = UserMappingTable.createRequiredColumns(0);
+    let allColumns = UserMappingTable.createRequiredColumns();
     if (columns) {
       allColumns = allColumns.concat(columns);
     }
@@ -49,34 +49,58 @@ export class UserMappingTable extends UserCustomTable {
    * @return {Number}
    */
   static numRequiredColumns(): number {
-    return UserMappingTable.createRequiredColumns(0).length;
+    return UserMappingTable.createRequiredColumns().length;
   }
   /**
    * Create the required columns
+   * @return {module:user/userColumn~UserColumn[]}
+   */
+  static createRequiredColumns(): UserColumn[] {
+    return [
+      UserMappingTable.createBaseIdColumn(),
+      UserMappingTable.createRelatedIdColumn(),
+    ];
+  }
+  /**
+   * Create the required columns with starting column index
    * @param  {Number} [startingIndex=0] starting index of the required columns
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createRequiredColumns(startingIndex = 0): UserColumn[] {
+  static createRequiredColumnsWithIndex(startingIndex = 0): UserColumn[] {
     return [
-      UserMappingTable.createBaseIdColumn(startingIndex++),
-      UserMappingTable.createRelatedIdColumn(startingIndex),
+      UserMappingTable.createBaseIdColumnWithIndex(startingIndex++),
+      UserMappingTable.createRelatedIdColumnWithIndex(startingIndex),
     ];
+  }
+  /**
+   * Create the base id column
+   * @return {module:user/userColumn~UserColumn}
+   */
+  static createBaseIdColumn(): UserColumn {
+    return UserCustomColumn.createColumn(UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Create the base id column
    * @param  {Number} index        index of the column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createBaseIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
+  static createBaseIdColumnWithIndex(index: number): UserColumn {
+    return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
+  }
+  /**
+   * Create the related id column
+   * @return {module:user/userColumn~UserColumn}
+   */
+  static createRelatedIdColumn(): UserColumn {
+    return UserCustomColumn.createColumn(UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Create the related id column
    * @param  {Number} index        index of the column
    * @return {module:user/userColumn~UserColumn}
    */
-  static createRelatedIdColumn(index: number): UserColumn {
-    return UserCustomColumn.createColumn(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
+  static createRelatedIdColumnWithIndex(index?: number): UserColumn {
+    return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Get the required columns

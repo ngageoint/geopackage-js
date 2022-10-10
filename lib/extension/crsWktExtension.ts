@@ -5,6 +5,7 @@ import { GeoPackageConstants } from '../geoPackageConstants';
 import { AlterTable } from '../db/alterTable';
 import { SpatialReferenceSystemConstants } from '../srs/spatialReferenceSystemConstants';
 import type { GeoPackage } from '../geoPackage';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * OGC Well known text representation of Coordinate Reference Systems extensionName
@@ -152,7 +153,7 @@ export class CrsWktExtension extends BaseExtension {
         this.extensionsDao.deleteByExtension(CrsWktExtension.EXTENSION_NAME);
       }
     } catch (e) {
-      throw new Error('Failed to delete CrsWkt extension. GeoPackage: ' + this.geoPackage.getName());
+      throw new GeoPackageException('Failed to delete CrsWkt extension. GeoPackage: ' + this.geoPackage.getName());
     }
   }
 }

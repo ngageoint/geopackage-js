@@ -8,7 +8,7 @@ describe('Tests for issue 68', function() {
 
   it('should get a tile', function() {
     this.timeout(5000);
-    return GeoPackageConnection.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
+    return GeoPackageManager.connect(path.join(__dirname, '..', '..', 'fixtures', 'issue_68.gpkg'))
     .then(function(geoPackageConnection) {
       var connection = geoPackageConnection;
       should.exist(connection);

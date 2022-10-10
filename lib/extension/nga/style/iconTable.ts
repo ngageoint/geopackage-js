@@ -129,13 +129,12 @@ export class IconTable extends MediaTable {
    */
   static createColumns(): UserColumn[] {
     const columns = IconTable.createRequiredColumns();
-    let index = columns.length;
-    columns.push(AttributesColumn.createColumn(index++, IconTable.COLUMN_NAME, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index++, IconTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index++, IconTable.COLUMN_WIDTH, GeoPackageDataType.REAL, false));
-    columns.push(AttributesColumn.createColumn(index++, IconTable.COLUMN_HEIGHT, GeoPackageDataType.REAL, false));
-    columns.push(AttributesColumn.createColumn(index++, IconTable.COLUMN_ANCHOR_U, GeoPackageDataType.REAL, false));
-    columns.push(AttributesColumn.createColumn(index, IconTable.COLUMN_ANCHOR_V, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_NAME, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_WIDTH, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_HEIGHT, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_ANCHOR_U, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(IconTable.COLUMN_ANCHOR_V, GeoPackageDataType.REAL, false));
     return columns;
   }
 }

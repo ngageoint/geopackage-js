@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup'
 
 var should = require('chai').should()
   , path = require('path');
@@ -16,11 +16,11 @@ describe('TileDao tests', function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       tileDao = geoPackage.getTileDao('TILESosmds');
     });
 
-    afterEach('close the geopackage connection', async function() {
+    afterEach('close the geoPackage connection', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -152,12 +152,12 @@ describe('TileDao tests', function() {
     var geoPackage;
     var tileDao;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var filename = path.join(__dirname, '..', '..', 'fixtures', 'private', 'alaska.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(filename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       tileDao = geoPackage.getTileDao('alaska');
     });
 

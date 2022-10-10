@@ -1,5 +1,5 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related'
+import { default as testSetup } from '../../../testSetup'
+import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
 
 var UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
   , RelatedTablesUtils = require('./relatedTablesUtils')
@@ -11,7 +11,7 @@ describe('Related Tables tests', function() {
   describe('Related Tables Read Tests', function() {
     var testGeoPackage;
     var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
-    var geopackage;
+    var geoPackage;
 
     var geoPackage;
 
@@ -22,10 +22,10 @@ describe('Related Tables tests', function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geopackage connection', async function() {
+    afterEach('close the geoPackage connection', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -112,7 +112,7 @@ describe('Related Tables tests', function() {
 
     var testGeoPackage;
     var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
-    var geopackage;
+    var geoPackage;
 
     var geoPackage;
 
@@ -123,10 +123,10 @@ describe('Related Tables tests', function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geopackage connection', async function() {
+    afterEach('close the geoPackage connection', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });

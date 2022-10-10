@@ -26,9 +26,7 @@ export class FeaturePaginatedResults extends UserPaginatedResults<
 
   /**
    * Get the pagination offset and limit
-   *
-   * @param resultSet
-   *            feature result set
+   * @param resultSet feature result set
    * @return pagination or null if not paginated
    */
   public static getPagination(resultSet: FeatureResultSet): Pagination {

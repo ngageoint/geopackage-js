@@ -1,4 +1,5 @@
 import * as GP from '../index';
+import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
 const GeoPackageDataType = GP.GeoPackageDataType,
   GeometryColumns = GP.GeometryColumns,
   GeoPackageGeometryData = GP.GeoPackageGeometryData,
@@ -21,8 +22,7 @@ const GeoPackageDataType = GP.GeoPackageDataType,
   DublinCoreType = GP.DublinCoreType,
   GeometryType = GP.GeometryType;
 
-const wkx = require('wkx'),
-  path = require('path'),
+const path = require('path'),
   fs = require('fs');
 
 const GeoPackageUtils = {};
@@ -30,14 +30,14 @@ const GeoPackageUtils = {};
 module.exports = GeoPackageUtils;
 export default GeoPackageUtils;
 
-GeoPackageUtils.createCRSWKTExtension = function(geopackage) {
+GeoPackageUtils.createCRSWKTExtension = function(geoPackage) {
   console.log('Creating CRS WKT Extension');
-  const crs = new CrsWktExtension(geopackage);
+  const crs = new CrsWktExtension(geoPackage);
   crs.getOrCreateExtension();
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createFeatures = function(geopackage) {
+GeoPackageUtils.createFeatures = function(geoPackage) {
   console.log('Creating Features');
   const bitSystems = {
     type: 'Point',
@@ -148,18 +148,18 @@ GeoPackageUtils.createFeatures = function(geopackage) {
     name: 'NGA Visitor Center',
   };
 
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point1', [point1], GeometryType.POINT);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'point2', [point2], GeometryType.POINT);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line1', [line1], GeometryType.LINESTRING);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'line2', [line2], GeometryType.LINESTRING);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon1', [poly1], GeometryType.POLYGON);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'polygon2', [poly2], GeometryType.POLYGON);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'geometry1', [point1, line1, poly1], GeometryType.GEOMETRY);
-  GeoPackageUtils.createFeatureTableAndAddFeatures(geopackage, 'geometry2', [point2, line2, poly2], GeometryType.GEOMETRY);
-  return geopackage;
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'point1', [point1], GeometryType.POINT);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'point2', [point2], GeometryType.POINT);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'line1', [line1], GeometryType.LINESTRING);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'line2', [line2], GeometryType.LINESTRING);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'polygon1', [poly1], GeometryType.POLYGON);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'polygon2', [poly2], GeometryType.POLYGON);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'geometry1', [point1, line1, poly1], GeometryType.GEOMETRY);
+  GeoPackageUtils.createFeatureTableAndAddFeatures(geoPackage, 'geometry2', [point2, line2, poly2], GeometryType.GEOMETRY);
+  return geoPackage;
 };
 
-GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableName, features, type) {
+GeoPackageUtils.createFeatureTableAndAddFeatures = function(geoPackage, tableName, features, type) {
   console.log('Creating Feature Table ' + tableName);
   const geometryColumns = new GeometryColumns();
   geometryColumns.table_name = tableName;
@@ -220,21 +220,21 @@ GeoPackageUtils.createFeatureTableAndAddFeatures = function(geopackage, tableNam
     ),
   );
 
-  geopackage.createFeatureTable(tableName, geometryColumns, columns, boundingBox, 4326);
-  const featureDao = geopackage.getFeatureDao(tableName);
+  geoPackage.createFeatureTable(tableName, geometryColumns, columns, boundingBox, 4326);
+  const featureDao = geoPackage.getFeatureDao(tableName);
   for (let i = 0; i < features.length; i++) {
     const feature = features[i];
-    GeoPackageUtils.createFeature(geopackage, feature.geoJson, feature.name, featureDao);
+    GeoPackageUtils.createFeature(geoPackage, feature.geoJson, feature.name, featureDao);
   }
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createFeature = function(geopackage, geoJson, name, featureDao) {
+GeoPackageUtils.createFeature = function(geoPackage, geoJson, name, featureDao) {
   const srs = featureDao.srs;
   const featureRow = featureDao.newRow();
   const geometryData = new GeoPackageGeometryData();
   geometryData.setSrsId(srs.srs_id);
-  const geometry = wkx.Geometry.parseGeoJSON(geoJson);
+  const geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
   geometryData.setGeometry(geometry);
   featureRow.geometry = geometryData;
   featureRow.setValueWithColumnName('text', name);
@@ -271,15 +271,15 @@ GeoPackageUtils.createFeature = function(geopackage, geoJson, name, featureDao) 
   return featureDao.create(featureRow);
 };
 
-GeoPackageUtils.createSchemaExtension = function(geopackage) {
+GeoPackageUtils.createSchemaExtension = function(geoPackage) {
   console.log('Create Schema Extension');
-  const schema = new SchemaExtension(geopackage);
+  const schema = new SchemaExtension(geoPackage);
   schema.getOrCreateExtension();
 
-  const tc = new TableCreator(geopackage);
+  const tc = new TableCreator(geoPackage);
   tc.createDataColumnConstraints();
   tc.createDataColumns();
-  const dcd = geopackage.dataColumnConstraintsDao;
+  const dcd = geoPackage.dataColumnConstraintsDao;
   const sampleRange = dcd.createObject();
   sampleRange.constraint_name = 'sampleRange';
   sampleRange.constraint_type = DataColumnConstraintsDao.RANGE_TYPE;
@@ -332,11 +332,11 @@ GeoPackageUtils.createSchemaExtension = function(geopackage) {
   sampleGlob.description = 'sampleGlob description';
   dcd.create(sampleGlob);
 
-  const dc = geopackage.dataColumnsDao;
-  const featureTables = geopackage.getFeatureTables();
+  const dc = geoPackage.dataColumnsDao;
+  const featureTables = geoPackage.getFeatureTables();
   for (let i = 0; i < featureTables.length; i++) {
     const tableName = featureTables[i];
-    const featureDao = geopackage.getFeatureDao(tableName);
+    const featureDao = geoPackage.getFeatureDao(tableName);
     const table = featureDao.getFeatureTable();
 
     for (let c = 0; c < table.getUserColumns().getColumns().length; c++) {
@@ -373,53 +373,53 @@ GeoPackageUtils.createSchemaExtension = function(geopackage) {
       break;
     }
   }
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createGeometryIndexExtension = function(geopackage) {
+GeoPackageUtils.createGeometryIndexExtension = function(geoPackage) {
   console.log('Create Geometry Index Extension');
-  const tables = geopackage.getFeatureTables();
+  const tables = geoPackage.getFeatureTables();
 
   return tables
     .reduce(function(sequence, table) {
       return sequence.then(function() {
         console.log('Index table ' + table);
-        const featureDao = geopackage.getFeatureDao(table);
+        const featureDao = geoPackage.getFeatureDao(table);
         const fti = featureDao.featureTableIndex;
         return fti.index();
       });
     }, Promise.resolve())
     .then(function() {
-      return geopackage;
+      return geoPackage;
     });
 };
 
-GeoPackageUtils.createFeatureTileLinkExtension = function(geopackage) {
-  return geopackage;
+GeoPackageUtils.createFeatureTileLinkExtension = function(geoPackage) {
+  return geoPackage;
 };
 
-GeoPackageUtils.createNonLinearGeometryTypesExtension = function(geopackage) {
-  return geopackage;
+GeoPackageUtils.createNonLinearGeometryTypesExtension = function(geoPackage) {
+  return geoPackage;
 };
 
-GeoPackageUtils.createRTreeSpatialIndexExtension = function(geopackage) {
-  const tables = geopackage.getFeatureTables();
+GeoPackageUtils.createRTreeSpatialIndexExtension = function(geoPackage) {
+  const tables = geoPackage.getFeatureTables();
 
   return tables
     .reduce(function(sequence, table) {
       return sequence.then(function() {
-        const featureDao = geopackage.getFeatureDao(table);
-        const rtreeIndex = new RTreeIndex(geopackage, featureDao);
+        const featureDao = geoPackage.getFeatureDao(table);
+        const rtreeIndex = new RTreeIndex(geoPackage, featureDao);
         return rtreeIndex.create();
       });
     }, Promise.resolve())
     .then(function() {
-      return geopackage;
+      return geoPackage;
     });
 };
 
-GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
-  const relatedTables = geopackage.relatedTablesExtension;
+GeoPackageUtils.createRelatedTablesMediaExtension = function(geoPackage) {
+  const relatedTables = geoPackage.relatedTablesExtension;
   let mediaTable = MediaTable.create('media');
   relatedTables.createRelatedTable(mediaTable);
 
@@ -434,7 +434,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       const bitsRowId = mediaDao.create(bitsLogo);
       bitsLogo = mediaDao.queryForId(bitsRowId);
 
-      const featureDao = geopackage.getFeatureDao('geometry1');
+      const featureDao = geoPackage.getFeatureDao('geometry1');
       const rows = featureDao.queryForLike('text', 'BIT Systems%');
 
       return rows.reduce(function(sequence, row) {
@@ -448,32 +448,32 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geopackage) {
       return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'NGA_Logo.png'));
     })
     .then(function(ngaLogoBuffer) {
-      const ngaRowId = geopackage.addMedia('media', ngaLogoBuffer, 'image/png');
+      const ngaRowId = geoPackage.addMedia('media', ngaLogoBuffer, 'image/png');
       const ngaLogo = mediaDao.queryForId(ngaRowId);
 
-      const featureDao = geopackage.getFeatureDao('geometry2');
+      const featureDao = geoPackage.getFeatureDao('geometry2');
       const rows = featureDao.queryForLike('text', 'NGA%');
 
       return rows.reduce(function(sequence, row) {
         return sequence.then(function() {
           const featureRow = featureDao.getRow(row);
-          geopackage.linkMedia('geometry2', featureRow.id, 'media', ngaRowId);
-          const relationships = geopackage.getLinkedMedia('geometry2', featureRow.id);
+          geoPackage.linkMedia('geometry2', featureRow.id, 'media', ngaRowId);
+          const relationships = geoPackage.getLinkedMedia('geometry2', featureRow.id);
           relationships.length.should.be.equal(1);
           relationships[0].id.should.be.equal(ngaRowId);
         });
       }, Promise.resolve());
     })
     .then(function() {
-      return geopackage;
+      return geoPackage;
     });
 };
 
-GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
-  const point1FeatureDao = geopackage.getFeatureDao('point1');
-  const polygon1FeatureDao = geopackage.getFeatureDao('polygon1');
-  const point2FeatureDao = geopackage.getFeatureDao('point2');
-  const polygon2FeatureDao = geopackage.getFeatureDao('polygon2');
+GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geoPackage) {
+  const point1FeatureDao = geoPackage.getFeatureDao('point1');
+  const polygon1FeatureDao = geoPackage.getFeatureDao('polygon1');
+  const point2FeatureDao = geoPackage.getFeatureDao('point2');
+  const polygon2FeatureDao = geoPackage.getFeatureDao('polygon2');
 
   // relate the point1 feature to the polygon1 feature
   const point1Row = point1FeatureDao.getRow(point1FeatureDao.queryForAll()[0]);
@@ -509,11 +509,11 @@ GeoPackageUtils.createRelatedTablesFeaturesExtension = function(geopackage) {
   const point2Row = point2FeatureDao.getRow(point2FeatureDao.queryForAll()[0]);
   const polygon2Row = polygon2FeatureDao.getRow(polygon2FeatureDao.queryForAll()[0]);
   point2FeatureDao.linkFeatureRow(point2Row, polygon2Row);
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createRelatedTablesSimpleAttributesExtension = function(geopackage) {
-  return geopackage;
+GeoPackageUtils.createRelatedTablesSimpleAttributesExtension = function(geoPackage) {
+  return geoPackage;
 };
 
 GeoPackageUtils.loadFile = function(filePath) {
@@ -542,19 +542,19 @@ GeoPackageUtils.loadFile = function(filePath) {
   });
 };
 
-GeoPackageUtils.createTiles = function(geopackage) {
+GeoPackageUtils.createTiles = function(geoPackage) {
   return GeoPackageUtils.addWebMercatorTilesFromPath(
-    geopackage,
+    geoPackage,
     'OSM',
     path.join(__dirname, 'fixtures', 'tiles'),
     0,
     3,
   ).then(function() {
-    return geopackage;
+    return geoPackage;
   });
 };
 
-GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, tileBaseDir, minZoom, maxZoom) {
+GeoPackageUtils.addWebMercatorTilesFromPath = function(geoPackage, tableName, tileBaseDir, minZoom, maxZoom) {
   tableName = tableName || 'OSM';
   const tileMatrixSetBoundingBox = new BoundingBox(
     -20037508.342789244,
@@ -570,9 +570,9 @@ GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, ti
   );
   const contentsSrsId = 3857;
   const tileMatrixSetSrsId = 3857;
-  geopackage.spatialReferenceSystemDao.createWebMercator();
-  const tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId,);
-  geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom);
+  geoPackage.spatialReferenceSystemDao.createWebMercator();
+  const tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId,);
+  geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, minZoom, maxZoom);
   const zooms = [];
   for (let i = minZoom; i <= maxZoom; i++) {
     zooms.push(i);
@@ -594,7 +594,7 @@ GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, ti
                 path.join(__dirname, 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString() + '.png'),
               ).then(function(image) {
                 console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
-                return geopackage.addTile(image, tableName, zoom, y, x);
+                return geoPackage.addTile(image, tableName, zoom, y, x);
               });
             });
           }, Promise.resolve());
@@ -603,15 +603,15 @@ GeoPackageUtils.addWebMercatorTilesFromPath = function(geopackage, tableName, ti
     });
   }, Promise.resolve())
     .then(function() {
-      return geopackage;
+      return geoPackage;
     });
 };
 
-GeoPackageUtils.createWebPExtension = function(geopackage) {
+GeoPackageUtils.createWebPExtension = function(geoPackage) {
   console.log('Creating WebP Extension');
   const tableName = 'webp_tiles';
 
-  const webpExtension = new WebPExtension(geopackage, tableName);
+  const webpExtension = new WebPExtension(geoPackage, tableName);
   webpExtension.getOrCreateExtension();
 
   const tileMatrixSetBoundingBox = new BoundingBox(
@@ -629,19 +629,19 @@ GeoPackageUtils.createWebPExtension = function(geopackage) {
 
   const contentsSrsId = 3857;
   const tileMatrixSetSrsId = 3857;
-  geopackage.spatialReferenceSystemDao.createWebMercator();
-  let tileMatrixSet = geopackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-  geopackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 15, 15);
+  geoPackage.spatialReferenceSystemDao.createWebMercator();
+  let tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
+  geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 15, 15);
   return GeoPackageUtils.loadFile(path.join(__dirname, 'fixtures', 'tiles', '15', '6844', '12438.webp'))
     .then(function(image) {
-      return geopackage.addTile(image, tableName, 15, 12438, 6844);
+      return geoPackage.addTile(image, tableName, 15, 12438, 6844);
     })
     .then(function() {
-      return geopackage;
+      return geoPackage;
     });
 };
 
-GeoPackageUtils.createAttributes = function(geopackage) {
+GeoPackageUtils.createAttributes = function(geoPackage) {
   console.log('Creating Attributes table');
   const tableName = 'attributes';
 
@@ -685,8 +685,8 @@ GeoPackageUtils.createAttributes = function(geopackage) {
   dc.mime_type = 'text/html';
   dc.constraint_name = 'test constraint';
 
-  geopackage.createAttributesTable(tableName, columns, new Constraints(), [dc]);
-  const attributeDao = geopackage.getAttributeDao(tableName);
+  geoPackage.createAttributesTable(tableName, columns, new Constraints(), [dc]);
+  const attributeDao = geoPackage.getAttributeDao(tableName);
 
   for (let i = 0; i < 10; i++) {
     const attributeRow = attributeDao.newRow();
@@ -748,19 +748,19 @@ GeoPackageUtils.createAttributes = function(geopackage) {
     date: new Date().toISOString().slice(0, 10),
     datetime: new Date().toISOString(),
   };
-  geopackage.addAttributeRow(tableName, row);
+  geoPackage.addAttributeRow(tableName, row);
 
   attributeDao.queryForAll().length.should.be.equal(11);
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createMetadataExtension = function(geopackage) {
-  const metadataExtension = new MetadataExtension(geopackage);
+GeoPackageUtils.createMetadataExtension = function(geoPackage) {
+  const metadataExtension = new MetadataExtension(geoPackage);
   metadataExtension.getOrCreateExtension();
 
-  geopackage.createMetadataTable();
-  geopackage.createMetadataReferenceTable();
-  const metadataDao = geopackage.metadataDao;
+  geoPackage.createMetadataTable();
+  geoPackage.createMetadataReferenceTable();
+  const metadataDao = geoPackage.metadataDao;
 
   const md1 = metadataDao.createObject();
   md1.id = 1;
@@ -786,14 +786,14 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
   md3.metadata = 'TEST METADATA 3';
   metadataDao.create(md3);
 
-  const metadataReferenceDao = geopackage.metadataReferenceDao;
+  const metadataReferenceDao = geoPackage.metadataReferenceDao;
 
   const ref1 = metadataReferenceDao.createObject();
   ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
   ref1.setMetadata(md1);
   metadataReferenceDao.create(ref1);
 
-  const tileTables = geopackage.getTileTables();
+  const tileTables = geoPackage.getTileTables();
   if (tileTables.length) {
     const ref2 = metadataReferenceDao.createObject();
     ref2.setReferenceScopeType(MetadataReference.TABLE);
@@ -803,7 +803,7 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
     metadataReferenceDao.create(ref2);
   }
 
-  const featureTables = geopackage.getFeatureTables();
+  const featureTables = geoPackage.getFeatureTables();
   if (featureTables.length) {
     const ref3 = metadataReferenceDao.createObject();
     ref3.setReferenceScopeType(MetadataReference.ROW_COL);
@@ -813,13 +813,13 @@ GeoPackageUtils.createMetadataExtension = function(geopackage) {
     ref3.setMetadata(md3);
     metadataReferenceDao.create(ref3);
   }
-  return geopackage;
+  return geoPackage;
 };
 
-GeoPackageUtils.createCoverageDataExtension = function(geopackage) {
-  return geopackage;
+GeoPackageUtils.createCoverageDataExtension = function(geoPackage) {
+  return geoPackage;
 };
 
-GeoPackageUtils.createPropertiesExtension = function(geopackage) {
-  return geopackage;
+GeoPackageUtils.createPropertiesExtension = function(geoPackage) {
+  return geoPackage;
 };

@@ -14,13 +14,10 @@ import { SQLUtils } from '../../db/sqlUtils';
 export class UserMappingDao extends UserCustomDao {
   /**
    * Constructor
-   *
-   * @param dao
-   *            user custom data access object
-   * @param userMappingTable
-   *            user mapping table
+   * @param dao user custom data access object
+   * @param userMappingTable user mapping table
    */
-  public constructor(dao: UserCustomDao, userMappingTable: UserMappingTable) {
+  public constructor(dao: UserCustomDao, userMappingTable?: UserMappingTable) {
     super(dao, userMappingTable != null ? userMappingTable : new UserMappingTable(dao.getTable()));
   }
 

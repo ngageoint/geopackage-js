@@ -272,13 +272,13 @@ export class TileCreator {
    * @param zoomLevel zoom level
    * @return tile
    */
-  public getTile(requestBoundingBox: BoundingBox, zoomLevel?: number): GeoPackageTile {
+  public async getTile(requestBoundingBox: BoundingBox, zoomLevel?: number): Promise<GeoPackageTile> {
     let tile = null;
     const tileMatrix = this.tileDao.getTileMatrix(zoomLevel);
     if (tileMatrix != null) {
       const tileMatrices = [];
       tileMatrices.push(tileMatrix);
-      tile = this.getTileWithTileMatrices(requestBoundingBox, tileMatrices);
+      tile = await this.getTileWithTileMatrices(requestBoundingBox, tileMatrices);
     }
     return tile;
   }

@@ -1,4 +1,4 @@
-import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 import { Extensions } from '../../extensions';
 
 /**

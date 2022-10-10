@@ -1,19 +1,18 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
+import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
 
 var FeatureTiles = require('../../../../lib/tiles/features/featureTiles').FeatureTiles
   , Canvas = require('../../../../lib/canvas/canvas').Canvas
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureTilePointIcon = require('../../../../lib/tiles/features/featureTilePointIcon').FeatureTilePointIcon
   , NumberFeaturesTile = require('../../../../lib/tiles/features/custom/numberFeaturesTile').NumberFeaturesTile
-  , ShadedFeaturesTile = require('../../../../lib/tiles/features/custom/shadedFeaturesTile').ShadedFeaturesTile
-  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  , SetupFeatureTable = require('../../../setupFeatureTable')
   , ImageUtils = require('../../../../lib/image/imageUtils').ImageUtils
   , FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , should = require('chai').should()
-  , path = require('path')
-  , wkx = require('wkx');
+  , path = require('path');
 
 var isWeb = !(typeof(process) !== 'undefined' && process.version);
 var isLinux = process.platform === 'linux';
@@ -77,7 +76,7 @@ describe('GeoPackage FeatureTiles tests', function() {
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(srs.srs_id);
-        var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+        var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
         geometryData.setGeometry(geometry);
         featureRow.geometry = geometryData;
         featureRow.setValueWithColumnName('name', name);
@@ -102,7 +101,7 @@ describe('GeoPackage FeatureTiles tests', function() {
       // await featureDao.featureTableIndex.index()
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -124,16 +123,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -245,16 +244,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var indexedfilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(indexedfilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -368,16 +367,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -585,16 +584,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -624,16 +623,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled_with_icon.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -678,16 +677,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'styled_scaled.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('Drawing Layer 1');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -868,55 +867,6 @@ describe('GeoPackage FeatureTiles tests', function() {
           });
         });
     });
-
-    it('should get the max feature shaded tile and test various functions', function(done) {
-      this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.maxFeaturesPerTile = 1;
-      ft.maxFeaturesPerTile.should.be.equal(1);
-      should.not.exist(ft.maxFeaturesTileDraw);
-      var shadedFeaturesTile = new ShadedFeaturesTile();
-
-      shadedFeaturesTile.getTileBorderStrokeWidth().should.be.equal(2);
-      shadedFeaturesTile.setTileBorderStrokeWidth(12);
-      shadedFeaturesTile.getTileBorderStrokeWidth().should.be.equal(12);
-      shadedFeaturesTile.setTileBorderStrokeWidth(2);
-
-      shadedFeaturesTile.getTileBorderColor().should.be.equal("rgba(0, 0, 0, 1.0)");
-      shadedFeaturesTile.setTileBorderColor("rgba(0, 0, 0, 0.50)");
-      shadedFeaturesTile.getTileBorderColor().should.be.equal("rgba(0, 0, 0, 0.50)");
-      shadedFeaturesTile.setTileBorderColor("rgba(0, 0, 0, 1.0)");
-
-      shadedFeaturesTile.getTileFillColor().should.be.equal("rgba(0, 0, 0, 0.0625)");
-      shadedFeaturesTile.setTileFillColor("rgba(0, 0, 0, 0.50)");
-      shadedFeaturesTile.getTileFillColor().should.be.equal("rgba(0, 0, 0, 0.50)");
-      shadedFeaturesTile.setTileFillColor("rgba(0, 0, 0, 0.0625)");
-
-      shadedFeaturesTile.isDrawUnindexedTiles().should.be.equal(true);
-      shadedFeaturesTile.setDrawUnindexedTiles(false);
-      shadedFeaturesTile.isDrawUnindexedTiles().should.be.equal(false);
-      shadedFeaturesTile.setDrawUnindexedTiles(true);
-
-      shadedFeaturesTile.getCompressFormat().should.be.equal('png');
-      shadedFeaturesTile.setCompressFormat('jpeg');
-      shadedFeaturesTile.getCompressFormat().should.be.equal('jpeg');
-      shadedFeaturesTile.setCompressFormat('png');
-
-      ft.maxFeaturesTileDraw = shadedFeaturesTile;
-      should.exist(ft.maxFeaturesTileDraw);
-
-      ft.drawTile(153632, 91343, 18)
-        .then(function(image) {
-          testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', 'max_feature_tile_shaded.png'), function(err, equal) {
-            try {
-              equal.should.be.equal(true);
-              done();
-            } catch (e) {
-              done(e);
-            }
-          });
-        });
-    });
   });
 
   describe('Styled GeometryCollection GeoPackage tests', function() {
@@ -924,16 +874,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('test');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -960,16 +910,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multi.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('multi');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -995,16 +945,16 @@ describe('GeoPackage FeatureTiles tests', function() {
     var featureDao;
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipleholes.gpkg');
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('multipolywithholes');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });

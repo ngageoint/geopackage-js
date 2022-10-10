@@ -4,6 +4,9 @@ import { ExtensionScopeType } from '../extensionScopeType';
 import { DataColumns } from './columns/dataColumns';
 import { DataColumnConstraints } from './constraints/dataColumnConstraints';
 import type { GeoPackage } from '../../geoPackage';
+import { DataColumnsDao } from './columns/dataColumnsDao';
+import { GeoPackageException } from '../../geoPackageException';
+import { DataColumnConstraintsDao } from './constraints/dataColumnConstraintsDao';
 
 /**
  * SchemaExtension module.
@@ -57,5 +60,81 @@ export class SchemaExtension extends BaseExtension {
     if (this.extensionsDao.isTableExists()) {
       this.extensionsDao.deleteByExtension(SchemaExtension.EXTENSION_NAME);
     }
+  }
+
+  /**
+   * Get a Data Columns DAO
+   * @return Data Columns DAO
+   */
+  public getDataColumnsDao(): DataColumnsDao {
+    return SchemaExtension.getDataColumnsDao(this.geoPackage);
+  }
+
+  /**
+   * Get a Data Columns DAO
+   * @param geoPackage GeoPackage
+   * @return Data Columns DAO
+   */
+  public static getDataColumnsDao(geoPackage: GeoPackage): DataColumnsDao {
+    return DataColumnsDao.createDao(geoPackage);
+  }
+
+  /**
+   * Create the Data Columns table if it does not already exist
+   * @return true if created
+   */
+  public createDataColumnsTable(): boolean {
+    this.verifyWritable();
+
+    let created = false;
+    const dao = this.getDataColumnsDao();
+    try {
+      if (!dao.isTableExists()) {
+        created = this.geoPackage.getTableCreator().createDataColumns();
+      }
+    } catch (e) {
+      throw new GeoPackageException("Failed to check if DataColumns table exists and create it");
+    }
+    return created;
+  }
+
+  /**
+   * Get a Data Column Constraints DAO
+   * @return Data Column Constraints DAO
+   */
+  public getDataColumnConstraintsDao(): DataColumnConstraintsDao {
+    return SchemaExtension.getDataColumnConstraintsDao(this.geoPackage);
+  }
+
+  /**
+   * Get a Data Column Constraints DAO
+   * @param geoPackage GeoPackage
+   * @return Data Column Constraints DAO
+   */
+  public static getDataColumnConstraintsDao(geoPackage: GeoPackage): DataColumnConstraintsDao {
+    return DataColumnConstraintsDao.createDao(geoPackage);
+  }
+
+  /**
+   * Create the Data Column Constraints table if it does not already exist
+   * @return true if created
+   */
+  public createDataColumnConstraintsTable(): boolean {
+    this.verifyWritable();
+
+    let created = false;
+    const dao = this.getDataColumnConstraintsDao();
+    try {
+      if (!dao.isTableExists()) {
+        created = this.geoPackage.getTableCreator().createDataColumnConstraints();
+        if (created) {
+          // Create the schema extension record
+          this.getOrCreateExtension();
+        }
+      }
+    } catch (e) {
+      throw new GeoPackageException("Failed to check if DataColumnConstraints table exists and create it");
+    }
+    return created;
   }
 }

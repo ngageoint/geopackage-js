@@ -43,7 +43,7 @@ export class GeoPackageValidate {
   }
 
   static validateMinimumTables(geoPackage: GeoPackage): GeoPackageValidationError[] {
-    const errors: GeoPackageValidationError[] = [];
+    const errors = [];
     const srsExists = geoPackage.getSpatialReferenceSystemDao().isTableExists();
     const contentsExists = geoPackage.getContentsDao().isTableExists();
     if (!srsExists) {

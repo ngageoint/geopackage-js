@@ -86,7 +86,6 @@ export class AttributesColumn extends UserColumn {
 
   /**
    * Create a new column
-   * @param index
    * @param name
    * @param type
    * @param notNull
@@ -95,7 +94,28 @@ export class AttributesColumn extends UserColumn {
    * @param autoincrement
    */
   static createColumn(
-    index: number,
+    name: string,
+    type: GeoPackageDataType,
+    notNull = false,
+    defaultValue?: DBValue,
+    max?: number,
+    autoincrement?: boolean,
+  ): AttributesColumn {
+    return AttributesColumn.createColumnWithIndex(AttributesColumn.NO_INDEX, name, type, notNull, defaultValue, max, autoincrement);
+  }
+
+  /**
+   * Create a new column
+   * @param index
+   * @param name
+   * @param type
+   * @param notNull
+   * @param defaultValue
+   * @param max
+   * @param autoincrement
+   */
+  static createColumnWithIndex(
+    index: number = AttributesColumn.NO_INDEX,
     name: string,
     type: GeoPackageDataType,
     notNull = false,
@@ -108,12 +128,24 @@ export class AttributesColumn extends UserColumn {
 
   /**
    * Create a new primary key column
-   * @param index
    * @param name
    * @param autoincrement
    */
   static createPrimaryKeyColumn(
-    index: number,
+    name: string,
+    autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
+  ): AttributesColumn {
+    return AttributesColumn.createPrimaryKeyColumnWithIndex(AttributesColumn.NO_INDEX, name, autoincrement);
+  }
+
+  /**
+   * Create a new primary key column with a provided index
+   * @param index
+   * @param name
+   * @param autoincrement
+   */
+  static createPrimaryKeyColumnWithIndex(
+    index: number = AttributesColumn.NO_INDEX,
     name: string,
     autoincrement: boolean = UserTableDefaults.DEFAULT_AUTOINCREMENT,
   ): AttributesColumn {
@@ -122,7 +154,7 @@ export class AttributesColumn extends UserColumn {
       name,
       GeoPackageDataType.INTEGER,
       undefined,
-      undefined,
+      true,
       undefined,
       true,
       autoincrement,

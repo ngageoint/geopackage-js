@@ -1,7 +1,6 @@
 const TileBoundingBoxUtils = require('../../../lib/tiles/tileBoundingBoxUtils').TileBoundingBoxUtils
-  , TileUtilities = require('../../../lib/tiles/creator/tileUtilities').TileUtilities
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
-  , Projection = require('../../../lib/projection/projection').Projection;
+  , { Projections, Projection } = require('@ngageoint/projections-js');
 
 require('chai').should();
 
@@ -13,7 +12,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var longitude = 10018754.17139462;
 
 
-    var maxColumn = TileBoundingBoxUtils.getTileColumnWithTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
+    var maxColumn = TileBoundingBoxUtils.getTileColumn(totalBox, tileMatrixWidth, longitude);
     maxColumn.should.be.equal(3);
     done();
   });
@@ -24,7 +23,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var longitude = 10018755.17139462;
 
 
-    var maxColumn = TileBoundingBoxUtils.getTileColumnWithTotalBoundingBox(totalBox, tileMatrixWidth, longitude, true);
+    var maxColumn = TileBoundingBoxUtils.getTileColumn(totalBox, tileMatrixWidth, longitude);
     maxColumn.should.be.equal(3);
     done();
   });
@@ -35,7 +34,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018754.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getTileRow(totalBox, tileMatrixHeight, latitude);
     minRow.should.be.equal(1);
     done();
   });
@@ -46,7 +45,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var latitude = 10018755.17139462;
 
 
-    var minRow = TileBoundingBoxUtils.getRowWithTotalBoundingBox(totalBox, tileMatrixHeight, latitude, true);
+    var minRow = TileBoundingBoxUtils.getTileRow(totalBox, tileMatrixHeight, latitude);
     minRow.should.be.equal(0);
     done();
   });
@@ -57,7 +56,7 @@ describe('TileBoundingBoxUtils tests', function() {
     var height = 256;
     var width = 256;
     var projectionTo = 'EPSG:3857';
-    var projectionToDefinition = Projection.hasProjection(projectionTo)
+    var projectionToDefinition = Projections.hasProjection(projectionTo)
     var projectionFrom = 'EPSG:3395';
     var projectionFromDefinition = 'PROJCS["WGS 84 / World Mercator",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3395"],AXIS["Easting",EAST],AXIS["Northing",NORTH]]';
     var tileHeightUnitsPerPixel = 19567.87924100511;

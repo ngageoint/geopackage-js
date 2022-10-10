@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
   , Contents = require('../../../../lib/contents/contents').Contents
@@ -9,15 +9,15 @@ describe('GeometryColumns tests', function() {
 
   var geoPackage;
   var filename;
-  beforeEach('should open the geopackage', async function() {
+  beforeEach('should open the geoPackage', async function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
     filename = result.path;
   });
 
-  afterEach('should close the geopackage', function() {
+  afterEach('should close the geoPackage', function() {
     geoPackage.close();
     testSetup.deleteGeoPackage(filename);
   });

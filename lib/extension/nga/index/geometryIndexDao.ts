@@ -53,7 +53,7 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   }
 
   public createObject(result: Record<string, DBValue>): GeometryIndex {
-    throw new Error('Method not implemented.');
+    throw new GeoPackageException('Method not implemented.');
   }
 
   /**

@@ -407,7 +407,6 @@ export abstract class Dao<T, ID> {
    * @return {string} primary key where clause
    */
   buildPkWhere(idValue: any[] | any): string {
-    console.log(this.idColumns);
     if (Array.isArray(idValue)) {
       const idValuesArray = idValue;
       const idColumnValues = new ColumnValues();

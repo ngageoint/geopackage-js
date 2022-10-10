@@ -7,7 +7,7 @@ import { TileRow } from './tileRow';
 import { TileTable } from './tileTable';
 import { TileMatrix } from '../matrix/tileMatrix';
 import { BoundingBox } from '../../boundingBox';
-import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
+import { Projection, ProjectionConstants, Projections, ProjectionTransform } from '@ngageoint/projections-js';
 import { GeoPackageException } from '../../geoPackageException';
 import { TileBoundingBoxUtils } from '../tileBoundingBoxUtils';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
@@ -63,6 +63,8 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    */
   private readonly heights: number[];
 
+  private readonly webZoomToGeoPackageZooms: Map<number, number>;
+
   /**
    * Constructor
    *
@@ -111,8 +113,40 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
       throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null Contents');
     }
     if (this.geoPackage.getTileMatrixSetDao().getSrs(tileMatrixSet.getSrsId()) == null) {
-      throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null SpatialReferenceSystem');
+      throw new GeoPackageException('TileMa trixSet ' + tileMatrixSet.getId() + ' has null SpatialReferenceSystem');
     }
+    this.webZoomToGeoPackageZooms = new Map<number, number>();
+    this.setWebMapZoomLevels();
+  }
+
+  webZoomToGeoPackageZoom(webZoom: number): number {
+    return this.determineGeoPackageZoomLevel(webZoom);
+  }
+
+  setWebMapZoomLevels(): void {
+    const totalTileWidth = this.tileMatrixSet.getMaxX() - this.tileMatrixSet.getMinX();
+    const totalTileHeight = this.tileMatrixSet.getMaxY() - this.tileMatrixSet.getMinY();
+    for (let i = 0; i < this.tileMatrices.length; i++) {
+      const tileMatrix = this.tileMatrices[i];
+      const singleTileWidth = totalTileWidth / tileMatrix.getMatrixWidth();
+      const singleTileHeight = totalTileHeight / tileMatrix.getMatrixHeight();
+      const tileBox = new BoundingBox(
+        this.tileMatrixSet.getMinX(),
+        this.tileMatrixSet.getMinX() + singleTileWidth,
+        this.tileMatrixSet.getMinY(),
+        this.tileMatrixSet.getMinY() + singleTileHeight,
+      );
+      const transform = new ProjectionTransform(this.projection, Projections.getWGS84Projection());
+      const ne = transform.transform(tileBox.getMaxLongitude(), tileBox.getMaxLatitude());
+      const sw = transform.transform(tileBox.getMinLongitude(), tileBox.getMinLatitude());
+      const width = ne[0] - sw[0];
+      const zoom = Math.ceil(Math.log2(360 / width));
+      this.webZoomToGeoPackageZooms.set(zoom, tileMatrix.getZoomLevel());
+    }
+  }
+
+  determineGeoPackageZoomLevel(zoom: number): number {
+    return this.webZoomToGeoPackageZooms.get(zoom);
   }
 
   /**

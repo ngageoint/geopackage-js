@@ -6,6 +6,7 @@
 import { AttributesRow } from '../../../attributes/attributesRow';
 import { StyleTable } from './styleTable';
 import { UserColumn } from '../../../user/userColumn';
+import { GeoPackageException } from '../../../geoPackageException';
 
 /**
  * Style Row
@@ -195,7 +196,7 @@ export class StyleRow extends AttributesRow {
    */
   setWidth(width: number): void {
     if (width !== null && width < 0.0) {
-      throw new Error('Width must be greater than or equal to 0.0, invalid value: ' + width);
+      throw new GeoPackageException('Width must be greater than or equal to 0.0, invalid value: ' + width);
     }
     this.setValueWithColumnName(this.getWidthColumn().getName(), width);
   }
@@ -299,7 +300,7 @@ export class StyleRow extends AttributesRow {
         validated = '#' + color;
       }
       if (!StyleRow.colorPattern.test(validated)) {
-        throw new Error('Color must be in hex format #RRGGBB or #RGB, invalid value: ' + color);
+        throw new GeoPackageException('Color must be in hex format #RRGGBB or #RGB, invalid value: ' + color);
       }
       validated = validated.toUpperCase();
     }
@@ -311,7 +312,7 @@ export class StyleRow extends AttributesRow {
    */
   validateOpacity(opacity: number): boolean {
     if (opacity != null && (opacity < 0.0 || opacity > 1.0)) {
-      throw new Error('Opacity must be set inclusively between 0.0 and 1.0, invalid value: ' + opacity);
+      throw new GeoPackageException('Opacity must be set inclusively between 0.0 and 1.0, invalid value: ' + opacity);
     }
     return true;
   }

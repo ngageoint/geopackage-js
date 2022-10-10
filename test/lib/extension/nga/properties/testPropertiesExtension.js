@@ -1,4 +1,4 @@
-// package mil.nga.geopackage.extension.nga.properties;
+// package mil.nga.geoPackage.extension.nga.properties;
 //
 // import java.util.HashSet;
 // import java.util.List;
@@ -8,8 +8,8 @@
 // import org.junit.Test;
 //
 // import junit.framework.TestCase;
-// import mil.nga.geopackage.CreateGeoPackageTestCase;
-// import mil.nga.geopackage.extension.Extensions;
+// import mil.nga.geoPackage.CreateGeoPackageTestCase;
+// import mil.nga.geoPackage.extension.Extensions;
 //
 // /**
 //  * Properties Extension Tests

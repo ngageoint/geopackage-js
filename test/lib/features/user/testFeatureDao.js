@@ -1,16 +1,15 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var FeatureColumn = require('../../../../lib/features/user/featureColumn').FeatureColumn
   , GeoPackageDataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   , GeometryData = require('../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
-  , SetupFeatureTable = require('../../../fixtures/setupFeatureTable')
+  , SetupFeatureTable = require('../../../setupFeatureTable')
   , RelatedTablesUtils = require('../../extension/relatedTables/relatedTablesUtils')
   , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
+  , FeatureConverter = require('@ngageoint/simple-features-geojson-js').FeatureConverter
   , SimpleAttributesTable = require('../../../../lib/extension/related/simple/simpleAttributesTable').SimpleAttributesTable
-  , wkx = require('wkx')
-  , helpers = require('@turf/helpers')
   , path = require('path')
   , should = require('chai').should();
 
@@ -25,10 +24,10 @@ describe('FeatureDao tests', function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
     });
 
-    afterEach('close the geopackage connection', async function() {
+    afterEach('close the geoPackage connection', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -62,15 +61,15 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -98,15 +97,15 @@ describe('FeatureDao tests', function() {
     var filename;
     var geoPackage;
 
-    beforeEach('should copy the geopackage', async function() {
+    beforeEach('should copy the geoPackage', async function() {
       filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp', testSetup.createTempName());
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       await testSetup.deleteGeoPackage(filename);
     });
 
@@ -135,15 +134,15 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'geometrycollection.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('test');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -176,15 +175,15 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'multipoint.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('multipoint');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -217,15 +216,15 @@ describe('FeatureDao tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers2.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -242,7 +241,7 @@ describe('FeatureDao tests', function() {
       var centerPoint = helpers.point([ -105.92193603515625, 34.406906587428736 ]);
 
 
-      var iterator = featureDao.queryForGeoJSONIndexedFeaturesWithBoundingBox(bb);
+      var iterator = featureDao.getIndexManager().queryWithBoundingBox(false, undefined, bb);
       var foundFeatures = [];
       var closestDistance = 100000000000;
       var closest;
@@ -291,15 +290,15 @@ describe('FeatureDao tests', function() {
   });
 
   describe('Query tests', function() {
-    var geopackage;
+    var geoPackage;
     var queryTestFeatureDao;
     var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
     var testGeoPackage;
     var tileBuffer;
 
-    afterEach('should delete the geopackage', async function() {
+    afterEach('should delete the geoPackage', async function() {
       try {
-        geopackage.close();
+        geoPackage.close();
       } catch (e) {}
       await testSetup.deleteGeoPackage(testGeoPackage);
     });
@@ -311,7 +310,7 @@ describe('FeatureDao tests', function() {
 
     beforeEach('should create the GeoPackage', async function() {
       testGeoPackage = path.join(testPath, testSetup.createTempName());
-      geopackage = await testSetup.createGeoPackage(testGeoPackage)
+      geoPackage = await testSetup.createGeoPackage(testGeoPackage)
 
       // @ts-ignore
       var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.GEOMETRY);
@@ -415,7 +414,7 @@ describe('FeatureDao tests', function() {
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
         geometryData.setSrsId(srs.srs_id);
-        var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+        var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
         geometryData.setGeometry(geometry);
         featureRow.geometry = geometryData;
         featureRow.setValueWithColumnName('name', name);
@@ -432,8 +431,8 @@ describe('FeatureDao tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      geopackage.createFeatureTable('QueryTest', geometryColumns, columns);
-      var featureDao = geopackage.getFeatureDao('QueryTest');
+      geoPackage.createFeatureTable('QueryTest', geometryColumns, columns);
+      var featureDao = geoPackage.getFeatureDao('QueryTest');
       queryTestFeatureDao = featureDao;
       createRow(box1, 'box1', featureDao);
       createRow(box2, 'box2', featureDao);
@@ -464,14 +463,14 @@ describe('FeatureDao tests', function() {
 
     it('should query for _feature_id', function() {
       // @ts-ignore
-      var row = geopackage.getFeature('QueryTest', 'line');
+      var row = geoPackage.getFeature('QueryTest', 'line');
       // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
 
     it('should query for _properties_id', function() {
       // @ts-ignore
-      var row = geopackage.getFeature('QueryTest', 'propertiesline');
+      var row = geoPackage.getFeature('QueryTest', 'propertiesline');
       // @ts-ignore
       row.properties.name.should.be.equal('line');
     });
@@ -488,7 +487,7 @@ describe('FeatureDao tests', function() {
       // @ts-ignore
       // @ts-ignore
       var bb = new BoundingBox(-.4, -.6, 2.4, 2.6);
-      return geopackage.getFeaturesInBoundingBox('QueryTest', -.4, -.6, 2.4, 2.6)
+      return geoPackage.getFeaturesInBoundingBox('QueryTest', -.4, -.6, 2.4, 2.6)
       .then(function(iterator) {
         for (var feature of iterator) {
           feature.values.name.should.be.equal('box1');
@@ -615,7 +614,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 1029, y: 1013, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return geopackage.getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
+      return geoPackage.getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -625,7 +624,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 1026, y: 1015, z: 11 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(5000);
       console.time('generating indexed tile');
-      return geopackage.getFeatureTileFromXYZ('QueryTest', 1026, 1015, 11, 256, 256)
+      return geoPackage.getFeatureTileFromXYZ('QueryTest', 1026, 1015, 11, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -635,7 +634,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 features as geojson', function() {
       this.timeout(3000);
       console.time('generating indexed tile');
-      return geopackage.getGeoJSONFeaturesInTile('QueryTest', 64, 63, 7)
+      return geoPackage.getGeoJSONFeaturesInTile('QueryTest', 64, 63, 7)
       .then(function(geoJSON) {
         console.timeEnd('generating indexed tile');
         should.exist(geoJSON);
@@ -646,7 +645,7 @@ describe('FeatureDao tests', function() {
     it('should get the x: 64, y: 63, z: 7 tile from the GeoPackage api in a reasonable amount of time', function() {
       this.timeout(3000);
       console.time('generating indexed tile');
-      return geopackage.getFeatureTileFromXYZ('QueryTest', 64, 63, 7, 256, 256)
+      return geoPackage.getFeatureTileFromXYZ('QueryTest', 64, 63, 7, 256, 256)
       .then(function(data) {
         console.timeEnd('generating indexed tile');
         should.exist(data);
@@ -654,7 +653,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should create a media relationship between a feature and a media row', function() {
-      var rte = geopackage.relatedTablesExtension;
+      var rte = geoPackage.relatedTablesExtension;
       var additionalMediaColumns = RelatedTablesUtils.createAdditionalUserColumns(MediaTable.numRequiredColumns());
       var mediaTable = MediaTable.create('media_table', additionalMediaColumns);
       rte.createRelatedTable(mediaTable);
@@ -683,7 +682,7 @@ describe('FeatureDao tests', function() {
     });
 
     it('should create a simple attributes relationship between a feature and a simple attributes row', function() {
-      var rte = geopackage.relatedTablesExtension;
+      var rte = geoPackage.relatedTablesExtension;
       var simpleUserColumns = RelatedTablesUtils.createSimpleUserColumns(SimpleAttributesTable.numRequiredColumns(), true);
       var simpleTable = SimpleAttributesTable.create('simple_table', simpleUserColumns);
       rte.createRelatedTable(simpleTable);

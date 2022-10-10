@@ -5,6 +5,7 @@ import { GeoPackageDataType } from '../../../db/geoPackageDataType';
 import { UserCustomColumn } from '../../../user/custom/userCustomColumn';
 import { UserCustomTable } from '../../../user/custom/userCustomTable';
 import type { SimpleAttributesTableMetadata } from './simpleAttributesTableMetadata';
+import { GeoPackageException } from '../../../geoPackageException';
 
 /**
  * Simple Attributes Requirements Class User-Defined Related Data Table
@@ -19,7 +20,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @param columns list of columns
    * @param idColumnName id column name
    */
-  constructor(tableName: string, columns: UserCustomColumn[], idColumnName: string);
+  constructor(tableName: string, columns: UserCustomColumn[], idColumnName?: string);
 
   /**
    * Constructor
@@ -56,14 +57,13 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * column exists and that all columns are simple data types
    */
   validateColumns(): boolean {
-    const columns = this.columns;
-    if (columns.getColumns().length < 2) {
-      throw new Error('Simple Attributes Tables require at least one non id column');
+    const columns = this.getColumns();
+    if (columns.length < 2) {
+      throw new GeoPackageException('Simple Attributes Tables require at least one non id column');
     }
-    for (let i = 0; i < columns.getColumns().length; i++) {
-      const column = columns.getColumns()[i];
+    for (const column of columns) {
       if (!SimpleAttributesTable.isSimple(column)) {
-        throw new Error(
+        throw new GeoPackageException(
           'Simple Attributes Tables only support simple data types. Column: ' +
             column.getName() +
             ', Non Simple Data Type: ' +
@@ -80,11 +80,11 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @return {module:extension/relatedTables~SimpleAttributesTable}
    */
   static create(tableName: string, additionalColumns?: UserColumn[]): SimpleAttributesTable {
-    let tableColumns = SimpleAttributesTable.createRequiredColumns(0);
+    let tableColumns = SimpleAttributesTable.createRequiredColumns();
     if (additionalColumns) {
       tableColumns = tableColumns.concat(additionalColumns);
     }
-    return new SimpleAttributesTable(tableName, tableColumns, null);
+    return new SimpleAttributesTable(tableName, tableColumns);
   }
 
   /**
@@ -92,7 +92,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @param metadata simple attributes table metadata
    * @return simple attributes table
    */
-  public static createFromMetadata(metadata: SimpleAttributesTableMetadata): SimpleAttributesTable {
+  public static createWithMetadata(metadata: SimpleAttributesTableMetadata): SimpleAttributesTable {
     const columns = metadata.buildColumns();
     return new SimpleAttributesTable(metadata.getTableName(), columns, metadata.getIdColumnName());
   }
@@ -113,30 +113,57 @@ export class SimpleAttributesTable extends UserRelatedTable {
   static numRequiredColumns(): number {
     return SimpleAttributesTable.requiredColumns().length;
   }
+
   /**
-   * Create the required columns
+   * Create the required columns with a specified starting column index
    * @param  {Number} [startingIndex=0] starting index of the required columns
    * @param  {string} [idColumnName=id]  id column name
    * @param  {boolean} autoincrement
    * @return {module:user/userColumn~UserColumn[]}
    */
-  static createRequiredColumns(
+  static createRequiredColumnsWithIndex(
     startingIndex = 0,
     idColumnName = SimpleAttributesTable.COLUMN_ID,
     autoincrement?: boolean,
   ): UserColumn[] {
-    return [SimpleAttributesTable.createIdColumn(startingIndex++, idColumnName, autoincrement)];
+    return [SimpleAttributesTable.createIdColumnWithIndex(startingIndex++, idColumnName, autoincrement)];
   }
+
+  /**
+   * Create the required columns
+   * @param  {string} [idColumnName=id]  id column name
+   * @param  {boolean} autoincrement
+   * @return {module:user/userColumn~UserColumn[]}
+   */
+  static createRequiredColumns(
+    idColumnName = SimpleAttributesTable.COLUMN_ID,
+    autoincrement?: boolean,
+  ): UserColumn[] {
+    return [SimpleAttributesTable.createIdColumn(idColumnName, autoincrement)];
+  }
+
   /**
    * Create the primary key id column
+   * @param  {string} idColumnName name of the id column
+   * @param  {boolean} autoincrement
+   * @return {module:user/userColumn~UserColumn}
+   */
+  static createIdColumn(idColumnName: string, autoincrement?: boolean): UserColumn {
+    return UserCustomColumn.createPrimaryKeyColumn(idColumnName, autoincrement);
+  }
+
+
+  /**
+   * Create the primary key id column with a specified column index
    * @param  {Number} index        index of the column
    * @param  {string} idColumnName name of the id column
    * @param  {boolean} autoincrement
    * @return {module:user/userColumn~UserColumn}
    */
-  static createIdColumn(index: number, idColumnName: string, autoincrement?: boolean): UserColumn {
-    return UserCustomColumn.createPrimaryKeyColumn(index, idColumnName, autoincrement);
+  static createIdColumnWithIndex(index: number, idColumnName: string, autoincrement?: boolean): UserColumn {
+    return UserCustomColumn.createPrimaryKeyColumnWithIndex(index, idColumnName, autoincrement);
   }
+
   /**
    * Determine if the column is a simple column
    * @param  {module:user/userColumn~UserColumn} column column to check

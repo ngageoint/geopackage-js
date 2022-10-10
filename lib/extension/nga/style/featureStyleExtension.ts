@@ -20,7 +20,7 @@ import { StyleRow } from './styleRow';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { ContentsId } from '../contents/contentsId';
-import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 import type { GeoPackage } from '../../../geoPackage';
 
 /**

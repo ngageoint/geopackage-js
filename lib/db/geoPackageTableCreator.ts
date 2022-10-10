@@ -4,6 +4,7 @@ import { GeoPackageConnection } from './geoPackageConnection';
 import { UserColumn } from '../user/userColumn';
 import { SQLUtils } from './sqlUtils';
 import type { GeoPackage } from '../geoPackage';
+import { GeoPackageException } from '../geoPackageException';
 
 type SqlScripts =
   | 'spatial_reference_system'
@@ -200,7 +201,7 @@ export class GeoPackageTableCreator {
     const connection = this.connection;
     const result = connection.tableExists(userTable.getTableName());
     if (result) {
-      throw new Error('Table already exists and cannot be created: ' + userTable.getTableName());
+      throw new GeoPackageException('Table already exists and cannot be created: ' + userTable.getTableName());
     }
     // Build the create table sql
     const sql = SQLUtils.createTableSQL(userTable);

@@ -184,4 +184,11 @@ export abstract class UserConnection<TColumn extends UserColumn,
 		return SqliteQueryBuilder.buildQuery(distinct, tables, columns, groupBy, where, join, having, orderBy, limit, offset);
 	}
 
+	/**
+	 * Get the connection
+	 */
+	public getConnection(): GeoPackageConnection {
+		return this.connection;
+	}
+
 }

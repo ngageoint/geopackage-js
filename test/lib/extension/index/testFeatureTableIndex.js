@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 
 var FeatureTableIndex = require('../../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex
@@ -19,11 +19,11 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -89,7 +89,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       });
     });
 
-    it('should index the table from the geopackage object', function() {
+    it('should index the table from the geoPackage object', function() {
       this.timeout(10000);
       return geoPackage.indexFeatureTable('FEATURESriversds')
       .then(function(indexed) {
@@ -101,7 +101,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       });
     });
 
-    it('should index the geopackage from the geopackage object', function() {
+    it('should index the geoPackage from the geoPackage object', function() {
       this.timeout(10000);
       return geoPackage.index()
       .then(function(status) {
@@ -121,15 +121,15 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers_indexed.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('rivers');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -139,7 +139,7 @@ describe('GeoPackage Feature Table Index Extension tests', function() {
       var whereArgs = [ 'rivers', 315 ];
 
       var query = sqliteQueryBuilder.buildQuery(false, "'nga_geometry_index'", undefined, whereString);
-      var result = geoPackage.database.get(query, whereArgs);
+      var result = geoPackage.getDatabase().get(query, whereArgs);
       should.exist(result);
       done();
     });

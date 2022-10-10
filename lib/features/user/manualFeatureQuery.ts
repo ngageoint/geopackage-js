@@ -93,7 +93,7 @@ export class ManualFeatureQuery {
 	 * @param offset
 	 */
 	public query(distinct = false, columns: string[] = this.featureDao.getColumnNames(), where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): FeatureResultSet {
-		return this.featureDao.query(distinct, columns);
+		return this.featureDao.query(distinct, columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
 	}
 
 	/**

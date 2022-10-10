@@ -1,4 +1,4 @@
-import { default as testSetup } from '../fixtures/testSetup'
+import { default as testSetup } from '../testSetup'
 
 var { GeoPackageManager } = require('../../')
   , should = require('chai').should();
@@ -6,16 +6,16 @@ var { GeoPackageManager } = require('../../')
 describe('GeoPackageManager Create tests', function() {
 
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
@@ -30,9 +30,9 @@ describe('GeoPackageManager Create tests', function() {
     should.fail(false, true, 'Error should have been thrown');
   });
 
-  it('should create the geopackage file', async function() {
-    should.exist(geopackage);
-    var applicationId = geopackage.getApplicationId();
+  it('should create the geoPackage file', async function() {
+    should.exist(geoPackage);
+    var applicationId = geoPackage.getApplicationId();
     var buff = Buffer.alloc(4);
     // @ts-ignore
     buff.writeUInt32BE(applicationId);

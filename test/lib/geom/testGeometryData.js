@@ -1,10 +1,10 @@
-var GeoPackageGeometryData = require('../../../lib/geom/geoPackageGeometryData').GeometryData;
+var GeoPackageGeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData;
 
-var wkx = require('wkx')
+var GeometryWriter = require('@ngageoint/simple-features-wkb-js').GeometryWriter
+  , Point = require('@ngageoint/simple-features-js').Point
   , should = require('chai').should();
 
 describe('Geometry Data tests', function() {
-
   var magic = Buffer.alloc(2);
   magic.write('GP', 0, 2, 'ascii');
   var version = Buffer.alloc(1);
@@ -14,8 +14,8 @@ describe('Geometry Data tests', function() {
   var srs = Buffer.alloc(4);
   srs.writeUInt32BE(4326);
 
-  var rawPoint = new wkx.Point(1, 2);
-  var point = rawPoint.toWkb();
+  var rawPoint = new Point(1, 2);
+  var point = GeometryWriter.writeGeometry(rawPoint);
 
   it('should fail the magic number check', function() {
     var buffer = Buffer.from('HI');

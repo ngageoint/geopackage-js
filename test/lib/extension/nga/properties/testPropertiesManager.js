@@ -1,8 +1,9 @@
 import path from "path";
-import testSetup from "../../../../fixtures/testSetup";
+import testSetup from "../../../../testSetup";
 import { PropertiesExtension } from "../../../../../lib/extension/nga/properties/propertiesExtension";
 import { GeoPackageManager } from "../../../../../lib/geoPackageManager";
 import { PropertiesManager } from "../../../../../lib/extension/nga/properties/propertiesManager";
+import { PropertyNames } from "../../../../../lib/extension/nga/properties/propertyNames";
 const should = require('chai').should();
 
 describe('GeoPackage Extension tests', function() {
@@ -33,7 +34,9 @@ describe('GeoPackage Extension tests', function() {
 		const geoPackageFiles = await createGeoPackageFiles();
 
 		for (const geoPackageFile of geoPackageFiles) {
-			const geoPackage = GeoPackageManager.open(geoPackageFile);
+			const geoPackage = await GeoPackageManager.open(geoPackageFile).catch(() => {
+				should.fail('Failed to open GeoPackage');
+			});
 			geoPackages.add(geoPackage);
 		}
 		return geoPackages;
@@ -43,8 +46,10 @@ describe('GeoPackage Extension tests', function() {
 		const geoPackageFiles = [];
 
 		for (let i = 0; i < GEOPACKAGE_COUNT; i++) {
-			var tmpGpPath = path.join(__dirname, 'tmp', GEOPACKAGE_FILE_NAME + i);
-			var geoPackage = await testSetup.createGeoPackage(tmpGpPath)
+			var tmpGpPath = path.join(__dirname, 'tmp', GEOPACKAGE_FILE_NAME + i + '.gpkg');
+			var geoPackage = await testSetup.createGeoPackage(tmpGpPath).catch(() => {
+				should.fail('Failed to create GeoPackage');
+			});
 			if (i < GEOPACKAGE_WITH_PROPERTIES_COUNT) {
 				addProperties(geoPackage, i);
 			}
@@ -159,7 +164,7 @@ describe('GeoPackage Extension tests', function() {
 			assertEquals(1, manager.hasValue(PropertyNames.IDENTIFIER, i.toString()).length);
 		}
 		assertEquals(0, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + (GEOPACKAGE_WITH_PROPERTIES_COUNT + 1)).length);
-		assertEquals(0, manager.hasValue(PropertyNames.IDENTIFIER, Integer.toString(GEOPACKAGE_WITH_PROPERTIES_COUNT)).length);
+		assertEquals(0, manager.hasValue(PropertyNames.IDENTIFIER, GEOPACKAGE_WITH_PROPERTIES_COUNT.toString()).length);
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, Boolean.TRUE.toString()).length);
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, Boolean.FALSE.toString()).length);
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(ODD_PROPERTY, Boolean.TRUE.toString()).length);
@@ -215,7 +220,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT, missingIdentifiers.length);
 		let indentifierIndex = 100;
 		for (const missingIdentifierGeoPackage of missingIdentifiers) {
-			(manager.addValue(missingIdentifierGeoPackage.getName(), PropertyNames.IDENTIFIER, Integer.toString(indentifierIndex++))).should.be.true;
+			(manager.addValue(missingIdentifierGeoPackage.getName(), PropertyNames.IDENTIFIER, (indentifierIndex++).toString())).should.be.true;
 		}
 		assertEquals(GEOPACKAGE_COUNT, manager.hasProperty(PropertyNames.IDENTIFIER).length);
 		assertEquals(0, manager.missingProperty(PropertyNames.IDENTIFIER).length);
@@ -344,9 +349,9 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(0, manager.numGeoPackages());
 	}
 
-	it('should test properties manager with GeoPackages', function() {
-		const manager = new PropertiesManager(createGeoPackages());
+	it('should test properties manager with GeoPackages', async function(done) {
+		const manager = new PropertiesManager(await createGeoPackages());
 		testPropertiesManager(manager);
-
+		done();
 	});
 });

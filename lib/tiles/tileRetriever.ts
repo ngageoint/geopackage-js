@@ -20,5 +20,5 @@ export interface TileRetriever {
    * @param zoom zoom level
    * @return tile with dimensions and bytes
    */
-  getTile(x: number, y: number, zoom: number): GeoPackageTile;
+  getTile(x: number, y: number, zoom: number): Promise<GeoPackageTile>;
 }

@@ -5,6 +5,7 @@
  */
 import { UserColumn } from './userColumn';
 import { GeoPackageDataType } from '../db/geoPackageDataType';
+import { GeoPackageException } from '../geoPackageException';
 
 export abstract class UserColumns<TColumn extends UserColumn> {
   /**
@@ -112,7 +113,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
         if (column.hasIndex()) {
           const index = column.getIndex();
           if (indices.has(index)) {
-            throw new Error('Duplicate index: ' + index + ', Table Name: ' + this.tableName);
+            throw new GeoPackageException('Duplicate index: ' + index + ', Table Name: ' + this.tableName);
           } else {
             indices.add(index);
           }
@@ -144,11 +145,11 @@ export abstract class UserColumns<TColumn extends UserColumn> {
 
       if (!this.custom) {
         if (column.getIndex() != index) {
-          throw new Error('No column found at index: ' + index + ', Table Name: ' + this.tableName);
+          throw new GeoPackageException('No column found at index: ' + index + ', Table Name: ' + this.tableName);
         }
 
         if (this.nameToIndex.has(lowerCaseColumnName)) {
-          throw new Error(
+          throw new GeoPackageException(
             'Duplicate column found at index: ' + index + ', Table Name: ' + this.tableName + ', Name: ' + columnName,
           );
         }
@@ -166,7 +167,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
           if (this.custom) {
             error = error.concat(', columns: ' + this.columnNames);
           }
-          throw new Error(error);
+          throw new GeoPackageException(error);
         }
         this.pkIndex = index;
       }
@@ -223,7 +224,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
    */
   duplicateCheck(index: number, previousIndex: number, column: string): void {
     if (previousIndex !== null && previousIndex !== undefined) {
-      throw new Error(
+      throw new GeoPackageException(
         'More than one ' +
           column +
           " column was found for table '" +
@@ -244,7 +245,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
   typeCheck(expected: GeoPackageDataType, column: TColumn): void {
     const actual = column.getDataType();
     if (actual === null || actual === undefined || actual !== expected) {
-      throw new Error(
+      throw new GeoPackageException(
         'Unexpected ' +
           column.getName() +
           " column data type was found for table '" +
@@ -264,7 +265,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
    */
   missingCheck(index: number, column: string): void {
     if (index === null || index === undefined) {
-      throw new Error('No ' + column + " column was found for table '" + this.tableName + "'");
+      throw new GeoPackageException('No ' + column + " column was found for table '" + this.tableName + "'");
     }
   }
 
@@ -296,7 +297,7 @@ export abstract class UserColumns<TColumn extends UserColumn> {
       if (this.custom) {
         error = error.concat(', columns: ' + this.columnNames);
       }
-      throw new Error(error);
+      throw new GeoPackageException(error);
     }
     return index;
   }

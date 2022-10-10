@@ -767,7 +767,7 @@ export class TileReprojection {
 
         const tileBounds = new BoundingBox(tileMinLongitude, tileMinLatitude, tileMaxLongitude, tileMaxLatitude);
 
-        const tile = tileCreator.getTile(tileBounds, zoom);
+        const tile = await tileCreator.getTile(tileBounds, zoom);
 
         if (tile != null) {
           let row = reprojectTileDao.queryForTile(tileColumn, tileRow, toZoom);

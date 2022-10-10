@@ -2,6 +2,7 @@ import { IconRow } from './iconRow';
 import { Canvas } from '../../../canvas/canvas';
 import { ImageUtils } from '../../../image/imageUtils';
 import { GeoPackageImage } from '../../../image/geoPackageImage';
+import { GeoPackageException } from '../../../geoPackageException';
 
 /**
  * @memberOf module:extension/nga/style
@@ -194,7 +195,7 @@ export class IconCache {
         try {
           iconImage = await ImageUtils.getImage(icon.getData());
         } catch (e) {
-          throw new Error('Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.getName());
+          throw new GeoPackageException('Failed to get the Icon Row image. Id: ' + iconId + ', Name: ' + icon.getName());
         }
 
         const dataWidth = iconImage.width;

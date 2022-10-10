@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup'
 
 var path = require('path')
   , should = require('chai').should()
@@ -13,17 +13,17 @@ describe('UserTableReader tests', function() {
     // @ts-ignore
     let result = await copyAndOpenGeopackage(sampleFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
   });
 
-  afterEach('close the geopackage connection', async function() {
+  afterEach('close the geoPackage connection', async function() {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
 
   it('should read the table', function() {
     var reader = new UserCustomTableReader('point2d');
-    var table = reader.readTable(geoPackage.database);
+    var table = reader.readTable(geoPackage.getDatabase());
     table.getTableName().should.be.equal('point2d');
     table.getUserColumns().getColumns().length.should.be.equal(8);
     table.getUserColumns().getColumns()[0].getName().should.be.equal('fid');
@@ -38,7 +38,7 @@ describe('UserTableReader tests', function() {
 
   it('should query the table', function() {
     var reader = new UserCustomTableReader('point2d');
-    var table = reader.readTable(geoPackage.database);
+    var table = reader.readTable(geoPackage.getDatabase());
     var ud = new UserCustomDao(geoPackage, table);
     var results = ud.queryForAll();
     should.exist(results);

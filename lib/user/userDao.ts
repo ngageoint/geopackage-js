@@ -107,8 +107,7 @@ export abstract class UserDao<
    */
   public projectBoundingBox(boundingBox: BoundingBox, projection: Projection): BoundingBox {
     const projectionTransform = GeometryTransform.create(projection, this.getProjection());
-    const projectedBoundingBox = boundingBox.transform(projectionTransform);
-    return projectedBoundingBox;
+    return boundingBox.transform(projectionTransform);
   }
 
   /**
@@ -392,6 +391,23 @@ export abstract class UserDao<
    */
   public countColumn(distinct: boolean, column: string, where: string, whereArgs: any[]) {
     return this.userDb.countColumn(this.getTableName(), distinct, column, where, whereArgs);
+  }
+
+  /**
+   * Gets the count
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public getCount(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
   }
 
   /**

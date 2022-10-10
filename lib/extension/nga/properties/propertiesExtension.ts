@@ -1,6 +1,6 @@
 import { BaseExtension } from '../../baseExtension';
 import { Extensions } from '../../extensions';
-import { NGAExtensionsConstants } from '../NGAExtensionsConstants';
+import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 import { Constraints } from '../../../db/table/constraints';
 import { UniqueConstraint } from '../../../db/table/uniqueConstraint';
 import { AttributesColumn } from '../../../attributes/attributesColumn';
@@ -89,20 +89,19 @@ export class PropertiesExtension extends BaseExtension {
     // Create the attributes table
     if (!this.geoPackage.isTableOrView(PropertiesExtension.TABLE_NAME)) {
       const propertyColumn = AttributesColumn.createColumn(
-        0,
         PropertiesExtension.COLUMN_PROPERTY,
         GeoPackageDataType.TEXT,
         true,
         null,
       );
-      const valueColumn = AttributesColumn.createColumn(1, PropertiesExtension.COLUMN_VALUE, GeoPackageDataType.TEXT);
+      const valueColumn = AttributesColumn.createColumn(PropertiesExtension.COLUMN_VALUE, GeoPackageDataType.TEXT);
       const additionalColumns: AttributesColumn[] = [];
       additionalColumns.push(propertyColumn);
       additionalColumns.push(valueColumn);
       const constraints = new Constraints();
       constraints.add(new UniqueConstraint(undefined, propertyColumn, valueColumn));
       this.geoPackage.createAttributesTableWithMetadata(
-        AttributesTableMetadata.create(PropertiesExtension.TABLE_NAME, null, additionalColumns, constraints),
+        AttributesTableMetadata.create(PropertiesExtension.TABLE_NAME, additionalColumns, constraints),
       );
     }
 

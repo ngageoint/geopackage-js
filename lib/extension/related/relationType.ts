@@ -13,7 +13,7 @@ export class RelationType {
    * Link features with other features
    * @type {Object}
    */
-  public static readonly FEATURES: RelationType = new RelationType('features', ContentsDataType.FEATURES);
+  public static readonly FEATURES: RelationType = new RelationType('features', ContentsDataType.nameFromType(ContentsDataType.FEATURES));
 
   /**
    * Relate sets of tabular text or numeric data
@@ -21,26 +21,26 @@ export class RelationType {
    */
   public static readonly SIMPLE_ATTRIBUTES: RelationType = new RelationType(
     'simple_attributes',
-    ContentsDataType.ATTRIBUTES,
+    ContentsDataType.nameFromType(ContentsDataType.ATTRIBUTES),
   );
 
   /**
    * Relate features or attributes to multimedia files such as pictures and videos
    * @type {Object}
    */
-  public static readonly MEDIA: RelationType = new RelationType('media', ContentsDataType.ATTRIBUTES);
+  public static readonly MEDIA: RelationType = new RelationType('media', ContentsDataType.nameFromType(ContentsDataType.ATTRIBUTES));
 
   /**
    * Attribute type relation
    * @type {Object}
    */
-  public static readonly ATTRIBUTES: RelationType = new RelationType('attributes', ContentsDataType.ATTRIBUTES);
+  public static readonly ATTRIBUTES: RelationType = new RelationType('attributes', ContentsDataType.nameFromType(ContentsDataType.ATTRIBUTES));
 
   /**
    * Tile type relation
    * @type {Object}
    */
-  public static readonly TILES: RelationType = new RelationType('tiles', ContentsDataType.TILES);
+  public static readonly TILES: RelationType = new RelationType('tiles', ContentsDataType.nameFromType(ContentsDataType.TILES));
 
   constructor(public name: string, public dataType: string) {}
 

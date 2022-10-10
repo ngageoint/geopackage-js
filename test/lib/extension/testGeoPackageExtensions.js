@@ -1,4 +1,5 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup'
+import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
 
 var ExtensionManager = require('../../../lib/extension/extensionManager').ExtensionManager
   , FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
@@ -17,14 +18,13 @@ var ExtensionManager = require('../../../lib/extension/extensionManager').Extens
   , MetadataExtension = require('../../../lib/extension/metadata/metadataExtension').MetadataExtension
   , should = require('chai').should()
   , expect = require('chai').expect
-  , wkx = require('wkx')
   , path = require('path')
   , _ = require('lodash');
 
 
 describe('GeoPackage Extensions tests', function() {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
   var tableName = 'feature_table';
   var iconImage;
   var iconImageBuffer;
@@ -66,7 +66,7 @@ describe('GeoPackage Extensions tests', function() {
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
     var columns = [];
 
     columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
@@ -83,16 +83,16 @@ describe('GeoPackage Extensions tests', function() {
     geometryColumns.z = 0;
     geometryColumns.m = 0;
 
-    geopackage.createFeatureTable(tableName, geometryColumns, columns);
+    geoPackage.createFeatureTable(tableName, geometryColumns, columns);
 
-    var featureDao = geopackage.getFeatureDao(tableName);
+    var featureDao = geoPackage.getFeatureDao(tableName);
 
     var createRow = function(geoJson, name, featureDao) {
       var srs = featureDao.srs;
       var featureRow = featureDao.newRow();
       var geometryData = new GeometryData();
       geometryData.setSrsId(srs.srs_id);
-      var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+      var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
       geometryData.setGeometry(geometry);
       featureRow.geometry = geometryData;
       featureRow.setValueWithColumnName('name', name);
@@ -152,10 +152,10 @@ describe('GeoPackage Extensions tests', function() {
     createRow(line, 'line2', featureDao);
     createRow(point, 'point', featureDao);
     createRow(point2, 'point2', featureDao);
-    geopackage.featureStyleExtension.getOrCreateExtension(tableName);
-    geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
-    geopackage.featureStyleExtension.getContentsId().getOrCreateExtension();
-    const featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    geoPackage.featureStyleExtension.getOrCreateExtension(tableName);
+    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
+    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension();
+    const featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     featureTableStyles.createRelationships();
     featureTableStyles.setTableStyle(GeometryType.POINT, randomStyle(featureTableStyles));
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', 'fixtures', 'point.png'));
@@ -164,66 +164,66 @@ describe('GeoPackage Extensions tests', function() {
     featureTableStyles.setTableIcon(GeometryType.POINT, randomIcon(featureTableStyles));
 
     // setup schema extension
-    schemaExtension = new SchemaExtension(geopackage);
-    geopackage.createDataColumns();
-    geopackage.createDataColumnConstraintsTable();
+    schemaExtension = new SchemaExtension(geoPackage);
+    geoPackage.createDataColumns();
+    geoPackage.createDataColumnConstraintsTable();
 
-    rtreeIndex = new RTreeIndex(geopackage, featureDao);
+    rtreeIndex = new RTreeIndex(geoPackage, featureDao);
     rtreeExtension = rtreeIndex.create()[0];
-    var fti = new FeatureTableIndex(geopackage, featureDao);
+    var fti = new FeatureTableIndex(geoPackage, featureDao);
     var indexed = fti.isIndexed();
     indexed.should.be.equal(true);
     var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName);
     exists.should.be.equal(true);
-    const metadataExtension = new MetadataExtension(geopackage);
+    const metadataExtension = new MetadataExtension(geoPackage);
     metadataExtension.getOrCreateExtension();
 
-    geopackage.createMetadataTable();
-    geopackage.createMetadataReferenceTable();
-    const metadataDao = geopackage.metadataDao;
+    geoPackage.createMetadataTable();
+    geoPackage.createMetadataReferenceTable();
+    const metadataDao = geoPackage.metadataDao;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should copy extensions for table', function() {
     const newTableName = 'copied_feature_table';
-    geopackage.copyTable(tableName, newTableName, true, true);
-    const featureTableStyles = new FeatureTableStyles(geopackage, newTableName);
+    geoPackage.copyTable(tableName, newTableName, true, true);
+    const featureTableStyles = new FeatureTableStyles(geoPackage, newTableName);
     featureTableStyles.hasIconRelationship().should.be.equal(true);
-    const rtreeIndexNewTable = new RTreeIndex(geopackage, geopackage.getFeatureDao(newTableName));
+    const rtreeIndexNewTable = new RTreeIndex(geoPackage, geoPackage.getFeatureDao(newTableName));
     rtreeIndexNewTable.extensionExists.should.be.equal(true);
     rtreeIndexNewTable.hasExtension(rtreeIndexNewTable.extensionName, rtreeIndexNewTable.tableName, rtreeIndexNewTable.columnName).should.be.equal(true);
   });
 
   it('should delete extensions for table', function() {
-    new ExtensionManager(geopackage).deleteTableExtensions(tableName);
-    new FeatureStyleExtension(geopackage).has(tableName).should.be.equal(false);
+    new ExtensionManager(geoPackage).deleteTableExtensions(tableName);
+    new FeatureStyleExtension(geoPackage).has(tableName).should.be.equal(false);
   });
 
   it('should delete extensions', function() {
-    geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
-    new ExtensionManager(geopackage).deleteExtensions();
-    geopackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
+    geoPackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
+    new ExtensionManager(geoPackage).deleteExtensions();
+    geoPackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
   });
 
   it('should copy table and then delete copy and style extension for original table should be unchanged', function() {
     const newTableName = 'copied_feature_table';
-    let featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    let featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
     should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
-    geopackage.copyTable(tableName, newTableName, true, true);
-    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    geoPackage.copyTable(tableName, newTableName, true, true);
+    featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
     should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
-    featureTableStyles = new FeatureTableStyles(geopackage, newTableName);
+    featureTableStyles = new FeatureTableStyles(geoPackage, newTableName);
     should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
     should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
-    geopackage.deleteTable(newTableName);
-    featureTableStyles = new FeatureTableStyles(geopackage, tableName);
+    geoPackage.deleteTable(newTableName);
+    featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
     should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
   });

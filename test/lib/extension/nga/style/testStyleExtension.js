@@ -1,5 +1,6 @@
 
-import { default as testSetup } from '../../../../fixtures/testSetup'
+import { default as testSetup } from '../../../../testSetup'
+import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , StyleMappingTable = require('../../../../../lib/extension/nga/style/styleMappingTable').StyleMappingTable
@@ -15,14 +16,13 @@ var FeatureTableStyles = require('../../../../../lib/extension/nga/style/feature
   , should = require('chai').should()
   , assert = require('assert')
   , path = require('path')
-  , wkx = require('wkx')
   , GeometryData = require('../../../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , FeatureStyleExtension = require('../../../../../lib/extension/nga/style/featureStyleExtension').FeatureStyleExtension;
 
 describe('StyleExtension Tests', function() {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
   var featureTableName = 'feature_table';
   var featureTable;
   var featureTableStyles;
@@ -45,7 +45,7 @@ describe('StyleExtension Tests', function() {
     var featureRow = featureDao.newRow();
     var geometryData = new GeometryData();
     geometryData.setSrsId(srs.srs_id);
-    var geometry = wkx.Geometry.parseGeoJSON(geoJson);
+    var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
     geometryData.setGeometry(geometry);
     featureRow.geometry = geometryData;
     featureRow.setValueWithColumnName('name', name);
@@ -88,56 +88,56 @@ describe('StyleExtension Tests', function() {
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = geopackage.createFeatureTable(featureTableName);
+    featureTable = geoPackage.createFeatureTable(featureTableName);
     var box = {
       "type": "Polygon",
       "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
     };
-    featureRowId = createRow(box, 'box', geopackage.getFeatureDao(featureTableName));
-    geopackage.featureStyleExtension.getOrCreateExtension(featureTableName)
-    geopackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
-    geopackage.featureStyleExtension.getContentsId().getOrCreateExtension()
-    featureTableStyles = new FeatureTableStyles(geopackage, featureTableName);
+    featureRowId = createRow(box, 'box', geoPackage.getFeatureDao(featureTableName));
+    geoPackage.featureStyleExtension.getOrCreateExtension(featureTableName)
+    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
+    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension()
+    featureTableStyles = new FeatureTableStyles(geoPackage, featureTableName);
     iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))
     // @ts-ignore
     iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     Canvas.disposeImage(iconImage);
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should create extension for feature table', function() {
-    var extensions = geopackage.extensionDao.queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
+    var extensions = geoPackage.extensionDao.queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
     should.exist(extensions.length);
     if (extensions.length) {
       extensions.length.should.be.equal(1);
     }
   });
 
-  it('should check if geopackage has extension or not', function() {
-    geopackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
-    geopackage.featureStyleExtension.has('not_valid_feature_table').should.be.equal(false);
+  it('should check if geoPackage has extension or not', function() {
+    geoPackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
+    geoPackage.featureStyleExtension.has('not_valid_feature_table').should.be.equal(false);
     featureTableStyles.has().should.be.equal(true);
   });
 
   it('should return all feature tables with style extension', function() {
-    geopackage.featureStyleExtension.getTables().length.should.be.equal(1);
+    geoPackage.featureStyleExtension.getTables().length.should.be.equal(1);
   });
 
   it('should get related tables extension', function() {
-    geopackage.featureStyleExtension.getRelatedTables().should.be.equal(geopackage.relatedTablesExtension);
+    geoPackage.featureStyleExtension.getRelatedTables().should.be.equal(geoPackage.relatedTablesExtension);
   });
 
   it('should get content id extension', function() {
-    geopackage.featureStyleExtension.getContentsId().should.be.equal(geopackage.contentsIdExtension);
+    geoPackage.featureStyleExtension.getContentsId().should.be.equal(geoPackage.contentsIdExtension);
   });
 
   it('should create relationships', function() {
@@ -191,7 +191,7 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should create style relationship even if contentsIdExtension does not yet exist', function() {
-    geopackage.contentsIdExtension.removeExtension();
+    geoPackage.contentsIdExtension.removeExtension();
     featureTableStyles.createTableIconRelationship();
     featureTableStyles.hasTableIconRelationship().should.be.equal(true);
   });
@@ -199,7 +199,7 @@ describe('StyleExtension Tests', function() {
   it('should delete all relationships', function() {
     featureTableStyles.createTableStyleRelationship();
     featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
-    geopackage.featureStyleExtension.deleteAllRelationships();
+    geoPackage.featureStyleExtension.deleteAllRelationships();
     featureTableStyles.hasTableStyleRelationship().should.be.equal(false);
   });
 
@@ -213,7 +213,7 @@ describe('StyleExtension Tests', function() {
     should.not.exist(featureTableStyles.getCachedTableIcons());
     should.not.exist(featureTableStyles.getTableIconDefault());
     should.not.exist(featureTableStyles.getTableIcon("GEOMETRY"));
-    var featureDao = geopackage.getFeatureDao(featureTableName);
+    var featureDao = geoPackage.getFeatureDao(featureTableName);
     var featureRow = featureDao.queryForId(featureRowId);
     should.not.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
     should.not.exist(featureTableStyles.getFeatureStyles(featureRow.id));
@@ -429,12 +429,12 @@ describe('StyleExtension Tests', function() {
     // test table style default
     var tableStyleDefault = randomStyle(featureTableStyles);
     featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    geopackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
+    geoPackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
     featureTableStyles.has().should.be.equal(true);
     featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
-    geopackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
-    geopackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTableName)).should.be.equal(true);
+    geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTableName)).should.be.equal(true);
     should.exist(featureTableStyles.getTableStyleDefault());
     // test geometry style
     var polygonStyle = randomStyle(featureTableStyles);
@@ -451,7 +451,7 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.getTableStyle(GeometryType.POLYGON).id.should.be.equal(polygonStyle.id);
 
     featureTableStyles.hasTableIconRelationship().should.be.equal(false);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(false);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(false);
     // Create table icon relationship
     featureTableStyles.hasTableIconRelationship().should.be.equal(false);
 
@@ -462,8 +462,8 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.setTableIconDefault(tableIconDefault);
     var pointIcon = randomIcon(featureTableStyles);
     featureTableStyles.setTableIcon(GeometryType.POINT, pointIcon);
-    geopackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(true);
+    geoPackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(true);
 
     featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
@@ -476,24 +476,24 @@ describe('StyleExtension Tests', function() {
     pointIcon.id.should.be.equal(featureTableStyles.getTableIcon(GeometryType.POINT).id);
 
     featureTableStyles.hasStyleRelationship().should.be.equal(false);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(false);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(false);
     featureTableStyles.hasIconRelationship().should.be.equal(false);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTableName)).should.be.equal(false);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTableName)).should.be.equal(false);
 
     var types = [GeometryType.POINT, GeometryType.POLYGON, GeometryType.LINESTRING, GeometryType.MULTIPOINT, GeometryType.MULTIPOLYGON, GeometryType.MULTILINESTRING];
     // Create style and icon relationship
     featureTableStyles.createStyleRelationship();
     featureTableStyles.hasStyleRelationship().should.be.equal(true);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(true);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(true);
 
     featureTableStyles.createIconRelationship();
     featureTableStyles.hasIconRelationship().should.be.equal(true);
-    geopackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTableName)).should.be.equal(true);
+    geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTableName)).should.be.equal(true);
     var featureRow, style, icon, typeStyle, typeIcon;
     var i, j, t;
     var featureResultsStyles = {};
     var featureResultsIcons = {};
-    var featureDao = geopackage.getFeatureDao(featureTableName);
+    var featureDao = geoPackage.getFeatureDao(featureTableName);
     var results = featureDao.queryForAll();
     for (i = 0; i < results.length; i++) {
       featureRow = featureDao.createObject(results[i]);
@@ -503,8 +503,8 @@ describe('StyleExtension Tests', function() {
       featureStyle.icon.id.should.be.equal(tableIconDefault.id);
 
       // verify that if no icon or style exist for the feature, that the default for the table is used
-      geopackage.featureStyleExtension.getStyle(featureTableName, featureRow.id, null, true).id.should.be.equal(tableStyleDefault.id);
-      geopackage.featureStyleExtension.getIcon(featureTableName, featureRow.id, null, true).id.should.be.equal(tableIconDefault.id);
+      geoPackage.featureStyleExtension.getStyle(featureTableName, featureRow.id, null, true).id.should.be.equal(tableStyleDefault.id);
+      geoPackage.featureStyleExtension.getIcon(featureTableName, featureRow.id, null, true).id.should.be.equal(tableIconDefault.id);
 
       // Feature Styles
       var featureRowStyles = {};
@@ -579,7 +579,7 @@ describe('StyleExtension Tests', function() {
     should.exist(featureTableStyles.getIconMappingDao());
     should.exist(featureTableStyles.getTableIconMappingDao());
 
-    var featureStyleExtension = geopackage.featureStyleExtension;
+    var featureStyleExtension = geoPackage.featureStyleExtension;
     featureStyles = featureTableStyles.getFeatureStyles(featureRow.id);
     should.exist(featureStyles.styles);
     should.exist(featureStyles.icons);
@@ -604,18 +604,18 @@ describe('StyleExtension Tests', function() {
       featureStyleExtension.has(featureTableName).should.be.equal(false);
     }
     featureStyleExtension.has(featureTableName).should.be.equal(false);
-    geopackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
-    geopackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
-    geopackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
     featureStyleExtension.removeExtension();
-    geopackage.isTable(StyleTable.TABLE_NAME).should.be.equal(false);
-    geopackage.isTable(IconTable.TABLE_NAME).should.be.equal(false);
-    geopackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(false);
+    geoPackage.isTable(IconTable.TABLE_NAME).should.be.equal(false);
+    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
     var contentsIdExtension = featureStyleExtension.getContentsId();
     contentsIdExtension.count().should.be.equal(1);
     contentsIdExtension.deleteIds().should.be.equal(1);
     contentsIdExtension.removeExtension();
-    geopackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(false);
+    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(false);
   }));
 
   it('should test featureStyles useIcon functionality', mochaAsync(async () => {
@@ -625,7 +625,7 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.createStyleRelationship();
     featureTableStyles.createIconRelationship();
 
-    var featureDao = geopackage.getFeatureDao(featureTableName);
+    var featureDao = geoPackage.getFeatureDao(featureTableName);
     var results = featureDao.queryForAll();
     var featureRow = featureDao.createObject(results[0]);
 
@@ -655,7 +655,7 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.createStyleRelationship();
     featureTableStyles.createIconRelationship();
 
-    var featureDao = geopackage.getFeatureDao(featureTableName);
+    var featureDao = geoPackage.getFeatureDao(featureTableName);
     var results = featureDao.queryForAll();
     var featureRow = featureDao.createObject(results[0]);
 

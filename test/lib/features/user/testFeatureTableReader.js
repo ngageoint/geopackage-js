@@ -1,4 +1,4 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var FeatureTableReader = require('../../../../lib/features/user/featureTableReader').FeatureTableReader
   , GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
@@ -14,10 +14,10 @@ describe('FeatureTableReader tests', function() {
     // @ts-ignore
     let result = await copyAndOpenGeopackage(sampleFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
   });
 
-  afterEach('close the geopackage connection', async function() {
+  afterEach('close the geoPackage connection', async function() {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });

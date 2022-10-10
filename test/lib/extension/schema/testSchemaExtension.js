@@ -1,31 +1,31 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var SchemaExtension = require('../../../../lib/extension/schema/schemaExtension').SchemaExtension;
 
 describe('GeoPackage Schema Extension tests', function() {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
-    geopackage.close();
+    geoPackage.close();
     await testSetup.deleteGeoPackage(testGeoPackage);
   });
 
   it('should have the extension', function() {
-    var schemaExtension = new SchemaExtension(geopackage);
+    var schemaExtension = new SchemaExtension(geoPackage);
     schemaExtension.has().should.be.equal(true);
   });
 
   it('should remove the extension', function() {
-    var schemaExtension = new SchemaExtension(geopackage);
-    geopackage.createDataColumns();
-    geopackage.createDataColumnConstraintsTable();
+    var schemaExtension = new SchemaExtension(geoPackage);
+    geoPackage.createDataColumns();
+    geoPackage.createDataColumnConstraintsTable();
     schemaExtension.has().should.be.equal(true);
     schemaExtension.removeExtension();
     schemaExtension.has().should.be.equal(false);

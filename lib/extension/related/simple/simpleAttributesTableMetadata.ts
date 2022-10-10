@@ -130,7 +130,7 @@ export class SimpleAttributesTableMetadata extends UserTableMetadata<UserCustomC
     if (simpleAttributeColumns == null) {
       simpleAttributeColumns = [];
       simpleAttributeColumns.push(
-        ...SimpleAttributesTable.createRequiredColumns(0, this.getIdColumnName(), this.isAutoincrement()),
+        ...SimpleAttributesTable.createRequiredColumns(this.getIdColumnName(), this.isAutoincrement()),
       );
 
       const additional = this.getAdditionalColumns();

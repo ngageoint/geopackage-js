@@ -1,4 +1,5 @@
 import { DBValue } from './dbValue';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * SQLite query builder module.
@@ -47,7 +48,7 @@ export class SqliteQueryBuilder {
   ): string {
     let query = '';
     if (SqliteQueryBuilder.isEmpty(groupBy) && !SqliteQueryBuilder.isEmpty(having)) {
-      throw new Error('Illegal Arguments: having clauses require a groupBy clause');
+      throw new GeoPackageException('Illegal Arguments: having clauses require a groupBy clause');
     }
 
     query += 'select ';

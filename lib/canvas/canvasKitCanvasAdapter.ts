@@ -7,6 +7,7 @@ import { CanvasUtils } from './canvasUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { EmulatedCanvas2D, EmulatedImageData, Image, ImageFormatEnumValues } from '../../@types/canvaskit';
 import { ImageType } from '../image/imageType';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * Node based canvas creation
@@ -121,11 +122,11 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
         height = image.height();
       }
     } catch (e) {
-      throw new Error('Failed to create image.');
+      throw new GeoPackageException('Failed to create image.');
     }
 
     if (image == null) {
-      throw new Error('Failed to create image.');
+      throw new GeoPackageException('Failed to create image.');
     }
 
     return new GeoPackageImage(image, width, height);

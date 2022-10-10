@@ -149,15 +149,14 @@ export class StyleTable extends AttributesTable {
    */
   static createColumns(): AttributesColumn[] {
     const columns = [];
-    let index = 0;
-    columns.push(AttributesColumn.createPrimaryKeyColumn(index++, StyleTable.COLUMN_ID));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_COLOR, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_OPACITY, GeoPackageDataType.REAL, false));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_WIDTH, GeoPackageDataType.REAL, false));
-    columns.push(AttributesColumn.createColumn(index++, StyleTable.COLUMN_FILL_COLOR, GeoPackageDataType.TEXT, false));
-    columns.push(AttributesColumn.createColumn(index, StyleTable.COLUMN_FILL_OPACITY, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createPrimaryKeyColumn(StyleTable.COLUMN_ID));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_NAME, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_DESCRIPTION, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_COLOR, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_OPACITY, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_WIDTH, GeoPackageDataType.REAL, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_FILL_COLOR, GeoPackageDataType.TEXT, false));
+    columns.push(AttributesColumn.createColumn(StyleTable.COLUMN_FILL_OPACITY, GeoPackageDataType.REAL, false));
     return columns;
   }
 }

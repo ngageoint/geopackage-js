@@ -12,6 +12,9 @@ import type { GeoPackage } from '../../../geoPackage';
  * Table Index Data Access Object
  */
 export class TableIndexDao extends GeoPackageDao<TableIndex, string> {
+  readonly gpkgTableName: string = TableIndex.TABLE_NAME;
+  readonly idColumns: string[] = [TableIndex.COLUMN_TABLE_NAME];
+
   /**
    * Create the DAO
    *

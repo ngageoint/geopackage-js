@@ -1,8 +1,8 @@
-import { default as testSetup } from '../../fixtures/testSetup'
+import { default as testSetup } from '../../testSetup'
 
 var DataColumns = require('../../../lib/extension/schema/columns/dataColumns').DataColumns
   , DataColumnConstraints = require('../../../lib/extension/schema/constraints/dataColumnConstraints').DataColumnConstraints
-  , TableCreator = require('../../../lib/db/tableCreator').GeoPackageTableCreator
+  , GeoPackageTableCreator = require('../../../lib/db/geoPackageTableCreator').GeoPackageTableCreator
   , DataColumnsDao = require('../../../lib/extension/schema/columns/dataColumnsDao').DataColumnsDao
   , DataColumnConstraintsDao = require('../../../lib/extension/schema/constraints/dataColumnConstraintsDao').DataColumnConstraintsDao
   , Contents = require('../../../lib/contents/contents').Contents
@@ -21,10 +21,10 @@ describe('Data Columns tests', function() {
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
   });
 
-  afterEach('should close the geopackage', async function() {
+  afterEach('should close the geoPackage', async function() {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   });
@@ -117,7 +117,7 @@ describe('Data Columns tests', function() {
   });
 
   it('should create a data column constraint', function() {
-    var tc = new TableCreator(geoPackage);
+    var tc = new GeoPackageTableCreator(geoPackage);
     tc.createDataColumnConstraints();
     var dao = new DataColumnConstraintsDao(geoPackage);
     var dc = new DataColumnConstraints();
@@ -145,7 +145,7 @@ describe('Data Columns tests', function() {
   });
 
   it('should create a data column constraint and query unique', function() {
-    var tc = new TableCreator(geoPackage);
+    var tc = new GeoPackageTableCreator(geoPackage);
     tc.createDataColumnConstraints();
     var dao = new DataColumnConstraintsDao(geoPackage);
     var dc = new DataColumnConstraints();

@@ -1,36 +1,36 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
+import { default as testSetup } from '../../../testSetup'
 
 var should = require('chai').should()
   , MetadataReference = require('../../../../lib/extension/metadata/reference/metadataReference').MetadataReference
   , Metadata = require('../../../../lib/extension/metadata/metadata').Metadata
-  , Verification = require('../../../fixtures/verification');
+  , Verification = require('../../../verification');
 
 describe('Metadata Reference tests', function() {
   var testGeoPackage;
-  var geopackage;
+  var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
-    geopackage = created.geopackage;
+    geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
     try {
-      geopackage.close();
+      geoPackage.close();
       await testSetup.deleteGeoPackage(testGeoPackage);
     } catch (e) {
     }
   });
 
   it('should create metadata and reference', function() {
-    geopackage.createMetadataTable();
-    geopackage.createMetadataReferenceTable();
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geoPackage.createMetadataTable();
+    geoPackage.createMetadataReferenceTable();
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geopackage.metadataDao;
-    var metadataReferenceDao = geopackage.metadataReferenceDao;
+    var metadataDao = geoPackage.metadataDao;
+    var metadataReferenceDao = geoPackage.metadataReferenceDao;
 
     var metadata1 = new Metadata();
     metadata1.id = 1;
@@ -76,13 +76,13 @@ describe('Metadata Reference tests', function() {
   });
 
   it('should create metadata and reference with a parent and then remove it', function() {
-    geopackage.createMetadataTable();
-    geopackage.createMetadataReferenceTable();
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geoPackage.createMetadataTable();
+    geoPackage.createMetadataReferenceTable();
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geopackage.metadataDao;
-    var metadataReferenceDao = geopackage.metadataReferenceDao;
+    var metadataDao = geoPackage.metadataDao;
+    var metadataReferenceDao = geoPackage.metadataReferenceDao;
 
     var metadata1 = new Metadata();
     metadata1.id = 1;
@@ -123,13 +123,13 @@ describe('Metadata Reference tests', function() {
   });
 
   it('should query for metadatareference by metadata and parent', function() {
-    geopackage.createMetadataTable();
-    geopackage.createMetadataReferenceTable();
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geoPackage.createMetadataTable();
+    geoPackage.createMetadataReferenceTable();
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geopackage.metadataDao;
-    var metadataReferenceDao = geopackage.metadataReferenceDao;
+    var metadataDao = geoPackage.metadataDao;
+    var metadataReferenceDao = geoPackage.metadataReferenceDao;
 
     var metadata1 = new Metadata();
     metadata1.id = 1;
@@ -206,13 +206,13 @@ describe('Metadata Reference tests', function() {
 
   it('should query for metadatareference by metadata', function() {
 
-    geopackage.createMetadataTable();
-    geopackage.createMetadataReferenceTable();
-    Verification.verifyMetadataReference(geopackage).should.be.equal(true);
-    Verification.verifyMetadata(geopackage).should.be.equal(true);
+    geoPackage.createMetadataTable();
+    geoPackage.createMetadataReferenceTable();
+    Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
+    Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geopackage.metadataDao;
-    var metadataReferenceDao = geopackage.metadataReferenceDao;
+    var metadataDao = geoPackage.metadataDao;
+    var metadataReferenceDao = geoPackage.metadataReferenceDao;
 
     var metadata1 = new Metadata();
     metadata1.id = 1;

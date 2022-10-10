@@ -19,7 +19,7 @@ export class MediaDao extends UserCustomDao {
    * @param dao  user custom data access object
    * @param mediaTable  user custom table
    */
-  public constructor(dao: UserCustomDao, mediaTable: MediaTable) {
+  public constructor(dao: UserCustomDao, mediaTable?: MediaTable) {
     super(dao, mediaTable != null ? mediaTable : new MediaTable(dao.getTable()));
   }
 

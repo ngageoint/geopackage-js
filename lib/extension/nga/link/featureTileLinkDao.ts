@@ -54,7 +54,7 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
       }
       if (results.length > 0) {
         if (results.length > 1) {
-          throw new Error(
+          throw new GeoPackageException(
             'More than one FeatureTileLink' +
               ' returned for key. Feature Table Name: ' +
               key.getFeatureTableName() +

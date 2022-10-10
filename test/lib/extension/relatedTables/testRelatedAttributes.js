@@ -1,5 +1,5 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import {RelatedTablesExtension} from '../../../../lib/extension/related'
+import { default as testSetup } from '../../../testSetup'
+import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
 import {UserMappingTable} from '../../../../lib/extension/related/userMappingTable';
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
@@ -18,10 +18,10 @@ describe('Related Attributes tests', function() {
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
-    geoPackage = result.geopackage;
+    geoPackage = result.geoPackage;
   });
 
-  afterEach('delete the geopackage', async function() {
+  afterEach('delete the geoPackage', async function() {
     geoPackage.close();
     await testSetup.deleteGeoPackage(filename);
   })

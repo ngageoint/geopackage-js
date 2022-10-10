@@ -1,10 +1,9 @@
-import { default as testSetup } from '../../../fixtures/testSetup'
-import {RTreeIndex} from '../../../../lib/extension/rtree/rTreeIndexExtension'
+import { default as testSetup } from '../../../testSetup'
+import { RTreeIndexExtension } from '../../../../lib/extension/rtree/rTreeIndexExtension'
 import {FeatureTableIndex} from '../../../../lib/extension/nga/index/featureTableIndex'
-import {RTreeIndexDao} from '../../../../lib/extension/rtree/rtreeIndexDao'
+import {RTreeIndexTableDao} from '../../../../lib/extension/rtree/rTreeIndexTableDao'
 
 var BoundingBox = require('../../../../lib/boundingBox').BoundingBox
-  // , testSetup = require('../../../fixtures/testSetup')
   , should = require('chai').should()
   , path = require('path');
 
@@ -17,15 +16,15 @@ describe('RTree tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'super.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('line1');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
@@ -35,23 +34,23 @@ describe('RTree tests', function() {
       var indexed = fti.isIndexed();
       fti.rtreeIndexed.should.be.equal(true);
       indexed.should.be.equal(true);
-      var exists = fti.hasExtension(RTreeIndexDao.EXTENSION_NAME, fti.tableName, fti.columnName);
+      var exists = fti.hasExtension(RTreeIndexTableDao.EXTENSION_NAME, fti.tableName, fti.columnName);
       exists.should.be.equal(true);
 
       var extensionDao = fti.extensionsDao;
-      var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(RTreeIndexDao.EXTENSION_NAME, fti.tableName, fti.columnName);
+      var extensions = extensionDao.queryByExtensionAndTableNameAndColumnName(RTreeIndexTableDao.EXTENSION_NAME, fti.tableName, fti.columnName);
       var extension = extensions[0];
-      extension.author.should.be.equal('gpkg');
-      extension.extensionNameNoAuthor.should.be.equal('rtree_index');
-      extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
-      extension.column_name.should.be.equal('geometry');
-      extension.table_name.should.be.equal('line1');
-      extension.scope.should.be.equal('write-only');
-      extension.extension_name.should.be.equal('gpkg_rtree_index');
+      extension.getAuthor().should.be.equal('gpkg');
+      extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
+      extension.getDefinition().should.be.equal('http://www.geoPackage.org/spec/#extension_rtree');
+      extension.getColumnName().should.be.equal('geometry');
+      extension.getTableName().should.be.equal('line1');
+      extension.getScope().should.be.equal('write-only');
+      extension.getExtensionName().should.be.equal('gpkg_rtree_index');
 
     });
 
-    it('should query the index from the geopackage api', function() {
+    it('should query the index from the geoPackage api', function() {
       return geoPackage.getGeoJSONFeaturesInTile('line1', 0, 0, 0)
         .then(function(features) {
           features.length.should.be.equal(1);
@@ -102,22 +101,22 @@ describe('RTree tests', function() {
     var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'rivers.gpkg');
     var filename;
 
-    beforeEach('should open the geopackage', async function() {
+    beforeEach('should open the geoPackage', async function() {
       // @ts-ignore
       let result = await copyAndOpenGeopackage(originalFilename);
       filename = result.path;
-      geoPackage = result.geopackage;
+      geoPackage = result.geoPackage;
       featureDao = geoPackage.getFeatureDao('FEATURESriversds');
     });
 
-    afterEach('should close the geopackage', async function() {
+    afterEach('should close the geoPackage', async function() {
       geoPackage.close();
       await testSetup.deleteGeoPackage(filename);
     });
 
     it('should add the RTree extension to the GeoPackage', function() {
-      var rtreeIndex = new RTreeIndex(geoPackage, featureDao);
-      let extension = rtreeIndex.create()[0];
+      var rtreeIndex = new RTreeIndexExtension(geoPackage);
+      let extension = rtreeIndex.createWithFeatureTable(featureDao.getTable());
       var fti = new FeatureTableIndex(geoPackage, featureDao);
       var indexed = fti.isIndexed();
       indexed.should.be.equal(true);
@@ -125,13 +124,13 @@ describe('RTree tests', function() {
       exists.should.be.equal(true);
       var extensionDao = rtreeIndex.extensionsDao;
       extensionDao.queryByExtension(rtreeIndex.extensionName);
-      extension.author.should.be.equal('gpkg');
-      extension.extensionNameNoAuthor.should.be.equal('rtree_index');
-      extension.definition.should.be.equal('http://www.geopackage.org/spec/#extension_rtree');
-      extension.column_name.should.be.equal('geom');
-      extension.table_name.should.be.equal('FEATURESriversds');
-      extension.scope.should.be.equal('write-only');
-      extension.extension_name.should.be.equal('gpkg_rtree_index');
+      extension.getAuthor().should.be.equal('gpkg');
+      extension.getExtensionNameNoAuthor().should.be.equal('rtree_index');
+      extension.getDefinition().should.be.equal('http://www.geoPackage.org/spec/#extension_rtree');
+      extension.getColumnName().should.be.equal('geom');
+      extension.getTableName().should.be.equal('FEATURESriversds');
+      extension.getScope().should.be.equal('write-only');
+      extension.getExtensionName().should.be.equal('gpkg_rtree_index');
     });
   });
 });
