@@ -748,20 +748,19 @@ export class FeatureTiles {
 
   /**
    * Simplify x,y tile coordinates by 1 pixel
-   * @param lineString GeoJSON with coordinates in pixels
+   * @param coordinatesArray GeoJSON with coordinates in pixels
    * @param isPolygon determines if the first and last point need to stay connected
    * @return simplified GeoJSON
    * @since 2.0.0
    */
-  simplifyPoints(lineString: any, isPolygon = false): any | null {
-    lineString.coordinates = simplify(
-      lineString.coordinates.map(coordinate => {
+  simplifyPoints(coordinatesArray: any, isPolygon = false): any | null {
+    return simplify(
+      coordinatesArray.map(coordinate => {
         return { x: coordinate[0], y: coordinate[1] };
       }),
       this.simplifyToleranceInPixels,
       false,
     ).map(point => [point.x, point.y]);
-    return lineString;
   }
 
   /**
@@ -773,18 +772,18 @@ export class FeatureTiles {
    * @param transform
    */
   getPath(lineString: any, context: any, boundingBox: BoundingBox, isPolygon = false, transform: Function): void {
-    lineString.coordinates = lineString.coordinates.map(coordinate => {
-      const transformedCoordinate = transform(coordinate);
+    const line = lineString.coordinates.map(coordinate => {
+      const transformedCoordinate = transform(coordinate.slice());
       return [
         TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, transformedCoordinate[0]),
         TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, transformedCoordinate[1]),
       ];
     });
-    const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(lineString, isPolygon) : lineString;
-    if (simplifiedLineString.coordinates.length > 1) {
-      context.moveTo(simplifiedLineString.coordinates[0][0], simplifiedLineString.coordinates[0][1]);
-      for (let i = 1; i < simplifiedLineString.coordinates.length; i++) {
-        context.lineTo(simplifiedLineString.coordinates[i][0], simplifiedLineString.coordinates[i][1]);
+    const simplifiedLineString = this.simplifyGeometries ? this.simplifyPoints(line, isPolygon) : line;
+    if (simplifiedLineString.length > 1) {
+      context.moveTo(simplifiedLineString[0][0], simplifiedLineString[0][1]);
+      for (let i = 1; i < simplifiedLineString.length; i++) {
+        context.lineTo(simplifiedLineString[i][0], simplifiedLineString[i][1]);
       }
     }
   }

@@ -38,6 +38,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 
 ### Changelog
 
+##### 4.2.3
+
+- fix cached geometry error
+
 ##### 4.2.2
 
 - fix simplify error
