@@ -1,6 +1,6 @@
 {
   "mode": "file",
-  "out": "api-docs",
+  "out": "docs/api",
   "tsconfig": "tsconfig.json",
   "exclude": "test/**/*",
   "excludePrivate": true,
