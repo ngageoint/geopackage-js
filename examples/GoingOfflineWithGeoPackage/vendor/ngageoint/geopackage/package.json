@@ -1,0 +1,125 @@
+{
+  "name": "@ngageoint/geopackage",
+  "version": "4.1.0",
+  "description": "GeoPackage JavaScript Library",
+  "keywords": [
+    "NGA",
+    "geopackage"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "NGA",
+    "url": "https://www.nga.mil"
+  },
+  "contributors": [
+    "Daniel Barela <daniel.barela@gmail.com>",
+    "Christopher Caldwell <c.caldwell90@gmail.com>",
+    "Jared Lincenberg <jaredlincenberg@gmail.com>"
+  ],
+  "homepage": "http://ngageoint.github.io/geopackage-js/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngageoint/geopackage-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ngageoint/geopackage-js/issues"
+  },
+  "bin": "./cli",
+  "dependencies": {
+    "@turf/bbox": "6.3.0",
+    "@turf/boolean-clockwise": "6.5.0",
+    "@turf/boolean-point-in-polygon": "6.5.0",
+    "@turf/boolean-within": "6.5.0",
+    "@turf/distance": "6.5.0",
+    "@turf/helpers": "6.5.0",
+    "@turf/intersect": "6.5.0",
+    "@turf/line-intersect": "6.5.0",
+    "@turf/point-to-line-distance": "6.5.0",
+    "@turf/polygon-to-line": "6.5.0",
+    "@types/geojson": "7946.0.8",
+    "@types/proj4": "2.5.2",
+    "file-type": "12.4.0",
+    "image-size": "0.8.3",
+    "lodash": "4.17.21",
+    "proj4": "2.7.2",
+    "reproject": "1.2.5",
+    "rtree-sql.js": "1.0.0",
+    "simplify-js": "1.2.4",
+    "webworkify": "1.5.0",
+    "wkx": "0.4.8"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "0.1.3",
+    "@types/chai": "4.2.7",
+    "@types/fs-extra": "9.0.11",
+    "@types/lodash": "^4.14.157",
+    "@types/mocha": "5.2.7",
+    "@types/node": "^12.12.12",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "babel-polyfill": "^6.23.0",
+    "browserify": "16.5.0",
+    "browserify-css": "0.15.0",
+    "canvas-compare": "https://github.com/caldwellc/canvas-compare.git",
+    "chai": "4.2.0",
+    "copy-webpack-plugin": "^8.1.1",
+    "coveralls": "^3.0.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.9.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "fs-extra": "9.1.0",
+    "json-loader": "^0.5.7",
+    "mocha": "6.2.2",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nock": "11.7.0",
+    "node-loader": "^2.0.0",
+    "node-polyfill-webpack-plugin": "^1.1.0",
+    "nyc": "^14.1.1",
+    "prettier": "^1.19.1",
+    "sass": "^1.29.0",
+    "sass-loader": "^10.0.5",
+    "source-map-support": "0.5.16",
+    "ts-loader": "^6.2.1",
+    "ts-node": "^8.5.2",
+    "typedoc": "^0.15.4",
+    "typescript": "^4.5.4",
+    "webpack": "5.37.0",
+    "webpack-bundle-analyzer": "4.4.1",
+    "webpack-cli": "4.7.0",
+    "xhr-mock": "2.5.1"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "7.4.1",
+    "chalk": "4.1.1",
+    "inquirer": "8.0.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "browser": "dist/geopackage.min.js",
+  "files": [
+    "dist",
+    "cli",
+    "converters"
+  ],
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "temp-dir": "./.test_run",
+    "report-dir": "./docs/coverage",
+    "reporter": [
+      "lcov"
+    ]
+  },
+  "scripts": {
+    "gh-pages-build": "npm install && npm run typedoc --options typedoc.json",
+    "typedoc": "rm -rf ./api-docs; typedoc --tsconfig tsconfig.json --mode file --out api-docs index.ts",
+    "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage; npm run clean-dist; npm run clean-test;",
+    "clean-dist": "rm -rf ./dist",
+    "clean-test": "rm -rf ./test/bundle ./test/sql-wasm.wasm ./test/node_modules ./test/tmp",
+    "test-node": "npm run clean; nyc --no-clean mocha -r ts-node/register",
+    "build-browser-test": "npm run clean && webpack -c browser.test.config.js --output-filename browser.test.bundle.js --mode=development",
+    "test": "npm run test-node && npm run report",
+    "report": "nyc report",
+    "build": "npm run clean && webpack && tsc",
+    "prepare": "npm run build"
+  }
+}
