@@ -53,6 +53,10 @@ The GeoPackage JavaScript library currently provides the ability to read GeoPack
 - Added in FeatureConnection, TileConnection, AttributesConnection and UserCustomConnections.
 - Added GeoPackageCache
 
+##### 4.2.3
+
+- fix cached geometry error
+
 ##### 4.2.2
 
 - fix simplify error

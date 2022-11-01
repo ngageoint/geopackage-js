@@ -1,6 +1,6 @@
 {
   "name": "@ngageoint/geopackage",
-  "version": "4.2.2",
+  "version": "4.2.3",
   "description": "GeoPackage JavaScript Library",
   "keywords": [
     "NGA",
@@ -73,7 +73,7 @@
     "source-map-support": "0.5.16",
     "ts-loader": "^9.3.0",
     "ts-node": "^8.5.2",
-    "typedoc": "^0.15.4",
+    "typedoc": "^0.22.18",
     "typescript": "^4.5.4",
     "webpack": "5.37.0",
     "webpack-bundle-analyzer": "4.4.1",
@@ -110,7 +110,7 @@
   },
   "scripts": {
     "gh-pages-build": "npm install && npm run typedoc --options typedoc.json",
-    "typedoc": "rm -rf ./api-docs; typedoc --tsconfig tsconfig.json --mode file --out api-docs index.ts",
+    "typedoc": "rm -rf ./docs/api; typedoc --tsconfig tsconfig.json --out docs/api index.ts",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage; npm run clean-dist; npm run clean-test;",
     "clean-dist": "rm -rf ./dist",
     "clean-test": "rm -rf ./test/bundle ./test/sql-wasm.wasm ./test/node_modules ./test/tmp",
