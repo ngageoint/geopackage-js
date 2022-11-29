@@ -1,4 +1,5 @@
 import { default as testSetup } from '../../testSetup'
+import { TileGrid } from "../../../lib/tiles/tileGrid";
 
 var should = require('chai').should()
   , path = require('path');
@@ -26,21 +27,21 @@ describe('TileDao tests', function() {
     });
 
     it('should get the zoom levels', function(done) {
-      tileDao.minZoom.should.be.equal(0);
-      tileDao.maxZoom.should.be.equal(3);
+      tileDao.getMinZoom().should.be.equal(0);
+      tileDao.getMaxZoom().should.be.equal(3);
       done();
     });
 
     it('should get the bounding box for each zoom level', function() {
       [0, 1, 2, 3, 4].forEach(function(zoom) {
-        var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
+        var bb = tileDao.getBoundingBoxAtZoomLevel(zoom);
         if (zoom === 4) {
           should.not.exist(bb);
         } else {
-          bb.minLongitude.should.be.equal(-20037508.342789244);
-          bb.maxLongitude.should.be.equal(20037508.342789244);
-          bb.minLatitude.should.be.equal(-20037508.342789244);
-          bb.maxLatitude.should.be.equal(20037508.342789244);
+          bb.getMinLongitude().should.be.equal(-20037508.342789244);
+          bb.getMaxLongitude().should.be.equal(20037508.342789244);
+          bb.getMinLatitude().should.be.equal(-20037508.342789244);
+          bb.getMaxLatitude().should.be.equal(20037508.342789244);
         }
       })
     });
@@ -67,18 +68,18 @@ describe('TileDao tests', function() {
 
     it('should query for a tile', function() {
       var tileRow = tileDao.queryForTile(0, 0, 0);
-      tileRow.zoomLevel.should.be.equal(0);
-      tileRow.tileColumn.should.be.equal(0);
-      tileRow.row.should.be.equal(0);
-      var data = tileRow.tileData;
+      tileRow.getZoomLevel().should.be.equal(0);
+      tileRow.getTileColumn().should.be.equal(0);
+      tileRow.getTileRow().should.be.equal(0);
+      var data = tileRow.getTileData();
       should.exist(data);
     });
 
     it('should query for tiles in the zoom level', function() {
       var count = 0;
-      for (var tileRow of tileDao.queryForTilesWithZoomLevel(1)) {
-        tileRow.zoomLevel.should.be.equal(1);
-        var data = tileRow.tileData;
+      for (var tileRow of tileDao.queryForTiles(1)) {
+        tileRow.getZoomLevel().should.be.equal(1);
+        var data = tileRow.getTileData();
         should.exist(data);
         count++;
       }
@@ -88,8 +89,8 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level descending order', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesDescending(1)) {
-        tileRow.zoomLevel.should.be.equal(1);
-        var data = tileRow.tileData;
+        tileRow.getZoomLevel().should.be.equal(1);
+        var data = tileRow.getTileData();
         should.exist(data);
         count++;
       }
@@ -99,9 +100,9 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level and column', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesInColumn(1, 1)) {
-        tileRow.zoomLevel.should.be.equal(1);
-        tileRow.tileColumn.should.be.equal(1);
-        var data = tileRow.tileData;
+        tileRow.getZoomLevel().should.be.equal(1);
+        tileRow.getTileColumn().should.be.equal(1);
+        var data = tileRow.getTileData();
         should.exist(data);
         count++;
       }
@@ -111,9 +112,9 @@ describe('TileDao tests', function() {
     it('should query for tiles in the zoom level and row', function() {
       var count = 0;
       for (var tileRow of tileDao.queryForTilesInRow(1, 1)) {
-        tileRow.zoomLevel.should.be.equal(1);
-        tileRow.row.should.be.equal(1);
-        var data = tileRow.tileData;
+        tileRow.getZoomLevel().should.be.equal(1);
+        tileRow.getTileRow().should.be.equal(1);
+        var data = tileRow.getTileData();
         should.exist(data);
         count++;
       }
@@ -121,19 +122,13 @@ describe('TileDao tests', function() {
     });
 
     it('should query for tiles in the tile grid', function() {
-      var tileGrid = {
-        min_x: 0,
-        max_x: 1,
-        min_y: 0,
-        max_y: 0
-      };
+      var tileGrid = new TileGrid(0, 1, 0, 0);
       var iterator = tileDao.queryByTileGrid(tileGrid, 1);
       var count = 0;
-      for (var tileRow of iterator) {
-        tileRow.zoomLevel.should.be.equal(1);
-        tileRow.row.should.be.equal(0);
-        var data = tileRow.tileData;
-        should.exist(data);
+      for (const tileRow of iterator) {
+        tileRow.getZoomLevel().should.be.equal(1);
+        tileRow.getTileRow().should.be.equal(0);
+        should.exist(tileRow.getTileData());
         count++;
       }
       count.should.be.equal(2);
@@ -162,20 +157,20 @@ describe('TileDao tests', function() {
     });
 
     it('should get the zoom levels', function() {
-      tileDao.minZoom.should.be.equal(4);
-      tileDao.maxZoom.should.be.equal(4);
+      tileDao.getMinZoom().should.be.equal(4);
+      tileDao.getMaxZoom().should.be.equal(4);
     });
 
     it('should get the bounding box for each zoom level', function() {
       [4, 5].forEach(function(zoom) {
-        var bb = tileDao.getBoundingBoxWithZoomLevel(zoom);
+        var bb = tileDao.getBoundingBoxAtZoomLevel(zoom);
         if (zoom === 5) {
           should.not.exist(bb);
         } else {
-          bb.minLongitude.should.be.equal(-180);
-          bb.maxLongitude.should.be.equal(-157.5);
-          bb.minLatitude.should.be.equal(45);
-          bb.maxLatitude.should.be.equal(67.5);
+          bb.getMinLongitude().should.be.equal(-180);
+          bb.getMaxLongitude().should.be.equal(-157.5);
+          bb.getMinLatitude().should.be.equal(45);
+          bb.getMaxLatitude().should.be.equal(67.5);
         }
       });
     });
@@ -186,10 +181,10 @@ describe('TileDao tests', function() {
         if (zoom === 5) {
           should.not.exist(grid);
         } else {
-          grid.minX.should.be.equal(0);
-          grid.minY.should.be.equal(0);
-          grid.maxX.should.be.equal(3);
-          grid.maxX.should.be.equal(3);
+          grid.getMinX().should.be.equal(0);
+          grid.getMinY().should.be.equal(0);
+          grid.getMaxX().should.be.equal(3);
+          grid.getMaxY().should.be.equal(3);
         }
       });
     });
@@ -201,75 +196,65 @@ describe('TileDao tests', function() {
     });
 
     it('should query for a tile', function() {
-      return tileDao.queryForTile(1, 1, 4)
-      .then(function(tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        tileRow.tileColumn.should.be.equal(1);
-        tileRow.row.should.be.equal(1);
-        var data = tileRow.tileData;
-        should.exist(data);
-      });
+      const tileRow = tileDao.queryForTile(1, 1, 4);
+      tileRow.getZoomLevel().should.be.equal(4);
+      tileRow.getTileColumn().should.be.equal(1);
+      tileRow.getTileRow().should.be.equal(1);
+      should.exist(tileRow.getTileData());
     });
 
     it('should query for tiles in the zoom level', function() {
-      return tileDao.queryForTilesWithZoomLevel(4, function(err, tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        var data = tileRow.tileData;
-        should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(16);
-      });
+      let count = 0;
+      for (const tileRow of tileDao.queryForTiles(4)) {
+        tileRow.getZoomLevel().should.be.equal(4);
+        should.exist(tileRow.getTileData());
+        count++;
+      }
+      count.should.be.equal(16);
     });
 
     it('should query for tiles in the zoom level descending order', function() {
-      tileDao.queryForTilesDescending(4, function(err, tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        var data = tileRow.tileData;
-        should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(16);
-      });
+      let count = 0;
+      for (const tileRow of tileDao.queryForTilesDescending(4)) {
+        tileRow.getZoomLevel().should.be.equal(4);
+        should.exist(tileRow.getTileData());
+        count++;
+      }
+      count.should.be.equal(16);
     });
 
     it('should query for tiles in the zoom level and column', function() {
-      return tileDao.queryForTilesInColumn(1, 4, function(err, tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        tileRow.tileColumn.should.be.equal(1);
-        var data = tileRow.tileData;
-        should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(4);
-      });
+      let count = 0;
+      for (const tileRow of tileDao.queryForTilesInColumn(1, 4)) {
+        tileRow.getZoomLevel().should.be.equal(4);
+        tileRow.getTileColumn().should.be.equal(1);
+        should.exist(tileRow.getTileData());
+        count++;
+      }
+      count.should.be.equal(4);
     });
 
     it('should query for tiles in the zoom level and row', function() {
-      return tileDao.queryForTilesInRow(1, 4, function(err, tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        tileRow.row.should.be.equal(1);
-        var data = tileRow.tileData;
-        should.exist(data);
-      }).then(function(count) {
-        count.should.be.equal(4);
-      });
+      let count = 0;
+      for (const tileRow of tileDao.queryForTilesInRow(1, 4)) {
+        tileRow.getZoomLevel().should.be.equal(4);
+        tileRow.getTileColumn().should.be.equal(1);
+        should.exist(tileRow.getTileData());
+        count++;
+      }
+      count.should.be.equal(4);
     });
 
-    it('should query for tiles in the tile grid', function(done) {
-      var tileGrid = {
-        minX: 0,
-        maxX: 1,
-        minY: 0,
-        maxY: 0
-      };
-      tileDao.queryByTileGrid(tileGrid, 4, function(err, tileRow) {
-        tileRow.zoomLevel.should.be.equal(4);
-        tileRow.row.should.be.equal(0);
-        var data = tileRow.tileData;
-        should.exist(data);
-      })
-      .then(function(count) {
-        count.should.be.equal(2);
-        done();
-      });
+    it('should query for tiles in the tile grid', function() {
+      const tileGrid = new TileGrid(0, 1, 0, 0);
+      let count = 0;
+      for (const tileRow of tileDao.queryByTileGrid(tileGrid, 4)) {
+        tileRow.getZoomLevel().should.be.equal(4);
+        tileRow.getTileColumn().should.be.equal(1);
+        should.exist(tileRow.getTileData());
+        count++;
+      }
+      count.should.be.equal(2);
     });
   });
 });

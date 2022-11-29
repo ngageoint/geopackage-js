@@ -61,11 +61,6 @@ export class GeometryIndex {
   public static readonly COLUMN_MAX_M = 'max_m';
 
   /**
-   * Foreign key to Extensions by table name
-   */
-  private tableIndex: TableIndex;
-
-  /**
    * Name of the feature table
    */
   private table_name: string;
@@ -124,17 +119,16 @@ export class GeometryIndex {
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof GeometryIndex) {
       const geometryIndex = args[0];
-      this.tableIndex = geometryIndex.tableIndex;
-      this.table_name = geometryIndex.table_name;
-      this.geom_id = geometryIndex.geom_id;
-      this.min_x = geometryIndex.min_x;
-      this.max_x = geometryIndex.max_x;
-      this.min_y = geometryIndex.min_y;
-      this.max_y = geometryIndex.max_y;
-      this.min_z = geometryIndex.min_z;
-      this.max_z = geometryIndex.max_z;
-      this.min_m = geometryIndex.min_m;
-      this.max_m = geometryIndex.max_m;
+      this.table_name = geometryIndex.getTableName();
+      this.geom_id = geometryIndex.getGeomId();
+      this.min_x = geometryIndex.getMinX();
+      this.max_x = geometryIndex.getMaxX();
+      this.min_y = geometryIndex.getMinY();
+      this.max_y = geometryIndex.getMaxY();
+      this.min_z = geometryIndex.getMinZ();
+      this.max_z = geometryIndex.getMaxZ();
+      this.min_m = geometryIndex.getMinM();
+      this.max_m = geometryIndex.getMaxM();
     }
   }
 
@@ -144,7 +138,7 @@ export class GeometryIndex {
    * @return geometry index key
    */
   public getId(): GeometryIndexKey {
-    return new GeometryIndexKey(this.table_name, this.geom_id);
+    return new GeometryIndexKey(this.getTableName(), this.getGeomId());
   }
 
   /**
@@ -157,27 +151,25 @@ export class GeometryIndex {
   }
 
   /**
-   * Get the table index
-   *
-   * @return table index
-   */
-  public getTableIndex(): TableIndex {
-    return this.tableIndex;
-  }
-
-  /**
    * Set the table index
    *
    * @param tableIndex
    *            table index
    */
   public setTableIndex(tableIndex: TableIndex): void {
-    this.tableIndex = tableIndex;
     if (tableIndex != null) {
       this.table_name = tableIndex.getTableName();
     } else {
       this.table_name = null;
     }
+  }
+
+  /**
+   * Sets the table name.
+   * @param tableName
+   */
+  public setTableName(tableName: string): void {
+    this.table_name = tableName;
   }
 
   /**

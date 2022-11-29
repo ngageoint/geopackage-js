@@ -9,6 +9,7 @@ import { SQLiteMasterColumn } from '../master/sqliteMasterColumn';
 import { StringUtils } from '../stringUtils';
 import type { GeoPackageConnection } from '../geoPackageConnection';
 import { GeoPackageException } from '../../geoPackageException';
+import { DateConverter } from '../dateConverter';
 
 export class TableInfo {
   /**
@@ -218,7 +219,7 @@ export class TableInfo {
       const dataType = TableInfo.getDataType(type);
       let defaultValue = undefined;
       if (result.dflt_value) {
-        defaultValue = result.dflt_value.replace(/\\'/g, '');
+        defaultValue = TableInfo.getDefaultValue(result.dflt_value.replace(/\\'/g, ''), dataType);
       }
       const tableColumn = new TableColumn(
         index,
@@ -260,4 +261,53 @@ export class TableInfo {
     }
     return dataType;
   }
+
+  /**
+   * Get the default object value for the string default value with the data type
+   * @param defaultValue default value
+   * @param type data type
+   * @return default value
+   */
+  public static getDefaultValue(defaultValue: string, type: GeoPackageDataType): any {
+    let value: any = defaultValue;
+
+    if (defaultValue != null && type != null && defaultValue.toUpperCase() !== TableInfo.DEFAULT_NULL) {
+      switch (type) {
+        case GeoPackageDataType.TEXT:
+          break;
+        case GeoPackageDataType.DATE:
+        case GeoPackageDataType.DATETIME:
+          try {
+            value = DateConverter.convert(defaultValue);
+          } catch (e) {
+            console.warn("Invalid " + type + " format: " + defaultValue + ", String value used", e);
+          }
+          break;
+        case GeoPackageDataType.BOOLEAN:
+          value = Number.parseInt(defaultValue) === 1
+          break;
+        case GeoPackageDataType.TINYINT:
+        case GeoPackageDataType.SMALLINT:
+        case GeoPackageDataType.MEDIUMINT:
+        case GeoPackageDataType.INT:
+        case GeoPackageDataType.INTEGER:
+          value = Number.parseInt(defaultValue);
+          break;
+        case GeoPackageDataType.FLOAT:
+        case GeoPackageDataType.DOUBLE:
+        case GeoPackageDataType.REAL:
+          value = Number.parseFloat(defaultValue);
+          break;
+        case GeoPackageDataType.BLOB:
+          value = Buffer.from(defaultValue);
+          break;
+        default:
+          throw new GeoPackageException("Unsupported Data Type " + type);
+      }
+
+    }
+
+    return value;
+  }
+
 }

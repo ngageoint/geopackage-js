@@ -28,4 +28,5 @@ export interface DBAdapter {
   size(): number;
   readableSize(): string;
   query(sql: string, params: [] | Record<string, any>): ResultSet;
+  unsafe(enabled: boolean): void;
 }

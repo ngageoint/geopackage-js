@@ -1,4 +1,6 @@
 import { Result } from './result';
+import { GeoPackageDataType } from './geoPackageDataType';
+import { ResultSetResult } from './resultSetResult';
 
 /**
  * Database Result utilities
@@ -22,11 +24,12 @@ export class ResultUtils {
    * @param columnName column name
    * @return value
    */
-  public static buildSingleResult(result: Result, columnName: string): any {
+  public static buildSingleResult(result: ResultSetResult, columnName: string): any {
     let value = null;
     if (result.moveToNext()) {
       value = result.getValue(columnName);
     }
+    result.close();
     return value;
   }
 
@@ -37,11 +40,12 @@ export class ResultUtils {
    * @param columnIdx column index
    * @return value
    */
-  public static buildSingleResultWithColumnIndex(result: Result, columnIdx: number): any {
+  public static buildSingleResultWithColumnIndex(result: ResultSetResult, columnIdx: number): any {
     let value = null;
     if (result.moveToNext()) {
       value = result.getValueWithIndex(columnIdx);
     }
+    result.close();
     return value;
   }
 
@@ -53,7 +57,7 @@ export class ResultUtils {
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResults(result: Result, columnName: string, limit?: number): unknown[] {
+  public static buildSingleColumnResults(result: ResultSetResult, columnName: string, limit?: number): unknown[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValue(columnName);
@@ -62,6 +66,7 @@ export class ResultUtils {
         break;
       }
     }
+    result.close();
     return results;
   }
 
@@ -73,7 +78,7 @@ export class ResultUtils {
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResultsWithColumnIndex(result: Result, columnIndex = 0, limit?: number): unknown[] {
+  public static buildSingleColumnResultsWithColumnIndex(result: ResultSetResult, columnIndex = 0, limit?: number): unknown[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValueWithIndex(columnIndex);
@@ -82,6 +87,7 @@ export class ResultUtils {
         break;
       }
     }
+    result.close();
     return results;
   }
 
@@ -92,7 +98,7 @@ export class ResultUtils {
    * @param limit result row limit
    * @return results
    */
-  public static buildResults(result: Result, limit: number): unknown[][] {
+  public static buildResults(result: ResultSetResult, limit: number): unknown[][] {
     const results = [];
     let columns = null;
     while (result.moveToNext()) {
@@ -100,15 +106,15 @@ export class ResultUtils {
         columns = result.getColumnNames();
       }
       const row = [];
-      for (const column of columns) {
-        row.push(result.getValue(column));
+      for (let i = 0; i < columns; i++) {
+        row.push(result.getValue(columns[i]));
       }
       results.push(row);
       if (limit != null && results.length >= limit) {
         break;
       }
     }
-
+    result.close();
     return results;
   }
 }

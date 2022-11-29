@@ -46,6 +46,14 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
     return this.geoPackage.getContentsDao().queryForIdWithKey(contentsId.getTableName());
   }
 
+  /**
+   * Create the necessary tables for this dao
+   * @return {Promise}
+   */
+  createTable(): boolean {
+    return this.geoPackage.getTableCreator().createContentsId();
+  }
+
   queryForIdWithKey(key: number): ContentsId {
     return this.queryForId(key);
   }
@@ -65,7 +73,7 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
   /**
    * Query by table name
    * @param  {string} tableName name of the table
-   * @return {module:extension/nga/contents.ContentsId}
+   * @return {ContentsId}
    */
   queryForTableName(tableName: string): ContentsId {
     const contentsIds = this.queryForAll(
@@ -73,7 +81,7 @@ export class ContentsIdDao extends GeoPackageDao<ContentsId, number> {
       this.buildWhereArgs(tableName),
     );
     if (contentsIds.length > 0) {
-      return (contentsIds[0] as unknown) as ContentsId;
+      return this.createObject(contentsIds[0]);
     } else {
       return null;
     }

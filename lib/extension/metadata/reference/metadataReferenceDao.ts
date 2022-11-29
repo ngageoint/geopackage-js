@@ -3,6 +3,7 @@ import { MetadataReference } from './metadataReference';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import type { GeoPackage } from '../../../geoPackage';
+import { ReferenceScopeType } from './referenceScopeType';
 
 /**
  * Metadata Reference Data Access Object
@@ -14,13 +15,13 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
   createObject(results?: Record<string, DBValue>): MetadataReference {
     const mr = new MetadataReference();
     if (results) {
-      mr.reference_scope = results.reference_scope as string;
-      mr.table_name = results.table_name as string;
-      mr.column_name = results.column_name as string;
-      mr.row_id_value = results.row_id_value as number;
-      mr.timestamp = new Date(results.timestamp as string);
-      mr.md_file_id = results.md_file_id as number;
-      mr.md_parent_id = results.md_parent_id as number;
+      mr.setReferenceScopeType(ReferenceScopeType.fromName(results.reference_scope as string));
+      mr.setTableName(results.table_name as string);
+      mr.setColumnName(results.column_name as string);
+      mr.setRowIdValue(results.row_id_value as number);
+      mr.setTimestamp(new Date(results.timestamp as string));
+      mr.setMdFileId(results.md_file_id as number);
+      mr.setMdParentId(results.md_parent_id as number);
     }
     return mr;
   }

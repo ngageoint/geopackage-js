@@ -52,6 +52,5 @@ global.copyAndOpenGeopackage = async function(original, copy) {
   } else {
     filename = original;
   }
-  console.log(filename);
   return openGeoPackage(filename);
 };

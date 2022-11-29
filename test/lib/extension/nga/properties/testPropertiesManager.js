@@ -5,6 +5,7 @@ import { GeoPackageManager } from "../../../../../lib/geoPackageManager";
 import { PropertiesManager } from "../../../../../lib/extension/nga/properties/propertiesManager";
 import { PropertyNames } from "../../../../../lib/extension/nga/properties/propertyNames";
 const should = require('chai').should();
+const assert = require('chai').assert;
 
 describe('GeoPackage Extension tests', function() {
 	const GEOPACKAGE_COUNT = 12;
@@ -64,9 +65,9 @@ describe('GeoPackage Extension tests', function() {
 		const properties = new PropertiesExtension(geoPackage);
 		properties.addValue(PropertyNames.TITLE, GEOPACKAGE_NAME + (i + 1));
 		properties.addValue(PropertyNames.IDENTIFIER, i.toString());
-		properties.addValue(EVEN_PROPERTY, i % 2 === 0 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
+		properties.addValue(EVEN_PROPERTY, i % 2 === 0 ? 'true' : 'false');
 		if (i % 2 === 1) {
-			properties.addValue(ODD_PROPERTY, Boolean.TRUE.toString());
+			properties.addValue(ODD_PROPERTY, 'true');
 		}
 
 		if (i % COLOR_RED_FREQUENCY === 0) {
@@ -93,7 +94,7 @@ describe('GeoPackage Extension tests', function() {
 		names.length.should.be.equal(GEOPACKAGE_COUNT);
 		for (let i = 1; i <= names.length; i++) {
 			const name = GEOPACKAGE_NAME + i;
-			(names.indexOf(name) !== -1).should.be.true;
+			(names.indexOf(name) > -1).should.be.true;
 			should.exist(manager.getGeoPackage(name));
 		}
 		manager.numGeoPackages().should.be.equal(GEOPACKAGE_COUNT);
@@ -104,11 +105,11 @@ describe('GeoPackage Extension tests', function() {
 		// getProperties
 		let properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TITLE)).should.be.true;
-		(properties.contains(PropertyNames.IDENTIFIER)).should.be.true;
-		(properties.contains(EVEN_PROPERTY)).should.be.true;
-		(properties.contains(ODD_PROPERTY)).should.be.true;
-		(properties.contains(PropertyNames.TAG)).should.be.true;
+		(properties.indexOf(PropertyNames.TITLE) > -1).should.be.true;
+		(properties.indexOf(PropertyNames.IDENTIFIER) > -1).should.be.true;
+		(properties.indexOf(EVEN_PROPERTY) > -1).should.be.true;
+		(properties.indexOf(ODD_PROPERTY) > -1).should.be.true;
+		(properties.indexOf(PropertyNames.TAG) > -1).should.be.true;
 
 		// hasProperty
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT, manager.hasProperty(PropertyNames.TITLE).length);
@@ -138,24 +139,24 @@ describe('GeoPackage Extension tests', function() {
 		(manager.hasValues(EVEN_PROPERTY)).should.be.true;
 		(manager.hasValues(ODD_PROPERTY)).should.be.true;
 		(manager.hasValues(PropertyNames.TAG)).should.be.true;
-		TestCase.assertFalse(manager.hasValues(PropertyNames.CREATOR));
+		assert.isFalse(manager.hasValues(PropertyNames.CREATOR));
 
 		// getValues
 		let titles = manager.getValues(PropertyNames.TITLE);
 		let identifiers = manager.getValues(PropertyNames.IDENTIFIER);
 		for (let i = 0; i < GEOPACKAGE_WITH_PROPERTIES_COUNT; i++) {
-			(titles.contains(GEOPACKAGE_NAME + (i + 1))).should.be.true;
-			(identifiers.contains(i.toString())).should.be.true;
+			(titles.indexOf(GEOPACKAGE_NAME + (i + 1)) > -1).should.be.true;
+			(identifiers.indexOf(i.toString()) > -1).should.be.true;
 		}
 		let evenValues = manager.getValues(EVEN_PROPERTY);
-		(evenValues.contains(Boolean.TRUE.toString())).should.be.true;
-		(evenValues.contains(Boolean.FALSE.toString())).should.be.true;
+		(evenValues.indexOf('true') > -1).should.be.true;
+		(evenValues.indexOf('false') > -1).should.be.true;
 		let oddValues = manager.getValues(ODD_PROPERTY);
-		(oddValues.contains(Boolean.TRUE.toString())).should.be.true;
+		(oddValues.indexOf('true') > -1).should.be.true;
 		let tags = manager.getValues(PropertyNames.TAG);
-		(tags.contains(COLOR_RED)).should.be.true;
-		(tags.contains(COLOR_GREEN)).should.be.true;
-		(tags.contains(COLOR_BLUE)).should.be.true;
+		(tags.indexOf(COLOR_RED) > -1).should.be.true;
+		(tags.indexOf(COLOR_GREEN) > -1).should.be.true;
+		(tags.indexOf(COLOR_BLUE) > -1).should.be.true;
 		(manager.getValues(PropertyNames.CREATOR).isEmpty()).should.be.true;
 
 		// hasValue
@@ -165,10 +166,10 @@ describe('GeoPackage Extension tests', function() {
 		}
 		assertEquals(0, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + (GEOPACKAGE_WITH_PROPERTIES_COUNT + 1)).length);
 		assertEquals(0, manager.hasValue(PropertyNames.IDENTIFIER, GEOPACKAGE_WITH_PROPERTIES_COUNT.toString()).length);
-		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, Boolean.TRUE.toString()).length);
-		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, Boolean.FALSE.toString()).length);
-		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(ODD_PROPERTY, Boolean.TRUE.toString()).length);
-		assertEquals(0, manager.hasValue(ODD_PROPERTY, Boolean.FALSE.toString()).length);
+		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, 'true').length);
+		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(EVEN_PROPERTY, 'false').length);
+		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.hasValue(ODD_PROPERTY, 'true').length);
+		assertEquals(0, manager.hasValue(ODD_PROPERTY, 'false').length);
 		assertEquals(COLOR_RED_COUNT, manager.hasValue(PropertyNames.TAG, COLOR_RED).length);
 		assertEquals(COLOR_GREEN_COUNT, manager.hasValue(PropertyNames.TAG, COLOR_GREEN).length);
 		assertEquals(COLOR_BLUE_COUNT, manager.hasValue(PropertyNames.TAG, COLOR_BLUE).length);
@@ -176,10 +177,10 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(0, manager.hasValue(PropertyNames.CREATOR, CREATOR).length);
 
 		// missingValue
-		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(EVEN_PROPERTY, Boolean.TRUE.toString()).length);
-		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(EVEN_PROPERTY, Boolean.FALSE.toString()).length);
-		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(ODD_PROPERTY, Boolean.TRUE.toString()).length);
-		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(ODD_PROPERTY, Boolean.FALSE.toString()).length);
+		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(EVEN_PROPERTY, 'true').length);
+		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(EVEN_PROPERTY, 'false').length);
+		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT + GEOPACKAGE_WITH_PROPERTIES_COUNT / 2, manager.missingValue(ODD_PROPERTY, 'true').length);
+		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(ODD_PROPERTY, 'false').length);
 		assertEquals(GEOPACKAGE_COUNT - COLOR_RED_COUNT, manager.missingValue(PropertyNames.TAG, COLOR_RED).length);
 		assertEquals(GEOPACKAGE_COUNT - COLOR_GREEN_COUNT, manager.missingValue(PropertyNames.TAG, COLOR_GREEN).length);
 		assertEquals(GEOPACKAGE_COUNT - COLOR_BLUE_COUNT, manager.missingValue(PropertyNames.TAG, COLOR_BLUE).length);
@@ -191,27 +192,27 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(++numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.CREATOR)).should.be.true;
+		(properties.indexOf(PropertyNames.CREATOR) > -1).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.hasProperty(PropertyNames.CREATOR).length);
 		assertEquals(0, manager.missingProperty(PropertyNames.CREATOR).length);
 		assertEquals(1, manager.numValues(PropertyNames.CREATOR));
 		(manager.hasValues(PropertyNames.CREATOR)).should.be.true;
-		(manager.getValues(PropertyNames.CREATOR).contains(CREATOR)).should.be.true;
+		(manager.getValues(PropertyNames.CREATOR).indexOf(CREATOR) > -1).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.hasValue(PropertyNames.CREATOR, CREATOR).length);
 		assertEquals(0, manager.missingValue(PropertyNames.CREATOR, CREATOR).length);
 
 		// Add a property value to a single GeoPackage
-		TestCase.assertFalse(manager.addValue(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CREATOR, CREATOR));
+		assert.isFalse(manager.addValue(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CREATOR, CREATOR));
 		(manager.addValue(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CONTRIBUTOR, CREATOR)).should.be.true;
 		assertEquals(++numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.CONTRIBUTOR)).should.be.true;
+		(properties.indexOf(PropertyNames.CONTRIBUTOR) > -1).should.be.true;
 		assertEquals(1, manager.hasProperty(PropertyNames.CONTRIBUTOR).length);
 		assertEquals(GEOPACKAGE_COUNT - 1, manager.missingProperty(PropertyNames.CONTRIBUTOR).length);
 		assertEquals(1, manager.numValues(PropertyNames.CONTRIBUTOR));
 		(manager.hasValues(PropertyNames.CONTRIBUTOR)).should.be.true;
-		(manager.getValues(PropertyNames.CONTRIBUTOR).contains(CREATOR)).should.be.true;
+		(manager.getValues(PropertyNames.CONTRIBUTOR).indexOf(CREATOR) > -1).should.be.true;
 		assertEquals(1, manager.hasValue(PropertyNames.CONTRIBUTOR, CREATOR).length);
 		assertEquals(GEOPACKAGE_COUNT - 1, manager.missingValue(PropertyNames.CONTRIBUTOR, CREATOR).length);
 
@@ -235,11 +236,11 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(--numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		TestCase.assertFalse(properties.contains(PropertyNames.IDENTIFIER));
+		assert.isFalse(properties.indexOf(PropertyNames.IDENTIFIER) > -1);
 		assertEquals(0, manager.hasProperty(PropertyNames.IDENTIFIER).length);
 		assertEquals(GEOPACKAGE_COUNT, manager.missingProperty(PropertyNames.IDENTIFIER).length);
 		assertEquals(0, manager.numValues(PropertyNames.IDENTIFIER));
-		TestCase.assertFalse(manager.hasValues(PropertyNames.IDENTIFIER));
+		assert.isFalse(manager.hasValues(PropertyNames.IDENTIFIER));
 		assertEquals(0, manager.getValues(PropertyNames.IDENTIFIER).length);
 		assertEquals(0, manager.hasValue(PropertyNames.IDENTIFIER, "1").length);
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.IDENTIFIER, "1").length);
@@ -249,12 +250,12 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TAG)).should.be.true;
+		(properties.indexOf(PropertyNames.TAG) > -1).should.be.true;
 		assertEquals(--numTagged, manager.hasProperty(PropertyNames.TAG).length);
 		assertEquals(GEOPACKAGE_COUNT - numTagged, manager.missingProperty(PropertyNames.TAG).length);
 		assertEquals(3, manager.numValues(PropertyNames.TAG));
 		(manager.hasValues(PropertyNames.TAG)).should.be.true;
-		(manager.getValues(PropertyNames.TAG).contains(COLOR_RED)).should.be.true;
+		(manager.getValues(PropertyNames.TAG).indexOf(COLOR_RED) > -1).should.be.true;
 		assertEquals(COLOR_RED_COUNT - 1, manager.hasValue(PropertyNames.TAG, COLOR_RED).length);
 		assertEquals(GEOPACKAGE_COUNT - (COLOR_RED_COUNT - 1), manager.missingValue(PropertyNames.TAG, COLOR_RED).length);
 
@@ -263,13 +264,13 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TAG)).should.be.true;
+		(properties.indexOf(PropertyNames.TAG) > -1).should.be.true;
 		assertEquals(--numTagged, manager.hasProperty(PropertyNames.TAG).length);
 		assertEquals(GEOPACKAGE_COUNT - numTagged, manager.missingProperty(PropertyNames.TAG).length);
 		assertEquals(2, manager.numValues(PropertyNames.TAG));
 		(manager.hasValues(PropertyNames.TAG)).should.be.true;
-		TestCase.assertFalse(manager.getValues(PropertyNames.TAG).contains(COLOR_RED));
-		(manager.getValues(PropertyNames.TAG).contains(COLOR_GREEN)).should.be.true;
+		assert.isFalse(manager.getValues(PropertyNames.TAG).indexOf(COLOR_RED) > -1);
+		(manager.getValues(PropertyNames.TAG).indexOf(COLOR_GREEN) > -1).should.be.true;
 		assertEquals(0, manager.hasValue(PropertyNames.TAG, COLOR_RED).length);
 		assertEquals(COLOR_GREEN_COUNT - 1, manager.hasValue(PropertyNames.TAG, COLOR_GREEN).length);
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TAG, COLOR_RED).length);
@@ -279,12 +280,12 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TAG)).should.be.true;
+		(properties.indexOf(PropertyNames.TAG) > -1).should.be.true;
 		assertEquals(--numTagged, manager.hasProperty(PropertyNames.TAG).length);
 		assertEquals(GEOPACKAGE_COUNT - numTagged, manager.missingProperty(PropertyNames.TAG).length);
 		assertEquals(2, manager.numValues(PropertyNames.TAG));
 		(manager.hasValues(PropertyNames.TAG)).should.be.true;
-		(manager.getValues(PropertyNames.TAG).contains(COLOR_GREEN)).should.be.true;
+		(manager.getValues(PropertyNames.TAG).indexOf(COLOR_GREEN) > -1).should.be.true;
 		assertEquals(COLOR_GREEN_COUNT - 2, manager.hasValue(PropertyNames.TAG, COLOR_GREEN).length);
 		assertEquals(GEOPACKAGE_COUNT - (COLOR_GREEN_COUNT - 2), manager.missingValue(PropertyNames.TAG, COLOR_GREEN).length);
 
@@ -293,13 +294,13 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TITLE)).should.be.true;
+		(properties.indexOf(PropertyNames.TITLE) > -1).should.be.true;
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT - 1, manager.hasProperty(PropertyNames.TITLE).length);
 		assertEquals(GEOPACKAGE_COUNT - (GEOPACKAGE_WITH_PROPERTIES_COUNT - 1), manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT - 1, manager.numValues(PropertyNames.TITLE));
 		(manager.hasValues(PropertyNames.TITLE)).should.be.true;
-		TestCase.assertFalse(manager.getValues(PropertyNames.TITLE).contains(GEOPACKAGE_NAME + 2));
-		(manager.getValues(PropertyNames.TITLE).contains(GEOPACKAGE_NAME + 3)).should.be.true;
+		assert.isFalse(manager.getValues(PropertyNames.TITLE).indexOf(GEOPACKAGE_NAME + 2) > -1);
+		(manager.getValues(PropertyNames.TITLE).indexOf(GEOPACKAGE_NAME + 3) > -1).should.be.true;
 		assertEquals(0, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 2).length);
 		assertEquals(1, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 2).length);
@@ -309,13 +310,13 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
-		(properties.contains(PropertyNames.TITLE)).should.be.true;
+		(properties.indexOf(PropertyNames.TITLE) > -1).should.be.true;
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT - 2, manager.hasProperty(PropertyNames.TITLE).length);
 		assertEquals(GEOPACKAGE_COUNT - (GEOPACKAGE_WITH_PROPERTIES_COUNT - 2), manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(GEOPACKAGE_WITH_PROPERTIES_COUNT - 2, manager.numValues(PropertyNames.TITLE));
 		(manager.hasValues(PropertyNames.TITLE)).should.be.true;
-		TestCase.assertFalse(manager.getValues(PropertyNames.TITLE).contains(GEOPACKAGE_NAME + 4));
-		(manager.getValues(PropertyNames.TITLE).contains(GEOPACKAGE_NAME + 3)).should.be.true;
+		assert.isFalse(manager.getValues(PropertyNames.TITLE).indexOf(GEOPACKAGE_NAME + 4) > -1);
+		(manager.getValues(PropertyNames.TITLE).indexOf(GEOPACKAGE_NAME + 3) > -1).should.be.true;
 		assertEquals(0, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 4).length);
 		assertEquals(1, manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 4).length);
@@ -327,7 +328,7 @@ describe('GeoPackage Extension tests', function() {
 		(manager.hasProperty(PropertyNames.TITLE).isEmpty()).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(0, manager.numValues(PropertyNames.TITLE));
-		TestCase.assertFalse(manager.hasValues(PropertyNames.TITLE));
+		assert.isFalse(manager.hasValues(PropertyNames.TITLE));
 		(manager.getValues(PropertyNames.TITLE).isEmpty()).should.be.true;
 		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).isEmpty()).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);
@@ -339,7 +340,7 @@ describe('GeoPackage Extension tests', function() {
 		(manager.hasProperty(PropertyNames.TITLE).isEmpty()).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(0, manager.numValues(PropertyNames.TITLE));
-		TestCase.assertFalse(manager.hasValues(PropertyNames.TITLE));
+		assert.isFalse(manager.hasValues(PropertyNames.TITLE));
 		(manager.getValues(PropertyNames.TITLE).isEmpty()).should.be.true;
 		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).isEmpty()).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);

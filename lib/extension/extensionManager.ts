@@ -18,6 +18,7 @@ import { DataColumns } from './schema/columns/dataColumns';
 import { MetadataReference } from './metadata/reference/metadataReference';
 import { ExtendedRelation } from './related/extendedRelation';
 import type { GeoPackage } from '../geoPackage';
+import { PropertiesExtension } from './nga/properties/propertiesExtension';
 
 /**
  * GeoPackage Extension Manager for deleting and copying extensions
@@ -62,6 +63,7 @@ export class ExtensionManager extends ExtensionManagement {
     // this.deleteGriddedCoverage(table);
     this.deleteSchema(table);
     this.deleteMetadata(table);
+    this.deleteProperties(table);
 
     this.deleteTable(table);
   }
@@ -81,6 +83,7 @@ export class ExtensionManager extends ExtensionManagement {
     this.deleteSchemaExtension();
     this.deleteMetadataExtension();
     this.deleteCrsWktExtension();
+    this.deletePropertiesExtension();
 
     this.delete();
   }
@@ -561,5 +564,33 @@ export class ExtensionManager extends ExtensionManagement {
     if (crsWktExtension.has()) {
       crsWktExtension.removeExtension();
     }
+  }
+
+  /**
+   * Delete the Properties extension if the deleted table is the properties
+   * table
+   *
+   * @param table table name
+   */
+  public deleteProperties(table: string): void {
+    if (table.toUpperCase() === PropertiesExtension.TABLE_NAME.toUpperCase()) {
+      this.deletePropertiesExtension();
+    }
+  }
+
+  /**
+   * Delete the properties extension from the GeoPackage
+   */
+  public deletePropertiesExtension(): void {
+    this.getPropertiesExtension().removeExtension();
+  }
+
+  /**
+   * Get a Properties Extension used only for deletions
+   *
+   * @return Feature Style Extension
+   */
+  private getPropertiesExtension(): PropertiesExtension {
+    return new PropertiesExtension(this.geoPackage);
   }
 }

@@ -89,7 +89,7 @@ export abstract class UserResultSet<
    * {@inheritDoc}
    */
   public getValueForColumn(column: TColumn): any {
-    return this.getValue(this.getValue(column.getName()));
+    return this.getValue(column.getName());
   }
 
   /**
@@ -112,25 +112,26 @@ export abstract class UserResultSet<
   public getId(): number {
     let id = -1;
 
-    const pkColumn = this.columns.getPkColumn();
-    if (pkColumn == null) {
-      const error = ['No primary key column in '];
-      if (this.columns.isCustom()) {
-        error.push('custom specified table columns. ');
+    if (this.resultSet.hasValue()) {
+      const pkColumn = this.columns.getPkColumn();
+      if (pkColumn == null) {
+        const error = ['No primary key column in '];
+        if (this.columns.isCustom()) {
+          error.push('custom specified table columns. ');
+        }
+        error.push('table: ' + this.columns.getTableName());
+        if (this.columns.isCustom()) {
+          error.push(', columns: ' + this.columns.getColumnNames());
+        }
+        throw new GeoPackageException(error.join(''));
       }
-      error.push('table: ' + this.columns.getTableName());
-      if (this.columns.isCustom()) {
-        error.push(', columns: ' + this.columns.getColumnNames());
-      }
-      throw new GeoPackageException(error.join(''));
-    }
 
-    const objectValue = this.getValueForColumn(pkColumn);
-    if (typeof objectValue === 'number') {
-      id = objectValue;
-    } else {
-      throw new GeoPackageException(
-        'Primary Key value was not a number. table: ' +
+      const objectValue = this.getValueForColumn(pkColumn);
+      if (typeof objectValue === 'number') {
+        id = objectValue;
+      } else {
+        throw new GeoPackageException(
+          'Primary Key value was not a number. table: ' +
           this.columns.getTableName() +
           ', index: ' +
           pkColumn.getIndex() +
@@ -138,7 +139,8 @@ export abstract class UserResultSet<
           pkColumn.getName() +
           ', value: ' +
           objectValue,
-      );
+        );
+      }
     }
 
     return id;
@@ -169,20 +171,25 @@ export abstract class UserResultSet<
    * {@inheritDoc}
    */
   public getRow(): TRow {
-    const columnTypes = [];
-    const values = [];
+    let row: TRow;
+    if (this.resultSet.hasValue()) {
+      const columnTypes = [];
+      const values = [];
 
-    try {
-      for (let index = 0; index < this.columns.columnCount(); index++) {
-        const column = this.columns.getColumnForIndex(index);
-        values.push(this.getValueForColumn(column));
-        columnTypes.push(column.getDataType());
+      try {
+        for (let index = 0; index < this.columns.columnCount(); index++) {
+          const column = this.columns.getColumnForIndex(index);
+          values.push(this.getValueForColumn(column));
+          columnTypes.push(column.getDataType());
+        }
+      } catch (e) {
+        console.error(e);
+        throw new GeoPackageException('Failed to retrieve the row');
       }
-    } catch (e) {
-      throw new GeoPackageException('Failed to retrieve the row');
+      row = this.getRowWithColumnTypesAndValues(columnTypes, values)
     }
 
-    return this.getRowWithColumnTypesAndValues(columnTypes, values);
+    return row;
   }
 
   /**

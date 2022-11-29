@@ -113,7 +113,7 @@ export abstract class UserConnection<TColumn extends UserColumn,
 		limit?: number,
 		offset?: number
 	): TResult {
-		const sql = this.querySQL(distinct, tables, columns, groupBy, where, join, having, orderBy, limit, offset);
+		const sql = this.querySQL(distinct, tables, columns, where, join, groupBy, having, orderBy, limit, offset);
 		const resultSet = SQLUtils.query(this.connection, sql, whereArgs);
 		return this.createResult(columns, resultSet, sql, whereArgs);
 	}
@@ -181,7 +181,7 @@ export abstract class UserConnection<TColumn extends UserColumn,
 		limit?: number,
 		offset?: number,
 	): string {
-		return SqliteQueryBuilder.buildQuery(distinct, tables, columns, groupBy, where, join, having, orderBy, limit, offset);
+		return SqliteQueryBuilder.buildQuery(distinct, tables, columns, where, join, groupBy, having, orderBy, limit, offset);
 	}
 
 	/**

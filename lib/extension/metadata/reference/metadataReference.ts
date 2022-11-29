@@ -135,6 +135,15 @@ export class MetadataReference {
       this.md_parent_id = -1;
     }
   }
+
+  /**
+   * Setter for the table name
+   * @param tableName
+   */
+  setTableName(tableName: string): void {
+    this.table_name = tableName;
+  }
+
   setReferenceScopeType(referenceScopeType: ReferenceScopeType): void {
     this.reference_scope = referenceScopeType;
     switch (referenceScopeType) {
@@ -154,5 +163,45 @@ export class MetadataReference {
         this.row_id_value = undefined;
         break;
     }
+  }
+
+  /**
+   * Setter for the column name
+   * @param columnName
+   */
+  setColumnName(columnName: string) {
+    this.column_name = columnName;
+  }
+
+  /**
+   * Setter for the row id value
+   * @param rowIdValue
+   */
+  setRowIdValue(rowIdValue: number) {
+    this.row_id_value = rowIdValue;
+  }
+
+  /**
+   * Setter for the timestamp
+   * @param date
+   */
+  setTimestamp(date: Date) {
+    this.timestamp = date;
+  }
+
+  /**
+   * Setter the metadata file id
+   * @param mdFileId
+   */
+  setMdFileId(mdFileId: number) {
+    this.md_file_id = mdFileId;
+  }
+
+  /**
+   * Setter for the metadata parent id
+   * @param mdParentId
+   */
+  setMdParentId(mdParentId: number) {
+    this.md_parent_id = mdParentId;
   }
 }

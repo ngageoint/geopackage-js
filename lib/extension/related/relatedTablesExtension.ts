@@ -79,6 +79,15 @@ export class RelatedTablesExtension extends BaseExtension {
    *
    * @return extension
    */
+  public getOrCreateExtension(): Extensions {
+    return this.getOrCreate();
+  }
+
+  /**
+   * Get or create the extension
+   *
+   * @return extension
+   */
   public getOrCreate(): Extensions {
     // Create table
     this.createExtendedRelationsTable();

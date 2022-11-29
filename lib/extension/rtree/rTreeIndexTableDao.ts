@@ -100,7 +100,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
     if (!this.has()) {
       extension = this.rTree.createWithFeatureTable(this.featureDao.getTable());
       if (this.progress != null) {
-        this.progress.addProgress(this.count(false, undefined));
+        this.progress.addProgress(this.count());
       }
     }
     return extension;
@@ -130,6 +130,393 @@ export class RTreeIndexTableDao extends UserCustomDao {
   public getFeatureDao(): FeatureDao {
     return this.featureDao;
   }
+
+  /**
+   * Query for rtree index records
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public query(where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): UserCustomResultSet {
+    return this.queryWithDistinctAndColumns(undefined, undefined, where, whereArgs, join, groupBy, having, orderBy, limit);
+  }
+
+  /**
+   * Query for rtree index records
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryWithDistinct(distinct: boolean, where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): UserCustomResultSet {
+    return this.queryWithDistinctAndColumns(distinct, undefined, where, whereArgs, join, groupBy, having, orderBy, limit);
+  }
+
+  /**
+   * Query for rtree index records
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryWithColumns(columns: string[], where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): UserCustomResultSet {
+    return this.queryWithDistinctAndColumns(undefined, columns, where, whereArgs, join, groupBy, having, orderBy, limit);
+  }
+
+  /**
+   * Query for rtree index records
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryWithDistinctAndColumns(distinct: boolean, columns: string[], where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): UserCustomResultSet {
+    this.validateRTree();
+    return super.queryWithDistinctAndColumns(distinct, columns, where, whereArgs, join, groupBy, having, orderBy, limit);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public queryWithGeometryEnvelope(envelope: GeometryEnvelope): UserCustomResultSet {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public queryWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope): UserCustomResultSet {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public queryWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope): UserCustomResultSet {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public queryWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope): UserCustomResultSet {
+    return this.queryWithBoundsAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY);
+  }
+  
+  /**
+   * Query for rows within the bounds
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public queryWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection?: Projection): UserCustomResultSet {
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, undefined, boundingBox, projection);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public queryWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection?: Projection): UserCustomResultSet {
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, undefined, boundingBox, projection);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param columns columns
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public queryWithBoundingBoxAndProjectionAndColumns(columns: string[], boundingBox: BoundingBox, projection?: Projection): UserCustomResultSet {
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, columns, boundingBox, projection);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public queryWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection?: Projection): UserCustomResultSet {
+    const projectedBoundingBox = projection != null ? this.projectBoundingBox(boundingBox, projection) : boundingBox;
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, projectedBoundingBox.buildEnvelope());
+  }
+  
+  /**
+   * Query for rows within the bounds
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public queryWithBounds(minX: number, minY: number, maxX: number, maxY: number): UserCustomResultSet {
+    return this.queryWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public queryWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number): UserCustomResultSet {
+    return this.queryWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public queryWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number): UserCustomResultSet {
+    return this.queryWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Query for rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public queryWithBoundsAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number): UserCustomResultSet {
+    this.validateRTree();
+    const where = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereArgs = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return super.queryWithDistinctAndColumns(distinct, columns, where, whereArgs);
+  }
+
+
+  /**
+   * Count of rtree index records
+   * @param where
+   * @param whereArgs
+   */
+  public count(where?: string, whereArgs?: any[]): number {
+    return this.countWithDistinctAndColumns(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Count of rtree index records
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   */
+  public countWithDistinct(distinct: boolean, where?: string, whereArgs?: any[]): number {
+    return this.countWithDistinctAndColumns(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Count of rtree index records
+   * @param columns
+   * @param where
+   * @param whereArgs
+   */
+  public countWithColumns(columns: string[], where?: string, whereArgs?: any[]): number {
+    return this.countWithDistinctAndColumns(undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Count of rtree index records
+   * @param distinct
+   * @param columns
+   * @param where
+   * @param whereArgs
+   */
+  public countWithDistinctAndColumns(distinct: boolean, columns: string[], where?: string, whereArgs?: any[]): number {
+    this.validateRTree();
+    return super.countWithDistinctAndColumns(distinct, columns, where, whereArgs);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public countWithGeometryEnvelope(envelope: GeometryEnvelope): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public countWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public countWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @return results
+   */
+  public countWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope): number {
+    return this.countWithBoundsAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public countWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection?: Projection): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, undefined, boundingBox, projection);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public countWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection?: Projection): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, undefined, boundingBox, projection);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param columns columns
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public countWithBoundingBoxAndProjectionAndColumns(columns: string[], boundingBox: BoundingBox, projection?: Projection): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, columns, boundingBox, projection);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param boundingBox BoundingBox
+   * @param projection Projection
+   * @return results
+   */
+  public countWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection?: Projection): number {
+    const projectedBoundingBox = projection != null ? this.projectBoundingBox(boundingBox, projection) : boundingBox;
+    return this.countWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, projectedBoundingBox.buildEnvelope());
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public countWithBounds(minX: number, minY: number, maxX: number, maxY: number): number {
+    return this.countWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public countWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number): number {
+    return this.countWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public countWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number): number {
+    return this.countWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY);
+  }
+
+  /**
+   * Count of rows within the bounds
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @return results
+   */
+  public countWithBoundsAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number): number {
+    const where = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereArgs = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return this.countWithDistinctAndColumns(distinct, columns, where, whereArgs);
+  }
+
 
   /**
    * Get the RTree Index Table row from the current result set location
@@ -232,6 +619,41 @@ export class RTreeIndexTableDao extends UserCustomDao {
 
   /**
    * Query for features within the geometry envelope
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelope(envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -239,28 +661,56 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs
    * @return feature results
    */
-  public queryFeaturesWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where?: string,
-    whereArgs?: any[],
-  ): FeatureResultSet {
-    return this.queryFeaturesWithBounds(
-      distinct,
-      columns,
-      envelope.minX,
-      envelope.minY,
-      envelope.maxX,
-      envelope.maxY,
-      where,
-      whereArgs,
-    );
+  public queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithBoundsAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs);
   }
 
   /**
    * Query for features within the bounds
-   *
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where
+   * @param whereArgs
+   * @return results
+   */
+  public queryFeaturesWithBounds(minX: number, minY: number, maxX: number, maxY: number, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the bounds
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where
+   * @param whereArgs
+   * @return results
+   */
+  public queryFeaturesWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the bounds
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where
+   * @param whereArgs
+   * @return results
+   */
+  public queryFeaturesWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the bounds
    * @param distinct distinct rows
    * @param columns columns
    * @param minX min x
@@ -271,27 +721,11 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs
    * @return results
    */
-  public queryFeaturesWithBounds(
-    distinct,
-    columns: string[],
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    where?: string,
-    whereArgs?: any[],
-  ): FeatureResultSet {
+  public queryFeaturesWithBoundsAndDistinctAndColumns(distinct, columns: string[], minX: number, minY: number, maxX: number, maxY: number, where?: string, whereArgs?: any[]): FeatureResultSet {
     this.validateRTree();
-    const whereBounds = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereBoundsArgs = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
-    return this.featureDao.queryIn(
-      distinct,
-      columns,
-      this.queryIdsSQL(false, whereBounds),
-      whereBoundsArgs,
-      where,
-      whereArgs,
-    );
+    const whereBounds = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereBoundsArgs = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, this.queryIdsSQL(false, whereBounds), whereBoundsArgs, where, whereArgs);
   }
 
   /**
@@ -302,9 +736,80 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs where args
    * @return feature results
    */
-  public queryFeatures(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+  public queryFeatures(where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param distinct distinct column values
+   * @param columns columns
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeaturesWithDistinct(distinct?: boolean, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param distinct distinct column values
+   * @param columns columns
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeaturesWithColumns(columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param distinct distinct column values
+   * @param columns columns
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeaturesWithDistinctAndColumns(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
     this.validateRTree();
-    return this.featureDao.queryIn(distinct, columns, this.queryIdsSQL(), undefined, where, whereArgs);
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, this.queryIdsSQL(), undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public countFeatures(where?: string, whereArgs?: any[]): number {
+    this.validateRTree();
+    return this.countFeaturesWithDistinctAndColumn(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param distinct distinct column values
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public countFeaturesWithDistinct(distinct?: boolean, where?: string, whereArgs?: any[]): number {
+    this.validateRTree();
+    return this.countFeaturesWithDistinctAndColumn(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all features
+   * @param column column
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public countFeaturesWithColumn(column?: string, where?: string, whereArgs?: any[]): number {
+    this.validateRTree();
+    return this.countFeaturesWithDistinctAndColumn(undefined, column, where, whereArgs);
   }
 
   /**
@@ -315,9 +820,9 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs where args
    * @return feature results
    */
-  public countFeatures(distinct?: boolean, column?: string, where?: string, whereArgs?: any[]): number {
+  public countFeaturesWithDistinctAndColumn(distinct?: boolean, column?: string, where?: string, whereArgs?: any[]): number {
     this.validateRTree();
-    return this.featureDao.countIn(distinct, column, this.queryIdsSQL(), undefined, where, whereArgs);
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, this.queryIdsSQL(), undefined, where, whereArgs);
   }
 
   /**
@@ -332,7 +837,41 @@ export class RTreeIndexTableDao extends UserCustomDao {
 
   /**
    * Count the Features within the Geometry Envelope
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumn(undefined, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
+   * @param distinct distinct column values
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumn(distinct, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
+   * @param column count column name
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelopeAndColumn(column: string, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumn(undefined, column, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
    * @param distinct distinct column values
    * @param column count column name
    * @param envelope geometry envelope
@@ -340,28 +879,12 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs where arguments
    * @return count
    */
-  public countFeaturesWithGeometryEnvelope(
-    distinct: boolean,
-    column: string,
-    envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
-  ): number {
-    return this.countFeaturesWithBounds(
-      distinct,
-      column,
-      envelope.minX,
-      envelope.minY,
-      envelope.maxX,
-      envelope.maxY,
-      where,
-      whereArgs,
-    );
+  public countFeaturesWithGeometryEnvelopeAndDistinctAndColumn(distinct: boolean, column: string, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundsAndDistinctAndColumn(distinct, column, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs);
   }
 
   /**
    * Count the features within the bounds
-   *
    * @param distinct distinct column values
    * @param column count column name
    * @param minX min x
@@ -371,21 +894,13 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param fieldValues field values
    * @return count
    */
-  public countFeaturesWithFieldValues(
-    distinct: boolean,
-    column: string,
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    fieldValues: ColumnValues,
-  ): number {
+  public countFeaturesWithFieldValues(distinct: boolean, column: string, minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): number {
     this.validateRTree();
-    const whereBounds: string = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereBoundsArgs: string[] = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
+    const whereBounds: string = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereBoundsArgs: string[] = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
     const fieldWhere = this.buildWhereWithFields(fieldValues);
     const fieldWhereArgs = this.buildWhereArgsWithValues(fieldValues);
-    return this.featureDao.countIn(
+    return this.featureDao.countInWithDistinctAndColumn(
       distinct,
       column,
       this.queryIdsSQL(false, whereBounds),
@@ -397,7 +912,50 @@ export class RTreeIndexTableDao extends UserCustomDao {
 
   /**
    * Count the features within the bounds
-   *
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBounds(minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundsAndDistinctAndColumn(undefined, undefined, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Count the features within the bounds
+   * @param distinct distinct column values
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundsAndDistinctAndColumn(distinct, undefined, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Count the features within the bounds
+   * @param column count column name
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundsAndColumn(column: string, minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundsAndDistinctAndColumn(undefined, column, minX, minY, maxX, maxY, where, whereArgs);
+  }
+
+  /**
+   * Count the features within the bounds
    * @param distinct distinct column values
    * @param column count column name
    * @param minX min x
@@ -408,33 +966,57 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param whereArgs where arguments
    * @return count
    */
-  public countFeaturesWithBounds(
-    distinct: boolean,
-    column: string,
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    where: string,
-    whereArgs: any[],
-  ): number {
+  public countFeaturesWithBoundsAndDistinctAndColumn(distinct: boolean, column: string, minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[]): number {
     this.validateRTree();
-    const whereBounds: string = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereBoundsArgs: string[] = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
-    return this.featureDao.countIn(
-      distinct,
-      column,
-      this.queryIdsSQL(false, whereBounds),
-      whereBoundsArgs,
-      where,
-      whereArgs,
-    );
+    const whereBounds: string = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereBoundsArgs: string[] = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, this.queryIdsSQL(false, whereBounds), whereBoundsArgs, where, whereArgs);
   }
 
   /**
    * Query for rows within the bounding box, starting at the offset and
    * returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBoundingBox(boundingBox: BoundingBox, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundingBoxAndDistinctAndColumns(undefined, undefined, boundingBox, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBoundingBoxAndDistinct(distinct: boolean, boundingBox: BoundingBox, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundingBoxAndDistinctAndColumns(distinct, undefined, boundingBox, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBoundingBoxAndColumns(columns: string[], boundingBox: BoundingBox, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundingBoxAndDistinctAndColumns(undefined, columns, boundingBox, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -443,28 +1025,54 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryForChunkWithBoundingBox(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): UserCustomResultSet {
-    return this.queryForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      boundingBox.buildEnvelope(),
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryForChunkWithBoundingBoxAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), orderBy, limit, offset);
   }
 
   /**
    * Query for rows within the bounding box, starting at the offset and
    * returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithGeometryEnvelope(envelope: GeometryEnvelope, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounding box, starting at the offset and
+   * returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -473,31 +1081,57 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryForChunkWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): UserCustomResultSet {
-    return this.queryForChunkWithBounds(
-      distinct,
-      columns,
-      envelope.minX,
-      envelope.minY,
-      envelope.maxX,
-      envelope.maxY,
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundsAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounding box, starting at the offset and
    * returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(undefined, undefined, boundingBox, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct, undefined, boundingBox, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(undefined, columns, boundingBox, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -507,33 +1141,56 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndFieldValues(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     const fieldWhere = this.buildWhereWithFields(fieldValues);
     const fieldWhereArgs = this.buildWhereArgsWithValues(fieldValues);
-    return this.queryFeaturesForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      boundingBox.buildEnvelope(),
-      fieldWhere,
-      fieldWhereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), fieldWhere, fieldWhereArgs, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounding box ordered by id, starting at the
    * offset and returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBox(boundingBox: BoundingBox, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndDistinctAndColumns(undefined, undefined, boundingBox, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndDistinct(distinct: boolean, boundingBox: BoundingBox, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndDistinctAndColumns(distinct, undefined, boundingBox, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndColumns(columns: string[], boundingBox: BoundingBox, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndDistinctAndColumns(undefined, columns, boundingBox, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box ordered by id, starting at the
+   * offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -542,28 +1199,60 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkIdOrderWithBoundingBox(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    where: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkIdOrderWithGeometryEnvelope(
-      distinct,
-      columns,
-      boundingBox.buildEnvelope(),
-      where,
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), where, limit, offset);
   }
 
   /**
    * Query for features within the bounding box, starting at the offset and
    * returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBox(boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(undefined, undefined, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndDistinc(distinct: boolean, boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct, undefined, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndColumns(columns: string[], boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(undefined, columns, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and
+   * returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -574,33 +1263,61 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBox(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      boundingBox.buildEnvelope(),
-      where,
-      whereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), where, whereArgs, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounding box in the provided projection
    * ordered by id, starting at the offset and returning no more than the
    * limit
-   *
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndDistinctAndColumn(undefined, undefined, boundingBox, projection, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection
+   * ordered by id, starting at the offset and returning no more than the
+   * limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndDistinctAndColumn(distinct, undefined, boundingBox, projection, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection
+   * ordered by id, starting at the offset and returning no more than the
+   * limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndColumn(columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndDistinctAndColumn(undefined, columns, boundingBox, projection, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection
+   * ordered by id, starting at the offset and returning no more than the
+   * limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -610,31 +1327,59 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkIdOrderWithBoundingBoxAndProjection(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    projection: Projection,
-    where: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithBoundingBoxAndProjection(
-      distinct,
-      columns,
-      boundingBox,
-      projection,
-      where,
-      undefined,
-      this.getPkColumnName(),
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkIdOrderWithBoundingBoxAndProjectionAndDistinctAndColumn(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, columns, boundingBox, projection, where, undefined, this.getPkColumnName(), limit, offset);
   }
 
   /**
    * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, undefined, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, undefined, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndColumns(columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, columns, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -646,34 +1391,55 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndProjection(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    projection: Projection,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
     const featureBoundingBox = this.projectBoundingBox(boundingBox, projection);
-    return this.queryFeaturesForChunkWithBoundingBox(
-      distinct,
-      columns,
-      featureBoundingBox,
-      where,
-      whereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct, columns, featureBoundingBox, where, whereArgs, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope ordered by id, starting
    * at the offset and returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -682,30 +1448,60 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkIdOrderWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      envelope,
-      where,
-      undefined,
-      this.getPkColumnName(),
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, envelope, where, undefined, this.getPkColumnName(), limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope, starting at the offset
    * and returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -716,29 +1512,58 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithBounds(
-      distinct,
-      columns,
-      envelope.minX,
-      envelope.minY,
-      envelope.maxX,
-      envelope.maxY,
-      where,
-      whereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundsAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounds, starting at the offset and returning no
+   * more than the limit
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBounds(minX: number, minY: number, maxX: number, maxY: number, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounds, starting at the offset and returning no
+   * more than the limit
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for rows within the bounds, starting at the offset and returning no
+   * more than the limit
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryForChunkWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, orderBy: string, limit: number, offset: number): UserCustomResultSet {
+    return this.queryForChunkWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, orderBy, limit, offset);
   }
 
   /**
@@ -756,21 +1581,64 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryForChunkWithBounds(
-    distinct: boolean,
-    columns: string[],
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): UserCustomResultSet {
+  public queryForChunkWithBoundsAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, orderBy: string, limit: number, offset: number): UserCustomResultSet {
     this.validateRTree();
-    const where: string = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereArgs: any[] = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
-    return this.queryForChunk(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);
+    const where: string = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereArgs: any[] = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return this.queryForChunkWithDistinctAndColumns(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
   }
 
   /**
@@ -789,42 +1657,68 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithFieldValues(
-    distinct: boolean,
-    columns: string[],
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    fieldValues: ColumnValues,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     this.validateRTree();
-    const where = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereArgs = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
+    const where = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereArgs = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
     const fieldWhere = this.buildWhereWithFields(fieldValues);
     const fieldWhereArgs = this.buildWhereArgsWithValues(fieldValues);
-    return this.featureDao.queryInForChunk(
-      distinct,
-      columns,
-      this.queryIdsSQL(false, where),
-      whereArgs,
-      fieldWhere,
-      fieldWhereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, this.queryIdsSQL(false, where), whereArgs, fieldWhere, fieldWhereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounds ordered by id, starting at the
    * offset and returning no more than the limit
-   *
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkIdOrderWithBounds(minX: number, minY: number, maxX: number, maxY: number, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkIdOrderWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param minX min x
@@ -836,30 +1730,27 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkIdOrderWithBounds(
-    distinct: boolean,
-    columns: string[],
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    where: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithBounds(
-      distinct,
-      columns,
-      minX,
-      minY,
-      maxX,
-      maxY,
-      where,
-      undefined,
-      this.getPkColumnName(),
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkIdOrderWithBoundsAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundsAndDistinctAndColumns(distinct, columns, minX, minY, maxX, maxY, where, undefined, this.getPkColumnName(), limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   *
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithBounds(minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundsAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, where, whereArgs, orderBy, limit, offset);
   }
 
   /**
@@ -879,41 +1770,96 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithBounds(
-    distinct: boolean,
-    columns: string[],
-    minX: number,
-    minY: number,
-    maxX: number,
-    maxY: number,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundsAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundsAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   *
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithBoundsAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundsAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   *
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param minX min x
+   * @param minY min y
+   * @param maxX max x
+   * @param maxY max y
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithBoundsAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
     this.validateRTree();
-    const whereBounds: string = this.buildWhereForBounds(minX, minY, maxX, maxY);
-    const whereBoundsArgs: string[] = this.buildWhereArgsForBounds(minX, minY, maxX, maxY);
-    return this.featureDao.queryInForChunk(
-      distinct,
-      columns,
-      this.queryIdsSQL(false, whereBounds),
-      whereBoundsArgs,
-      where,
-      whereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+    const whereBounds: string = this.buildWhereWithBounds(minX, minY, maxX, maxY);
+    const whereBoundsArgs: string[] = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, this.queryIdsSQL(false, whereBounds), whereBoundsArgs, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounds ordered by id, starting at the
    * offset and returning no more than the limit
-   *
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkId(where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdWithDistinctAndColumns(undefined, undefined, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkIdWithDistinct(distinct: boolean, where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdWithDistinctAndColumns(distinct, undefined, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
+   * @param columns columns
+   * @param where where clause
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkIdWithColumns(columns: string[], where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdWithDistinctAndColumns(undefined, columns, where, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds ordered by id, starting at the
+   * offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param where where clause
@@ -921,20 +1867,57 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkId(
-    distinct: boolean,
-    columns: string[],
-    where: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunk(distinct, columns, where, undefined, this.getPkColumnName(), limit, offset);
+  public queryFeaturesForChunkIdWithDistinctAndColumns(distinct: boolean, columns: string[], where: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(distinct, columns, where, undefined, this.getPkColumnName(), limit, offset);
   }
 
   /**
    * Query for features within the bounds, starting at the offset and
    * returning no more than the limit
-   *
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunk(where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(undefined, undefined, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithDistinct(distinct: boolean, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(distinct, undefined, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return results
+   */
+  public queryFeaturesForChunkWithColumns(columns: string[], where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(undefined, columns, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounds, starting at the offset and
+   * returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param where where clause
@@ -944,27 +1927,9 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunk(
-    distinct: boolean,
-    columns: string[],
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithDistinctAndColumns(distinct: boolean, columns: string[], where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
     this.validateRTree();
-    return this.featureDao.queryForChunk(
-      distinct,
-      columns,
-      where,
-      whereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.featureDao.queryForChunkWithDistinctAndColumns(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
@@ -985,7 +1950,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param maxY max y
    * @return where clause
    */
-  private buildWhereForBounds(minX: number, minY: number, maxX: number, maxY: number): string {
+  private buildWhereWithBounds(minX: number, minY: number, maxX: number, maxY: number): string {
     const where = [];
     where.push(super.buildWhereWithOp(RTreeIndexExtensionConstants.COLUMN_MIN_X, maxX, '<='));
     where.push(' AND ');
@@ -1008,11 +1973,11 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param maxY max y
    * @return where clause args
    */
-  private buildWhereArgsForBounds(minX: number, minY: number, maxX: number, maxY: number): string[] {
+  private buildWhereArgsWithBounds(minX: number, minY: number, maxX: number, maxY: number): any[] {
     minX -= this.tolerance;
     maxX += this.tolerance;
     minY -= this.tolerance;
     maxY += this.tolerance;
-    return super.buildWhereArgs([maxX, maxY, minX, minY]);
+    return [maxX, maxY, minX, minY];
   }
 }

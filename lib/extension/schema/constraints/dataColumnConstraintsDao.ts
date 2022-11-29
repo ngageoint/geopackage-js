@@ -4,6 +4,7 @@ import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { DataColumnConstraintsKey } from './dataColumnConstraintsKey';
 import type { DataColumnsDao } from '../columns/dataColumnsDao';
 import type { GeoPackage } from '../../../geoPackage';
+import { DataColumnConstraintType } from './dataColumnConstraintType';
 
 /**
  * Data Column Constraints Data Access Object
@@ -27,19 +28,19 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
 
   /**
    * Creates a new DataColumnConstraints object
-   * @return {module:dataColumnConstraints~DataColumnConstraints}
+   * @return {DataColumnConstraints}
    */
   createObject(results?: Record<string, DBValue>): DataColumnConstraints {
     const dcc = new DataColumnConstraints();
     if (results) {
-      dcc.constraint_name = results.constraint_name as string;
-      dcc.constraint_type = results.constraint_type as string;
-      dcc.value = results.value as string;
-      dcc.min = results.min as number;
-      dcc.max = results.max as number;
-      dcc.min_is_inclusive = results.min_is_inclusive as boolean;
-      dcc.max_is_inclusive = results.max_is_inclusive as boolean;
-      dcc.description = results.description as string;
+      dcc.setConstraintName(results.constraint_name as string);
+      dcc.setConstraintType(DataColumnConstraintType.fromName(results.constraint_type as string));
+      dcc.setValue(results.value as string);
+      dcc.setMin(results.min as number);
+      dcc.setMax(results.max as number);
+      dcc.setMinIsInclusive(results.min_is_inclusive as boolean);
+      dcc.setMaxIsInclusive(results.max_is_inclusive as boolean);
+      dcc.setDescription(results.description as string);
     }
     return dcc;
   }
@@ -49,10 +50,19 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
    * @return {Iterable}
    */
   queryByConstraintName(constraintName: string): IterableIterator<DataColumnConstraints> {
-    return (this.queryForEach(
-      DataColumnConstraints.COLUMN_CONSTRAINT_NAME,
-      constraintName,
-    ) as unknown) as IterableIterator<DataColumnConstraints>;
+    const iterator = this.queryForEach(DataColumnConstraints.COLUMN_CONSTRAINT_NAME, constraintName);
+    const createObject = this.createObject;
+    return {
+      [Symbol.iterator](): IterableIterator<DataColumnConstraints> {
+        return this;
+      }, next(): IteratorResult<DataColumnConstraints> {
+        const result = iterator.next();
+        return {
+          value: createObject(result.value),
+          done: result.done
+        }
+      }
+    };
   }
   /**
    * Query by the unique column values

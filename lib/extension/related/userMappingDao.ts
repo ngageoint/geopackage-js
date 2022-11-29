@@ -152,17 +152,12 @@ export class UserMappingDao extends UserCustomDao {
 
   /**
    * Query by both base id and related id
-   *
-   * @param baseId
-   *            base id
-   * @param relatedId
-   *            related id
+   * @param baseId base id
+   * @param relatedId related id
    * @return result set
    */
   public queryByIds(baseId: number, relatedId: number): UserCustomResultSet {
     return this.query(
-      false,
-      this.getTable().getColumnNames(),
       this.buildWhereIds(baseId, relatedId),
       this.buildWhereIdsArgs(baseId, relatedId),
     );

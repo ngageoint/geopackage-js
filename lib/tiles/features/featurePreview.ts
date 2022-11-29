@@ -260,8 +260,7 @@ export class FeaturePreview {
       expandedBoundingBox = TileBoundingBoxUtils.boundWebMercatorBoundingBox(expandedBoundingBox);
       const zoom = TileBoundingBoxUtils.getZoomLevel(expandedBoundingBox);
 
-      const results: FeatureResultSet = featureDao.query(
-        false,
+      const results: FeatureResultSet = featureDao.queryWithColumns(
         this.columns,
         this.where,
         this.whereArgs,

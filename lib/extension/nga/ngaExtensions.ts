@@ -18,6 +18,7 @@ import { ContentsId } from './contents/contentsId';
 import { NGAExtensionsConstants } from './ngaExtensionsConstants';
 import { FeatureTableIndexConstants } from './index/featureTableIndexConstants';
 import type { GeoPackage } from '../../geoPackage';
+import { FeatureTileTableLinker } from './link/featureTileTableLinker';
 
 /**
  * NGA Extensions
@@ -42,7 +43,6 @@ export class NGAExtensions extends ExtensionManagement {
 
   /**
    * Delete all NGA table extensions for the table within the GeoPackage
-   * @param geoPackage GeoPackage
    * @param table  table name
    */
   public deleteTableExtensions(table: string): void {
@@ -50,19 +50,20 @@ export class NGAExtensions extends ExtensionManagement {
     this.deleteTileScaling(table);
     this.deleteFeatureStyle(table);
     this.deleteContentsId(table);
+    this.deleteFeatureTileLink(table);
     // Delete future extensions for the table here
   }
 
   /**
    * Delete all NGA extensions including custom extension tables for the
    * GeoPackage
-   * @param geoPackage GeoPackage
    */
   public deleteExtensions(): void {
     this.deleteGeometryIndexExtension();
     this.deleteTileScalingExtension();
     this.deleteFeatureStyleExtension();
     this.deleteContentsIdExtension();
+    this.deleteFeatureTileLinkExtension();
     // Delete future extension tables here
   }
 
@@ -77,6 +78,7 @@ export class NGAExtensions extends ExtensionManagement {
       this.copyFeatureStyle(table, newTable);
       this.copyTileScaling(table, newTable);
       this.copyGeometryIndex(table, newTable);
+      this.copyFeatureTileLink(table, newTable);
       // Copy future extensions for the table here
     } catch (e) {
       console.warn('Failed to copy extensions for table: ' + newTable + ', copied from table: ' + table, e);
@@ -412,6 +414,72 @@ export class NGAExtensions extends ExtensionManagement {
       }
     } catch (e) {
       console.warn('Failed to create Contents Id for table: ' + newTable + ', copied from table: ' + table, e);
+    }
+  }
+
+  /**
+   * Delete the Feature Tile Link extensions for the table
+   * @param table table name
+   */
+  public deleteFeatureTileLink(table: string): void {
+    const featureTileLinkDao = FeatureTileTableLinker.getFeatureTileLinkDao(this.geoPackage);
+    try {
+      if (featureTileLinkDao.isTableExists()) {
+        featureTileLinkDao.deleteByTableName(table);
+      }
+    } catch (e) {
+      throw new GeoPackageException("Failed to delete Feature Tile Link. GeoPackage: " + this.geoPackage.getName() + ", Table: " + table);
+    }
+  }
+
+  /**
+   * Delete the Feature Tile Link extension including the extension entries
+   * and custom tables
+   */
+  public deleteFeatureTileLinkExtension(): void {
+    const featureTileLinkDao = FeatureTileTableLinker.getFeatureTileLinkDao(this.geoPackage);
+    const extensionsDao = this.geoPackage.getExtensionsDao();
+    try {
+      if (featureTileLinkDao.isTableExists()) {
+        this.geoPackage.dropTable(featureTileLinkDao.getTableName());
+      }
+      if (extensionsDao.isTableExists()) {
+        extensionsDao.deleteByExtension(FeatureTileTableLinker.EXTENSION_NAME);
+      }
+    } catch (e) {
+      throw new GeoPackageException(
+        "Failed to delete Feature Tile Link extension and table. GeoPackage: "
+        + this.geoPackage.getName());
+    }
+  }
+
+  /**
+   * Copy the Feature Tile Link extensions for the table
+   *
+   * @param table table name
+   * @param newTable new table name
+   */
+  public copyFeatureTileLink(table: string, newTable: string): void {
+    try {
+      const extensionsDao = this.geoPackage.getExtensionsDao();
+      if (extensionsDao.isTableExists()) {
+        const extensions = extensionsDao.queryAllByExtension(FeatureTileTableLinker.EXTENSION_NAME);
+        if (extensions.length > 0) {
+          const featureTileLinkDao = FeatureTileTableLinker.getFeatureTileLinkDao(this.geoPackage);
+          if (featureTileLinkDao.isTableExists()) {
+            for (const featureTileLink of featureTileLinkDao.queryForFeatureTableName(table)) {
+              featureTileLink.setFeatureTableName(newTable);
+              featureTileLinkDao.create(featureTileLink);
+            }
+            for (const featureTileLink of featureTileLinkDao.queryForTileTableName(table)) {
+              featureTileLink.setTileTableName(newTable);
+              featureTileLinkDao.create(featureTileLink);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to create Feature Tile Link for table: ' + newTable + ', copied from table: ' + table);
     }
   }
 }

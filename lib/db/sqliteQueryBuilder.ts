@@ -1,5 +1,6 @@
 import { DBValue } from './dbValue';
 import { GeoPackageException } from '../geoPackageException';
+import { SQLUtils } from './sqlUtils';
 
 /**
  * SQLite query builder module.
@@ -97,15 +98,15 @@ export class SqliteQueryBuilder {
     if (object.columnNames) {
       return SqliteQueryBuilder.buildInsertFromColumnNames(table, object);
     }
-    let insert = 'insert into ' + table + ' (';
+    let insert = 'insert into ' + SQLUtils.quoteWrap(table) + ' (';
     let keys = '';
     let values = '';
     let first = true;
     for (const key in object) {
       if (Object.prototype.hasOwnProperty.call(object, key) && object[key] !== undefined) {
         if (!first) {
-          keys += ',';
-          values += ',';
+          keys += ', ';
+          values += ', ';
         }
         first = false;
         keys += key;
@@ -124,7 +125,7 @@ export class SqliteQueryBuilder {
    * @return {string} insert statement
    */
   static buildInsertFromColumnNames(table: string, object: any): string {
-    let insert = 'insert into ' + table + ' (';
+    let insert = 'insert into ' + SQLUtils.quoteWrap(table) + ' (';
     let keys = '';
     let values = '';
     let first = true;
@@ -132,8 +133,8 @@ export class SqliteQueryBuilder {
     for (let i = 0; i < columnNames.length; i++) {
       const key = columnNames[i];
       if (!first) {
-        keys += ',';
-        values += ',';
+        keys += ', ';
+        values += ', ';
       }
       first = false;
       keys += '"' + key + '"';

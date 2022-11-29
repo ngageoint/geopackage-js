@@ -174,8 +174,9 @@ export class SqliteAdapter implements DBAdapter {
    * @returns {Boolean}
    */
   isTableExists(tableName: string): boolean {
-    const statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
-    const result = statement.get({ name: tableName });
+    let statement = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:name");
+    const result = statement.get({ name: tableName })
+    statement = null;
     return !!result;
   }
   /**
@@ -220,10 +221,17 @@ export class SqliteAdapter implements DBAdapter {
    */
   run(sql: string, params?: [] | Record<string, DBValue>): { changes: number; lastInsertRowid: number } {
     const statement = this.db.prepare(sql);
-    if (params) {
-      return statement.run(params);
-    } else {
-      return statement.run();
+    try {
+      if (params) {
+        return statement.run(params);
+      } else {
+        return statement.run();
+      }
+    } catch (e) {
+      if (e.code !== 'SQLITE_BUSY') {
+        throw new Error('the database is busy, wahhh')
+      }
+      this.db.isBusy()
     }
   }
   /**
@@ -233,7 +241,6 @@ export class SqliteAdapter implements DBAdapter {
    * @return {Number} last inserted row id
    */
   insert(sql: string, params?: [] | Record<string, DBValue>): number {
-    console.log(sql);
     const statement = this.db.prepare(sql);
     return statement.run(params).lastInsertRowid;
   }
@@ -322,13 +329,25 @@ export class SqliteAdapter implements DBAdapter {
     } else {
       iterator = statement.iterate();
     }
-    return new ResultSet(iterator, {
-      close: () => {
-        try {
-          statement = null;
+    const close = () => {
+      try {
+        if (iterator != null) {
+          iterator.return();
           iterator = null;
-        } catch (e) {}
+        }
+        statement = null;
+      } catch (e) {
+        console.error(e);
       }
-    }, this);
+    }
+    return new ResultSet(iterator, { close }, this);
+  }
+
+  /**
+   * Enable or disable unsafe mode
+   * @param enabled
+   */
+  unsafe(enabled: boolean): void {
+    this.db.unsafeMode(enabled);
   }
 }

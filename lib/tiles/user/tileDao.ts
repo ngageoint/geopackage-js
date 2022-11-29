@@ -164,6 +164,20 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
   }
 
   /**
+   * Get the tile grid of the zoom level
+   * @param  {Number} zoomLevel zoom level
+   * @return {TileGrid}           tile grid at zoom level, null if no tile matrix at zoom level
+   */
+  getTileGridWithZoomLevel(zoomLevel: number): TileGrid {
+    let tileGrid;
+    const tileMatrix = this.getTileMatrix(zoomLevel);
+    if (tileMatrix) {
+      tileGrid = new TileGrid(0, ~~tileMatrix.getMatrixWidth() - 1, 0, ~~tileMatrix.getMatrixHeight() - 1);
+    }
+    return tileGrid;
+  }
+
+  /**
    * Get the bounding box of tiles
    * @param zoomLevel zoom level
    * @return bounding box of zoom level, or null if no tiles
@@ -509,7 +523,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
       where.push(' AND ');
       where.push(this.buildWhereWithOp(TileTable.COLUMN_TILE_ROW, tileGrid.getMaxY(), '<='));
       const whereArgs = [zoomLevel, tileGrid.getMinX(), tileGrid.getMaxX(), tileGrid.getMinY(), tileGrid.getMaxY()];
-      tileResultSet = this.query(false, undefined, where.join(''), whereArgs, null, null, orderBy);
+      tileResultSet = this.query(where.join(''), whereArgs, null, null, orderBy);
     }
 
     return tileResultSet;
@@ -565,7 +579,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
   public countAtZoomLevel(zoomLevel: number): number {
     const where = this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
     const whereArgs = [zoomLevel];
-    return super.count(false, undefined, where, whereArgs);
+    return super.count(where, whereArgs);
   }
 
   /**

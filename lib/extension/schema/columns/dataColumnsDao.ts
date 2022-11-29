@@ -4,6 +4,7 @@ import { DBValue } from '../../../db/dbValue';
 import { TableColumnKey } from '../../../db/tableColumnKey';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import type { GeoPackage } from '../../../geoPackage';
+import { ColumnValues } from '../../../dao/columnValues';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -40,13 +41,13 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   createObject(results?: Record<string, DBValue>): DataColumns {
     const dc = new DataColumns();
     if (results) {
-      dc.table_name = results.table_name as string;
-      dc.column_name = results.column_name as string;
-      dc.name = results.name as string;
-      dc.title = results.title as string;
-      dc.description = results.description as string;
-      dc.mime_type = results.mime_type as string;
-      dc.constraint_name = results.constraint_name as string;
+      dc.setTableName(results.table_name as string);
+      dc.setColumnName(results.column_name as string);
+      dc.setName(results.name as string);
+      dc.setTitle(results.title as string);
+      dc.setDescription(results.description as string);
+      dc.setMimeType(results.mime_type as string);
+      dc.setConstraintName(results.constraint_name as string);
     }
     return dc;
   }
@@ -64,9 +65,19 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
    * @return {Iterable.<Object>} iterator of database objects
    */
   queryByConstraintName(constraintName: string): IterableIterator<DataColumns> {
-    return (this.queryForEach(DataColumns.COLUMN_CONSTRAINT_NAME, constraintName) as unknown) as IterableIterator<
-      DataColumns
-    >;
+    const iterator = this.queryForEach(DataColumns.COLUMN_CONSTRAINT_NAME, constraintName);
+    const createObject = this.createObject;
+    return {
+      [Symbol.iterator](): IterableIterator<DataColumns> {
+        return this;
+      }, next(): IteratorResult<DataColumns> {
+        const result = iterator.next();
+        return {
+          value: createObject(result.value),
+          done: result.done
+        }
+      }
+    };
   }
   /**
    * Get DataColumn by column name and table name
@@ -79,14 +90,14 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
     if (!exists) {
       return;
     }
-    const where =
-      this.buildWhereWithFieldAndValue(DataColumns.COLUMN_TABLE_NAME, tableName) +
-      ' and ' +
-      this.buildWhereWithFieldAndValue(DataColumns.COLUMN_COLUMN_NAME, columnName);
+    const columnValues = new ColumnValues();
+    columnValues.addColumn(DataColumns.COLUMN_TABLE_NAME, tableName);
+    columnValues.addColumn(DataColumns.COLUMN_COLUMN_NAME, columnName);
+    const where = this.buildWhere(columnValues);
     const values = [tableName, columnName];
     let dataColumn: DataColumns;
-    for (const row of this.queryWhere(where, values)) {
-      dataColumn = this.createObject(row);
+    for (const result of this.queryWhere(where, values)) {
+      dataColumn = this.createObject(result);
     }
     return dataColumn;
   }

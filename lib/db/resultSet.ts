@@ -17,9 +17,9 @@ export class ResultSet {
   nextValue: any;
 
   /**
-   * Track if result set is done
+   * Track if result set has a next
    */
-  done = false;
+  hasNext = true;
 
   /**
    * Statement
@@ -66,12 +66,12 @@ export class ResultSet {
    * Move position to next position
    */
   public next(): boolean {
-    if (!this.done) {
+    if (this.hasNext) {
       const nextResult = this.results.next();
       this.nextValue = nextResult.value;
-      this.done = nextResult.done;
+      this.hasNext = !nextResult.done;
     }
-    return this.done;
+    return this.hasNext;
   }
 
   /**
@@ -186,8 +186,12 @@ export class ResultSet {
   close(): void {
     try {
       this.results = null;
-      this.statement.close();
-    } catch (e) {}
+      if (this.statement != null) {
+        this.statement.close();
+      }
+    } catch (e) {
+      console.error('failed to close');
+    }
   }
 
   /**
@@ -195,5 +199,12 @@ export class ResultSet {
    */
   getConnection(): DBAdapter {
     return this.connection;
+  }
+
+  /**
+   * Returns true if this result has a value after calling next
+   */
+  hasValue (): boolean {
+    return this.nextValue != null;
   }
 }

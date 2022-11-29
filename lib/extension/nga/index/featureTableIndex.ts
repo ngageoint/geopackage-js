@@ -20,6 +20,9 @@ import { ColumnValues } from '../../../dao/columnValues';
 import { FeatureTableIndexConstants } from './featureTableIndexConstants';
 import type { GeoPackage } from '../../../geoPackage';
 import type { FeatureDao } from '../../../features/user/featureDao';
+import { DBValue } from '../../../db/dbValue';
+import { NGAExtensions } from '../ngaExtensions';
+import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -62,6 +65,28 @@ export class FeatureTableIndex extends BaseExtension {
    */
   private readonly featureDao: FeatureDao;
 
+
+  /**
+   * Extension author
+   */
+  public static readonly EXTENSION_AUTHOR: string = NGAExtensionsConstants.EXTENSION_AUTHOR;
+
+  /**
+   * Extension name without the author
+   */
+  public static readonly EXTENSION_NAME_NO_AUTHOR: string = "geometry_index";
+
+  /**
+   * Extension, with author and name
+   */
+  public static readonly EXTENSION_NAME: string = Extensions.buildExtensionName(FeatureTableIndex.EXTENSION_AUTHOR, FeatureTableIndex.EXTENSION_NAME_NO_AUTHOR);
+
+  /**
+   * Extension definition URL
+   */
+  public static readonly EXTENSION_DEFINITION = 'http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html';
+
+
   /**
    * Constructor
    * @param geoPackage GeoPackage object
@@ -72,8 +97,8 @@ export class FeatureTableIndex extends BaseExtension {
     this.featureDao = featureDao;
     this.tableName = featureDao.getTableName();
     this.columnName = featureDao.getGeometryColumnName();
-    this.tableIndexDao = FeatureTableIndex.getTableIndexDao(geoPackage);
-    this.geometryIndexDao = FeatureTableIndex.getGeometryIndexDao(geoPackage);
+    this.tableIndexDao = this.getTableIndexDao();
+    this.geometryIndexDao = this.getGeometryIndexDao();
   }
 
   /**
@@ -176,6 +201,7 @@ export class FeatureTableIndex extends BaseExtension {
           this.geometryIndexDao.createOrUpdate(geometryIndex);
           indexed = true;
         } catch (e) {
+          console.error(e);
           throw new GeoPackageException(
             'Failed to create or update Geometry Index. GeoPackage: ' +
               this.geoPackage.getName() +
@@ -266,6 +292,7 @@ export class FeatureTableIndex extends BaseExtension {
     try {
       deleted = this.geometryIndexDao.deleteByIdWithKey(key);
     } catch (e) {
+      console.error(e);
       throw new GeoPackageException(
         'Failed to delete index, GeoPackage: ' +
           this.geoPackage.getName() +
@@ -286,7 +313,7 @@ export class FeatureTableIndex extends BaseExtension {
   public isIndexed(): boolean {
     let indexed = false;
     const extension = this.getExtension();
-    if (extension != null) {
+    if (extension != null && extension.length > 0) {
       const contentsDao = this.geoPackage.getContentsDao();
       try {
         const contents = contentsDao.queryForId(this.tableName);
@@ -294,14 +321,12 @@ export class FeatureTableIndex extends BaseExtension {
           const lastChange = contents.getLastChange();
 
           const tableIndex = this.tableIndexDao.queryForId(this.tableName);
-
           if (tableIndex != null) {
             const lastIndexed = tableIndex.getLastIndexed();
             indexed = lastIndexed != null && lastIndexed.getTime() >= lastChange.getTime();
           }
         }
       } catch (e) {
-        console.error(e);
         throw new GeoPackageException(
           'Failed to check if table is indexed, GeoPackage: ' +
             this.geoPackage.getName() +
@@ -442,7 +467,12 @@ export class FeatureTableIndex extends BaseExtension {
    * @return extensions object or null if one does not exist
    */
   public getExtension(): Extensions[] {
-    return [this.get(FeatureTableIndexConstants.EXTENSION_NAME, this.tableName, this.columnName)];
+    const extensions = [];
+    const extension = this.get(FeatureTableIndexConstants.EXTENSION_NAME, this.tableName, this.columnName)
+    if (extension != null) {
+      extensions.push(extension)
+    }
+    return extensions;
   }
 
   /**
@@ -457,7 +487,7 @@ export class FeatureTableIndex extends BaseExtension {
   /**
    * Get a Table Index DAO
    *
-   * @param this.geoPackage GeoPackage
+   * @param geoPackage GeoPackage
    * @return table index dao
    */
   public static getTableIndexDao(geoPackage: GeoPackage): TableIndexDao {
@@ -567,15 +597,15 @@ export class FeatureTableIndex extends BaseExtension {
    * @return geometry indices iterator
    */
   public query(): IterableIterator<GeometryIndex> {
-    const geometryIndices = null;
+    let geometryIndices = null;
 
     try {
       const fieldValues = new ColumnValues();
       fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
-      this.geometryIndexDao.queryWhere(
+      geometryIndices = this.geometryIndexDao.createTypedIterator(this.geometryIndexDao.queryWhere(
         this.geometryIndexDao.buildWhere(fieldValues),
         this.geometryIndexDao.buildWhereArgs(fieldValues),
-      );
+      ));
     } catch (e) {
       throw new GeoPackageException(
         'Failed to query for all Geometry Indices. GeoPackage: ' +
@@ -742,7 +772,7 @@ export class FeatureTableIndex extends BaseExtension {
 
     const qb = this.queryBuilderWithGeometryEnvelope(envelope);
     try {
-      geometryIndices = this.geometryIndexDao.queryWhere(qb.where, qb.whereArgs);
+      geometryIndices = this.geometryIndexDao.createTypedIterator(this.geometryIndexDao.queryWhere(qb.where, qb.whereArgs));
     } catch (e) {
       throw new GeoPackageException(
         'Failed to query for Geometry Indices. GeoPackage: ' +
@@ -848,8 +878,7 @@ export class FeatureTableIndex extends BaseExtension {
    */
   public projectBoundingBox(boundingBox: BoundingBox, projection: Projection): BoundingBox {
     const projectionTransform = GeometryTransform.create(projection, this.getProjection());
-    const projectedBoundingBox = boundingBox.transform(projectionTransform);
-    return projectedBoundingBox;
+    return boundingBox.transform(projectionTransform);
   }
 
   /**
@@ -898,28 +927,6 @@ export class FeatureTableIndex extends BaseExtension {
   }
 
   /**
-   * Indexes a chunk of feature rows
-   * @param tableIndex
-   * @param columns
-   * @param chunkOffset
-   * @protected
-   */
-  private indexChunk(tableIndex, columns, chunkOffset): number {
-    const resultSet = this.featureDao.queryForChunk(
-      false,
-      columns,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      this.chunkLimit,
-      chunkOffset,
-    );
-    return this.indexRows(tableIndex, resultSet);
-  }
-
-  /**
    * Indexes the table
    * @param tableIndex
    * @protected
@@ -935,7 +942,27 @@ export class FeatureTableIndex extends BaseExtension {
       const chunkOffset = offset;
 
       try {
-        chunkCount = this.indexChunk(tableIndex, columns, chunkOffset);
+        const connection = this.geoPackage.getConnection().getConnectionSource();
+        connection.transaction(() => {
+          try {
+            connection.unsafe(true);
+            const resultSet = this.featureDao.queryForChunkWithColumns(
+              columns,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              this.chunkLimit,
+              chunkOffset,
+            );
+            chunkCount = this.indexRows(tableIndex, resultSet);
+          } catch (e) {
+            console.error(e);
+          } finally {
+            connection.unsafe(false);
+          }
+        })
         if (chunkCount > 0) {
           count += chunkCount;
         }
@@ -981,6 +1008,7 @@ export class FeatureTableIndex extends BaseExtension {
         console.error('Failed to index feature. Table: ' + tableIndex.getTableName());
       }
     }
+    resultSet.close();
     return count;
   }
 
@@ -1007,6 +1035,41 @@ export class FeatureTableIndex extends BaseExtension {
 
   /**
    * Query for features within the geometry envelope
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelope(envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where
+   * @param whereArgs
+   * @return feature results
+   */
+  public queryFeaturesWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, whereArgs);
+  }
+
+  /**
+   * Query for features within the geometry envelope
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -1014,15 +1077,41 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs
    * @return feature results
    */
-  public queryFeaturesWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where?: string,
-    whereArgs?: any[],
-  ): FeatureResultSet {
+  public queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
     const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.queryIn(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+  }
+
+  /**
+   * Query for all Features
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeatures(where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all Features
+   * @param distinct distinct rows
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeaturesWithDistinct(distinct?: boolean, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for all Features
+   * @param columns columns
+   * @param where where
+   * @param whereArgs where args
+   * @return feature results
+   */
+  public queryFeaturesWithColumns(columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithDistinctAndColumns(undefined, columns, where, whereArgs);
   }
 
   /**
@@ -1033,9 +1122,41 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs where args
    * @return feature results
    */
-  public queryFeatures(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+  public queryFeaturesWithDistinctAndColumns(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
     const nestedQuery = this.queryBuilder();
-    return this.featureDao.queryIn(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+  }
+
+  /**
+   * Count features
+   * @param where where
+   * @param whereArgs where args
+   * @return count
+   */
+  public countFeatures(where?: string, whereArgs?: any[]): number {
+    return this.countFeaturesWithDistinctAndColumn(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Count features
+   * @param distinct distinct rows
+   * @param where where
+   * @param whereArgs where args
+   * @return count
+   */
+  public countFeaturesWithDistinct(distinct?: boolean, where?: string, whereArgs?: any[]): number {
+    return this.countFeaturesWithDistinctAndColumn(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Count features
+   * @param column column
+   * @param where where
+   * @param whereArgs where args
+   * @return count
+   */
+  public countFeaturesWithColumn(column?: string, where?: string, whereArgs?: any[]): number {
+    return this.countFeaturesWithDistinctAndColumn(undefined, column, where, whereArgs);
   }
 
   /**
@@ -1046,25 +1167,109 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs where args
    * @return count
    */
-  public countFeatures(distinct?: boolean, column?: string, where?: string, whereArgs?: any[]): number {
+  public countFeaturesWithDistinctAndColumn(distinct?: boolean, column?: string, where?: string, whereArgs?: any[]): number {
     const nestedQuery = this.queryBuilder();
-    return this.featureDao.countIn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
   }
 
   /**
    * Count features
-   *
    * @param column count column name
    * @return count
    */
   public countColumnFeatures(column: string): number {
     const nestedQuery = this.queryBuilder();
-    return this.featureDao.countIn(false, column, nestedQuery.where, nestedQuery.whereArgs);
+    return this.featureDao.countInWithColumn(column, nestedQuery.where, nestedQuery.whereArgs);
   }
 
   /**
    * Count the Features within the bounding box in the provided projection
-   *
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBox(boundingBox: BoundingBox, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndDistinctAndColumns(undefined, undefined, boundingBox, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param distinct distinct column values
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndDistinct(distinct: boolean, boundingBox: BoundingBox, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndDistinctAndColumns(distinct, undefined, boundingBox, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param column count column name
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndColumns(column: string, boundingBox: BoundingBox, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndDistinctAndColumns(undefined, column, boundingBox, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndDistinctAndColumns(distinct: boolean, column: string, boundingBox: BoundingBox, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct, column, boundingBox.buildEnvelope(), where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param boundingBox bounding box
+   * @param projection: Projection of the provided bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, undefined, boundingBox, projection, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param distinct distinct column values
+   * @param boundingBox bounding box
+   * @param projection: Projection of the provided bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, undefined, boundingBox, projection, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
+   * @param column count column name
+   * @param boundingBox bounding box
+   * @param projection: Projection of the provided bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithBoundingBoxAndProjectionAndColumns(column: string, boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, column, boundingBox, projection, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the bounding box in the provided projection
    * @param distinct distinct column values
    * @param column count column name
    * @param boundingBox bounding box
@@ -1073,42 +1278,48 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs where arguments
    * @return count
    */
-  public countFeaturesWithBoundingBox(
-    distinct: boolean,
-    column: string,
-    boundingBox: BoundingBox,
-    where: string,
-    whereArgs: any[],
-  ): number {
-    return this.countFeaturesWithGeometryEnvelope(distinct, column, boundingBox.buildEnvelope(), where, whereArgs);
-  }
-
-  /**
-   * Count the Features within the bounding box in the provided projection
-   *
-   * @param distinct distinct column values
-   * @param column count column name
-   * @param boundingBox bounding box
-   * @param projection: Projection of the provided bounding box
-   * @param where where clause
-   * @param whereArgs where arguments
-   * @return count
-   */
-  public countFeaturesWithBoundingBoxAndProjection(
-    distinct: boolean,
-    column: string,
-    boundingBox: BoundingBox,
-    projection: Projection,
-    where: string,
-    whereArgs: any[],
-  ): number {
+  public countFeaturesWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct: boolean, column: string, boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[]): number {
     const featureBoundingBox = this.projectBoundingBox(boundingBox, projection);
-    return this.countFeaturesWithBoundingBox(distinct, column, featureBoundingBox, where, whereArgs);
+    return this.countFeaturesWithBoundingBoxAndDistinctAndColumns(distinct, column, featureBoundingBox, where, whereArgs);
   }
 
   /**
    * Count the Features within the Geometry Envelope
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
+   * @param distinct distinct column values
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
+   * @param column count column name
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countFeaturesWithGeometryEnvelopeAndColumns(column: string, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
+    return this.countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, column, envelope, where, whereArgs);
+  }
+
+  /**
+   * Count the Features within the Geometry Envelope
    * @param distinct distinct column values
    * @param column count column name
    * @param envelope geometry envelope
@@ -1116,24 +1327,14 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs where arguments
    * @return count
    */
-  public countFeaturesWithGeometryEnvelope(
-    distinct: boolean,
-    column: string,
-    envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
-  ): number {
+  public countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, column: string, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
     const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.countIn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
   }
 
   /**
    * Query for features within the bounding box, starting at the offset and returning no more than the limit
-   *
-   * @param distinct distinct rows
-   * @param columns columns
    * @param boundingBox bounding box
-   * @param projection: Projection
    * @param where where clause
    * @param whereArgs where arguments
    * @param orderBy order by
@@ -1141,31 +1342,105 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBox(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      boundingBox.buildEnvelope(),
-      where,
-      whereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkWithBoundingBox(boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(undefined, undefined, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndDistinct(distinct: boolean, boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct, undefined, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndColumns(columns: string[], boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(undefined, columns, boundingBox, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box, starting at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), where, whereArgs, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
-   *
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjection(boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, undefined, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct, undefined, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param projection: Projection
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndColumns(columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(undefined, columns, boundingBox, projection, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the bounding box in the provided projection, starting at the offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -1177,34 +1452,58 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndProjection(
-    distinct: boolean,
-    columns: string[],
-    boundingBox: BoundingBox,
-    projection: Projection,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndProjectionAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
     const featureBoundingBox = this.projectBoundingBox(boundingBox, projection);
-    return this.queryFeaturesForChunkWithBoundingBox(
-      distinct,
-      columns,
-      featureBoundingBox,
-      where,
-      whereArgs,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.queryFeaturesForChunkWithBoundingBoxAndDistinctAndColumns(distinct, columns, featureBoundingBox, where, whereArgs, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope, starting at the offset
    * and returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithFieldValues(envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, undefined, envelope, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct, undefined, envelope, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, columns, envelope, fieldValues, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -1214,37 +1513,60 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithFieldValues(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.featureDao.queryInForChunk(
-      distinct,
-      columns,
-      nestedQuery.where,
-      nestedQuery.whereArgs,
-      where,
-      whereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope ordered by id, starting
    * at the offset and returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelope(envelope, where, whereArgs, this.getPkColumnName(), limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinct(distinct, envelope, where, whereArgs, this.getPkColumnName(), limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndColumns(columns, envelope, where, whereArgs, this.getPkColumnName(), limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -1254,31 +1576,60 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkIdOrderWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunkWithGeometryEnvelope(
-      distinct,
-      columns,
-      envelope,
-      where,
-      whereArgs,
-      this.getPkColumnName(),
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkIdOrderWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, envelope, where, whereArgs, this.getPkColumnName(), limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope, starting at the offset
    * and returning no more than the limit
-   *
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelope(envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope, starting at the offset
+   * and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param envelope geometry envelope
@@ -1289,36 +1640,55 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithGeometryEnvelope(
-    distinct: boolean,
-    columns: string[],
-    envelope: GeometryEnvelope,
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
+  public queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
     const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.queryInForChunk(
-      distinct,
-      columns,
-      nestedQuery.where,
-      nestedQuery.whereArgs,
-      where,
-      whereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
    * Query for features within the geometry envelope ordered by id, starting
    * at the offset and returning no more than the limit
-   *
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrder(where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithDistinctAndColumns(undefined, undefined, where, whereArgs, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithDistinct(distinct: boolean, where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithDistinctAndColumns(distinct, undefined, where, whereArgs, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkIdOrderWithColumns(columns: string[], where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkIdOrderWithDistinctAndColumns(undefined, columns, where, whereArgs, limit, offset);
+  }
+
+  /**
+   * Query for features within the geometry envelope ordered by id, starting
+   * at the offset and returning no more than the limit
    * @param distinct distinct rows
    * @param columns columns
    * @param where where clause
@@ -1327,15 +1697,49 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkIdOrder(
-    distinct: boolean,
-    columns: string[],
-    where: string,
-    whereArgs: any[],
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.queryFeaturesForChunk(distinct, columns, where, whereArgs, this.getPkColumnName(), limit, offset);
+  public queryFeaturesForChunkIdOrderWithDistinctAndColumns(distinct: boolean, columns: string[], where: string, whereArgs: any[], limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(distinct, columns, where, whereArgs, this.getPkColumnName(), limit, offset);
+  }
+
+  /**
+   * Query for features
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunk(where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(undefined, undefined, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithDistinct(distinct: boolean, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(distinct, undefined, where, whereArgs, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for features
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk query offset
+   * @return feature results
+   */
+  public queryFeaturesForChunkWithColumns(columns: string[], where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.queryFeaturesForChunkWithDistinctAndColumns(undefined, columns, where, whereArgs, orderBy, limit, offset);
   }
 
   /**
@@ -1349,25 +1753,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunk(
-    distinct: boolean,
-    columns: string[],
-    where: string,
-    whereArgs: any[],
-    orderBy: string,
-    limit: number,
-    offset: number,
-  ): FeatureResultSet {
-    return this.featureDao.queryForChunk(
-      distinct,
-      columns,
-      where,
-      whereArgs,
-      undefined,
-      undefined,
-      orderBy,
-      limit,
-      offset,
-    );
+  public queryFeaturesForChunkWithDistinctAndColumns(distinct: boolean, columns: string[], where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
+    return this.featureDao.queryForChunkWithDistinctAndColumns(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 }

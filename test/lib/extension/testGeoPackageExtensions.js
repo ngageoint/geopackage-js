@@ -205,9 +205,9 @@ describe('GeoPackage Extensions tests', function() {
   });
 
   it('should delete extensions', function() {
-    geoPackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.getConnection().isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
     new ExtensionManager(geoPackage).deleteExtensions();
-    geoPackage.connection.isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
+    geoPackage.getConnection().isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
   });
 
   it('should copy table and then delete copy and style extension for original table should be unchanged', function() {

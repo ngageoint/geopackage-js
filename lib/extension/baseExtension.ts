@@ -3,6 +3,7 @@ import { ExtensionsDao } from './extensionsDao';
 import { ExtensionScopeType } from './extensionScopeType';
 import type { GeoPackage } from '../geoPackage';
 import type { GeoPackageConnection } from '../db/geoPackageConnection';
+import { GeoPackageException } from '../geoPackageException';
 
 /**
  * Abstract base GeoPackage extension
@@ -70,17 +71,27 @@ export abstract class BaseExtension {
   ): Extensions {
     let extension = this.get(extensionName, tableName, columnName);
     if (extension == null) {
-      if (!this.extensionsDao.isTableExists()) {
-        this.geoPackage.createExtensionsTable();
+      try {
+        if (!this.extensionsDao.isTableExists()) {
+          this.geoPackage.createExtensionsTable();
+        }
+
+        extension = new Extensions();
+        extension.setTableName(tableName);
+        extension.setColumnName(columnName);
+        extension.setExtensionName(extensionName);
+        extension.setDefinition(definition);
+        extension.setScope(scopeType);
+
+        this.extensionsDao.create(extension);
+      } catch (e) {
+        console.error(e)
+        throw new GeoPackageException(
+          "Failed to create '" + extensionName
+          + "' extension for GeoPackage: "
+          + this.geoPackage.getName() + ", Table Name: "
+          + tableName + ", Column Name: " + columnName);
       }
-      extension = new Extensions();
-      extension.setTableName(tableName);
-      extension.setColumnName(columnName);
-      extension.setExtensionName(extensionName);
-      extension.setDefinition(definition);
-      extension.setScope(scopeType);
-      this.createExtension(extensionName, tableName, columnName, definition, scopeType);
-      extension = this.get(extensionName, tableName, columnName);
     }
     return extension;
   }
@@ -92,7 +103,7 @@ export abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @return {Extensions[]}
    */
-  get(extensionName: string, tableName: string, columnName: string): Extensions {
+  get(extensionName: string, tableName?: string, columnName?: string): Extensions {
     let extension = null;
     if (this.extensionsDao.isTableExists()) {
       const extensions = this.extensionsDao.queryByExtensionAndTableNameAndColumnName(
@@ -114,7 +125,7 @@ export abstract class BaseExtension {
    * @param  {String}   columnName    column name
    * @return {Extensions[]}
    */
-  getExtension(extensionName: string, tableName: string | null, columnName: string | null): Extensions[] {
+  getExtension(extensionName: string, tableName?: string | null, columnName?: string | null): Extensions[] {
     if (!this.extensionsDao.isTableExists()) {
       return [];
     }
@@ -158,11 +169,11 @@ export abstract class BaseExtension {
     scopeType: string,
   ): number {
     const extension = new Extensions();
-    extension.table_name = tableName;
-    extension.column_name = columnName;
-    extension.extension_name = extensionName;
-    extension.definition = definition;
-    extension.scope = scopeType;
+    extension.setTableName(tableName);
+    extension.setColumnName(columnName);
+    extension.setExtensionName(extensionName);
+    extension.setDefinition(definition);
+    extension.setScope(scopeType);
     return this.extensionsDao.create(extension);
   }
 }

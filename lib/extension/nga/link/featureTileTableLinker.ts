@@ -15,7 +15,7 @@ import type { GeoPackage } from '../../../geoPackage';
  * <p>
  * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html">http://ngageoint.github.io/GeoPackage/docs/extensions/feature-tile-link.html</a>
  */
-export abstract class FeatureTileTableLinker extends BaseExtension {
+export class FeatureTileTableLinker extends BaseExtension {
   /**
    * Extension author
    */
@@ -74,10 +74,8 @@ export abstract class FeatureTileTableLinker extends BaseExtension {
   /**
    * Link a feature and tile table together. Does nothing if already linked.
    *
-   * @param featureTable
-   *            feature table
-   * @param tileTable
-   *            tile table
+   * @param featureTable  feature table
+   * @param tileTable tile table
    */
   public link(featureTable: string, tileTable: string): void {
     if (!this.isLinked(featureTable, tileTable)) {
@@ -318,5 +316,13 @@ export abstract class FeatureTileTableLinker extends BaseExtension {
     }
 
     return featureTables;
+  }
+
+  /**
+   * Creates a Feature Tile Link Dao
+   * @param geoPackage
+   */
+  static getFeatureTileLinkDao(geoPackage: GeoPackage): FeatureTileLinkDao {
+    return FeatureTileLinkDao.createDao(geoPackage);
   }
 }

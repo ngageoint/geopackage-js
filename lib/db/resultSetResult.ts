@@ -1,6 +1,7 @@
 import { Result } from './result';
 import { ResultSet } from './resultSet';
 import { GeoPackageException } from '../geoPackageException';
+import { GeoPackageDataType } from './geoPackageDataType';
 
 /**
  * Result Set result implementation.
@@ -31,13 +32,16 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the value
+   * @param columnName
+   * @param dataType
    */
-  public getValue(columnName: string): any {
+  public getValue(columnName: string, dataType?: GeoPackageDataType): any {
     let value;
     try {
       value = this.resultSet.getValue(columnName);
     } catch (e) {
+      console.error(e)
       throw new GeoPackageException('Failed to get value for column name: ' + columnName);
     }
     return value;
@@ -57,13 +61,15 @@ export class ResultSetResult implements Result {
   }
 
   /**
-   * {@inheritDoc}
+   * Move the cursor to the next row.
+   * @return true if another row
    */
   public moveToNext(): boolean {
     let next = false;
     try {
       next = this.resultSet.next();
     } catch (e) {
+      console.error(e);
       throw new GeoPackageException('Failed to move ResultSet cursor to next');
     }
     return next;

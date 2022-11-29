@@ -39,8 +39,8 @@ export class TableIndex {
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof TableIndex) {
       const tableIndex = args[0];
-      this.table_name = tableIndex.table_name;
-      this.last_indexed = new Date(tableIndex.last_indexed);
+      this.table_name = tableIndex.getTableName();
+      this.last_indexed = new Date(tableIndex.getLastIndexed());
       this.geometryIndices = tableIndex.getGeometryIndices().slice();
     }
   }

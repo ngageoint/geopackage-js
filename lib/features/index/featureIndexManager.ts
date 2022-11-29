@@ -580,17 +580,17 @@ export class FeatureIndexManager {
    * @param columns columns
    * @return feature index results, close when done
    */
-  public queryAll(distinct: boolean, columns: string[]): FeatureIndexResults {
+  public queryAll(distinct?: boolean, columns?: string[]): FeatureIndexResults {
     let results = null;
     for (const type of this.getLocation()) {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            const geoPackageResultSet = this.featureTableIndex.queryFeatures(distinct, columns);
+            const geoPackageResultSet = this.featureTableIndex.queryFeaturesWithDistinctAndColumns(distinct, columns);
             results = new FeatureIndexFeatureResults(geoPackageResultSet);
             break;
           case FeatureIndexType.RTREE:
-            const rTreeResultSet = this.rTreeIndexTableDao.queryFeatures(distinct, columns);
+            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesWithDistinctAndColumns(distinct, columns);
             results = new FeatureIndexFeatureResults(rTreeResultSet);
             break;
           default:
@@ -606,7 +606,7 @@ export class FeatureIndexManager {
       }
     }
     if (results == null) {
-      const featureResultSet = this.manualFeatureQuery.query(distinct, columns);
+      const featureResultSet = this.manualFeatureQuery.queryWithDistinctAndColumns(distinct, columns);
       results = new FeatureIndexFeatureResults(featureResultSet);
     }
     return results;
@@ -633,10 +633,10 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            count = this.featureTableIndex.countFeatures(distinct, column);
+            count = this.featureTableIndex.countFeaturesWithDistinctAndColumn(distinct, column);
             break;
           case FeatureIndexType.RTREE:
-            count = this.rTreeIndexTableDao.countFeatures(distinct, column);
+            count = this.rTreeIndexTableDao.countFeaturesWithDistinctAndColumn(distinct, column);
             break;
           default:
             throw new GeoPackageException('Unsupported feature index type: ' + type);
@@ -699,11 +699,11 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            const geoPackageResultSet = this.featureTableIndex.queryFeatures(distinct, columns, where, whereArgs);
+            const geoPackageResultSet = this.featureTableIndex.queryFeaturesWithDistinctAndColumns(distinct, columns, where, whereArgs);
             results = new FeatureIndexFeatureResults(geoPackageResultSet);
             break;
           case FeatureIndexType.RTREE:
-            const rTreeResultSet = this.rTreeIndexTableDao.queryFeatures(distinct, columns, where, whereArgs);
+            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesWithDistinctAndColumns(distinct, columns, where, whereArgs);
             results = new FeatureIndexFeatureResults(rTreeResultSet);
             break;
           default:
@@ -719,7 +719,7 @@ export class FeatureIndexManager {
       }
     }
     if (results == null) {
-      const featureResultSet = this.manualFeatureQuery.query(distinct, columns, where, whereArgs);
+      const featureResultSet = this.manualFeatureQuery.queryWithDistinctAndColumns(distinct, columns, where, whereArgs);
       results = new FeatureIndexFeatureResults(featureResultSet);
     }
     return results;
@@ -740,10 +740,10 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            count = this.featureTableIndex.countFeatures(distinct, column, where, whereArgs);
+            count = this.featureTableIndex.countFeaturesWithDistinctAndColumn(distinct, column, where, whereArgs);
             break;
           case FeatureIndexType.RTREE:
-            count = this.rTreeIndexTableDao.countFeatures(distinct, column, where, whereArgs);
+            count = this.rTreeIndexTableDao.countFeaturesWithDistinctAndColumn(distinct, column, where, whereArgs);
             break;
           default:
             throw new GeoPackageException('Unsupported feature index type: ' + type);
@@ -758,7 +758,7 @@ export class FeatureIndexManager {
       }
     }
     if (count == null) {
-      count = this.manualFeatureQuery.count(distinct, [column], where, whereArgs);
+      count = this.manualFeatureQuery.countWithDistinctAndColumns(distinct, [column], where, whereArgs);
     }
     return count;
   }
@@ -972,7 +972,7 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            const geoPackageResultSet = this.featureTableIndex.queryFeaturesWithGeometryEnvelope(
+            const geoPackageResultSet = this.featureTableIndex.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(
               distinct,
               columns,
               envelope,
@@ -982,7 +982,7 @@ export class FeatureIndexManager {
             results = new FeatureIndexFeatureResults(geoPackageResultSet);
             break;
           case FeatureIndexType.RTREE:
-            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesWithGeometryEnvelope(
+            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(
               distinct,
               columns,
               envelope,
@@ -1004,7 +1004,7 @@ export class FeatureIndexManager {
       }
     }
     if (results == null) {
-      results = this.manualFeatureQuery.queryWhereWithGeometryEnvelope(distinct, columns, envelope, where, whereArgs);
+      results = this.manualFeatureQuery.queryWhereWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, envelope, where, whereArgs);
     }
     return results;
   }
@@ -1030,7 +1030,7 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            count = this.featureTableIndex.countFeaturesWithGeometryEnvelope(
+            count = this.featureTableIndex.countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(
               distinct,
               column,
               envelope,
@@ -1039,7 +1039,7 @@ export class FeatureIndexManager {
             );
             break;
           case FeatureIndexType.RTREE:
-            count = this.rTreeIndexTableDao.countFeaturesWithGeometryEnvelope(
+            count = this.rTreeIndexTableDao.countFeaturesWithGeometryEnvelopeAndDistinctAndColumn(
               distinct,
               column,
               envelope,
@@ -1293,7 +1293,7 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            const geoPackageResultSet = this.featureTableIndex.queryFeaturesForChunk(
+            const geoPackageResultSet = this.featureTableIndex.queryFeaturesForChunkWithDistinctAndColumns(
               distinct,
               columns,
               where,
@@ -1305,7 +1305,7 @@ export class FeatureIndexManager {
             results = new FeatureIndexFeatureResults(geoPackageResultSet);
             break;
           case FeatureIndexType.RTREE:
-            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesForChunk(
+            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesForChunkWithDistinctAndColumns(
               distinct,
               columns,
               where,
@@ -1329,7 +1329,7 @@ export class FeatureIndexManager {
       }
     }
     if (results == null) {
-      const featureResultSet = this.manualFeatureQuery.queryForChunk(
+      const featureResultSet = this.manualFeatureQuery.queryForChunkWithDistinctAndColumns(
         distinct,
         columns,
         where,
@@ -1527,7 +1527,7 @@ export class FeatureIndexManager {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
-            const geoPackageResultSet = this.featureTableIndex.queryFeaturesForChunkWithGeometryEnvelope(
+            const geoPackageResultSet = this.featureTableIndex.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(
               distinct,
               columns,
               envelope,
@@ -1540,7 +1540,7 @@ export class FeatureIndexManager {
             results = new FeatureIndexFeatureResults(geoPackageResultSet);
             break;
           case FeatureIndexType.RTREE:
-            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesForChunkWithGeometryEnvelope(
+            const rTreeResultSet = this.rTreeIndexTableDao.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(
               distinct,
               columns,
               envelope,
@@ -1565,7 +1565,7 @@ export class FeatureIndexManager {
       }
     }
     if (results == null) {
-      results = this.manualFeatureQuery.queryForChunkWithGeometryEnvelope(
+      results = this.manualFeatureQuery.queryForChunkWithGeometryEnvelopeAndDistinctAndColumns(
         distinct,
         columns,
         envelope,

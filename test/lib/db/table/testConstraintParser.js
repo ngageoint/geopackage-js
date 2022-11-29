@@ -87,21 +87,21 @@ function testSQLScript(script, primaryKey, unique, check, foreignKey, names) {
 
 describe('Constraint Tests', function() {
   it('test table constraints', function() {
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.spatial_reference_system, 0, 0, 0, 0, []);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.contents, 0, 0, 0, 1, ["fk_gc_r_srs_id"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.geometry_columns, 1, 1, 0, 2, ["pk_geom_cols", "uk_gc_table_name", "fk_gc_tn", "fk_gc_srs"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.tile_matrix_set, 0, 0, 0, 2, ["fk_gtms_table_name", "fk_gtms_srs"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.tile_matrix, 1, 0, 0, 1, ["pk_ttm", "fk_tmm_table_name"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.data_columns, 1, 1, 0, 0, ["pk_gdc", "gdc_tn"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.data_column_constraints, 0, 1, 0, 0, ["gdcc_ntv"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.metadata, 0, 0, 0, 0, ["m_pk"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.metadata_reference, 0, 0, 0, 2, ["crmr_mfi_fk", "crmr_mpi_fk"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.extensions, 0, 1, 0, 0, ["ge_tce"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.extended_relations, 0, 0, 0, 0, []);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.table_index, 0, 0, 0, 0, []);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.geometry_index, 1, 0, 0, 1, ["pk_ngi", "fk_ngi_nti_tn"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.feature_tile_link, 1, 0, 0, 0, ["pk_nftl"]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.tile_scaling, 0, 0, 1, 1, ["fk_nts_gtms_tn", null]);
-    testSQLScript(GeoPackageTableCreator.tableCreationScripts.contents_id, 0, 1, 0, 1, ["uk_nci_table_name", "fk_nci_gc_tn"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.spatial_reference_system, 0, 0, 0, 0, []);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.contents, 0, 0, 0, 1, ["fk_gc_r_srs_id"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.geometry_columns, 1, 1, 0, 2, ["pk_geom_cols", "uk_gc_table_name", "fk_gc_tn", "fk_gc_srs"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.tile_matrix_set, 0, 0, 0, 2, ["fk_gtms_table_name", "fk_gtms_srs"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.tile_matrix, 1, 0, 0, 1, ["pk_ttm", "fk_tmm_table_name"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.data_columns, 1, 1, 0, 0, ["pk_gdc", "gdc_tn"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.data_column_constraints, 0, 1, 0, 0, ["gdcc_ntv"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.metadata, 0, 0, 0, 0, ["m_pk"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.metadata_reference, 0, 0, 0, 2, ["crmr_mfi_fk", "crmr_mpi_fk"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.extensions, 0, 1, 0, 0, ["ge_tce"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.extended_relations, 0, 0, 0, 0, []);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.table_index, 0, 0, 0, 0, []);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.geometry_index, 1, 0, 0, 1, ["pk_ngi", "fk_ngi_nti_tn"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.feature_tile_link, 1, 0, 0, 0, ["pk_nftl"]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.tile_scaling, 0, 0, 1, 1, ["fk_nts_gtms_tn", null]);
+    testSQLScript(GeoPackageTableCreator.sqlScripts.contents_id, 0, 1, 0, 1, ["uk_nci_table_name", "fk_nci_gc_tn"]);
   });
 });

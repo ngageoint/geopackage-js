@@ -1,4 +1,4 @@
-var SpatialReferenceSystem = require('../../../../lib/srs/spatialReferenceSystem').SpatialReferenceSystem
+var SpatialReferenceSystem = require('../../../lib/srs/spatialReferenceSystem').SpatialReferenceSystem
   , should = require('chai').should()
   , path = require('path');
 
@@ -7,7 +7,7 @@ describe('SpatialReferenceSystem tests', function() {
   var geoPackage;
 
   beforeEach('should open the geoPackage', async function() {
-    var filename = path.join(__dirname, '..', '..', '..', 'fixtures', 'gdal_sample.gpkg');
+    var filename = path.join(__dirname, '..', '..', 'fixtures', 'gdal_sample.gpkg');
     // @ts-ignore
     geoPackage = (await openGeoPackage(filename)).geoPackage;
   });

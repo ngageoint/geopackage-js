@@ -35,9 +35,9 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
    */
   public static create(
     geometryColumns: GeometryColumns,
-    boundingBox?: BoundingBox,
     additionalColumns?: FeatureColumn[],
     idColumnName?: string,
+    boundingBox?: BoundingBox,
     autoincrement?: boolean,
   ): FeatureTableMetadata {
     return new FeatureTableMetadata(null, geometryColumns, idColumnName, additionalColumns, boundingBox, autoincrement);
@@ -56,7 +56,7 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
     table: FeatureTable,
     idColumnName?: string,
     boundingBox?: BoundingBox,
-    autoincrement = false,
+    autoincrement?: boolean,
   ): FeatureTableMetadata {
     return new FeatureTableMetadata(
       null,
@@ -166,9 +166,9 @@ export class FeatureTableMetadata extends UserTableMetadata<FeatureColumn> {
       this.dataType = args[0];
       this.geometryColumns = args[1];
       this.idColumnName = args[2];
-      this.autoincrement = args[3];
-      this.additionalColumns = args[4];
-      this.boundingBox = args[5];
+      this.additionalColumns = args[3];
+      this.boundingBox = args[4];
+      this.autoincrement = args[5];
     }
   }
   /**

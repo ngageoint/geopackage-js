@@ -4,6 +4,7 @@ import { DBValue } from '../db/dbValue';
 import { GeoPackageDao } from '../db/geoPackageDao';
 import { ExtensionsKey } from './extensionsKey';
 import type { GeoPackage } from '../geoPackage';
+import { ExtensionScopeType } from './extensionScopeType';
 
 /**
  * Extension Data Access Object
@@ -39,11 +40,11 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    */
   createObject(row: Record<string, DBValue>): Extensions {
     const e = new Extensions();
-    e.table_name = row['table_name'] as string;
-    e.column_name = row['column_name'] as string;
-    e.extension_name = row['extension_name'] as string;
-    e.definition = row['definition'] as string;
-    e.scope = row['scope'] as string;
+    e.setTableName(row['table_name'] as string);
+    e.setColumnName(row['column_name'] as string);
+    e.setExtensionName(row['extension_name'] as string);
+    e.setDefinition(row['definition'] as string);
+    e.setScope(row['scope'] as string);
     return e;
   }
   /**
@@ -99,17 +100,18 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
     columnName: string,
   ): Extensions[] {
     const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
-    if (tableName !== null && tableName !== undefined) {
+    if (extensionName != null) {
+      values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+    }
+    if (tableName != null) {
       values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
     }
-    if (columnName !== null && columnName !== undefined) {
+    if (columnName != null) {
       values.addColumn(Extensions.COLUMN_COLUMN_NAME, columnName);
     }
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
-      const e = this.createObject(row);
-      extensions.push(e);
+      extensions.push(this.createObject(row));
     }
     return extensions;
   }

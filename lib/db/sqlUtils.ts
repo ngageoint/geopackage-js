@@ -564,6 +564,20 @@ export class SQLUtils {
   }
 
   /**
+   * Query for values up to the limit
+   *
+   * @param connection connection
+   * @param sql sql statement
+   * @param args arguments
+   * @param limit result row limit
+   * @return results
+   */
+  public static queryResults(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, limit: number): Array<Array<any>> {
+    const result = SQLUtils.wrapQuery(connection, sql, args);
+    return ResultUtils.buildResults(result, limit);
+  }
+
+  /**
    * Count for query
    * @param connection connection
    * @param tableName table
@@ -709,7 +723,7 @@ export class SQLUtils {
    * @param columnIdx column index
    * @return result, null if no result
    */
-  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, columnIdx: number): any {
+  public static querySingleResultWithColumnIndex(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, columnIdx: number = 0): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
     return ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
   }
@@ -748,7 +762,8 @@ export class SQLUtils {
       update.push((i > 0) ? "," : "");
       update.push(SQLUtils.quoteWrap(colName));
       args.push(values.get(colName));
-      update.push("=?");
+      update.push(" = ?");
+      i++;
     }
     if (whereArgs != null) {
       for (i = setValuesSize; i < argsSize; i++) {
@@ -759,7 +774,7 @@ export class SQLUtils {
       update.push(" WHERE ");
       update.push(whereClause);
     }
-    const sql = update.toString();
+    const sql = update.join('');
     return connection.run(sql, args).changes;
   }
 
@@ -790,9 +805,9 @@ export class SQLUtils {
    */
   public static insertOrThrow(connection: GeoPackageConnection, table: string, values: ContentValues): number {
     const insert = [];
-    insert.push("insert into ");
+    insert.push('insert into ');
     insert.push(SQLUtils.quoteWrap(table));
-    insert.push("(");
+    insert.push(' (');
     let args = [];
     let size = (values != null && values.size() > 0) ? values.size() : 0;
     let i = 0;
@@ -800,6 +815,7 @@ export class SQLUtils {
       insert.push((i > 0) ? "," : "");
       insert.push(SQLUtils.quoteWrap(colName));
       args.push(values.get(colName));
+      i++;
     }
     insert.push(')');
     insert.push(" values (");

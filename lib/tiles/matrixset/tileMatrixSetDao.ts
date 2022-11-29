@@ -35,7 +35,7 @@ export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
       tms.setMinX(results[TileMatrixSet.COLUMN_MIN_X] as number);
       tms.setMinY(results[TileMatrixSet.COLUMN_MIN_Y] as number);
       tms.setMaxX(results[TileMatrixSet.COLUMN_MAX_X] as number);
-      tms.setMaxX(results[TileMatrixSet.COLUMN_MAX_Y] as number);
+      tms.setMaxY(results[TileMatrixSet.COLUMN_MAX_Y] as number);
     }
     return tms;
   }

@@ -219,12 +219,18 @@ export class Extensions {
 
   /**
    * Set the extension scope type
-   *
-   * @param scope
-   *            extension scope type
+   * @param scope extension scope type
    */
-  public setScope(scope: ExtensionScopeType): void {
-    this.scope = ExtensionScopeType.fromName(scope);
+  public setScope(scope: string): void {
+    this.scope = scope;
+  }
+
+  /**
+   * Set the extension scope type
+   * @param scope extension scope type
+   */
+  public setScopeType(scope: ExtensionScopeType): void {
+    this.scope = ExtensionScopeType.nameFromType(scope);
   }
 
   /**

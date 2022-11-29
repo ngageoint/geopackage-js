@@ -9,6 +9,7 @@ var testSetup = require('../../testSetup').default
   , Contents = require('../../../lib/contents/contents').Contents
   , ConstraintType = require('../../../lib/db/table/constraintType').ConstraintType
   , Constraints = require('../../../lib/db/table/constraints').Constraints
+  , should = require('chai').should();
 const { AttributesColumn } = require("../../../lib/attributes/attributesColumn");
 const { AttributesTableMetadata } = require("../../../lib/attributes/attributesTableMetadata");
 const { ContentsDataType } = require("../../../lib/contents/contentsDataType");
@@ -123,8 +124,12 @@ describe('GeoPackage Attribute table create tests', function() {
   });
 
   afterEach(async function() {
-    geoPackage.close();
-    await testSetup.deleteGeoPackage(testGeoPackage);
+    try {
+      geoPackage.close();
+      await testSetup.deleteGeoPackage(testGeoPackage);
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   it('should create an attribute table only', async function() {
@@ -238,34 +243,34 @@ describe('GeoPackage Attribute table create tests', function() {
       primaryKey: true,
       autoincrement: true,
     },
-      {
-        index: 1,
-        constraints: {
-          constraints: [],
-          typedConstraints: {},
-        },
-        name: 'Name',
-        max: null,
-        dataType: 9,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT)
+    {
+      index: 1,
+      constraints: {
+        constraints: [],
+        typedConstraints: {},
       },
-      {
-        index: 2,
-        constraints: {
-          constraints: [],
-          typedConstraints: {},
-        },
-        name: 'Number',
-        max: null,
-        dataType: 5,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
-      }]);
+      name: 'Name',
+      max: null,
+      dataType: 9,
+      notNull: false,
+      primaryKey: false,
+      autoincrement: false,
+      type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT)
+    },
+    {
+      index: 2,
+      constraints: {
+        constraints: [],
+        typedConstraints: {},
+      },
+      name: 'Number',
+      max: null,
+      dataType: 5,
+      notNull: false,
+      primaryKey: false,
+      autoincrement: false,
+      type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER)
+    }]);
 
     var dc = new DataColumnsDao(geoPackage);
     var dataColumn = dc.getDataColumns('NewTable', 'Name');
@@ -382,7 +387,7 @@ describe('GeoPackage Attribute table create tests', function() {
     columns.push(AttributesColumn.createColumn('test_blob.test', GeoPackageDataType.BLOB, false, null));
     columns.push(AttributesColumn.createColumn('test_integer.test', GeoPackageDataType.INTEGER, false, null));
 
-    var table = new AttributesTable(geoPackage.connection, columns);
+    var table = new AttributesTable(geoPackage.getConnection(), columns);
 
     (function() {
       new AttributesDao(geoPackage, table);
@@ -416,201 +421,216 @@ describe('GeoPackage Attribute table create tests', function() {
     dc.setConstraintName('test constraint');
     dataColumnsDao.create(dc);
 
-    var reader = new AttributesTableReader(tableName);
-    var result = reader.readAttributeTable(geoPackage);
-    columns = result.getUserColumns().getColumns();
-    var plainObject = JSON.parse(JSON.stringify(columns));
-    plainObject.should.deep.include.members([
-      {
-        index: 0,
-        name: 'id',
-        dataType: 5,
-        notNull: true,
-        primaryKey: true,
-        autoincrement: true,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: notNullPrimaryKeyConstraints,
-      },
-      {
-        index: 1,
-        name: 'test_text.test',
-        dataType: 9,
-        notNull: false,
-        defaultValue: "\'default\'",
-        primaryKey: false,
-        autoincrement: false,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-        constraints: defaultConstraints('\'default\''),
-      },
-      {
-        index: 2,
-        name: 'test_real.test',
-        dataType: 8,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
-        constraints: emptyConstraints,
-      },
-      {
-        index: 3,
-        name: 'test_boolean.test',
-        dataType: 0,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
-        constraints: emptyConstraints,
-      },
-      {
-        index: 4,
-        name: 'test_blob.test',
-        dataType: 10,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
-        constraints: emptyConstraints,
-      },
-      {
-        index: 5,
-        name: 'test_integer.test',
-        dataType: 5,
-        notNull: false,
-        defaultValue: '5',
-        primaryKey: false,
-        autoincrement: false,
-        max: null,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
-        constraints: defaultConstraints(5),
-      },
-      {
-        index: 6,
-        name: 'test_text_limited.test',
-        dataType: 9,
-        max: 5,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
-        constraints: emptyConstraints,
-      },
-      {
-        index: 7,
-        name: 'test_blob_limited.test',
-        dataType: 10,
-        max: 7,
-        notNull: false,
-        primaryKey: false,
-        autoincrement: false,
-        type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
-        constraints: emptyConstraints,
-      }]);
-    var dataColumn = dataColumnsDao.getDataColumns('test_attributes.test', 'test_text_limited.test');
-    dataColumn.should.be.deep.equal(dc);
+    try {
+      var reader = new AttributesTableReader(tableName);
+      var result = reader.readAttributeTable(geoPackage);
+      columns = result.getUserColumns().getColumns();
+      var plainObject = JSON.parse(JSON.stringify(columns));
+      plainObject.should.deep.include.members([
+        {
+          index: 0,
+          name: 'id',
+          dataType: 5,
+          notNull: true,
+          primaryKey: true,
+          autoincrement: true,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+          constraints: notNullPrimaryKeyConstraints,
+        },
+        {
+          index: 1,
+          name: 'test_text.test',
+          dataType: 9,
+          notNull: false,
+          defaultValue: '\'default\'',
+          primaryKey: false,
+          autoincrement: false,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+          constraints: defaultConstraints('\'default\''),
+        },
+        {
+          index: 2,
+          name: 'test_real.test',
+          dataType: 8,
+          notNull: false,
+          primaryKey: false,
+          autoincrement: false,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.REAL),
+          constraints: emptyConstraints,
+        },
+        {
+          index: 3,
+          name: 'test_boolean.test',
+          dataType: 0,
+          notNull: false,
+          primaryKey: false,
+          autoincrement: false,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.BOOLEAN),
+          constraints: emptyConstraints,
+        },
+        {
+          index: 4,
+          name: 'test_blob.test',
+          dataType: 10,
+          notNull: false,
+          primaryKey: false,
+          autoincrement: false,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
+          constraints: emptyConstraints,
+        },
+        {
+          index: 5,
+          name: 'test_integer.test',
+          dataType: 5,
+          notNull: false,
+          defaultValue: 5,
+          primaryKey: false,
+          autoincrement: false,
+          max: null,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.INTEGER),
+          constraints: defaultConstraints(5),
+        },
+        {
+          index: 6,
+          name: 'test_text_limited.test',
+          dataType: 9,
+          max: 5,
+          notNull: false,
+          primaryKey: false,
+          autoincrement: false,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.TEXT),
+          constraints: emptyConstraints,
+        },
+        {
+          index: 7,
+          name: 'test_blob_limited.test',
+          dataType: 10,
+          max: 7,
+          notNull: false,
+          primaryKey: false,
+          autoincrement: false,
+          type: GeoPackageDataType.nameFromType(GeoPackageDataType.BLOB),
+          constraints: emptyConstraints,
+        }]);
+      var dataColumn = dataColumnsDao.getDataColumns('test_attributes.test', 'test_text_limited.test');
+      dataColumn.should.be.deep.equal(dc);
+    } catch (e) {
+      console.error(e)
+    }
   });
 
-  describe('GeoPackage attribute CRUD tests', function(done) {
-    beforeEach(function() {
-      var columns = [];
-      columns.push(AttributesColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
-      columns.push(AttributesColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
-      columns.push(AttributesColumn.createColumn('test_boolean2', GeoPackageDataType.BOOLEAN, false, null));
-      columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
-      columns.push(AttributesColumn.createColumn('test_real', GeoPackageDataType.REAL, false, null));
-      columns.push(AttributesColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN, false, null));
-      columns.push(AttributesColumn.createColumn('test_blob', GeoPackageDataType.BLOB, false, null));
-      columns.push(AttributesColumn.createColumn('test_integer', GeoPackageDataType.INTEGER, false, null));
-      columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ""));
-      columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ""));
+  it('GeoPackage attribute CRUD tests - should create an attribute', function() {
+    var columns = [];
+    columns.push(AttributesColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
+    columns.push(AttributesColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
+    columns.push(AttributesColumn.createColumn('test_boolean2', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_real', GeoPackageDataType.REAL, false, null));
+    columns.push(AttributesColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(AttributesColumn.createColumn('test_blob', GeoPackageDataType.BLOB, false, null));
+    columns.push(AttributesColumn.createColumn('test_integer', GeoPackageDataType.INTEGER, false, null));
+    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ""));
 
-      geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
-      var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
-      contentsVerified.should.be.equal(true);
-      var attributesTableExists = Verification.verifyTableExists(geoPackage, tableName);
-      attributesTableExists.should.be.equal(true);
-    });
-
-    it('should create an attribute', function() {
-      try {
-        var attributeDao = geoPackage.getAttributesDao(tableName);
-        var attributeRow = attributeDao.newRow();
-        attributeRow.setValueWithColumnName('test_text.test', 'hello');
-        attributeRow.setValueWithColumnName('test_real', 3.0);
-        attributeRow.setValueWithColumnName('test_boolean', true);
-        attributeRow.setValueWithColumnName('test_boolean2', false);
-        attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-        attributeRow.setValueWithColumnName('test_integer', 5);
-        attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-        attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
-        attributeRow.setValueWithColumnName('test space', 'space space');
-        attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
-        console.log(attributeRow);
-        attributeDao.create(attributeRow);
-        const count = attributeDao.getCount();
-        count.should.be.equal(1);
-        var ar = attributeDao.queryForAll().next().value;
-        ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
-        ar.getValueWithColumnName('test_real').should.be.equal(3.0);
-        ar.getValueWithColumnName('test_boolean').should.be.equal(true);
-        ar.getValueWithColumnName('test_integer').should.be.equal(5);
-        ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-        ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-        ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-        ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
-        ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
-      } catch (e) {
-        console.error(e);
-      }
-    });
-
-    describe('delete attribute tests', function(done) {
-      var attributeDao;
-
-      beforeEach(function() {
-        attributeDao = geoPackage.getAttributesDao(tableName);
-        var attributeRow = attributeDao.createObject();
-        attributeRow.setValueWithColumnName('test_text.test', 'hello');
-        attributeRow.setValueWithColumnName('test_real', 3.0);
-        attributeRow.setValueWithColumnName('test_boolean', attributeRow.toObjectValue(3, 1));
-        attributeRow.setValueWithColumnName('test_boolean2', attributeRow.toObjectValue(10, 0));
-        attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-        attributeRow.setValueWithColumnName('test_integer', 5);
-        attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-        attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
-        attributeRow.setValueWithColumnName('test space', 'space space');
-        attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
-
-        attributeDao.create(attributeRow);
-        var count = attributeDao.getCount();
-        count.should.be.equal(1);
-        var ar = attributeDao.queryForAll().next().value;
-        ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
-        ar.getValueWithColumnName('test_real').should.be.equal(3.0);
-        ar.getValueWithColumnName('test_boolean').should.be.equal(true);
-        ar.getValueWithColumnName('test_boolean2').should.be.equal(false);
-        ar.getValueWithColumnName('test_integer').should.be.equal(5);
-        ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-        ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-        ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-        ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
-        ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
-      });
-
-      it('should delete the attribute', function() {
-        var count = attributeDao.getCount();
-        count.should.be.equal(1);
-        var ar = attributeDao.queryForAll().next().value;
-        attributeDao.delete(ar);
-        count = attributeDao.getCount();
-        count.should.be.equal(0);
-      });
-    });
+    geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
+    var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
+    contentsVerified.should.be.equal(true);
+    var attributesTableExists = Verification.verifyTableExists(geoPackage, tableName);
+    attributesTableExists.should.be.equal(true);
+    var attributeDao = geoPackage.getAttributesDao(tableName);
+    var attributeRow = attributeDao.newRow();
+    attributeRow.setValueWithColumnName('test_text.test', 'hello');
+    attributeRow.setValueWithColumnName('test_real', 3.0);
+    attributeRow.setValueWithColumnName('test_boolean', true);
+    attributeRow.setValueWithColumnName('test_boolean2', false);
+    attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
+    attributeRow.setValueWithColumnName('test_integer', 5);
+    attributeRow.setValueWithColumnName('test_text_limited', 'testt');
+    attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValueWithColumnName('test space', 'space space');
+    attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
+    attributeDao.create(attributeRow);
+    const count = attributeDao.getCount();
+    count.should.be.equal(1);
+    const attributesResultSet = attributeDao.queryForAll();
+    while (attributesResultSet.moveToNext()) {
+      const ar = attributesResultSet.getRow();
+      ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
+      ar.getValueWithColumnName('test_real').should.be.equal(3.0);
+      ar.getValueWithColumnName('test_boolean').should.be.equal(true);
+      ar.getValueWithColumnName('test_integer').should.be.equal(5);
+      ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
+      ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
+      ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+      ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
+      ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+    }
+    attributesResultSet.close();
   });
 
+  it('GeoPackage attribute CRUD tests - should delete the attribute', function() {
+    var columns = [];
+    columns.push(AttributesColumn.createColumn('test_text_limited', GeoPackageDataType.TEXT, false, null, 5));
+    columns.push(AttributesColumn.createColumn('test_blob_limited', GeoPackageDataType.BLOB, false, null, 7));
+    columns.push(AttributesColumn.createColumn('test_boolean2', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(AttributesColumn.createColumn('test_text.test', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test_real', GeoPackageDataType.REAL, false, null));
+    columns.push(AttributesColumn.createColumn('test_boolean', GeoPackageDataType.BOOLEAN, false, null));
+    columns.push(AttributesColumn.createColumn('test_blob', GeoPackageDataType.BLOB, false, null));
+    columns.push(AttributesColumn.createColumn('test_integer', GeoPackageDataType.INTEGER, false, null));
+    columns.push(AttributesColumn.createColumn('test space', GeoPackageDataType.TEXT, false, ""));
+    columns.push(AttributesColumn.createColumn('test-dash', GeoPackageDataType.TEXT, false, ""));
+    geoPackage.createAttributesTableWithMetadata(AttributesTableMetadata.create(tableName, columns));
+    var contentsVerified = Verification.verifyContentsForTable(geoPackage, tableName);
+    contentsVerified.should.be.equal(true);
+    var attributesTableExists = Verification.verifyTableExists(geoPackage, tableName);
+    attributesTableExists.should.be.equal(true);
+
+    const attributeDao = geoPackage.getAttributesDao(tableName);
+    var attributeRow = attributeDao.newRow();
+    attributeRow.setValueWithColumnName('test_text.test', 'hello');
+    attributeRow.setValueWithColumnName('test_real', 3.0);
+    attributeRow.setValueWithColumnName('test_boolean', attributeRow.toObjectValue(3, 1));
+    attributeRow.setValueWithColumnName('test_boolean2', attributeRow.toObjectValue(10, 0));
+    attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
+    attributeRow.setValueWithColumnName('test_integer', 5);
+    attributeRow.setValueWithColumnName('test_text_limited', 'testt');
+    attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValueWithColumnName('test space', 'space space');
+    attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
+
+    attributeDao.create(attributeRow);
+
+    let count = attributeDao.getCount();
+    count.should.be.equal(1);
+    let attributesResultSet = attributeDao.queryForAll();
+    attributesResultSet.moveToNext();
+    let ar = attributesResultSet.getRow();
+    ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
+    ar.getValueWithColumnName('test_real').should.be.equal(3.0);
+    ar.getValueWithColumnName('test_boolean').should.be.equal(true);
+    ar.getValueWithColumnName('test_boolean2').should.be.equal(false);
+    ar.getValueWithColumnName('test_integer').should.be.equal(5);
+    ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
+    ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
+    ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+    ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
+    ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+    attributesResultSet.close();
+
+    // delete attribute row
+    attributeDao.deleteRow(ar);
+
+    count = attributeDao.getCount();
+    count.should.be.equal(0);
+    attributesResultSet = attributeDao.queryForAll();
+    attributesResultSet.moveToNext();
+    should.not.exist(attributesResultSet.getRow());
+    attributesResultSet.close();
+  });
 });

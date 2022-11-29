@@ -3,6 +3,7 @@ import { TableColumnKey } from '../../db/tableColumnKey';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { SpatialReferenceSystemConstants } from '../../srs/spatialReferenceSystemConstants';
 import { Contents } from '../../contents/contents';
+import { ContentsDataType } from '../../contents/contentsDataType';
 
 /**
  * Geometry Columns object. Identifies the geometry columns in tables that contain user data representing features.
@@ -250,6 +251,22 @@ export class GeometryColumns {
   private validateValues(column: string, value: number): void {
     if (value < 0 || value > 2) {
       throw new GeoPackageException(column + ' value must be 0 for prohibited, 1 for mandatory, or 2 for optional');
+    }
+  }
+
+  /**
+   * Set the contents
+   * @param contents contents
+   */
+  public setContents(contents: Contents): void {
+    if (contents != null) {
+      // Verify the Contents have a features data type (Spec Requirement 23)
+      if (!contents.isFeaturesTypeOrUnknown()) {
+        throw new GeoPackageException("The Contents of a GeometryColumns must have a data type of " + ContentsDataType.nameFromType(ContentsDataType.FEATURES) + ". actual type: " + contents.getDataTypeName());
+      }
+      this.table_name = contents.getId();
+    } else {
+      this.table_name = null;
     }
   }
 }

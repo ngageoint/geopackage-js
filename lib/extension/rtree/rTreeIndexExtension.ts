@@ -15,15 +15,30 @@ import { UserCustomTable } from '../../user/custom/userCustomTable';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { RTreeIndexExtensionConstants } from './rTreeIndexExtensionConstants';
 import type { GeoPackage } from '../../geoPackage';
+import { GeoPackageConstants } from '../../geoPackageConstants';
 
 /**
  * RTreeIndex extension
  */
 export class RTreeIndexExtension extends BaseExtension {
+
+  /**
+   * Extension name
+   */
+  public static readonly EXTENSION_NAME =
+    GeoPackageConstants.EXTENSION_AUTHOR + Extensions.EXTENSION_NAME_DIVIDER + RTreeIndexExtensionConstants.NAME;
+
+  /**
+   * Extension definition URL
+   */
+  public static readonly DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
+
+
   /**
    * Connection
    */
   protected connection: GeoPackageConnection = null;
+
 
   private sqlScripts = {
     rtree_create: 'CREATE VIRTUAL TABLE "rtree_<t>_<c>" USING rtree(id, minx, maxx, miny, maxy)',
@@ -125,10 +140,10 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public getOrCreate(tableName: string, columnName: string): Extensions {
     return super.getOrCreate(
-      RTreeIndexExtensionConstants.EXTENSION_NAME,
+      RTreeIndexExtension.EXTENSION_NAME,
       tableName,
       columnName,
-      RTreeIndexExtensionConstants.DEFINITION,
+      RTreeIndexExtension.DEFINITION,
       ExtensionScopeType.WRITE_ONLY,
     );
   }
@@ -149,7 +164,7 @@ export class RTreeIndexExtension extends BaseExtension {
    */
   public hasExtensionWithTableAndColumn(tableName: string, columnName: string): boolean {
     return (
-      super.hasExtension(RTreeIndexExtensionConstants.EXTENSION_NAME, tableName, columnName) &&
+      super.hasExtension(RTreeIndexExtension.EXTENSION_NAME, tableName, columnName) &&
       this.connection.tableOrViewExists(this.getRTreeTableName(tableName, columnName))
     );
   }
@@ -161,7 +176,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @return true if has extension
    */
   public hasExtensionWithTable(tableName: string): boolean {
-    return super.hasExtension(RTreeIndexExtensionConstants.EXTENSION_NAME, tableName, undefined);
+    return super.hasExtension(RTreeIndexExtension.EXTENSION_NAME, tableName, undefined);
   }
 
   /**
@@ -170,7 +185,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @return true if has extension
    */
   public has(): boolean {
-    return super.hasExtensions(RTreeIndexExtensionConstants.EXTENSION_NAME);
+    return super.hasExtensions(RTreeIndexExtension.EXTENSION_NAME);
   }
 
   /**
@@ -241,7 +256,7 @@ export class RTreeIndexExtension extends BaseExtension {
   public create(tableName: string, geometryColumnName: string, idColumnName: string): Extensions {
     const extension = this.getOrCreate(tableName, geometryColumnName);
     this.createAllFunctions();
-    this.createRTreeIndex(tableName, geometryColumnName);
+    this.createRTreeIndex(tableName, geometryColumnName, idColumnName);
     this.loadRTreeIndex(tableName, geometryColumnName, idColumnName);
     this.createAllTriggers(tableName, geometryColumnName, idColumnName);
     return extension;
@@ -253,7 +268,7 @@ export class RTreeIndexExtension extends BaseExtension {
    * @param featureTable feature table
    */
   public createRTreeIndexWithFeatureTable(featureTable: FeatureTable): void {
-    this.createRTreeIndex(featureTable.getTableName(), featureTable.getGeometryColumnName());
+    this.createRTreeIndex(featureTable.getTableName(), featureTable.getGeometryColumnName(), featureTable.getPkColumnName());
   }
 
   /**
@@ -261,10 +276,11 @@ export class RTreeIndexExtension extends BaseExtension {
    *
    * @param tableName table name
    * @param geometryColumnName geometry column name
+   * @param idColumn id column name
    */
-  public createRTreeIndex(tableName: string, geometryColumnName: string): void {
+  public createRTreeIndex(tableName: string, geometryColumnName: string, idColumn?: string): void {
     const sqlName = 'rtree_create';
-    this.executeSQL(sqlName, tableName, geometryColumnName);
+    this.executeSQL(sqlName, tableName, geometryColumnName, idColumn);
   }
 
   /**
@@ -575,7 +591,7 @@ export class RTreeIndexExtension extends BaseExtension {
       this.drop(tableName, geometryColumnName);
       try {
         this.extensionsDao.deleteByExtensionAndTableNameAndColumnName(
-          RTreeIndexExtensionConstants.EXTENSION_NAME,
+          RTreeIndexExtension.EXTENSION_NAME,
           tableName,
           geometryColumnName,
         );
@@ -600,7 +616,7 @@ export class RTreeIndexExtension extends BaseExtension {
     try {
       if (this.extensionsDao.isTableExists()) {
         const extensions = this.extensionsDao.queryByExtensionAndTableName(
-          RTreeIndexExtensionConstants.EXTENSION_NAME,
+          RTreeIndexExtension.EXTENSION_NAME,
           tableName,
         );
         for (const extension of extensions) {
@@ -625,7 +641,7 @@ export class RTreeIndexExtension extends BaseExtension {
   public deleteAll(): void {
     try {
       if (this.extensionsDao.isTableExists()) {
-        const extensions = this.extensionsDao.queryAllByExtension(RTreeIndexExtensionConstants.EXTENSION_NAME);
+        const extensions = this.extensionsDao.queryAllByExtension(RTreeIndexExtension.EXTENSION_NAME);
         for (const extension of extensions) {
           this.deleteWithTableAndGeometryColumn(extension.getTableName(), extension.getColumnName());
         }
@@ -821,11 +837,9 @@ export class RTreeIndexExtension extends BaseExtension {
     idColumnName?: string,
     triggerName?: string,
   ): void {
-    const statements = this.sqlScripts[sqlName];
-    for (const statement of statements) {
-      const sql = this.substituteSqlArguments(statement, tableName, geometryColumnName, idColumnName, triggerName);
-      this._executeSQL(sql, triggerName != null);
-    }
+    const statement = this.sqlScripts[sqlName];
+    const sql = this.substituteSqlArguments(statement, tableName, geometryColumnName, idColumnName, triggerName);
+    this._executeSQL(sql, triggerName != null);
   }
 
   /**
@@ -855,19 +869,15 @@ export class RTreeIndexExtension extends BaseExtension {
     idColumnName: string,
     triggerName: string,
   ): string {
-    let substituted = sql;
-
-    substituted = substituted.replace(RTreeIndexExtensionConstants.TABLE_SUBSTITUTE, tableName);
-    substituted = substituted.replace(RTreeIndexExtensionConstants.GEOMETRY_COLUMN_SUBSTITUTE, geometryColumnName);
-
+    let substituted = sql.slice();
+    substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.TABLE_SUBSTITUTE, 'gm'), tableName);
+    substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.GEOMETRY_COLUMN_SUBSTITUTE, 'gm'), geometryColumnName);
     if (idColumnName != null) {
-      substituted = substituted.replace(RTreeIndexExtensionConstants.PK_COLUMN_SUBSTITUTE, idColumnName);
+      substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.PK_COLUMN_SUBSTITUTE, 'gm'), idColumnName);
     }
-
     if (triggerName != null) {
-      substituted = substituted.replace(RTreeIndexExtensionConstants.TRIGGER_SUBSTITUTE, triggerName);
+      substituted = substituted.replace(new RegExp(RTreeIndexExtensionConstants.TRIGGER_SUBSTITUTE, 'gm'), triggerName);
     }
-
     return substituted;
   }
 

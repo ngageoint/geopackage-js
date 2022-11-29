@@ -27,11 +27,11 @@ export class MetadataDao extends GeoPackageDao<Metadata, number> {
   createObject(results?: Record<string, DBValue>): Metadata {
     const m = new Metadata();
     if (results) {
-      m.id = results.id as number;
-      m.md_scope = results.md_scope as string;
-      m.md_standard_uri = results.md_standard_uri as string;
-      m.mime_type = results.mime_type as string;
-      m.metadata = results.metadata as string;
+      m.setId(results.id as number);
+      m.setMetadataScope(results.md_scope as string);
+      m.setStandardUri(results.md_standard_uri as string);
+      m.setMimeType(results.mime_type as string);
+      m.setMetadata(results.metadata as string);
     }
     return m;
   }

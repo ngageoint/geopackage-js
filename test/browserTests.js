@@ -1,8 +1,8 @@
 // require('chai').should();
-// require('./fixtures/testUtils');
+// require('./testUtils');
 // require('./lib/db/table/testConstraintParser');
-// require('./lib/core/contents/testContents');
-// require('./lib/core/srs/testSpatialReferenceSystem');
+// require('./lib/contents/testContents');
+// require('./lib/srs/testSpatialReferenceSystem');
 // require('./lib/dataColumns/testDataColumns');
 // require('./lib/db/testGeoPackageDataType');
 // require('./lib/db/testTableCreator');
@@ -30,7 +30,7 @@
 // require('./lib/issues/issue68.js');
 // require('./lib/tiles/features/testFeaturePaintCache');
 // require('./lib/tiles/features/testFeatureTiles');
-// require('./lib/extension/index/testFeatureTableIndex');
+// require('./lib/extension/nga/index/testFeatureTableIndex');
 // require('./lib/extension/testExtensionDao');
 // require('./lib/extension/nga/contents/testContentsIdDao');
 // require('./lib/extension/nga/style/testIconCache');

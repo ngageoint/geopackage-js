@@ -38,7 +38,21 @@ export namespace TileScalingType {
   }
 
   export function fromName(type: string): TileScalingType {
-    return TileScalingType[type as keyof typeof TileScalingType] as TileScalingType;
+    switch (type) {
+      case 'in':
+        return TileScalingType.IN;
+      case 'out':
+        return TileScalingType.OUT;
+      case 'in_out':
+        return TileScalingType.IN_OUT;
+      case 'out_in':
+        return TileScalingType.OUT_IN;
+      case 'closest_in_out':
+        return TileScalingType.CLOSEST_IN_OUT;
+      case 'closest_out_in':
+        return TileScalingType.CLOSEST_OUT_IN;
+    }
+    return null;
   }
 }
 

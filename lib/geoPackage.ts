@@ -71,7 +71,7 @@ import { MediaDao } from './extension/related/media/mediaDao';
 import { MediaRow } from './extension/related/media/mediaRow';
 import { MediaTableMetadata } from './extension/related/media/mediaTableMetadata';
 import { UserCustomColumn } from './user/custom/userCustomColumn';
-import { Geometry, GeometryType, LineString, MultiPolygon, Point, Polygon } from '@ngageoint/simple-features-js';
+import { GeometryType } from '@ngageoint/simple-features-js';
 import { FeatureColumn } from './features/user/featureColumn';
 import { SimpleAttributesTableMetadata } from './extension/related/simple/simpleAttributesTableMetadata';
 import { SimpleAttributesTable } from './extension/related/simple/simpleAttributesTable';
@@ -560,34 +560,120 @@ export class GeoPackage {
   }
 
   /**
-   * Perform a foreign key check
-   * @param tableName
+   * Query for the foreign keys value
+   * @param db connection
+   * @return true if enabled, false if disabled
+   * @since 3.3.0
    */
-  public foreignKeyCheck(tableName: string = null): ResultSet {
-    const resultSet = this.query(SQLUtils.foreignKeyCheckSQL(tableName), null);
+  public static foreignKeys(db: GeoPackageConnection): boolean {
+    const foreignKeys = db.querySingleResult("PRAGMA foreign_keys");
+    return foreignKeys != null && foreignKeys;
+  }
+
+  /**
+   * Change the foreign keys state
+   * @param db connection
+   * @param on true to turn on, false to turn off
+   * @return previous foreign keys value
+   * @since 3.3.0
+   */
+  public static enableForeignKeys(db: GeoPackageConnection, on: boolean): boolean {
+    const foreignKeys = GeoPackage.foreignKeys(db);
+    if (foreignKeys !== on) {
+      const sql = GeoPackage.foreignKeysSQL(on);
+      db.run(sql);
+    }
+    return foreignKeys;
+  }
+
+  /**
+   * Create the foreign keys SQL
+   * @param on true to turn on, false to turn off
+   * @return foreign keys SQL
+   * @since 3.3.0
+   */
+  public static foreignKeysSQL(on: boolean): string {
+    return "PRAGMA foreign_keys = " + on;
+  }
+
+  /**
+   * Perform a foreign key check
+   *
+   * @param db
+   *            connection
+   * @param tableName
+   *            table name
+   * @return empty list if valid or violation errors, 4 column values for each
+   *         violation. see SQLite PRAGMA foreign_key_check
+   * @since 3.3.0
+   */
+  public static foreignKeyCheck(db: GeoPackageConnection, tableName?: string): Array<Array<any>> {
+    const sql = GeoPackage.foreignKeyCheckSQL(tableName);
+    return db.queryResults(sql, null);
+  }
+
+  /**
+   * Create the foreign key check SQL
+   *
+   * @param tableName
+   *            table name
+   * @return foreign key check SQL
+   * @since 3.3.0
+   */
+  public static foreignKeyCheckSQL(tableName): string {
+    return "PRAGMA foreign_key_check" + (tableName != null ? "(" + SQLUtils.quoteWrap(tableName) + ")" : "");
+  }
+
+  /**
+   * Create the integrity check SQL
+   *
+   * @return integrity check SQL
+   * @since 3.3.0
+   */
+  public static integrityCheckSQL(): string {
+    return "PRAGMA integrity_check";
+  }
+
+  /**
+   * Create the quick check SQL
+   *
+   * @return quick check SQL
+   * @since 3.3.0
+   */
+  public static quickCheckSQL(): string {
+    return "PRAGMA quick_check";
+  }
+
+  /**
+   * Foreign Key Check
+   */
+  public foreignKeyCheck(tableName?: string): ResultSet {
+    let resultSet = this.query(SQLUtils.foreignKeyCheckSQL(tableName), null);
     try {
       if (!resultSet.next()) {
+        resultSet.close();
+        resultSet = null;
       }
     } catch (e) {
-      throw new GeoPackageException('Foreign key check failed on database: ' + this.getName());
+      throw new GeoPackageException("Foreign key check failed on database: " + this.getName());
     }
     return resultSet;
   }
 
   /**
-   * {@inheritDoc}
+   * Integrity check
    */
   public integrityCheck(): ResultSet {
-    return this.integrityCheckResultSet(this.query(SQLUtils.integrityCheckSQL(), null));
+    return this.integrityCheckWithResultSet(this.query(SQLUtils.integrityCheckSQL(), null));
   }
 
   /**
-   * {@inheritDoc}
+   * Quick check
    */
   public quickCheck(): ResultSet {
-    return this.integrityCheckResultSet(this.query(SQLUtils.quickCheckSQL(), null));
+    return this.integrityCheckWithResultSet(this.query(SQLUtils.quickCheckSQL(), null));
   }
-
+  
   /**
    * Check the result set returned from the integrity check to see if things
    * are "ok"
@@ -595,16 +681,17 @@ export class GeoPackage {
    * @param resultSet
    * @return null if ok, else the open result set
    */
-  private integrityCheckResultSet(resultSet: ResultSet): ResultSet {
+  private integrityCheckWithResultSet(resultSet: ResultSet): ResultSet {
     try {
       if (resultSet.next()) {
-        const value = resultSet.getStringAtIndex(1);
-        if (value === 'ok') {
+        const value = resultSet.getStringAtIndex(0);
+        if (value === "ok") {
+          resultSet.close();
           resultSet = null;
         }
       }
     } catch (e) {
-      throw new GeoPackageException('Integrity check failed on database: ' + this.getName());
+      throw new GeoPackageException("Integrity check failed on database: " + this.getName());
     }
     return resultSet;
   }
@@ -1068,7 +1155,7 @@ export class GeoPackage {
       const property = properties[i] as { name: string; dataType: string };
       columns.push(FeatureColumn.createColumn(property.name, GeoPackageDataType.fromName(property.dataType)));
     }
-    return this.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumn, BoundingBox.worldWGS84(), columns));
+    return this.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumn, columns, undefined, BoundingBox.worldWGS84()));
   }
 
   /**
@@ -1094,7 +1181,7 @@ export class GeoPackage {
       contents.setTableName(tableName);
       contents.setDataTypeName(metadata.getDataType(), ContentsDataType.FEATURES);
       contents.setIdentifier(tableName);
-      // contents.setLastChange(new Date());
+      contents.setLastChange(new Date());
       const boundingBox = metadata.getBoundingBox();
       if (boundingBox != null) {
         contents.setMinX(boundingBox.getMinLongitude());
@@ -1304,9 +1391,10 @@ export class GeoPackage {
     const dao = this.getExtensionsDao();
     try {
       if (!dao.isTableExists()) {
-        created = this.tableCreator.createExtensions();
+        created = this.getTableCreator().createExtensions();
       }
     } catch (e) {
+      console.error(e);
       throw new GeoPackageException('Failed to check if Extensions table exists and create it');
     }
     return created;
@@ -1470,7 +1558,7 @@ export class GeoPackage {
     }
 
     const contents = this.copyUserTable(tableName, newTableName, transferContent);
-    geometryColumns.setContents(contents);
+    geometryColumns.setTableName(contents.getId());
     try {
       geometryColumnsDao.create(geometryColumns);
     } catch (e) {
@@ -1506,8 +1594,7 @@ export class GeoPackage {
     }
 
     const contents = this.copyUserTable(tableName, newTableName, transferContent);
-
-    tileMatrixSet.setContents(contents);
+    tileMatrixSet.setTableName(contents.getId());
     try {
       tileMatrixSetDao.create(tileMatrixSet);
     } catch (e) {
@@ -1515,7 +1602,7 @@ export class GeoPackage {
     }
 
     for (const tileMatrix of tileMatrices) {
-      tileMatrix.setContents(contents);
+      tileMatrix.setTableName(contents.getId());
       try {
         tileMatrixDao.create(tileMatrix);
       } catch (e) {
@@ -2147,7 +2234,7 @@ export class GeoPackage {
       progress.setMax(features.length);
     }
 
-    const insertSql = SqliteQueryBuilder.buildInsert("'" + featureDao.getTableName() + "'", featureRow);
+    const insertSql = SqliteQueryBuilder.buildInsert(SQLUtils.quoteWrap(featureDao.getTableName()), featureRow);
 
     const stepFunction = async (start: number, end: number, resolve: Function) => {
       // execute step if there are still features

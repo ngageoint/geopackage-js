@@ -59,13 +59,13 @@ export class FeatureTable extends UserTable<FeatureColumn> {
       } else if (typeof args[0] === 'string') {
         const tableName = args[0];
         const columns: FeatureColumn[] = args[1];
-        super(new FeatureColumns(args[0], undefined, columns, false));
+        super(new FeatureColumns(tableName, undefined, columns, false));
       }
     } else if (args.length === 3) {
       const tableName = args[0];
       const geometryColumn = args[1];
       const columns: FeatureColumn[] = args[2];
-      super(new FeatureColumns(args[0], geometryColumn, columns, false));
+      super(new FeatureColumns(tableName, geometryColumn, columns, false));
     }
   }
 

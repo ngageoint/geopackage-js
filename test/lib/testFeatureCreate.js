@@ -475,7 +475,7 @@ describe('GeoPackage Feature table create tests', function() {
 
         var rows = featureDao.queryForAll();
         var fr = featureDao.getRow(rows[0]);
-        var result = featureDao.delete(fr);
+        var result = featureDao.deleteRow(fr);
         var count = featureDao.getCount();
         count.should.be.equal(0);
       });

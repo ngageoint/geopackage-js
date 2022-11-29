@@ -20,7 +20,7 @@ export abstract class UserTableReader<TColumn extends UserColumn, TTable extends
   private readonly tableName: string;
 
   /**
-   * @param table_name name of the table
+   * @param tableName name of the table
    */
   protected constructor(tableName: string) {
     this.tableName = tableName;

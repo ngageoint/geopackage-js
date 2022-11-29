@@ -854,9 +854,10 @@ export class GeoPackageGeometryData {
   private readString(num: number, reader: ByteReader): string {
     const parts = [];
     for (let i = 0; i < num; i++) {
-      parts.push(reader.readByte());
+      const byte = reader.readByte();
+      parts.push(Number.parseInt(byte));
     }
-    return parts.join('');
+    return String.fromCharCode(...parts);
   }
 
   private writeString(str: string, writer: ByteWriter): void {
@@ -875,7 +876,7 @@ export class GeoPackageGeometryData {
     const reader = new ByteReader(buffer);
 
     // Get 2 buffer as the magic number and validate
-    let magic = null;
+    let magic = '';
     try {
       magic = this.readString(2, reader);
     } catch (e) {
@@ -884,7 +885,7 @@ export class GeoPackageGeometryData {
           GeoPackageConstants.GEOMETRY_MAGIC_NUMBER,
       );
     }
-    if (!magic.equals(GeoPackageConstants.GEOMETRY_MAGIC_NUMBER)) {
+    if (magic !== GeoPackageConstants.GEOMETRY_MAGIC_NUMBER) {
       throw new GeoPackageException(
         'Unexpected GeoPackage Geometry magic number: ' +
           magic +
@@ -895,7 +896,7 @@ export class GeoPackageGeometryData {
 
     try {
       // Get a byte as the version and validate, value of 0 = version 1
-      const version = reader.readByte();
+      const version = Number.parseInt(reader.readByte());
       if (version !== GeoPackageConstants.GEOMETRY_VERSION_1) {
         throw new GeoPackageException(
           'Unexpected GeoPackage Geometry version: ' +
@@ -906,12 +907,13 @@ export class GeoPackageGeometryData {
       }
 
       // Get a flags byte and then read the flag values
-      const flags = reader.readByte();
+      const flags = Number.parseInt(reader.readByte());
       const envelopeIndicator = this.readFlags(flags);
       reader.setByteOrder(this.byteOrder);
 
       // Read the 5th - 8th buffer as the srs id
       this.srsId = reader.readInt();
+
 
       // Read the envelope
       this.envelope = this.readEnvelope(envelopeIndicator, reader);
@@ -920,13 +922,14 @@ export class GeoPackageGeometryData {
     }
 
     // Save off where the WKB buffer start
-    this.wkbGeometryIndex = reader.readByte();
+    this.wkbGeometryIndex = reader.position;
 
     // Read the Well-Known Binary Geometry if not marked as empty
     if (!this.empty) {
       try {
-        this.geometry = GeometryReader.readGeometry(reader.buffer, GeoPackageGeometryData.geometryFilter);
+        this.geometry = GeometryReader.readGeometryWithByteReader(reader, GeoPackageGeometryData.geometryFilter);
       } catch (e) {
+        console.error(e);
         throw new GeoPackageException('Failed to read the WKB geometry');
       }
     }
@@ -1073,13 +1076,11 @@ export class GeoPackageGeometryData {
     const emptyValue = this.empty ? 1 : 0;
     flag += emptyValue << 4;
 
-    // Add the envelope contents indicator code (3-bit unsigned integer to
-    // bits 3, 2, and 1)
+    // Add the envelope contents indicator code (3-bit unsigned integer to bits 3, 2, and 1)
     const envelopeIndicator = this.envelope == null ? 0 : GeoPackageGeometryData.getIndicator(this.envelope);
     flag += envelopeIndicator << 1;
 
-    // Add the byte order to bit 0, 0 for Big Endian and 1 for Little
-    // Endian
+    // Add the byte order to bit 0, 0 for Big Endian and 1 for Little Endian
     const byteOrderValue = this.byteOrder == ByteOrder.BIG_ENDIAN ? 0 : 1;
     flag += byteOrderValue;
 
@@ -1112,14 +1113,14 @@ export class GeoPackageGeometryData {
       let maxM = null;
 
       // Read z values
-      if (envelopeIndicator == 2 || envelopeIndicator == 4) {
+      if (envelopeIndicator === 2 || envelopeIndicator === 4) {
         hasZ = true;
         minZ = reader.readDouble();
         maxZ = reader.readDouble();
       }
 
       // Read m values
-      if (envelopeIndicator == 3 || envelopeIndicator == 4) {
+      if (envelopeIndicator === 3 || envelopeIndicator === 4) {
         hasM = true;
         minM = reader.readDouble();
         maxM = reader.readDouble();

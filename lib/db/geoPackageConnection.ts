@@ -8,6 +8,7 @@ import { SQLiteMasterColumn } from './master/sqliteMasterColumn';
 import { SQLUtils } from './sqlUtils';
 import type { ResultSet } from './resultSet';
 import type { DBAdapter } from './dbAdapter';
+import { GeoPackageDataType } from './geoPackageDataType';
 
 /**
  * Represents a connection to the GeoPackage database
@@ -83,7 +84,7 @@ export class GeoPackageConnection {
   }
   /**
    * Gets the first result from the query
-   * @param  {string} sql    sql query to run
+   * @param  {string} sql sql query to run
    * @param  {Array|Object} [params] array of substitution parameters
    * @return {any}
    */
@@ -97,6 +98,37 @@ export class GeoPackageConnection {
    * @return {any}
    */
   query(sql: string, params?: [] | Record<string, any>): ResultSet {
+    return this.connectionSource.query(sql, params);
+  }
+
+
+  /**
+   * Queries for a single result
+   * @param sql
+   * @param args
+   * @param column
+   */
+  public querySingleResult(sql: string, args?: string[], column?: number): any {
+    return SQLUtils.querySingleResultWithColumnIndex(this, sql, args, column);
+  }
+
+  /**
+   * Query results and return array
+   * @param sql
+   * @param args
+   * @param limit
+   */
+  public queryResults(sql: string, args?: String[], limit?: number) {
+    return SQLUtils.queryResults(this.connectionSource, sql, args, limit);
+  }
+
+  /**
+   * Gets the first result from the query
+   * @param  {string} sql    sql query to run
+   * @param  {Array|Object} [params] array of substitution parameters
+   * @return {any}
+   */
+  queryTypedResults(sql: string, params?: [] | Record<string, any>): ResultSet {
     return this.connectionSource.query(sql, params);
   }
   /**
@@ -213,7 +245,7 @@ export class GeoPackageConnection {
    * @return {number} number of rows deleted
    */
   delete(tableName: string, where?: string, whereArgs?: [] | Record<string, any>): number {
-    let deleteStatement = 'DELETE FROM ' + tableName + '';
+    let deleteStatement = 'DELETE FROM ' + SQLUtils.quoteWrap(tableName) + '';
     if (where) {
       deleteStatement += ' WHERE ' + where;
     }

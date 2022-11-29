@@ -122,7 +122,7 @@ export abstract class UserTableMetadata<TColumn extends UserColumn> {
    * @return autoincrement flag
    */
   public isAutoincrement(): boolean {
-    return this.autoincrement;
+    return this.autoincrement != null ? this.autoincrement : UserTable.DEFAULT_AUTOINCREMENT;
   }
 
   /**

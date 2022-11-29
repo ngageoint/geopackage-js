@@ -133,17 +133,6 @@ export class RTreeIndexExtensionConstants {
   public static readonly COLUMN_MAX_Y = 'maxy';
 
   /**
-   * Extension name
-   */
-  public static readonly EXTENSION_NAME =
-    GeoPackageConstants.EXTENSION_AUTHOR + Extensions.EXTENSION_NAME_DIVIDER + RTreeIndexExtensionConstants.NAME;
-
-  /**
-   * Extension definition URL
-   */
-  public static readonly DEFINITION = 'http://www.geopackage.org/spec/#extension_rtree';
-
-  /**
    * Table substitute value
    */
   public static readonly TABLE_SUBSTITUTE = '<t>';

@@ -353,11 +353,20 @@ export class SqljsAdapter implements DBAdapter {
       throw e;
     }
   }
+
+  /**
+   * Enable or disable unsafe mode
+   * @param enabled
+   */
+  unsafe(enabled: boolean): void {
+
+  }
+
   /**
    * Returns a result set for the given query
    */
   query(sql: string, params?: [] | Record<string, DBValue>): ResultSet {
-    const statement = this.db.prepare(sql);
+    let statement = this.db.prepare(sql);
     statement.bind(params);
     return new ResultSet({
       [Symbol.iterator](): IterableIterator<Record<string, DBValue>> {
@@ -380,6 +389,7 @@ export class SqljsAdapter implements DBAdapter {
     }, {
       close: () => {
         statement.free();
+        statement = null;
       }
     }, this);
   }

@@ -48,8 +48,8 @@ export class ContentValues {
    *
    * @return value set
    */
-  public valueSet(): any[] {
-    return Object.values(this.values);
+  public valueSet(): IterableIterator<any> {
+    return this.values.values();
   }
 
   /**
@@ -57,8 +57,8 @@ export class ContentValues {
    *
    * @return field key set
    */
-  public keySet(): string[] {
-    return Object.keys(this.values);
+  public keySet(): IterableIterator<string> {
+    return this.values.keys();
   }
 
   /**

@@ -13,6 +13,7 @@ import { ColumnValues } from '../../../dao/columnValues';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { AttributesTableMetadata } from '../../../attributes/attributesTableMetadata';
 import type { GeoPackage } from '../../../geoPackage';
+import { AttributesResultSet } from '../../../attributes/attributesResultSet';
 
 /**
  * GeoPackage properties core extension for defining GeoPackage specific
@@ -163,7 +164,9 @@ export class PropertiesExtension extends BaseExtension {
           'SELECT DISTINCT ' + PropertiesExtension.COLUMN_PROPERTY + ' FROM ' + PropertiesExtension.TABLE_NAME,
           null,
         )
-        .map(result => result[PropertiesExtension.COLUMN_PROPERTY]);
+        .map(result => {
+          return result as string
+        });
     }
     return properties;
   }
@@ -383,7 +386,7 @@ export class PropertiesExtension extends BaseExtension {
    * @param property property name
    * @return result
    */
-  private queryForValues(property: string): any {
+  private queryForValues(property: string): AttributesResultSet {
     let result = null;
     if (this.has()) {
       result = this.getDao().queryForEqWithFieldAndValue(PropertiesExtension.COLUMN_PROPERTY, property);
@@ -396,12 +399,20 @@ export class PropertiesExtension extends BaseExtension {
    * @param results  results
    * @return list of values
    */
-  private getValuesForResults(results: Array<Record<string, DBValue>>): string[] {
-    let values = [];
+  private getValuesForResults(results: AttributesResultSet): string[] {
+    let values = null;
     if (results != null) {
-      for (const result of results) {
-        values = this.getColumnResults(PropertiesExtension.COLUMN_VALUE, results);
+      try {
+        if (results.getCount() > 0) {
+          values = this.getColumnResults(PropertiesExtension.COLUMN_VALUE, results);
+        } else {
+          values = [];
+        }
+      } finally {
+        results.close();
       }
+    } else {
+      values = [];
     }
 
     return values;
@@ -413,10 +424,10 @@ export class PropertiesExtension extends BaseExtension {
    * @param results results
    * @return list of column index values
    */
-  private getColumnResults(property: string, results: Array<Record<string, DBValue>>): string[] {
+  private getColumnResults(property: string, results: AttributesResultSet): string[] {
     const values = [];
-    for (const result of results) {
-      values.push(result[property]);
+    while (results.moveToNext()) {
+      values.push(results.getString(property));
     }
     return values;
   }

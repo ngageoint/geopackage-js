@@ -1,4 +1,5 @@
 import { default as testSetup } from '../../../../testSetup'
+import { ContentsIdExtension } from "../../../../../lib/extension/nga/contents/contentsIdExtension";
 
 var Verification = require('../../../../verification')
   , ContentsDataType = require('../../../../../lib/contents/contentsDataType').ContentsDataType
@@ -8,7 +9,9 @@ describe('ContentsIdExtension Tests', function() {
   var testGeoPackage;
   var geoPackage;
   var tableName = 'test';
+  var contentsDao;
   var contents;
+  var contentsIdExtension;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
@@ -16,16 +19,17 @@ describe('ContentsIdExtension Tests', function() {
     geoPackage = created.geoPackage;
   });
 
-  beforeEach('create the GeoPackage connection', async function() {
-    var contentsDao = geoPackage.contentsDao;
-    var contentsIdExtension = geoPackage.contentsIdExtension;
-    contentsIdExtension.getOrCreateExtension();
-    var contentsIdDao = contentsIdExtension.dao;
+  beforeEach('create the GeoPackage connection',function() {
+    // create the contents for 'test'
+    contentsDao = geoPackage.getContentsDao();
     contents = contentsDao.createObject();
-    contents.table_name = tableName;
-    contents.data_type = ContentsDataType.FEATURES;
+    contents.setTableName(tableName);
+    contents.setDataType(ContentsDataType.FEATURES);
     contentsDao.create(contents);
-    contentsIdDao.createTable();
+
+    // enable the contents_id extension
+    contentsIdExtension = new ContentsIdExtension(geoPackage);
+    contentsIdExtension.getOrCreateExtension();
   });
 
   afterEach(async function() {
@@ -39,115 +43,118 @@ describe('ContentsIdExtension Tests', function() {
 
   it('should create a record in the nga_contents_id table', function() {
     // test create
-    geoPackage.contentsIdExtension.create(contents).table_name.should.be.equal(tableName);
+    contentsIdExtension.create(contents).getTableName().should.be.equal(tableName);
   });
 
   it('should create a record in the nga_contents_id table', function() {
     // test create
-    geoPackage.contentsIdExtension.createId(contents).table_name.should.be.equal(tableName);
+    contentsIdExtension.createId(contents).should.be.equal(1);
   });
 
   it('should retrieve table_name\'s of contents without record in contentsId table', function() {
     // test getMissing
-    var missing = geoPackage.contentsIdExtension.getMissing("");
-    missing.length.should.be.equal(1);
+    var missing = contentsIdExtension.getMissing();
+    missing.length.should.be.equal(geoPackage.getTables().length);
+    contentsIdExtension.getIds().length.should.be.equal(0);
+
     // test create
-    var contentsId = geoPackage.contentsIdExtension.create(contents);
-    contentsId.table_name.should.be.equal(tableName);
+    var contentsId = contentsIdExtension.create(contents);
+    contentsId.getTableName().should.be.equal(tableName);
     // test getMissing returns nothing when all contents records have entry in contentsId table
-    missing = geoPackage.contentsIdExtension.getMissing("");
-    missing.length.should.be.equal(0);
+    missing = contentsIdExtension.getMissing();
+    missing.length.should.be.equal(geoPackage.getTables().length - 1);
+    contentsIdExtension.getIds().length.should.be.equal(1);
   });
 
   it('should retrieve table_name\'s of contents without record in contentsId table for given type', function() {
     // test getMissing
-    var missing = geoPackage.contentsIdExtension.getMissing(ContentsDataType.FEATURES);
+    var missing = contentsIdExtension.getMissing(ContentsDataType.FEATURES);
     missing.length.should.be.equal(1);
     // test create
-    var contentsId = geoPackage.contentsIdExtension.create(contents);
-    contentsId.table_name.should.be.equal(tableName);
+    var contentsId = contentsIdExtension.create(contents);
+    contentsId.getTableName().should.be.equal(tableName);
     // test getMissing returns nothing when all contents records have entry in contentsId table
-    missing = geoPackage.contentsIdExtension.getMissing(ContentsDataType.FEATURES);
+    missing = contentsIdExtension.getMissing(ContentsDataType.FEATURES);
     missing.length.should.be.equal(0);
   });
 
   it('should retrieve contentsId using contents object', function() {
     // create contentsId for contents
-    geoPackage.contentsIdExtension.create(contents);
+    contentsIdExtension.create(contents);
     // retrieve by contents
-    geoPackage.contentsIdExtension.get(contents).table_name.should.be.equal(contents.table_name);
+    contentsIdExtension.getWithContents(contents).getTableName().should.be.equal(contents.getTableName());
   });
 
   it('should retrieve contentsId by data_type of contents', function() {
     // create contentsId for contents
-    geoPackage.contentsIdExtension.create(contents);
+    contentsIdExtension.create(contents);
 
     // test getIdsByType
-    var contentIdsForTypeFeature = geoPackage.contentsIdExtension.getIdsByType(ContentsDataType.FEATURES);
+    var contentIdsForTypeFeature = contentsIdExtension.getIds(ContentsDataType.FEATURES);
     contentIdsForTypeFeature.length.should.be.equal(1);
 
-    contentIdsForTypeFeature = geoPackage.contentsIdExtension.getIdsByType(ContentsDataType.ATTRIBUTES);
+    contentIdsForTypeFeature = contentsIdExtension.getIds(ContentsDataType.ATTRIBUTES);
     contentIdsForTypeFeature.length.should.be.equal(0);
 
-    contentIdsForTypeFeature = geoPackage.contentsIdExtension.getIdsByType(ContentsDataType.TILES);
+    contentIdsForTypeFeature = contentsIdExtension.getIds(ContentsDataType.TILES);
     contentIdsForTypeFeature.length.should.be.equal(0);
   });
 
   it('should delete contentsId by type', function() {
     // create contentsId for contents
-    geoPackage.contentsIdExtension.create(contents);
+    contentsIdExtension.create(contents);
 
     // test deleteIds
-    let numDeleted = geoPackage.contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
+    let numDeleted = contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
     numDeleted.should.be.equal(1);
 
     // test deleteIds when no ids to be deleted
-    numDeleted = geoPackage.contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
+    numDeleted = contentsIdExtension.deleteIds(ContentsDataType.FEATURES);
     numDeleted.should.be.equal(0);
   });
 
   it('should getId for contents', function() {
-    var id = geoPackage.contentsIdExtension.create(contents).id;
-    geoPackage.contentsIdExtension.getId(contents).should.be.equal(id);
+    var id = contentsIdExtension.create(contents).getId();
+    contentsIdExtension.getId(contents).should.be.equal(id);
   });
 
   it('should create contentsIds for all contents without contentsIds', function() {
     // test createIds which will create ids for all contents without contents ids
-    geoPackage.contentsIdExtension.createIds().should.be.equal(1);
+    contentsIdExtension.createIds().should.be.equal(2);
   });
 
   it('should create getOrCreate contents id', function() {
     // test that get or create will get the contents id when it doesn't exist
-    var contentsId = geoPackage.contentsIdExtension.getOrCreateId(contents);
-    contentsId.table_name.should.be.equal(tableName);
+    var contentsId = contentsIdExtension.getOrCreateContentsId(contents);
+    contentsId.getTableName().should.be.equal(tableName);
     // test that get or create will create the contents id when it does exist
-    contentsId = geoPackage.contentsIdExtension.getOrCreateId(contents);
-    contentsId.table_name.should.be.equal(tableName);
+    contentsId = contentsIdExtension.getOrCreateContentsId(contents);
+    contentsId.getTableName().should.be.equal(tableName);
   });
 
   it('should deleteId by contents', function() {
     // test createIds which will create ids for all contents without contents ids
-    let numCreated = geoPackage.contentsIdExtension.createIds();
+    let numCreated = contentsIdExtension.createIds(ContentsDataType.FEATURES);
     numCreated.should.be.equal(1);
     // delete by table name
-    geoPackage.contentsIdExtension.deleteId(contents).should.be.equal(1);
+    contentsIdExtension.deleteId(contents).should.be.equal(1);
   });
 
   it('should return the count of contentsIds', function() {
     // test createIds which will create ids for all contents without contents ids
-    geoPackage.contentsIdExtension.createIds();
-    geoPackage.contentsIdExtension.count().should.be.equal(1);
+    contentsIdExtension.createIds();
+    contentsIdExtension.count().should.be.equal(2);
   });
 
   it('should return array of table names', function() {
-    geoPackage.contentsIdExtension.dao.getTableNames().length.should.be.equal(0);
-    geoPackage.contentsIdExtension.createIds();
-    geoPackage.contentsIdExtension.dao.getTableNames().length.should.be.equal(1);
+    contentsIdExtension.getDao().getTableNames().length.should.be.equal(0);
+    contentsIdExtension.createIds();
+    contentsIdExtension.getDao().getTableNames().length.should.be.equal(2);
   });
 
   it('should return contents id for table name', function() {
-    should.not.exist(geoPackage.contentsIdExtension.dao.queryForTableName(tableName));
-    geoPackage.contentsIdExtension.createIds();
-    geoPackage.contentsIdExtension.dao.queryForTableName(tableName).table_name.should.be.equal(tableName);
+    should.not.exist(contentsIdExtension.getDao().queryForTableName(tableName));
+    contentsIdExtension.createIds();
+    contentsIdExtension.getDao().queryForTableName(tableName).getTableName().should.be.equal(tableName);
   });
 });

@@ -8,6 +8,7 @@ import { GeoPackageException } from '../../../geoPackageException';
 import { GeoPackageTableCreator } from '../../../db/geoPackageTableCreator';
 import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
 import type { GeoPackage } from '../../../geoPackage';
+import { ContentsDataType } from '../../../contents/contentsDataType';
 
 /**
  * Contents ID extension
@@ -49,7 +50,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Get or create the contents id extension
-   * @return {Promise}
+   * @return {Extensions}
    */
   getOrCreateExtension(): Extensions {
     // Create table
@@ -73,18 +74,16 @@ export class ContentsIdExtension extends BaseExtension {
         contentsDao.create(contents);
       }
     } catch (e) {
-      throw new GeoPackageException(
-        'Failed to create contents entry for contents id. GeoPackage: ' + this.geoPackage.getName(),
-      );
+      throw new GeoPackageException('Failed to create contents entry for contents id. GeoPackage: ' + this.geoPackage.getName());
     }
 
     return extension;
   }
   /**
    * Get the ContentsIdDao
-   * @returns {module:extension/nga/contents.ContentsIdDao}
+   * @returns {ContentsIdDao}
    */
-  get dao(): ContentsIdDao {
+  getDao(): ContentsIdDao {
     return this.contentsIdDao;
   }
   has(): boolean {
@@ -92,8 +91,8 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Get the ContentsId object
-   * @param contents {module:core/contents.Contents}
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @param contents {Contents}
+   * @returns {ContentsId}
    */
   getWithContents(contents: Contents): ContentsId {
     let contentsId = null;
@@ -105,7 +104,7 @@ export class ContentsIdExtension extends BaseExtension {
   /**
    * Get the ContentsId object
    * @param tableName
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @returns {ContentsId}
    */
   getWithTableName(tableName: string): ContentsId {
     let contentsId = null;
@@ -116,7 +115,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Get the ContentsId id
-   * @param contents {module:core/contents.Contents}
+   * @param contents {Contents}
    * @returns {Number}
    */
   getId(contents: Contents): number {
@@ -143,8 +142,8 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Creates contentsId for contents
-   * @param contents {module:core/contents.Contents}
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @param contents {Contents}
+   * @returns {ContentsId}
    */
   create(contents: Contents): ContentsId {
     return this.createWithTableName(contents.getTableName());
@@ -152,7 +151,7 @@ export class ContentsIdExtension extends BaseExtension {
   /**
    * Creates contentsId for contents
    * @param tableName
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @returns {ContentsId}
    */
   createWithTableName(tableName: string): ContentsId {
     if (!this.has()) {
@@ -164,7 +163,8 @@ export class ContentsIdExtension extends BaseExtension {
     const contents = this.geoPackage.getTableContents(tableName);
     contentsId.setTableName(contents.getTableName());
     try {
-      this.contentsIdDao.create(contentsId);
+      const id = this.contentsIdDao.create(contentsId);
+      contentsId.setId(id);
     } catch (e) {
       throw new GeoPackageException(
         'Failed to create contents id for GeoPackage: ' + this.geoPackage.getName() + ', Table Name: ' + tableName,
@@ -175,8 +175,8 @@ export class ContentsIdExtension extends BaseExtension {
 
   /**
    * Creates contentsId for contents
-   * @param contents {module:core/contents.Contents}
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @param contents {Contents}
+   * @returns number
    */
   createId(contents: Contents): number {
     let contentsId = null;
@@ -188,7 +188,7 @@ export class ContentsIdExtension extends BaseExtension {
   /**
    * Creates contentsId for contents
    * @param tableName {string}
-   * @returns {module:extension/nga/contents.ContentsId}
+   * @returns number
    */
   createIdWithTableName(tableName: string): number {
     return this.createWithTableName(tableName).getId();
@@ -236,7 +236,7 @@ export class ContentsIdExtension extends BaseExtension {
   }
   /**
    * Deletes contentsId for contents
-   * @param contents {module:core/contents.Contents}
+   * @param contents {Contents}
    */
   deleteId(contents: Contents): number {
     let deleted = 0;
@@ -266,10 +266,12 @@ export class ContentsIdExtension extends BaseExtension {
   /**
    * Create contentsIds for contents of type passed in
    * @param type defaults to ""
-   * @returns {number}
+   * @returns {number} the number of contentsIds created
    */
-  createIds(type = ''): number {
-    const missing = this.getMissing(type);
+  createIds(type: string | ContentsDataType = ''): number {
+    const typeString = typeof type === 'string' ? type : ContentsDataType.nameFromType(type);
+
+    const missing = this.getMissing(typeString);
     for (let i = 0; i < missing.length; i++) {
       this.getOrCreateIdWithTableName(missing[i]);
     }
@@ -280,13 +282,15 @@ export class ContentsIdExtension extends BaseExtension {
    * @param type
    * @returns {number}
    */
-  deleteIds(type = ''): number {
+  deleteIds(type: string | ContentsDataType = ''): number {
+    const typeString = typeof type === 'string' ? type : ContentsDataType.nameFromType(type);
+
     let deleted = 0;
     if (this.has()) {
-      if (type.length === 0) {
+      if (typeString.length === 0) {
         deleted = this.contentsIdDao.deleteAll();
       } else {
-        const ids = this.getIdsByType(type);
+        const ids = this.getIds(typeString);
         for (let i = 0; i < ids.length; i++) {
           deleted += this.contentsIdDao.deleteById(ids[i].getId());
         }
@@ -294,7 +298,8 @@ export class ContentsIdExtension extends BaseExtension {
     }
     return deleted;
   }
-  getIdsByType(type = ''): ContentsId[] {
+  getIds(type: string | ContentsDataType = ''): ContentsId[] {
+    const typeString = typeof type === 'string' ? type : ContentsDataType.nameFromType(type);
     let contentIds = [];
     if (this.has()) {
       let query = 'SELECT ';
@@ -310,16 +315,16 @@ export class ContentsIdExtension extends BaseExtension {
       query += Contents.TABLE_NAME;
       let where = '';
       const params = [];
-      if (type != null && type.length > 0) {
+      if (typeString != null && typeString.length > 0) {
         where += Contents.COLUMN_DATA_TYPE;
         where += ' = ?';
-        params.push(type);
+        params.push(typeString);
       }
       if (where.length > 0) {
         query += ' WHERE ' + where;
       }
       query += ')';
-      contentIds = this.connection.all(query, params);
+      contentIds = this.connection.all(query, params).map(result => this.contentsIdDao.createObject(result));
     }
     return contentIds;
   }
@@ -333,29 +338,31 @@ export class ContentsIdExtension extends BaseExtension {
    * @param type
    * @returns {string[]} contentsTableNames
    */
-  getMissing(type = ''): string[] {
+  getMissing(type: string | ContentsDataType = ''): string[] {
+    const typeString = typeof type === 'string' ? type : ContentsDataType.nameFromType(type);
     let query = 'SELECT ' + Contents.COLUMN_TABLE_NAME + ' FROM ' + Contents.TABLE_NAME;
     let where = '';
     const params = [];
-    if (type != null && type.length > 0) {
+    if (typeString != null && typeString.length > 0) {
       where += Contents.COLUMN_DATA_TYPE;
       where += ' = ?';
-      params.push(type);
+      params.push(typeString);
     }
-    if (this.has()) {
+    if (this.contentsIdDao.isTableExists()) {
       if (where.length > 0) {
         where += ' AND ';
       }
       where += Contents.COLUMN_TABLE_NAME;
       where += ' NOT IN (SELECT ';
-      where += Contents.COLUMN_TABLE_NAME;
+      where += ContentsId.COLUMN_TABLE_NAME;
       where += ' FROM ';
-      where += Contents.TABLE_NAME;
+      where += ContentsId.TABLE_NAME;
       where += ')';
     }
     if (where.length > 0) {
       query += ' WHERE ' + where;
     }
+
     return this.connection.all(query, params).map(result => result.table_name);
   }
 

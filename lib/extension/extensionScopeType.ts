@@ -20,6 +20,12 @@ export namespace ExtensionScopeType {
   }
 
   export function fromName(type: string): ExtensionScopeType {
-    return ExtensionScopeType[type as keyof typeof ExtensionScopeType] as ExtensionScopeType;
+    switch (type) {
+      case 'read-write':
+        return ExtensionScopeType.READ_WRITE;
+      case 'write-only':
+        return ExtensionScopeType.WRITE_ONLY;
+    }
+    return null;
   }
 }

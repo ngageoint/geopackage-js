@@ -27,11 +27,11 @@
   "bin": "./cli",
   "dependencies": {
     "@ngageoint/projections-js": "1.0.0",
-    "@ngageoint/simple-features-geojson-js": "1.0.2",
-    "@ngageoint/simple-features-js": "1.0.2",
-    "@ngageoint/simple-features-proj-js": "1.0.2",
-    "@ngageoint/simple-features-wkb-js": "1.0.2",
-    "@ngageoint/simple-features-wkt-js": "1.0.2",
+    "@ngageoint/simple-features-geojson-js": "1.1.1",
+    "@ngageoint/simple-features-js": "1.1.1",
+    "@ngageoint/simple-features-proj-js": "1.1.1",
+    "@ngageoint/simple-features-wkb-js": "1.1.1",
+    "@ngageoint/simple-features-wkt-js": "1.1.1",
     "@types/geojson": "7946.0.10",
     "@types/offscreencanvas": "^2019.7.0",
     "image-size": "0.8.3",
@@ -81,7 +81,7 @@
     "xhr-mock": "2.5.1"
   },
   "optionalDependencies": {
-    "better-sqlite3": "7.4.1",
+    "better-sqlite3": "7.6.2",
     "chalk": "4.1.1",
     "inquirer": "8.0.0"
   },
@@ -113,7 +113,7 @@
     "typedoc": "rm -rf ./docs/api; typedoc --tsconfig tsconfig.json --out docs/api index.ts",
     "clean": "rm -rf ./.test_run; rm -rf ./.nyc_output; rm -rf ./docs/coverage; npm run clean-dist; npm run clean-test;",
     "clean-dist": "rm -rf ./dist",
-    "clean-test": "rm -rf ./test/bundle ./test/sql-wasm.wasm ./test/node_modules ./test/tmp",
+    "clean-test": "rm -rf test/bundle test/sql-wasm.wasm test/node_modules test/tmp",
     "test-node": "npm run clean; nyc --no-clean mocha -r ts-node/register",
     "build-browser-test": "npm run clean && webpack -c browser.test.config.js --output-filename browser.test.bundle.js --mode=development",
     "test": "npm run test-node && npm run report",

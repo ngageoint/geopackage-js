@@ -1,4 +1,5 @@
 var path = require('path')
+  , assert = require('chai').assert
   , Canvas = require('../lib/canvas/canvas').Canvas
   , GeoPackage = require('../lib/geoPackage').GeoPackage
   , crypto = require('crypto')
@@ -681,9 +682,9 @@ module.exports.getTestFile = function(fileName) {
  * @param geoPackage
  */
 module.exports.validateGeoPackage = function(geoPackage) {
-  geoPackage.foreignKeyCheck().should.not.be.null;
-  geoPackage.integrityCheck().should.not.be.null;
-  geoPackage.quickCheck().should.not.be.null;
+  assert.isNull(geoPackage.foreignKeyCheck());
+  assert.isNull(geoPackage.integrityCheck());
+  assert.isNull(geoPackage.quickCheck());
 }
 
 

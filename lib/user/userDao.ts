@@ -327,6 +327,47 @@ export abstract class UserDao<
   /**
    * Query for rows by ids in the nested SQL query
    *
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return result
+   */
+  public queryIn(nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
+    return this.queryInWithDistinctAndColumns(undefined, undefined, nestedSQL, nestedArgs, where, whereArgs);
+  }
+
+  /**
+   * Query for rows by ids in the nested SQL query
+   *
+   * @param distinct distinct rows
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return result
+   */
+  public queryInWithDistinct(distinct: boolean, nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
+    return this.queryInWithDistinctAndColumns(distinct, undefined, nestedSQL, nestedArgs, where, whereArgs);
+  }
+
+  /**
+   * Query for rows by ids in the nested SQL query
+   *
+   * @param columns columns
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return result
+   */
+  public queryInWithColumns(columns: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
+    return this.queryInWithDistinctAndColumns(undefined, columns, nestedSQL, nestedArgs, where, whereArgs);
+  }
+
+  /**
+   * Query for rows by ids in the nested SQL query
+   *
    * @param distinct distinct rows
    * @param columns columns
    * @param nestedSQL nested SQL
@@ -335,10 +376,66 @@ export abstract class UserDao<
    * @param whereArgs where arguments
    * @return result
    */
-  public queryIn(distinct?: boolean, columns?: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
+  public queryInWithDistinctAndColumns(distinct?: boolean, columns?: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[]): TResult {
     const whereClause = this.buildWhereIn(nestedSQL, where);
     const args = this.buildWhereInArgs(nestedArgs, whereArgs);
-    return this.query(distinct, columns, whereClause, args);
+    return this.queryWithDistinctAndColumns(distinct, columns, whereClause, args);
+  }
+
+  /**
+   * Query for ordered rows by ids in the nested SQL query, starting at the
+   * offset and returning no more than the limit.
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param groupBy group by
+   * @param having having
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk offset
+   * @return result
+   */
+  public queryInForChunk(nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryInForChunkWithDistinctAndColumns(undefined, undefined, nestedSQL, nestedArgs, where, whereArgs, groupBy, having, orderBy, limit, offset)
+  }
+
+  /**
+   * Query for ordered rows by ids in the nested SQL query, starting at the
+   * offset and returning no more than the limit.
+   * @param distinct distinct rows
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param groupBy group by
+   * @param having having
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk offset
+   * @return result
+   */
+  public queryInForChunkWithDistinct(distinct: boolean, nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryInForChunkWithDistinctAndColumns(distinct, undefined, nestedSQL, nestedArgs, where, whereArgs, groupBy, having, orderBy, limit, offset)
+  }
+
+  /**
+   * Query for ordered rows by ids in the nested SQL query, starting at the
+   * offset and returning no more than the limit.
+   * @param columns columns
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @param groupBy group by
+   * @param having having
+   * @param orderBy order by
+   * @param limit chunk limit
+   * @param offset chunk offset
+   * @return result
+   */
+  public queryInForChunkWithColumns(columns: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryInForChunkWithDistinctAndColumns(undefined, columns, nestedSQL, nestedArgs, where, whereArgs, groupBy, having, orderBy, limit, offset)
   }
 
   /**
@@ -357,10 +454,57 @@ export abstract class UserDao<
    * @param offset chunk offset
    * @return result
    */
-  public queryInForChunk(distinct: boolean, columns: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+  public queryInForChunkWithDistinctAndColumns(distinct: boolean, columns: string[], nestedSQL?: string, nestedArgs?: any[], where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
     const whereClause = this.buildWhereIn(nestedSQL, where);
     const args = this.buildWhereInArgs(nestedArgs, whereArgs);
-    return this.queryForChunk(distinct, columns, whereClause, args, groupBy, having, orderBy, limit, offset);
+    return this.queryForChunkWithDistinctAndColumns(distinct, columns, whereClause, args, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public query(where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithDistinctAndColumns(false, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryWithDistinct(distinct: boolean, where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithDistinctAndColumns(distinct, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryWithColumns(columns: string[], where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithDistinctAndColumns(false, columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
   }
 
   /**
@@ -376,8 +520,8 @@ export abstract class UserDao<
    * @param limit
    * @param offset
    */
-  public query(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
-    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  public queryWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
     this.prepareResult(result);
     return result;
   }
@@ -395,6 +539,53 @@ export abstract class UserDao<
 
   /**
    * Gets the count
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public getCount(where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.getCountWithDistinctAndColumns(undefined, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Gets the count
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public getCountWithDistinct(distinct = false, where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.getCountWithDistinctAndColumns(distinct, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Gets the count
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public getCountWithColumns(columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.getCountWithDistinctAndColumns(undefined, columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Gets the count
    * @param distinct
    * @param columns
    * @param where
@@ -406,8 +597,55 @@ export abstract class UserDao<
    * @param limit
    * @param offset
    */
-  public getCount(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+  public getCountWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
     return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Count
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public count(where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.countWithDistinctAndColumns(undefined, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Count
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public countWithDistinct(distinct = false, where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.countWithDistinctAndColumns(distinct, undefined, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Count
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param join
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public countWithColumns(columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+    return this.countWithDistinctAndColumns(undefined, columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
   }
 
   /**
@@ -423,7 +661,7 @@ export abstract class UserDao<
    * @param limit
    * @param offset
    */
-  public count(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: [] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
+  public countWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[] | DBValue[], join?: string, groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): number {
     return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, join, groupBy, having, orderBy, limit, offset);
   }
 
@@ -434,12 +672,50 @@ export abstract class UserDao<
    * @return count
    */
   public countColumnIn(column: string, nestedSQL: string): number {
-    return this.countIn(false, column, nestedSQL);
+    return this.countInWithColumn(column, nestedSQL);
   }
 
   /**
    * Get the count in the nested SQL query
-   *
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countIn(nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+    return this.countInWithDistinctAndColumn(undefined, undefined, nestedSQL, nestedArgs, where, whereArgs);
+  }
+
+  /**
+   * Get the count in the nested SQL query
+   * @param distinct distinct column values
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countInWithDistinct(distinct?: boolean, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+    return this.countInWithDistinctAndColumn(distinct, undefined, nestedSQL, nestedArgs, where, whereArgs);
+
+  }
+
+  /**
+   * Get the count in the nested SQL query
+   * @param column count column name
+   * @param nestedSQL nested SQL
+   * @param nestedArgs nested SQL args
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countInWithColumn(column?: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+    return this.countInWithDistinctAndColumn(undefined, column, nestedSQL, nestedArgs, where, whereArgs);
+  }
+
+  /**
+   * Get the count in the nested SQL query
    * @param distinct distinct column values
    * @param column count column name
    * @param nestedSQL nested SQL
@@ -448,7 +724,7 @@ export abstract class UserDao<
    * @param whereArgs where arguments
    * @return count
    */
-  public countIn(distinct?: boolean, column?: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
+  public countInWithDistinctAndColumn(distinct?: boolean, column?: string, nestedSQL?: string, nestedArgs?: string[], where?: string, whereArgs?: string[]): number {
     const whereClause = this.buildWhereIn(nestedSQL, where);
     const args = this.buildWhereInArgs(nestedArgs, whereArgs);
     return this.db.countColumn(this.getTableName(), distinct, column, whereClause, args);
@@ -462,7 +738,7 @@ export abstract class UserDao<
   public queryForId(id: number): TResult {
     const where = this.getPkWhere(id);
     const whereArgs = this.getPkWhereArgs(id);
-    const result = this.userDb.query(false, this.getTableName(), this.getColumnNames(), where, whereArgs, undefined, undefined, undefined);
+    const result = this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.getColumnNames(), where, whereArgs);
     this.prepareResult(result);
     return result;
   }
@@ -478,6 +754,7 @@ export abstract class UserDao<
     if (readCursor.moveToNext()) {
       row = readCursor.getRow();
     }
+    readCursor.close();
     return row;
   }
 
@@ -737,22 +1014,20 @@ export abstract class UserDao<
   public queryForEq(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
     const where = this.buildWhere(fieldName, value);
     const whereArgs = this.buildWhereArgs(value);
-    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs, undefined, groupBy, having, orderBy);
+    const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs, undefined, groupBy, having, orderBy);
     this.prepareResult(result);
     return result;
   }
 
   /**
    * Count where all fields match their values
-   * @param distinct distinct column values
-   * @param column count column name
    * @param fieldValues field values
    * @return count
    */
   public countForFieldValues(fieldValues: ColumnValues): number {
     const where = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgsWithValues(fieldValues);
-    return this.count(false, this.table.getColumnNames(), where, whereArgs);
+    return this.count(where, whereArgs);
   }
 
   /**
@@ -774,6 +1049,53 @@ export abstract class UserDao<
   /**
    * Query for ordered rows starting at the offset and returning no more than
    * the limit.
+   * @param where
+   * @param whereArgs
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryForChunk(where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.query(where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for ordered rows starting at the offset and returning no more than
+   * the limit.
+   * @param distinct
+   * @param where
+   * @param whereArgs
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryForChunkWithDistinct(distinct = false, where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithDistinct(distinct, where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for ordered rows starting at the offset and returning no more than
+   * the limit.
+   * @param columns
+   * @param where
+   * @param whereArgs
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @param limit
+   * @param offset
+   */
+  public queryForChunkWithColumns(columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithColumns(columns, where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
+  }
+
+  /**
+   * Query for ordered rows starting at the offset and returning no more than
+   * the limit.
    * @param distinct
    * @param columns
    * @param where
@@ -784,8 +1106,8 @@ export abstract class UserDao<
    * @param limit
    * @param offset
    */
-  public queryForChunk(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
-    return this.query(distinct, columns, where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
+  public queryForChunkWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), where?: string, whereArgs?: any[], groupBy?: string, having?: string, orderBy?: string, limit?: number, offset?: number): TResult {
+    return this.queryWithDistinctAndColumns(distinct, columns, where, whereArgs, undefined, groupBy, having, orderBy, limit, offset);
   }
 
   /**
@@ -839,7 +1161,6 @@ export abstract class UserDao<
    */
   public renameColumn(column: TColumn, newColumnName: string): void {
     this.renameTableColumn(column.getName(), newColumnName);
-    this.table.renameColumn(column, newColumnName);
   }
 
   /**
@@ -849,7 +1170,6 @@ export abstract class UserDao<
    */
   public renameColumnWithName(columnName: string, newColumnName: string): void {
     this.renameTableColumn(columnName, newColumnName);
-    this.table.renameColumnWithName(columnName, newColumnName);
   }
 
   /**
@@ -859,7 +1179,6 @@ export abstract class UserDao<
    */
   public renameColumnWithIndex(index: number, newColumnName: string): void {
     this.renameTableColumn(this.table.getColumnName(index), newColumnName);
-    this.table.renameColumnWithIndex(index, newColumnName);
   }
 
   /**
@@ -869,6 +1188,7 @@ export abstract class UserDao<
    */
   protected renameTableColumn(columnName: string, newColumnName: string): void {
     AlterTable.renameColumn(this.db, this.table.getTableName(), columnName, newColumnName);
+    this.table.renameColumnWithName(columnName, newColumnName);
   }
 
   /**
@@ -876,7 +1196,7 @@ export abstract class UserDao<
    * @param column column
    */
   public dropColumn(column: TColumn): void {
-    AlterTable.dropColumn(this.db, this.table.getTableName(), column.getName());
+    AlterTable.dropColumnForUserTable(this.db, this.table, column.getName());
   }
 
   /**
@@ -884,7 +1204,7 @@ export abstract class UserDao<
    * @param index column index
    */
   public dropColumnWithIndex(index: number): void {
-    AlterTable.dropColumn(this.db, this.table.getTableName(), this.table.getColumnName(index));
+    AlterTable.dropColumnForUserTable(this.db, this.table, this.table.getColumnName(index));
   }
 
   /**
@@ -892,7 +1212,7 @@ export abstract class UserDao<
    * @param columnName column name
    */
   public dropColumnWithName(columnName: string): void {
-    AlterTable.dropColumn(this.db, this.table.getTableName(), columnName);
+    AlterTable.dropColumnForUserTable(this.db, this.table, columnName);
   }
 
   /**
@@ -924,7 +1244,7 @@ export abstract class UserDao<
    * @param columnNames column names
    */
   public dropColumnNames(columnNames: string[]): void {
-    AlterTable.dropColumns(this.db, this.table.getTableName(), columnNames);
+    AlterTable.dropColumnsForUserTable(this.db, this.table, columnNames);
   }
 
   /**
@@ -932,7 +1252,7 @@ export abstract class UserDao<
    * @param column column
    */
   public alterColumn(column: TColumn): void {
-    AlterTable.alterColumn(this.db, this.table.getTableName(), column);
+    AlterTable.alterColumnForTable(this.db, this.table, column);
   }
 
   /**
@@ -940,7 +1260,14 @@ export abstract class UserDao<
    * @param columns columns
    */
   public alterColumns(columns: TColumn[]): void {
-    AlterTable.alterColumns(this.db, this.table.getTableName(), columns);
+    AlterTable.alterColumnsForTable(this.db, this.table, columns);
+  }
+
+  /**
+   * Delete the row passed in
+   */
+  public deleteRow(row: TRow): number {
+    return this.deleteById(row.getId())
   }
 
   /**
@@ -1106,7 +1433,7 @@ export abstract class UserDao<
   public queryForFieldValues(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
     const where = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgs(fieldValues);
-    const result = this.userDb.query(distinct, this.getTableName(), columns, where, whereArgs);
+    const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs);
     this.prepareResult(result);
     return result;
   }

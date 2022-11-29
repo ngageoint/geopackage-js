@@ -475,8 +475,6 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
         }
       }
     }
-
-    console.log(contentValues);
     return contentValues;
   }
 
@@ -492,7 +490,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
       this.validateValue(column, value, ['number']);
       contentValues.put(columnName, value);
     } else if (typeof value === 'string') {
-      this.validateValue(column, value, ['string']);
+      this.validateValue(column, value, ['Date', 'string']);
       const stringValue = value as string;
       if (column.getMax() != null && stringValue.length > column.getMax()) {
         throw new GeoPackageException(

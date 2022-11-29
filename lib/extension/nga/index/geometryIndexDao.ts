@@ -12,6 +12,9 @@ import type { GeoPackage } from '../../../geoPackage';
  * Geometry Index Data Access Object
  */
 export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndexKey> {
+  readonly gpkgTableName: string = GeometryIndex.TABLE_NAME;
+  readonly idColumns: string[] = [GeometryIndex.COLUMN_TABLE_NAME, GeometryIndex.COLUMN_GEOM_ID];
+
   constructor(geoPackage: GeoPackage) {
     super(geoPackage, GeometryIndex.TABLE_NAME);
   }
@@ -36,24 +39,40 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
       fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, key.getTableName());
       fieldValues.addColumn(GeometryIndex.COLUMN_GEOM_ID, key.getGeomId());
       const results = this.queryForFieldValues(fieldValues);
-      if (results != null) {
-        const result = results.next();
-        if (!result.done) {
-          throw new GeoPackageException(
-            'More than one GeometryIndex returned for key. Table Name: ' +
-              key.getTableName() +
-              ', Geom Id: ' +
-              key.getGeomId(),
-          );
+      const values = [];
+      for (const result of results) {
+        if (result != null) {
+          values.push(result);
         }
-        geometryIndex = result.value;
+      }
+      if (values.length > 1) {
+        throw new GeoPackageException(
+          'More than one GeometryIndex returned for key. Table Name: ' +
+          key.getTableName() +
+          ', Geom Id: ' +
+          key.getGeomId(),
+        );
+      }
+      if (values.length === 1) {
+        geometryIndex = this.createObject(values[0]);
       }
       return geometryIndex;
     }
   }
 
   public createObject(result: Record<string, DBValue>): GeometryIndex {
-    throw new GeoPackageException('Method not implemented.');
+    const geometryIndex = new GeometryIndex();
+    geometryIndex.setTableName(result['table_name'] as string)
+    geometryIndex.setGeomId(result['geom_id'] as number);
+    geometryIndex.setMinX(result['min_x'] as number);
+    geometryIndex.setMaxX(result['max_x'] as number);
+    geometryIndex.setMinY(result['min_y'] as number);
+    geometryIndex.setMaxY(result['max_y'] as number);
+    geometryIndex.setMinZ(result['min_z'] as number);
+    geometryIndex.setMaxZ(result['max_z'] as number);
+    geometryIndex.setMinM(result['min_m'] as number);
+    geometryIndex.setMaxM(result['max_m'] as number);
+    return geometryIndex;
   }
 
   /**
@@ -96,10 +115,7 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   public deleteByIdWithKey(id: GeometryIndexKey): number {
     let count = 0;
     if (id != null) {
-      const deleteData = this.queryForIdWithKey(id);
-      if (deleteData != null) {
-        count = this.delete(deleteData);
-      }
+      count = this.deleteByMultiId([id.getTableName(), id.getGeomId()]);
     }
     return count;
   }

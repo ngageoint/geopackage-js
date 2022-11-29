@@ -50,13 +50,13 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
   createObject(results?: Record<string, DBValue>): SpatialReferenceSystem {
     const srs = new SpatialReferenceSystem();
     if (results) {
-      srs.srs_name = results.srs_name as string;
-      srs.srs_id = results.srs_id as number;
-      srs.organization = results.organization as string;
-      srs.organization_coordsys_id = results.organization_coordsys_id as number;
-      srs.definition = results.definition as string;
-      srs.definition_12_063 = results.definition as string;
-      srs.description = results.description as string;
+      srs.setSrsName(results.srs_name as string);
+      srs.setSrsId(results.srs_id as number);
+      srs.setOrganization(results.organization as string);
+      srs.setOrganizationCoordsysId(results.organization_coordsys_id as number);
+      srs.setDefinition(results.definition as string);
+      srs.setDefinition_12_063(results.definition as string);
+      srs.setDescription(results.description as string);
     }
     return srs;
   }

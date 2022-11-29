@@ -4,6 +4,7 @@ import { DBValue } from '../db/dbValue';
 import { SQLUtils } from '../db/sqlUtils';
 import type { GeoPackage } from '../geoPackage';
 import type { GeoPackageConnection } from '../db/geoPackageConnection';
+import { GeometryIndex } from '../extension/nga/index/geometryIndex';
 
 /**
  * Return class for the {@link Dao#createOrUpdate(Object)} method.
@@ -107,7 +108,7 @@ export abstract class Dao<T, ID> {
   queryForId(id: DBValue): T | undefined {
     const whereString = this.buildPkWhere(id);
     const whereArgs = this.buildPkWhereArgs(id);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
     const result = this.db.get(query, whereArgs);
     if (!result) return;
     return this.createObject(result);
@@ -146,7 +147,7 @@ export abstract class Dao<T, ID> {
   queryForMultiId(idValues: DBValue[]): T {
     const whereString = this.buildPkWhere(idValues);
     const whereArgs = this.buildPkWhereArgs(idValues);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
     const result = this.db.get(query, whereArgs);
     if (!result) return;
     return this.createObject(result);
@@ -186,7 +187,7 @@ export abstract class Dao<T, ID> {
    * @return {Object[]} raw object array from the database
    */
   queryForAll(where?: string, whereArgs?: DBValue[]): Record<string, DBValue>[] {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
     return this.db.all(query, whereArgs);
   }
 
@@ -197,7 +198,7 @@ export abstract class Dao<T, ID> {
    * @return {Object[]} raw object array from the database
    */
   queryForAllAndCreateObjects(where?: string, whereArgs?: DBValue[]): T[] {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
     return this.db.all(query, whereArgs).map(result => this.createObject(result));
   }
 
@@ -212,7 +213,7 @@ export abstract class Dao<T, ID> {
     values.addColumn(fieldName, value);
     const where = this.buildWhereLike(values);
     const whereArgs = this.buildWhereArgs(value);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, where);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
     return this.db.all(query, whereArgs);
   }
 
@@ -229,7 +230,7 @@ export abstract class Dao<T, ID> {
       where = this.buildWhere(fieldValues);
       whereArgs = this.buildWhereArgs(fieldValues);
     }
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", [columnName], where);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), [columnName], where);
     return this.db.all(query, whereArgs);
   }
 
@@ -240,7 +241,7 @@ export abstract class Dao<T, ID> {
    * @param whereArgs
    */
   queryForColumnWhere(columnName: string, where?: string, whereArgs?: DBValue[]): Record<string, DBValue>[] {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", [columnName], where);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), [columnName], where);
     return this.db.all(query, whereArgs);
   }
 
@@ -253,7 +254,7 @@ export abstract class Dao<T, ID> {
   queryForChunk(pageSize: number, page: number): Record<string, DBValue>[] {
     const query = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       undefined,
       undefined,
@@ -287,7 +288,7 @@ export abstract class Dao<T, ID> {
     if (!field) {
       const query: string = SqliteQueryBuilder.buildQuery(
         false,
-        "'" + this.gpkgTableName + "'",
+        SQLUtils.quoteWrap(this.gpkgTableName),
         columns,
         undefined,
         undefined,
@@ -301,7 +302,7 @@ export abstract class Dao<T, ID> {
       const whereArgs: DBValue[] | null = this.buildWhereArgs(value);
       const query = SqliteQueryBuilder.buildQuery(
         false,
-        "'" + this.gpkgTableName + "'",
+        SQLUtils.quoteWrap(this.gpkgTableName),
         undefined,
         whereString,
         undefined,
@@ -323,7 +324,7 @@ export abstract class Dao<T, ID> {
   queryForFieldValues(fieldValues: ColumnValues): IterableIterator<Record<string, DBValue>> {
     const whereString: string = this.buildWhere(fieldValues);
     const whereArgs: DBValue[] = this.buildWhereArgs(fieldValues);
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", undefined, whereString);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
     return this.db.each(query, whereArgs);
   }
 
@@ -341,7 +342,7 @@ export abstract class Dao<T, ID> {
     whereArgs?: DBValue[],
     columns?: string[],
   ): IterableIterator<Record<string, DBValue>> {
-    const query = SqliteQueryBuilder.buildQuery(false, "'" + this.gpkgTableName + "'", columns, where, join);
+    const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), columns, where, join);
     return this.db.each(query, whereArgs);
   }
 
@@ -365,8 +366,33 @@ export abstract class Dao<T, ID> {
    * @return {IterableIterator<any>}
    */
   queryWhereWithArgsDistinct(where: string, whereArgs?: DBValue[]): IterableIterator<Record<string, DBValue>> {
-    const query = SqliteQueryBuilder.buildQuery(true, "'" + this.gpkgTableName + "'", undefined, where);
+    const query = SqliteQueryBuilder.buildQuery(true, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
     return this.db.each(query, whereArgs);
+  }
+
+  /**
+   * Creates a geometry index iterator from the iterator returned from a query
+   * @param iterator
+   * @private
+   */
+  public createTypedIterator(iterator: IterableIterator<Record<string, DBValue>>) {
+    const self = this;
+    return {
+      [Symbol.iterator](): IterableIterator<T> {
+        return this;
+      },
+      next(): { value: T, done: boolean } {
+        let tObj = null;
+        const result = iterator.next();
+        if (result.value != null) {
+          tObj = self.createObject(result.value);
+        }
+        return {
+          value: tObj,
+          done: result.done
+        };
+      }
+    };
   }
 
   /**
@@ -389,7 +415,7 @@ export abstract class Dao<T, ID> {
   ): IterableIterator<Record<string, DBValue>> {
     const query: string = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       where,
       undefined,
@@ -428,7 +454,10 @@ export abstract class Dao<T, ID> {
       const idValuesArray = idValue;
       let values: DBValue[] = [];
       for (let i = 0; i < idValuesArray.length; i++) {
-        values = values.concat(this.buildWhereArgs(idValuesArray[i]));
+        const value = this.buildWhereArgs(idValuesArray[i]);
+        if (value != null) {
+          values = values.concat(value);
+        }
       }
       return values;
     }
@@ -560,7 +589,7 @@ export abstract class Dao<T, ID> {
     const whereArgs = this.buildWhereArgs(value);
     const query = SqliteQueryBuilder.buildQuery(
       false,
-      "'" + this.gpkgTableName + "'",
+      SQLUtils.quoteWrap(this.gpkgTableName),
       undefined,
       whereString,
       undefined,
@@ -587,11 +616,11 @@ export abstract class Dao<T, ID> {
     if (fields instanceof ColumnValues) {
       where = this.buildWhere(fields, 'and');
       whereArgs = this.buildWhereArgs(fields);
-      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
+      query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), where);
     } else {
       const whereString = this.buildWhereWithFieldAndValue(fields, value);
       whereArgs = this.buildWhereArgs(value);
-      query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", whereString);
+      query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), whereString);
     }
     const result = this.db.get(query, whereArgs);
     return result?.count;
@@ -604,7 +633,7 @@ export abstract class Dao<T, ID> {
    * @return {number} count of objects
    */
   countWhere(where: string, whereArgs: DBValue[]): number {
-    const query = SqliteQueryBuilder.buildCount("'" + this.gpkgTableName + "'", where);
+    const query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), where);
     const result = this.db.get(query, whereArgs);
     return result?.count;
   }
@@ -617,7 +646,7 @@ export abstract class Dao<T, ID> {
    * @return {number}
    */
   minOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
-    return this.db.minOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
+    return this.db.minOfColumn(SQLUtils.quoteWrap(this.gpkgTableName), column, where, whereArgs);
   }
 
   /**
@@ -628,7 +657,7 @@ export abstract class Dao<T, ID> {
    * @return {number}
    */
   maxOfColumn(column: string, where?: string, whereArgs?: DBValue[]): number {
-    return this.db.maxOfColumn("'" + this.gpkgTableName + "'", column, where, whereArgs);
+    return this.db.maxOfColumn(SQLUtils.quoteWrap(this.gpkgTableName), column, where, whereArgs);
   }
 
   /**
@@ -651,7 +680,7 @@ export abstract class Dao<T, ID> {
   deleteById(idValue: DBValue): number {
     const where = this.buildPkWhere(idValue);
     const whereArgs = this.buildPkWhereArgs(idValue);
-    return this.db.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
   }
 
   /**
@@ -662,7 +691,7 @@ export abstract class Dao<T, ID> {
   deleteByMultiId(idValues: any[]): number {
     const where = this.buildPkWhere(idValues);
     const whereArgs = this.buildPkWhereArgs(idValues);
-    return this.db.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
   }
 
   deleteByID(id: ID): void {
@@ -680,7 +709,7 @@ export abstract class Dao<T, ID> {
    * @return {number} number of objects deleted
    */
   deleteWhere(where: string, whereArgs: DBValue[]): number {
-    return this.db.delete("'" + this.gpkgTableName + "'", where, whereArgs);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), where, whereArgs);
   }
 
   /**
@@ -688,7 +717,7 @@ export abstract class Dao<T, ID> {
    * @return {number} number of objects deleted
    */
   deleteAll(): number {
-    return this.db.delete("'" + this.gpkgTableName + "'", '', []);
+    return this.db.delete(SQLUtils.quoteWrap(this.gpkgTableName), '', []);
   }
 
   /**
@@ -697,7 +726,7 @@ export abstract class Dao<T, ID> {
    * @return {number} id of the inserted object
    */
   create(object: T): number {
-    const sql = SqliteQueryBuilder.buildInsert("'" + this.gpkgTableName + "'", object);
+    const sql = SqliteQueryBuilder.buildInsert(SQLUtils.quoteWrap(this.gpkgTableName), object);
     const insertObject = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
     return this.db.insert(sql, insertObject);
   }
@@ -717,7 +746,7 @@ export abstract class Dao<T, ID> {
     changes: number;
     lastInsertRowid: number;
   } {
-    const update = SqliteQueryBuilder.buildUpdate("'" + this.gpkgTableName + "'", values, where, whereArgs);
+    const update = SqliteQueryBuilder.buildUpdate(SQLUtils.quoteWrap(this.gpkgTableName), values, where, whereArgs);
     return this.db.run(update.sql, update.args);
   }
 
@@ -733,11 +762,14 @@ export abstract class Dao<T, ID> {
     lastInsertRowid: number;
   } {
     const updateValues = SqliteQueryBuilder.buildUpdateOrInsertObject(object);
-    let update = SqliteQueryBuilder.buildObjectUpdate("'" + this.gpkgTableName + "'", object);
+    let update = SqliteQueryBuilder.buildObjectUpdate(SQLUtils.quoteWrap(this.gpkgTableName), object);
     const multiId = this.getMultiId(object);
-    if (multiId.length) {
+    if (multiId.length > 0) {
       let where = ' where ';
       for (let i = 0; i < multiId.length; i++) {
+        if (i > 0) {
+          where += ' and ';
+        }
         where += '"' + this.idColumns[i] + '" = $' + SqliteQueryBuilder.fixColumnName(this.idColumns[i]);
         updateValues[SqliteQueryBuilder.fixColumnName(this.idColumns[i])] = multiId[i];
       }
@@ -781,7 +813,7 @@ export abstract class Dao<T, ID> {
    * @param {string} newName
    */
   rename(newName: string): void {
-    this.db.run('ALTER TABLE ' + "'" + this.gpkgTableName + "' RENAME TO '" + newName + "'");
+    this.db.run('ALTER TABLE ' + SQLUtils.quoteWrap(this.gpkgTableName) + " RENAME TO " + SQLUtils.quoteWrap(newName));
     this.gpkgTableName = newName;
   }
 }
