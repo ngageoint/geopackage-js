@@ -314,7 +314,7 @@ export class FeatureTiles {
 
       const styleDao = this.featureTableStyles.getStyleDao();
       for (const styleRowId of styleRowIds) {
-        const styleRow = styleDao.getRow(styleDao.queryForIdRow(styleRowId));
+        const styleRow = styleDao.getRow(styleDao.queryForId(styleRowId));
         const styleHalfWidth = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         this.widthOverlap = Math.max(this.widthOverlap, styleHalfWidth);
         this.heightOverlap = Math.max(this.heightOverlap, styleHalfWidth);
@@ -333,7 +333,7 @@ export class FeatureTiles {
 
       const iconDao = this.featureTableStyles.getIconDao();
       for (const iconRowId of iconRowIds) {
-        const iconRow = iconDao.getRow(iconDao.queryForIdRow(iconRowId));
+        const iconRow = iconDao.getRow(iconDao.queryForId(iconRowId));
         const iconDimensions = iconRow.getDerivedDimensions();
         const iconWidth = this.scale * Math.ceil(iconDimensions[0]);
         const iconHeight = this.scale * Math.ceil(iconDimensions[1]);

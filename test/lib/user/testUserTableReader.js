@@ -58,11 +58,11 @@ describe('UserTableReader tests', function() {
       ur.getColumnNameWithIndex(0).should.be.equal('fid');
       ur.getColumnIndexWithColumnName('fid').should.be.equal(0);
       ur.getValueWithIndex(0).should.be.equal(i+1);
-      ur.getValueWithColumnName('fid').should.be.equal(i+1);
+      ur.getValue('fid').should.be.equal(i+1);
       ur.getRowColumnTypeWithIndex(0).should.be.equal(5);
       ur.getRowColumnTypeWithColumnName('fid').should.be.equal(5);
       ur.getColumnWithIndex(0).name.should.be.equal('fid');
-      ur.getColumnWithColumnName('fid').name.should.be.equal('fid');
+      ur.getColumn('fid').name.should.be.equal('fid');
       ur.id.should.be.equal(i+1);
       ur.pkColumn.getName().should.be.equal('fid');
       ur.getColumnWithIndex(0).getType().should.be.equal('INTEGER');

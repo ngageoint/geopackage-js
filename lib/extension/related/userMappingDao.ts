@@ -7,6 +7,7 @@ import { UserMappingRow } from './userMappingRow';
 import { UserCustomResultSet } from '../../user/custom/userCustomResultSet';
 import { UserCustomRow } from '../../user/custom/userCustomRow';
 import { SQLUtils } from '../../db/sqlUtils';
+import { DBValue } from '../../db/dbValue';
 
 /**
  * User Mapping DAO for reading user mapping data tables
@@ -304,7 +305,7 @@ export class UserMappingDao extends UserCustomDao {
    * @param relatedId related id
    * @return where args
    */
-  private buildWhereIdsArgs(baseId: number, relatedId: number): string[] {
+  private buildWhereIdsArgs(baseId: number, relatedId: number): DBValue[] {
     return this.buildWhereArgs([baseId, relatedId]);
   }
 }

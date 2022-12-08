@@ -1030,7 +1030,7 @@ export class FeatureTableIndex extends BaseExtension {
    */
   public getFeatureRow(geometryIndex: GeometryIndex): FeatureRow {
     const geomId = geometryIndex.getGeomId();
-    return this.featureDao.queryForIdRow(geomId);
+    return this.featureDao.queryForId(geomId);
   }
 
   /**

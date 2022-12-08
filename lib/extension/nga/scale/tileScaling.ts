@@ -115,10 +115,10 @@ export class TileScaling {
       this.zoom_out = args[2];
     } else if (args.length === 1) {
       const tileScaling = args[0];
-      this.table_name = tileScaling.tableName;
-      this.scaling_type = tileScaling.scalingType;
-      this.zoom_in = tileScaling.zoomIn;
-      this.zoom_out = tileScaling.zoomOut;
+      this.table_name = tileScaling.getTableName();
+      this.scaling_type = tileScaling.getScalingType();
+      this.zoom_in = tileScaling.getZoomIn();
+      this.zoom_out = tileScaling.getZoomOut();
     }
   }
 

@@ -85,7 +85,7 @@ export class DublinCoreMetadata {
    */
   public static getValue(row: UserRow<UserColumn, UserTable<UserColumn>>, type: DublinCoreType): any {
     const name = DublinCoreMetadata.getColumn(row, type).getName();
-    return row.getValueWithColumnName(name);
+    return row.getValue(name);
   }
 
   /**
@@ -96,6 +96,6 @@ export class DublinCoreMetadata {
    */
   public static setValue(row: UserRow<UserColumn, UserTable<UserColumn>>, type: DublinCoreType, value: any): void {
     const column = DublinCoreMetadata.getColumn(row, type);
-    row.setValueWithColumnName(column.getName(), value);
+    row.setValue(column.getName(), value);
   }
 }

@@ -96,7 +96,7 @@ export class TileTableScaling extends BaseExtension {
     } catch (e) {
       throw new GeoPackageException(
         'Failed to create or update tile scaling for GeoPackage: ' +
-          +this.geoPackage.getName() +
+          + this.geoPackage.getName() +
           ', Tile Table: ' +
           this.tableName,
       );
@@ -107,16 +107,74 @@ export class TileTableScaling extends BaseExtension {
 
   /**
    * Get the TileScalingDao
-   * @returns {module:extension/nga/scale.TileScalingDao}
+   * @returns {TileScalingDao}
    */
   get dao(): TileScalingDao {
     return this.tileScalingDao;
   }
-  has(): boolean {
-    return (
-      this.hasExtension(TileTableScaling.EXTENSION_NAME, this.tableName, null) && this.tileScalingDao.isTableExists()
-    );
+
+  /**
+   * Get the tile scaling
+   * @return tile scaling
+   */
+  public getTileScaling(): TileScaling {
+    let tileScaling = null;
+    if (this.has()) {
+      try {
+        tileScaling = this.tileScalingDao.queryForId(this.tableName);
+      } catch (e) {
+        throw new GeoPackageException(
+          "Failed to query for tile scaling for GeoPackage: "
+          + this.geoPackage.getName() + ", Tile Table: "
+          + this.tableName);
+      }
+    }
+    return tileScaling;
   }
+
+  /**
+   * Checks if this GeoPackage has the tile scaling extension
+   */
+  has(): boolean {
+    let exists = false;
+    try {
+      exists = this.hasExtension(TileTableScaling.EXTENSION_NAME, this.tableName, null)
+        && this.tileScalingDao.isTableExists()
+        && this.tileScalingDao.idExists(this.tableName);
+    } catch (e) {
+      throw new GeoPackageException(
+        "Failed to check for tile scaling for GeoPackage: "
+        + this.geoPackage.getName() + ", Tile Table: "
+        + this.tableName);
+    }
+    return exists;
+  }
+
+  /**
+   * Delete the tile table scaling for the tile table
+   *
+   * @return true if deleted
+   */
+  public delete(): boolean {
+
+    let deleted = false;
+
+    try {
+      if (this.tileScalingDao.isTableExists()) {
+        deleted = this.tileScalingDao.deleteById(this.tableName) > 0;
+      }
+      if (this.extensionsDao.isTableExists()) {
+        deleted = this.extensionsDao.deleteByExtensionAndTableName(TileTableScaling.EXTENSION_NAME, this.tableName) > 0 || deleted;
+      }
+    } catch (e) {
+      throw new GeoPackageException(
+        "Failed to delete tile table scaling for GeoPackage: "
+        + this.geoPackage.getName() + ", Table: " + this.tableName);
+    }
+
+    return deleted;
+  }
+
   /**
    * Remove tileScaling id extension
    */
@@ -149,7 +207,6 @@ export class TileTableScaling extends BaseExtension {
       if (!this.tileScalingDao.isTableExists()) {
         const tableCreator = new GeoPackageTableCreator(this.geoPackage);
         created = tableCreator.execScript('tile_scaling');
-
       }
     } catch (e) {
       throw new GeoPackageException('Failed to check if TileScaling table exists and create it');

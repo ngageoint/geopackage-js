@@ -733,24 +733,13 @@ export abstract class UserDao<
   /**
    * Query for the row with the provided id
    * @param id id
-   * @return result
-   */
-  public queryForId(id: number): TResult {
-    const where = this.getPkWhere(id);
-    const whereArgs = this.getPkWhereArgs(id);
-    const result = this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.getColumnNames(), where, whereArgs);
-    this.prepareResult(result);
-    return result;
-  }
-
-  /**
-   * Query for the row with the provided id
-   * @param id id
    * @return row
    */
-  public queryForIdRow(id: number): TRow {
+  public queryForId(id: number): TRow {
     let row = null;
-    let readCursor = this.queryForId(id);
+    const where = this.getPkWhere(id);
+    const whereArgs = this.getPkWhereArgs(id);
+    const readCursor = this.prepareResult(this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.getColumnNames(), where, whereArgs));
     if (readCursor.moveToNext()) {
       row = readCursor.getRow();
     }
@@ -812,7 +801,7 @@ export abstract class UserDao<
    * @param id  id
    * @return primary key where args
    */
-  protected getPkWhereArgs(id: number): [] {
+  protected getPkWhereArgs(id: number): DBValue[] | null {
     return this.buildWhereArgs(id);
   }
 
@@ -955,15 +944,21 @@ export abstract class UserDao<
 
   /**
    * Build where (or selection) args for the value
-   * @param value value
+   * @param values value
    * @return where args
    */
-  public buildWhereArgs(value: any): [] {
-    let args = null;
-    if (value != null) {
-      args = [value]
+  public buildWhereArgs(values: DBValue[] | ColumnValues | DBValue): DBValue[] | null {
+    let args: DBValue[] = [];
+    if (Array.isArray(values)) {
+      args = this._buildWhereArgsWithArray(values);
+    } else if (values instanceof ColumnValues) {
+      args = this._buildWhereArgsWithColumnValues(values);
+    } else {
+      if (values !== undefined && values !== null) {
+        args.push(values);
+      }
     }
-    return args;
+    return args.length ? args : null;
   }
 
   /**

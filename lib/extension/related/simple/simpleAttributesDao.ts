@@ -65,7 +65,7 @@ export class SimpleAttributesDao extends UserCustomDao {
   public getRows(ids: number[]): SimpleAttributesRow[] {
     const simpleAttributesRows = [];
     for (const id of ids) {
-      const userCustomRow = this.queryForIdRow(id);
+      const userCustomRow = this.queryForId(id);
       if (userCustomRow != null) {
         simpleAttributesRows.push(this.getRow(userCustomRow));
       }

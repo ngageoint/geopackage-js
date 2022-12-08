@@ -178,7 +178,7 @@ export class PropertiesManager {
    * @param retain
    *            GeoPackages to retain
    */
-  public closeRetainGeoPackages(retain: string[]): void {
+  public closeRetaWithGeoPackages(retain: string[]): void {
     const close = [];
 
     for (const key of this.propertiesMap.keys()) {
@@ -217,11 +217,13 @@ export class PropertiesManager {
    * @return set of properties
    */
   public getProperties(): string[] {
-    const allProperties = [];
+    const allProperties = new Set<string>();
     for (const properties of this.propertiesMap.values()) {
-      allProperties.push(...properties.getProperties());
+      properties.getProperties().forEach(property => {
+        allProperties.add(property);
+      })
     }
-    return allProperties;
+    return Array.from(allProperties);
   }
 
   /**
@@ -280,11 +282,13 @@ export class PropertiesManager {
    * @return set of values
    */
   public getValues(property: string): string[] {
-    const allValues = [];
+    const allValues = new Set<string>;
     for (const properties of this.propertiesMap.values()) {
-      allValues.push(...properties.getValues(property));
+      properties.getValues(property).forEach(value => {
+        allValues.add(value);
+      })
     }
-    return allValues;
+    return Array.from(allValues);
   }
 
   /**
@@ -374,7 +378,7 @@ export class PropertiesManager {
   public deleteProperty(property: string): number {
     let count = 0;
     for (const geoPackage of this.propertiesMap.keys()) {
-      if (this.deletePropertyInGeoPackage(geoPackage, property)) {
+      if (this.deletePropertyWithGeoPackage(geoPackage, property)) {
         count++;
       }
     }
@@ -387,7 +391,7 @@ export class PropertiesManager {
    * @param property property name
    * @return true if deleted
    */
-  public deletePropertyInGeoPackage(geoPackage: string, property: string): boolean {
+  public deletePropertyWithGeoPackage(geoPackage: string, property: string): boolean {
     let deleted = false;
     const properties = this.propertiesMap.get(geoPackage);
     if (properties != null) {
@@ -408,7 +412,7 @@ export class PropertiesManager {
   public deleteValue(property: string, value: string): number {
     let count = 0;
     for (const geoPackage of this.propertiesMap.keys()) {
-      if (this.deleteValueInGeoPackage(geoPackage, property, value)) {
+      if (this.deleteValueWithGeoPackage(geoPackage, property, value)) {
         count++;
       }
     }
@@ -426,7 +430,7 @@ export class PropertiesManager {
    *            property value
    * @return true if deleted
    */
-  public deleteValueInGeoPackage(geoPackage: string, property: string, value: string): boolean {
+  public deleteValueWithGeoPackage(geoPackage: string, property: string, value: string): boolean {
     let deleted = false;
     const properties = this.propertiesMap.get(geoPackage);
     if (properties != null) {
@@ -443,7 +447,7 @@ export class PropertiesManager {
   public deleteAll(): number {
     let count = 0;
     for (const geoPackage of this.propertiesMap.keys()) {
-      if (this.deleteAllByName(geoPackage)) {
+      if (this.deleteAllWithGeoPackage(geoPackage)) {
         count++;
       }
     }
@@ -457,9 +461,9 @@ export class PropertiesManager {
    *            GeoPackage name
    * @return true if any deleted
    */
-  public deleteAllByName(geoPackage: string): boolean {
+  public deleteAllWithGeoPackage(geoPackage: string): boolean {
     let deleted = false;
-    const properties = this.propertiesMap.get(geoPackage);
+    const properties: PropertiesExtension = this.propertiesMap.get(geoPackage);
     if (properties != null) {
       deleted = properties.deleteAll() > 0;
     }
@@ -471,7 +475,7 @@ export class PropertiesManager {
    */
   public removeExtension(): void {
     for (const geoPackage of this.propertiesMap.keys()) {
-      this.removeExtensionByName(geoPackage);
+      this.removeExtensionWithGeoPackage(geoPackage);
     }
   }
 
@@ -481,7 +485,7 @@ export class PropertiesManager {
    * @param geoPackage
    *            GeoPackage name
    */
-  public removeExtensionByName(geoPackage: string): void {
+  public removeExtensionWithGeoPackage(geoPackage: string): void {
     const properties = this.propertiesMap.get(geoPackage);
     if (properties != null) {
       properties.removeExtension();

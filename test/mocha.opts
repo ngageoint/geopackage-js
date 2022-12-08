@@ -1,5 +1,0 @@
---recursive
---require chai
---require test/testUtils
---require source-map-support/register
---full-trace

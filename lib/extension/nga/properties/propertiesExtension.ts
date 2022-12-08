@@ -294,8 +294,8 @@ export class PropertiesExtension extends BaseExtension {
     let added = false;
     if (!this.hasValue(property, value)) {
       const row = this.newRow();
-      row.setValueWithColumnName(PropertiesExtension.COLUMN_PROPERTY, property);
-      row.setValueWithColumnName(PropertiesExtension.COLUMN_VALUE, value);
+      row.setValue(PropertiesExtension.COLUMN_PROPERTY, property);
+      row.setValue(PropertiesExtension.COLUMN_VALUE, value);
       this.getDao().create(row);
       added = true;
     }
@@ -344,7 +344,7 @@ export class PropertiesExtension extends BaseExtension {
   public deleteAll(): number {
     let count = 0;
     if (this.has()) {
-      count = this.getDao().delete();
+      count = this.getDao().deleteAll();
     }
     return count;
   }

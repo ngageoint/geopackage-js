@@ -53,7 +53,7 @@ export class IconDao extends MediaDao {
    */
   public queryForRow(styleMappingRow: StyleMappingRow): IconRow {
     let iconRow = null;
-    const userCustomRow = this.queryForIdRow(styleMappingRow.getRelatedId());
+    const userCustomRow = this.queryForId(styleMappingRow.getRelatedId());
     if (userCustomRow != null) {
       iconRow = this.getRow(userCustomRow);
     }

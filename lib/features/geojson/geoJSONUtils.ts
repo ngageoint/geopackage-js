@@ -33,13 +33,13 @@ export class GeoJSONUtils {
       for (const columnName in featureRow.getColumns().getColumnNames()) {
         if (columnName !== featureRow.getGeometryColumnName()) {
           if (columnName.toLowerCase() === '_feature_id') {
-            geoJson.id = featureRow.getValueWithColumnName(columnName) as string | number;
+            geoJson.id = featureRow.getValue(columnName) as string | number;
           } else if (columnName.toLowerCase() === 'id') {
-            geoJson.properties[columnName] = featureRow.getValueWithColumnName(columnName);
+            geoJson.properties[columnName] = featureRow.getValue(columnName);
           } else if (columnName.toLowerCase() === '_properties_id') {
-            geoJson.properties[columnName.substring(12)] = featureRow.getValueWithColumnName(columnName);
+            geoJson.properties[columnName.substring(12)] = featureRow.getValue(columnName);
           } else {
-            geoJson.properties[dataColumnsMap ? dataColumnsMap.get(columnName) : columnName ] = featureRow.getValueWithColumnName(columnName);
+            geoJson.properties[dataColumnsMap ? dataColumnsMap.get(columnName) : columnName ] = featureRow.getValue(columnName);
           }
         }
       }

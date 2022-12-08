@@ -237,10 +237,10 @@ GeoPackageUtils.createFeature = function(geoPackage, geoJson, name, featureDao) 
   const geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
   geometryData.setGeometry(geometry);
   featureRow.geometry = geometryData;
-  featureRow.setValueWithColumnName('text', name);
-  featureRow.setValueWithColumnName('real', Math.random() * 5000.0);
-  featureRow.setValueWithColumnName('boolean', Math.random() < 0.5 ? false : true);
-  featureRow.setValueWithColumnName(
+  featureRow.setValue('text', name);
+  featureRow.setValue('real', Math.random() * 5000.0);
+  featureRow.setValue('boolean', Math.random() < 0.5 ? false : true);
+  featureRow.setValue(
     'blob',
     Buffer.from(
       Math.random()
@@ -249,15 +249,15 @@ GeoPackageUtils.createFeature = function(geoPackage, geoJson, name, featureDao) 
         .substr(0, 5),
     ),
   );
-  featureRow.setValueWithColumnName('integer', Math.round(Math.random() * 500));
-  featureRow.setValueWithColumnName(
+  featureRow.setValue('integer', Math.round(Math.random() * 500));
+  featureRow.setValue(
     'text_limited',
     Math.random()
       .toString(36)
       .replace(/[^a-z]+/g, '')
       .substr(0, 5),
   );
-  featureRow.setValueWithColumnName(
+  featureRow.setValue(
     'blob_limited',
     Buffer.from(
       Math.random()
@@ -266,8 +266,8 @@ GeoPackageUtils.createFeature = function(geoPackage, geoJson, name, featureDao) 
         .substr(0, 5),
     ),
   );
-  featureRow.setValueWithColumnName('date', new Date());
-  featureRow.setValueWithColumnName('datetime', new Date());
+  featureRow.setValue('date', new Date());
+  featureRow.setValue('datetime', new Date());
   return featureDao.create(featureRow);
 };
 
@@ -690,10 +690,10 @@ GeoPackageUtils.createAttributes = function(geoPackage) {
 
   for (let i = 0; i < 10; i++) {
     const attributeRow = attributeDao.newRow();
-    attributeRow.setValueWithColumnName('text', tableName);
-    attributeRow.setValueWithColumnName('real', Math.random() * 5000.0);
-    attributeRow.setValueWithColumnName('boolean', Math.random() < 0.5 ? false : true);
-    attributeRow.setValueWithColumnName(
+    attributeRow.setValue('text', tableName);
+    attributeRow.setValue('real', Math.random() * 5000.0);
+    attributeRow.setValue('boolean', Math.random() < 0.5 ? false : true);
+    attributeRow.setValue(
       'blob',
       Buffer.from(
         Math.random()
@@ -702,15 +702,15 @@ GeoPackageUtils.createAttributes = function(geoPackage) {
           .substr(0, 5),
       ),
     );
-    attributeRow.setValueWithColumnName('integer', Math.round(Math.random() * 500));
-    attributeRow.setValueWithColumnName(
+    attributeRow.setValue('integer', Math.round(Math.random() * 500));
+    attributeRow.setValue(
       'text_limited',
       Math.random()
         .toString(36)
         .replace(/[^a-z]+/g, '')
         .substr(0, 5),
     );
-    attributeRow.setValueWithColumnName(
+    attributeRow.setValue(
       'blob_limited',
       Buffer.from(
         Math.random()
@@ -719,8 +719,8 @@ GeoPackageUtils.createAttributes = function(geoPackage) {
           .substr(0, 5),
       ),
     );
-    attributeRow.setValueWithColumnName('date', new Date());
-    attributeRow.setValueWithColumnName('datetime', new Date());
+    attributeRow.setValue('date', new Date());
+    attributeRow.setValue('datetime', new Date());
     attributeDao.create(attributeRow);
   }
 

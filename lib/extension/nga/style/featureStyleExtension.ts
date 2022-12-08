@@ -93,7 +93,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get or create the metadata extension
-   *  @param {module:features/user/featureTable|String} featureTable, defaults to null
+   *  @param {FeatureTable|String} featureTable, defaults to null
    * @return {Promise}
    */
   getOrCreateExtension(featureTable: FeatureTable | string): Extensions {
@@ -108,7 +108,7 @@ export class FeatureStyleExtension extends BaseExtension {
 
   /**
    * Determine if the GeoPackage has the extension or has the extension for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {Boolean}
    */
   has(featureTable: FeatureTable | string): boolean {
@@ -162,7 +162,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Create style, icon, table style, and table icon relationships for the
    * feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {any}
    */
   createRelationships(featureTable: FeatureTable | string): void {
@@ -174,7 +174,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Check if feature table has a style, icon, table style, or table icon
    * relationships
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {boolean}
    */
   hasRelationship(featureTable: string | FeatureTable): boolean {
@@ -187,7 +187,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Create a style relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {any}
    */
   createStyleRelationship(featureTable: string | FeatureTable): void {
@@ -200,7 +200,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Determine if a style relationship exists for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {boolean}
    */
   hasStyleRelationship(featureTable: string | FeatureTable): boolean {
@@ -212,7 +212,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Create a feature table style relationship
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {ExtendedRelation}
    */
   createTableStyleRelationship(featureTable: string | FeatureTable): void {
@@ -225,7 +225,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Determine if a feature table style relationship exists
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {boolean} true if relationship exists
    */
   hasTableStyleRelationship(featureTable: string | FeatureTable): boolean {
@@ -237,7 +237,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Create an icon relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {ExtendedRelation}
    */
   createIconRelationship(featureTable: string | FeatureTable): void {
@@ -250,7 +250,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Determine if an icon relationship exists for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {boolean} true if relationship exists
    */
   hasIconRelationship(featureTable: string | FeatureTable): boolean {
@@ -262,7 +262,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Create a feature table icon relationship
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {ExtendedRelation}
    */
   createTableIconRelationship(featureTable: string | FeatureTable): void {
@@ -275,7 +275,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Determine if a feature table icon relationship exists
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @returns {Boolean} true if relationship exists
    */
   hasTableIconRelationship(featureTable: string | FeatureTable): boolean {
@@ -288,7 +288,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Get the mapping table name
    * @param tablePrefix table name prefix
-   * @param {module:features/user/featureTable|String} featureTable feature table name
+   * @param {FeatureTable|String} featureTable feature table name
    * @returns {String} mapping table name
    */
   getMappingTableName(tablePrefix: string, featureTable: string | FeatureTable): string {
@@ -383,7 +383,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Delete the style and icon table and row relationships for the feature
    * table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteRelationships(
     featureTable: string | FeatureTable,
@@ -402,7 +402,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete a style relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteStyleRelationship(featureTable: string | FeatureTable): number {
     return this._deleteStyleRelationship(
@@ -412,7 +412,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete a table style relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableStyleRelationship(featureTable: string | FeatureTable): number {
     return this._deleteStyleRelationship(
@@ -422,7 +422,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete a icon relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteIconRelationship(featureTable: string | FeatureTable): number {
     return this._deleteStyleRelationship(
@@ -432,7 +432,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete a table icon relationship for the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableIconRelationship(featureTable: string | FeatureTable): number {
     return this._deleteStyleRelationship(
@@ -443,7 +443,7 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Delete a style extension feature table relationship and the mapping table
    * @param {String} mappingTableName
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @private
    */
   _deleteStyleRelationship(mappingTableName: string, featureTable: string | FeatureTable): number {
@@ -461,32 +461,32 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get a Style Mapping DAO
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleMappingDao} style mapping DAO
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleMappingDao} style mapping DAO
    */
   getStyleMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTable);
   }
   /**
    * Get a Table Style Mapping DAO
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleMappingDao} table style mapping DAO
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleMappingDao} table style mapping DAO
    */
   getTableStyleMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTable);
   }
   /**
    * Get a Icon Mapping DAO
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleMappingDao} icon mapping DAO
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleMappingDao} icon mapping DAO
    */
   getIconMappingDao(featureTable: FeatureTable | string): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_ICON, featureTable);
   }
   /**
    * Get a Table Icon Mapping DAO
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleMappingDao} table icon mapping DAO
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleMappingDao} table icon mapping DAO
    */
   getTableIconMappingDao(featureTable: string | FeatureTable): StyleMappingDao {
     return this._getMappingDao(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTable);
@@ -494,12 +494,12 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Get a Style Mapping DAO from a table name
    * @param {String} tablePrefix table name prefix
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleMappingDao} style mapping dao
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleMappingDao} style mapping dao
    * @private
    */
   _getMappingDao(tablePrefix: string, featureTable: string | FeatureTable): StyleMappingDao {
-    const tableName = tablePrefix + featureTable;
+    const tableName = this.getMappingTableName(tablePrefix, featureTable);
     let dao = null;
     if (this.geoPackage.isTableOrView(tableName)) {
       dao = new StyleMappingDao(this.relatedTables.getUserDao(tableName));
@@ -508,7 +508,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get a style DAO
-   * @return {module:extension/nga/style.StyleDao} style DAO
+   * @return {StyleDao} style DAO
    */
   getStyleDao(): StyleDao {
     let styleDao = null;
@@ -521,7 +521,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get a icon DAO
-   * @return {module:extension/nga/style.IconDao}
+   * @return {IconDao}
    */
   getIconDao(): IconDao {
     let iconDao = null;
@@ -533,8 +533,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the feature table default feature styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.FeatureStyles} table feature styles or null
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {FeatureStyles} table feature styles or null
    */
   getTableFeatureStyles(featureTable: string | FeatureTable): FeatureStyles {
     let featureStyles = null;
@@ -550,17 +550,17 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the default style of the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {StyleRow} style row
    */
   getTableStyleDefault(featureTable: string | FeatureTable): StyleRow {
     return this.getTableStyle(featureTable, null);
   }
   /**
    * Get the style of the feature table and geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType): StyleRow {
     let style = null;
@@ -576,8 +576,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the feature table default styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.Styles} table styles or null
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {Styles} table styles or null
    */
   getTableStyles(featureTable: string | FeatureTable): Styles {
     let styles = null;
@@ -589,17 +589,17 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the default icon of the feature table
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {IconRow} icon row
    */
   getTableIconDefault(featureTable: string | FeatureTable): IconRow {
     return this.getTableIcon(featureTable, null);
   }
   /**
    * Get the icon of the feature table and geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType): IconRow {
     let icon = null;
@@ -615,8 +615,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the feature table default icons
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @return {module:extension/nga/style.Icons} table icons or null
+   * @param {FeatureTable|String} featureTable feature table
+   * @return {Icons} table icons or null
    */
   getTableIcons(featureTable: string | FeatureTable): Icons {
     let icons = null;
@@ -631,7 +631,7 @@ export class FeatureStyleExtension extends BaseExtension {
    * @param {Number} featureId
    * @param mappingDao
    * @param {boolean} tableIcons
-   * @returns {module:extension/nga/style.Icons}
+   * @returns {Icons}
    * @private
    */
   getIcons(featureId: number, mappingDao: StyleMappingDao, tableIcons = false): Icons {
@@ -656,9 +656,9 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Gets Styles for featureId and mappingDao
    * @param {Number} featureId
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao
+   * @param {StyleMappingDao} mappingDao
    * @param {boolean} tableStyles
-   * @returns {module:extension/nga/style.Styles}
+   * @returns {Styles}
    */
   getStyles(featureId: number, mappingDao: StyleMappingDao, tableStyles = false): Styles {
     let styles = new Styles(tableStyles);
@@ -681,17 +681,17 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the feature styles for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyles} feature styles or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyles} feature styles or null
    */
   getFeatureStylesForFeatureRow(featureRow: FeatureRow): FeatureStyles {
-    return this.getFeatureStyles(featureRow.getTable(), featureRow.id);
+    return this.getFeatureStyles(featureRow.getTable(), featureRow.getId());
   }
   /**
    * Get the feature styles for the feature row
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.FeatureStyles} feature styles or null
+   * @return {FeatureStyles} feature styles or null
    */
   getFeatureStyles(featureTable: string | FeatureTable, featureId: number): FeatureStyles {
     const styles = this.getStyles(featureId, this.getStyleMappingDao(featureTable));
@@ -704,34 +704,34 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the styles for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.Styles} styles or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {Styles} styles or null
    */
   getStylesForFeatureRow(featureRow: FeatureRow): Styles {
-    return this.getStyles(featureRow.id, this.getStyleMappingDao(featureRow.getTable().getTableName()));
+    return this.getStyles(featureRow.getId(), this.getStyleMappingDao(featureRow.getTable().getTableName()));
   }
   /**
    * Get the styles for the feature id
    * @param {String} tableName table name
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.Styles} styles or null
+   * @return {Styles} styles or null
    */
   getStylesForFeatureId(tableName: string, featureId: number): Styles {
     return this.getStyles(featureId, this.getStyleMappingDao(tableName));
   }
   /**
    * Get the icons for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.Icons} icons or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {Icons} icons or null
    */
   getIconsForFeatureRow(featureRow: FeatureRow): Icons {
-    return this.getIcons(featureRow.id, this.getIconMappingDao(featureRow.getTable().getTableName()));
+    return this.getIcons(featureRow.getId(), this.getIconMappingDao(featureRow.getTable().getTableName()));
   }
   /**
    * Get the icons for the feature id
    * @param {String} tableName table name
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.Icons} icons or null
+   * @return {Icons} icons or null
    */
   getIconsForFeatureId(tableName: string, featureId: number): Icons {
     return this.getIcons(featureId, this.getIconMappingDao(tableName));
@@ -740,37 +740,37 @@ export class FeatureStyleExtension extends BaseExtension {
    * Get the feature style (style and icon) of the feature row, searching in
    * order: feature geometry type style or icon, feature default style or
    * icon, table geometry type style or icon, table default style or icon
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.getTable().getTableName(), featureRow.id, featureRow.getGeometryType(), true),
-      this.getIcon(featureRow.getTable().getTableName(), featureRow.id, featureRow.getGeometryType(), true),
+      this.getStyle(featureRow.getTable().getTableName(), featureRow.getId(), featureRow.getGeometryType(), true),
+      this.getIcon(featureRow.getTable().getTableName(), featureRow.getId(), featureRow.getGeometryType(), true),
     );
   }
   /**
    * Get the feature style (style and icon) of the feature, searching in
    * order: feature geometry type style or icon, feature default style or
    * icon, table geometry type style or icon, table default style or icon
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleDefault(featureRow: FeatureRow): FeatureStyle {
     return new FeatureStyle(
-      this.getStyle(featureRow.getTable().getTableName(), featureRow.id, null, true),
-      this.getIcon(featureRow.getTable().getTableName(), featureRow.id, null, true),
+      this.getStyle(featureRow.getTable().getTableName(), featureRow.getId(), null, true),
+      this.getIcon(featureRow.getTable().getTableName(), featureRow.getId(), null, true),
     );
   }
   /**
    * Get the icon of the feature, searching in order: feature geometry type
    * icon, feature default icon, when tableIcon enabled continue searching:
    * table geometry type icon, table default icon
-   * @param {module:features/user/featureTable|String} featureTable
+   * @param {FeatureTable|String} featureTable
    * @param {Number} featureId
    * @param {GeometryType} geometryType
    * @param {Boolean} tableIcon
-   * @returns {module:extension/nga/style.IconRow}
+   * @returns {IconRow}
    * @private
    */
   getIcon(
@@ -793,11 +793,11 @@ export class FeatureStyleExtension extends BaseExtension {
    * Get the style of the feature, searching in order: feature geometry type
    * style, feature default style, when tableStyle enabled continue searching:
    * table geometry type style, table default style
-   * @param {module:features/user/featureTable|String} featureTable
+   * @param {FeatureTable|String} featureTable
    * @param {Number} featureId
    * @param {GeometryType} geometryType
    * @param {Boolean} tableStyle
-   * @returns {module:extension/nga/style.StyleRow}
+   * @returns {StyleRow}
    * @private
    */
   getStyle(
@@ -818,8 +818,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table default feature styles
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles feature styles
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {FeatureStyles} featureStyles feature styles
    * @return {any}
    */
   setTableFeatureStyles(
@@ -856,8 +856,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table default styles
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.Styles} styles default styles
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {Styles} styles default styles
    * @return {any}
    */
   setTableStyles(
@@ -886,8 +886,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table style default
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setTableStyleDefault(featureTable: string | FeatureTable, style: StyleRow): number {
@@ -895,9 +895,9 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table style for the geometry type
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType, style?: StyleRow): number {
@@ -912,8 +912,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table default icons
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.Icons} icons default icons
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {Icons} icons default icons
    * @return {any}
    */
   setTableIcons(
@@ -942,8 +942,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table icon default
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setTableIconDefault(featureTable: string | FeatureTable, icon?: IconRow): number {
@@ -951,9 +951,9 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature table icon for the geometry type
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType, icon?: IconRow): number {
@@ -968,8 +968,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature styles for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles feature styles
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyles} featureStyles feature styles
    * @return {any}
    */
   setFeatureStylesForFeatureRow(
@@ -986,14 +986,14 @@ export class FeatureStyleExtension extends BaseExtension {
       };
     };
   } {
-    return this.setFeatureStyles(featureRow.getTable().getTableName(), featureRow.id, featureStyles);
+    return this.setFeatureStyles(featureRow.getTable().getTableName(), featureRow.getId(), featureStyles);
   }
 
   /**
    * Set the feature styles for the feature table and feature id
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles feature styles
+   * @param {FeatureStyles} featureStyles feature styles
    * @return {any}
    */
   setFeatureStyles(
@@ -1009,8 +1009,8 @@ export class FeatureStyleExtension extends BaseExtension {
     };
   } {
     if (featureStyles !== null) {
-      const styles = this.setStyles(featureTable, featureId, featureStyles.styles);
-      const icons = this.setIcons(featureTable, featureId, featureStyles.icons);
+      const styles = this.setStyles(featureTable, featureId, featureStyles.getStyles());
+      const icons = this.setIcons(featureTable, featureId, featureStyles.getIcons());
       return {
         styles,
         icons,
@@ -1030,8 +1030,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature style (style and icon) of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRow(
@@ -1050,9 +1050,9 @@ export class FeatureStyleExtension extends BaseExtension {
   /**
    * Set the feature style (style and icon) of the feature row for the
    * specified geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRowAndGeometryType(
@@ -1067,12 +1067,12 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   } {
-    return this.setFeatureStyle(featureRow.getTable().getTableName(), featureRow.id, geometryType, featureStyle);
+    return this.setFeatureStyle(featureRow.getTable().getTableName(), featureRow.getId(), geometryType, featureStyle);
   }
   /**
    * Set the feature style default (style and icon) of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleDefaultForFeatureRow(
@@ -1086,14 +1086,14 @@ export class FeatureStyleExtension extends BaseExtension {
       icon: number;
     };
   } {
-    return this.setFeatureStyle(featureRow.getTable().getTableName(), featureRow.id, null, featureStyle);
+    return this.setFeatureStyle(featureRow.getTable().getTableName(), featureRow.getId(), null, featureStyle);
   }
   /**
    * Set the feature style (style and icon) of the feature
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyle(
@@ -1127,9 +1127,9 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the feature style (style and icon) of the feature
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {object}
    */
   setFeatureStyleDefault(
@@ -1148,21 +1148,21 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the styles for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.Styles} styles styles
+   * @param {FeatureRow} featureRow feature row
+   * @param {Styles} styles styles
    * @return {Promise}
    */
   setStylesForFeatureRow(
     featureRow: FeatureRow,
     styles: Styles,
   ): { styleDefault: number; styles: number[]; deleted: number } {
-    return this.setStyles(featureRow.getTable().getTableName(), featureRow.id, styles);
+    return this.setStyles(featureRow.getTable().getTableName(), featureRow.getId(), styles);
   }
   /**
    * Set the styles for the feature table and feature id
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.Styles} styles styles
+   * @param {Styles} styles styles
    * @return {Promise}
    */
   setStyles(
@@ -1196,8 +1196,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the style of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {FeatureRow} featureRow feature row
+   * @param {StyleRow} style style row
    * @return {Promise}
    */
   setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
@@ -1205,29 +1205,29 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the style of the feature row for the specified geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {Promise}
    */
   setStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType, style: StyleRow): number {
-    return this.setStyle(featureRow.getTable().getTableName(), featureRow.id, geometryType, style);
+    return this.setStyle(featureRow.getTable().getTableName(), featureRow.getId(), geometryType, style);
   }
   /**
    * Set the default style of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {FeatureRow} featureRow feature row
+   * @param {StyleRow} style style row
    * @return {Promise}
    */
   setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
-    return this.setStyle(featureRow.getTable().getTableName(), featureRow.id, null, style);
+    return this.setStyle(featureRow.getTable().getTableName(), featureRow.getId(), null, style);
   }
   /**
    * Set the style of the feature
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyle(
@@ -1246,9 +1246,9 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the default style of the feature
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyleDefault(featureTable: string | FeatureTable, featureId: number, style: StyleRow): number {
@@ -1256,21 +1256,21 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the icons for the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.Icons} icons icons
+   * @param {FeatureRow} featureRow feature row
+   * @param {Icons} icons icons
    * @return {Promise}
    */
   setIconsForFeatureRow(
     featureRow: FeatureRow,
     icons: Icons,
   ): { iconDefault: number; icons: number[]; deleted: number } {
-    return this.setIcons(featureRow.getTable().getTableName(), featureRow.id, icons);
+    return this.setIcons(featureRow.getTable().getTableName(), featureRow.getId(), icons);
   }
   /**
    * Set the icons for the feature table and feature id
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.Icons} icons icons
+   * @param {Icons} icons icons
    * @return {Promise}
    */
   setIcons(
@@ -1302,8 +1302,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the icon of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {FeatureRow} featureRow feature row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
@@ -1311,30 +1311,30 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the icon of the feature row for the specified geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType, icon: IconRow): number {
-    return this.setIcon(featureRow.getTable().getTableName(), featureRow.id, geometryType, icon);
+    return this.setIcon(featureRow.getTable().getTableName(), featureRow.getId(), geometryType, icon);
   }
   /**
    * Set the default icon of the feature row
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {FeatureRow} featureRow feature row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
-    return this.setIcon(featureRow.getTable().getTableName(), featureRow.id, null, icon);
+    return this.setIcon(featureRow.getTable().getTableName(), featureRow.getId(), null, icon);
   }
   /**
    * Get the icon of the feature, searching in order: feature geometry type
    * icon, feature default icon, table geometry type icon, table default icon
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIcon(featureTable: string | FeatureTable, featureId: number, geometryType: GeometryType, icon?: IconRow): number {
@@ -1348,9 +1348,9 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Set the default icon of the feature
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIconDefault(featureTable: string | FeatureTable, featureId: number, icon: IconRow): number {
@@ -1358,43 +1358,43 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the style id, either from the existing style or by inserting a new one
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {Number} style id
    */
   getOrInsertStyle(style: StyleRow): number {
     let styleId;
     if (style.hasId()) {
-      styleId = style.id;
+      styleId = style.getId();
     } else {
       const styleDao = this.getStyleDao();
       if (styleDao !== null) {
         styleId = styleDao.create(style);
-        style.id = styleId;
+        style.setId(styleId, true);
       }
     }
     return styleId;
   }
   /**
    * Get the icon id, either from the existing icon or by inserting a new one
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Number} icon id
    */
   getOrInsertIcon(icon: IconRow): number {
     let iconId: number;
     if (icon.hasId()) {
-      iconId = icon.id;
+      iconId = icon.getId();
     } else {
       const iconDao = this.getIconDao();
       if (iconDao != null) {
         iconId = iconDao.create(icon);
-        icon.id = iconId;
+        icon.setId(iconId, true);
       }
     }
     return iconId;
   }
   /**
    * Insert a style mapping row
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao mapping dao
+   * @param {StyleMappingDao} mappingDao mapping dao
    * @param {Number} baseId base id, either contents id or feature id
    * @param {Number} relatedId related id, either style or icon id
    * @param {GeometryType} geometryType geometry type or null
@@ -1413,7 +1413,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete all feature styles including table styles, table icons, style, and icons
-   * @param {module:features/user/featureTable~FeatureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteAllFeatureStyles(
     featureTable: string | FeatureTable,
@@ -1434,7 +1434,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete all styles including table styles and feature row style
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteAllStyles(
     featureTable: string | FeatureTable,
@@ -1449,7 +1449,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete all icons including table icons and feature row icons
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteAllIcons(
     featureTable: string | FeatureTable,
@@ -1464,7 +1464,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature table feature styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableFeatureStyles(
     featureTable: string | FeatureTable,
@@ -1479,21 +1479,21 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature table styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableStyles(featureTable: string | FeatureTable): number {
     return this.deleteTableMappings(this.getTableStyleMappingDao(featureTable), featureTable);
   }
   /**
    * Delete the feature table default style
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableStyleDefault(featureTable: string | FeatureTable): number {
     return this.deleteTableStyle(featureTable, null);
   }
   /**
    * Delete the feature table style for the geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
    */
   deleteTableStyle(featureTable: string | FeatureTable, geometryType: GeometryType): number {
@@ -1501,21 +1501,21 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature table icons
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableIcons(featureTable: string | FeatureTable): number {
     return this.deleteTableMappings(this.getTableIconMappingDao(featureTable), featureTable);
   }
   /**
    * Delete the feature table default icon
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableIconDefault(featureTable: string | FeatureTable): number {
     return this.deleteTableIcon(featureTable, null);
   }
   /**
    * Delete the feature table icon for the geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
    */
   deleteTableIcon(featureTable: string | FeatureTable, geometryType: GeometryType): number {
@@ -1523,8 +1523,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the table style mappings
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao  mapping dao
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {StyleMappingDao} mappingDao  mapping dao
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteTableMappings(mappingDao: StyleMappingDao, featureTable: string | FeatureTable): number {
     if (mappingDao !== null) {
@@ -1537,8 +1537,8 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the table style mapping with the geometry type value
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao  mapping dao
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {StyleMappingDao} mappingDao  mapping dao
+   * @param {FeatureTable|String} featureTable feature table
    * @param {GeometryType} geometryType geometry type
    */
   deleteTableMapping(
@@ -1556,7 +1556,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete all feature styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteFeatureStyles(
     featureTable: string | FeatureTable,
@@ -1571,21 +1571,21 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete all styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteStyles(featureTable: string | FeatureTable): number {
     return this.deleteMappings(this.getStyleMappingDao(featureTable));
   }
   /**
    * Delete feature row styles
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStylesForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteStylesForFeatureId(featureRow.getTable().getTableName(), featureRow.id);
+    return this.deleteStylesForFeatureId(featureRow.getTable().getTableName(), featureRow.getId());
   }
   /**
    * Delete feature row styles
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    */
   deleteStylesForFeatureId(featureTable: string | FeatureTable, featureId: number): number {
@@ -1593,14 +1593,14 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature row default style
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStyleDefaultForFeatureRow(featureRow: FeatureRow): number {
     return this.deleteStyleForFeatureRowAndGeometryType(featureRow, null);
   }
   /**
    * Delete the feature row default style
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    */
   deleteStyleDefault(featureTable: string | FeatureTable, featureId: number): number {
@@ -1608,22 +1608,22 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature row style for the feature row geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStyleForFeatureRow(featureRow: FeatureRow): number {
     return this.deleteStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Delete the feature row style for the geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
    */
   deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
-    return this.deleteStyle(featureRow.getTable(), featureRow.id, geometryType);
+    return this.deleteStyle(featureRow.getTable(), featureRow.getId(), geometryType);
   }
   /**
    * Delete the feature row style for the geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
    */
@@ -1632,16 +1632,16 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the style row and associated mappings by style row
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.StyleRow} styleRow style row
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {StyleRow} styleRow style row
    */
   deleteStyleAndMappingsByStyleRow(featureTable: string | FeatureTable, styleRow: StyleRow): number {
-    return this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.id);
+    return this.deleteStyleAndMappingsByStyleRowId(featureTable, styleRow.getId());
   }
 
   /**
    * Delete the style row and associated mappings by style row id
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} styleRowId style row id
    */
   deleteStyleAndMappingsByStyleRowId(featureTable: string | FeatureTable, styleRowId: number): number {
@@ -1663,21 +1663,21 @@ export class FeatureStyleExtension extends BaseExtension {
 
   /**
    * Delete all icons
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    */
   deleteIcons(featureTable: string | FeatureTable): number {
     return this.deleteMappings(this.getIconMappingDao(featureTable));
   }
   /**
    * Delete feature row icons
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconsForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconsForFeatureId(featureRow.getTable().getTableName(), featureRow.id);
+    return this.deleteIconsForFeatureId(featureRow.getTable().getTableName(), featureRow.getId());
   }
   /**
    * Delete feature row icons
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    */
   deleteIconsForFeatureId(featureTable: string | FeatureTable, featureId: number): number {
@@ -1685,14 +1685,14 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature row default icon
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconDefaultForFeatureRow(featureRow: FeatureRow): number {
-    return this.deleteIconDefault(featureRow.getTable().getTableName(), featureRow.id);
+    return this.deleteIconDefault(featureRow.getTable().getTableName(), featureRow.getId());
   }
   /**
    * Delete the feature row default icon
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    */
   deleteIconDefault(featureTable: FeatureTable | string, featureId: number): number {
@@ -1700,22 +1700,22 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the feature row icon for the feature row geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconForFeatureRow(featureRow: FeatureRow): number {
     return this.deleteIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
   }
   /**
    * Delete the feature row icon for the geometry type
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
    */
   deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
-    return this.deleteIcon(featureRow.getTable(), featureRow.id, geometryType);
+    return this.deleteIcon(featureRow.getTable(), featureRow.getId(), geometryType);
   }
   /**
    * Delete the feature row icon for the geometry type
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
    */
@@ -1724,16 +1724,16 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the icon row and associated mappings by icon row
-   * @param {module:features/user/featureTable|String} featureTable feature table
-   * @param {module:extension/nga/style.IconRow} iconRow icon row
+   * @param {FeatureTable|String} featureTable feature table
+   * @param {IconRow} iconRow icon row
    */
   deleteIconAndMappingsByIconRow(featureTable: FeatureTable | string, iconRow: IconRow): number {
-    return this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.id);
+    return this.deleteIconAndMappingsByIconRowId(featureTable, iconRow.getId());
   }
 
   /**
    * Delete the icon row and associated mappings by icon row id
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @param {Number} iconRowId icon row id
    */
   deleteIconAndMappingsByIconRowId(featureTable: FeatureTable | string, iconRowId: number): number {
@@ -1755,7 +1755,7 @@ export class FeatureStyleExtension extends BaseExtension {
 
   /**
    * Delete all style mappings
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {StyleMappingDao} mappingDao  mapping dao
    */
   deleteMappings(mappingDao?: StyleMappingDao): number {
     if (mappingDao !== null) {
@@ -1765,7 +1765,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the style mappings
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {StyleMappingDao} mappingDao  mapping dao
    * @param {Number} featureId feature id
    */
   deleteMappingsForFeatureId(mappingDao?: StyleMappingDao, featureId?: number): number {
@@ -1776,7 +1776,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Delete the style mapping with the geometry type value
-   * @param {module:extension/nga/style.StyleMappingDao} mappingDao  mapping dao
+   * @param {StyleMappingDao} mappingDao  mapping dao
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
    */
@@ -1788,7 +1788,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get all the unique style row ids the table maps to
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return style row ids
    */
   getAllTableStyleIds(featureTable: FeatureTable | string): number[] {
@@ -1801,7 +1801,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get all the unique icon row ids the table maps to
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return icon row ids
    */
   getAllTableIconIds(featureTable: FeatureTable | string): number[] {
@@ -1814,7 +1814,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get all the unique style row ids the features map to
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {Number[]} style row ids
    */
   getAllStyleIds(featureTable: FeatureTable | string): number[] {
@@ -1827,7 +1827,7 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get all the unique icon row ids the features map to
-   * @param {module:features/user/featureTable|String} featureTable feature table
+   * @param {FeatureTable|String} featureTable feature table
    * @return {Number[]} icon row ids
    */
   getAllIconIds(featureTable: FeatureTable | string): number[] {

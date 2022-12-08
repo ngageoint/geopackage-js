@@ -227,15 +227,11 @@ export class TileBoundingBoxUtils {
    */
   public static getWebMercatorBoundingBoxWithTileGrid(tileGrid: TileGrid, zoom: number): BoundingBox {
     const tileSize = TileBoundingBoxUtils.tileSizeWithZoom(zoom);
-
-    const minLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + tileGrid.getMinX() * tileSize;
-    const maxLon = -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH + (tileGrid.getMaxX() + 1) * tileSize;
-    const minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - (tileGrid.getMaxY() + 1) * tileSize;
-    const maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - tileGrid.getMinY() * tileSize;
-
-    const box = new BoundingBox(minLon, minLat, maxLon, maxLat);
-
-    return box;
+    const minLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) + (tileGrid.getMinX() * tileSize);
+    const maxLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) + ((tileGrid.getMaxX() + 1) * tileSize);
+    const minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - ((tileGrid.getMaxY() + 1) * tileSize);
+    const maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH - (tileGrid.getMinY() * tileSize);
+    return new BoundingBox(minLon, minLat, maxLon, maxLat);
   }
 
   /**
@@ -620,6 +616,7 @@ export class TileBoundingBoxUtils {
   /**
    * Get the tile size in length units (meters by default)
    * @param tilesPerSide  tiles per side total length
+   * @param totalLength  total length
    * @return tile size
    */
   public static tileSize(
@@ -772,9 +769,7 @@ export class TileBoundingBoxUtils {
       }
     }
 
-    const tileGrid: TileGrid = new TileGrid(minColumn, minRow, maxColumn, maxRow);
-
-    return tileGrid;
+    return new TileGrid(minColumn, minRow, maxColumn, maxRow);
   }
 
   /**

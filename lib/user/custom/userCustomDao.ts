@@ -63,7 +63,7 @@ export class UserCustomDao extends UserDao<UserCustomColumn, UserCustomTable, Us
       .getUserColumns()
       .getColumnNames();
     for (const columnName of columnNames) {
-      row.setValueWithColumnName(columnName, results[columnName]);
+      row.setValue(columnName, results[columnName]);
     }
     return row;
   }

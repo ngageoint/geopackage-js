@@ -211,7 +211,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param  {string} columnName column name
    * @return {Object}            value
    */
-  getValueWithColumnName(columnName: string): any {
+  getValue(columnName: string): any {
     const index = this.getColumnIndexWithColumnName(columnName)
     const value = this.values[index];
     const dataType = this.getRowColumnTypeWithColumnName(columnName);
@@ -241,8 +241,8 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param columnName name of the column
    */
   toDatabaseValue(columnName: string): DBValue {
-    const column = this.getColumnWithColumnName(columnName);
-    const value = this.getValueWithColumnName(columnName);
+    const column = this.getColumn(columnName);
+    const value = this.getValue(columnName);
     if (column.getDataType() === GeoPackageDataType.BOOLEAN) {
       return value === true ? 1 : 0;
     }
@@ -277,7 +277,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param  {string} columnName column name
    * @return {UserColumn}            column
    */
-  getColumnWithColumnName(columnName: string): UserColumn {
+  getColumn(columnName: string): UserColumn {
     return this.table.getColumn(columnName);
   }
   /**
@@ -352,7 +352,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
    * @param {string} columnName column name
    * @param {Object} value      value
    */
-  setValueWithColumnName(columnName: string, value: any): void {
+  setValue(columnName: string, value: any): void {
     const columnIndex = this.getColumnIndexWithColumnName(columnName);
     this.setValueWithIndex(columnIndex, value);
   }

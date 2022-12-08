@@ -42,7 +42,6 @@ export class SqliteAdapter implements DBAdapter {
                     this.filePath = tmpPath;
                     resolve(this);
                   } catch (err) {
-                    console.log('error', err);
                     reject(err);
                   }
                 });
@@ -66,7 +65,6 @@ export class SqliteAdapter implements DBAdapter {
             try {
               this.db.pragma('journal_mode = WAL');
             } catch (err) {
-              console.log('error', err);
               reject(err);
             }
             this.filePath = tmpPath;
@@ -275,7 +273,11 @@ export class SqliteAdapter implements DBAdapter {
    */
   delete(sql: string, params?: [] | Record<string, DBValue>): number {
     const statement = this.db.prepare(sql);
-    return statement.run(params).changes;
+    if (params != null) {
+      return statement.run(params).changes;
+    } else {
+      return statement.run().changes;
+    }
   }
   /**
    * Drops the table

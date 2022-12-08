@@ -46,29 +46,29 @@ describe('UserTable tests', function() {
   it('should rename UserTable columns', function() {
     userTable.getUserColumns().getColumns().length.should.be.equal(2);
     userTable.getTableName().should.be.equal('test_table');
-    expect(() => { userTable.getColumnWithColumnName('test_table_string')}).to.throw();
-    should.exist(userTable.getColumnWithColumnName('test_table_text'));
-    userTable.renameColumn(userTable.getColumnWithColumnName('test_table_text'), 'test_table_string');
-    expect(() => { userTable.getColumnWithColumnName('test_table_text')}).to.throw();
-    should.exist(userTable.getColumnWithColumnName('test_table_string'));
+    expect(() => { userTable.getColumn('test_table_string')}).to.throw();
+    should.exist(userTable.getColumn('test_table_text'));
+    userTable.renameColumn(userTable.getColumn('test_table_text'), 'test_table_string');
+    expect(() => { userTable.getColumn('test_table_text')}).to.throw();
+    should.exist(userTable.getColumn('test_table_string'));
     userTable.renameColumnAtIndex(1, 'test_table_text');
-    expect(() => { userTable.getColumnWithColumnName('test_table_string')}).to.throw();
-    should.exist(userTable.getColumnWithColumnName('test_table_text'));
+    expect(() => { userTable.getColumn('test_table_string')}).to.throw();
+    should.exist(userTable.getColumn('test_table_text'));
   });
 
   it('should add and drop UserTable columns', function() {
     userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
-    should.exist(userTable.getColumnWithColumnName('test_table_integer'));
+    should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumnWithName('test_table_integer');
-    expect(() => { userTable.getColumnWithColumnName('test_table_integer')}).to.throw();
+    expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
     userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
-    should.exist(userTable.getColumnWithColumnName('test_table_integer'));
+    should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumnWithIndex(2);
-    expect(() => { userTable.getColumnWithColumnName('test_table_integer')}).to.throw();
+    expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
     userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
-    should.exist(userTable.getColumnWithColumnName('test_table_integer'));
+    should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumn(userTable.getUserColumns().getColumns()[2]);
-    expect(() => { userTable.getColumnWithColumnName('test_table_integer')}).to.throw();
+    expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
   });
 
   it('should alter a UserTable column', function() {
@@ -76,9 +76,9 @@ describe('UserTable tests', function() {
     const columnAlter = column.copy();
     columnAlter.setDefaultValue(7);
     userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
-    should.exist(userTable.getColumnWithColumnName('test_table_integer'));
+    should.exist(userTable.getColumn('test_table_integer'));
     userTable.alterColumn(columnAlter);
-    userTable.getColumnWithColumnName('test_table_integer').getDefaultValue().should.be.equal(7);
+    userTable.getColumn('test_table_integer').getDefaultValue().should.be.equal(7);
   });
 
   it('should copy a UserCustomTable object', function() {

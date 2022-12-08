@@ -1,7 +1,3 @@
-/**
- * @memberOf module:extension/nga/style
- * @class FeatureStyleExtension
- */
 import { FeatureStyles } from './featureStyles';
 import { FeatureStyle } from './featureStyle';
 import { Styles } from './styles';
@@ -19,26 +15,33 @@ import type { GeoPackage } from '../../../geoPackage';
 
 /**
  * Feature Table Styles, styles and icons for an individual feature table
- * @param  {module:geoPackage~GeoPackage} geoPackage GeoPackage object
- * @param {String} tableName
- * @constructor
+ * @class FeatureStyleExtension
  */
 export class FeatureTableStyles {
+  geoPackage: GeoPackage;
   featureStyleExtension: FeatureStyleExtension;
   cachedTableFeatureStyles: FeatureStyles;
   tableName: string;
-  constructor(public geoPackage: GeoPackage, tableNameOrTable: string | FeatureTable) {
+
+  /**
+   * Constructor
+   * @param  {GeoPackage} geoPackage GeoPackage object
+   * @param {String} tableNameOrTable
+   * @constructor
+   */
+  constructor(geoPackage: GeoPackage, tableNameOrTable: string | FeatureTable) {
+    this.geoPackage = geoPackage;
     if (tableNameOrTable instanceof FeatureTable) {
       this.tableName = tableNameOrTable.getTableName();
     } else {
       this.tableName = tableNameOrTable;
     }
-    this.featureStyleExtension = new FeatureStyleExtension(geoPackage);
+    this.featureStyleExtension = new FeatureStyleExtension(this.geoPackage, this.geoPackage.getRelatedTablesExtension());
     this.cachedTableFeatureStyles = new FeatureStyles();
   }
   /**
    * Get the feature style extension
-   * @return {module:extension/nga/style.FeatureStyleExtension} feature style extension
+   * @return {FeatureStyleExtension} feature style extension
    */
   getFeatureStyleExtension(): FeatureStyleExtension {
     return this.featureStyleExtension;
@@ -167,63 +170,63 @@ export class FeatureTableStyles {
   }
   /**
    * Get a Style Mapping DAO
-   * @return {module:extension/nga/style.StyleMappingDao} style mapping DAO
+   * @return {StyleMappingDao} style mapping DAO
    */
   getStyleMappingDao(): StyleMappingDao {
     return this.featureStyleExtension.getStyleMappingDao(this.tableName);
   }
   /**
    * Get a Table Style Mapping DAO
-   * @return {module:extension/nga/style.StyleMappingDao} table style mapping DAO
+   * @return {StyleMappingDao} table style mapping DAO
    */
   getTableStyleMappingDao(): StyleMappingDao {
     return this.featureStyleExtension.getTableStyleMappingDao(this.tableName);
   }
   /**
    * Get a Icon Mapping DAO
-   * @return {module:extension/nga/style.StyleMappingDao} icon mapping DAO
+   * @return {StyleMappingDao} icon mapping DAO
    */
   getIconMappingDao(): StyleMappingDao {
     return this.featureStyleExtension.getIconMappingDao(this.tableName);
   }
   /**
    * Get a Table Icon Mapping DAO
-   * @return {module:extension/nga/style.StyleMappingDao} table icon mapping DAO
+   * @return {StyleMappingDao} table icon mapping DAO
    */
   getTableIconMappingDao(): StyleMappingDao {
     return this.featureStyleExtension.getTableIconMappingDao(this.tableName);
   }
   /**
    * Get a style DAO
-   * @return {module:extension/nga/style.StyleDao} style DAO
+   * @return {StyleDao} style DAO
    */
   getStyleDao(): StyleDao {
     return this.featureStyleExtension.getStyleDao();
   }
   /**
    * Get a icon DAO
-   * @return {module:extension/nga/style.IconDao} icon DAO
+   * @return {IconDao} icon DAO
    */
   getIconDao(): IconDao {
     return this.featureStyleExtension.getIconDao();
   }
   /**
    * Get the table feature styles
-   * @return {module:extension/nga/style.FeatureStyles} table feature styles or null
+   * @return {FeatureStyles} table feature styles or null
    */
   getTableFeatureStyles(): FeatureStyles {
     return this.featureStyleExtension.getTableFeatureStyles(this.tableName);
   }
   /**
    * Get the table styles
-   * @return {module:extension/nga/style.Styles} table styles or null
+   * @return {Styles} table styles or null
    */
   getTableStyles(): Styles {
     return this.featureStyleExtension.getTableStyles(this.tableName);
   }
   /**
    * Get the cached table styles, querying and caching if needed
-   * @return {module:extension/nga/style.Styles} cached table styles
+   * @return {Styles} cached table styles
    */
   getCachedTableStyles(): Styles {
     let styles = this.cachedTableFeatureStyles.styles;
@@ -242,28 +245,28 @@ export class FeatureTableStyles {
   /**
    * Get the table style of the geometry type
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getTableStyle(geometryType: GeometryType): StyleRow {
     return this.featureStyleExtension.getTableStyle(this.tableName, geometryType);
   }
   /**
    * Get the table style default
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getTableStyleDefault(): StyleRow {
     return this.featureStyleExtension.getTableStyleDefault(this.tableName);
   }
   /**
    * Get the table icons
-   * @return {module:extension/nga/style.Icons} table icons or null
+   * @return {Icons} table icons or null
    */
   getTableIcons(): Icons {
     return this.featureStyleExtension.getTableIcons(this.tableName);
   }
   /**
    * Get the cached table icons, querying and caching if needed
-   * @return {module:extension/nga/style.Icons} cached table icons
+   * @return {Icons} cached table icons
    */
   getCachedTableIcons(): Icons {
     let icons = this.cachedTableFeatureStyles.icons;
@@ -282,14 +285,14 @@ export class FeatureTableStyles {
   /**
    * Get the table icon of the geometry type
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getTableIcon(geometryType: GeometryType): IconRow {
     return this.featureStyleExtension.getTableIcon(this.tableName, geometryType);
   }
   /**
    * Get the table icon default
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getTableIconDefault(): IconRow {
     return this.featureStyleExtension.getTableIconDefault(this.tableName);
@@ -297,8 +300,8 @@ export class FeatureTableStyles {
   /**
    * Get the feature styles for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyles} feature styles or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyles} feature styles or null
    */
   getFeatureStylesForFeatureRow(featureRow: FeatureRow): FeatureStyles {
     return this.featureStyleExtension.getFeatureStylesForFeatureRow(featureRow);
@@ -307,7 +310,7 @@ export class FeatureTableStyles {
    * Get the feature styles for the feature id
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.FeatureStyles} feature styles or null
+   * @return {FeatureStyles} feature styles or null
    */
   getFeatureStyles(featureId: number): FeatureStyles {
     return this.featureStyleExtension.getFeatureStyles(this.tableName, featureId);
@@ -317,8 +320,8 @@ export class FeatureTableStyles {
    * order: feature geometry type style or icon, feature default style or
    * icon, table geometry type style or icon, table default style or icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return this.getFeatureStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
@@ -329,9 +332,9 @@ export class FeatureTableStyles {
    * or icon, feature default style or icon, table geometry type style or
    * icon, table default style or icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): FeatureStyle {
     return this.getFeatureStyle(featureRow.id, geometryType);
@@ -341,8 +344,8 @@ export class FeatureTableStyles {
    * searching in order: feature default style or icon, table default style or
    * icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @param {FeatureRow} featureRow feature row
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleDefaultForFeatureRow(featureRow: FeatureRow): FeatureStyle {
     return this.getFeatureStyle(featureRow.id, null);
@@ -354,7 +357,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyle(featureId: number, geometryType: GeometryType): FeatureStyle {
     let featureStyle = null;
@@ -371,7 +374,7 @@ export class FeatureTableStyles {
    * icon, table geometry type style or icon, table default style or icon
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.FeatureStyle} feature style
+   * @return {FeatureStyle} feature style
    */
   getFeatureStyleDefault(featureId: number): FeatureStyle {
     return this.getFeatureStyle(featureId, null);
@@ -379,8 +382,8 @@ export class FeatureTableStyles {
   /**
    * Get the styles for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.Styles} styles or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {Styles} styles or null
    */
   getStylesForFeatureRow(featureRow: FeatureRow): Styles {
     return this.featureStyleExtension.getStylesForFeatureRow(featureRow);
@@ -389,7 +392,7 @@ export class FeatureTableStyles {
    * Get the styles for the feature id
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.Styles}  styles or null
+   * @return {Styles}  styles or null
    */
   getStylesForFeatureId(featureId: number): Styles {
     return this.featureStyleExtension.getStylesForFeatureId(this.tableName, featureId);
@@ -399,8 +402,8 @@ export class FeatureTableStyles {
    * type style, feature default style, table geometry type style, table
    * default style
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @param {FeatureRow} featureRow feature row
+   * @return {StyleRow} style row
    */
   getStyleForFeatureRow(featureRow: FeatureRow): StyleRow {
     return this.getStyleForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
@@ -410,9 +413,9 @@ export class FeatureTableStyles {
    * searching in order: feature geometry type style, feature default style,
    * table geometry type style, table default style
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): StyleRow {
     return this.getStyle(featureRow.id, geometryType);
@@ -421,8 +424,8 @@ export class FeatureTableStyles {
    * Get the default style of the feature row, searching in order: feature
    * default style, table default style
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @param {FeatureRow} featureRow feature row
+   * @return {StyleRow} style row
    */
   getStyleDefaultForFeatureRow(featureRow: FeatureRow): StyleRow {
     return this.getStyle(featureRow.id, null);
@@ -434,7 +437,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getStyle(featureId: number, geometryType: GeometryType): StyleRow {
     let styleRow = this.featureStyleExtension.getStyle(this.tableName, featureId, geometryType, false);
@@ -452,7 +455,7 @@ export class FeatureTableStyles {
    * style, table default style
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.StyleRow} style row
+   * @return {StyleRow} style row
    */
   getStyleDefault(featureId: number): StyleRow {
     return this.getStyle(featureId, null);
@@ -460,8 +463,8 @@ export class FeatureTableStyles {
   /**
    * Get the icons for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.Icons} icons or null
+   * @param {FeatureRow} featureRow feature row
+   * @return {Icons} icons or null
    */
   getIconsForFeatureRow(featureRow: FeatureRow): Icons {
     return this.featureStyleExtension.getIconsForFeatureRow(featureRow);
@@ -470,7 +473,7 @@ export class FeatureTableStyles {
    * Get the icons for the feature id
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.Icons} icons or null
+   * @return {Icons} icons or null
    */
   getIconsForFeatureId(featureId: number): Icons {
     return this.featureStyleExtension.getIconsForFeatureId(this.tableName, featureId);
@@ -480,8 +483,8 @@ export class FeatureTableStyles {
    * type icon, feature default icon, table geometry type icon, table default
    * icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @param {FeatureRow} featureRow feature row
+   * @return {IconRow} icon row
    */
   getIconForFeatureRow(featureRow: FeatureRow): IconRow {
     return this.getIconForFeatureRowAndGeometryType(featureRow, featureRow.getGeometryType());
@@ -491,9 +494,9 @@ export class FeatureTableStyles {
    * searching in order: feature geometry type icon, feature default icon,
    * table geometry type icon, table default icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): IconRow {
     return this.getIcon(featureRow.id, geometryType);
@@ -502,8 +505,8 @@ export class FeatureTableStyles {
    * Get the default icon of the feature row, searching in order: feature
    * default icon, table default icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @param {FeatureRow} featureRow feature row
+   * @return {IconRow} icon row
    */
   getIconDefaultForFeatureRow(featureRow: FeatureRow): IconRow {
     return this.getIcon(featureRow.id, null);
@@ -514,7 +517,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getIcon(featureId: number, geometryType: GeometryType): IconRow {
     let iconRow = this.featureStyleExtension.getIcon(this.tableName, featureId, geometryType, false);
@@ -532,14 +535,14 @@ export class FeatureTableStyles {
    * icon, table default icon
    *
    * @param {Number} featureId feature id
-   * @return {module:extension/nga/style.IconRow} icon row
+   * @return {IconRow} icon row
    */
   getIconDefault(featureId: number): IconRow {
     return this.getIcon(featureId, null);
   }
   /**
    * Set the feature table default feature styles
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles default feature styles
+   * @param {FeatureStyles} featureStyles default feature styles
    * @return {Promise}
    */
   setTableFeatureStyles(
@@ -565,7 +568,7 @@ export class FeatureTableStyles {
   /**
    * Set the feature table default styles
    *
-   * @param {module:extension/nga/style.Styles} styles default styles
+   * @param {Styles} styles default styles
    * @return {Promise}
    */
   setTableStyles(
@@ -582,7 +585,7 @@ export class FeatureTableStyles {
   /**
    * Set the feature table style default
    *
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setTableStyleDefault(style: StyleRow): number {
@@ -605,7 +608,7 @@ export class FeatureTableStyles {
   /**
    * Set the feature table default icons
    *
-   * @param {module:extension/nga/style.Icons} icons default icons
+   * @param {Icons} icons default icons
    * @return {any}
    */
   setTableIcons(
@@ -622,7 +625,7 @@ export class FeatureTableStyles {
   /**
    * Set the feature table icon default
    *
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setTableIconDefault(icon: IconRow): number {
@@ -634,7 +637,7 @@ export class FeatureTableStyles {
    * Set the feature table icon for the geometry type
    *
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setTableIcon(geometryType: GeometryType, icon: IconRow): number {
@@ -645,8 +648,8 @@ export class FeatureTableStyles {
   /**
    * Set the feature styles for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles feature styles
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyles} featureStyles feature styles
    * @return {any}
    */
   setFeatureStylesForFeatureRow(
@@ -669,7 +672,7 @@ export class FeatureTableStyles {
    * Set the feature styles for the feature table and feature id
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.FeatureStyles} featureStyles feature styles
+   * @param {FeatureStyles} featureStyles feature styles
    * @return {any}
    */
   setFeatureStyles(
@@ -688,8 +691,8 @@ export class FeatureTableStyles {
   /**
    * Set the feature style (style and icon) of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRow(
@@ -709,9 +712,9 @@ export class FeatureTableStyles {
    * Set the feature style (style and icon) of the feature row for the
    * specified geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleForFeatureRowAndGeometryType(
@@ -735,8 +738,8 @@ export class FeatureTableStyles {
   /**
    * Set the feature style default (style and icon) of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureRow} featureRow feature row
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleDefaultForFeatureRow(
@@ -757,7 +760,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyle(
@@ -778,7 +781,7 @@ export class FeatureTableStyles {
    * Set the feature style (style and icon) of the feature
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.FeatureStyle} featureStyle feature style
+   * @param {FeatureStyle} featureStyle feature style
    * @return {any}
    */
   setFeatureStyleDefault(
@@ -797,8 +800,8 @@ export class FeatureTableStyles {
   /**
    * Set the styles for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.Styles} styles styles
+   * @param {FeatureRow} featureRow feature row
+   * @param {Styles} styles styles
    * @return {any}
    */
   setStylesForFeatureRow(
@@ -811,7 +814,7 @@ export class FeatureTableStyles {
    * Set the styles for the feature table and feature id
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.Styles} styles styles
+   * @param {Styles} styles styles
    * @return {any}
    */
   setStyles(featureId: number, styles: Styles): { styleDefault: number; styles: number[]; deleted: number } {
@@ -820,8 +823,8 @@ export class FeatureTableStyles {
   /**
    * Set the style of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {FeatureRow} featureRow feature row
+   * @param {StyleRow} style style row
    * @return {any}
    */
   setStyleForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
@@ -830,9 +833,9 @@ export class FeatureTableStyles {
   /**
    * Set the style of the feature row for the specified geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType, style: StyleRow): number {
@@ -841,8 +844,8 @@ export class FeatureTableStyles {
   /**
    * Set the default style of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {FeatureRow} featureRow feature row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyleDefaultForFeatureRow(featureRow: FeatureRow, style: StyleRow): number {
@@ -853,7 +856,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyle(featureId: number, geometryType: GeometryType, style: StyleRow): number {
@@ -863,7 +866,7 @@ export class FeatureTableStyles {
    * Set the default style of the feature
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.StyleRow} style style row
+   * @param {StyleRow} style style row
    * @return {number}
    */
   setStyleDefault(featureId: number, style: StyleRow): number {
@@ -872,8 +875,8 @@ export class FeatureTableStyles {
   /**
    * Set the icons for the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.Icons} icons icons
+   * @param {FeatureRow} featureRow feature row
+   * @param {Icons} icons icons
    * @return {any}
    */
   setIconsForFeatureRow(
@@ -890,7 +893,7 @@ export class FeatureTableStyles {
    * Set the icons for the feature table and feature id
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.Icons} icons icons
+   * @param {Icons} icons icons
    * @return {any}
    */
   setIcons(
@@ -906,8 +909,8 @@ export class FeatureTableStyles {
   /**
    * Set the icon of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {FeatureRow} featureRow feature row
+   * @param {IconRow} icon icon row
    * @return {number}
    */
   setIconForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
@@ -916,9 +919,9 @@ export class FeatureTableStyles {
   /**
    * Set the icon of the feature row for the specified geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Promise}
    */
   setIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType, icon: IconRow): number {
@@ -927,8 +930,8 @@ export class FeatureTableStyles {
   /**
    * Set the default icon of the feature row
    *
-   * @param {module:features/user/featureRow} featureRow feature row
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {FeatureRow} featureRow feature row
+   * @param {IconRow} icon icon row
    * @return {Promise}
    */
   setIconDefaultForFeatureRow(featureRow: FeatureRow, icon: IconRow): number {
@@ -940,7 +943,7 @@ export class FeatureTableStyles {
    *
    * @param {Number} featureId feature id
    * @param {GeometryType} geometryType geometry type
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Promise}
    */
   setIcon(featureId: number, geometryType: GeometryType, icon: IconRow): number {
@@ -950,7 +953,7 @@ export class FeatureTableStyles {
    * Set the default icon of the feature
    *
    * @param {Number} featureId feature id
-   * @param {module:extension/nga/style.IconRow} icon icon row
+   * @param {IconRow} icon icon row
    * @return {Promise}
    */
   setIconDefault(featureId: number, icon: IconRow): number {
@@ -1096,7 +1099,7 @@ export class FeatureTableStyles {
   /**
    * Delete feature row styles
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStylesForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteStylesForFeatureRow(featureRow);
@@ -1112,7 +1115,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row default style
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStyleDefaultForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteStyleDefaultForFeatureRow(featureRow);
@@ -1128,7 +1131,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row style for the feature row geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteStyleForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteStyleForFeatureRow(featureRow);
@@ -1136,7 +1139,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row style for the geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
    */
   deleteStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
@@ -1154,7 +1157,7 @@ export class FeatureTableStyles {
   /**
    * Delete the style and associated mappings using StyleRow
    *
-   * @param {module:extension/nga/style.StyleRow} styleRow style row
+   * @param {StyleRow} styleRow style row
    */
   deleteStyleAndMappingsByStyleRow(styleRow: StyleRow): number {
     return this.featureStyleExtension.deleteStyleAndMappingsByStyleRow(this.tableName, styleRow);
@@ -1178,7 +1181,7 @@ export class FeatureTableStyles {
   /**
    * Delete feature row icons
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconsForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteIconsForFeatureRow(featureRow);
@@ -1194,7 +1197,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row default icon
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconDefaultForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteIconDefaultForFeatureRow(featureRow);
@@ -1210,7 +1213,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row icon for the feature row geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    */
   deleteIconForFeatureRow(featureRow: FeatureRow): number {
     return this.featureStyleExtension.deleteIconForFeatureRow(featureRow);
@@ -1218,7 +1221,7 @@ export class FeatureTableStyles {
   /**
    * Delete the feature row icon for the geometry type
    *
-   * @param {module:features/user/featureRow} featureRow feature row
+   * @param {FeatureRow} featureRow feature row
    * @param {GeometryType} geometryType geometry type
    */
   deleteIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): number {
@@ -1236,7 +1239,7 @@ export class FeatureTableStyles {
   /**
    * Delete the icon and associated mappings using IconRow
    *
-   * @param {module:extension/nga/style.IconRow} iconRow icon row
+   * @param {IconRow} iconRow icon row
    */
   deleteIconAndMappingsByIconRow(iconRow: IconRow): number {
     return this.featureStyleExtension.deleteIconAndMappingsByIconRow(this.tableName, iconRow);
@@ -1253,7 +1256,7 @@ export class FeatureTableStyles {
   /**
    * Get all the unique style row ids the table maps to
    *
-   * @return {module:extension/nga/style.StyleRow} style row ids
+   * @return {StyleRow} style row ids
    */
   getAllTableStyleIds(): number[] {
     return this.featureStyleExtension.getAllTableStyleIds(this.tableName);
@@ -1261,7 +1264,7 @@ export class FeatureTableStyles {
   /**
    * Get all the unique icon row ids the table maps to
    *
-   * @return {module:extension/nga/style.IconRow} icon row ids
+   * @return {IconRow} icon row ids
    */
   getAllTableIconIds(): number[] {
     return this.featureStyleExtension.getAllTableIconIds(this.tableName);
@@ -1269,7 +1272,7 @@ export class FeatureTableStyles {
   /**
    * Get all the unique style row ids the features map to
    *
-   * @return {module:extension/nga/style.StyleRow} style row ids
+   * @return {StyleRow} style row ids
    */
   getAllStyleIds(): number[] {
     return this.featureStyleExtension.getAllStyleIds(this.tableName);
@@ -1277,7 +1280,7 @@ export class FeatureTableStyles {
   /**
    * Get all the unique icon row ids the features map to
    *
-   * @return {module:extension/nga/style.IconRow} icon row ids
+   * @return {IconRow} icon row ids
    */
   getAllIconIds(): number[] {
     return this.featureStyleExtension.getAllIconIds(this.tableName);

@@ -5,7 +5,7 @@ import http from 'http';
 import CanvasKitInit from '../../canvaskit/canvaskit.js';
 import { CanvasUtils } from './canvasUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
-import { EmulatedCanvas2D, EmulatedImageData, Image, ImageFormatEnumValues } from '../../@types/canvaskit';
+import { EmulatedCanvas2D, EmulatedImageData, EncodedImageFormat, Image } from '../../@types/canvaskit';
 import { ImageType } from '../image/imageType';
 import { GeoPackageException } from '../geoPackageException';
 
@@ -26,7 +26,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
     CanvasKitCanvasAdapter.canvasKitWasmLocateFile = locateFile;
   }
 
-  // Let user set CanvasKit from outside of this module. i.e. they load it into their context and then pass the CanvasKit object to this adapter.
+  // Let user set CanvasKit from outside this module. i.e. they load it into their context and then pass the CanvasKit object to this adapter.
   static setCanvasKit(CanvasKit): void {
     CanvasKitCanvasAdapter.CanvasKit = CanvasKit;
     CanvasKitCanvasAdapter.initialized = true;
@@ -122,6 +122,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
         height = image.height();
       }
     } catch (e) {
+      console.error(e)
       throw new GeoPackageException('Failed to create image.');
     }
 
@@ -189,16 +190,20 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   ): Promise<GeoPackageImage> {
     const canvas = this.create(scaledWidth, scaledHeight);
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.getImage() as CanvasImageSource, 0, 0, scaledWidth, scaledHeight);
+    ctx.drawImage(image.getImage(), 0, 0, scaledWidth, scaledHeight);
     const result = await this.createImage(await this.toDataURL(canvas, 'image/png'), 'image/png');
     this.disposeCanvas(canvas);
     return result;
   }
 
   disposeImage(image: GeoPackageImage): void {
-    if (image != null && image.getImage() && image.getImage() instanceof Image) {
-      (image.getImage() as Image).delete();
-      image = null;
+    if (image != null && image.getImage() && image.getImage().delete != null) {
+      try {
+        image.getImage().delete();
+        image = null;
+      } catch (e) {
+        // ignore
+      }
     }
   }
 
@@ -209,33 +214,8 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param compressionQuality
    */
   writeImageToBytes(image: GeoPackageImage, imageFormat: ImageType, compressionQuality: number): Promise<Uint8Array> {
-    const internalImage = image.getImage() as Image;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    let type = ImageFormatEnumValues.PNG;
-    switch (imageFormat) {
-      case ImageType.PNG:
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        type = ImageFormatEnumValues.PNG;
-        break;
-      case ImageType.JPG:
-      case ImageType.JPEG:
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        type = ImageFormatEnumValues.JPEG;
-        break;
-      case ImageType.WEBP:
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        type = ImageFormatEnumValues.WEBP;
-        break;
-    }
-    // need to do something else here
-    if (imageFormat === ImageType.TIFF) {
-      // TODO: figure out how to enclode geotiff
-    }
-    return Promise.resolve(internalImage.encodeToBytes(type, compressionQuality));
+    const internalImage = image.getImage();
+    return Promise.resolve(internalImage.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
   }
 
   /**
@@ -244,7 +224,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   getImageData(image: GeoPackageImage): ImageData {
     const canvas = this.create(image.getWidth(), image.getHeight());
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(image.getImage() as CanvasImageSource, 0, 0);
+    ctx.drawImage(image.getImage(), 0, 0);
     return ctx.getImageData(0, 0, image.getWidth(), image.getHeight());
   }
 
@@ -256,5 +236,43 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
   mergeCanvas(fromCanvas: any, toContext: any): void {
     const image = fromCanvas.bf.makeImageSnapshot();
     toContext.drawImage(image, 0, 0);
+  }
+
+  /**
+   * Gets the type for the image format
+   * @param imageFormat
+   */
+  getTypeForImageFormat (imageFormat: ImageType): EncodedImageFormat {
+    let type = CanvasKitCanvasAdapter.CanvasKit.ImageFormat.PNG;
+    switch (imageFormat) {
+      case ImageType.PNG:
+        type = CanvasKitCanvasAdapter.CanvasKit.ImageFormat.PNG;
+        break;
+      case ImageType.JPG:
+      case ImageType.JPEG:
+        type = CanvasKitCanvasAdapter.CanvasKit.ImageFormat.JPEG;
+        break;
+      case ImageType.WEBP:
+        type = CanvasKitCanvasAdapter.CanvasKit.ImageFormat.WEBP;
+        break;
+    }
+    // need to do something else here
+    if (imageFormat === ImageType.TIFF) {
+      // TODO: figure out how to encode geotiff
+    }
+
+    return type;
+  }
+
+  /**
+   * Converts the contents drawn in a canvas to a byte array
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   * @return Promise<Uint8Array>
+   */
+  toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality: number = 100): Promise<Uint8Array> {
+    const image = canvas.bf.makeImageSnapshot();
+    return Promise.resolve(image.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
   }
 }

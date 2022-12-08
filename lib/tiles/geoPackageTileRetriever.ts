@@ -51,17 +51,16 @@ export class GeoPackageTileRetriever implements TileRetriever {
   public async getTile(x: number, y: number, zoom: number): Promise<GeoPackageTile> {
     // Get the bounding box of the requested tile
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
-    return this.tileCreator.getTile(webMercatorBoundingBox, zoom);
+    return this.tileCreator.getTile(webMercatorBoundingBox);
   }
 
   /**
    * Get the tile for the specified bounds
    * @param boundingBox
-   * @param zoom
    */
-  public async getTileWithBounds(boundingBox: BoundingBox, zoom?: number): Promise<GeoPackageTile> {
+  public async getTileWithBounds(boundingBox: BoundingBox): Promise<GeoPackageTile> {
     // Get the bounding box of the requested tile
-    return this.tileCreator.getTile(boundingBox, zoom);
+    return this.tileCreator.getTile(boundingBox);
   }
 
   /**

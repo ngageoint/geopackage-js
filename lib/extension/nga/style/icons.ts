@@ -2,18 +2,17 @@ import { IconRow } from './iconRow';
 import { GeometryType } from '@ngageoint/simple-features-js';
 
 /**
- * @memberOf module:extension/nga/style
  * @class Icons
- */
-/**
- * Icons constructor
- * @constructor
  */
 export class Icons {
   defaultIcon: IconRow = null;
   icons: Map<GeometryType, IconRow>;
   tableIcons: boolean;
 
+  /**
+   * Icons constructor
+   * @constructor
+   */
   constructor(tableIcons = false) {
     this.icons = new Map();
     this.tableIcons = tableIcons;

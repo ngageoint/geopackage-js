@@ -20,13 +20,13 @@ export enum TileScalingType {
   OUT_IN = 'out_in',
 
   /**
-   * Search for tiles in closest zoom level order, zoom in levels before zoom
+   * Search for tiles in the closest zoom level order, zoom in levels before zoom
    * out
    */
   CLOSEST_IN_OUT = 'closest_in_out',
 
   /**
-   * Search for tiles in closest zoom level order, zoom out levels before zoom
+   * Search for tiles in the closest zoom level order, zoom out levels before zoom
    * in
    */
   CLOSEST_OUT_IN = 'closest_out_in',
@@ -34,11 +34,11 @@ export enum TileScalingType {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace TileScalingType {
   export function nameFromType(type: TileScalingType): string {
-    return TileScalingType[type];
+    return type.toLowerCase();
   }
 
   export function fromName(type: string): TileScalingType {
-    switch (type) {
+    switch (type.toLowerCase()) {
       case 'in':
         return TileScalingType.IN;
       case 'out':

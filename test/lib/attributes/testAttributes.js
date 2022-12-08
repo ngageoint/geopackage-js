@@ -544,31 +544,31 @@ describe('GeoPackage Attribute table create tests', function() {
     attributesTableExists.should.be.equal(true);
     var attributeDao = geoPackage.getAttributesDao(tableName);
     var attributeRow = attributeDao.newRow();
-    attributeRow.setValueWithColumnName('test_text.test', 'hello');
-    attributeRow.setValueWithColumnName('test_real', 3.0);
-    attributeRow.setValueWithColumnName('test_boolean', true);
-    attributeRow.setValueWithColumnName('test_boolean2', false);
-    attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-    attributeRow.setValueWithColumnName('test_integer', 5);
-    attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-    attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
-    attributeRow.setValueWithColumnName('test space', 'space space');
-    attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
+    attributeRow.setValue('test_text.test', 'hello');
+    attributeRow.setValue('test_real', 3.0);
+    attributeRow.setValue('test_boolean', true);
+    attributeRow.setValue('test_boolean2', false);
+    attributeRow.setValue('test_blob', Buffer.from('test'));
+    attributeRow.setValue('test_integer', 5);
+    attributeRow.setValue('test_text_limited', 'testt');
+    attributeRow.setValue('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValue('test space', 'space space');
+    attributeRow.setValue('test-dash', 'dash-dash');
     attributeDao.create(attributeRow);
     const count = attributeDao.getCount();
     count.should.be.equal(1);
     const attributesResultSet = attributeDao.queryForAll();
     while (attributesResultSet.moveToNext()) {
       const ar = attributesResultSet.getRow();
-      ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
-      ar.getValueWithColumnName('test_real').should.be.equal(3.0);
-      ar.getValueWithColumnName('test_boolean').should.be.equal(true);
-      ar.getValueWithColumnName('test_integer').should.be.equal(5);
-      ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-      ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-      ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-      ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
-      ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+      ar.getValue('test_text.test').should.be.equal('hello');
+      ar.getValue('test_real').should.be.equal(3.0);
+      ar.getValue('test_boolean').should.be.equal(true);
+      ar.getValue('test_integer').should.be.equal(5);
+      ar.getValue('test_blob').toString().should.be.equal('test');
+      ar.getValue('test_text_limited').should.be.equal('testt');
+      ar.getValue('test_blob_limited').toString().should.be.equal('testtes');
+      ar.getValue('test space').toString().should.be.equal('space space');
+      ar.getValue('test-dash').toString().should.be.equal('dash-dash');
     }
     attributesResultSet.close();
   });
@@ -593,16 +593,16 @@ describe('GeoPackage Attribute table create tests', function() {
 
     const attributeDao = geoPackage.getAttributesDao(tableName);
     var attributeRow = attributeDao.newRow();
-    attributeRow.setValueWithColumnName('test_text.test', 'hello');
-    attributeRow.setValueWithColumnName('test_real', 3.0);
-    attributeRow.setValueWithColumnName('test_boolean', attributeRow.toObjectValue(3, 1));
-    attributeRow.setValueWithColumnName('test_boolean2', attributeRow.toObjectValue(10, 0));
-    attributeRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-    attributeRow.setValueWithColumnName('test_integer', 5);
-    attributeRow.setValueWithColumnName('test_text_limited', 'testt');
-    attributeRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
-    attributeRow.setValueWithColumnName('test space', 'space space');
-    attributeRow.setValueWithColumnName('test-dash', 'dash-dash');
+    attributeRow.setValue('test_text.test', 'hello');
+    attributeRow.setValue('test_real', 3.0);
+    attributeRow.setValue('test_boolean', attributeRow.toObjectValue(3, 1));
+    attributeRow.setValue('test_boolean2', attributeRow.toObjectValue(10, 0));
+    attributeRow.setValue('test_blob', Buffer.from('test'));
+    attributeRow.setValue('test_integer', 5);
+    attributeRow.setValue('test_text_limited', 'testt');
+    attributeRow.setValue('test_blob_limited', Buffer.from('testtes'));
+    attributeRow.setValue('test space', 'space space');
+    attributeRow.setValue('test-dash', 'dash-dash');
 
     attributeDao.create(attributeRow);
 
@@ -611,16 +611,16 @@ describe('GeoPackage Attribute table create tests', function() {
     let attributesResultSet = attributeDao.queryForAll();
     attributesResultSet.moveToNext();
     let ar = attributesResultSet.getRow();
-    ar.getValueWithColumnName('test_text.test').should.be.equal('hello');
-    ar.getValueWithColumnName('test_real').should.be.equal(3.0);
-    ar.getValueWithColumnName('test_boolean').should.be.equal(true);
-    ar.getValueWithColumnName('test_boolean2').should.be.equal(false);
-    ar.getValueWithColumnName('test_integer').should.be.equal(5);
-    ar.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-    ar.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-    ar.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-    ar.getValueWithColumnName('test space').toString().should.be.equal('space space');
-    ar.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+    ar.getValue('test_text.test').should.be.equal('hello');
+    ar.getValue('test_real').should.be.equal(3.0);
+    ar.getValue('test_boolean').should.be.equal(true);
+    ar.getValue('test_boolean2').should.be.equal(false);
+    ar.getValue('test_integer').should.be.equal(5);
+    ar.getValue('test_blob').toString().should.be.equal('test');
+    ar.getValue('test_text_limited').should.be.equal('testt');
+    ar.getValue('test_blob_limited').toString().should.be.equal('testtes');
+    ar.getValue('test space').toString().should.be.equal('space space');
+    ar.getValue('test-dash').toString().should.be.equal('dash-dash');
     attributesResultSet.close();
 
     // delete attribute row

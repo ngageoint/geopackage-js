@@ -59,11 +59,11 @@ describe('AlterTable tests', function() {
         geometry: geoJson
       }));
       featureRow.setGeometry(geometryData);
-      featureRow.setValueWithColumnName('name', name);
-      featureRow.setValueWithColumnName('_feature_id', name);
-      featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+      featureRow.setValue('name', name);
+      featureRow.setValue('_feature_id', name);
+      featureRow.setValue('_properties_id', 'properties' + name);
       if (!_.isNil(properties) && !_.isNil(properties.test_col)) {
-        featureRow.setValueWithColumnName('test_col', properties.test_col);
+        featureRow.setValue('test_col', properties.test_col);
       }
       return featureDao.create(featureRow);
     };

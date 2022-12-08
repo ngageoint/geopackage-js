@@ -79,9 +79,9 @@ describe('GeoPackage FeatureTiles tests', function() {
         var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
         geometryData.setGeometry(geometry);
         featureRow.geometry = geometryData;
-        featureRow.setValueWithColumnName('name', name);
-        featureRow.setValueWithColumnName('_feature_id', name);
-        featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+        featureRow.setValue('name', name);
+        featureRow.setValue('_feature_id', name);
+        featureRow.setValue('_properties_id', 'properties' + name);
         return featureDao.create(featureRow);
       }
       // create the features

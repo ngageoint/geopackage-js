@@ -2,6 +2,7 @@ import { CanvasAdapter } from './canvasAdapter';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { ImageType } from '../image/imageType';
 import { CanvasUtils } from './canvasUtils';
+import { ImageFormatEnumValues } from '../../@types/canvaskit';
 
 /**
  * Browser based canvas adapter
@@ -140,5 +141,17 @@ export class HtmlCanvasAdapter implements CanvasAdapter {
    */
   mergeCanvas(fromCanvas: any, toContext: any): void {
     toContext.drawImage(fromCanvas, 0, 0);
+  }
+
+  /**
+   * Converts the contents drawn in a canvas to a byte array
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   * @return Promise<Uint8Array>
+   */
+  toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
+    const dataUrl = canvas.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality);
+    return Promise.resolve(CanvasUtils.base64toUInt8Array(dataUrl));
   }
 }

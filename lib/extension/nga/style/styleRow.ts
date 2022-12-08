@@ -68,14 +68,14 @@ export class StyleRow extends AttributesRow {
    * @return {String}
    */
   getName(): string {
-    return this.getValueWithColumnName(this.getNameColumn().getName());
+    return this.getValue(this.getNameColumn().getName());
   }
   /**
    * Sets the name for the row
    * @param {String} name name
    */
   setName(name: string): void {
-    this.setValueWithColumnName(this.getNameColumn().getName(), name);
+    this.setValue(this.getNameColumn().getName(), name);
   }
   /**
    * Get the description column
@@ -89,14 +89,14 @@ export class StyleRow extends AttributesRow {
    * @return {String}
    */
   getDescription(): string {
-    return this.getValueWithColumnName(this.getDescriptionColumn().getName());
+    return this.getValue(this.getDescriptionColumn().getName());
   }
   /**
    * Sets the description for the row
    * @param {String} description description
    */
   setDescription(description: string): void {
-    this.setValueWithColumnName(this.getDescriptionColumn().getName(), description);
+    this.setValue(this.getDescriptionColumn().getName(), description);
   }
   /**
    * Get the color column
@@ -124,7 +124,7 @@ export class StyleRow extends AttributesRow {
    * @return {String} color
    */
   getHexColor(): string {
-    return this.getValueWithColumnName(this.getColorColumn().getName());
+    return this.getValue(this.getColorColumn().getName());
   }
   /**
    * Set the color
@@ -141,7 +141,7 @@ export class StyleRow extends AttributesRow {
    */
   setHexColor(color: string): void {
     const validatedColor = this.validateColor(color);
-    this.setValueWithColumnName(this.getColorColumn().getName(), validatedColor);
+    this.setValue(this.getColorColumn().getName(), validatedColor);
   }
   /**
    * Get the opacity column
@@ -155,7 +155,7 @@ export class StyleRow extends AttributesRow {
    * @return {Number}
    */
   getOpacity(): number {
-    return this.getValueWithColumnName(this.getOpacityColumn().getName());
+    return this.getValue(this.getOpacityColumn().getName());
   }
   /**
    * Get the opacity or default value
@@ -174,7 +174,7 @@ export class StyleRow extends AttributesRow {
    */
   setOpacity(opacity: number): void {
     this.validateOpacity(opacity);
-    this.setValueWithColumnName(this.getOpacityColumn().getName(), opacity);
+    this.setValue(this.getOpacityColumn().getName(), opacity);
   }
   /**
    * Get the width column
@@ -188,7 +188,7 @@ export class StyleRow extends AttributesRow {
    * @return {number}
    */
   getWidth(): number {
-    return this.getValueWithColumnName(this.getWidthColumn().getName());
+    return this.getValue(this.getWidthColumn().getName());
   }
   /**
    * Sets the width for the row
@@ -198,7 +198,7 @@ export class StyleRow extends AttributesRow {
     if (width !== null && width < 0.0) {
       throw new GeoPackageException('Width must be greater than or equal to 0.0, invalid value: ' + width);
     }
-    this.setValueWithColumnName(this.getWidthColumn().getName(), width);
+    this.setValue(this.getWidthColumn().getName(), width);
   }
   /**
    * Get the width value or default width
@@ -237,7 +237,7 @@ export class StyleRow extends AttributesRow {
    * @return {String} color
    */
   getFillHexColor(): string {
-    return this.getValueWithColumnName(this.getFillColorColumn().getName());
+    return this.getValue(this.getFillColorColumn().getName());
   }
   /**
    * Set the fill color
@@ -254,7 +254,7 @@ export class StyleRow extends AttributesRow {
    */
   setFillHexColor(color: string): void {
     const validatedColor = this.validateColor(color);
-    this.setValueWithColumnName(this.getFillColorColumn().getName(), validatedColor);
+    this.setValue(this.getFillColorColumn().getName(), validatedColor);
   }
   /**
    * Get the fill opacity column
@@ -268,7 +268,7 @@ export class StyleRow extends AttributesRow {
    * @return {Number}
    */
   getFillOpacity(): number {
-    return this.getValueWithColumnName(this.getFillOpacityColumn().getName());
+    return this.getValue(this.getFillOpacityColumn().getName());
   }
   /**
    * Sets the fill opacity for the row
@@ -276,7 +276,7 @@ export class StyleRow extends AttributesRow {
    */
   setFillOpacity(fillOpacity: number): void {
     this.validateOpacity(fillOpacity);
-    this.setValueWithColumnName(this.getFillOpacityColumn().getName(), fillOpacity);
+    this.setValue(this.getFillOpacityColumn().getName(), fillOpacity);
   }
   /**
    * Get the fill opacity or default value

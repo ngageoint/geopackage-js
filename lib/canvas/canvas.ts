@@ -114,4 +114,14 @@ export class Canvas {
     Canvas.checkCanvasAdapter();
     return Canvas.adapter.mergeCanvas(fromCanvas, toContext);
   }
+
+  /**
+   * Returns the byte array representing the drawn content of a canvas.
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   */
+  static toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality?: number): Promise<Uint8Array> {
+    return Canvas.adapter.toBytes(canvas, imageFormat, compressionQuality);
+  }
 }

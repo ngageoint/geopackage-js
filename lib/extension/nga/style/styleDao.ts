@@ -54,7 +54,7 @@ export class StyleDao extends AttributesDao {
    */
   public queryForRow(styleMappingRow: StyleMappingRow): StyleRow {
     let styleRow = null;
-    const attributesRow = this.queryForIdRow(styleMappingRow.getRelatedId());
+    const attributesRow = this.queryForId(styleMappingRow.getRelatedId());
     if (attributesRow != null) {
       styleRow = this.getRow(attributesRow);
     }

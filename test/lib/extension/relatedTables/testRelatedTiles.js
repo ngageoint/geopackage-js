@@ -318,7 +318,7 @@ describe('Related Tile tests', function() {
               featureRow.id.should.be.greaterThan(0);
               featureIds.indexOf(featureRow.id).should.not.equal(-1);
               mappedIds.indexOf(featureRow.id).should.not.equal(-1);
-              if (featureRow.getValueWithColumnName(featureRow.geometryColumn.name)) {
+              if (featureRow.getValue(featureRow.geometryColumn.name)) {
                 var geometryData = featureRow.geometry;
 
                 should.exist(geometryData);

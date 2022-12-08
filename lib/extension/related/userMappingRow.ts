@@ -79,14 +79,14 @@ export class UserMappingRow extends UserCustomRow {
    * @return {Number}
    */
   getBaseId(): number {
-    return this.getValueWithColumnName(this.getBaseIdColumn().getName());
+    return this.getValue(this.getBaseIdColumn().getName());
   }
   /**
    * Sets the base id
    * @param  {Number} baseId base id
    */
   setBaseId(baseId: number): void {
-    this.setValueWithColumnName(this.getBaseIdColumn().getName(), baseId);
+    this.setValue(this.getBaseIdColumn().getName(), baseId);
   }
 
   /**
@@ -110,14 +110,14 @@ export class UserMappingRow extends UserCustomRow {
    * @return {Number}
    */
   getRelatedId(): number {
-    return this.getValueWithColumnName(this.getRelatedIdColumn().getName());
+    return this.getValue(this.getRelatedIdColumn().getName());
   }
   /**
    * Sets the related id
    * @param  {Number} relatedId related id
    */
   setRelatedId(relatedId: number): void {
-    this.setValueWithColumnName(this.getRelatedIdColumn().getName(), relatedId);
+    this.setValue(this.getRelatedIdColumn().getName(), relatedId);
   }
 
   /**

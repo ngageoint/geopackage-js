@@ -2184,7 +2184,7 @@ export class GeoPackage {
     userMappingRow.setBaseId(baseId);
     userMappingRow.setRelatedId(relatedId);
     for (const column in mappingColumnValues) {
-      userMappingRow.setValueWithColumnName(column, mappingColumnValues[column]);
+      userMappingRow.setValue(column, mappingColumnValues[column]);
     }
     return userMappingDao.create(userMappingRow);
   }
@@ -2264,7 +2264,7 @@ export class GeoPackage {
             geometryData.setGeometry(geometry);
             for (const propertyKey in feature.properties) {
               if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
-                featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+                featureRow.setValue(propertyKey, feature.properties[propertyKey]);
               }
             }
             // bind this feature's data to the insert statement and insert into the table
@@ -2329,7 +2329,7 @@ export class GeoPackage {
     featureRow.setGeometry(geometryData);
     for (const propertyKey in feature.properties) {
       if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
-        featureRow.setValueWithColumnName(propertyKey, feature.properties[propertyKey]);
+        featureRow.setValue(propertyKey, feature.properties[propertyKey]);
       }
     }
     const id = featureDao.create(featureRow);
@@ -2399,7 +2399,7 @@ export class GeoPackage {
     row.setContentType(contentType);
     row.setData(dataBuffer);
     for (const key in additionalProperties) {
-      row.setValueWithColumnName(key, additionalProperties[key]);
+      row.setValue(key, additionalProperties[key]);
     }
     return mediaDao.create(row);
   }
@@ -2950,7 +2950,7 @@ export class GeoPackage {
       tile.values = [];
       for (let i = 0; i < tiles.columns.length; i++) {
         const column = tiles.columns[i];
-        const value = row.getValueWithColumnName(column.getName());
+        const value = row.getValue(column.getName());
         if (column.getName() === 'tile_data') {
           tile.values.push('data');
         } else if (value === null || value === 'null') {
@@ -3076,7 +3076,7 @@ export class GeoPackage {
       tile.values = [];
       for (let i = 0; i < tiles.columns.length; i++) {
         const column = tiles.columns[i];
-        const value = row.getValueWithColumnName(column.getName());
+        const value = row.getValue(column.getName());
         if (column.getName() === 'tile_data') {
           tile.values.push('data');
         } else if (value === null || value === 'null') {
@@ -3195,7 +3195,7 @@ export class GeoPackage {
     let feature = null;
     const featureDao = this.getFeatureDao(table);
     const srs = featureDao.getSrs();
-    let featureRow = featureDao.queryForIdRow(featureId);
+    let featureRow = featureDao.queryForId(featureId);
     if (featureRow == null) {
       let resultSet = featureDao.queryForEq(false, undefined, '_feature_id', featureId);
       resultSet.moveToNext();
@@ -3366,7 +3366,7 @@ export class GeoPackage {
     const tileDao = this.getTileDao(table);
     const retriever = new GeoPackageTileRetriever(tileDao, width, height, 'image/png', projection);
     const bounds = new BoundingBox(minLon, maxLon, minLat, maxLat);
-    return retriever.getTileWithBounds(bounds, z);
+    return retriever.getTileWithBounds(bounds);
   }
 
   /**

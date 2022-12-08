@@ -72,7 +72,7 @@ export class ManualFeatureQueryResults implements FeatureIndexResults {
   public next(): { value: FeatureRow; done: boolean } {
     const id = this.featureIds[this.index++];
     const done = this.index >= this.featureIds.length;
-    const value = this.featureDao.queryForIdRow(id);
+    const value = this.featureDao.queryForId(id);
     return {
       value,
       done,

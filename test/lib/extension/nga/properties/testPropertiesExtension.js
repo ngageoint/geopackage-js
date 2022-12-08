@@ -23,9 +23,7 @@ function generateUUID() { // Public Domain/MIT
 }
 
 function testPropertyName(extension, property) {
-  console.log(extension.hasProperty(property))
   assert.isFalse(extension.hasProperty(property));
-  console.log(2);
   let count = 1;
   if (Math.random() < .5) {
     count = 1 + Math.round(10 * Math.random());
@@ -37,22 +35,15 @@ function testPropertyName(extension, property) {
     extension.addValue(property, value);
   }
   assert.isTrue(extension.hasProperty(property));
-  console.log(2);
-  extension.numValues(property).should.be.equal(count);
-  console.log(2);
-  assert.isTrue(extension.hasSingleValue(property));
-  console.log(2);
+  extension.numValuesForProperty(property).should.be.equal(count);
+  assert.isTrue(count !== 1 || extension.hasSingleValue(property));
   assert.isTrue(extension.hasValues(property));
-  console.log(2);
 
   const propertyValues = extension.getValues(property);
   values.length.should.be.equal(propertyValues.length);
-  console.log(2);
   for (const value of propertyValues) {
     assert.isTrue(values.indexOf(value) > -1);
-    console.log(2);
     assert.isTrue(extension.hasValue(property, value));
-    console.log(2);
   }
   return count;
 }
@@ -179,73 +170,47 @@ describe('Properties Extension Tests', function() {
 
     it('test property names', function() {
      try {
+       geoPackage.getExtensionManager().deleteExtensions();
+
        const extension = new PropertiesExtension(geoPackage);
 
        let count = 0;
 
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.CONTRIBUTOR);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.COVERAGE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.CREATED);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.CREATOR);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.DATE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.DESCRIPTION);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.IDENTIFIER);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.LICENSE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.MODIFIED);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.PUBLISHER);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.REFERENCES);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.RELATION);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.SOURCE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.SPATIAL);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.SUBJECT);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.TAG);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.TEMPORAL);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.TITLE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.TYPE);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.URI);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.VALID);
-       console.log('1');
        count += testPropertyName(extension, PropertyNames.VERSION);
-       console.log('1');
 
        assert.isTrue(22 === extension.numProperties());
-       console.log('1');
        assert.isTrue(count === extension.numValues());
-       console.log('1');
 
        let deleted = 0;
        for (const property of extension.getProperties()) {
          deleted += extension.deleteProperty(property);
        }
        assert.isTrue(count === deleted);
-       console.log('1');
        assert.isTrue(0 === extension.numProperties());
-       console.log('1');
        assert.isTrue(0 === extension.numValues());
 
        extension.removeExtension();
-       console.log('1');
        assert.isFalse(extension.has());
      } catch (e) {
        console.error(e);

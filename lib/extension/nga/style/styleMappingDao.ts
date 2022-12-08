@@ -29,7 +29,7 @@ export class StyleMappingDao extends UserMappingDao {
    * Get StyleMappingTable
    */
   getTable(): StyleMappingTable {
-    return this.getTable() as StyleMappingTable;
+    return super.getTable() as StyleMappingTable;
   }
 
   /**

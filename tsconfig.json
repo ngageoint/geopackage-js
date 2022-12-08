@@ -21,15 +21,14 @@
       "noEmit": false,
       "noImplicitAny": false,
       "esModuleInterop": true,
-      "sourceMap": true
+      "sourceMap": true,
   },
   "include": [
       "index.ts",
-      "./lib", // type-checks all js files as well not just .ts extension
-      "@types/canvaskit/index.d.ts"
+      "./lib",
+      "./@types",
   ],
   "exclude": [
-      "./lib/wkb",
       "dist/**/*",
       "./test"
   ]

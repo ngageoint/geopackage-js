@@ -52,16 +52,25 @@ export class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
   }
 
   /**
-   * {@inheritDoc}
-   * <p>
    * Handles geometry columns
    */
-  public setValue(index: number, value: any): void {
+  public setValueWithIndex(index: number, value: any): void {
     if (index == this.getGeometryColumnIndex() && (value instanceof Buffer || value instanceof Uint8Array)) {
       const buffer = Buffer.from(value);
       value = GeoPackageGeometryData.createWithBuffer(buffer);
     }
     super.setValueWithIndex(index, value);
+  }
+
+  /**
+   * Handles geometry columns
+   */
+  public setValue(columnName: string, value: any): void {
+    if (columnName.toLowerCase() === this.getGeometryColumnName().toLowerCase() && (value instanceof Buffer || value instanceof Uint8Array)) {
+      const buffer = Buffer.from(value);
+      value = GeoPackageGeometryData.createWithBuffer(buffer);
+    }
+    super.setValue(columnName, value);
   }
 
   /**

@@ -44,7 +44,7 @@ export class DublinCoreType {
    */
   public static readonly TITLE: DublinCoreType = new DublinCoreType('title');
 
-  constructor(public name: string, public synonyms?: string[]) {}
+  constructor(public name: string, public synonyms: string[] = []) {}
 
   public getName(): string {
     return this.name;
@@ -55,26 +55,34 @@ export class DublinCoreType {
   }
 
   /**
+   * Returns a list of all dublin core types
+   */
+  public static getTypes(): DublinCoreType[] {
+    return [DublinCoreType.DATE, DublinCoreType.DESCRIPTION, DublinCoreType.FORMAT, DublinCoreType.IDENTIFIER, DublinCoreType.SOURCE, DublinCoreType.TITLE];
+  }
+
+  /**
    * Get the Dublin Core Type from the name
    * @param  {string} name name
    * @return {module:extension/relatedTables~DublinCoreType}
    */
   public static fromName(name: string): DublinCoreType {
-    for (const prop in DublinCoreType) {
-      const type = DublinCoreType[prop as keyof typeof DublinCoreType] as DublinCoreType;
-      if (type.getName() === name) {
-        return type;
+    let dublinCoreType = null;
+    for (const type of DublinCoreType.getTypes()) {
+      if (type.getName() === name.toLowerCase()) {
+        dublinCoreType = type;
+        break;
       }
-    }
-    for (const prop in DublinCoreType) {
-      const type = DublinCoreType[prop as keyof typeof DublinCoreType] as DublinCoreType;
-      if (type.getSynonyms()) {
-        for (let i = 0; i < type.getSynonyms().length; i++) {
-          if (type.getSynonyms()[i] === name) {
-            return type;
-          }
+      for (const synonym of type.getSynonyms()) {
+        if (synonym === name.toLowerCase()) {
+          dublinCoreType = type;
+          break;
         }
       }
+      if (dublinCoreType != null) {
+        break;
+      }
     }
+    return dublinCoreType;
   }
 }

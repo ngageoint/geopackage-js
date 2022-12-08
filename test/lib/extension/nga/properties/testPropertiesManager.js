@@ -7,7 +7,7 @@ import { PropertyNames } from "../../../../../lib/extension/nga/properties/prope
 const should = require('chai').should();
 const assert = require('chai').assert;
 
-describe('GeoPackage Extension tests', function() {
+describe('GeoPackage Properties Manager tests', function() {
 	const GEOPACKAGE_COUNT = 12;
 	const GEOPACKAGE_WITH_PROPERTIES_COUNT = 10;
 	const GEOPACKAGE_WITHOUT_PROPERTIES_COUNT = GEOPACKAGE_COUNT - GEOPACKAGE_WITH_PROPERTIES_COUNT;
@@ -34,11 +34,13 @@ describe('GeoPackage Extension tests', function() {
 		const geoPackages = [];
 		const geoPackageFiles = await createGeoPackageFiles();
 
+		let i = 1;
 		for (const geoPackageFile of geoPackageFiles) {
-			const geoPackage = await GeoPackageManager.open(geoPackageFile).catch(() => {
+			const name = GEOPACKAGE_NAME + i++;
+			const geoPackage = await GeoPackageManager.open(geoPackageFile, name).catch(() => {
 				should.fail('Failed to open GeoPackage');
 			});
-			geoPackages.add(geoPackage);
+			geoPackages.push(geoPackage);
 		}
 		return geoPackages;
 	}
@@ -54,7 +56,7 @@ describe('GeoPackage Extension tests', function() {
 			if (i < GEOPACKAGE_WITH_PROPERTIES_COUNT) {
 				addProperties(geoPackage, i);
 			}
-			geoPackageFiles.add(geoPackage.getPath());
+			geoPackageFiles.push(geoPackage.getPath());
 			geoPackage.close();
 		}
 
@@ -62,6 +64,7 @@ describe('GeoPackage Extension tests', function() {
 	}
 
 	function addProperties(geoPackage, i) {
+
 		const properties = new PropertiesExtension(geoPackage);
 		properties.addValue(PropertyNames.TITLE, GEOPACKAGE_NAME + (i + 1));
 		properties.addValue(PropertyNames.IDENTIFIER, i.toString());
@@ -69,7 +72,6 @@ describe('GeoPackage Extension tests', function() {
 		if (i % 2 === 1) {
 			properties.addValue(ODD_PROPERTY, 'true');
 		}
-
 		if (i % COLOR_RED_FREQUENCY === 0) {
 			properties.addValue(PropertyNames.TAG, COLOR_RED);
 		}
@@ -157,7 +159,7 @@ describe('GeoPackage Extension tests', function() {
 		(tags.indexOf(COLOR_RED) > -1).should.be.true;
 		(tags.indexOf(COLOR_GREEN) > -1).should.be.true;
 		(tags.indexOf(COLOR_BLUE) > -1).should.be.true;
-		(manager.getValues(PropertyNames.CREATOR).isEmpty()).should.be.true;
+		(manager.getValues(PropertyNames.CREATOR).length === 0).should.be.true;
 
 		// hasValue
 		for (let i = 0; i < GEOPACKAGE_WITH_PROPERTIES_COUNT; i++) {
@@ -202,8 +204,8 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(0, manager.missingValue(PropertyNames.CREATOR, CREATOR).length);
 
 		// Add a property value to a single GeoPackage
-		assert.isFalse(manager.addValue(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CREATOR, CREATOR));
-		(manager.addValue(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CONTRIBUTOR, CREATOR)).should.be.true;
+		assert.isFalse(manager.addValueToGeoPackage(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CREATOR, CREATOR));
+		(manager.addValueToGeoPackage(GEOPACKAGE_NAME + GEOPACKAGE_COUNT, PropertyNames.CONTRIBUTOR, CREATOR)).should.be.true;
 		assertEquals(++numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
@@ -221,7 +223,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_WITHOUT_PROPERTIES_COUNT, missingIdentifiers.length);
 		let indentifierIndex = 100;
 		for (const missingIdentifierGeoPackage of missingIdentifiers) {
-			(manager.addValue(missingIdentifierGeoPackage.getName(), PropertyNames.IDENTIFIER, (indentifierIndex++).toString())).should.be.true;
+			(manager.addValueToGeoPackage(missingIdentifierGeoPackage.getName(), PropertyNames.IDENTIFIER, (indentifierIndex++).toString())).should.be.true;
 		}
 		assertEquals(GEOPACKAGE_COUNT, manager.hasProperty(PropertyNames.IDENTIFIER).length);
 		assertEquals(0, manager.missingProperty(PropertyNames.IDENTIFIER).length);
@@ -246,7 +248,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.IDENTIFIER, "1").length);
 
 		// Delete a property from a single GeoPackage
-		(manager.deleteProperty(GEOPACKAGE_NAME + "1", PropertyNames.TAG)).should.be.true;
+		(manager.deletePropertyWithGeoPackage(GEOPACKAGE_NAME + "1", PropertyNames.TAG)).should.be.true;
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
@@ -276,7 +278,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TAG, COLOR_RED).length);
 
 		// Delete a property value from a single GeoPackage
-		(manager.deleteValue(GEOPACKAGE_NAME + (COLOR_GREEN_FREQUENCY + 1), PropertyNames.TAG, COLOR_GREEN)).should.be.true;
+		(manager.deleteValueWithGeoPackage(GEOPACKAGE_NAME + (COLOR_GREEN_FREQUENCY + 1), PropertyNames.TAG, COLOR_GREEN)).should.be.true;
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
@@ -290,7 +292,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_COUNT - (COLOR_GREEN_COUNT - 2), manager.missingValue(PropertyNames.TAG, COLOR_GREEN).length);
 
 		// Delete all properties from a single GeoPackage
-		(manager.deleteAll(GEOPACKAGE_NAME + 2)).should.be.true;
+		(manager.deleteAllWithGeoPackage(GEOPACKAGE_NAME + 2)).should.be.true;
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
@@ -306,7 +308,7 @@ describe('GeoPackage Extension tests', function() {
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 2).length);
 
 		// Remove the extension from a single GeoPackage
-		manager.removeExtension(GEOPACKAGE_NAME + 4);
+		manager.removeExtensionWithGeoPackage(GEOPACKAGE_NAME + 4);
 		assertEquals(numProperties, manager.numProperties());
 		properties = manager.getProperties();
 		assertEquals(numProperties, properties.length);
@@ -324,35 +326,42 @@ describe('GeoPackage Extension tests', function() {
 		// Delete all properties from all GeoPackages
 		assertEquals(GEOPACKAGE_COUNT - 2, manager.deleteAll());
 		assertEquals(0, manager.numProperties());
-		(manager.getProperties().isEmpty()).should.be.true;
-		(manager.hasProperty(PropertyNames.TITLE).isEmpty()).should.be.true;
+		(manager.getProperties().length === 0).should.be.true;
+		(manager.hasProperty(PropertyNames.TITLE).length === 0).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(0, manager.numValues(PropertyNames.TITLE));
 		assert.isFalse(manager.hasValues(PropertyNames.TITLE));
-		(manager.getValues(PropertyNames.TITLE).isEmpty()).should.be.true;
-		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).isEmpty()).should.be.true;
+		(manager.getValues(PropertyNames.TITLE).length === 0).should.be.true;
+		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length === 0).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);
 
 		// Remove the extension from all GeoPackages
 		manager.removeExtension();
 		assertEquals(0, manager.numProperties());
-		(manager.getProperties().isEmpty()).should.be.true;
-		(manager.hasProperty(PropertyNames.TITLE).isEmpty()).should.be.true;
+		(manager.getProperties().length === 0).should.be.true;
+		(manager.hasProperty(PropertyNames.TITLE).length === 0).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingProperty(PropertyNames.TITLE).length);
 		assertEquals(0, manager.numValues(PropertyNames.TITLE));
 		assert.isFalse(manager.hasValues(PropertyNames.TITLE));
-		(manager.getValues(PropertyNames.TITLE).isEmpty()).should.be.true;
-		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).isEmpty()).should.be.true;
+		(manager.getValues(PropertyNames.TITLE).length === 0).should.be.true;
+		(manager.hasValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length === 0).should.be.true;
 		assertEquals(GEOPACKAGE_COUNT, manager.missingValue(PropertyNames.TITLE, GEOPACKAGE_NAME + 3).length);
+	}
 
+	let manager;
+
+	beforeEach('create properties manager', async function() {
+		manager = new PropertiesManager(await createGeoPackages());
+
+	});
+
+	afterEach('close the geopackages', async function() {
 		// Close the GeoPackages
 		manager.closeGeoPackages();
 		assertEquals(0, manager.numGeoPackages());
-	}
+	});
 
-	it('should test properties manager with GeoPackages', async function(done) {
-		const manager = new PropertiesManager(await createGeoPackages());
+	it('should test properties manager with GeoPackages', function() {
 		testPropertiesManager(manager);
-		done();
 	});
 });

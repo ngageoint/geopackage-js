@@ -404,15 +404,15 @@ describe('GeoPackage Feature table create tests', function() {
       var point = new Point(1, 2);
       geometryData.setGeometry(point);
       featureRow.geometry = geometryData;
-      featureRow.setValueWithColumnName('test_text.test', 'hello');
-      featureRow.setValueWithColumnName('test_real', 3.0);
-      featureRow.setValueWithColumnName('test_boolean', true);
-      featureRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-      featureRow.setValueWithColumnName('test_integer', 5);
-      featureRow.setValueWithColumnName('test_text_limited', 'testt');
-      featureRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
-      featureRow.setValueWithColumnName('test space', 'space space');
-      featureRow.setValueWithColumnName('test-dash', 'dash-dash');
+      featureRow.setValue('test_text.test', 'hello');
+      featureRow.setValue('test_real', 3.0);
+      featureRow.setValue('test_boolean', true);
+      featureRow.setValue('test_blob', Buffer.from('test'));
+      featureRow.setValue('test_integer', 5);
+      featureRow.setValue('test_text_limited', 'testt');
+      featureRow.setValue('test_blob_limited', Buffer.from('testtes'));
+      featureRow.setValue('test space', 'space space');
+      featureRow.setValue('test-dash', 'dash-dash');
 
       var result = featureDao.create(featureRow);
       var count = featureDao.getCount();
@@ -422,15 +422,15 @@ describe('GeoPackage Feature table create tests', function() {
       var geom = fr.geometry;
       geom.geometry.x.should.be.equal(1);
       geom.geometry.y.should.be.equal(2);
-      fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
-      fr.getValueWithColumnName('test_real').should.be.equal(3.0);
-      fr.getValueWithColumnName('test_boolean').should.be.equal(true);
-      fr.getValueWithColumnName('test_integer').should.be.equal(5);
-      fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-      fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-      fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
-      fr.getValueWithColumnName('test space').toString().should.be.equal('space space');
-      fr.getValueWithColumnName('test-dash').toString().should.be.equal('dash-dash');
+      fr.getValue('test_text.test').should.be.equal('hello');
+      fr.getValue('test_real').should.be.equal(3.0);
+      fr.getValue('test_boolean').should.be.equal(true);
+      fr.getValue('test_integer').should.be.equal(5);
+      fr.getValue('test_blob').toString().should.be.equal('test');
+      fr.getValue('test_text_limited').should.be.equal('testt');
+      fr.getValue('test_blob_limited').toString().should.be.equal('testtes');
+      fr.getValue('test space').toString().should.be.equal('space space');
+      fr.getValue('test-dash').toString().should.be.equal('dash-dash');
     });
 
     describe('delete feature tests', function(done) {
@@ -444,13 +444,13 @@ describe('GeoPackage Feature table create tests', function() {
         var point = new Point(1, 2);
         geometryData.setGeometry(point);
         featureRow.geometry = geometryData;
-        featureRow.setValueWithColumnName('test_text.test', 'hello');
-        featureRow.setValueWithColumnName('test_real', 3.0);
-        featureRow.setValueWithColumnName('test_boolean', true);
-        featureRow.setValueWithColumnName('test_blob', Buffer.from('test'));
-        featureRow.setValueWithColumnName('test_integer', 5);
-        featureRow.setValueWithColumnName('test_text_limited', 'testt');
-        featureRow.setValueWithColumnName('test_blob_limited', Buffer.from('testtes'));
+        featureRow.setValue('test_text.test', 'hello');
+        featureRow.setValue('test_real', 3.0);
+        featureRow.setValue('test_boolean', true);
+        featureRow.setValue('test_blob', Buffer.from('test'));
+        featureRow.setValue('test_integer', 5);
+        featureRow.setValue('test_text_limited', 'testt');
+        featureRow.setValue('test_blob_limited', Buffer.from('testtes'));
 
         var result = featureDao.create(featureRow);
         var count = featureDao.getCount();
@@ -460,13 +460,13 @@ describe('GeoPackage Feature table create tests', function() {
         var geom = fr.geometry;
         geom.geometry.x.should.be.equal(1);
         geom.geometry.y.should.be.equal(2);
-        fr.getValueWithColumnName('test_text.test').should.be.equal('hello');
-        fr.getValueWithColumnName('test_real').should.be.equal(3.0);
-        fr.getValueWithColumnName('test_boolean').should.be.equal(true);
-        fr.getValueWithColumnName('test_integer').should.be.equal(5);
-        fr.getValueWithColumnName('test_blob').toString().should.be.equal('test');
-        fr.getValueWithColumnName('test_text_limited').should.be.equal('testt');
-        fr.getValueWithColumnName('test_blob_limited').toString().should.be.equal('testtes');
+        fr.getValue('test_text.test').should.be.equal('hello');
+        fr.getValue('test_real').should.be.equal(3.0);
+        fr.getValue('test_boolean').should.be.equal(true);
+        fr.getValue('test_integer').should.be.equal(5);
+        fr.getValue('test_blob').toString().should.be.equal('test');
+        fr.getValue('test_text_limited').should.be.equal('testt');
+        fr.getValue('test_blob_limited').toString().should.be.equal('testtes');
       });
 
       it('should delete the feature', function() {

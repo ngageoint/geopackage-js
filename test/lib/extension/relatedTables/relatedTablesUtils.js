@@ -85,7 +85,7 @@ module.exports.populateRow = function(table, row, skipColumns) {
           break;
       }
 
-      row.setValueWithColumnName(column.name, value);
+      row.setValue(column.name, value);
     }
   }
 }

@@ -27,14 +27,14 @@ export class TileGrid {
   /**
    * Constructor
    * @param minX
-   * @param maxX
    * @param minY
+   * @param maxX
    * @param maxY
    */
-  constructor(minX: number, maxX: number, minY: number, maxY: number) {
+  constructor(minX: number, minY: number, maxX: number, maxY: number) {
     this.minX = minX;
-    this.maxX = maxX;
     this.minY = minY;
+    this.maxX = maxX;
     this.maxY = maxY;
 }
 

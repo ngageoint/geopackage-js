@@ -49,7 +49,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(2,1,2)
       .then(function(tile) {
-        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
+        testSetup.diffImages(tile.getData(), path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
           try {
             equal.should.be.equal(true);
             done();
@@ -67,7 +67,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTileWithWgs84BoundsInProjection(wgs84BoundingBox, 2, 'EPSG:3857')
       .then(function(tile) {
-        testSetup.diffImages(tile, path.join(__dirname, '..','..','fixtures','reprojTile.png'), function(err, equal) {
+        testSetup.diffImages(tile.getData(), path.join(__dirname, '..','..','fixtures','reprojTile.png'), function(err, equal) {
           try {
             equal.should.be.equal(true);
             done();
@@ -102,7 +102,7 @@ describe('GeoPackage Tile Retriever tests', function() {
                   return new Promise(function(resolve, reject) {
                     gpr.getTile(x,y,zoom)
                     .then(function(tile) {
-                      testSetup.diffImages(tile, path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, equal) {
+                      testSetup.diffImages(tile.getData(), path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, equal) {
                         console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png') + ' passes?', equal);
                         equal.should.be.equal(true);
                         resolve();
@@ -195,7 +195,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','imageryTileWeb.png');
         }
-        testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
+        testSetup.diffImages(tile.getData(), expectedPath, function (err, imagesAreSame) {
           try {
             imagesAreSame.should.be.equal(true);
             done();
@@ -282,7 +282,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','reprojectTileWeb.png');
         }
-        testSetup.diffImages(tile, expectedPath, function (err, imagesAreSame) {
+        testSetup.diffImages(tile.getData(), expectedPath, function (err, imagesAreSame) {
           try {
             imagesAreSame.should.be.equal(true);
             done();

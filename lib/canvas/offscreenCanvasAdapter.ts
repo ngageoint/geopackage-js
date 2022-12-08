@@ -2,6 +2,7 @@ import { CanvasAdapter } from './canvasAdapter';
 import { CanvasUtils } from './canvasUtils';
 import { GeoPackageImage } from '../image/geoPackageImage';
 import { ImageType } from '../image/imageType';
+import { ImageFormatEnumValues } from '../../@types/canvaskit';
 
 /**
  * OffscreenCanvas canvas adapter. This can only run inside a web worker.
@@ -133,9 +134,7 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
       if (imageFormat === ImageType.TIFF) {
         // TODO: do something different
       }
-      this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then(result => {
-        resolve(CanvasUtils.base64toUInt8Array(result));
-      });
+      this.toBytes(canvas, imageFormat, compressionQuality);
     });
   }
 
@@ -156,5 +155,22 @@ export class OffscreenCanvasAdapter implements CanvasAdapter {
    */
   mergeCanvas(fromCanvas: any, toContext: any): void {
     toContext.drawImage(fromCanvas, 0, 0);
+  }
+
+
+
+  /**
+   * Converts the contents drawn in a canvas to a byte array
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   * @return Uint8Array
+   */
+  toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array> {
+    return new Promise(resolve => {
+      this.toDataURL(canvas, ImageType.getMimeType(imageFormat), compressionQuality).then(result => {
+        resolve(CanvasUtils.base64toUInt8Array(result));
+      });
+    })
   }
 }

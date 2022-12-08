@@ -107,4 +107,12 @@ export interface CanvasAdapter {
    * @param toContext
    */
   mergeCanvas(fromCanvas: any, toContext: any): void;
+
+  /**
+   * Converts the contents drawn in a canvas to a byte array
+   * @param canvas
+   * @param imageFormat
+   * @param compressionQuality
+   */
+  toBytes(canvas: any, imageFormat: ImageType, compressionQuality?: number): Promise<Uint8Array>;
 }

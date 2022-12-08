@@ -95,11 +95,11 @@ describe('GeoPackage Extensions tests', function() {
       var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
       geometryData.setGeometry(geometry);
       featureRow.geometry = geometryData;
-      featureRow.setValueWithColumnName('name', name);
-      featureRow.setValueWithColumnName('_feature_id', name);
-      featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+      featureRow.setValue('name', name);
+      featureRow.setValue('_feature_id', name);
+      featureRow.setValue('_properties_id', 'properties' + name);
       if (!_.isNil(geoJson.properties) && !_.isNil(geoJson.properties.test_col)) {
-        featureRow.setValueWithColumnName('test_col', geoJson.properties.test_col);
+        featureRow.setValue('test_col', geoJson.properties.test_col);
       }
       return featureDao.create(featureRow);
     };

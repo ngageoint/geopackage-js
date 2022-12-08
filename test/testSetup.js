@@ -1,3 +1,8 @@
+import { FeatureTableMetadata } from "../lib/features/user/featureTableMetadata";
+import { GeometryColumns } from "../lib/features/columns/geometryColumns";
+import { TableColumnKey } from "../lib/db/tableColumnKey";
+import { BoundingBox } from "../lib/boundingBox";
+
 var path = require('path')
   , assert = require('chai').assert
   , Canvas = require('../lib/canvas/canvas').Canvas
@@ -204,7 +209,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
   ImageUtils.getImage(actualTile).then(actualImage => {
     const actual = Canvas.create(width, height);
     let actualCtx = actual.getContext('2d');
-    actualCtx.drawImage(actualImage.image, 0, 0);
+    actualCtx.drawImage(actualImage.getImage(), 0, 0);
     const actualDataUrl = actual.toDataURL();
     new Promise(resolve => {
       if (!isNode) {
@@ -304,8 +309,17 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
  * @throws SQLException
  */
 module.exports.createFeatureTable = function(geoPackage, contents, geometryColumn, geometryType) {
-  const table = module.exports.buildFeatureTable(contents.getTableName(), geometryColumn, geometryType);
-  geoPackage.createFeatureTable(table);
+  const additionalColumns = [];
+  additionalColumns.push(FeatureColumn.createColumn("test_text_limited", GeoPackageDataType.TEXT, false, 5));
+  additionalColumns.push(FeatureColumn.createColumn("test_blob_limited", GeoPackageDataType.BLOB, false, 7));
+  additionalColumns.push(FeatureColumn.createColumn("test_date", GeoPackageDataType.DATE));
+  additionalColumns.push(FeatureColumn.createColumn("test_datetime", GeoPackageDataType.DATETIME));
+  additionalColumns.push(FeatureColumn.createColumn("test_text", GeoPackageDataType.TEXT, false, ""));
+  additionalColumns.push(FeatureColumn.createColumn( "test_real", GeoPackageDataType.REAL));
+  additionalColumns.push(FeatureColumn.createColumn("test_boolean", GeoPackageDataType.BOOLEAN));
+  additionalColumns.push(FeatureColumn.createColumn("test_blob", GeoPackageDataType.BLOB));
+  additionalColumns.push(FeatureColumn.createColumn(module.exports.TEST_INTEGER_COLUMN, GeoPackageDataType.INTEGER));
+  const table = module.exports.buildFeatureTable(geoPackage, contents.getTableName(), geometryColumn, geometryType, additionalColumns);
   const random = Math.random();
   const dataColumnsDao = SchemaExtension.getDataColumnsDao(geoPackage);
   const dataColumns = new DataColumns();
@@ -330,25 +344,26 @@ module.exports.createFeatureTable = function(geoPackage, contents, geometryColum
 /**
  * Build an example feature table
  *
+ * @param geoPackage
  * @param tableName
- * @param geometryColumn
+ * @param geometryColumnName
  * @param geometryType
+ * @param additionalColumns
  * @return feature table
  */
-module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryType) {
-  const columns = [];
-  columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
-  columns.push(FeatureColumn.createColumn(7, "test_text_limited", GeoPackageDataType.TEXT, 5));
-  columns.push(FeatureColumn.createColumn(8, "test_blob_limited", GeoPackageDataType.BLOB, 7));
-  columns.push(FeatureColumn.createColumn(9, "test_date", GeoPackageDataType.DATE));
-  columns.push(FeatureColumn.createColumn(10, "test_datetime", GeoPackageDataType.DATETIME));
-  columns.push(FeatureColumn.createGeometryColumn(1, geometryColumn, geometryType));
-  columns.push(FeatureColumn.createColumn(2, "test_text", GeoPackageDataType.TEXT, false, ""));
-  columns.push(FeatureColumn.createColumn(3, "test_real", GeoPackageDataType.REAL));
-  columns.push(FeatureColumn.createColumn(4, "test_boolean", GeoPackageDataType.BOOLEAN));
-  columns.push(FeatureColumn.createColumn(5, "test_blob", GeoPackageDataType.BLOB));
-  columns.push(FeatureColumn.createColumn(6, module.exports.TEST_INTEGER_COLUMN, GeoPackageDataType.INTEGER));
-  return new FeatureTable(tableName, geometryColumn, columns);
+module.exports.buildFeatureTable = function(geoPackage, tableName, geometryColumnName, geometryType, additionalColumns) {
+  const srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+  const geometryColumns = new GeometryColumns();
+  geometryColumns.setId(new TableColumnKey(tableName, geometryColumnName));
+  geometryColumns.setGeometryType(geometryType);
+  geometryColumns.setZ(1);
+  geometryColumns.setM(0);
+  geometryColumns.setSrsId(srs.getSrsId());
+
+  const boundingBox = new BoundingBox(-180, -90, 180, 90);
+
+  return geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, additionalColumns, 'id', boundingBox));
 }
 
 /**

@@ -16,7 +16,7 @@ export enum ExtensionScopeType {
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ExtensionScopeType {
   export function nameFromType(type: ExtensionScopeType): string {
-    return ExtensionScopeType[type];
+    return type.toLowerCase();
   }
 
   export function fromName(type: string): ExtensionScopeType {

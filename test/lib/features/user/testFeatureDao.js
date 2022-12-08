@@ -81,11 +81,11 @@ describe('FeatureDao tests', function() {
       for (var row of iterator) {
         count++;
         row.values.property_1.should.be.equal('Columbia');
-        should.exist(row.getValueWithColumnName('geom'));
-        should.exist(row.getValueWithColumnName('id'));
-        should.exist(row.getValueWithColumnName('property_0'));
-        should.exist(row.getValueWithColumnName('property_1'));
-        should.exist(row.getValueWithColumnName('property_2'));
+        should.exist(row.getValue('geom'));
+        should.exist(row.getValue('id'));
+        should.exist(row.getValue('property_0'));
+        should.exist(row.getValue('property_1'));
+        should.exist(row.getValue('property_2'));
       }
       count.should.be.equal(1);
     });
@@ -417,9 +417,9 @@ describe('FeatureDao tests', function() {
         var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
         geometryData.setGeometry(geometry);
         featureRow.geometry = geometryData;
-        featureRow.setValueWithColumnName('name', name);
-        featureRow.setValueWithColumnName('_feature_id', name);
-        featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+        featureRow.setValue('name', name);
+        featureRow.setValue('_feature_id', name);
+        featureRow.setValue('_properties_id', 'properties' + name);
         return featureDao.create(featureRow);
       };
       // create the features
@@ -447,13 +447,13 @@ describe('FeatureDao tests', function() {
       for (var feature of queryTestFeatureDao.queryForEach('_feature_id', 'line')) {
         line = queryTestFeatureDao.getRow(feature);
       }
-      line.setValueWithColumnName('name', 'UpdatedLine');
+      line.setValue('name', 'UpdatedLine');
       var newLine;
       queryTestFeatureDao.update(line);
       for (var feature of queryTestFeatureDao.queryForEach('_feature_id', 'line')) {
         newLine = queryTestFeatureDao.getRow(feature);
       }
-      newLine.getValueWithColumnName('name').should.be.equal('UpdatedLine');
+      newLine.getValue('name').should.be.equal('UpdatedLine');
     });
 
     it('should count by a field', function(){

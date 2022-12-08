@@ -16,6 +16,7 @@ import { ResultUtils } from './resultUtils';
 import { ContentValues } from '../user/contentValues';
 import { DBAdapter } from './dbAdapter';
 import type { GeoPackageConnection } from './geoPackageConnection';
+import { DBValue } from './dbValue';
 
 export class SQLUtils {
   /**
@@ -749,7 +750,7 @@ export class SQLUtils {
    * @param whereArgs where arguments
    * @return updated count
    */
-  public static update(connection: GeoPackageConnection, table: string, values: ContentValues, whereClause: string, whereArgs: []): number {
+  public static update(connection: GeoPackageConnection, table: string, values: ContentValues, whereClause: string, whereArgs: DBValue[]): number {
     const update = [];
     update.push("update ");
     update.push(SQLUtils.quoteWrap(table));

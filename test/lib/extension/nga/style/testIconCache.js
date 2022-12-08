@@ -1,4 +1,7 @@
 import { default as testSetup } from '../../../../testSetup'
+import { GeometryType } from "@ngageoint/simple-features-js";
+import { FeatureColumn } from "../../../../../lib/features/user/featureColumn";
+import { GeoPackageDataType } from "../../../../../lib/db/geoPackageDataType";
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , IconCache = require('../../../../../lib/extension/nga/style/iconCache').IconCache
@@ -21,19 +24,19 @@ describe('IconCache Tests', function() {
 
   var randomIcon = function(featureTableStyles, noWidth = false, noHeight = false, noAnchors = false) {
     var iconRow = featureTableStyles.getIconDao().newRow();
-    iconRow.data = iconImageBuffer;
-    iconRow.contentType = 'image/png';
-    iconRow.name = "Icon Name";
-    iconRow.description = "Icon Description";
+    iconRow.setData(iconImageBuffer);
+    iconRow.setContentType('image/png');
+    iconRow.setName('Icon Name');
+    iconRow.setDescription('Icon Description');
     if (!noWidth) {
-      iconRow.width = iconImage.width;
+      iconRow.setWidth(iconImage.getWidth());
     }
     if (!noHeight) {
-      iconRow.height = iconImage.height;
+      iconRow.setHeight(iconImage.getHeight());
     }
     if (!noAnchors) {
-      iconRow.anchorU = 0.5;
-      iconRow.anchorV = 1.0;
+      iconRow.setAnchorU(0.5);
+      iconRow.setAnchorV(1.0);
     }
     return iconRow;
   };
@@ -41,12 +44,12 @@ describe('IconCache Tests', function() {
   var compareImages = function (imageA, imageB) {
     return new Promise(function(resolve) {
       var actualCanvas, actualCtx, expectedCanvas, expectedCtx;
-      actualCanvas = Canvas.create(imageA.width, imageA.height);
+      actualCanvas = Canvas.create(imageA.getWidth(), imageA.getHeight());
       actualCtx = actualCanvas.getContext('2d');
-      expectedCanvas = Canvas.create(imageB.width, imageB.height);
+      expectedCanvas = Canvas.create(imageB.getWidth(), imageB.getHeight());
       expectedCtx = expectedCanvas.getContext('2d');
-      actualCtx.drawImage(imageA.image, 0, 0);
-      expectedCtx.drawImage(imageB.image, 0, 0);
+      actualCtx.drawImage(imageA.getImage(), 0, 0);
+      expectedCtx.drawImage(imageB.getImage(), 0, 0);
 
       // @ts-ignore
       const result = actualCanvas.toDataURL() === expectedCanvas.toDataURL();
@@ -66,15 +69,20 @@ describe('IconCache Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = geoPackage.createFeatureTable(featureTableName);
-    geoPackage.featureStyleExtension.getOrCreateExtension(featureTableName);
-    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
-    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension();
+    featureTable = testSetup.buildFeatureTable(geoPackage, featureTableName, 'geom', GeometryType.GEOMETRY, [
+      FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ''),
+      FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ''),
+      FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ''),
+    ]);
+
     featureTableStyles = new FeatureTableStyles(geoPackage, featureTableName);
+    featureTableStyles.getFeatureStyleExtension().getOrCreateExtension(featureTableName);
+    featureTableStyles.getFeatureStyleExtension().getRelatedTables().getOrCreateExtension();
+    featureTableStyles.getFeatureStyleExtension().getContentsId().getOrCreateExtension();
     featureTableStyles.createIconRelationship();
-    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
+    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'));
     // @ts-ignore
-    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
+    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'));
   });
 
   afterEach(async function() {
@@ -181,7 +189,7 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.id = 0;
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
     should.not.exist(iconCache.getIconForIconRow(iconRow));
     var result = await compareImages(expectedImage, image);
@@ -192,7 +200,7 @@ describe('IconCache Tests', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
     iconRow.id = 0;
-    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
+    var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIcon(iconRow, 2.0);
     var result = await compareImages(expectedImage, image);
     result.should.be.equal(true);
@@ -202,21 +210,19 @@ describe('IconCache Tests', function() {
   it('should automatically determine dimensions of an icon with no explicit width/height', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = featureTableStyles.getIconDao().newRow();
-    iconRow.id = 0;
-    iconRow.data = iconImageBuffer;
-    iconRow.contentType = 'image/png';
-    iconRow.name = "Icon Name";
-    iconRow.description = "Icon Description";
-    iconRow.width = iconImage.width;
+    iconRow.setData(iconImageBuffer);
+    iconRow.setContentType('image/png');
+    iconRow.setName("Icon Name");
+    iconRow.setDescription("Icon Description");
+    iconRow.setWidth(iconImage.getWidth());
 
-    var image = await iconCache.createScaledIcon(iconRow, 1.0);
-    image.width.should.be.equal(iconImage.width);
-    image.height.should.be.equal(iconImage.height);
+    let image = await iconCache.createScaledIcon(iconRow, 1.0);
+    image.getWidth().should.be.equal(iconImage.getWidth());
+    image.getHeight().should.be.equal(iconImage.getHeight());
 
-    iconRow.id = 1;
-    iconRow.width = undefined;
-    var image = await iconCache.createScaledIcon(iconRow, 1.0);
-    image.width.should.be.equal(iconImage.width);
-    image.height.should.be.equal(iconImage.height);
+    iconRow.setWidth(undefined);
+    image = await iconCache.createScaledIcon(iconRow, 1.0);
+    image.getWidth().should.be.equal(iconImage.getWidth());
+    image.getHeight().should.be.equal(iconImage.getHeight());
   }));
 });

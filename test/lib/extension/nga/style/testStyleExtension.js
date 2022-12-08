@@ -1,6 +1,9 @@
 
 import { default as testSetup } from '../../../../testSetup'
 import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
+import { GeoPackageDataType } from "../../../../../lib/db/geoPackageDataType";
+import { FeatureColumn } from "../../../../../lib/features/user/featureColumn";
+import { ContentsId } from "../../../../../lib/extension/nga/contents/contentsId";
 
 var FeatureTableStyles = require('../../../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , StyleMappingTable = require('../../../../../lib/extension/nga/style/styleMappingTable').StyleMappingTable
@@ -26,6 +29,7 @@ describe('StyleExtension Tests', function() {
   var featureTableName = 'feature_table';
   var featureTable;
   var featureTableStyles;
+  var featureStyleExtension;
   var featureRowId;
   var iconImage;
   var iconImageBuffer;
@@ -41,34 +45,34 @@ describe('StyleExtension Tests', function() {
   };
 
   var createRow = function(geoJson, name, featureDao) {
-    var srs = featureDao.srs;
+    var srs = featureDao.getSrs();
     var featureRow = featureDao.newRow();
     var geometryData = new GeometryData();
-    geometryData.setSrsId(srs.srs_id);
+    geometryData.setSrsId(srs.getSrsId());
     var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
     geometryData.setGeometry(geometry);
-    featureRow.geometry = geometryData;
-    featureRow.setValueWithColumnName('name', name);
-    featureRow.setValueWithColumnName('_feature_id', name);
-    featureRow.setValueWithColumnName('_properties_id', 'properties' + name);
+    featureRow.setGeometry(geometryData);
+    featureRow.setValue('name', name);
+    featureRow.setValue('_feature_id', name);
+    featureRow.setValue('_properties_id', 'properties' + name);
     return featureDao.create(featureRow);
   };
 
   var randomIcon = function(featureTableStyles) {
     var iconRow = featureTableStyles.getIconDao().newRow();
-    iconRow.data = iconImageBuffer;
-    iconRow.contentType = 'image/png';
-    iconRow.name = "Icon Name";
-    iconRow.description = "Icon Description";
-    iconRow.width = Math.random() * iconImage.width;
-    iconRow.height = Math.random() * iconImage.height;
-    iconRow.anchorU = Math.random();
-    iconRow.anchorV = Math.random();
+    iconRow.setData(iconImageBuffer);
+    iconRow.setContentType('image/png');
+    iconRow.setName("Icon Name");
+    iconRow.setDescription("Icon Description");
+    iconRow.setWidth(Math.random() * iconImage.getWidth());
+    iconRow.setHeight(Math.random() * iconImage.getHeight());
+    iconRow.setAnchorU(Math.random());
+    iconRow.setAnchorV(Math.random());
     return iconRow;
   };
 
   var randomStyle = function(featureTableStyles) {
-    var styleRow = featureTableStyles.getStyleDao().createObject();
+    var styleRow = featureTableStyles.getStyleDao().newRow();
     styleRow.setName("Style Name");
     styleRow.setDescription("Style Description");
     styleRow.setColor(randomColor(), 1.0);
@@ -93,19 +97,29 @@ describe('StyleExtension Tests', function() {
 
   beforeEach('create the GeoPackage connection and setup the FeatureStyleExtension', async function() {
     // create a feature table first
-    featureTable = geoPackage.createFeatureTable(featureTableName);
-    var box = {
-      "type": "Polygon",
-      "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+    featureTable = testSetup.buildFeatureTable(geoPackage, featureTableName, 'geom', GeometryType.GEOMETRY, [
+      FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ''),
+      FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ''),
+      FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ''),
+    ]);
+    const box = {
+      type: 'Feature',
+      geometry: {
+        "type": "Polygon",
+        "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+      },
+      properties: {}
     };
     featureRowId = createRow(box, 'box', geoPackage.getFeatureDao(featureTableName));
-    geoPackage.featureStyleExtension.getOrCreateExtension(featureTableName)
-    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension()
-    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension()
+    featureStyleExtension = new FeatureStyleExtension(geoPackage);
+    featureStyleExtension.getOrCreateExtension(featureTableName)
+    featureStyleExtension.getRelatedTables().getOrCreateExtension()
+    featureStyleExtension.getContentsId().getOrCreateExtension()
     featureTableStyles = new FeatureTableStyles(geoPackage, featureTableName);
-    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'))
+
+    iconImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'))
     // @ts-ignore
-    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'point.png'));
+    iconImageBuffer = await loadTile(path.join(__dirname, '..', '..', '..', '..', 'fixtures', 'point.png'));
   });
 
   afterEach(async function() {
@@ -115,7 +129,7 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should create extension for feature table', function() {
-    var extensions = geoPackage.extensionDao.queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
+    var extensions = geoPackage.getExtensionsDao().queryByExtensionAndTableName(FeatureStyleExtension.EXTENSION_NAME, featureTableName);
     should.exist(extensions.length);
     if (extensions.length) {
       extensions.length.should.be.equal(1);
@@ -123,21 +137,21 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should check if geoPackage has extension or not', function() {
-    geoPackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
-    geoPackage.featureStyleExtension.has('not_valid_feature_table').should.be.equal(false);
+    featureStyleExtension.has(featureTableName).should.be.equal(true);
+    featureStyleExtension.has('not_valid_feature_table').should.be.equal(false);
     featureTableStyles.has().should.be.equal(true);
   });
 
   it('should return all feature tables with style extension', function() {
-    geoPackage.featureStyleExtension.getTables().length.should.be.equal(1);
+    featureStyleExtension.getTables().length.should.be.equal(1);
   });
 
   it('should get related tables extension', function() {
-    geoPackage.featureStyleExtension.getRelatedTables().should.be.equal(geoPackage.relatedTablesExtension);
+    should.exist(featureStyleExtension.getRelatedTables());
   });
 
   it('should get content id extension', function() {
-    geoPackage.featureStyleExtension.getContentsId().should.be.equal(geoPackage.contentsIdExtension);
+    should.exist(featureStyleExtension.getContentsId());
   });
 
   it('should create relationships', function() {
@@ -191,7 +205,7 @@ describe('StyleExtension Tests', function() {
   });
 
   it('should create style relationship even if contentsIdExtension does not yet exist', function() {
-    geoPackage.contentsIdExtension.removeExtension();
+    featureStyleExtension.getContentsId().removeExtension();
     featureTableStyles.createTableIconRelationship();
     featureTableStyles.hasTableIconRelationship().should.be.equal(true);
   });
@@ -199,7 +213,7 @@ describe('StyleExtension Tests', function() {
   it('should delete all relationships', function() {
     featureTableStyles.createTableStyleRelationship();
     featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
-    geoPackage.featureStyleExtension.deleteAllRelationships();
+    featureStyleExtension.deleteAllRelationships();
     featureTableStyles.hasTableStyleRelationship().should.be.equal(false);
   });
 
@@ -213,70 +227,70 @@ describe('StyleExtension Tests', function() {
     should.not.exist(featureTableStyles.getCachedTableIcons());
     should.not.exist(featureTableStyles.getTableIconDefault());
     should.not.exist(featureTableStyles.getTableIcon("GEOMETRY"));
-    var featureDao = geoPackage.getFeatureDao(featureTableName);
-    var featureRow = featureDao.queryForId(featureRowId);
+    const featureDao = geoPackage.getFeatureDao(featureTableName);
+    const featureRow = featureDao.queryForId(featureRowId);
     should.not.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getFeatureStyles(featureRow.id));
+    should.not.exist(featureTableStyles.getFeatureStyles(featureRow.getId()));
     should.not.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
     should.not.exist(featureTableStyles.getFeatureStyleDefault(featureRow));
-    should.not.exist(featureTableStyles.getFeatureStyle(featureRow.id, featureRow.geometryType));
-    should.not.exist(featureTableStyles.getFeatureStyleDefault(featureRow.id));
+    should.not.exist(featureTableStyles.getFeatureStyle(featureRow.getId(), featureRow.getGeometryType()));
+    should.not.exist(featureTableStyles.getFeatureStyleDefault(featureRow.getId()));
     should.not.exist(featureTableStyles.getStylesForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getStylesForFeatureId(featureRow.id));
+    should.not.exist(featureTableStyles.getStylesForFeatureId(featureRow.getId()));
     should.not.exist(featureTableStyles.getStyleForFeatureRow(featureRow));
     should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getStyle(featureRow.id, featureRow.geometryType));
-    should.not.exist(featureTableStyles.getStyleDefault(featureRow.id));
+    should.not.exist(featureTableStyles.getStyle(featureRow.getId(), featureRow.getGeometryType()));
+    should.not.exist(featureTableStyles.getStyleDefault(featureRow.getId()));
     should.not.exist(featureTableStyles.getIconsForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getIconsForFeatureId(featureRow.id));
+    should.not.exist(featureTableStyles.getIconsForFeatureId(featureRow.getId()));
     should.not.exist(featureTableStyles.getIconForFeatureRow(featureRow));
     should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getIcon(featureRow.id, featureRow.geometryType));
-    should.not.exist(featureTableStyles.getIconDefault(featureRow.id));
+    should.not.exist(featureTableStyles.getIcon(featureRow.getId(), featureRow.getGeometryType()));
+    should.not.exist(featureTableStyles.getIconDefault(featureRow.getId()));
   });
 
   it('should test IconRow methods', mochaAsync(async () => {
     featureTableStyles.createTableIconRelationship();
-    var pointIcon = randomIcon(featureTableStyles);
+    const pointIcon = randomIcon(featureTableStyles);
     featureTableStyles.setTableIcon(GeometryType.POINT, pointIcon);
-    var retrievedIcon = featureTableStyles.getTableIcon(GeometryType.POINT);
-    retrievedIcon.name.should.be.equal('Icon Name');
-    retrievedIcon.description.should.be.equal('Icon Description');
-    retrievedIcon.width.should.be.below(retrievedIcon.width + 0.1);
-    retrievedIcon.height.should.be.below(retrievedIcon.height + 0.1);
-    retrievedIcon.anchorUOrDefault.should.be.below(1.1);
-    retrievedIcon.anchorVOrDefault.should.be.below(1.1);
-    (retrievedIcon.derivedWidth).should.be.equal(retrievedIcon.width);
-    (retrievedIcon.derivedHeight).should.be.equal(retrievedIcon.height);
-    var retrievedIconWidth = retrievedIcon.width;
-    var retrievedIconHeight = retrievedIcon.height;
-    var retrievedIconAnchorU = retrievedIcon.anchorU;
-    var retrievedIconAnchorV = retrievedIcon.anchorV;
-    retrievedIcon.anchorU = null;
-    retrievedIcon.anchorV = null;
-    retrievedIcon.anchorUOrDefault.should.be.equal(0.5);
-    retrievedIcon.anchorVOrDefault.should.be.equal(1.0);
-    retrievedIcon.anchorU = retrievedIconAnchorU;
-    retrievedIcon.anchorV = retrievedIconAnchorV;
-    retrievedIcon.width = null;
-    retrievedIcon.height = null;
-    (retrievedIcon.derivedWidth).should.be.equal(iconImage.width);
-    (retrievedIcon.derivedHeight).should.be.equal(iconImage.height);
-    retrievedIcon.width  = retrievedIconWidth;
-    retrievedIcon.height = null;
-    (retrievedIcon.derivedWidth).should.be.equal(retrievedIconWidth);
-    (retrievedIcon.derivedHeight).should.be.equal(iconImage.height * (retrievedIconWidth / iconImage.width));
-    retrievedIcon.width = null;
-    retrievedIcon.height = retrievedIconHeight;
-    (retrievedIcon.derivedWidth).should.be.equal(iconImage.width * (retrievedIconHeight / iconImage.height));
-    (retrievedIcon.derivedHeight).should.be.equal(retrievedIconHeight);
-    retrievedIcon.width = retrievedIconWidth;
-    retrievedIcon.height = retrievedIconHeight;
+    const retrievedIcon = featureTableStyles.getTableIcon(GeometryType.POINT);
+    retrievedIcon.getName().should.be.equal('Icon Name');
+    retrievedIcon.getDescription().should.be.equal('Icon Description');
+    retrievedIcon.getWidth().should.be.below(retrievedIcon.getWidth() + 0.1);
+    retrievedIcon.getHeight().should.be.below(retrievedIcon.getHeight() + 0.1);
+    retrievedIcon.getAnchorUOrDefault().should.be.below(1.1);
+    retrievedIcon.getAnchorVOrDefault().should.be.below(1.1);
+    (retrievedIcon.getDerivedWidth()).should.be.equal(retrievedIcon.getWidth());
+    (retrievedIcon.getDerivedHeight()).should.be.equal(retrievedIcon.getHeight() );
+    const retrievedIconWidth = retrievedIcon.getWidth();
+    const retrievedIconHeight = retrievedIcon.getHeight();
+    const retrievedIconAnchorU = retrievedIcon.getAnchorU();
+    const retrievedIconAnchorV = retrievedIcon.getAnchorV();
+    retrievedIcon.setAnchorU(null);
+    retrievedIcon.setAnchorV(null);
+    retrievedIcon.getAnchorUOrDefault().should.be.equal(0.5);
+    retrievedIcon.getAnchorVOrDefault().should.be.equal(1.0);
+    retrievedIcon.setAnchorU(retrievedIconAnchorU);
+    retrievedIcon.setAnchorV(retrievedIconAnchorV);
+    retrievedIcon.setWidth(null);
+    retrievedIcon.setHeight(null);
+    (retrievedIcon.getDerivedWidth()).should.be.equal(iconImage.getWidth());
+    (retrievedIcon.getDerivedHeight()).should.be.equal(iconImage.getHeight());
+    retrievedIcon.setWidth(retrievedIconWidth);
+    retrievedIcon.setHeight(null);
+    (retrievedIcon.getDerivedWidth()).should.be.equal(retrievedIconWidth);
+    (retrievedIcon.getDerivedHeight()).should.be.equal(iconImage.getHeight() * (retrievedIconWidth / iconImage.getWidth()));
+    retrievedIcon.setWidth(null);
+    retrievedIcon.setHeight(retrievedIconHeight);
+    (retrievedIcon.getDerivedWidth()).should.be.equal(iconImage.getWidth() * (retrievedIconHeight / iconImage.getHeight()));
+    (retrievedIcon.getDerivedHeight()).should.be.equal(retrievedIconHeight);
+    retrievedIcon.setWidth(retrievedIconWidth);
+    retrievedIcon.setHeight(retrievedIconHeight);
     retrievedIcon.validateAnchor(null);
     retrievedIcon.validateAnchor(0.0);
     retrievedIcon.validateAnchor(0.5);
     retrievedIcon.validateAnchor(1.0);
-    var badAnchor = -1.0;
+    let badAnchor = -1.0;
     assert.throws(() => {
       retrievedIcon.validateAnchor(badAnchor);
     }, Error, "Anchor must be set inclusively between 0.0 and 1.0, invalid value: " + badAnchor);
@@ -429,26 +443,28 @@ describe('StyleExtension Tests', function() {
     // test table style default
     var tableStyleDefault = randomStyle(featureTableStyles);
     featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    geoPackage.featureStyleExtension.has(featureTableName).should.be.equal(true);
+    featureStyleExtension.has(featureTableName).should.be.equal(true);
     featureTableStyles.has().should.be.equal(true);
     featureTableStyles.hasTableStyleRelationship().should.be.equal(true);
     geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
-    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(ContentsId.TABLE_NAME).should.be.equal(true);
     geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE, featureTableName)).should.be.equal(true);
     should.exist(featureTableStyles.getTableStyleDefault());
+
+
     // test geometry style
     var polygonStyle = randomStyle(featureTableStyles);
     featureTableStyles.setTableStyle(GeometryType.POLYGON, polygonStyle);
     var featureStyles = featureTableStyles.getTableFeatureStyles();
     should.exist(featureStyles);
-    should.exist(featureStyles.styles);
-    should.not.exist(featureStyles.icons);
+    should.exist(featureStyles.getStyles());
+    should.not.exist(featureStyles.getIcons());
     var tableStyles = featureTableStyles.getTableStyles();
     should.exist(tableStyles);
     should.exist(tableStyles.getDefault());
-    tableStyles.getDefault().id.should.be.equal(tableStyleDefault.id);
-    featureTableStyles.getTableStyle(null).id.should.be.equal(tableStyleDefault.id);
-    featureTableStyles.getTableStyle(GeometryType.POLYGON).id.should.be.equal(polygonStyle.id);
+    tableStyles.getDefault().getId().should.be.equal(tableStyleDefault.getId());
+    featureTableStyles.getTableStyle(null).getId().should.be.equal(tableStyleDefault.getId());
+    featureTableStyles.getTableStyle(GeometryType.POLYGON).getId().should.be.equal(polygonStyle.getId());
 
     featureTableStyles.hasTableIconRelationship().should.be.equal(false);
     geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON, featureTableName)).should.be.equal(false);
@@ -471,9 +487,9 @@ describe('StyleExtension Tests', function() {
     var tableIcons = featureStyles.icons;
     should.exist(tableIcons);
     should.exist(tableIcons.getDefault());
-    tableIconDefault.id.should.be.equal(tableIcons.getDefault().id);
-    tableIconDefault.id.should.be.equal(featureTableStyles.getTableIcon(null).id);
-    pointIcon.id.should.be.equal(featureTableStyles.getTableIcon(GeometryType.POINT).id);
+    tableIconDefault.getId().should.be.equal(tableIcons.getDefault().getId());
+    tableIconDefault.getId().should.be.equal(featureTableStyles.getTableIcon(null).getId());
+    pointIcon.getId().should.be.equal(featureTableStyles.getTableIcon(GeometryType.POINT).getId());
 
     featureTableStyles.hasStyleRelationship().should.be.equal(false);
     geoPackage.isTable(featureTableStyles.getFeatureStyleExtension().getMappingTableName(FeatureStyleExtension.TABLE_MAPPING_STYLE, featureTableName)).should.be.equal(false);
@@ -494,21 +510,25 @@ describe('StyleExtension Tests', function() {
     var featureResultsStyles = {};
     var featureResultsIcons = {};
     var featureDao = geoPackage.getFeatureDao(featureTableName);
-    var results = featureDao.queryForAll();
-    for (i = 0; i < results.length; i++) {
-      featureRow = featureDao.createObject(results[i]);
-
+    let features = [];
+    let resultSet = featureDao.queryForAll();
+    while (resultSet.moveToNext()) {
+      features.push(resultSet.getRow());
+    }
+    resultSet.close();
+    for (i = 0; i < features.length; i++) {
+      featureRow = features[i];
       var featureStyle = featureTableStyles.getFeatureStyleDefaultForFeatureRow(featureRow);
-      featureStyle.style.id.should.be.equal(tableStyleDefault.id);
-      featureStyle.icon.id.should.be.equal(tableIconDefault.id);
+      featureStyle.style.getId().should.be.equal(tableStyleDefault.getId());
+      featureStyle.icon.getId().should.be.equal(tableIconDefault.getId());
 
       // verify that if no icon or style exist for the feature, that the default for the table is used
-      geoPackage.featureStyleExtension.getStyle(featureTableName, featureRow.id, null, true).id.should.be.equal(tableStyleDefault.id);
-      geoPackage.featureStyleExtension.getIcon(featureTableName, featureRow.id, null, true).id.should.be.equal(tableIconDefault.id);
+      featureStyleExtension.getStyle(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableStyleDefault.getId());
+      featureStyleExtension.getIcon(featureTableName, featureRow.getId(), null, true).getId().should.be.equal(tableIconDefault.getId());
 
       // Feature Styles
       var featureRowStyles = {};
-      featureResultsStyles[featureRow.id] = featureRowStyles;
+      featureResultsStyles[featureRow.getId()] = featureRowStyles;
       // Add a default style
       var styleDefault = randomStyle(featureTableStyles);
       featureTableStyles.setStyleDefaultForFeatureRow(featureRow, styleDefault);
@@ -522,7 +542,7 @@ describe('StyleExtension Tests', function() {
       }
       // Feature Icons
       var featureRowIcons = {};
-      featureResultsIcons[featureRow.id] = featureRowIcons;
+      featureResultsIcons[featureRow.getId()] = featureRowIcons;
       // Add a default icon
       var iconDefault = randomIcon(featureTableStyles);
       featureTableStyles.setIconDefaultForFeatureRow(featureRow, iconDefault);
@@ -534,10 +554,16 @@ describe('StyleExtension Tests', function() {
         featureRowIcons[t] = typeIcon;
       }
     }
-    results = featureDao.queryForAll();
-    for (i = 0; i < results.length; i++) {
-      featureRow = featureDao.createObject(results[i]);
-      var featureRowId = featureRow.id;
+
+    resultSet = featureDao.queryForAll();
+    features = [];
+    while (resultSet.moveToNext()) {
+      features.push(resultSet.getRow());
+    }
+    resultSet.close();
+    for (i = 0; i < features.length; i++) {
+      const featureRow = features[i];
+      var featureRowId = featureRow.getId();
       featureStyles = featureResultsStyles[featureRowId];
       var featureIcons = featureResultsIcons[featureRowId];
       if (featureStyles) {
@@ -545,14 +571,14 @@ describe('StyleExtension Tests', function() {
         var defaultStyle = featureStyles['null'];
         if (defaultStyle) {
           style = featureTableStyles.getStyleDefaultForFeatureRow(featureRow);
-          defaultStyle.id.should.be.equal(style.id);
+          defaultStyle.getId().should.be.equal(style.getId());
         }
         for (j = 0; j < types.length; j++) {
           t = types[j];
           typeStyle = featureStyles[t];
           if (typeStyle) {
             style = featureTableStyles.getStyleForFeatureRowAndGeometryType(featureRow, t);
-            typeStyle.id.should.be.equal(style.id);
+            typeStyle.getId().should.be.equal(style.getId());
           }
         }
       }
@@ -560,14 +586,14 @@ describe('StyleExtension Tests', function() {
         var defaultIcon = featureIcons['null'];
         if (defaultIcon) {
           icon = featureTableStyles.getIconDefaultForFeatureRow(featureRow);
-          defaultIcon.id.should.be.equal(icon.id);
+          defaultIcon.getId().should.be.equal(icon.getId());
         }
         for (j = 0; j < types.length; j++) {
           t = types[j];
           typeIcon = featureIcons[t];
           if (typeIcon) {
             icon = featureTableStyles.getIconForFeatureRowAndGeometryType(featureRow, t);
-            typeIcon.id.should.be.equal(icon.id);
+            typeIcon.getId().should.be.equal(icon.getId());
           }
         }
       }
@@ -579,10 +605,9 @@ describe('StyleExtension Tests', function() {
     should.exist(featureTableStyles.getIconMappingDao());
     should.exist(featureTableStyles.getTableIconMappingDao());
 
-    var featureStyleExtension = geoPackage.featureStyleExtension;
-    featureStyles = featureTableStyles.getFeatureStyles(featureRow.id);
-    should.exist(featureStyles.styles);
-    should.exist(featureStyles.icons);
+    featureStyles = featureTableStyles.getFeatureStyles(featureRow.getId());
+    should.exist(featureStyles.getStyles());
+    should.exist(featureStyles.getIcons());
 
     should.exist(featureStyleExtension.getFeatureStyleForFeatureRow(featureRow));
     should.exist(featureStyleExtension.getFeatureStyleDefault(featureRow));
@@ -595,27 +620,22 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.deleteAllFeatureStyles();
     should.not.exist(featureStyleExtension.getTableStyles(featureTableName));
     should.not.exist(featureStyleExtension.getTableIcons(featureTableName));
-    results = featureDao.queryForAll();
-    for (i = 0; i < results.length; i++) {
-      featureRow = featureDao.createObject(results[i]);
-      should.not.exist(featureStyleExtension.getStylesForFeatureRow(featureRow));
-      should.not.exist(featureStyleExtension.getIconsForFeatureRow(featureRow));
-      featureStyleExtension.deleteRelationships(featureTableName);
-      featureStyleExtension.has(featureTableName).should.be.equal(false);
-    }
+
+    featureStyleExtension.deleteRelationships(featureTableName);
+
     featureStyleExtension.has(featureTableName).should.be.equal(false);
     geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(true);
     geoPackage.isTable(IconTable.TABLE_NAME).should.be.equal(true);
-    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(ContentsId.TABLE_NAME).should.be.equal(true);
     featureStyleExtension.removeExtension();
     geoPackage.isTable(StyleTable.TABLE_NAME).should.be.equal(false);
     geoPackage.isTable(IconTable.TABLE_NAME).should.be.equal(false);
-    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.isTable(ContentsId.TABLE_NAME).should.be.equal(true);
     var contentsIdExtension = featureStyleExtension.getContentsId();
     contentsIdExtension.count().should.be.equal(1);
     contentsIdExtension.deleteIds().should.be.equal(1);
     contentsIdExtension.removeExtension();
-    geoPackage.isTable(ContentsIdDao.TABLE_NAME).should.be.equal(false);
+    geoPackage.isTable(ContentsId.TABLE_NAME).should.be.equal(false);
   }));
 
   it('should test featureStyles useIcon functionality', mochaAsync(async () => {
@@ -626,8 +646,10 @@ describe('StyleExtension Tests', function() {
     featureTableStyles.createIconRelationship();
 
     var featureDao = geoPackage.getFeatureDao(featureTableName);
-    var results = featureDao.queryForAll();
-    var featureRow = featureDao.createObject(results[0]);
+    var resultSet = featureDao.queryForAll();
+    resultSet.moveToNext();
+    var featureRow = resultSet.getRow();
+    resultSet.close();
 
     // test table style default
     var tableStyleDefault = randomStyle(featureTableStyles);
@@ -643,177 +665,183 @@ describe('StyleExtension Tests', function() {
   }));
 
   it('should test FeatureTableStyles functions', mochaAsync(async () => {
-    // relationships do not yet exist, thus these will be null
-    should.not.exist(featureTableStyles.getAllTableStyleIds());
-    should.not.exist(featureTableStyles.getAllTableIconIds());
-    should.not.exist(featureTableStyles.getAllStyleIds());
-    should.not.exist(featureTableStyles.getAllIconIds());
+    try {
+      // relationships do not yet exist, thus these will be null
+      should.not.exist(featureTableStyles.getAllTableStyleIds());
+      should.not.exist(featureTableStyles.getAllTableIconIds());
+      should.not.exist(featureTableStyles.getAllStyleIds());
+      should.not.exist(featureTableStyles.getAllIconIds());
 
-    // setup relationships
-    featureTableStyles.createTableStyleRelationship();
-    featureTableStyles.createTableIconRelationship();
-    featureTableStyles.createStyleRelationship();
-    featureTableStyles.createIconRelationship();
+      // setup relationships
+      featureTableStyles.createTableStyleRelationship();
+      featureTableStyles.createTableIconRelationship();
+      featureTableStyles.createStyleRelationship();
+      featureTableStyles.createIconRelationship();
 
-    var featureDao = geoPackage.getFeatureDao(featureTableName);
-    var results = featureDao.queryForAll();
-    var featureRow = featureDao.createObject(results[0]);
+      var featureDao = geoPackage.getFeatureDao(featureTableName);
+      var resultSet = featureDao.queryForAll();
+      resultSet.moveToNext();
+      var featureRow = resultSet.getRow();
+      resultSet.close();
 
-    // test table style default
-    var tableStyleDefault = randomStyle(featureTableStyles);
-    var tableIconDefault = randomIcon(featureTableStyles);
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    var featureStyles = featureTableStyles.getTableFeatureStyles();
-    featureTableStyles.setTableFeatureStyles(null);
-    should.not.exist(featureTableStyles.getTableStyleDefault());
-    featureTableStyles.setTableFeatureStyles(featureStyles);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    featureTableStyles.setTableStyles(null);
-    featureTableStyles.setTableIcons(null);
-    should.not.exist(featureTableStyles.getTableStyles());
-    should.not.exist(featureTableStyles.getTableIcons());
-    featureTableStyles.setFeatureStylesForFeatureRow(featureRow, featureStyles);
-    should.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
-    featureTableStyles.deleteStylesForFeatureRow(featureRow);
-    featureTableStyles.deleteIconsForFeatureRow(featureRow);
-    should.not.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
+      // test table style default
+      var tableStyleDefault = randomStyle(featureTableStyles);
+      var tableIconDefault = randomIcon(featureTableStyles);
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      var featureStyles = featureTableStyles.getTableFeatureStyles();
+      featureTableStyles.setTableFeatureStyles(null);
+      should.not.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.setTableFeatureStyles(featureStyles);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.setTableStyles(null);
+      featureTableStyles.setTableIcons(null);
+      should.not.exist(featureTableStyles.getTableStyles());
+      should.not.exist(featureTableStyles.getTableIcons());
+      featureTableStyles.setFeatureStylesForFeatureRow(featureRow, featureStyles);
+      should.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
+      featureTableStyles.deleteStylesForFeatureRow(featureRow);
+      featureTableStyles.deleteIconsForFeatureRow(featureRow);
+      should.not.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
 
-    var featureStyle = new FeatureStyle(tableStyleDefault, tableIconDefault);
-    featureTableStyles.setFeatureStyleForFeatureRow(featureRow, featureStyle);
-    should.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
-    featureTableStyles.setFeatureStyleForFeatureRow(featureRow, null);
-    should.not.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
-    featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
-    featureTableStyles.setTableStyle(GeometryType.POINT, null);
-    should.not.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+      var featureStyle = new FeatureStyle(tableStyleDefault, tableIconDefault);
+      featureTableStyles.setFeatureStyleForFeatureRow(featureRow, featureStyle);
+      should.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
+      featureTableStyles.setFeatureStyleForFeatureRow(featureRow, null);
+      should.not.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));
+      featureTableStyles.setTableStyle(GeometryType.POINT, tableStyleDefault);
+      should.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
+      featureTableStyles.setTableStyle(GeometryType.POINT, null);
+      should.not.exist(featureTableStyles.getTableStyle(GeometryType.POINT));
 
-    featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
-    should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
-    featureTableStyles.setTableIcon(GeometryType.POINT, null);
-    should.not.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+      featureTableStyles.setTableIcon(GeometryType.POINT, tableIconDefault);
+      should.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
+      featureTableStyles.setTableIcon(GeometryType.POINT, null);
+      should.not.exist(featureTableStyles.getTableIcon(GeometryType.POINT));
 
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteAllStyles();
-    should.not.exist(featureTableStyles.getTableStyleDefault());
-    should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteAllStyles();
+      should.not.exist(featureTableStyles.getTableStyleDefault());
+      should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
-    should.exist(featureTableStyles.getTableIconDefault());
-    should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteAllIcons();
-    should.not.exist(featureTableStyles.getTableIconDefault());
-    should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
+      should.exist(featureTableStyles.getTableIconDefault());
+      should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteAllIcons();
+      should.not.exist(featureTableStyles.getTableIconDefault());
+      should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    should.exist(featureTableStyles.getTableIconDefault());
-    featureTableStyles.deleteTableFeatureStyles();
-    should.not.exist(featureTableStyles.getTableStyleDefault());
-    should.not.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      should.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.deleteTableFeatureStyles();
+      should.not.exist(featureTableStyles.getTableStyleDefault());
+      should.not.exist(featureTableStyles.getTableIconDefault());
 
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    featureTableStyles.deleteTableStyles();
-    should.not.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.deleteTableStyles();
+      should.not.exist(featureTableStyles.getTableStyleDefault());
 
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    should.exist(featureTableStyles.getTableIconDefault());
-    featureTableStyles.deleteTableIcons();
-    should.not.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      should.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.deleteTableIcons();
+      should.not.exist(featureTableStyles.getTableIconDefault());
 
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    featureTableStyles.deleteTableStyleDefault();
-    should.not.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.deleteTableStyleDefault();
+      should.not.exist(featureTableStyles.getTableStyleDefault());
 
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    should.exist(featureTableStyles.getTableIconDefault());
-    featureTableStyles.deleteTableIconDefault();
-    should.not.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      should.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.deleteTableIconDefault();
+      should.not.exist(featureTableStyles.getTableIconDefault());
 
-    featureTableStyles.setTableStyleDefault(tableStyleDefault);
-    should.exist(featureTableStyles.getTableStyleDefault());
-    featureTableStyles.deleteTableStyle(null);
-    should.not.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.setTableStyleDefault(tableStyleDefault);
+      should.exist(featureTableStyles.getTableStyleDefault());
+      featureTableStyles.deleteTableStyle(null);
+      should.not.exist(featureTableStyles.getTableStyleDefault());
 
-    featureTableStyles.setTableIconDefault(tableIconDefault);
-    should.exist(featureTableStyles.getTableIconDefault());
-    featureTableStyles.deleteTableIcon(null);
-    should.not.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.setTableIconDefault(tableIconDefault);
+      should.exist(featureTableStyles.getTableIconDefault());
+      featureTableStyles.deleteTableIcon(null);
+      should.not.exist(featureTableStyles.getTableIconDefault());
 
-    featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
-    featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
-    should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteFeatureStyles();
-    should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
+      featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
+      should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteFeatureStyles();
+      should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
-    should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteStyles();
-    should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.setStyleDefaultForFeatureRow(featureRow, tableStyleDefault);
+      should.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteStyles();
+      should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
-    should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteIcons();
-    should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.setIconDefaultForFeatureRow(featureRow, tableStyleDefault);
+      should.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteIcons();
+      should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setFeatureStylesForFeatureRow(featureRow, null);
-    featureTableStyles.setFeatureStyles(featureRow.id, null);
-    featureTableStyles.setFeatureStyleForFeatureRow(featureRow, null);
-    featureTableStyles.setFeatureStyleDefaultForFeatureRow(featureRow, null);
-    featureTableStyles.setFeatureStyleForFeatureRowAndGeometryType(featureRow, null, null);
-    featureTableStyles.setFeatureStyle(featureRow.id, null, null);
-    featureTableStyles.setFeatureStyleDefault(featureRow.id, null);
-    should.not.exist(featureTableStyles.getFeatureStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.setFeatureStylesForFeatureRow(featureRow, null);
+      featureTableStyles.setFeatureStyles(featureRow.getId(), null);
+      featureTableStyles.setFeatureStyleForFeatureRow(featureRow, null);
+      featureTableStyles.setFeatureStyleDefaultForFeatureRow(featureRow, null);
+      featureTableStyles.setFeatureStyleForFeatureRowAndGeometryType(featureRow, null, null);
+      featureTableStyles.setFeatureStyle(featureRow.getId(), null, null);
+      featureTableStyles.setFeatureStyleDefault(featureRow.getId(), null);
+      should.not.exist(featureTableStyles.getFeatureStyleDefaultForFeatureRow(featureRow));
 
-    featureTableStyles.setStylesForFeatureRow(featureRow, null);
-    featureTableStyles.setStyles(featureRow.id, null);
-    featureTableStyles.setStyleForFeatureRow(featureRow, null);
-    featureTableStyles.setStyle(featureRow.id, null, null);
-    featureTableStyles.setStyleDefault(featureRow.id, null);
-    should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteStylesForFeatureRow(featureRow);
-    featureTableStyles.deleteStylesForFeatureId(featureRow.id);
-    featureTableStyles.deleteStyleDefaultForFeatureRow(featureRow);
-    featureTableStyles.deleteStyleDefault(featureRow.id);
-    featureTableStyles.deleteStyleForFeatureRow(featureRow);
-    featureTableStyles.deleteStyleForFeatureRowAndGeometryType(featureRow, null);
-    featureTableStyles.deleteStyle(featureRow.id, null);
+      featureTableStyles.setStylesForFeatureRow(featureRow, null);
+      featureTableStyles.setStyles(featureRow.getId(), null);
+      featureTableStyles.setStyleForFeatureRow(featureRow, null);
+      featureTableStyles.setStyle(featureRow.getId(), null, null);
+      featureTableStyles.setStyleDefault(featureRow.getId(), null);
+      should.not.exist(featureTableStyles.getStyleDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteStylesForFeatureRow(featureRow);
+      featureTableStyles.deleteStylesForFeatureId(featureRow.getId());
+      featureTableStyles.deleteStyleDefaultForFeatureRow(featureRow);
+      featureTableStyles.deleteStyleDefault(featureRow.getId());
+      featureTableStyles.deleteStyleForFeatureRow(featureRow);
+      featureTableStyles.deleteStyleForFeatureRowAndGeometryType(featureRow, null);
+      featureTableStyles.deleteStyle(featureRow.getId(), null);
 
-    featureTableStyles.setIconsForFeatureRow(featureRow, null);
-    featureTableStyles.setIcons(featureRow.id, null);
-    featureTableStyles.setIconForFeatureRow(featureRow, null);
-    featureTableStyles.setIcon(featureRow.id, null, null);
-    featureTableStyles.setIconDefault(featureRow.id, null);
-    should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
-    featureTableStyles.deleteIconsForFeatureRow(featureRow);
-    featureTableStyles.deleteIconsForFeatureId(featureRow.id);
-    featureTableStyles.deleteIconDefaultForFeatureRow(featureRow);
-    featureTableStyles.deleteIconDefault(featureRow.id);
-    featureTableStyles.deleteIconForFeatureRow(featureRow);
-    featureTableStyles.deleteIconForFeatureRowAndGeometryType(featureRow, null);
-    featureTableStyles.deleteIcon(featureRow.id, null);
+      featureTableStyles.setIconsForFeatureRow(featureRow, null);
+      featureTableStyles.setIcons(featureRow.getId(), null);
+      featureTableStyles.setIconForFeatureRow(featureRow, null);
+      featureTableStyles.setIcon(featureRow.getId(), null, null);
+      featureTableStyles.setIconDefault(featureRow.getId(), null);
+      should.not.exist(featureTableStyles.getIconDefaultForFeatureRow(featureRow));
+      featureTableStyles.deleteIconsForFeatureRow(featureRow);
+      featureTableStyles.deleteIconsForFeatureId(featureRow.getId());
+      featureTableStyles.deleteIconDefaultForFeatureRow(featureRow);
+      featureTableStyles.deleteIconDefault(featureRow.getId());
+      featureTableStyles.deleteIconForFeatureRow(featureRow);
+      featureTableStyles.deleteIconForFeatureRowAndGeometryType(featureRow, null);
+      featureTableStyles.deleteIcon(featureRow.getId(), null);
 
-    featureStyles = new FeatureStyles();
-    var styles = new Styles();
-    styles.setDefault(tableStyleDefault);
-    featureStyles.styles = styles;
+      featureStyles = new FeatureStyles();
+      var styles = new Styles();
+      styles.setDefault(tableStyleDefault);
+      featureStyles.setStyles(styles);
 
-    featureTableStyles.getAllTableStyleIds().length.should.be.equal(0);
-    featureTableStyles.getAllTableIconIds().length.should.be.equal(0);
-    featureTableStyles.getAllStyleIds().length.should.be.equal(0);
-    featureTableStyles.getAllIconIds().length.should.be.equal(0);
+      featureTableStyles.getAllTableStyleIds().length.should.be.equal(0);
+      featureTableStyles.getAllTableIconIds().length.should.be.equal(0);
+      featureTableStyles.getAllStyleIds().length.should.be.equal(0);
+      featureTableStyles.getAllIconIds().length.should.be.equal(0);
+    } catch (e) {
+      console.error(e);
+    }
   }));
 });

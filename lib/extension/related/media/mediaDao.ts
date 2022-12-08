@@ -64,7 +64,7 @@ export class MediaDao extends UserCustomDao {
   public getRows(ids: number[]): MediaRow[] {
     const mediaRows = [];
     for (const id of ids) {
-      const userCustomRow = this.queryForIdRow(id);
+      const userCustomRow = this.queryForId(id);
       if (userCustomRow != null) {
         mediaRows.push(this.getRow(userCustomRow));
       }
