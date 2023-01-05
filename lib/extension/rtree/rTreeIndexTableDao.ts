@@ -545,7 +545,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @return feature row
    */
   public getFeatureRow(row: RTreeIndexTableRow): FeatureRow {
-    return this.featureDao.queryForId(row.getId());
+    return this.featureDao.queryForIdRow(row.getId());
   }
 
   /**
@@ -730,8 +730,6 @@ export class RTreeIndexTableDao extends UserCustomDao {
 
   /**
    * Query for all features
-   * @param distinct distinct column values
-   * @param columns columns
    * @param where where
    * @param whereArgs where args
    * @return feature results

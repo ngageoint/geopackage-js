@@ -33,9 +33,9 @@ export class StyleMappingDao extends UserMappingDao {
   }
 
   /**
-   * Create a new {module:user/custom~UserCustomTable}
-   * @param  {module:user/custom~UserCustomDao} userCustomDao
-   * @return {module:user/custom~UserCustomTable} userCustomTable user custom table
+   * Create a new {UserCustomTable}
+   * @param  {UserCustomDao} userCustomDao
+   * @return {UserCustomTable} userCustomTable user custom table
    */
   static createMappingTable(userCustomDao: UserCustomDao): StyleMappingTable {
     return new StyleMappingTable(userCustomDao.getTableName(), userCustomDao.getColumns(), null);
@@ -54,8 +54,8 @@ export class StyleMappingDao extends UserMappingDao {
    *            result set
    * @return style mapping row
    */
-  public getRowWithResultSet(resultSet: UserCustomResultSet): StyleMappingRow {
-    return this.getRow(resultSet.getRow());
+  public getRow(resultSet: UserCustomResultSet): StyleMappingRow {
+    return this.getRowWithUserCustomRow(resultSet.getRow());
   }
 
   /**
@@ -65,7 +65,7 @@ export class StyleMappingDao extends UserMappingDao {
    *            custom row
    * @return style mapping row
    */
-  public getRow(row: UserCustomRow): StyleMappingRow {
+  public getRowWithUserCustomRow(row: UserCustomRow): StyleMappingRow {
     return new StyleMappingRow(row);
   }
 
@@ -80,7 +80,7 @@ export class StyleMappingDao extends UserMappingDao {
     const rows = [];
     const resultSet = this.queryByBaseId(id);
     while (resultSet.moveToNext()) {
-      rows.push(this.getRowWithResultSet(resultSet));
+      rows.push(this.getRow(resultSet));
     }
     return rows;
   }

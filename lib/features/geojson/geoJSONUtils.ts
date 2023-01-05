@@ -30,20 +30,21 @@ export class GeoJSONUtils {
       console.log('Error parsing Geometry', e);
     }
     if (geoJson.geometry != null) {
-      for (const columnName in featureRow.getColumns().getColumnNames()) {
+      for (const columnName of featureRow.getColumns().getColumnNames()) {
+        const value = featureRow.getValue(columnName);
         if (columnName !== featureRow.getGeometryColumnName()) {
           if (columnName.toLowerCase() === '_feature_id') {
-            geoJson.id = featureRow.getValue(columnName) as string | number;
+            geoJson.id = value as string | number;
           } else if (columnName.toLowerCase() === 'id') {
-            geoJson.properties[columnName] = featureRow.getValue(columnName);
+            geoJson.properties[columnName] = value;
           } else if (columnName.toLowerCase() === '_properties_id') {
-            geoJson.properties[columnName.substring(12)] = featureRow.getValue(columnName);
+            geoJson.properties[columnName.substring(12)] = value;
           } else {
-            geoJson.properties[dataColumnsMap ? dataColumnsMap.get(columnName) : columnName ] = featureRow.getValue(columnName);
+            geoJson.properties[dataColumnsMap != null && dataColumnsMap.has(columnName) ? dataColumnsMap.get(columnName) : columnName] = value;
           }
         }
       }
-      geoJson.id = geoJson.id || featureRow.id;
+      geoJson.id = geoJson.id || featureRow.getId();
     }
     return geoJson
   }

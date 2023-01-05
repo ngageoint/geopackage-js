@@ -1,7 +1,10 @@
+const { GeometryEnvelope } = require("@ngageoint/simple-features-js");
+const { env } = require("rtree-sql.js/.eslintrc");
 var GeoPackageGeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData;
 
 var GeometryWriter = require('@ngageoint/simple-features-wkb-js').GeometryWriter
   , Point = require('@ngageoint/simple-features-js').Point
+  , ByteOrder = require("@ngageoint/simple-features-wkb-js").ByteOrder
   , should = require('chai').should();
 
 describe('Geometry Data tests', function() {
@@ -30,7 +33,7 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version]);
     (function() {
       var geometryData = new GeoPackageGeometryData(buffer);
-    }).should.throw('Unexpected GeoPackage Geometry version 1, Expected: 0');
+    }).should.throw('Unexpected GeoPackage Geometry version: 1, Expected: 0');
   });
 
   it('should throw unexpected geometry flags where 7 is 1 and 6 is 1', function() {
@@ -66,37 +69,25 @@ describe('Geometry Data tests', function() {
 
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
-    geometryData.extended.should.be.equal(true);
+    geometryData.isExtended().should.be.equal(true);
 
-    var buffer = geometryData.toData();
+    buffer = geometryData.toBuffer();
     var geometryData2 = new GeoPackageGeometryData(buffer);
-    geometryData2.extended.should.be.equal(true);
+    geometryData2.isExtended().should.be.equal(true);
   });
 
   it('should set empty to true', function() {
     var flags = Buffer.alloc(1);
     flags.writeUInt8(32);
 
-    var buffer = Buffer.concat([magic, version, flags, srs]);
+    let buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
-    geometryData.extended.should.be.equal(true);
-    geometryData.empty = true;
+    geometryData.isExtended().should.be.equal(true);
+    geometryData.setEmpty(true);
 
-    var buffer = geometryData.toData();
+    buffer = geometryData.toBuffer();
     var geometryData2 = new GeoPackageGeometryData(buffer);
-    geometryData2.empty.should.be.equal(true);
-  });
-
-  it('should fail to parse the geometry but not throw an error', function() {
-    var flags = Buffer.alloc(1);
-    flags.writeUInt8(32);
-
-    var badGeom = Buffer.alloc(1);
-    badGeom.writeUInt8(0);
-
-    var buffer = Buffer.concat([magic, version, flags, srs, badGeom]);
-    var geometryData = new GeoPackageGeometryData(buffer);
-    should.exist(geometryData.geometryError);
+    geometryData2.isEmpty().should.be.equal(true);
   });
 
   it('should set byte order to little endian', function() {
@@ -104,7 +95,7 @@ describe('Geometry Data tests', function() {
     flags.writeUInt8(1);
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
-    geometryData.byteOrder.should.be.equal(1);
+    geometryData.getByteOrder().should.be.equal(ByteOrder.LITTLE_ENDIAN);
   });
 
   it('should export byte order as little endian', function() {
@@ -114,7 +105,7 @@ describe('Geometry Data tests', function() {
     var geometryData = new GeoPackageGeometryData(buffer);
     geometryData.byteOrder.should.be.equal(1);
 
-    var buffer = geometryData.toData();
+    var buffer = geometryData.toBuffer();
     var geometryData2 = new GeoPackageGeometryData(buffer);
     geometryData2.byteOrder.should.be.equal(1);
   });
@@ -138,14 +129,14 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version, tflags, srs, envelope, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    geometryData.envelope.minX.should.be.equal(5.0);
-    geometryData.envelope.maxX.should.be.equal(78.0);
-    geometryData.envelope.minY.should.be.equal(29.0);
-    geometryData.envelope.maxY.should.be.equal(12.0);
-    geometryData.envelope.hasZ.should.be.equal(false);
-    geometryData.envelope.hasM.should.be.equal(false);
-    geometryData.geometry.x.should.be.equal(1);
-    geometryData.geometry.y.should.be.equal(2);
+    geometryData.getEnvelope().minX.should.be.equal(5.0);
+    geometryData.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData.getEnvelope().minY.should.be.equal(29.0);
+    geometryData.getEnvelope().maxY.should.be.equal(12.0);
+    geometryData.getEnvelope().hasZ.should.be.equal(false);
+    geometryData.getEnvelope().hasM.should.be.equal(false);
+    geometryData.getGeometry().x.should.be.equal(1);
+    geometryData.getGeometry().y.should.be.equal(2);
   });
 
   it('should parse the big endian envelope with z', function() {
@@ -161,16 +152,16 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version, tflags, srs, envelope, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    geometryData.envelope.minX.should.be.equal(5.0);
-    geometryData.envelope.maxX.should.be.equal(78.0);
-    geometryData.envelope.minY.should.be.equal(29.0);
-    geometryData.envelope.maxY.should.be.equal(12.0);
-    geometryData.envelope.hasZ.should.be.equal(true);
-    geometryData.envelope.minZ.should.be.equal(87.0);
-    geometryData.envelope.maxZ.should.be.equal(99.0);
-    geometryData.envelope.hasM.should.be.equal(false);
-    geometryData.geometry.x.should.be.equal(1);
-    geometryData.geometry.y.should.be.equal(2);
+    geometryData.getEnvelope().minX.should.be.equal(5.0);
+    geometryData.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData.getEnvelope().minY.should.be.equal(29.0);
+    geometryData.getEnvelope().maxY.should.be.equal(12.0);
+    geometryData.getEnvelope().hasZ.should.be.equal(true);
+    geometryData.getEnvelope().minZ.should.be.equal(87.0);
+    geometryData.getEnvelope().maxZ.should.be.equal(99.0);
+    geometryData.getEnvelope().hasM.should.be.equal(false);
+    geometryData.getGeometry().x.should.be.equal(1);
+    geometryData.getGeometry().y.should.be.equal(2);
   });
 
   it('should parse the big endian envelope with m', function() {
@@ -186,16 +177,16 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version, tflags, srs, envelope, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    geometryData.envelope.minX.should.be.equal(5.0);
-    geometryData.envelope.maxX.should.be.equal(78.0);
-    geometryData.envelope.minY.should.be.equal(29.0);
-    geometryData.envelope.maxY.should.be.equal(12.0);
-    geometryData.envelope.hasZ.should.be.equal(false);
-    geometryData.envelope.hasM.should.be.equal(true);
-    geometryData.envelope.minM.should.be.equal(87.0);
-    geometryData.envelope.maxM.should.be.equal(99.0);
-    geometryData.geometry.x.should.be.equal(1);
-    geometryData.geometry.y.should.be.equal(2);
+    geometryData.getEnvelope().minX.should.be.equal(5.0);
+    geometryData.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData.getEnvelope().minY.should.be.equal(29.0);
+    geometryData.getEnvelope().maxY.should.be.equal(12.0);
+    geometryData.getEnvelope().hasZ.should.be.equal(false);
+    geometryData.getEnvelope().hasM.should.be.equal(true);
+    geometryData.getEnvelope().minM.should.be.equal(87.0);
+    geometryData.getEnvelope().maxM.should.be.equal(99.0);
+    geometryData.getGeometry().x.should.be.equal(1);
+    geometryData.getGeometry().y.should.be.equal(2);
   });
 
   it('should parse the big endian envelope with m and z', function() {
@@ -213,18 +204,18 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version, tflags, srs, envelope, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
     geometryData.byteOrder.should.be.equal(0);
-    geometryData.envelope.minX.should.be.equal(5.0);
-    geometryData.envelope.maxX.should.be.equal(78.0);
-    geometryData.envelope.minY.should.be.equal(29.0);
-    geometryData.envelope.maxY.should.be.equal(12.0);
-    geometryData.envelope.hasZ.should.be.equal(true);
-    geometryData.envelope.minZ.should.be.equal(87.0);
-    geometryData.envelope.maxZ.should.be.equal(99.0);
-    geometryData.envelope.hasM.should.be.equal(true);
-    geometryData.envelope.minM.should.be.equal(45.0);
-    geometryData.envelope.maxM.should.be.equal(55.0);
-    geometryData.geometry.x.should.be.equal(1);
-    geometryData.geometry.y.should.be.equal(2);
+    geometryData.getEnvelope().minX.should.be.equal(5.0);
+    geometryData.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData.getEnvelope().minY.should.be.equal(29.0);
+    geometryData.getEnvelope().maxY.should.be.equal(12.0);
+    geometryData.getEnvelope().hasZ.should.be.equal(true);
+    geometryData.getEnvelope().minZ.should.be.equal(87.0);
+    geometryData.getEnvelope().maxZ.should.be.equal(99.0);
+    geometryData.getEnvelope().hasM.should.be.equal(true);
+    geometryData.getEnvelope().minM.should.be.equal(45.0);
+    geometryData.getEnvelope().maxM.should.be.equal(55.0);
+    geometryData.getGeometry().x.should.be.equal(1);
+    geometryData.getGeometry().y.should.be.equal(2);
   });
 
   it('should parse the Uint8Array', function() {
@@ -242,19 +233,19 @@ describe('Geometry Data tests', function() {
     var buffer = Buffer.concat([magic, version, tflags, srs, envelope, point]);
     var array = new Uint8Array(buffer);
     var geometryData = new GeoPackageGeometryData(array);
-    geometryData.byteOrder.should.be.equal(0);
-    geometryData.envelope.minX.should.be.equal(5.0);
-    geometryData.envelope.maxX.should.be.equal(78.0);
-    geometryData.envelope.minY.should.be.equal(29.0);
-    geometryData.envelope.maxY.should.be.equal(12.0);
-    geometryData.envelope.hasZ.should.be.equal(true);
-    geometryData.envelope.minZ.should.be.equal(87.0);
-    geometryData.envelope.maxZ.should.be.equal(99.0);
-    geometryData.envelope.hasM.should.be.equal(true);
-    geometryData.envelope.minM.should.be.equal(45.0);
-    geometryData.envelope.maxM.should.be.equal(55.0);
-    geometryData.geometry.x.should.be.equal(1);
-    geometryData.geometry.y.should.be.equal(2);
+    geometryData.getByteOrder().should.be.equal(ByteOrder.BIG_ENDIAN);
+    geometryData.getEnvelope().minX.should.be.equal(5.0);
+    geometryData.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData.getEnvelope().minY.should.be.equal(29.0);
+    geometryData.getEnvelope().maxY.should.be.equal(12.0);
+    geometryData.getEnvelope().hasZ.should.be.equal(true);
+    geometryData.getEnvelope().minZ.should.be.equal(87.0);
+    geometryData.getEnvelope().maxZ.should.be.equal(99.0);
+    geometryData.getEnvelope().hasM.should.be.equal(true);
+    geometryData.getEnvelope().minM.should.be.equal(45.0);
+    geometryData.getEnvelope().maxM.should.be.equal(55.0);
+    geometryData.getGeometry().x.should.be.equal(1);
+    geometryData.getGeometry().y.should.be.equal(2);
   });
 
   it('should throw unexpected geometry flags error', function() {
@@ -269,53 +260,54 @@ describe('Geometry Data tests', function() {
   it('should get the point out', function() {
     var buffer = Buffer.concat([magic, version, flags, srs, point]);
     var geometryData = new GeoPackageGeometryData(buffer);
-    geometryData.byteOrder.should.be.equal(0);
+    geometryData.getByteOrder().should.be.equal(0);
   });
 
   it('should create a point geometry data with an envelope', function() {
     var geometryData = new GeoPackageGeometryData();
-    geometryData.empty.should.be.equal(true);
+    geometryData.isEmpty().should.be.equal(true);
     geometryData.setSrsId(4326);
     geometryData.setGeometry(rawPoint);
-    geometryData.empty.should.be.equal(false);
-    geometryData.setEnvelope({
-      minX: 5.0,
-      maxX: 78.0,
-      minY: 12.0,
-      maxY: 29.0,
-      hasZ: true,
-      minZ: 87.0,
-      maxZ: 99.0,
-      hasM: true,
-      minM: 45.0,
-      maxM: 55.0
-    });
-    var buffer = geometryData.toData();
+    geometryData.isEmpty().should.be.equal(false);
+    const envelope = new GeometryEnvelope(
+      5.0,
+      12.0,
+      87.0,
+      45.0,
+      78.0,
+      29.0,
+      99.0,
+      55.0
+    );
+    envelope.hasZ = true;
+    envelope.hasM = true;
+    geometryData.setEnvelope(envelope);
+    var buffer = geometryData.toBuffer();
     var geometryData2 = new GeoPackageGeometryData(buffer);
-    geometryData2.byteOrder.should.be.equal(0);
-    geometryData2.envelope.minX.should.be.equal(5.0);
-    geometryData2.envelope.maxX.should.be.equal(78.0);
-    geometryData2.envelope.minY.should.be.equal(12.0);
-    geometryData2.envelope.maxY.should.be.equal(29.0);
-    geometryData2.envelope.hasZ.should.be.equal(true);
-    geometryData2.envelope.minZ.should.be.equal(87.0);
-    geometryData2.envelope.maxZ.should.be.equal(99.0);
-    geometryData2.envelope.hasM.should.be.equal(true);
-    geometryData2.envelope.minM.should.be.equal(45.0);
-    geometryData2.envelope.maxM.should.be.equal(55.0);
-    geometryData2.geometry.x.should.be.equal(1);
-    geometryData2.geometry.y.should.be.equal(2);
+    geometryData2.getByteOrder().should.be.equal(ByteOrder.BIG_ENDIAN);
+    geometryData2.getEnvelope().minX.should.be.equal(5.0);
+    geometryData2.getEnvelope().maxX.should.be.equal(78.0);
+    geometryData2.getEnvelope().minY.should.be.equal(12.0);
+    geometryData2.getEnvelope().maxY.should.be.equal(29.0);
+    geometryData2.getEnvelope().hasZ.should.be.equal(true);
+    geometryData2.getEnvelope().minZ.should.be.equal(87.0);
+    geometryData2.getEnvelope().maxZ.should.be.equal(99.0);
+    geometryData2.getEnvelope().hasM.should.be.equal(true);
+    geometryData2.getEnvelope().minM.should.be.equal(45.0);
+    geometryData2.getEnvelope().maxM.should.be.equal(55.0);
+    geometryData2.getGeometry().x.should.be.equal(1);
+    geometryData2.getGeometry().y.should.be.equal(2);
   });
 
   it('should create a point geometry data without an envelope', function() {
     var geometryData = new GeoPackageGeometryData();
     geometryData.setSrsId(4326);
     geometryData.setGeometry(rawPoint);
-    var buffer = geometryData.toData();
+    var buffer = geometryData.toBuffer();
     var geometryData2 = new GeoPackageGeometryData(buffer);
-    geometryData2.byteOrder.should.be.equal(0);
-    geometryData2.geometry.x.should.be.equal(1);
-    geometryData2.geometry.y.should.be.equal(2);
+    geometryData2.getByteOrder().should.be.equal(ByteOrder.BIG_ENDIAN);
+    geometryData2.getGeometry().x.should.be.equal(1);
+    geometryData2.getGeometry().y.should.be.equal(2);
   });
 
 });

@@ -7,7 +7,7 @@ import { TileColumn } from './tileColumn';
 import { UserColumns } from '../../user/userColumns';
 
 /**
- * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
+ * `TileColumn` models columns in [user tile pyramid tables]{@link TileTable}.
  */
 export class TileColumns extends UserColumns<TileColumn> {
   /**

@@ -23,6 +23,7 @@ import type { FeatureDao } from '../../../features/user/featureDao';
 import { DBValue } from '../../../db/dbValue';
 import { NGAExtensions } from '../ngaExtensions';
 import { NGAExtensionsConstants } from '../ngaExtensionsConstants';
+import { SQLUtils } from '../../../db/sqlUtils';
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -1030,7 +1031,7 @@ export class FeatureTableIndex extends BaseExtension {
    */
   public getFeatureRow(geometryIndex: GeometryIndex): FeatureRow {
     const geomId = geometryIndex.getGeomId();
-    return this.featureDao.queryForId(geomId);
+    return this.featureDao.queryForIdRow(geomId);
   }
 
   /**
@@ -1041,7 +1042,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @return feature results
    */
   public queryFeaturesWithGeometryEnvelope(envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
-    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, undefined, envelope, where, whereArgs);
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(envelope, undefined, undefined, where, whereArgs);
   }
 
   /**
@@ -1052,8 +1053,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs
    * @return feature results
    */
-  public queryFeaturesWithGeometryEnvelopeAndDistinct(distinct: boolean, envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
-    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct, undefined, envelope, where, whereArgs);
+  public queryFeaturesWithGeometryEnvelopeAndDistinct(envelope: GeometryEnvelope, distinct: boolean, where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(envelope, distinct, undefined, where, whereArgs);
   }
 
   /**
@@ -1064,22 +1065,42 @@ export class FeatureTableIndex extends BaseExtension {
    * @param whereArgs
    * @return feature results
    */
-  public queryFeaturesWithGeometryEnvelopeAndColumns(columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
-    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(undefined, columns, envelope, where, whereArgs);
+  public queryFeaturesWithGeometryEnvelopeAndColumns(envelope: GeometryEnvelope, columns: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+    return this.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(envelope, undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Build SQL for selecting ids from the query builder
+   *
+   * @param envelope
+   * @return SQL
+   */
+  private queryIdsSQL(envelope?: GeometryEnvelope): { sql: string, args: any[]} {
+    const { where, whereArgs } = envelope != null ? this.queryBuilderWithGeometryEnvelope(envelope) : this.queryBuilder();
+
+    let sql = 'SELECT ' + SQLUtils.quoteWrap(GeometryIndex.COLUMN_GEOM_ID) + ' FROM ' + SQLUtils.quoteWrap(GeometryIndex.TABLE_NAME);
+
+    if (where) {
+      sql += ' WHERE ' + where;
+    }
+    return {
+      sql: sql,
+      args: whereArgs
+    }
   }
 
   /**
    * Query for features within the geometry envelope
+   * @param envelope geometry envelope
    * @param distinct distinct rows
    * @param columns columns
-   * @param envelope geometry envelope
    * @param where
    * @param whereArgs
    * @return feature results
    */
-  public queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where?: string, whereArgs?: any[]): FeatureResultSet {
-    const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+  public queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(envelope: GeometryEnvelope, distinct: boolean, columns: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
+    const nestedQuery = this.queryIdsSQL(envelope);
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.sql, nestedQuery.args, where, whereArgs);
   }
 
   /**
@@ -1123,8 +1144,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return feature results
    */
   public queryFeaturesWithDistinctAndColumns(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureResultSet {
-    const nestedQuery = this.queryBuilder();
-    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    const nestedQuery = this.queryIdsSQL();
+    return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, nestedQuery.sql, nestedQuery.args, where, whereArgs);
   }
 
   /**
@@ -1168,8 +1189,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return count
    */
   public countFeaturesWithDistinctAndColumn(distinct?: boolean, column?: string, where?: string, whereArgs?: any[]): number {
-    const nestedQuery = this.queryBuilder();
-    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    const nestedQuery = this.queryIdsSQL();
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.sql, nestedQuery.args, where, whereArgs);
   }
 
   /**
@@ -1178,8 +1199,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return count
    */
   public countColumnFeatures(column: string): number {
-    const nestedQuery = this.queryBuilder();
-    return this.featureDao.countInWithColumn(column, nestedQuery.where, nestedQuery.whereArgs);
+    const nestedQuery = this.queryIdsSQL();
+    return this.featureDao.countInWithColumn(column, nestedQuery.sql, nestedQuery.args);
   }
 
   /**
@@ -1328,8 +1349,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return count
    */
   public countFeaturesWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, column: string, envelope: GeometryEnvelope, where: string, whereArgs: any[]): number {
-    const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs);
+    const nestedQuery = this.queryIdsSQL(envelope);
+    return this.featureDao.countInWithDistinctAndColumn(distinct, column, nestedQuery.sql, nestedQuery.args, where, whereArgs);
   }
 
   /**
@@ -1514,10 +1535,10 @@ export class FeatureTableIndex extends BaseExtension {
    * @return feature results
    */
   public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
-    const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
+    const nestedQuery = this.queryIdsSQL(envelope);
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs, undefined, undefined, orderBy, limit, offset);
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.sql, nestedQuery.args, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**
@@ -1641,8 +1662,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return feature results
    */
   public queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, where: string, whereArgs: any[], orderBy: string, limit: number, offset: number): FeatureResultSet {
-    const nestedQuery = this.queryBuilderWithGeometryEnvelope(envelope);
-    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.where, nestedQuery.whereArgs, where, whereArgs, undefined, undefined, orderBy, limit, offset);
+    const nestedQuery = this.queryIdsSQL(envelope);
+    return this.featureDao.queryInForChunkWithDistinctAndColumns(distinct, columns, nestedQuery.sql, nestedQuery.args, where, whereArgs, undefined, undefined, orderBy, limit, offset);
   }
 
   /**

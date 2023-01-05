@@ -17,9 +17,9 @@ import { UserCustomColumn } from '../../user/custom/userCustomColumn';
  * @param  {string} tableName       table name
  * @param  {string} relationName    relation name
  * @param  {string} dataType        Contents data type
- * @param  {module:user/userColumn~UserColumn} columns         columns
+ * @param  {UserColumn} columns         columns
  * @param  {string[]} [requiredColumns] required columns
- * @return {module:extension/relatedTables~UserRelatedTable}
+ * @return {UserRelatedTable}
  */
 export class UserRelatedTable extends UserCustomTable {
   /**

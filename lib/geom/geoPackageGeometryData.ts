@@ -914,11 +914,14 @@ export class GeoPackageGeometryData {
       // Read the 5th - 8th buffer as the srs id
       this.srsId = reader.readInt();
 
-
       // Read the envelope
       this.envelope = this.readEnvelope(envelopeIndicator, reader);
     } catch (e) {
-      throw new GeoPackageException('Failed to read the GeoPackage geometry header');
+      if (e instanceof GeoPackageException) {
+        throw e;
+      } else {
+        throw new GeoPackageException('Failed to read the GeoPackage geometry header');
+      }
     }
 
     // Save off where the WKB buffer start
@@ -929,7 +932,6 @@ export class GeoPackageGeometryData {
       try {
         this.geometry = GeometryReader.readGeometryWithByteReader(reader, GeoPackageGeometryData.geometryFilter);
       } catch (e) {
-        console.error(e);
         throw new GeoPackageException('Failed to read the WKB geometry');
       }
     }

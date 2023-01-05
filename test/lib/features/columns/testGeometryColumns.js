@@ -1,4 +1,5 @@
 import { default as testSetup } from '../../../testSetup'
+import { ContentsDataType } from "../../../../lib/contents/contentsDataType";
 
 var GeometryColumnsDao = require('../../../../lib/features/columns/geometryColumnsDao').GeometryColumnsDao
   , Contents = require('../../../../lib/contents/contents').Contents
@@ -131,16 +132,16 @@ describe('GeometryColumns tests', function() {
     });
     var contents = gcd.getContents(table);
     var expectedContents = new Contents();
-    expectedContents.table_name = 'point2d';
-    expectedContents.data_type = 'features';
-    expectedContents.identifier = 'point2d';
-    expectedContents.description = '';
-    expectedContents.last_change = '2014-08-27T15:36:41.000Z';
-    expectedContents.min_x = 1;
-    expectedContents.min_y = 2;
-    expectedContents.max_x = 1;
-    expectedContents.max_y = 2;
-    expectedContents.srs_id = 0;
+    expectedContents.setTableName('point2d');
+    expectedContents.setDataType(ContentsDataType.FEATURES);
+    expectedContents.setIdentifier('point2d');
+    expectedContents.setDescription('');
+    expectedContents.setLastChange(new Date('2014-08-27T15:36:41.000Z'));
+    expectedContents.setMinX(1);
+    expectedContents.setMinY(2);
+    expectedContents.setMaxX(1);
+    expectedContents.setMaxY(2);
+    expectedContents.setSrsId(0);
     contents.should.be.deep.equal(expectedContents);
   });
 

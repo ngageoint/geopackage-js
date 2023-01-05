@@ -35,8 +35,8 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   }
 
   /**
-   * Creates a new {module:dataColumns~DataColumns} object
-   * @return {module:dataColumns~DataColumns}
+   * Creates a new {DataColumns} object
+   * @return {DataColumns}
    */
   createObject(results?: Record<string, DBValue>): DataColumns {
     const dc = new DataColumns();
@@ -53,8 +53,8 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   }
   /**
    * Get the Contents from the Data Columns
-   * @param  {module:dataColumns~DataColumns} dataColumns data columns
-   * @return {module:core/contents~Contents}             contents
+   * @param  {DataColumns} dataColumns data columns
+   * @return {Contents} contents
    */
   getContents(dataColumns: DataColumns): Contents {
     return this.geoPackage.getContentsDao().queryForId(dataColumns.getTableName());
@@ -62,7 +62,7 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
   /**
    * Query by constraint name
    * @param  {String} constraintName     constraint name
-   * @return {Iterable.<Object>} iterator of database objects
+   * @return {IterableIterator<DataColumns>} iterator of database objects
    */
   queryByConstraintName(constraintName: string): IterableIterator<DataColumns> {
     const iterator = this.queryForEach(DataColumns.COLUMN_CONSTRAINT_NAME, constraintName);
@@ -83,7 +83,7 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
    * Get DataColumn by column name and table name
    * @param  {String} tableName  table name
    * @param  {String} columnName column name
-   * @return {module:dataColumns~DataColumns}
+   * @return {DataColumns}
    */
   getDataColumns(tableName: string, columnName: string): DataColumns {
     const exists = this.isTableExists();

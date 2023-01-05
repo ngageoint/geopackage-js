@@ -17,7 +17,7 @@ export class GeoPackageManager {
    * In Node, open a GeoPackage file at the given path, or in a browser, load an in-memory GeoPackage from the given byte array.
    * @param  {string|Uint8Array|Buffer} gppathOrByteArray path to the GeoPackage file or `Uint8Array` of GeoPackage bytes
    * @param  {string} name - name of GeoPackage, but defaults to file path in Node
-   * @return {Promise<GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an `Error`
+   * @return {Promise<GeoPackage>} promise that resolves with the open {@link GeoPackage} object or rejects with an `Error`
    */
   static async open(gppathOrByteArray: string | Uint8Array | Buffer, name: string = undefined): Promise<GeoPackage> {
     let geoPackage: GeoPackage;
@@ -51,7 +51,7 @@ export class GeoPackageManager {
    * In Node, create a GeoPackage file at the given file path, or in a browser,
    * create an in-memory GeoPackage.
    * @param  {string} gppath path of the created GeoPackage file; ignored in the browser
-   * @return {Promise<typeof GeoPackage>} promise that resolves with the open {@link module:geoPackage~GeoPackage} object or rejects with an  `Error`
+   * @return {Promise<typeof GeoPackage>} promise that resolves with the open {@link GeoPackage} object or rejects with an  `Error`
    */
   static async create(gppath?: string): Promise<GeoPackage> {
     let geoPackage: GeoPackage;

@@ -1,5 +1,6 @@
 var GeoPackage = require('../../../lib/geoPackage').GeoPackage
   , GeoPackageConnection = require('../../../lib/db/geoPackageConnection').GeoPackageConnection
+  , GeoPackageManager = require('../../../lib/geoPackageManager').GeoPackageManager
   , GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , path = require('path')
   , should = require('chai').should();
@@ -20,10 +21,10 @@ describe('Tests for issue 68', function() {
       var info = geoPackage.getInfoForTable(tileDao);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       return gpr.getTile(192,401,10)
-      .then(function(tile) {
-        should.exist(tile);
-        geoPackage.close();
-      });
+        .then((tile) => {
+          should.exist(tile);
+          geoPackage.close();
+        });
     });
   });
 

@@ -145,7 +145,7 @@ export class SqljsAdapter implements DBAdapter {
    * @see {@link http://kripken.github.io/sql.js/documentation/#http://kripken.github.io/sql.js/documentation/class/Database.html#create_function-dynamic|sqljs create_function}
    * @param  {string} name               name of function to register
    * @param  {Function} functionDefinition function to register
-   * @return {module:db/sqljsAdapter~Adapter} this
+   * @return {Adapter} this
    */
   registerFunction(name: string, functionDefinition: Function): this {
     this.db.create_function(name, functionDefinition);

@@ -1,23 +1,24 @@
+import { default as testSetup } from '../../../testSetup'
 import { ZoomOtherExtension } from "../../../../lib/extension/zoomOtherExtension";
 import { GeoPackageConstants } from "../../../../lib/geoPackageConstants";
 import { TileTable } from "../../../../lib/tiles/user/tileTable";
-import { Extensions } from "../../../../lib/extension/extensions";
+import { ExtensionScopeType } from "../../../../lib/extension/extensionScopeType";
 const should = require('chai').should();
 
 describe('ZoomOtherExtension tests', function() {
 
-  var testGeoPackage;
+  var geoPackagePath;
   var geoPackage;
 
   beforeEach(async function() {
     let created = await testSetup.createTmpGeoPackage();
-    testGeoPackage = created.path;
+    geoPackagePath = created.path;
     geoPackage = created.geoPackage;
   });
 
   afterEach(async function() {
     geoPackage.close();
-    await testSetup.deleteGeoPackage(testGeoPackage);
+    await testSetup.deleteGeoPackage(geoPackagePath);
   });
 
 
@@ -29,13 +30,13 @@ describe('ZoomOtherExtension tests', function() {
     const extension = zoomOtherExtension.getOrCreate(tableName);
     should.exist(extension);
     zoomOtherExtension.has(tableName).should.be.true;
-    ZoomOtherExtension.EXTENSION_NAME.should.be.equal(extension.extensionName)
-    GeoPackageConstants.EXTENSION_AUTHOR.should.be.equal(extension.author)
-    ZoomOtherExtension.NAME.should.be.equal(ZoomOtherExtension.getExtensionNameNoAuthor(extension.extensionName));
+    ZoomOtherExtension.EXTENSION_NAME.should.be.equal(extension.getExtensionName())
+    GeoPackageConstants.EXTENSION_AUTHOR.should.be.equal(extension.getAuthor())
+    ZoomOtherExtension.NAME.should.be.equal(extension.getExtensionNameNoAuthor());
     tableName.should.be.equal(extension.getTableName());
-    TileTable.COLUMN_TILE_DATA.should.be.equal(extension.column_name);
-    Extensions.READ_WRITE.should.be.equal(extension.scope);
-    ZoomOtherExtension.DEFINITION.should.be.equal(extension.definition);
+    TileTable.COLUMN_TILE_DATA.should.be.equal(extension.getColumnName());
+    ExtensionScopeType.READ_WRITE.should.be.equal(extension.getScope());
+    ZoomOtherExtension.DEFINITION.should.be.equal(extension.getDefinition());
 
     geoPackage.getExtensionManager().deleteTableExtensions(tableName);
     zoomOtherExtension.has(tableName).should.be.false;

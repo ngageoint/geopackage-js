@@ -69,7 +69,7 @@ export class DataColumnConstraintsDao extends GeoPackageDao<DataColumnConstraint
    * @param  {String} constraintName     constraint name
    * @param  {String} constraintType     constraint type
    * @param  {String} value              value
-   * @return {module:dataColumnConstraints~DataColumnConstraints}
+   * @return {DataColumnConstraints}
    */
   queryUnique(constraintName: string, constraintType: string, value: string): DataColumnConstraints {
     const dataColumnConstraints = new DataColumnConstraintsKey(constraintName, constraintType, value);

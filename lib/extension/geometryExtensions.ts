@@ -116,8 +116,7 @@ export class GeometryExtensions extends BaseExtension {
    */
   public has(tableName: string, columnName: string, author: string, geometryType: GeometryType): boolean {
     const extensionName = GeometryExtensions.getExtensionName(geometryType, author);
-    const exists = this.hasExtension(extensionName, tableName, columnName);
-    return exists;
+    return this.hasExtension(extensionName, tableName, columnName);
   }
 
   /**
@@ -145,8 +144,7 @@ export class GeometryExtensions extends BaseExtension {
       );
     }
 
-    return;
-    (author != null
+    return (author != null
       ? GeometryExtensions.isGeoPackageExtension(geometryType)
         ? GeoPackageConstants.EXTENSION_AUTHOR
         : author

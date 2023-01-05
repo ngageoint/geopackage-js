@@ -14,8 +14,8 @@ import { UserColumn } from '../../../user/userColumn';
 export class DublinCoreMetadata {
   /**
    * Check if the table has a column for the Dublin Core Type term
-   * @param  {module:user/userTable~UserTable|module:user/userRow~UserRow} table user table or user row to check
-   * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
+   * @param  {UserRow} table user table or user row to check
+   * @param  {DublinCoreType} type  Dublin Core Type
    * @return {Boolean}
    */
   public static hasColumn(
@@ -79,8 +79,8 @@ export class DublinCoreMetadata {
 
   /**
    * Get the value from the row for the Dublin Core Type term
-   * @param  {module:user/userRow~UserRow} row user row to get value from
-   * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
+   * @param  {UserRow} row user row to get value from
+   * @param  {DublinCoreType} type  Dublin Core Type
    * @return {Object}
    */
   public static getValue(row: UserRow<UserColumn, UserTable<UserColumn>>, type: DublinCoreType): any {
@@ -90,8 +90,8 @@ export class DublinCoreMetadata {
 
   /**
    * Set the value in the row for the Dublin Core Type term
-   * @param  {module:user/userRow~UserRow} row user row to set the value
-   * @param  {module:extension/relatedTables~DublinCoreType} type  Dublin Core Type
+   * @param  {UserRow} row user row to set the value
+   * @param  {DublinCoreType} type  Dublin Core Type
    * @param  {Object} value value to set
    */
   public static setValue(row: UserRow<UserColumn, UserTable<UserColumn>>, type: DublinCoreType, value: any): void {

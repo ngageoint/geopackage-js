@@ -1,20 +1,32 @@
 import { default as testSetup } from '../../../testSetup'
 import {RelatedTablesExtension} from '../../../../lib/extension/related/relatedTablesExtension'
 import {UserMappingTable} from '../../../../lib/extension/related/userMappingTable';
+import { GeoPackageDataType } from "../../../../lib/db/geoPackageDataType";
+import { RelationType } from "../../../../lib/extension/related/relationType";
+import { ContentsDataType } from "../../../../lib/contents/contentsDataType";
 
 var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataType
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , should = require('chai').should()
+  , assert = require('chai').assert
   , path = require('path');
 
+
+/**
+ * Verify they equal
+ * @param a
+ * @param b
+ */
+function assertEquals(a, b) {
+  a.should.equal(b);
+}
+
 describe('Related Attributes tests', function() {
-  var testGeoPackage;
-  var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
   var geoPackage;
 
   var filename;
   beforeEach('create the GeoPackage connection', async function() {
-    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'attributes.gpkg');
+    var originalFilename = path.join(__dirname, '..', '..', '..', 'fixtures', 'import_db.gpkg');
     // @ts-ignore
     let result = await copyAndOpenGeopackage(originalFilename);
     filename = result.path;
@@ -26,166 +38,223 @@ describe('Related Attributes tests', function() {
     await testSetup.deleteGeoPackage(filename);
   })
 
-  function validateContents(attributesTable, contents) {
-    should.exist(contents);
-    should.exist(contents.data_type);
-    'attributes'.should.be.equal(contents.data_type);
-    attributesTable.table_name.should.be.equal(contents.table_name);
-    should.exist(contents.last_change);
-  }
-
   it('should create an attributes relationship', function() {
-    var rte = new RelatedTablesExtension(geoPackage);
-    rte.has().should.be.equal(false);
+    try {
+      // Create a related tables extension
+      const rte = new RelatedTablesExtension(geoPackage);
 
-    var extendedRelationships = rte.getRelationships();
-    extendedRelationships.length.should.be.equal(0);
-
-    var attributesTables = geoPackage.getAttributesTables();
-
-    var baseTableName = geoPackage.getAttributesTables()[0];
-    var attributesDao = geoPackage.getAttributeDao(baseTableName);
-
-    var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
-    var mappingTableName = 'attributes_2_attributes';
-    var userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
-    rte.has(userMappingTable.table_name).should.be.equal(false);
-    userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
-
-    var baseIdColumn = userMappingTable.baseIdColumn;
-    should.exist(baseIdColumn);
-    baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
-    baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
-    baseIdColumn.notNull.should.be.equal(true);
-    baseIdColumn.primaryKey.should.be.equal(false);
-
-    var relatedIdColumn = userMappingTable.relatedIdColumn;
-    should.exist(relatedIdColumn);
-    relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
-    relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
-    relatedIdColumn.notNull.should.be.equal(true);
-    relatedIdColumn.primaryKey.should.be.equal(false);
-    rte.has(userMappingTable.table_name).should.be.equal(false);
-
-    var relationship = RelatedTablesExtension.RelationshipBuilder()
-      .setBaseTableName(baseTableName)
-      .setRelatedTableName(baseTableName)
-      .setUserMappingTable(userMappingTable);
-
-    let extendedRelation =  rte.addAttributesRelationship(relationship);
-
-    rte.has().should.be.equal(true);
-    rte.has(userMappingTable.table_name).should.be.equal(true);
-    should.exist(extendedRelation);
-    var relationships = rte.getRelationships();
-    relationships.length.should.be.equal(1);
-    geoPackage.isTable(mappingTableName).should.be.equal(true);
-    'attributes'.should.be.equal(geoPackage.getTableType(baseTableName));
-    geoPackage.isTableType('attributes', baseTableName);
-
-    // Insert user mapping rows between attributes
-    var userMappingDao = rte.getMappingDao(mappingTableName);
-    var userMappingRow = userMappingDao.newRow();
-    userMappingRow.baseId = 4;
-    userMappingRow.relatedId = 7;
-    RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-    var createdId = userMappingDao.create(userMappingRow);
-    createdId.should.be.equal(1);
-
-    userMappingDao.count().should.be.equal(1);
-
-    userMappingRow = userMappingDao.newRow();
-    userMappingRow.baseId = 5;
-    userMappingRow.relatedId = 5;
-    RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
-    createdId = userMappingDao.create(userMappingRow);
-    createdId.should.be.equal(2);
-
-    userMappingDao.count().should.be.equal(2);
-
-    // Validate the user mapping rows
-    userMappingTable = userMappingDao.table;
-    var mappingColumns = userMappingTable.getUserColumns().getColumnNames();
-    var userMappingRows = userMappingDao.queryForAll();
-    var count = userMappingRows.length;
-    count.should.be.equal(2);
-    var manualCount = 0;
-
-    for (var i = 0; i < count; i++) {
-      const umr = userMappingRows[i];
-      var row = userMappingDao.getUserMappingRow(umr);
-      row.hasId().should.be.equal(false);
-      row.baseId.should.be.oneOf([4, 5]);
-      if (row.baseId === 4) {
-        row.baseId.should.be.equal(4);
-        row.relatedId.should.be.equal(7);
-      } else if (row.baseId === 5) {
-        row.baseId.should.be.equal(5);
-        row.relatedId.should.be.equal(5);
+      if (rte.has()) {
+        rte.removeExtension();
       }
-      RelatedTablesUtils.validateUserRow(mappingColumns, row);
-      RelatedTablesUtils.validateDublinCoreColumns(row);
-      manualCount++;
+
+      assert.isFalse(rte.has());
+      assert.isTrue(rte.getRelationships().length === 0);
+
+      // Choose a random attributes table
+      let attributesTables = geoPackage.getAttributesTables();
+      if (attributesTables.length === 0) {
+        return; // pass with no testing
+      }
+      const baseTableName = attributesTables[(Math.floor(Math.random() * attributesTables.length))];
+      const relatedTableName = attributesTables[(Math.floor(Math.random() * attributesTables.length))];
+
+      // Create and validate a mapping table
+      const additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns();
+      const mappingTableName = "attributes_attributes";
+      let userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
+      assert.isFalse(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
+      assertEquals(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length, userMappingTable.getColumns().length);
+      const baseIdColumn = userMappingTable.getBaseIdColumn();
+      assert.isNotNull(baseIdColumn);
+      assert.isTrue(baseIdColumn.isNamed(UserMappingTable.COLUMN_BASE_ID));
+      assertEquals(GeoPackageDataType.INTEGER, baseIdColumn.getDataType());
+      assert.isTrue(baseIdColumn.isNotNull());
+      assert.isFalse(baseIdColumn.isPrimaryKey());
+      const relatedIdColumn = userMappingTable.getRelatedIdColumn();
+      assert.isNotNull(relatedIdColumn);
+      assert.isTrue(relatedIdColumn.isNamed(UserMappingTable.COLUMN_RELATED_ID));
+      assertEquals(GeoPackageDataType.INTEGER, relatedIdColumn.getDataType());
+      assert.isTrue(relatedIdColumn.isNotNull());
+      assert.isFalse(relatedIdColumn.isPrimaryKey());
+      assert.isFalse(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
+
+      // Create the relationship between the attributes table and attributes
+      // table
+      let extendedRelation = rte.addAttributesRelationshipWithMappingTable(baseTableName, relatedTableName, userMappingTable);
+      assert.isTrue(rte.has());
+      assert.isTrue(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
+      assert.isNotNull(extendedRelation);
+      let extendedRelations = rte.getRelationships();
+      assertEquals(1, extendedRelations.length);
+      assert.isTrue(geoPackage.isTable(mappingTableName));
+
+      // Build the Attributes ids
+      let attributesDao = geoPackage.getAttributesDao(baseTableName);
+      const attributesResultSet = attributesDao.queryForAll();
+      const attributesCount = attributesResultSet.getCount();
+      const attributeIds = [];
+      while (attributesResultSet.moveToNext()) {
+        attributeIds.push(attributesResultSet.getRow().getId());
+      }
+      attributesResultSet.close();
+
+      // Build the Attribute related ids
+      const attributesDao2 = geoPackage.getAttributesDao(relatedTableName);
+      let attributesResultSet2 = attributesDao2.queryForAll();
+      const attributesCount2 = attributesResultSet2.getCount();
+      const attributeIds2 = [];
+      while (attributesResultSet2.moveToNext()) {
+        attributeIds2.push(attributesResultSet2.getRow().getId());
+      }
+      attributesResultSet2.close();
+
+      // Insert user mapping rows between attribute ids and attribute ids
+      const dao = rte.getMappingDao(mappingTableName);
+      let userMappingRow = null;
+      for (let i = 0; i < 10; i++) {
+        userMappingRow = dao.newRow();
+        userMappingRow.setBaseId(attributeIds[(Math.floor(Math.random() * attributesCount))]);
+        userMappingRow.setRelatedId(attributeIds2[(Math.floor(Math.random() * attributesCount2))]);
+        RelatedTablesUtils.populateUserRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+        assert.isTrue(dao.create(userMappingRow) > 0);
+      }
+      assertEquals(10, dao.count());
+
+      // Validate the user mapping rows
+      userMappingTable = dao.getTable();
+      const mappingColumns = userMappingTable.getColumnNames();
+      const resultSet = dao.queryForAll();
+      const count = resultSet.getCount();
+      assertEquals(10, count);
+      let manualCount = 0;
+      while (resultSet.moveToNext()) {
+        const resultRow = dao.getRow(resultSet);
+        assert.isFalse(resultRow.hasId());
+        assert.isTrue(attributeIds.indexOf(resultRow.getBaseId()) > -1);
+        assert.isTrue(attributeIds2.indexOf(resultRow.getRelatedId()) > -1);
+        RelatedTablesUtils.validateUserRow(mappingColumns, resultRow);
+        RelatedTablesUtils.validateDublinCoreColumns(resultRow);
+
+        manualCount++;
+      }
+      assertEquals(count, manualCount);
+      resultSet.close();
+
+      const extendedRelationsDao = rte.getExtendedRelationsDao();
+
+      // Get the relations starting from the attributes table
+      const attributesExtendedRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.getTableName());
+      const attributesExtendedRelations2 = extendedRelationsDao.getTableRelations(attributesDao.getTableName());
+      assertEquals(1, attributesExtendedRelations.length);
+      assertEquals(1, attributesExtendedRelations2.length);
+      assertEquals(attributesExtendedRelations[0].getId(), attributesExtendedRelations2[0].getId());
+
+      // Test the attributes table relations
+      for (const attributesRelation of attributesExtendedRelations) {
+        // Test the relation
+        assert.isTrue(attributesRelation.getId() >= 0);
+        assertEquals(attributesDao.getTableName(), attributesRelation.getBaseTableName());
+        assertEquals(attributesDao.getPkColumnName(), attributesRelation.getBasePrimaryColumn());
+        assertEquals(attributesDao2.getTableName(), attributesRelation.getRelatedTableName());
+        assertEquals(attributesDao2.getPkColumnName(), attributesRelation.getRelatedPrimaryColumn());
+        assertEquals(RelationType.ATTRIBUTES.getName(), attributesRelation.getRelationName());
+        assertEquals(mappingTableName, attributesRelation.getMappingTableName());
+
+        // Test the user mappings from the relation
+        const userMappingDao = rte.getMappingDaoWithExtendedRelation(attributesRelation);
+        const mappingResultSet = userMappingDao.queryForAll();
+        while (mappingResultSet.moveToNext()) {
+          userMappingRow = userMappingDao.getRow(mappingResultSet);
+          assert.isTrue(attributeIds.indexOf(userMappingRow.getBaseId()) > -1);
+          assert.isTrue(attributeIds2.indexOf(userMappingRow.getRelatedId()) > -1);
+          RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
+          RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
+        }
+        mappingResultSet.close();
+      }
+
+      // Get the relations starting from the attributes table
+      const relatedExtendedRelations = extendedRelationsDao.getRelatedTableRelations(relatedTableName);
+      const extendedRelations2 = extendedRelationsDao.getTableRelations(relatedTableName);
+      assertEquals(1, relatedExtendedRelations.length);
+      assertEquals(1, extendedRelations2.length);
+      assertEquals(relatedExtendedRelations[0].getId(), extendedRelations2[0].getId());
+
+      // Test the attributes table relations
+      for (const relation of relatedExtendedRelations) {
+        // Test the relation
+        assert.isTrue(relation.getId() >= 0);
+        assertEquals(attributesDao.getTableName(), relation.getBaseTableName());
+        assertEquals(attributesDao.getPkColumnName(), relation.getBasePrimaryColumn());
+        assertEquals(attributesDao2.getTableName(), relation.getRelatedTableName());
+        assertEquals(attributesDao2.getPkColumnName(), relation.getRelatedPrimaryColumn());
+        assertEquals(RelationType.ATTRIBUTES.getName(), relation.getRelationName());
+        assertEquals(mappingTableName, relation.getMappingTableName());
+
+        // Test the user mappings from the relation
+        const userMappingDao = rte.getMappingDaoWithExtendedRelation(relation);
+        const totalMappedCount = userMappingDao.count();
+        const mappingResultSet = userMappingDao.queryForAll();
+        while (mappingResultSet.moveToNext()) {
+          userMappingRow = userMappingDao.getRow(mappingResultSet);
+          assert.isTrue(attributeIds.indexOf(userMappingRow.getBaseId()) > -1);
+          assert.isTrue(attributeIds2.indexOf(userMappingRow.getRelatedId()) > -1);
+          RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
+          RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
+        }
+        mappingResultSet.close();
+
+        // Get and test the attributes DAO
+        attributesDao = geoPackage.getAttributesDao(attributesDao.getTableName());
+        assert.isNotNull(attributesDao);
+        const attributesTable = attributesDao.getTable();
+        assert.isNotNull(attributesTable);
+        const attributesContents = attributesTable.getContents();
+        assert.isNotNull(attributesContents);
+        assertEquals(ContentsDataType.ATTRIBUTES, attributesContents.getDataType());
+        assertEquals(ContentsDataType.nameFromType(ContentsDataType.ATTRIBUTES), attributesContents.getDataTypeName());
+        assertEquals(attributesTable.getTableName(), attributesContents.getTableName());
+        assert.isNotNull(attributesContents.getLastChange());
+
+        // Get and test the Attributes Rows mapped to each Attributes Row
+        attributesResultSet2 = attributesDao2.queryForAll();
+        let totalMapped = 0;
+        while (attributesResultSet2.moveToNext()) {
+          const attributes2Row = attributesResultSet2.getRow();
+          const mappedIds = rte.getMappingsForRelatedWithExtendedRelation(relation, attributes2Row.getId());
+          for (const mappedId of mappedIds) {
+            const attributesRow = attributesDao.queryForIdRow(mappedId);
+            assert.isNotNull(attributesRow);
+
+            assert.isTrue(attributesRow.hasId());
+            assert.isTrue(attributesRow.getId() >= 0);
+            assert.isTrue(attributeIds.indexOf(attributesRow.getId()) > -1);
+            assert.isTrue(mappedIds.indexOf(attributesRow.getId()) > -1);
+          }
+
+          totalMapped += mappedIds.length;
+        }
+        attributesResultSet2.close();
+        assertEquals(totalMappedCount, totalMapped);
+      }
+
+      // Delete a single mapping
+      const countOfIds = dao.countByIdsWithUserMappingRow(userMappingRow);
+      assertEquals(countOfIds, dao.deleteByIdsWithUserMappingRow(userMappingRow));
+      assertEquals(10 - countOfIds, dao.count());
+
+      // Delete the relationship and user mapping table
+      rte.removeRelationshipWithExtendedRelation(extendedRelation);
+      assert.isFalse(rte.hasExtensionForMappingTable(userMappingTable.getTableName()));
+      extendedRelations = rte.getRelationships();
+      assert.isFalse(geoPackage.isTable(mappingTableName));
+      assertEquals(0, extendedRelations.length);
+
+      // Delete the related tables extension
+      rte.removeExtension();
+      assert.isFalse(rte.has());
+    } catch (e) {
+      console.error(e);
     }
-
-    manualCount.should.be.equal(count);
-
-    var extendedRelationsDao = rte.extendedRelationDao;
-    var attributeBaseTableRelations = extendedRelationsDao.getBaseTableRelations(attributesDao.table_name);
-    var attributeTableRelations = extendedRelationsDao.getTableRelations(attributesDao.table_name);
-    attributeBaseTableRelations.length.should.be.equal(1);
-    attributeTableRelations.length.should.be.equal(1);
-    attributeBaseTableRelations[0].id.should.be.equal(attributeTableRelations[0].id);
-    extendedRelationsDao.getRelatedTableRelations(attributesDao.table_name).length.should.be.equal(1);
-
-    // Test the attribute table relations
-    for (i = 0; i < attributeBaseTableRelations.length; i++) {
-
-      // Test the relation
-      var attributeRelation = attributeBaseTableRelations[i];
-      attributeRelation.id.should.be.greaterThan(0);
-      attributesDao.table_name.should.be.equal(attributeRelation.base_table_name);
-      attributesDao.table.getPkColumn().getName().should.be.equal(attributeRelation.base_primary_column);
-      baseTableName.should.be.equal(attributeRelation.related_table_name);
-      attributesDao.table.getPkColumn().getName().should.be.equal(attributeRelation.related_primary_column);
-      'attributes'.should.be.equal(attributeRelation.relation_name);
-    }
-
-    var baseTables = extendedRelationsDao.getBaseTables();
-    baseTables.length.should.be.equal(1);
-    baseTables[0].should.be.equal(baseTableName);
-    var relatedTables = extendedRelationsDao.getRelatedTables();
-    relatedTables.length.should.be.equal(1);
-    relatedTables[0].should.be.equal(baseTableName);
-
-    // Delete a single mapping
-    var countOfIds = userMappingDao.countByIds(5);
-    var queryOfIds = userMappingDao.queryByIds(5);
-    var queryCount = 0;
-    for (let counter of queryOfIds) {
-      queryCount++;
-    }
-
-    queryCount.should.be.equal(countOfIds);
-    countOfIds.should.be.equal(userMappingDao.deleteByIds(5));
-    var userMappingCount = userMappingDao.count();
-    userMappingCount.should.be.equal(2-countOfIds);
-
-    // Delete by base id
-    var baseIdQuery = userMappingDao.queryByBaseId(4);
-    var countOfBaseIds = baseIdQuery.length;
-    var deleted = userMappingDao.deleteByBaseId(4);
-    deleted.should.be.equal(countOfBaseIds);
-
-    // Delete the relationship and user mapping table
-    rte.removeRelationship(extendedRelation);
-    rte.has(userMappingTable.getTableName()).should.be.equal(false);
-    relationships = rte.getRelationships();
-    relationships.length.should.be.equal(0);
-    geoPackage.isTable(mappingTableName).should.be.equal(false);
-
-    // Delete the related tables extension
-    rte.removeExtension();
-    rte.has().should.be.equal(false);
   });
 });

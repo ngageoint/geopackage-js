@@ -13,7 +13,7 @@ export class ColumnValues {
   /**
    * adds a column to the structure
    * @param  {string} columnName  name of column to add
-   * @param  {module:user/userColumn~UserColumn} column column to add
+   * @param  {UserColumn} column column to add
    */
   addColumn(columnName: string, column: UserColumn | any): void {
     this.columns.push(columnName);
@@ -22,7 +22,7 @@ export class ColumnValues {
   /**
    * Gets the column by name
    * @param  {string} columnName name of column
-   * @return {module:user/userColumn~UserColumn}            user column
+   * @return {UserColumn}            user column
    */
   getValue(columnName: string): UserColumn | any {
     return this.values[columnName];

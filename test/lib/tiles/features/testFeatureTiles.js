@@ -34,13 +34,9 @@ describe('GeoPackage FeatureTiles tests', function() {
       var geometryColumns = SetupFeatureTable.buildGeometryColumns('QueryTest', 'geom', GeometryType.POINT);
 
       var columns = [];
-
-      columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
-      // @ts-ignore
-      columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.POINT, false, null));
-      columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
-      columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ""));
+      columns.push(FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ""));
 
       var box = {
         "type": "Polygon",

@@ -11,7 +11,7 @@ import { AttributesColumn } from '../../../attributes/attributesColumn';
 /**
  * Icon Requirements Class Media Table
  * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns   media columns
+ * @param  {UserColumn[]} columns   media columns
  * @constructor
  */
 export class StyleTable extends AttributesTable {
@@ -47,7 +47,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getNameColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_NAME);
@@ -61,7 +61,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the description column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getDescriptionColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_DESCRIPTION);
@@ -75,7 +75,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the color column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getColorColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_COLOR);
@@ -89,7 +89,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the opacity column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getOpacityColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_OPACITY);
@@ -103,7 +103,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the width column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getWidthColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_WIDTH);
@@ -117,7 +117,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the fill_color column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getFillColorColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_FILL_COLOR);
@@ -131,7 +131,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Get the fill_opacity column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getFillOpacityColumn(): UserColumn {
     return this.getColumn(StyleTable.COLUMN_FILL_OPACITY);
@@ -145,7 +145,7 @@ export class StyleTable extends AttributesTable {
   }
   /**
    * Create the columns
-   * @return {module:user/custom~UserCustomColumn[]}
+   * @return {UserCustomColumn[]}
    */
   static createColumns(): AttributesColumn[] {
     const columns = [];

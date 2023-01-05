@@ -1,7 +1,3 @@
-/**
- * @module user/custom
- */
-
 import { UserColumn } from '../userColumn';
 import { GeoPackageDataType } from '../../db/geoPackageDataType';
 import { DBValue } from '../../db/dbValue';
@@ -12,7 +8,7 @@ import { TableColumn } from '../../db/table/tableColumn';
  * Create a new user custom columnd
  *  @param {Number} index        column index
  *  @param {string} name         column name
- *  @param {module:db/geoPackageDataType~GPKGDataType} dataType  data type
+ *  @param {GeoPackageDataType} dataType  data type
  *  @param {Number} max max value
  *  @param {Boolean} notNull      not null
  *  @param {Object} defaultValue default value or nil

@@ -41,8 +41,8 @@ export class UserMappingDao extends UserCustomDao {
    * @param resultSet result set
    * @return user mapping row
    */
-  public getRowFromResultSet(resultSet: UserCustomResultSet): UserMappingRow {
-    return this.getRow(resultSet.getRow());
+  public getRow(resultSet: UserCustomResultSet): UserMappingRow {
+    return this.getRowWithUserCustomRow(resultSet.getRow());
   }
 
   /**
@@ -50,7 +50,7 @@ export class UserMappingDao extends UserCustomDao {
    * @param row custom row
    * @return user mapping row
    */
-  public getRow(row: UserCustomRow): UserMappingRow {
+  public getRowWithUserCustomRow(row: UserCustomRow): UserMappingRow {
     return new UserMappingRow(row);
   }
 
@@ -71,7 +71,7 @@ export class UserMappingDao extends UserCustomDao {
    * @return result set
    */
   public queryByBaseId(baseId: number): UserCustomResultSet {
-    return this.queryForEq(false, this.getTable().getColumnNames(), UserMappingTable.COLUMN_BASE_ID, baseId);
+    return this.queryForEqWithColumns(this.getTable().getColumnNames(), UserMappingTable.COLUMN_BASE_ID, baseId);
   }
 
   /**
@@ -87,13 +87,11 @@ export class UserMappingDao extends UserCustomDao {
 
   /**
    * Count by base id
-   *
-   * @param baseId
-   *            base id
+   * @param baseId base id
    * @return count
    */
   public countByBaseId(baseId: number): number {
-    return this.countOfResultSet(this.queryByBaseId(baseId));
+    return this.countForEq(UserMappingTable.COLUMN_BASE_ID, baseId);
   }
 
   /**
@@ -115,7 +113,7 @@ export class UserMappingDao extends UserCustomDao {
    * @return result set
    */
   public queryByRelatedId(relatedId: number): UserCustomResultSet {
-    return this.queryForEq(false, this.getTable().getColumnNames(), UserMappingTable.COLUMN_RELATED_ID, relatedId);
+    return this.queryForEqWithColumns(this.getTable().getColumnNames(), UserMappingTable.COLUMN_RELATED_ID, relatedId);
   }
 
   /**
@@ -137,7 +135,7 @@ export class UserMappingDao extends UserCustomDao {
    * @return count
    */
   public countByRelatedId(relatedId: number): number {
-    return this.countOfResultSet(this.queryByRelatedId(relatedId));
+    return this.countForEq(UserMappingTable.COLUMN_RELATED_ID, relatedId);
   }
 
   /**
@@ -219,7 +217,10 @@ export class UserMappingDao extends UserCustomDao {
    * @return count
    */
   public countByIds(baseId: number, relatedId: number): number {
-    return this.queryByIds(baseId, relatedId).getCount();
+    return this.count(
+      this.buildWhereIds(baseId, relatedId),
+      this.buildWhereIdsArgs(baseId, relatedId),
+    );
   }
 
   /**
@@ -269,7 +270,7 @@ export class UserMappingDao extends UserCustomDao {
    * @param userMappingRow user mapping row
    * @return rows deleted
    */
-  public deleteByIdsWithUserRow(userMappingRow: UserMappingRow): number {
+  public deleteByIdsWithUserMappingRow(userMappingRow: UserMappingRow): number {
     return this.deleteByIds(userMappingRow.getBaseId(), userMappingRow.getRelatedId());
   }
 

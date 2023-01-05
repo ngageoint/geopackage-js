@@ -24,14 +24,19 @@ export class UserCustomTableReader extends UserTableReader<UserCustomColumn, Use
   }
 
   /**
-   * @inheritDoc
+   * Create the UserCustomTable
+   * @param {string} tableName
+   * @param {UserCustomColumn[]} columns
+   * @return {UserCustomTable}
    */
   createTable(tableName: string, columns: UserCustomColumn[]): UserCustomTable {
     return new UserCustomTable(tableName, columns, null);
   }
 
   /**
-   * @inheritDoc
+   * Create a UserCustomColumn
+   * @param {TableColumn} tableColumn
+   * @return {UserCustomColumn}
    */
   createColumn(tableColumn: TableColumn): UserCustomColumn {
     return UserCustomColumn.createColumnWithTableColumn(tableColumn);

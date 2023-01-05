@@ -731,20 +731,45 @@ export abstract class UserDao<
   }
 
   /**
+   * Gets the rows in this table by id
+   * @param  {Number[]} ids ids to query for
+   * @return rows array
+   */
+  public queryForIdRows(ids: number[]): TRow[] {
+    const rows: TRow[] = [];
+    for (let i = 0; i < ids.length; i++) {
+      const row = this.queryForIdRow(ids[i]);
+      if (row) {
+        rows.push(row);
+      }
+    }
+    return rows;
+  }
+
+  /**
    * Query for the row with the provided id
    * @param id id
    * @return row
    */
-  public queryForId(id: number): TRow {
+  public queryForIdRow(id: number): TRow {
     let row = null;
-    const where = this.getPkWhere(id);
-    const whereArgs = this.getPkWhereArgs(id);
-    const readCursor = this.prepareResult(this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.getColumnNames(), where, whereArgs));
+    const readCursor = this.queryForId(id);
     if (readCursor.moveToNext()) {
       row = readCursor.getRow();
     }
     readCursor.close();
     return row;
+  }
+
+  /**
+   * Query for the row with the provided id
+   * @param id id
+   * @return row
+   */
+  public queryForId(id: number): TResult {
+    const where = this.getPkWhere(id);
+    const whereArgs = this.getPkWhereArgs(id);
+    return this.prepareResult(this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.getColumnNames(), where, whereArgs));
   }
 
   /**
@@ -993,25 +1018,7 @@ export abstract class UserDao<
    * @return result
    */
   public queryForEqWithFieldAndValue(fieldName: string, value: any): TResult {
-    return this.queryForEq(false, this.table.getColumnNames(), fieldName, value);
-  }
-
-  /**
-   * Query for the row where the field equals the value
-   * @param distinct
-   * @param columns
-   * @param fieldName
-   * @param value
-   * @param groupBy
-   * @param having
-   * @param orderBy
-   */
-  public queryForEq(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
-    const where = this.buildWhere(fieldName, value);
-    const whereArgs = this.buildWhereArgs(value);
-    const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs, undefined, groupBy, having, orderBy);
-    this.prepareResult(result);
-    return result;
+    return this.queryForEq(fieldName, value);
   }
 
   /**
@@ -1035,7 +1042,7 @@ export abstract class UserDao<
    * @param having
    * @param orderBy
    */
-  public countForEq(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): number {
+  public countForEq(fieldName: string, value: any, distinct = false, columns: string[] = this.table.getColumnNames(), groupBy?: string, having?: string, orderBy?: string): number {
     const where = this.buildWhere(fieldName, value);
     const whereArgs = this.buildWhereArgs(value);
     return this.userDb.count(distinct, this.getTableName(), columns, where, whereArgs, undefined, groupBy, having, orderBy);
@@ -1420,15 +1427,109 @@ export abstract class UserDao<
 
   /**
    * Query for the row where all fields match their values
+   * @param fieldValues field values
+   * @return result
+   */
+  public queryForFieldValues(fieldValues: ColumnValues): TResult {
+    return this.queryForFieldValuesWithDistinctAndColumns(undefined, undefined, fieldValues);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
+   * @param distinct distinct rows
+   * @param fieldValues field values
+   * @return result
+   */
+  public queryForFieldValuesWithDistinct(distinct = false, fieldValues: ColumnValues): TResult {
+    return this.queryForFieldValuesWithDistinctAndColumns(distinct, undefined, fieldValues);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
+   * @param columns columns
+   * @param fieldValues field values
+   * @return result
+   */
+  public queryForFieldValuesWithColumns(columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
+    return this.queryForFieldValuesWithDistinctAndColumns(undefined, columns, fieldValues);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
    * @param distinct distinct rows
    * @param columns columns
    * @param fieldValues field values
    * @return result
    */
-  public queryForFieldValues(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
+  public queryForFieldValuesWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
     const where = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgs(fieldValues);
     const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs);
+    this.prepareResult(result);
+    return result;
+  }
+
+  /**
+   * Query for the row where all fields match their values
+   * @param property property name
+   * @param value property value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @return result
+   */
+  public queryForEq(property: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
+    return this.queryForEqWithDistinctAndColumns(undefined, undefined, property, value, groupBy, having, orderBy);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
+   * @param distinct distinct rows
+   * @param property property name
+   * @param value property value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @return result
+   */
+  public queryForEqWithDistinct(distinct = false, property: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
+    return this.queryForEqWithDistinctAndColumns(distinct, undefined, property, value, groupBy, having, orderBy);
+  }
+
+
+  /**
+   * Query for the row where all fields match their values
+   * @param columns columns
+   * @param property property name
+   * @param value property value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   * @return result
+   */
+  public queryForEqWithColumns(columns: string[] = this.table.getColumnNames(), property: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
+    return this.queryForEqWithDistinctAndColumns(undefined, columns, property, value, groupBy, having, orderBy);
+  }
+
+
+  /**
+   * Query for the row where the field equals the value
+   * @param distinct
+   * @param columns
+   * @param fieldName
+   * @param value
+   * @param groupBy
+   * @param having
+   * @param orderBy
+   */
+  public queryForEqWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), fieldName: string, value: any, groupBy?: string, having?: string, orderBy?: string): TResult {
+    const where = this.buildWhere(fieldName, value);
+    const whereArgs = this.buildWhereArgs(value);
+    const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs, undefined, groupBy, having, orderBy);
     this.prepareResult(result);
     return result;
   }

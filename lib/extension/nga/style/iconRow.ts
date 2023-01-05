@@ -57,7 +57,7 @@ export class IconRow extends MediaRow {
 
   /**
    * Get the name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getNameColumn(): UserColumn {
     return this.table.getColumn(IconTable.COLUMN_NAME);
@@ -78,7 +78,7 @@ export class IconRow extends MediaRow {
   }
   /**
    * Get the description column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getDescriptionColumn(): UserColumn {
     return this.getTable().getDescriptionColumn();
@@ -99,7 +99,7 @@ export class IconRow extends MediaRow {
   }
   /**
    * Get the width column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getWidthColumn(): UserColumn {
     return this.getTable().getWidthColumn();
@@ -133,7 +133,7 @@ export class IconRow extends MediaRow {
   }
   /**
    * Get the height column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getHeightColumn(): UserColumn {
     return this.getTable().getHeightColumn();
@@ -193,7 +193,7 @@ export class IconRow extends MediaRow {
   }
   /**
    * Get the anchor_u column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getAnchorUColumn(): UserColumn {
     return this.getTable().getAnchorUColumn();
@@ -226,7 +226,7 @@ export class IconRow extends MediaRow {
   }
   /**
    * Get the anchor_v column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getAnchorVColumn(): UserColumn {
     return this.getTable().getAnchorVColumn();

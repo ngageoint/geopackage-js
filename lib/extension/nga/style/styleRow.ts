@@ -58,7 +58,7 @@ export class StyleRow extends AttributesRow {
 
   /**
    * Get the name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getNameColumn(): UserColumn {
     return this.getTable().getNameColumn();
@@ -79,7 +79,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the description column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getDescriptionColumn(): UserColumn {
     return this.getTable().getDescriptionColumn();
@@ -100,7 +100,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the color column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getColorColumn(): UserColumn {
     return this.getTable().getColorColumn();
@@ -145,7 +145,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the opacity column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getOpacityColumn(): UserColumn {
     return this.getTable().getOpacityColumn();
@@ -178,7 +178,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the width column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getWidthColumn(): UserColumn {
     return this.getTable().getWidthColumn();
@@ -213,7 +213,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the fill color column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getFillColorColumn(): UserColumn {
     return this.getTable().getFillColorColumn();
@@ -258,7 +258,7 @@ export class StyleRow extends AttributesRow {
   }
   /**
    * Get the fill opacity column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getFillOpacityColumn(): UserColumn {
     return this.getTable().getFillOpacityColumn();

@@ -149,16 +149,16 @@ describe('GeoPackage create tests', function() {
   });
 
   it('should create the extensions table', function() {
-    let created = geoPackage.createExtensionTable();
+    let created = geoPackage.createExtensionsTable();
     created.should.be.equal(true);
     Verification.verifyExtensions(geoPackage).should.be.equal(true);
   });
 
   it('should not fail if the extensions table already exists', function() {
-    let created = geoPackage.createExtensionTable();
+    let created = geoPackage.createExtensionsTable();
     created.should.be.equal(true);
     Verification.verifyExtensions(geoPackage).should.be.equal(true);
-    created = geoPackage.createExtensionTable();
+    created = geoPackage.createExtensionsTable();
     created.should.be.equal(true);
     Verification.verifyExtensions(geoPackage).should.be.equal(true);
   });

@@ -23,7 +23,7 @@ export class StyleMappingTable extends UserMappingTable {
   }
   /**
    * Get the geometry type name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getGeometryTypeNameColumn(): UserColumn {
     return this.getColumn(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME);
@@ -31,14 +31,14 @@ export class StyleMappingTable extends UserMappingTable {
   /**
    * Creates a user mapping table with the minimum required columns followed by the additional columns
    * @param  {string} tableName name of the table
-   * @return {module:extension/relatedTables~UserMappingTable}
+   * @return {UserMappingTable}
    */
   static create(tableName: string): StyleMappingTable {
     return new StyleMappingTable(tableName, StyleMappingTable.createColumns(), null);
   }
   /**
    * Create the columns
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createColumns(): UserCustomColumn[] {
     const columns = UserMappingTable.createRequiredColumns();

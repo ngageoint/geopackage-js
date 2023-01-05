@@ -69,7 +69,7 @@ export class UserMappingRow extends UserCustomRow {
 
   /**
    * Get the base id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getBaseIdColumn(): UserColumn {
     return this.table.getColumn(UserMappingTable.COLUMN_BASE_ID);
@@ -100,7 +100,7 @@ export class UserMappingRow extends UserCustomRow {
 
   /**
    * Get the related id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getRelatedIdColumn(): UserColumn {
     return this.table.getColumn(UserMappingTable.COLUMN_RELATED_ID);

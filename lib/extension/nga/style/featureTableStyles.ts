@@ -337,7 +337,7 @@ export class FeatureTableStyles {
    * @return {FeatureStyle} feature style
    */
   getFeatureStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): FeatureStyle {
-    return this.getFeatureStyle(featureRow.id, geometryType);
+    return this.getFeatureStyle(featureRow.getId(), geometryType);
   }
   /**
    * Get the feature style default (style and icon) of the feature row,
@@ -348,7 +348,7 @@ export class FeatureTableStyles {
    * @return {FeatureStyle} feature style
    */
   getFeatureStyleDefaultForFeatureRow(featureRow: FeatureRow): FeatureStyle {
-    return this.getFeatureStyle(featureRow.id, null);
+    return this.getFeatureStyle(featureRow.getId(), null);
   }
   /**
    * Get the feature style (style and icon) of the feature, searching in
@@ -418,7 +418,7 @@ export class FeatureTableStyles {
    * @return {StyleRow} style row
    */
   getStyleForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): StyleRow {
-    return this.getStyle(featureRow.id, geometryType);
+    return this.getStyle(featureRow.getId(), geometryType);
   }
   /**
    * Get the default style of the feature row, searching in order: feature
@@ -428,7 +428,7 @@ export class FeatureTableStyles {
    * @return {StyleRow} style row
    */
   getStyleDefaultForFeatureRow(featureRow: FeatureRow): StyleRow {
-    return this.getStyle(featureRow.id, null);
+    return this.getStyle(featureRow.getId(), null);
   }
   /**
    * Get the style of the feature, searching in order: feature geometry type
@@ -499,7 +499,7 @@ export class FeatureTableStyles {
    * @return {IconRow} icon row
    */
   getIconForFeatureRowAndGeometryType(featureRow: FeatureRow, geometryType: GeometryType): IconRow {
-    return this.getIcon(featureRow.id, geometryType);
+    return this.getIcon(featureRow.getId(), geometryType);
   }
   /**
    * Get the default icon of the feature row, searching in order: feature
@@ -509,7 +509,7 @@ export class FeatureTableStyles {
    * @return {IconRow} icon row
    */
   getIconDefaultForFeatureRow(featureRow: FeatureRow): IconRow {
-    return this.getIcon(featureRow.id, null);
+    return this.getIcon(featureRow.getId(), null);
   }
   /**
    * Get the icon of the feature, searching in order: feature geometry type

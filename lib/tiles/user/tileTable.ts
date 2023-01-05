@@ -15,7 +15,7 @@ import { GeoPackageException } from '../../geoPackageException';
  *
  * @class
  * @param {string} tableName
- * @param {module:tiles/user/tileColumn~TileColumn[]} columns
+ * @param {TileColumn[]} columns
  */
 export class TileTable extends UserTable<TileColumn> {
   /**

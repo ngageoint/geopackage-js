@@ -35,24 +35,7 @@ export class GeoJSONResultSet implements IterableIterator<Feature> {
   constructor(featureIndexResultSet: FeatureIndexResults, featureDao: FeatureDao, dataColumnsDao: DataColumnsDao) {
     this.featureIndexResultSet = featureIndexResultSet;
     this.geometryTransform = this.getGeometryTransform(featureDao);
-    this.dataColumnsMap = GeoJSONResultSet.getColumnToDataColumnMap(featureDao, dataColumnsDao);
-  }
-
-
-  /**
-   * Gets the column name mapping
-   * @param featureDao
-   * @param dataColumnsDao
-   * @private
-   */
-  public static getColumnToDataColumnMap (featureDao: FeatureDao, dataColumnsDao: DataColumnsDao): any {
-    const dataColumns = dataColumnsDao.queryByTable(featureDao.getTableName());
-    const columnMap = {};
-    featureDao.getColumnNames().forEach(columnName => {
-      const dataColumn = dataColumns.find(dc => dc.getColumnName() === columnName);
-      columnMap[columnName] = dataColumn != null ? dataColumn.getName() : columnName;
-    })
-    return columnMap
+    this.dataColumnsMap = featureDao.getGeoPackage().getColumnToDataColumnMap(featureDao, dataColumnsDao);
   }
 
   /**

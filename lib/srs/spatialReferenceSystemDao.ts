@@ -45,7 +45,7 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Create a new SpatialReferenceSystem object
-   * @return {module:core/srs~SpatialReferenceSystem}
+   * @return {SpatialReferenceSystem}
    */
   createObject(results?: Record<string, DBValue>): SpatialReferenceSystem {
     const srs = new SpatialReferenceSystem();
@@ -213,7 +213,7 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
   /**
    * Get the Spatial Reference System for the provided id
    * @param  {Number}   srsId srs id
-   * @return {module:core/srs~SpatialReferenceSystem}
+   * @return {SpatialReferenceSystem}
    */
   getBySrsId(srsId: number): SpatialReferenceSystem {
     return this.queryForId(srsId);
@@ -228,8 +228,8 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Get the Contents for the SpatialReferenceSystem
-   * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem
-   * @return {module:features/columns~GeometryColumns}
+   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem
+   * @return {GeometryColumns}
    */
   private getContents(spatialReferenceSystem: SpatialReferenceSystem): Contents[] {
     const contentsDao = this.geoPackage.getContentsDao();
@@ -245,7 +245,8 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Get the GeometryColumns for the SpatialReferenceSystem
-   * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   * @return {module:features/columns~GeometryColumns}
+   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   
+   * @return {GeometryColumns}
    */
   private getGeometryColumns(spatialReferenceSystem: SpatialReferenceSystem): GeometryColumns[] {
     const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
@@ -261,7 +262,8 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
 
   /**
    * Get the TileMatrixSet for the SpatialReferenceSystem
-   * @param  {module:core/spatialReferenceSystem~SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem   * @return {module:tiles/matrixset~TileMatrixSet}
+   * @param  {SpatialReferenceSystem} spatialReferenceSystem SpatialReferenceSystem  
+   * @return {TileMatrixSet}
    */
   private getTileMatrixSet(spatialReferenceSystem: SpatialReferenceSystem): TileMatrixSet[] {
     const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();

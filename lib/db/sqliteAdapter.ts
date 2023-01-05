@@ -145,7 +145,7 @@ export class SqliteAdapter implements DBAdapter {
    * @see {@link https://github.com/JoshuaWise/better-sqlite3/wiki/API#registeroptions-function---this|better-sqlite3 register}
    * @param  {string} name               name of function to register
    * @param  {Function} functionDefinition function to register
-   * @return {module:db/sqliteAdapter~Adapter} this
+   * @return {Adapter} this
    */
   registerFunction(name: string, functionDefinition: Function): this {
     this.db.function(name, functionDefinition);
@@ -219,17 +219,10 @@ export class SqliteAdapter implements DBAdapter {
    */
   run(sql: string, params?: [] | Record<string, DBValue>): { changes: number; lastInsertRowid: number } {
     const statement = this.db.prepare(sql);
-    try {
-      if (params) {
-        return statement.run(params);
-      } else {
-        return statement.run();
-      }
-    } catch (e) {
-      if (e.code !== 'SQLITE_BUSY') {
-        throw new Error('the database is busy, wahhh')
-      }
-      this.db.isBusy()
+    if (params) {
+      return statement.run(params);
+    } else {
+      return statement.run();
     }
   }
   /**

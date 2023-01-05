@@ -25,7 +25,7 @@ export class IconCache {
    * @return {GeoPackageImage} icon image or null
    */
   getIconForIconRow(iconRow: IconRow): GeoPackageImage {
-    return this.get(iconRow.id);
+    return this.get(iconRow.getId());
   }
   /**
    * Get the cached image for the icon row id or null if not cached
@@ -86,7 +86,7 @@ export class IconCache {
    * @return {GeoPackageImage} removed icon image or null
    */
   removeIconForIconRow(iconRow: IconRow): GeoPackageImage {
-    return this.remove(iconRow.id);
+    return this.remove(iconRow.getId());
   }
   /**
    * Remove the cached image for the icon row id

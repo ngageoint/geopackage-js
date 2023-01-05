@@ -21,12 +21,9 @@ import type { GeoPackage } from '../../geoPackage';
 import { UserMappingDao } from './userMappingDao';
 import { UserDao } from '../../user/userDao';
 import { UserRow } from '../../user/userRow';
+import { UserMappingRow } from './userMappingRow';
 import { MediaDao } from './media/mediaDao';
 import { SimpleAttributesDao } from './simple/simpleAttributesDao';
-import { TileDao } from '../../tiles/user/tileDao';
-import { FeatureDao } from '../../features/user/featureDao';
-import { AttributesDao } from '../../attributes/attributesDao';
-import { UserMappingRow } from './userMappingRow';
 
 /**
  * Related Tables Extension
@@ -223,7 +220,7 @@ export class RelatedTablesExtension extends BaseExtension {
     let result;
     try {
       if (this.extendedRelationsDao.isTableExists()) {
-        result = this.extendedRelationsDao.queryForAll();
+        result = this.extendedRelationsDao.queryForAll().map(result => this.extendedRelationsDao.createObject(result));
       } else {
         result = [];
       }
@@ -464,7 +461,8 @@ export class RelatedTablesExtension extends BaseExtension {
     extendedRelation.setMappingTableName(userMappingTable.getTableName());
     extendedRelation.setRelationName(relationName);
     try {
-      this.extendedRelationsDao.create(extendedRelation);
+      const id = this.extendedRelationsDao.create(extendedRelation);
+      extendedRelation.setId(id);
     } catch (e) {
       throw new GeoPackageException(
         "Failed to add relationship '" + relationName + "' between " + baseTableName + ' and ' + relatedTableName,
@@ -979,6 +977,67 @@ export class RelatedTablesExtension extends BaseExtension {
     return created;
   }
 
+
+  /**
+   * Get a related media table DAO
+   * @param mediaTable media table
+   * @return media DAO
+   */
+  public getMediaDaoWithMediaTable(mediaTable: MediaTable): MediaDao {
+    return this.getMediaDao(mediaTable.getTableName());
+  }
+
+  /**
+   * Get a related media table DAO
+   * @param extendedRelation extended relation
+   * @return media DAO
+   */
+  public getMediaDaoWithExtendedRelation(extendedRelation: ExtendedRelation): MediaDao {
+    return this.getMediaDao(extendedRelation.getRelatedTableName());
+  }
+
+  /**
+   * Get a related media table DAO
+   * @param tableName media table name
+   * @return media DAO
+   */
+  public getMediaDao(tableName: string): MediaDao {
+    const mediaDao = new MediaDao(this.getUserDao(tableName));
+    this.setContents(mediaDao.getTable());
+    return mediaDao;
+  }
+
+  /**
+   * Get a related simple attributes table DAO
+   * @param simpleAttributesTable simple attributes table
+   * @return simple attributes DAO
+   */
+  public getSimpleAttributesDaoWithSimpleAttributesTable(simpleAttributesTable: SimpleAttributesTable): SimpleAttributesDao {
+    return this.getSimpleAttributesDao(simpleAttributesTable.getTableName());
+  }
+
+  /**
+   * Get a related simple attributes table DAO
+   * @param extendedRelation extended relation
+   * @return simple attributes DAO
+   */
+  public getSimpleAttributesDaoWithExtendedRelation(extendedRelation: ExtendedRelation): SimpleAttributesDao {
+    return this.getSimpleAttributesDao(extendedRelation.getRelatedTableName());
+  }
+
+  /**
+   * Get a related simple attributes table DAO
+   *
+   * @param tableName
+   *            simple attributes table name
+   * @return simple attributes DAO
+   */
+  public getSimpleAttributesDao(tableName: string): SimpleAttributesDao {
+    const simpleAttributesDao = new SimpleAttributesDao(this.getUserDao(tableName));
+    this.setContents(simpleAttributesDao.getTable());
+    return simpleAttributesDao;
+  }
+
   /**
    * Create a user related table if it does not exist. When not created, there
    * is no guarantee that an existing table has the same schema as the
@@ -997,13 +1056,13 @@ export class RelatedTablesExtension extends BaseExtension {
 
       try {
         // Create the contents
-        const contents = new Contents();
+        let contents = new Contents();
         contents.setTableName(relatedTableName);
         contents.setDataTypeName(relatedTable.getDataType());
         contents.setIdentifier(relatedTableName);
         const contentsDao = this.geoPackage.getContentsDao();
         contentsDao.create(contents);
-        contentsDao.refresh(contents);
+        contents = contentsDao.refresh(contents);
         relatedTable.setContents(contents);
       } catch (e) {
         this.geoPackage.deleteTableQuietly(relatedTableName);
@@ -1049,9 +1108,7 @@ export class RelatedTablesExtension extends BaseExtension {
 
   /**
    * Remove a specific relationship from the GeoPackage
-   *
-   * @param extendedRelation
-   *            extended relation
+   * @param extendedRelation extended relation
    */
   public removeRelationshipWithExtendedRelation(extendedRelation: ExtendedRelation): void {
     try {
@@ -1417,6 +1474,22 @@ export class RelatedTablesExtension extends BaseExtension {
   }
 
   /**
+   * Gets the mapping dao
+   * @param mappingTableName
+   */
+  public getMappingDao(mappingTableName: string): UserMappingDao {
+    return this.getUserMappingDao(mappingTableName);
+  }
+
+  /**
+   * Gets the mapping dao
+   * @param extendedRelation
+   */
+  public getMappingDaoWithExtendedRelation(extendedRelation: ExtendedRelation): UserMappingDao {
+    return this.getUserMappingDao(extendedRelation.getMappingTableName());
+  }
+
+  /**
    * Retrieves all rows that are related with a given record
    * @param baseTableName
    * @param baseId
@@ -1428,7 +1501,7 @@ export class RelatedTablesExtension extends BaseExtension {
     const relationships = this.getBaseTableRelations(baseTableName);
     for (let i = 0; i < relationships.length; i++) {
       const relation = relationships[i];
-      if (typeFilter != null && typeFilter.indexOf(relation.getRelationType()) !== -1) {
+      if (typeFilter == null || typeFilter.indexOf(relation.getRelationType()) !== -1) {
         const relationMap = new Map<UserMappingRow, UserRow<any, any>>();
         let userDao: UserDao<any, any, any, any>;
         switch (relation.getRelationType()) {
@@ -1453,13 +1526,330 @@ export class RelatedTablesExtension extends BaseExtension {
 
         const userMappingDao = this.getUserMappingDao(relation.getMappingTableName());
         const mappingResultSet = userMappingDao.queryByBaseId(baseId);
-        for (const row of mappingResultSet) {
-          const userMappingRow = userMappingDao.getRow(row);
-          relationMap.set(userMappingRow, userDao.queryForId(userMappingRow.getRelatedId()))
+        while (mappingResultSet.moveToNext()) {
+          const userMappingRow = userMappingDao.getRowWithUserCustomRow(mappingResultSet.getRow());
+          relationMap.set(userMappingRow, userDao.queryForIdRow(userMappingRow.getRelatedId()))
         }
         relationshipMap.set(relation, relationMap);
       }
     }
     return relationshipMap;
+  }
+
+
+  /**
+   * Get the related id mappings for the base id
+   *
+   * @param extendedRelation extended relation
+   * @param baseId base id
+   * @return IDs representing the matching related IDs
+   */
+  public getMappingsForBaseWithExtendedRelation(extendedRelation: ExtendedRelation, baseId: number): number[] {
+    return this.getMappingsForBase(extendedRelation.getMappingTableName(), baseId);
+  }
+
+  /**
+   * Get the related id mappings for the base id
+   * @param tableName mapping table name
+   * @param baseId base id
+   * @return IDs representing the matching related IDs
+   */
+  public getMappingsForBase(tableName: string, baseId: number): number[] {
+    const relatedIds = [];
+    const userMappingDao = this.getMappingDao(tableName);
+    const resultSet = userMappingDao.queryByBaseId(baseId);
+    try {
+      while (resultSet.moveToNext()) {
+        const row = userMappingDao.getRow(resultSet);
+        relatedIds.push(row.getRelatedId());
+      }
+    } finally {
+      resultSet.close();
+    }
+    return relatedIds;
+  }
+
+  /**
+   * Get the base id mappings for the related id
+   *
+   * @param extendedRelation extended relation
+   * @param relatedId related id
+   * @return IDs representing the matching base IDs
+   */
+  public getMappingsForRelatedWithExtendedRelation(extendedRelation: ExtendedRelation, relatedId: number): number[] {
+    return this.getMappingsForRelated(extendedRelation.getMappingTableName(), relatedId);
+  }
+
+  /**
+   * Get the base id mappings for the related id
+   * @param tableName mapping table name
+   * @param relatedId related id
+   * @return IDs representing the matching base IDs
+   */
+  public getMappingsForRelated(tableName: string, relatedId: number): number[] {
+
+    const baseIds = [];
+
+    const userMappingDao = this.getMappingDao(tableName);
+    const resultSet = userMappingDao.queryByRelatedId(relatedId);
+    try {
+      while (resultSet.moveToNext()) {
+        const row = userMappingDao.getRow(resultSet);
+        baseIds.push(row.getBaseId());
+      }
+    } finally {
+      resultSet.close();
+    }
+
+    return baseIds;
+  }
+
+  /**
+   * Determine if the base id and related id mapping exists
+   * @param tableName mapping table name
+   * @param baseId base id
+   * @param relatedId related id
+   * @return true if mapping exists
+   */
+  public hasMapping(tableName: string, baseId: number, relatedId: number): boolean {
+    const userMappingDao = this.getMappingDao(tableName);
+    return userMappingDao.countByIds(baseId, relatedId) > 0;
+  }
+
+  /**
+   * Count the number of mappings to the base table and id
+   * @param baseTable base table name
+   * @param baseId base id
+   * @return mappings count
+   */
+  public countMappingsToBase(baseTable: string, baseId: number): number {
+    return this.countMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(baseTable), baseId);
+  }
+
+  /**
+   * Determine if a mapping to the base table and id exists
+   * @param baseTable base table name
+   * @param baseId base id
+   * @return true if mapping exists
+   */
+  public hasMappingToBase(baseTable: string, baseId: number): boolean {
+    return this.countMappingsToBase(baseTable, baseId) > 0;
+  }
+
+  /**
+   * Count the number of mappings in the extended relations to the base id
+   * @param extendedRelations extended relations
+   * @param baseId base id
+   * @return mappings count
+   */
+  public countMappingsToBaseWithExtendedRelations(extendedRelations: ExtendedRelation[], baseId: number): number {
+    let count = 0;
+    if (extendedRelations != null) {
+      for (const extendedRelation of extendedRelations) {
+        count += this.countMappingsToBaseWithExtendedRelation(extendedRelation, baseId);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Determine if a mapping in the extended relations to the base id exists
+   * @param extendedRelations extended relations
+   * @param baseId base id
+   * @return true if mapping exists
+   */
+  public hasMappingToBaseWithExtendedRelations(extendedRelations: ExtendedRelation[], baseId: number): boolean {
+    return this.countMappingsToBaseWithExtendedRelations(extendedRelations, baseId) > 0;
+  }
+
+  /**
+   * Count the number of mappings in the extended relation to the base id
+   *
+   * @param extendedRelation extended relation
+   * @param baseId base id
+   * @return mappings count
+   */
+  public countMappingsToBaseWithExtendedRelation(extendedRelation: ExtendedRelation, baseId: number): number {
+    return this.getMappingDaoWithExtendedRelation(extendedRelation).countByBaseId(baseId);
+  }
+
+  /**
+   * Determine if a mapping in the extended relation to the base id exists
+   * @param extendedRelation extended relation
+   * @param baseId base id
+   * @return true if mapping exists
+   */
+  public hasMappingToBaseWithExtendedRelation(extendedRelation: ExtendedRelation, baseId: number): boolean {
+    return this.countMappingsToBaseWithExtendedRelation(extendedRelation, baseId) > 0;
+  }
+
+  /**
+   * Delete mappings to the base table and id
+   * @param baseTable base table name
+   * @param baseId base id
+   * @return rows deleted
+   */
+  public deleteMappingsToBase(baseTable: string, baseId: number): number {
+    return this.deleteMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(baseTable), baseId);
+  }
+
+  /**
+   * Delete mappings in the extended relations to the base id
+   * @param extendedRelations extended relations
+   * @param baseId base id
+   * @return rows deleted
+   */
+  public deleteMappingsToBaseWithExtendedRelations(extendedRelations: ExtendedRelation[], baseId: number): number {
+    let count = 0;
+    if (extendedRelations != null) {
+      for (const extendedRelation of extendedRelations) {
+        count += this.deleteMappingsToBaseWithExtendedRelation(extendedRelation, baseId);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Delete mappings in the extended relation to the base id
+   * @param extendedRelation extended relation
+   * @param baseId base id
+   * @return rows deleted
+   */
+  public deleteMappingsToBaseWithExtendedRelation(extendedRelation: ExtendedRelation, baseId: number): number {
+    return this.getMappingDaoWithExtendedRelation(extendedRelation).deleteByBaseId(baseId);
+  }
+
+  /**
+   * Count the number of mappings to the related table and id
+   * @param relatedTable related table name
+   * @param relatedId related id
+   * @return mappings count
+   */
+  public countMappingsToRelated(relatedTable: string, relatedId: number): number {
+    return this.countMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(relatedTable), relatedId);
+  }
+
+  /**
+   * Determine if a mapping to the related table and id exists
+   * @param relatedTable related table name
+   * @param relatedId related id
+   * @return true if mapping exists
+   */
+  public hasMappingToRelated(relatedTable: string, relatedId: number): boolean {
+    return this.countMappingsToRelated(relatedTable, relatedId) > 0;
+  }
+
+  /**
+   * Count the number of mappings in the extended relations to the related id
+   * @param extendedRelations extended relations
+   * @param relatedId related id
+   * @return mappings count
+   */
+  public countMappingsToRelatedWithExtendedRelations(extendedRelations: ExtendedRelation[], relatedId: number): number {
+    let count = 0;
+    if (extendedRelations != null) {
+      for (const extendedRelation of extendedRelations) {
+        count += this.countMappingsToRelatedWithExtendedRelation(extendedRelation, relatedId);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Determine if a mapping in the extended relations to the related id exists
+   * @param extendedRelations extended relations
+   * @param relatedId related id
+   * @return true if mapping exists
+   */
+  public hasMappingToRelatedWithExtendedRelations(extendedRelations: ExtendedRelation[], relatedId: number): boolean {
+    return this.countMappingsToRelatedWithExtendedRelations(extendedRelations, relatedId) > 0;
+  }
+
+  /**
+   * Count the number of mappings in the extended relation to the related id
+   * @param extendedRelation extended relation
+   * @param relatedId related id
+   * @return mappings count
+   */
+  public countMappingsToRelatedWithExtendedRelation(extendedRelation: ExtendedRelation, relatedId: number): number {
+    return this.getMappingDaoWithExtendedRelation(extendedRelation).countByRelatedId(relatedId);
+  }
+
+  /**
+   * Determine if a mapping in the extended relation to the related id exists
+   * @param extendedRelation extended relation
+   * @param relatedId related id
+   * @return true if mapping exists
+   */
+  public hasMappingToRelatedWithExtendedRelation(extendedRelation: ExtendedRelation, relatedId: number): boolean {
+    return this.countMappingsToRelatedWithExtendedRelation(extendedRelation, relatedId) > 0;
+  }
+
+  /**
+   * Delete mappings to the related table and id
+   * @param relatedTable related table name
+   * @param relatedId related id
+   * @return rows deleted
+   */
+  public deleteMappingsToRelated(relatedTable: string, relatedId: number): number {
+    return this.deleteMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(relatedTable), relatedId);
+  }
+
+  /**
+   * Delete mappings in the extended relations to the related id
+   * @param extendedRelations extended relations
+   * @param relatedId related id
+   * @return rows deleted
+   */
+  public deleteMappingsToRelatedWithExtendedRelations(extendedRelations: ExtendedRelation[], relatedId: number): number {
+    let count = 0;
+    if (extendedRelations != null) {
+      for (const extendedRelation of extendedRelations) {
+        count += this.deleteMappingsToRelatedWithExtendedRelation(extendedRelation, relatedId);
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Delete mappings in the extended relation to the related id
+   * @param extendedRelation extended relation
+   * @param relatedId related id
+   * @return rows deleted
+   */
+  public deleteMappingsToRelatedWithExtendedRelation(extendedRelation: ExtendedRelation, relatedId: number): number {
+    return this.getMappingDaoWithExtendedRelation(extendedRelation).deleteByRelatedId(relatedId);
+  }
+
+  /**
+   * Count the number of mappings to the table and id
+   * @param table table name
+   * @param id table id
+   * @return mappings count
+   */
+  public countMappings(table: string, id: number): number {
+    return this.countMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) + this.countMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id);
+  }
+
+  /**
+   * Determine if a mapping to the table and id exists
+   * @param table table name
+   * @param id table id
+   * @return true if mapping exists
+   */
+  public hasMappingForBaseOrRelatedId(table: string, id: number): boolean {
+    return this.hasMappingToBaseWithExtendedRelations(this.getBaseTableRelations(table), id) || this.hasMappingToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id);
+  }
+
+  /**
+   * Delete mappings to the table and id
+   * @param table table name
+   * @param id table id
+   * @return rows deleted
+   */
+  public deleteMappings(table: string, id: number): number {
+    let count = this.deleteMappingsToBaseWithExtendedRelations(this.getBaseTableRelations(table), id);
+    count += this.deleteMappingsToRelatedWithExtendedRelations(this.getRelatedTableRelations(table), id);
+    return count;
   }
 }

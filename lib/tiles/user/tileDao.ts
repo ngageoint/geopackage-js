@@ -126,6 +126,15 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
   setWebMapZoomLevels(): void {
     const totalTileWidth = this.tileMatrixSet.getMaxX() - this.tileMatrixSet.getMinX();
     const totalTileHeight = this.tileMatrixSet.getMaxY() - this.tileMatrixSet.getMinY();
+
+    let transform;
+    try {
+      transform = new ProjectionTransform(this.projection, Projections.getWGS84Projection());
+    } catch (e) {
+      console.error('Failed to create a projection transformation.');
+      transform = null;
+    }
+
     for (let i = 0; i < this.tileMatrices.length; i++) {
       const tileMatrix = this.tileMatrices[i];
       const singleTileWidth = totalTileWidth / tileMatrix.getMatrixWidth();
@@ -136,12 +145,14 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
         this.tileMatrixSet.getMinY(),
         this.tileMatrixSet.getMinY() + singleTileHeight,
       );
-      const transform = new ProjectionTransform(this.projection, Projections.getWGS84Projection());
-      const ne = transform.transform(tileBox.getMaxLongitude(), tileBox.getMaxLatitude());
-      const sw = transform.transform(tileBox.getMinLongitude(), tileBox.getMinLatitude());
-      const width = ne[0] - sw[0];
-      const zoom = Math.ceil(Math.log2(360 / width));
-      this.webZoomToGeoPackageZooms.set(zoom, tileMatrix.getZoomLevel());
+      if (transform != null) {
+        const ne = transform.transform(tileBox.getMaxLongitude(), tileBox.getMaxLatitude());
+        const sw = transform.transform(tileBox.getMinLongitude(), tileBox.getMinLatitude());
+        const width = ne[0] - sw[0];
+        const zoom = Math.ceil(Math.log2(360 / width));
+        this.webZoomToGeoPackageZooms.set(zoom, tileMatrix.getZoomLevel());
+      }
+
     }
   }
 
@@ -346,7 +357,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
     fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
     fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
     fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-    const resultSet = this.queryForFieldValues(false, undefined, fieldValues);
+    const resultSet = this.queryForFieldValues(fieldValues);
     let tileRow = null;
     if (resultSet.moveToNext()) {
       tileRow = resultSet.getRow();
@@ -360,7 +371,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile result set, should be closed
    */
   public queryForTiles(zoomLevel: number): TileResultSet {
-    return this.queryForEq(false, undefined, TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    return this.queryForEq(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
   }
 
   /**
@@ -370,8 +381,6 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    */
   public queryForTilesDescending(zoomLevel: number): TileResultSet {
     return this.queryForEq(
-      false,
-      undefined,
       TileTable.COLUMN_ZOOM_LEVEL,
       zoomLevel,
       null,
@@ -390,7 +399,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
     const fieldValues = new ColumnValues();
     fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
     fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-    return this.queryForFieldValues(false, undefined, fieldValues);
+    return this.queryForFieldValues(fieldValues);
   }
 
   /**
@@ -404,7 +413,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
     const fieldValues = new ColumnValues();
     fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
     fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-    return this.queryForFieldValues(false, undefined, fieldValues);
+    return this.queryForFieldValues(fieldValues);
   }
 
   /**

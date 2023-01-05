@@ -122,6 +122,21 @@ export class TileDaoUtils {
   }
 
   /**
+   * Binary search
+   * @param array
+   * @param value
+   * @private
+   * @return the actual index of -1 * insertion point
+   */
+  private static binarySearch(array: number[], value: number): number {
+    let index = sortedIndexOf(array, value);
+    if (index === -1) {
+      index = sortedIndex(array, value) * -1;
+    }
+    return index;
+  }
+
+  /**
    * Get the zoom level for the provided width and height in the default units
    * @param widths sorted widths
    * @param heights sorted heights
@@ -140,19 +155,12 @@ export class TileDaoUtils {
     lengthChecks: boolean,
   ): number {
     let zoomLevel = null;
-    let widthIndex = sortedIndexOf(widths, width);
-    if (widthIndex === -1) {
-      widthIndex = sortedIndex(widths, width);
-    }
+    let widthIndex = TileDaoUtils.binarySearch(widths, width);
     if (widthIndex < 0) {
       widthIndex = (widthIndex + 1) * -1;
     }
 
-    let heightIndex = sortedIndexOf(heights, height);
-    if (heightIndex === -1) {
-      heightIndex = sortedIndex(heights, height);
-    }
-
+    let heightIndex = TileDaoUtils.binarySearch(heights, height);
     if (heightIndex < 0) {
       heightIndex = (heightIndex + 1) * -1;
     }
@@ -165,10 +173,10 @@ export class TileDaoUtils {
       if (lengthChecks && width >= TileDaoUtils.getMaxLength(widths)) {
         widthIndex = -1;
       } else {
-        --widthIndex;
+        widthIndex--;
       }
     } else if (TileDaoUtils.closerToZoomIn(widths, width, widthIndex)) {
-      --widthIndex;
+      widthIndex--;
     }
 
     if (heightIndex == 0) {
@@ -179,10 +187,10 @@ export class TileDaoUtils {
       if (lengthChecks && height >= TileDaoUtils.getMaxLength(heights)) {
         heightIndex = -1;
       } else {
-        --heightIndex;
+        heightIndex--;
       }
     } else if (TileDaoUtils.closerToZoomIn(heights, height, heightIndex)) {
-      --heightIndex;
+      heightIndex--;
     }
 
     if (widthIndex >= 0 || heightIndex >= 0) {

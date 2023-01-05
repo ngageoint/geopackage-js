@@ -552,6 +552,7 @@ export class ExtensionManager extends ExtensionManagement {
         );
       }
     } catch (e) {
+      console.error(e);
       console.warn('Failed to create Metadata for table: ' + newTable + ', copied from table: ' + table);
     }
   }

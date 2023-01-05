@@ -29,8 +29,8 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   }
 
   /**
-   * Create a {module:extension/relatedTables~ExtendedRelation} object
-   * @return {module:extension/relatedTables~ExtendedRelation}
+   * Create a {ExtendedRelation} object
+   * @return {ExtendedRelation}
    */
   createObject(result?: Record<string, DBValue>): ExtendedRelation {
     const er = new ExtendedRelation();
@@ -73,7 +73,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   /**
    * Get all relations for the given base table name
    * @param  {string} baseTable base table name
-   * @return {module:extension/relatedTables~ExtendedRelation[]}
+   * @return {ExtendedRelation[]}
    */
   getBaseTableRelations(baseTable: string): ExtendedRelation[] {
     const results = [];
@@ -85,7 +85,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   /**
    * Get all relations for the given related table name
    * @param  {string} relatedTable related table name
-   * @return {module:extension/relatedTables~ExtendedRelation[]}
+   * @return {ExtendedRelation[]}
    */
   getRelatedTableRelations(relatedTable: string): ExtendedRelation[] {
     const results = [];
@@ -98,7 +98,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
    * Get all relations for the base table with the relation name
    * @param  {string} baseTable base table name
    * @param  {string} name      relation name
-   * @return {module:extension/relatedTables~ExtendedRelation[]}
+   * @return {ExtendedRelation[]}
    */
   getBaseTableRelationsWithName(baseTable: string, name: string): ExtendedRelation[] {
     const fields = new ColumnValues();
@@ -115,7 +115,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   /**
    * Get all relations to the table.  Returns relations where the table is the base table and relations where the table is the related table.
    * @param  {string} table table name to query for
-   * @return {module:extension/relatedTables~ExtendedRelation[]}
+   * @return {ExtendedRelation[]}
    */
   getTableRelations(table: string): ExtendedRelation[] {
     const fields = new ColumnValues();
@@ -185,7 +185,7 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
   /**
    * Get all relations by the mapping table name
    * @param  {string} mappingTableName name of the mapping table
-   * @return {module:extension/relatedTables~ExtendedRelation[]}
+   * @return {ExtendedRelation[]}
    */
   queryByMappingTableName(mappingTableName: string): ExtendedRelation[] {
     const fields = new ColumnValues();

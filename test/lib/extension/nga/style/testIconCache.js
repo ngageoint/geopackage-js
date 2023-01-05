@@ -102,7 +102,7 @@ describe('IconCache Tests', function() {
   it('should test icon cache should return icon for icon row', function() {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     should.not.exist(iconCache.getIconForIconRow(iconRow));
     should.not.exist(iconCache.putIconForIconRow(iconRow, iconImage));
     should.exist(iconCache.getIconForIconRow(iconRow));
@@ -118,7 +118,7 @@ describe('IconCache Tests', function() {
     // test access history stuff
     for (var i = 0; i < cacheSize * 2; i++) {
       var testRow = randomIcon(featureTableStyles);
-      testRow.id = i + 1;
+      testRow.setId(i + 1, true);
       iconCache.putIconForIconRow(testRow, iconImage);
       Object.keys(iconCache.iconCache).length.should.be.below(cacheSize + 1);
     }
@@ -129,7 +129,7 @@ describe('IconCache Tests', function() {
     var cacheSize = 3;
     var iconCache = new IconCache(cacheSize);
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     iconCache.putIconForIconRow(iconRow, iconImage);
     Object.keys(iconCache.iconCache).length.should.be.equal(1);
     iconCache.clear();
@@ -142,7 +142,7 @@ describe('IconCache Tests', function() {
     // test access history stuff
     for (var i = 0; i < cacheSize; i++) {
       var testRow = randomIcon(featureTableStyles);
-      testRow.id = i + 1;
+      testRow.setId(i + 1, true);
       iconCache.putIconForIconRow(testRow, iconImage);
       Object.keys(iconCache.iconCache).length.should.be.below(cacheSize + 1);
     }
@@ -168,7 +168,7 @@ describe('IconCache Tests', function() {
   it('should create icon and cache it', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     var image = await iconCache.createIcon(iconRow);
     var result = await compareImages(image, iconImage);
     result.should.be.equal(true);
@@ -178,7 +178,7 @@ describe('IconCache Tests', function() {
   it('should create icon but not cache it', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     var image = await iconCache.createIconNoCache(iconRow);
     var result = await compareImages(image, iconImage);
     result.should.be.equal(true);
@@ -188,7 +188,7 @@ describe('IconCache Tests', function() {
   it('should create scaled icon but not cache it', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIconNoCache(iconRow, 2.0);
     should.not.exist(iconCache.getIconForIconRow(iconRow));
@@ -199,7 +199,7 @@ describe('IconCache Tests', function() {
   it('should create scaled icon and cache it', mochaAsync(async () => {
     var iconCache = new IconCache();
     var iconRow = randomIcon(featureTableStyles);
-    iconRow.id = 0;
+    iconRow.setId(0, true);
     var expectedImage = await ImageUtils.getImage(path.join(__dirname, '..', '..', '..', '..', 'fixtures', isWeb ? 'web' : '', 'point_2x.png'));
     var image = await iconCache.createScaledIcon(iconRow, 2.0);
     var result = await compareImages(expectedImage, image);

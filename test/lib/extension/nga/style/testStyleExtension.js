@@ -123,9 +123,13 @@ describe('StyleExtension Tests', function() {
   });
 
   afterEach(async function() {
-    geoPackage.close();
-    Canvas.disposeImage(iconImage);
-    await testSetup.deleteGeoPackage(testGeoPackage);
+    try {
+      geoPackage.close();
+      Canvas.disposeImage(iconImage);
+      await testSetup.deleteGeoPackage(testGeoPackage);
+    } catch (e) {
+      console.error(e);
+    }
   });
 
   it('should create extension for feature table', function() {
@@ -228,7 +232,7 @@ describe('StyleExtension Tests', function() {
     should.not.exist(featureTableStyles.getTableIconDefault());
     should.not.exist(featureTableStyles.getTableIcon("GEOMETRY"));
     const featureDao = geoPackage.getFeatureDao(featureTableName);
-    const featureRow = featureDao.queryForId(featureRowId);
+    const featureRow = featureDao.queryForIdRow(featureRowId);
     should.not.exist(featureTableStyles.getFeatureStylesForFeatureRow(featureRow));
     should.not.exist(featureTableStyles.getFeatureStyles(featureRow.getId()));
     should.not.exist(featureTableStyles.getFeatureStyleForFeatureRow(featureRow));

@@ -107,12 +107,54 @@ export enum MetadataScopeType {
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace MetadataScopeType {
-  /**
-   * Get MetadataScopeType from type string
-   * @param type
-   */
+  export function nameFromType(type: MetadataScopeType): string {
+    return type.toLowerCase();
+  }
+
   export function fromName(type: string): MetadataScopeType {
-    return MetadataScopeType[type as keyof typeof MetadataScopeType] as MetadataScopeType;
+    switch (type) {
+      case 'undefined':
+        return MetadataScopeType.UNDEFINED;
+      case 'fieldSession':
+        return MetadataScopeType.FIELD_SESSION;
+      case 'collectionSession':
+        return MetadataScopeType.COLLECTION_SESSION;
+      case 'series':
+        return MetadataScopeType.SERIES;
+      case 'dataset':
+        return MetadataScopeType.DATASET;
+      case 'featureType':
+        return MetadataScopeType.FEATURE_TYPE;
+      case 'feature':
+        return MetadataScopeType.FEATURE;
+      case 'attributeType':
+        return MetadataScopeType.ATTRIBUTE_TYPE;
+      case 'attribute':
+        return MetadataScopeType.ATTRIBUTE;
+      case 'tile':
+        return MetadataScopeType.TILE;
+      case 'model':
+        return MetadataScopeType.MODEL;
+      case 'catalog':
+        return MetadataScopeType.CATALOG;
+      case 'schema':
+        return MetadataScopeType.SCHEMA;
+      case 'taxonomy':
+        return MetadataScopeType.TAXONOMY;
+      case 'software':
+        return MetadataScopeType.SOFTWARE;
+      case 'service':
+        return MetadataScopeType.SERVICE;
+      case 'collectionHardware':
+        return MetadataScopeType.COLLECTION_HARDWARE;
+      case 'nonGeographicDataset':
+        return MetadataScopeType.NON_GEOGRAPHIC_DATASET;
+      case 'dimensionGroup':
+        return MetadataScopeType.DIMENSION_GROUP;
+      case 'style':
+        return MetadataScopeType.STYLE;
+    }
+    return null;
   }
 
   /**

@@ -220,7 +220,7 @@ export abstract class Dao<T, ID> {
   /**
    * Queries for all matches and returns them.  Only queries for the specified column name  Be aware this pulls all results into memory
    * @param {string}  columnName  name of the column to query for
-   * @param {module:dao/columnValues~ColumnValues} [fieldValues] optional values to filter on
+   * @param {ColumnValues} [fieldValues] optional values to filter on
    * @return {Object[]} raw object array from the database
    */
   queryForColumns(columnName: string, fieldValues?: ColumnValues): Record<string, DBValue>[] {
@@ -318,7 +318,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Iterate all objects in thet able that match the ColumnValues passed in
-   * @param  {module:dao/columnValues~ColumnValues} fieldValues ColumnValues to query for
+   * @param  {ColumnValues} fieldValues ColumnValues to query for
    * @return {IterableIterator<any>}
    */
   queryForFieldValues(fieldValues: ColumnValues): IterableIterator<Record<string, DBValue>> {
@@ -466,7 +466,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Build where (or selection) LIKE statement for fields
-   * @param  {module:dao/columnValues~ColumnValues} fields    columns and values
+   * @param  {ColumnValues} fields    columns and values
    * @param  {string} [operation] AND or OR
    * @return {string} where clause
    */
@@ -602,7 +602,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Count rows in the table optionally filtered by the parameters specified
-   * @param  {module:dao/columnValues~ColumnValues|string} [fields] Either a ColumnValues object or a string specifying a field name
+   * @param  {ColumnValues|string} [fields] Either a ColumnValues object or a string specifying a field name
    * @param  {Object} [value]  value to filter on if fields is a string
    * @return {number} count of objects
    */
@@ -685,7 +685,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Delete the object specified by the ids
-   * @param  {module:dao/columnValues~ColumnValues} idValues id values
+   * @param  {ColumnValues} idValues id values
    * @return {number} number of objects deleted
    */
   deleteByMultiId(idValues: any[]): number {
@@ -733,7 +733,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Update all rows that match the query
-   * @param  {module:dao/columnValues~ColumnValues} values    values to insert
+   * @param  {ColumnValues} values    values to insert
    * @param  {string} where     where clause
    * @param  {Object[]} whereArgs where arguments
    * @return {number} number of objects updated

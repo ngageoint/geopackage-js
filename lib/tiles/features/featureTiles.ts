@@ -314,7 +314,7 @@ export class FeatureTiles {
 
       const styleDao = this.featureTableStyles.getStyleDao();
       for (const styleRowId of styleRowIds) {
-        const styleRow = styleDao.getRow(styleDao.queryForId(styleRowId));
+        const styleRow = styleDao.getRow(styleDao.queryForIdRow(styleRowId));
         const styleHalfWidth = this.scale * (styleRow.getWidthOrDefault() / 2.0);
         this.widthOverlap = Math.max(this.widthOverlap, styleHalfWidth);
         this.heightOverlap = Math.max(this.heightOverlap, styleHalfWidth);
@@ -333,7 +333,7 @@ export class FeatureTiles {
 
       const iconDao = this.featureTableStyles.getIconDao();
       for (const iconRowId of iconRowIds) {
-        const iconRow = iconDao.getRow(iconDao.queryForId(iconRowId));
+        const iconRow = iconDao.getRow(iconDao.queryForIdRow(iconRowId));
         const iconDimensions = iconRow.getDerivedDimensions();
         const iconWidth = this.scale * Math.ceil(iconDimensions[0]);
         const iconHeight = this.scale * Math.ceil(iconDimensions[1]);
@@ -497,7 +497,7 @@ export class FeatureTiles {
   getFeatureStyle(featureRow: FeatureRow, geometryType: GeometryType): FeatureStyle {
     let featureStyle = null;
     if (this.featureTableStyles != null) {
-      featureStyle = this.featureTableStyles.getFeatureStyle(featureRow.id, geometryType);
+      featureStyle = this.featureTableStyles.getFeatureStyle(featureRow.getId(), geometryType);
     }
     return featureStyle;
   }
@@ -709,8 +709,6 @@ export class FeatureTiles {
     let boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, z);
     boundingBox = this.expandBoundingBox(boundingBox);
     return this.indexManager.countWithBoundingBoxAndProjection(
-      false,
-      undefined,
       boundingBox,
       FeatureTiles.WEB_MERCATOR_PROJECTION,
     );
@@ -726,8 +724,6 @@ export class FeatureTiles {
     let boundingBox = TileBoundingBoxUtils.getWGS84BoundingBox(x, y, z);
     boundingBox = this.expandBoundingBoxWithProjection(boundingBox, FeatureTiles.WGS_84_PROJECTION);
     return this.indexManager.countWithBoundingBoxAndProjection(
-      false,
-      undefined,
       boundingBox,
       FeatureTiles.WGS_84_PROJECTION,
     );
@@ -745,7 +741,7 @@ export class FeatureTiles {
     y: number,
     z: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<Uint8Array> {
+  ): Promise<GeoPackageImage> {
     if (this.isIndexQuery()) {
       return this.drawTileQueryIndex(x, y, z, canvas);
     } else {
@@ -788,9 +784,9 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<Uint8Array> {
+  ): Promise<GeoPackageImage> {
     const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
-    const resultSet: FeatureResultSet = this.featureDao.queryForAll();
+    const resultSet = this.featureDao.queryForAll();
     let image = null;
     try {
       const totalCount = resultSet.getCount();
@@ -877,17 +873,17 @@ export class FeatureTiles {
     y: number,
     zoom: number,
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
-  ): Promise<Uint8Array> {
+  ): Promise<GeoPackageImage> {
     let image;
-    const boundingBox = TileBoundingBoxUtils.getBoundingBox(x, y, zoom);
+    const boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, zoom);
 
     // Query for the geometry count matching the bounds in the index
-    const tileCount = this.queryIndexedFeaturesCountWithBoundingBox(boundingBox, FeatureTiles.WEB_MERCATOR_PROJECTION);
+    const results = this.queryIndexedFeaturesWithBoundingBox(boundingBox, FeatureTiles.WEB_MERCATOR_PROJECTION);
+
+    const tileCount = results.count();
 
     // Draw if at least one geometry exists
     if (tileCount > 0) {
-      // Query for geometries matching the bounds in the index
-      const results = this.queryIndexedFeaturesWithBoundingBox(boundingBox, FeatureTiles.WEB_MERCATOR_PROJECTION);
       try {
         if (this.maxFeaturesPerTile == null || tileCount <= this.maxFeaturesPerTile) {
           // Draw the tile image
@@ -983,7 +979,7 @@ export class FeatureTiles {
     // that overlap
     const expandedQueryBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
     // Count for geometries matching the bounds in the index
-    return this.indexManager.countWithBoundingBoxAndProjection(false, undefined, expandedQueryBoundingBox, projection);
+    return this.indexManager.countWithBoundingBoxAndProjection(expandedQueryBoundingBox, projection);
   }
 
   /**
@@ -1025,7 +1021,7 @@ export class FeatureTiles {
     // that overlap
     const expandedQueryBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
     // Query for geometries matching the bounds in the index
-    return this.indexManager.queryWithBoundingBoxAndProjection(false, undefined, expandedQueryBoundingBox, projection);
+    return this.indexManager.queryWithBoundingBoxAndProjection(expandedQueryBoundingBox, projection);
   }
 
   /**
@@ -1039,16 +1035,15 @@ export class FeatureTiles {
     canvas?: HTMLCanvasElement | OffscreenCanvas | EmulatedCanvas2D,
   ): Promise<GeoPackageImage> {
     const featureTileCanvas = new FeatureTileCanvas(this.tileWidth, this.tileHeight, canvas);
-    // Feature projection to tile projection transform
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
+
     let drawn = false;
-    for (const featureRow of results) {
-      if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, featureRow)) {
+    for (const row of results) {
+      if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
         drawn = true;
       }
     }
-    results.close();
     let image = null;
     if (drawn) {
       image = featureTileCanvas.createImage();
@@ -1075,13 +1070,11 @@ export class FeatureTiles {
     const transform = GeometryTransform.create(this.projection, projection);
     const expandedBoundingBox = this.expandBoundingBoxWithProjection(boundingBox, projection);
     let drawn = false;
-    while (resultSet.moveToNext()) {
-      const row = resultSet.getRow();
+    for (const row of resultSet) {
       if (await this.drawFeature(zoom, boundingBox, expandedBoundingBox, transform, featureTileCanvas, row)) {
         drawn = true;
       }
     }
-    resultSet.close();
     let image = null;
     if (drawn) {
       image = featureTileCanvas.createImage();
@@ -1186,16 +1179,18 @@ export class FeatureTiles {
    * @return bounding box
    */
   public expandBoundingBoxWithProjection(boundingBox: BoundingBox, projection: Projection): BoundingBox {
-    let expandedBoundingBox = boundingBox;
+    let expandedBoundingBox = boundingBox.copy();
     const toWebMercator = GeometryTransform.create(projection, ProjectionConstants.EPSG_WEB_MERCATOR);
-    if (!projection.equalsProjection(Projections.getWebMercatorProjection())) {
+    if (!projection.equalsProjection(FeatureTiles.WEB_MERCATOR_PROJECTION)) {
       expandedBoundingBox = expandedBoundingBox.transform(toWebMercator);
     }
     expandedBoundingBox = this.expandBoundingBox(expandedBoundingBox);
+
     if (!projection.equalsProjection(FeatureTiles.WEB_MERCATOR_PROJECTION)) {
       const fromWebMercator = toWebMercator.getInverseTransformation();
       expandedBoundingBox = expandedBoundingBox.transform(fromWebMercator);
     }
+
 
     return expandedBoundingBox;
   }
@@ -1322,22 +1317,34 @@ export class FeatureTiles {
   }
 
   /**
-   * Simplify x,y tile coordinates by 1 pixel
+   * When the simplify tolerance is set, simplify the points to a similar
+   * curve with fewer points.
    * @param simplifyTolerance simplify tolerance in meters
-   * @param coordinates ordered points
-   * @return simplified GeoJSON
+   * @param points ordered points
+   * @return simplified points
    */
-  simplifyPoints(simplifyTolerance: number, coordinates: any): any | null {
+  protected simplifyPoints(simplifyTolerance: number, points: Point[]): Point[] {
+    let simplifiedPoints;
     if (this.simplifyGeometries) {
-      coordinates = simplify(
-        coordinates.map(coordinate => {
-          return { x: coordinate[0], y: coordinate[1] };
-        }),
-        simplifyTolerance,
-        false,
-      ).map(point => [point.x, point.y]);
+      const requiresTransformation = this.projection != null && Projections.getUnits(this.projection.toString()) !== 'meters';
+      // Reproject to web mercator if not in meters
+      if (requiresTransformation) {
+        const toWebMercator = GeometryTransform.create(this.projection, FeatureTiles.WEB_MERCATOR_PROJECTION);
+        points = toWebMercator.transformPoints(points);
+      }
+
+      // Simplify the points
+      simplifiedPoints = simplify(points, simplifyTolerance, false).map(point => new Point(point.x, point.y));
+
+      // Reproject back to the original projection
+      if (requiresTransformation) {
+        const fromWebMercator = GeometryTransform.create(FeatureTiles.WEB_MERCATOR_PROJECTION, this.projection);
+        simplifiedPoints = fromWebMercator.transformPoints(simplifiedPoints);
+      }
+    } else {
+      simplifiedPoints = points;
     }
-    return coordinates;
+    return simplifiedPoints;
   }
 
   getLength(pointA: Point, pointB: Point): number {
@@ -1471,19 +1478,19 @@ export class FeatureTiles {
     context: any,
     lineString: LineString,
   ): void {
-    let coordinates = lineString.points.map(point => {
-      const transformedCoordinate = transform.transformPoint(point);
-      return [
-        TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, transformedCoordinate[0]),
-        TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, transformedCoordinate[1]),
-      ];
-    });
-    coordinates = this.simplifyPoints(simplifyTolerance, coordinates);
-    if (coordinates.length > 1) {
-      context.moveTo(coordinates[0][0], coordinates[0][1]);
-      for (let i = 1; i < coordinates.length; i++) {
-        context.lineTo(coordinates[i][0], coordinates[i][1]);
+    const lineStringPoints = this.simplifyPoints(simplifyTolerance, lineString.points);
+
+    let index = 0;
+    for (const point of lineStringPoints) {
+      const projectedPoint = transform.transformPoint(point);
+      const x = TileBoundingBoxUtils.getXPixel(this.tileWidth, boundingBox, projectedPoint.x);
+      const y = TileBoundingBoxUtils.getYPixel(this.tileHeight, boundingBox, projectedPoint.y);
+      if (index === 0) {
+        context.moveTo(x, y);
+      } else {
+        context.lineTo(x, y);
       }
+      index++;
     }
   }
 
@@ -1493,7 +1500,7 @@ export class FeatureTiles {
    * @param simplifyTolerance simplify tolerance in meters
    * @param boundingBox bounding box
    * @param transform geometry transform
-   * @param context context
+   * @param canvas context
    * @param lineString line string
    * @param featureStyle feature style
    * @return true if drawn
@@ -1502,11 +1509,11 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform,
-    context: any,
+    canvas: FeatureTileCanvas,
     lineString: LineString,
     featureStyle,
   ): boolean {
-    return this.drawLine(simplifyTolerance, boundingBox, transform, context, lineString, featureStyle);
+    return this.drawLine(simplifyTolerance, boundingBox, transform, canvas, lineString, featureStyle);
   }
 
   /**
@@ -1515,7 +1522,7 @@ export class FeatureTiles {
    * @param simplifyTolerance simplify tolerance in meters
    * @param boundingBox bounding box
    * @param transform geometry transform
-   * @param context context
+   * @param canvas context
    * @param lineString line string
    * @param featureStyle feature style
    * @return true if drawn
@@ -1524,11 +1531,11 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform,
-    context: any,
+    canvas: FeatureTileCanvas,
     lineString: LineString,
     featureStyle,
   ): boolean {
-    return this.drawArcs(simplifyTolerance, boundingBox, transform, context, lineString, featureStyle);
+    return this.drawArcs(simplifyTolerance, boundingBox, transform, canvas, lineString, featureStyle);
   }
 
   /**
@@ -1536,7 +1543,7 @@ export class FeatureTiles {
    * @param simplifyTolerance
    * @param boundingBox
    * @param transform
-   * @param context
+   * @param canvas
    * @param geometry
    * @param featureStyle
    */
@@ -1544,12 +1551,14 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform: GeometryTransform,
-    context: any,
+    canvas: FeatureTileCanvas,
     geometry: LineString,
     featureStyle: FeatureStyle,
   ): boolean {
     let drawn = true;
     try {
+      const lineCanvas = canvas.getLineCanvas();
+      const context = lineCanvas.getContext('2d');
       context.save();
       context.beginPath();
       const paint = this.getLinePaint(featureStyle);
@@ -1570,7 +1579,7 @@ export class FeatureTiles {
    * @param simplifyTolerance
    * @param boundingBox
    * @param transform
-   * @param context
+   * @param canvas
    * @param geometry
    * @param featureStyle
    */
@@ -1578,12 +1587,14 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform: GeometryTransform,
-    context: any,
+    canvas: FeatureTileCanvas,
     geometry: LineString,
     featureStyle: FeatureStyle,
   ): boolean {
     let drawn = true;
     try {
+      const lineCanvas = canvas.getLineCanvas();
+      const context = lineCanvas.getContext('2d');
       context.save();
       context.beginPath();
       const paint = this.getLinePaint(featureStyle);
@@ -1624,7 +1635,7 @@ export class FeatureTiles {
    * @param simplifyTolerance
    * @param boundingBox
    * @param transform
-   * @param context
+   * @param canvas
    * @param featureStyle
    * @param polygon
    */
@@ -1632,10 +1643,12 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform: GeometryTransform,
-    context: any,
+    canvas: FeatureTileCanvas,
     polygon: Polygon,
     featureStyle: FeatureStyle,
   ): boolean {
+    const polyCanvas = canvas.getPolygonCanvas();
+    const context = polyCanvas.getContext('2d');
     // get paint
     context.save();
     context.beginPath();
@@ -1671,7 +1684,7 @@ export class FeatureTiles {
    * @param simplifyTolerance
    * @param boundingBox
    * @param transform
-   * @param context
+   * @param canvas
    * @param geometry
    * @param featureRow
    */
@@ -1679,7 +1692,7 @@ export class FeatureTiles {
     simplifyTolerance: number,
     boundingBox: BoundingBox,
     transform: GeometryTransform,
-    context: any,
+    canvas: FeatureTileCanvas,
     featureRow: FeatureRow,
     geometry: Geometry,
   ): Promise<boolean> {
@@ -1688,36 +1701,36 @@ export class FeatureTiles {
     const featureStyle = this.getFeatureStyle(featureRow, geometry.geometryType);
     switch (geometryType) {
       case GeometryType.POINT:
-        drawn = await this.drawPoint(boundingBox, transform, context, geometry as Point, featureStyle);
+        drawn = await this.drawPoint(boundingBox, transform, canvas, geometry as Point, featureStyle);
         break;
       case GeometryType.LINESTRING:
         drawn = this.drawLineString(
           simplifyTolerance,
           boundingBox,
           transform,
-          context,
+          canvas,
           geometry as LineString,
           featureStyle,
         );
         break;
       case GeometryType.POLYGON:
-        drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, context, geometry as Polygon, featureStyle);
+        drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, canvas, geometry as Polygon, featureStyle);
         break;
       case GeometryType.MULTIPOINT:
         for (const p of (geometry as MultiPoint).points) {
-          drawn = (await this.drawPoint(boundingBox, transform, context, p, featureStyle)) || drawn;
+          drawn = (await this.drawPoint(boundingBox, transform, canvas, p, featureStyle)) || drawn;
         }
         break;
       case GeometryType.MULTILINESTRING:
         const multiLineString = geometry as MultiLineString;
         for (const ls of multiLineString.lineStrings) {
-          drawn = this.drawLineString(simplifyTolerance, boundingBox, transform, context, ls, featureStyle) || drawn;
+          drawn = this.drawLineString(simplifyTolerance, boundingBox, transform, canvas, ls, featureStyle) || drawn;
         }
         break;
       case GeometryType.MULTIPOLYGON:
         const multiPolygon = geometry as MultiPolygon;
         for (const p of multiPolygon.polygons) {
-          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, context, p, featureStyle) || drawn;
+          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, canvas, p, featureStyle) || drawn;
         }
         break;
       case GeometryType.CIRCULARSTRING:
@@ -1726,7 +1739,7 @@ export class FeatureTiles {
           simplifyTolerance,
           boundingBox,
           transform,
-          context,
+          canvas,
           circularString,
           featureStyle,
         );
@@ -1734,29 +1747,29 @@ export class FeatureTiles {
       case GeometryType.COMPOUNDCURVE:
         const compoundCurve = geometry as CompoundCurve;
         for (const ls of compoundCurve.lineStrings) {
-          drawn = this.drawLineString(simplifyTolerance, boundingBox, transform, context, ls, featureStyle) || drawn;
+          drawn = this.drawLineString(simplifyTolerance, boundingBox, transform, canvas, ls, featureStyle) || drawn;
         }
         break;
       case GeometryType.POLYHEDRALSURFACE:
         const polyhedralSurface = geometry as PolyhedralSurface;
         for (const p of polyhedralSurface.polygons) {
-          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, context, p, featureStyle) || drawn;
+          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, canvas, p, featureStyle) || drawn;
         }
         break;
       case GeometryType.TIN:
         const tin = geometry as TIN;
         for (const p of tin.polygons) {
-          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, context, p, featureStyle) || drawn;
+          drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, canvas, p, featureStyle) || drawn;
         }
         break;
       case GeometryType.TRIANGLE:
         const triangle = geometry as Triangle;
-        drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, context, triangle, featureStyle);
+        drawn = this.drawPolygon(simplifyTolerance, boundingBox, transform, canvas, triangle, featureStyle);
         break;
       case GeometryType.GEOMETRYCOLLECTION:
         const geometryCollection = geometry as GeometryCollection<Geometry>;
         for (const g of geometryCollection.geometries) {
-          drawn = (await this.drawGeometry(simplifyTolerance, boundingBox, transform, context, featureRow, g)) || drawn;
+          drawn = (await this.drawGeometry(simplifyTolerance, boundingBox, transform, canvas, featureRow, g)) || drawn;
         }
         break;
       default:
@@ -1806,8 +1819,6 @@ export class FeatureTiles {
     maxLatitude = Math.max(maxLatitude, boundingBox.getMaxLatitude());
 
     // Bound with the web mercator limits
-    return TileBoundingBoxUtils.boundWebMercatorBoundingBox(
-      new BoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude),
-    );
+    return TileBoundingBoxUtils.boundWebMercatorBoundingBox(new BoundingBox(minLongitude, minLatitude, maxLongitude, maxLatitude));
   }
 }

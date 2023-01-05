@@ -133,7 +133,8 @@ export class FeatureTileCanvas {
       }
     }
     if (this.canvas != null && !this.isTransparent(this.canvas)) {
-      image = Canvas.createImage(await Canvas.toDataURL(this.canvas));
+      const dataUrl = await Canvas.toDataURL(this.canvas);
+      image = Canvas.createImage(dataUrl);
       if (!this.userProvidedCanvas) {
         Canvas.disposeCanvas(this.canvas);
       }

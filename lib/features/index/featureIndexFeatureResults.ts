@@ -51,19 +51,8 @@ export class FeatureIndexFeatureResults implements FeatureIndexResults {
   /**
    * {@inheritDoc}
    */
-  public next(): { value: FeatureRow; done: boolean } {
-    const value = this.resultSet.getRow();
-    if (this.resultSet.moveToNext()) {
-      return {
-        value: value,
-        done: false,
-      };
-    } else {
-      return {
-        value: value,
-        done: true,
-      };
-    }
+  public next(): { value: FeatureRow, done: boolean } {
+    return this.resultSet.next();
   }
 
   /**

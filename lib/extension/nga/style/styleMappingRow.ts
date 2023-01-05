@@ -14,7 +14,7 @@ import { StyleMappingTable } from './styleMappingTable';
 export class StyleMappingRow extends UserMappingRow {
   /**
    * Get the geometry type name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getGeometryTypeNameColumn(): UserColumn {
     return this.table.getColumn(StyleMappingTable.COLUMN_GEOMETRY_TYPE_NAME);

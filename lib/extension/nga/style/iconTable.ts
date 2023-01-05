@@ -41,7 +41,7 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the name column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getNameColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_NAME);
@@ -55,7 +55,7 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the description column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getDescriptionColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_DESCRIPTION);
@@ -69,7 +69,7 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the width column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getWidthColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_WIDTH);
@@ -83,7 +83,7 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the height column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getHeightColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_HEIGHT);
@@ -97,7 +97,7 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the anchor_u column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getAnchorUColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_ANCHOR_U);
@@ -111,21 +111,21 @@ export class IconTable extends MediaTable {
   }
   /**
    * Get the anchor_v column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getAnchorVColumn(): UserColumn {
     return this.getColumn(IconTable.COLUMN_ANCHOR_V);
   }
   /**
    * Create a media table with a minimum required columns followed by the additional columns
-   * @return {module:extension/relatedTables~MediaTable}
+   * @return {MediaTable}
    */
   static create(): IconTable {
     return new IconTable();
   }
   /**
    * Create the columns
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createColumns(): UserColumn[] {
     const columns = IconTable.createRequiredColumns();

@@ -1,6 +1,3 @@
-/**
- * @module user/custom
- */
 import { UserTable } from '../userTable';
 import { UserCustomColumn } from './userCustomColumn';
 import { UserCustomColumns } from './userCustomColumns';
@@ -10,7 +7,7 @@ import { UserColumns } from '../userColumns';
  * Create a new user custom table
  * @class
  * @param  {string} tableName       table name
- * @param  {module:user/userColumn~UserColumn[]} columns         user columns
+ * @param  {UserColumn[]} columns         user columns
  * @param  {string[]} requiredColumns required columns
  */
 export class UserCustomTable extends UserTable<UserCustomColumn> {
@@ -73,7 +70,8 @@ export class UserCustomTable extends UserTable<UserCustomColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * Copy the UserCustomTable
+   * @return {UserCustomTable}
    */
   copy(): UserCustomTable {
     return new UserCustomTable(
@@ -84,14 +82,16 @@ export class UserCustomTable extends UserTable<UserCustomColumn> {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the data type
+   * @return {string}
    */
   getDataType(): string {
     return null;
   }
 
   /**
-   * {@inheritDoc}
+   * Get user columns
+   * @return {UserCustomColumns}
    */
   getUserColumns(): UserCustomColumns {
     return super.getUserColumns() as UserCustomColumns;

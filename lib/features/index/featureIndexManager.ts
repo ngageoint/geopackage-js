@@ -210,7 +210,7 @@ export class FeatureIndexManager {
 
   /**
    * Index the feature table if needed, using the set index location
-   * @return this.count
+   * @return count
    */
   public index(): number {
     return this.indexType();
@@ -576,11 +576,37 @@ export class FeatureIndexManager {
 
   /**
    * Query for all feature index results
+   * @return feature index results, close when done
+   */
+  public queryAll(): FeatureIndexResults {
+    return this.queryAllWithDistinctAndColumns(undefined, undefined);
+  }
+
+  /**
+   * Query for all feature index results
+   * @param distinct distinct rows
+   * @return feature index results, close when done
+   */
+  public queryAllWithDistinct(distinct?: boolean): FeatureIndexResults {
+    return this.queryAllWithDistinctAndColumns(distinct, undefined);
+  }
+
+  /**
+   * Query for all feature index results
+   * @param columns columns
+   * @return feature index results, close when done
+   */
+  public queryAllWithColumns(columns?: string[]): FeatureIndexResults {
+    return this.queryAllWithDistinctAndColumns(undefined, columns);
+  }
+
+  /**
+   * Query for all feature index results
    * @param distinct distinct rows
    * @param columns columns
    * @return feature index results, close when done
    */
-  public queryAll(distinct?: boolean, columns?: string[]): FeatureIndexResults {
+  public queryAllWithDistinctAndColumns(distinct?: boolean, columns?: string[]): FeatureIndexResults {
     let results = null;
     for (const type of this.getLocation()) {
       try {
@@ -599,7 +625,7 @@ export class FeatureIndexManager {
         break;
       } catch (e) {
         if (this.continueOnError) {
-          console.error('Failed to query from feature index: ' + type, e);
+          console.error('Failed to query from feature index: ' + type);
         } else {
           throw e;
         }
@@ -615,19 +641,47 @@ export class FeatureIndexManager {
   /**
    * Query for all feature index count
    * @param column count column name
-   * @return this.count
+   * @return count
    */
   public countColumn(column: string): number {
-    return this.countAll(false, column);
+    return this.countAllWithColumn(column);
+  }
+
+  /**
+   * Query for all feature index count
+   * @return count
+   */
+  public countAll(): number {
+    return this.countAllWithDistinctAndColumn(undefined, undefined);
+
+  }
+
+  /**
+   * Query for all feature index count
+   * @param distinct distinct column values
+   * @return count
+   */
+  public countAllWithDistinct(distinct: boolean): number {
+    return this.countAllWithDistinctAndColumn(distinct, undefined);
+
+  }
+
+  /**
+   * Query for all feature index count
+   * @param column count column name
+   * @return count
+   */
+  public countAllWithColumn(column: string): number {
+    return this.countAllWithDistinctAndColumn(undefined, column);
   }
 
   /**
    * Query for all feature index count
    * @param distinct distinct column values
    * @param column count column name
-   * @return this.count
+   * @return count
    */
-  public countAll(distinct: boolean, column: string): number {
+  public countAllWithDistinctAndColumn(distinct: boolean, column: string): number {
     let count = null;
     for (const type of this.getLocation()) {
       try {
@@ -658,42 +712,130 @@ export class FeatureIndexManager {
 
   /**
    * Query for feature index results
-   *
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithFieldValues(fieldValues: ColumnValues): FeatureIndexResults {
+    return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index results
+   * @param fieldValues field values
+   * @param distinct distinct rows
+   * @return feature index results, close when done
+   */
+  public queryWithFieldValuesAndDistinct(fieldValues: ColumnValues, distinct: boolean): FeatureIndexResults {
+    return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index results
+   * @param fieldValues field values
+   * @param columns columns
+   * @return feature index results, close when done
+   */
+  public queryWithFieldValuesAndColumns(fieldValues: ColumnValues, columns: string[]): FeatureIndexResults {
+    return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, columns);
+  }
+
+  /**
+   * Query for feature index results
    * @param distinct distinct rows
    * @param columns columns
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public queryWithFieldValues(distinct: boolean, columns: string[], fieldValues: ColumnValues): FeatureIndexResults {
+  public queryWithFieldValuesAndDistinctAndColumns(fieldValues: ColumnValues, distinct: boolean, columns: string[]): FeatureIndexResults {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.query(distinct, columns, where, whereArgs);
+    return this.queryWithDistinctAndColumns(distinct, columns, where, whereArgs);
   }
 
   /**
    * Query for feature index count
-   *
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public countWithFieldValues(fieldValues: ColumnValues): number {
+    return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index count
    * @param distinct distinct column values
    * @param column count column name
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public countWithFieldValues(distinct: boolean, column: string, fieldValues: ColumnValues): number {
+  public countWithFieldValuesAndDistinct(fieldValues: ColumnValues, distinct: boolean, column: string): number {
+    return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index count
+   * @param column count column name
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public countWithFieldValuesAndColumn(fieldValues: ColumnValues, column: string): number {
+    return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, column);
+  }
+
+  /**
+   * Query for feature index count
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public countWithFieldValuesAndDistinctAndColumns(fieldValues: ColumnValues, distinct: boolean, column: string): number {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.count(distinct, column, where, whereArgs);
+    return this.countWithDistinctAndColumns(distinct, column, where, whereArgs);
   }
 
   /**
    * Query for feature index results
-   *
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public query(where?: string, whereArgs?: any[]): FeatureIndexResults {
+    return this.queryWithDistinctAndColumns(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithDistinct(distinct?: boolean, where?: string, whereArgs?: any[]): FeatureIndexResults {
+    return this.queryWithDistinctAndColumns(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithColumns(columns?: string[], where?: string, whereArgs?: any[]): FeatureIndexResults {
+    return this.queryWithDistinctAndColumns(undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results
    * @param distinct distinct rows
    * @param columns columns
    * @param where where clause
    * @param whereArgs where arguments
    * @return feature index results, close when done
    */
-  public query(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureIndexResults {
+  public queryWithDistinctAndColumns(distinct?: boolean, columns?: string[], where?: string, whereArgs?: any[]): FeatureIndexResults {
     let results = null;
     for (const type of this.getLocation()) {
       try {
@@ -728,13 +870,48 @@ export class FeatureIndexManager {
   /**
    * Query for feature index count
    *
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public count(where: string, whereArgs: any[]): number {
+    return this.countWithDistinctAndColumns(undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count
+   *
+   * @param distinct distinct column values
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithDistinct(distinct: boolean, where: string, whereArgs: any[]): number {
+    return this.countWithDistinctAndColumns(distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count
+   *
+   * @param column count column name
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithColumns(column: string, where: string, whereArgs: any[]): number {
+    return this.countWithDistinctAndColumns(undefined, column, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count
+   *
    * @param distinct distinct column values
    * @param column count column name
    * @param where where clause
    * @param whereArgs where arguments
-   * @return this.count
+   * @return count
    */
-  public count(distinct: boolean, column: string, where: string, whereArgs: any[]): number {
+  public countWithDistinctAndColumns(distinct: boolean, column: string, where: string, whereArgs: any[]): number {
     let count = null;
     for (const type of this.getLocation()) {
       try {
@@ -839,58 +1016,260 @@ export class FeatureIndexManager {
   /**
    * Query for feature index results within the bounding box, projected
    * correctly
-   * @param distinct distinct rows
-   * @param columns columns
    * @param boundingBox bounding box
    * @param fieldValues field values
    * @return feature index results, close when done
    */
   public queryWithBoundingBoxAndFieldValues(
-    distinct: boolean,
-    columns: string[],
     boundingBox: BoundingBox,
     fieldValues: ColumnValues,
   ): FeatureIndexResults {
-    return this.queryWithGeometryEnvelopeAndFieldValues(distinct, columns, boundingBox.buildEnvelope(), fieldValues);
-  }
-
-  /**
-   * Query for feature index count within the bounding box, projected
-   * correctly
-   * @param distinct distinct column values
-   * @param column column name
-   * @param boundingBox bounding box
-   * @param fieldValues field values
-   * @return this.count
-   */
-  public countWithBoundingBoxAndFieldValues(
-    distinct: boolean,
-    column: string,
-    boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
-  ): number {
-    return this.countWithGeometryEnvelopeAndFieldValues(distinct, column, boundingBox.buildEnvelope(), fieldValues);
+    return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, undefined, undefined);
   }
 
   /**
    * Query for feature index results within the bounding box, projected
    * correctly
    * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndFieldValuesAndDistinct(
+    distinct: boolean,
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
    * @param columns columns
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndFieldValuesAndColumns(
+    columns: string[],
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, undefined, columns);
+  }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param distinct distinct rows
+   * @param columns columns
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+    columns: string[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(boundingBox.buildEnvelope(), fieldValues, distinct, columns);
+  }
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @return count
+   */
+  public countWithBoundingBoxAndFieldValues(
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+  ): number {
+    return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @return count
+   */
+  public countWithBoundingBoxAndFieldValuesAndDistinct(
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+  ): number {
+    return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param column column name
+   * @return count
+   */
+  public countWithBoundingBoxAndFieldValuesAndColumn(
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+    column: string,
+  ): number {
+    return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, undefined, column);
+  }
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @param column column name
+   * @return count
+   */
+  public countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(
+    boundingBox: BoundingBox,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+    column: string,
+  ): number {
+    return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(boundingBox.buildEnvelope(), fieldValues, distinct, column);
+  }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
    * @param boundingBox bounding box
    * @param where where clause
    * @param whereArgs where arguments
    * @return feature index results, close when done
    */
   public queryWithBoundingBox(
-    distinct: boolean,
-    columns: string[],
     boundingBox: BoundingBox,
     where?: string,
     whereArgs?: any[],
   ): FeatureIndexResults {
-    return this.queryWithGeometryEnvelope(distinct, columns, boundingBox.buildEnvelope(), where, whereArgs);
+    return this.queryWithBoundingBoxAndDistinctAndColumns(boundingBox, undefined, undefined, where, whereArgs);
   }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
+   * @param distinct distinct rows
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndDistinct(
+    boundingBox: BoundingBox,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndDistinctAndColumns(boundingBox, distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
+   * @param columns columns
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndColumns(
+    boundingBox: BoundingBox,
+    columns: string[],
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndDistinctAndColumns(boundingBox, undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndDistinctAndColumns(
+    boundingBox: BoundingBox,
+    distinct: boolean,
+    columns: string[],
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(boundingBox.buildEnvelope(), distinct, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBox(
+    boundingBox: BoundingBox,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithBoundingBoxAndDistinctAndColumn(boundingBox, undefined, undefined, where, whereArgs);
+  }
+
+
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param distinct distinct column values
+   * @param boundingBox bounding box
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBoxAndDistinct(
+    boundingBox: BoundingBox,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithBoundingBoxAndDistinctAndColumn(boundingBox, distinct, undefined, where, whereArgs);
+  }
+
+
+
+  /**
+   * Query for feature index count within the bounding box, projected
+   * correctly
+   * @param boundingBox bounding box
+   * @param column count column value
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBoxAndColumn(
+    boundingBox: BoundingBox,
+    column: string,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(boundingBox.buildEnvelope(), undefined, column, where, whereArgs);
+  }
+
+
 
   /**
    * Query for feature index count within the bounding box, projected
@@ -900,16 +1279,59 @@ export class FeatureIndexManager {
    * @param boundingBox bounding box
    * @param where where clause
    * @param whereArgs where arguments
-   * @return this.count
+   * @return count
    */
-  public countWithBoundingBox(
+  public countWithBoundingBoxAndDistinctAndColumn(
+    boundingBox: BoundingBox,
     distinct: boolean,
     column: string,
-    boundingBox: BoundingBox,
     where?: string,
     whereArgs?: any[],
   ): number {
-    return this.countWithGeometryEnvelope(distinct, column, boundingBox.buildEnvelope(), where, whereArgs);
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(boundingBox.buildEnvelope(), distinct, column, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithGeometryEnvelopeAndFieldValues(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param distinct distinct rows
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithGeometryEnvelopeAndFieldValuesAndDistinct(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param columns columns
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithGeometryEnvelopeAndFieldValuesAndColumns(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
+    columns: string[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, undefined, columns);
   }
 
   /**
@@ -920,62 +1342,154 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public queryWithGeometryEnvelopeAndFieldValues(
-    distinct: boolean,
-    columns: string[],
+  public queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(
     envelope: GeometryEnvelope,
     fieldValues: ColumnValues,
+    distinct: boolean,
+    columns: string[],
   ): FeatureIndexResults {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.queryWithGeometryEnvelope(distinct, columns, envelope, where, whereArgs);
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(envelope, distinct, columns, where, whereArgs);
   }
 
   /**
    * Query for feature index count within the Geometry Envelope
-   * @param distinct distinct column values
-   * @param column count column name
    * @param envelope geometry envelope
    * @param fieldValues field values
-   * @return this.count
+   * @return count
    */
   public countWithGeometryEnvelopeAndFieldValues(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
+  ): number {
+    return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndFieldValuesAndDistinct(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
     distinct: boolean,
+  ): number {
+    return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param column count column name
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndFieldValuesAndColumn(
     column: string,
     envelope: GeometryEnvelope,
     fieldValues: ColumnValues,
   ): number {
+    return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, undefined, column);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @param column count column name
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(
+    envelope: GeometryEnvelope,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+    column: string
+  ): number {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
-    return this.countWithGeometryEnvelope(distinct, column, envelope, where, whereArgs);
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(envelope, distinct, column, where, whereArgs);
   }
 
   /**
    * Query for feature index results within the Geometry Envelope
-   *
-   * @param distinct distinct rows
-   * @param columns columns
    * @param envelope geometry envelope
    * @param where where clause
    * @param whereArgs where arguments
    * @return feature index results, close when done
    */
   public queryWithGeometryEnvelope(
+    envelope: GeometryEnvelope,
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(envelope, undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithEnvelopeAndDistinct(
+    envelope: GeometryEnvelope,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(envelope, distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithEnvelopeAndColumns(
+    envelope: GeometryEnvelope,
+    columns: string[],
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithGeometryEnvelopeAndDistinctAndColumns(envelope, undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithGeometryEnvelopeAndDistinctAndColumns(
+    envelope: GeometryEnvelope,
     distinct: boolean,
     columns: string[],
-    envelope: GeometryEnvelope,
     where?: string,
     whereArgs?: string[],
   ): FeatureIndexResults {
     let results = null;
-    for (const type of this.getLocation()) {
+    const featureIndexLocation = this.getLocation();
+    for (let type of featureIndexLocation) {
       try {
         switch (type) {
           case FeatureIndexType.GEOPACKAGE:
             const geoPackageResultSet = this.featureTableIndex.queryFeaturesWithGeometryEnvelopeAndDistinctAndColumns(
+              envelope,
               distinct,
               columns,
-              envelope,
               where,
               whereArgs,
             );
@@ -1011,17 +1525,66 @@ export class FeatureIndexManager {
 
   /**
    * Query for feature index count within the Geometry Envelope
-   * @param distinct distinct column values
-   * @param column count column name
    * @param envelope geometry envelope
    * @param where where clause
    * @param whereArgs where arguments
-   * @return this.count
+   * @return count
    */
   public countWithGeometryEnvelope(
+    envelope: GeometryEnvelope,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(envelope, undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param distinct distinct column values
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndDistinct(
+    envelope: GeometryEnvelope,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(envelope, distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param column count column name
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndColumn(
+    envelope: GeometryEnvelope,
+    column: string,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithGeometryEnvelopeAndDistinctAndColumn(envelope, undefined, column, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the Geometry Envelope
+   * @param envelope geometry envelope
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithGeometryEnvelopeAndDistinctAndColumn(
+    envelope: GeometryEnvelope,
     distinct: boolean,
     column: string,
-    envelope: GeometryEnvelope,
     where?: string,
     whereArgs?: any[],
   ): number {
@@ -1074,6 +1637,58 @@ export class FeatureIndexManager {
   /**
    * Query for feature index results within the bounding box in the provided
    * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndFieldValues(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @param distinct distinct rows
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinct(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @param columns columns
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndFieldValuesAndColumns(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+    columns: string[],
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, undefined, columns);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
    * @param distinct distinct rows
    * @param columns columns
    * @param boundingBox bounding box
@@ -1081,15 +1696,15 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public queryWithBoundingBoxAndProjectionAndFieldValues(
-    distinct: boolean,
-    columns: string[],
+  public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(
     boundingBox: BoundingBox,
     projection: Projection,
     fieldValues: ColumnValues,
+    distinct: boolean,
+    columns: string[],
   ): FeatureIndexResults {
     const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
-    return this.queryWithBoundingBoxAndFieldValues(distinct, columns, featureBoundingBox, fieldValues);
+    return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(featureBoundingBox, fieldValues, distinct, columns);
   }
 
   /**
@@ -1100,24 +1715,78 @@ export class FeatureIndexManager {
    * @param boundingBox bounding box
    * @param projection projection
    * @param fieldValues field values
-   * @return this.count
+   * @return count
    */
   public countWithBoundingBoxAndProjectionAndFieldValues(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+  ): number {
+    return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, undefined, undefined);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndFieldValuesAndDistinct(
+    distinct: boolean,
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+  ): number {
+    return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, distinct, undefined);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @param column count column value
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndFieldValuesAndColumn(
     distinct: boolean,
     column: string,
     boundingBox: BoundingBox,
     projection: Projection,
     fieldValues: ColumnValues,
   ): number {
+    return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, undefined, column);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param fieldValues field values
+   * @param distinct distinct column values
+   * @param column count column value
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    fieldValues: ColumnValues,
+    distinct: boolean,
+    column: string,
+  ): number {
     const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
-    return this.countWithBoundingBoxAndFieldValues(distinct, column, featureBoundingBox, fieldValues);
+    return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(featureBoundingBox, fieldValues, distinct, column);
   }
 
   /**
    * Query for feature index results within the bounding box in the provided
    * projection
-   * @param distinct distinct rows
-   * @param columns columns
    * @param boundingBox bounding box
    * @param projection projection
    * @param where where clause
@@ -1125,38 +1794,156 @@ export class FeatureIndexManager {
    * @return feature index results, close when done
    */
   public queryWithBoundingBoxAndProjection(
-    distinct: boolean,
-    columns: string[],
     boundingBox: BoundingBox,
     projection: Projection,
     where?: string,
     whereArgs?: any[],
   ): FeatureIndexResults {
-    const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
-    return this.queryWithBoundingBox(distinct, columns, featureBoundingBox, where, whereArgs);
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(boundingBox, projection, undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param distinct distinct rows
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndDistinct(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(boundingBox, projection, distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndColumns(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    columns: string[],
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    return this.queryWithBoundingBoxAndProjectionAndDistinctAndColumns(boundingBox, projection, undefined, columns, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index results within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param distinct distinct rows
+   * @param columns columns
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return feature index results, close when done
+   */
+  public queryWithBoundingBoxAndProjectionAndDistinctAndColumns(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    distinct: boolean,
+    columns: string[],
+    where?: string,
+    whereArgs?: any[],
+  ): FeatureIndexResults {
+    const featureBoundingBox = this.featureDao.getProjection().equalsProjection(projection) ? boundingBox : this.featureDao.projectBoundingBox(boundingBox, projection);
+    return this.queryWithBoundingBoxAndDistinctAndColumns(featureBoundingBox, distinct, columns, where, whereArgs);
   }
 
   /**
    * Query for feature index count within the bounding box in the provided
    * projection
-   * @param distinct distinct column values
-   * @param column count column name
    * @param boundingBox bounding box
    * @param projection projection
    * @param where where clause
    * @param whereArgs where arguments
-   * @return this.count
+   * @return count
    */
   public countWithBoundingBoxAndProjection(
-    distinct: boolean,
-    column: string,
     boundingBox: BoundingBox,
     projection: Projection,
     where?: string,
     whereArgs?: any[],
   ): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumn(boundingBox, projection, undefined, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param distinct distinct column values
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndDistinct(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    distinct: boolean,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumn(boundingBox, projection, distinct, undefined, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param column count column name
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndColumn(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    column: string,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
+    return this.countWithBoundingBoxAndProjectionAndDistinctAndColumn(boundingBox, projection, undefined, column, where, whereArgs);
+  }
+
+  /**
+   * Query for feature index count within the bounding box in the provided
+   * projection
+   * @param boundingBox bounding box
+   * @param projection projection
+   * @param distinct distinct column values
+   * @param column count column name
+   * @param where where clause
+   * @param whereArgs where arguments
+   * @return count
+   */
+  public countWithBoundingBoxAndProjectionAndDistinctAndColumn(
+    boundingBox: BoundingBox,
+    projection: Projection,
+    distinct: boolean,
+    column: string,
+    where?: string,
+    whereArgs?: any[],
+  ): number {
     const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
-    return this.countWithBoundingBox(distinct, column, featureBoundingBox, where, whereArgs);
+    return this.countWithBoundingBoxAndDistinctAndColumn(featureBoundingBox, distinct, column, where, whereArgs);
   }
 
   /**
@@ -1707,7 +2494,7 @@ export class FeatureIndexManager {
    * @param whereArgs
    */
   public queryForGeoJSONFeatures(boundingBox?: BoundingBox, where?: string, whereArgs?: any[]): GeoJSONResultSet {
-    const featureIndexResultSet: FeatureIndexResults = boundingBox != null ? this.queryWithBoundingBox(false, undefined, boundingBox, where, whereArgs) : this.query(false, undefined, where, whereArgs);
+    const featureIndexResultSet: FeatureIndexResults = this.queryWithBoundingBox(boundingBox, where, whereArgs);
     return new GeoJSONResultSet(featureIndexResultSet, this.getFeatureDao(), this.dataColumnsDao);
   }
 }

@@ -609,8 +609,7 @@ export class TileBoundingBoxUtils {
     );
     lowerLeftPoint = toWebMercator.transformPoint(lowerLeftPoint);
     upperRightPoint = toWebMercator.transformPoint(upperRightPoint);
-    const mercatorBox = new BoundingBox(lowerLeftPoint.x, lowerLeftPoint.y, upperRightPoint.x, upperRightPoint.y);
-    return mercatorBox;
+    return new BoundingBox(lowerLeftPoint.x, lowerLeftPoint.y, upperRightPoint.x, upperRightPoint.y);
   }
 
   /**
@@ -629,6 +628,7 @@ export class TileBoundingBoxUtils {
   /**
    * Get the zoom level from the tile size in length units (default is meters)
    * @param tileSize tile size in units total length
+   * @param totalLength
    * @return zoom level
    */
   public static zoomLevelOfTileSize(
@@ -690,8 +690,7 @@ export class TileBoundingBoxUtils {
    */
   public static toleranceDistanceWithLength(zoom: number, pixels: number): number {
     const tileSize = TileBoundingBoxUtils.tileSizeWithZoom(zoom);
-    const tolerance = tileSize / pixels;
-    return tolerance;
+    return tileSize / pixels;
   }
 
   /**
@@ -716,8 +715,7 @@ export class TileBoundingBoxUtils {
    */
   public static getYAsOppositeTileFormat(zoom: number, y: number): number {
     const tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoom);
-    const oppositeY = tilesPerSide - y - 1;
-    return oppositeY;
+    return tilesPerSide - y - 1;
   }
 
   /**
@@ -1208,7 +1206,7 @@ export class TileBoundingBoxUtils {
    * @return tile grid at new zoom level
    */
   public static tileGridZoom(tileGrid: TileGrid, fromZoom: number, toZoom: number): TileGrid {
-    let newTileGrid = null;
+    let newTileGrid;
     let zoomChange = toZoom - fromZoom;
     if (zoomChange > 0) {
       newTileGrid = TileBoundingBoxUtils.tileGridZoomIncrease(tileGrid, zoomChange);

@@ -419,7 +419,7 @@ GeoPackageUtils.createRTreeSpatialIndexExtension = function(geoPackage) {
 };
 
 GeoPackageUtils.createRelatedTablesMediaExtension = function(geoPackage) {
-  const relatedTables = geoPackage.relatedTablesExtension;
+  const relatedTables = geoPackage.getRelatedTablesExtension();
   let mediaTable = MediaTable.create('media');
   relatedTables.createRelatedTable(mediaTable);
 
@@ -432,7 +432,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geoPackage) {
       bitsLogo.contentType = 'image/png';
       bitsLogo.data = bitsLogoBuffer;
       const bitsRowId = mediaDao.create(bitsLogo);
-      bitsLogo = mediaDao.queryForId(bitsRowId);
+      bitsLogo = mediaDao.queryForIdRow(bitsRowId);
 
       const featureDao = geoPackage.getFeatureDao('geometry1');
       const rows = featureDao.queryForLike('text', 'BIT Systems%');
@@ -449,7 +449,7 @@ GeoPackageUtils.createRelatedTablesMediaExtension = function(geoPackage) {
     })
     .then(function(ngaLogoBuffer) {
       const ngaRowId = geoPackage.addMedia('media', ngaLogoBuffer, 'image/png');
-      const ngaLogo = mediaDao.queryForId(ngaRowId);
+      const ngaLogo = mediaDao.queryForIdRow(ngaRowId);
 
       const featureDao = geoPackage.getFeatureDao('geometry2');
       const rows = featureDao.queryForLike('text', 'NGA%');

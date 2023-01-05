@@ -11,7 +11,7 @@ import { UserCustomColumn } from '../../user/custom/userCustomColumn';
  * Contains user mapping table factory and utility methods
  * @class
  * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns   user mapping columns
+ * @param  {UserColumn[]} columns   user mapping columns
  */
 export class UserMappingTable extends UserCustomTable {
   public static readonly COLUMN_BASE_ID: string = 'base_id';
@@ -19,14 +19,14 @@ export class UserMappingTable extends UserCustomTable {
 
   /**
    * Get the base id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getBaseIdColumn(): UserColumn {
     return this.getColumn(UserMappingTable.COLUMN_BASE_ID);
   }
   /**
    * Get the related id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   getRelatedIdColumn(): UserColumn {
     return this.getColumn(UserMappingTable.COLUMN_RELATED_ID);
@@ -34,8 +34,8 @@ export class UserMappingTable extends UserCustomTable {
   /**
    * Creates a user mapping table with the minimum required columns followed by the additional columns
    * @param  {string} tableName name of the table
-   * @param  {module:user/userColumn~UserColumn[]} [columns] additional columns
-   * @return {module:extension/relatedTables~UserMappingTable}
+   * @param  {UserColumn[]} [columns] additional columns
+   * @return {UserMappingTable}
    */
   static create(tableName: string, columns?: UserColumn[]): UserMappingTable {
     let allColumns = UserMappingTable.createRequiredColumns();
@@ -53,7 +53,7 @@ export class UserMappingTable extends UserCustomTable {
   }
   /**
    * Create the required columns
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createRequiredColumns(): UserColumn[] {
     return [
@@ -64,7 +64,7 @@ export class UserMappingTable extends UserCustomTable {
   /**
    * Create the required columns with starting column index
    * @param  {Number} [startingIndex=0] starting index of the required columns
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createRequiredColumnsWithIndex(startingIndex = 0): UserColumn[] {
     return [
@@ -74,7 +74,7 @@ export class UserMappingTable extends UserCustomTable {
   }
   /**
    * Create the base id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createBaseIdColumn(): UserColumn {
     return UserCustomColumn.createColumn(UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
@@ -82,14 +82,14 @@ export class UserMappingTable extends UserCustomTable {
   /**
    * Create the base id column
    * @param  {Number} index        index of the column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createBaseIdColumnWithIndex(index: number): UserColumn {
     return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_BASE_ID, GeoPackageDataType.INTEGER, true);
   }
   /**
    * Create the related id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createRelatedIdColumn(): UserColumn {
     return UserCustomColumn.createColumn(UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);
@@ -97,7 +97,7 @@ export class UserMappingTable extends UserCustomTable {
   /**
    * Create the related id column
    * @param  {Number} index        index of the column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createRelatedIdColumnWithIndex(index?: number): UserColumn {
     return UserCustomColumn.createColumnWithIndex(index, UserMappingTable.COLUMN_RELATED_ID, GeoPackageDataType.INTEGER, true);

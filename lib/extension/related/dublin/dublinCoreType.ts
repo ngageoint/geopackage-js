@@ -64,7 +64,7 @@ export class DublinCoreType {
   /**
    * Get the Dublin Core Type from the name
    * @param  {string} name name
-   * @return {module:extension/relatedTables~DublinCoreType}
+   * @return {DublinCoreType}
    */
   public static fromName(name: string): DublinCoreType {
     let dublinCoreType = null;

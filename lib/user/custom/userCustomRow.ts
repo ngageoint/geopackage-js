@@ -50,7 +50,8 @@ export class UserCustomRow extends UserRow<UserCustomColumn, UserCustomTable> {
   }
 
   /**
-   * {@inheritDoc}
+   * Get columns
+   * @return {UserCustomColumns}
    */
   public getColumns(): UserCustomColumns {
     return super.getColumns() as UserCustomColumns;

@@ -4,7 +4,7 @@ import { DBValue } from '../../db/dbValue';
 import { UserTableDefaults } from '../../user/userTableDefaults';
 
 /**
- * `TileColumn` models columns in [user tile pyramid tables]{@link module:tiles/user/tileTable~TileTable}.
+ * `TileColumn` models columns in [user tile pyramid tables]{@link TileTable}.
  */
 export class TileColumn extends UserColumn {
   public static readonly COLUMN_ID: string = 'id';

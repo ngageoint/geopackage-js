@@ -10,7 +10,7 @@ export class StringUtils {
    */
   static quoteWrap(name: string): string {
     let quoteName = null;
-    if (name !== null) {
+    if (name != null) {
       if (name.startsWith('"') && name.endsWith('"')) {
         quoteName = name;
       } else {

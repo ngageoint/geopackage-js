@@ -295,9 +295,11 @@ export class SpatialReferenceSystem {
     ) {
       return Projections.getProjection(ProjectionConstants.AUTHORITY_EPSG, this.organization_coordsys_id);
     } else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
-      return Projections.getProjection(this.organization, this.organization_coordsys_id, this.definition_12_063);
+      Projections.setProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition_12_063);
+      return Projections.getProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition_12_063);
     } else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
-      return Projections.getProjection(this.organization, this.organization_coordsys_id, this.definition);
+      Projections.setProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition);
+      return Projections.getProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition);
     }
     return null;
   }

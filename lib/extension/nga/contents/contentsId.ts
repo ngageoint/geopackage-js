@@ -46,8 +46,8 @@ export class ContentsId {
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof ContentsId) {
       const contentsId = args[0];
-      this.id = contentsId.id;
-      this.table_name = contentsId.table_name;
+      this.id = contentsId.getId();
+      this.table_name = contentsId.getTableName();
     }
   }
 

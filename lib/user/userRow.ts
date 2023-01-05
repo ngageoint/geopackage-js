@@ -159,7 +159,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
 
   /**
    * Gets the id column
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   get idColumn(): UserColumn {
     return this.table.getPkColumn();
@@ -214,12 +214,11 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
   getValue(columnName: string): any {
     const index = this.getColumnIndexWithColumnName(columnName)
     const value = this.values[index];
-    const dataType = this.getRowColumnTypeWithColumnName(columnName);
-    if (value === undefined || value === null) return value;
-    if (dataType === GeoPackageDataType.BOOLEAN) {
-      return value === 1;
-    } else if (dataType === GeoPackageDataType.BLOB) {
-      return Buffer.from(value as Uint8Array);
+    if (value != null) {
+      const dataType = this.getRowColumnTypeWithColumnName(columnName);
+      if (dataType === GeoPackageDataType.BOOLEAN) {
+        return value === 1;
+      }
     }
     return value;
   }
@@ -280,24 +279,7 @@ export class UserRow<TColumn extends UserColumn, TTable extends UserTable<TColum
   getColumn(columnName: string): UserColumn {
     return this.table.getColumn(columnName);
   }
-  /**
-   * Get the id value, which is the value of the primary key
-   * @return {Number} id value
-   */
-  get id(): number {
-    let id = null;
-    if (this.pkColumn) {
-      id = this.getValueWithIndex(this.pkColumnIndex);
-    }
-    return id;
-  }
-  /**
-   * Set the primary key id value
-   * @param {Number} id id
-   */
-  set id(id: number) {
-    this.values[this.table.getPkColumnIndex()] = id;
-  }
+
   /**
    * Get the primary key column Index
    * @return {Number} pk index

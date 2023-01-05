@@ -76,8 +76,8 @@ export class SimpleAttributesTable extends UserRelatedTable {
   /**
    * Create a simple attributes table with the columns
    * @param  {string} tableName name of the table
-   * @param  {module:user/userColumn~UserColumn[]} additionalColumns additional columns
-   * @return {module:extension/relatedTables~SimpleAttributesTable}
+   * @param  {UserColumn[]} additionalColumns additional columns
+   * @return {SimpleAttributesTable}
    */
   static create(tableName: string, additionalColumns?: UserColumn[]): SimpleAttributesTable {
     let tableColumns = SimpleAttributesTable.createRequiredColumns();
@@ -119,7 +119,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @param  {Number} [startingIndex=0] starting index of the required columns
    * @param  {string} [idColumnName=id]  id column name
    * @param  {boolean} autoincrement
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createRequiredColumnsWithIndex(
     startingIndex = 0,
@@ -133,7 +133,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * Create the required columns
    * @param  {string} [idColumnName=id]  id column name
    * @param  {boolean} autoincrement
-   * @return {module:user/userColumn~UserColumn[]}
+   * @return {UserColumn[]}
    */
   static createRequiredColumns(
     idColumnName = SimpleAttributesTable.COLUMN_ID,
@@ -146,7 +146,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * Create the primary key id column
    * @param  {string} idColumnName name of the id column
    * @param  {boolean} autoincrement
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createIdColumn(idColumnName: string, autoincrement?: boolean): UserColumn {
     return UserCustomColumn.createPrimaryKeyColumn(idColumnName, autoincrement);
@@ -158,7 +158,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
    * @param  {Number} index        index of the column
    * @param  {string} idColumnName name of the id column
    * @param  {boolean} autoincrement
-   * @return {module:user/userColumn~UserColumn}
+   * @return {UserColumn}
    */
   static createIdColumnWithIndex(index: number, idColumnName: string, autoincrement?: boolean): UserColumn {
     return UserCustomColumn.createPrimaryKeyColumnWithIndex(index, idColumnName, autoincrement);
@@ -166,7 +166,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
 
   /**
    * Determine if the column is a simple column
-   * @param  {module:user/userColumn~UserColumn} column column to check
+   * @param  {UserColumn} column column to check
    * @return {Boolean}
    */
   static isSimple(column: UserColumn): boolean {
@@ -174,7 +174,7 @@ export class SimpleAttributesTable extends UserRelatedTable {
   }
   /**
    * Determine if the data type is a simple type: TEXT, INTEGER, or REAL
-   * @param {module:db/geoPackageDataType~GPKGDataType} dataType
+   * @param {GPKGDataType} dataType
    * @return {Boolean}
    */
   static isSimpleDataType(dataType: GeoPackageDataType): boolean {

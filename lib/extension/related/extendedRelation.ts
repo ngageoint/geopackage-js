@@ -101,13 +101,13 @@ export class ExtendedRelation {
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof ExtendedRelation) {
       const extendedRelation = args[0];
-      this.id = extendedRelation.id;
-      this.base_table_name = extendedRelation.base_table_name;
-      this.base_primary_column = extendedRelation.base_primary_column;
-      this.related_table_name = extendedRelation.related_table_name;
-      this.related_primary_column = extendedRelation.related_primary_column;
-      this.relation_name = extendedRelation.relation_name;
-      this.mapping_table_name = extendedRelation.mapping_table_name;
+      this.id = extendedRelation.getId();
+      this.base_table_name = extendedRelation.getBaseTableName();
+      this.base_primary_column = extendedRelation.getBasePrimaryColumn();
+      this.related_table_name = extendedRelation.getRelatedTableName();
+      this.related_primary_column = extendedRelation.getRelatedPrimaryColumn();
+      this.relation_name = extendedRelation.getRelationName();
+      this.mapping_table_name = extendedRelation.getMappingTableName();
     }
   }
 

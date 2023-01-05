@@ -5,8 +5,6 @@ var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataTy
   , Verification = require('../../../verification')
   , ContentsDataType = require('../../../../lib/contents/contentsDataType').ContentsDataType
   , UserMappingTable = require('../../../../lib/extension/related/userMappingTable').UserMappingTable
-  , MediaTable = require('../../../../lib/extension/related/media/mediaTable').MediaTable
-  , MediaRow = require('../../../../lib/extension/related/media/mediaRow').MediaRow
   , RelatedTablesUtils = require('./relatedTablesUtils')
   , BoundingBox = require('../../../../lib/boundingBox').BoundingBox
   , should = require('chai').should()
@@ -14,12 +12,8 @@ var DataType = require('../../../../lib/db/geoPackageDataType').GeoPackageDataTy
 
 describe('Related Tile tests', function() {
 
-  var testGeoPackage;
-  var testPath = path.join(__dirname, '..', '..', '..', 'fixtures', 'tmp');
   var geoPackage;
-
   var tileBuffer;
-
   var filename;
   beforeEach('create the GeoPackage connection', async function() {
 
@@ -37,22 +31,22 @@ describe('Related Tile tests', function() {
   })
 
   var tileMatrixSet;
-  var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+  var tileMatrixSetBoundingBox = BoundingBox.worldWebMercator();
   var tileTableName = 'OSM';
 
   function validateContents(tileTable, contents) {
     should.exist(contents);
-    should.exist(contents.data_type);
-    'tiles'.should.be.equal(contents.data_type);
-    tileTable.getTableName().should.be.equal(contents.table_name);
-    should.exist(contents.last_change);
+    should.exist(contents.getDataType());
+    'tiles'.should.be.equal(contents.getDataTypeName());
+    tileTable.getTableName().should.be.equal(contents.getTableName());
+    should.exist(contents.getLastChange());
   }
 
   function createTiles() {
-    var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
+    var contentsBoundingBox = new BoundingBox(-180, -85.0511287798066, 180, 85.0511287798066);
     var contentsSrsId = 4326;
     var tileMatrixSetSrsId = 3857;
-    geoPackage.spatialReferenceSystemDao.createWebMercator();
+    geoPackage.getSpatialReferenceSystemDao().createWebMercator();
     tileMatrixSet = geoPackage.createTileTableWithTableName(tileTableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
     Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
     Verification.verifyContentsForTable(geoPackage, tileTableName).should.be.equal(true);
@@ -77,10 +71,9 @@ describe('Related Tile tests', function() {
             }
             return ytiles.reduce(function(ySequence, y) {
               return ySequence.then(function() {
-                return new Promise(async function(resolve, reject) {
+                return new Promise(async function(resolve) {
                   // @ts-ignore
                   let image = await loadTile(path.join(__dirname, '..', '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
-                  console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tileTableName);
                   resolve(geoPackage.addTile(image, tileTableName, zoom, y, x));
                 });
               });
@@ -93,10 +86,9 @@ describe('Related Tile tests', function() {
 
   it('should create a tile relationship', function() {
     this.timeout(5000);
-
     return createTiles()
       .then(function() {
-        var rte = geoPackage.relatedTablesExtension;
+        var rte = geoPackage.getRelatedTablesExtension();
         rte.has().should.be.equal(false);
 
         var extendedRelationships = rte.getRelationships();
@@ -106,45 +98,39 @@ describe('Related Tile tests', function() {
 
         var tileDao = geoPackage.getTileDao(tileTableName);
 
-        var tileTable = tileDao.table;
-        var idColumn = tileTable.getIdColumn();
+        var tileTable = tileDao.getTable();
+        var idColumn = tileTable.getPkColumn();
         should.exist(idColumn);
 
-        var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns(UserMappingTable.numRequiredColumns());
+        var additionalMappingColumns = RelatedTablesUtils.createAdditionalUserColumns();
         var mappingTableName = 'features_tiles';
         var userMappingTable = UserMappingTable.create(mappingTableName, additionalMappingColumns);
-        rte.has(userMappingTable.getTableName()).should.be.equal(false);
+        rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(false);
         userMappingTable.getUserColumns().getColumnNames().length.should.be.equal(UserMappingTable.numRequiredColumns() + additionalMappingColumns.length);
 
-        var baseIdColumn = userMappingTable.baseIdColumn;
+        var baseIdColumn = userMappingTable.getBaseIdColumn();
         should.exist(baseIdColumn);
-        baseIdColumn.name.should.be.equal(UserMappingTable.COLUMN_BASE_ID);
-        baseIdColumn.dataType.should.be.equal(DataType.INTEGER);
-        baseIdColumn.notNull.should.be.equal(true);
-        baseIdColumn.primaryKey.should.be.equal(false);
+        baseIdColumn.getName().should.be.equal(UserMappingTable.COLUMN_BASE_ID);
+        baseIdColumn.getDataType().should.be.equal(DataType.INTEGER);
+        baseIdColumn.isNotNull().should.be.equal(true);
+        baseIdColumn.isPrimaryKey().should.be.equal(false);
 
-        var relatedIdColumn = userMappingTable.relatedIdColumn;
+        var relatedIdColumn = userMappingTable.getRelatedIdColumn();
         should.exist(relatedIdColumn);
-        relatedIdColumn.name.should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
-        relatedIdColumn.dataType.should.be.equal(DataType.INTEGER);
-        relatedIdColumn.notNull.should.be.equal(true);
-        relatedIdColumn.primaryKey.should.be.equal(false);
-        rte.has(userMappingTable.getTableName()).should.be.equal(false);
+        relatedIdColumn.getName().should.be.equal(UserMappingTable.COLUMN_RELATED_ID);
+        relatedIdColumn.getDataType().should.be.equal(DataType.INTEGER);
+        relatedIdColumn.isNotNull().should.be.equal(true);
+        relatedIdColumn.isPrimaryKey().should.be.equal(false);
+        rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(false);
 
         // Create the media table, content row, and relationship between the
-  	  // feature table and media table
+        // feature table and media table
 
-        var contentsDao = geoPackage.contentsDao;
-        var contentsTables = contentsDao.getTables();
-        var relationship = RelatedTablesExtension.RelationshipBuilder()
-          .setBaseTableName(baseTableName)
-          .setRelatedTableName(tileTableName)
-          .setUserMappingTable(userMappingTable);
-
-        let extendedRelation = rte.addTilesRelationship(relationship);
+        var contentsDao = geoPackage.getContentsDao();
+        let extendedRelation = rte.addTilesRelationshipWithMappingTable(baseTableName, tileTableName, userMappingTable);
         validateContents(tileTable, contentsDao.queryForId(tileTableName));
         rte.has().should.be.equal(true);
-        rte.has(userMappingTable.getTableName()).should.be.equal(true);
+        rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(true);
 
         should.exist(extendedRelation);
         relationships = rte.getRelationships();
@@ -157,27 +143,29 @@ describe('Related Tile tests', function() {
         geoPackage.isTableType('tiles', tileTableName);
 
         var featureDao = geoPackage.getFeatureDao(baseTableName);
-        var allFeatures = featureDao.queryForAll();
+        var featureResultSet = featureDao.queryForAll();
         var featureIds = [];
-        for (var i = 0; i < allFeatures.length; i++) {
-          var row = featureDao.getRow(allFeatures[i]);
-          featureIds.push(row.id);
+        while (featureResultSet.moveToNext()) {
+          const row = featureResultSet.getRow();
+          featureIds.push(row.getId());
         }
+        featureResultSet.close();
 
-        var allTiles = tileDao.queryForAll();
+        var tileResultSet = tileDao.queryForAll();
         var tileIds = [];
-        for (var i = 0; i < allTiles.length; i++) {
-          var row = tileDao.getRow(allTiles[i]);
-          tileIds.push(row.id);
+        while (tileResultSet.moveToNext()) {
+          const row = tileResultSet.getRow();
+          tileIds.push(row.getId());
         }
+        tileResultSet.close();
 
         // Insert user mapping rows between feature ids and media ids
-        var userMappingDao = rte.getMappingDao(mappingTableName);
+        var userMappingDao = rte.getMappingDao(userMappingTable.getTableName());
         for (var i = 0; i < 10; i++) {
           var userMappingRow = userMappingDao.newRow();
-          userMappingRow.baseId = featureIds[Math.floor(Math.random() * featureIds.length)];
-          userMappingRow.relatedId = tileIds[Math.floor(Math.random() * tileIds.length)];
-          RelatedTablesUtils.populateRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
+          userMappingRow.setBaseId(featureIds[Math.floor(Math.random() * featureIds.length)]);
+          userMappingRow.setRelatedId(tileIds[Math.floor(Math.random() * tileIds.length)]);
+          RelatedTablesUtils.populateUserRow(userMappingTable, userMappingRow, UserMappingTable.requiredColumns());
           var created = userMappingDao.create(userMappingRow);
           created.should.be.greaterThan(0);
         }
@@ -185,54 +173,53 @@ describe('Related Tile tests', function() {
         userMappingDao.count().should.be.equal(10);
 
         // Validate the user mapping rows
-        userMappingTable = userMappingDao.table;
+        userMappingTable = userMappingDao.getTable();
         var mappingColumns = userMappingTable.getUserColumns().getColumnNames();
-        var userMappingRows = userMappingDao.queryForAll();
-        var count = userMappingRows.length;
+        var userMappingResultSet = userMappingDao.queryForAll();
+        var count = userMappingResultSet.getCount();
         count.should.be.equal(10);
         var manualCount = 0;
 
-        for (i = 0; i < count; i++) {
-          userMappingRow = userMappingRows[i];
-          row = userMappingDao.getUserMappingRow(userMappingRow);
-          row.hasId().should.be.equal(false);
-          featureIds.indexOf(row.baseId).should.be.not.equal(-1);
-          tileIds.indexOf(row.relatedId).should.be.not.equal(-1);
-          RelatedTablesUtils.validateUserRow(mappingColumns, row);
-          RelatedTablesUtils.validateDublinCoreColumns(row);
+        while (userMappingResultSet.moveToNext()) {
+          userMappingRow = userMappingDao.getRowWithUserCustomRow(userMappingResultSet.getRow());
+          userMappingRow.hasId().should.be.equal(false);
+          featureIds.indexOf(userMappingRow.getBaseId()).should.be.not.equal(-1);
+          tileIds.indexOf(userMappingRow.getRelatedId()).should.be.not.equal(-1);
+          RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
+          RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
           manualCount++;
         }
 
         manualCount.should.be.equal(count);
 
-        var extendedRelationsDao = rte.extendedRelationDao;
-        var featureBaseTableRelations = extendedRelationsDao.getBaseTableRelations(featureDao.table_name);
-        var featureTableRelations = extendedRelationsDao.getTableRelations(featureDao.table_name);
+        var extendedRelationsDao = rte.getExtendedRelationsDao();
+        var featureBaseTableRelations = extendedRelationsDao.getBaseTableRelations(featureDao.getTableName());
+        var featureTableRelations = extendedRelationsDao.getTableRelations(featureDao.getTableName());
         featureBaseTableRelations.length.should.be.equal(1);
         featureTableRelations.length.should.be.equal(1);
-        featureBaseTableRelations[0].id.should.be.equal(featureTableRelations[0].id);
-        extendedRelationsDao.getRelatedTableRelations(featureDao.table_name).length.should.be.equal(0);
+        featureBaseTableRelations[0].getId().should.be.equal(featureTableRelations[0].getId());
+        extendedRelationsDao.getRelatedTableRelations(featureDao.getTableName()).length.should.be.equal(0);
 
         // Test the feature table relations
         for (i = 0; i < featureBaseTableRelations.length; i++) {
 
           // Test the relation
           var featureRelation = featureBaseTableRelations[i];
-          featureRelation.id.should.be.greaterThan(0);
-          featureDao.table_name.should.be.equal(featureRelation.base_table_name);
-          featureDao.getFeatureTable().getPkColumnName().should.be.equal(featureRelation.base_primary_column);
-          tileDao.table_name.should.be.equal(featureRelation.related_table_name);
-          tileDao.table.getPkColumnName().should.be.equal(featureRelation.related_primary_column);
-          'tiles'.should.be.equal(featureRelation.relation_name);
+          featureRelation.getId().should.be.greaterThan(0);
+          featureDao.getTableName().should.be.equal(featureRelation.getBaseTableName());
+          featureDao.getTable().getPkColumnName().should.be.equal(featureRelation.getBasePrimaryColumn());
+          tileDao.getTableName().should.be.equal(featureRelation.getRelatedTableName());
+          tileDao.getTable().getPkColumnName().should.be.equal(featureRelation.getRelatedPrimaryColumn());
+          'tiles'.should.be.equal(featureRelation.getRelationName());
 
           // test the user mappings from the relation
-          userMappingDao = rte.getMappingDao(featureRelation.mapping_table_name);
+          userMappingDao = rte.getMappingDao(featureRelation.getMappingTableName());
           var totalMappedCount = userMappingDao.count();
           var mappings = userMappingDao.queryForAll();
-          for (var m = 0; m < mappings.length; m++) {
-            userMappingRow = userMappingDao.getUserMappingRow(mappings[i]);
-            featureIds.indexOf(userMappingRow.baseId).should.not.be.equal(-1);
-            tileIds.indexOf(userMappingRow.relatedId).should.not.be.equal(-1);
+          while (mappings.moveToNext()) {
+            userMappingRow = userMappingDao.getRowWithUserCustomRow(mappings.getRow());
+            featureIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
+            tileIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
             RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
           }
@@ -241,20 +228,18 @@ describe('Related Tile tests', function() {
 
           var totalMapped = 0;
 
-          // get and test the Media Rows mapped to each Feature Row
-          var features = featureDao.queryForAll();
-          for (var f = 0; f < features.length; f++) {
-            var featureRow = featureDao.getRow(features[f]);
-            var mappedIds = rte.getMappingsForBase(featureRelation, featureRow.id);
-            var tileRows = tileDao.getRows(mappedIds);
+          // get and test the tile rows mapped to each Feature Row
+          featureResultSet = featureDao.queryForAll();
+          while (featureResultSet.moveToNext()) {
+            var featureRow = featureResultSet.getRow()
+            var mappedIds = rte.getMappingsForBase(featureRelation.getMappingTableName(), featureRow.getId());
+            var tileRows = tileDao.queryForIdRows(mappedIds);
             tileRows.length.should.be.equal(mappedIds.length);
 
-            tileRows.forEach(function(row) {
-              var tileRow = tileDao.getRow(row);
+            tileRows.forEach((tileRow) => {
               tileRow.hasId().should.be.equal(true);
-              tileRow.id.should.be.greaterThan(0);
-              tileIds.indexOf(tileRow.id).should.not.be.equal(-1);
-              tileIds.indexOf(tileRow.id).should.not.be.equal(-1);
+              tileRow.getId().should.be.greaterThan(0);
+              tileIds.indexOf(tileRow.getId()).should.not.be.equal(-1);
             });
 
             totalMapped += mappedIds.length;
@@ -268,79 +253,77 @@ describe('Related Tile tests', function() {
 
         tileRelatedTableRelations.length.should.be.equal(1);
         tileTableRelations.length.should.be.equal(1);
-        tileRelatedTableRelations[0].id.should.be.equal(tileTableRelations[0].id);
+        tileRelatedTableRelations[0].getId().should.be.equal(tileTableRelations[0].getId());
         extendedRelationsDao.getBaseTableRelations(tileTable.getTableName()).length.should.be.equal(0);
 
         // Test the tile table relations
         tileRelatedTableRelations.forEach(function(tileRelation) {
 
           // Test the relation
-          tileRelation.id.should.be.greaterThan(0);
-          featureDao.table_name.should.be.equal(tileRelation.base_table_name);
-          featureDao.getFeatureTable().getPkColumnName().should.be.equal(tileRelation.base_primary_column);
-          tileDao.table_name.should.be.equal(tileRelation.related_table_name);
-          tileDao.table.getPkColumnName().should.be.equal(tileRelation.related_primary_column);
-          'tiles'.should.be.equal(tileRelation.relation_name);
-          mappingTableName.should.be.equal(tileRelation.mapping_table_name);
+          tileRelation.getId().should.be.greaterThan(0);
+          featureDao.getTableName().should.be.equal(tileRelation.getBaseTableName());
+          featureDao.getTable().getPkColumnName().should.be.equal(tileRelation.getBasePrimaryColumn());
+          tileDao.getTableName().should.be.equal(tileRelation.getRelatedTableName());
+          tileDao.getTable().getPkColumnName().should.be.equal(tileRelation.getRelatedPrimaryColumn());
+          'tiles'.should.be.equal(tileRelation.getRelationName());
+          mappingTableName.should.be.equal(tileRelation.getMappingTableName());
 
           // Test the user mappings from the relation
-          var userMappingDao = rte.getMappingDao(tileRelation);
+          var userMappingDao = rte.getMappingDaoWithExtendedRelation(tileRelation);
           var totalMappedCount = userMappingDao.count();
           var mappings = userMappingDao.queryForAll();
-          mappings.forEach(function(row) {
-            var userMappingRow = userMappingDao.getUserMappingRow(row);
-            featureIds.indexOf(userMappingRow.baseId).should.not.be.equal(-1);
-            tileIds.indexOf(userMappingRow.relatedId).should.not.be.equal(-1);
+          while (mappings.moveToNext()) {
+            var userMappingRow = userMappingDao.getRowWithUserCustomRow(mappings.getRow());
+            featureIds.indexOf(userMappingRow.getBaseId()).should.not.be.equal(-1);
+            tileIds.indexOf(userMappingRow.getRelatedId()).should.not.be.equal(-1);
             RelatedTablesUtils.validateUserRow(mappingColumns, userMappingRow);
             RelatedTablesUtils.validateDublinCoreColumns(userMappingRow);
-          });
-
+          }
+          mappings.close();
           // Get and test the feature DAO
-          featureDao = geoPackage.getFeatureDao(featureDao.table_name);
+          featureDao = geoPackage.getFeatureDao(featureDao.getTableName());
           should.exist(featureDao);
-          var featureTable = featureDao.getFeatureTable();
+          var featureTable = featureDao.getTable();
           should.exist(featureTable);
           var featureContents = featureDao.getContents();
           should.exist(featureContents);
-          ContentsDataType.FEATURES.should.be.equal(featureContents.data_type);
-          featureTable.getTableName().should.be.equal(featureContents.table_name);
-          should.exist(featureContents.last_change);
+          ContentsDataType.FEATURES.should.be.equal(featureContents.getDataType());
+          featureTable.getTableName().should.be.equal(featureContents.getTableName());
+          should.exist(featureContents.getLastChange());
 
           var tiles = tileDao.queryForAll();
           var totalMapped = 0;
-          tiles.forEach(function(row) {
-            var tileRow = tileDao.getRow(row);
-            var mappedIds = rte.getMappingsForRelated(tileRelation.mapping_table_name, tileRow.id);
-            mappedIds.forEach(function(mappedId){
-              var featureRow = featureDao.queryForId(mappedId);
+          while (tiles.moveToNext()) {
+            var tileRow = tiles.getRow();
+            var mappedIds = rte.getMappingsForRelated(tileRelation.getMappingTableName(), tileRow.getId());
+            const featureRows = featureDao.queryForIdRows(mappedIds);
+            featureRows.forEach((featureRow) => {
               should.exist(featureRow);
               featureRow.hasId().should.be.equal(true);
-              featureRow.id.should.be.greaterThan(0);
-              featureIds.indexOf(featureRow.id).should.not.equal(-1);
-              mappedIds.indexOf(featureRow.id).should.not.equal(-1);
-              if (featureRow.getValue(featureRow.geometryColumn.name)) {
-                var geometryData = featureRow.geometry;
-
-                should.exist(geometryData);
-                if (!geometryData.empty) {
-                  should.exist(geometryData.geometry);
+              featureRow.getId().should.be.greaterThan(0);
+              featureIds.indexOf(featureRow.getId()).should.not.equal(-1);
+              mappedIds.indexOf(featureRow.getId()).should.not.equal(-1);
+              if (featureRow.getGeometry() != null) {
+                const geometryData = featureRow.getGeometry();
+                if (!geometryData.isEmpty()) {
+                  should.exist(geometryData.getGeometry());
                 }
               }
             });
             totalMapped += mappedIds.length;
-          });
-
+          }
+          tiles.close();
           totalMapped.should.be.equal(totalMappedCount);
         });
 
         // Delete a single mapping
-        var countOfIds = userMappingDao.countByIds(userMappingRow);
-        countOfIds.should.be.equal(userMappingDao.deleteByIds(userMappingRow));
-        userMappingDao.count().should.be.equal(10-countOfIds);
+        var countOfIds = userMappingDao.countByIdsWithUserMappingRow(userMappingRow);
+        countOfIds.should.be.equal(userMappingDao.deleteByIdsWithUserMappingRow(userMappingRow));
+        userMappingDao.count().should.be.equal(10 - countOfIds);
 
         // Delete the relationship and user mapping table
-        rte.removeRelationship(extendedRelation);
-        rte.has(userMappingTable.getTableName()).should.be.equal(false);
+        rte.removeRelationshipWithExtendedRelation(extendedRelation);
+        rte.hasExtensionForMappingTable(userMappingTable.getTableName()).should.be.equal(false);
         var relationships = rte.getRelationships();
         relationships.length.should.be.equal(0);
         geoPackage.isTable(mappingTableName).should.be.equal(false);
@@ -356,6 +339,5 @@ describe('Related Tile tests', function() {
         rte.removeExtension();
         rte.has().should.be.equal(false);
       });
-
   });
 });

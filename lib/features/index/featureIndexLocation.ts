@@ -27,19 +27,33 @@ export class FeatureIndexLocation implements IterableIterator<FeatureIndexType> 
   public constructor(manager: FeatureIndexManager) {
     this.manager = manager;
     this.order = this.manager.getIndexLocationQueryOrder()[Symbol.iterator]();
+    this.type = this.getNextSupportedFeatureIndexType();
   }
 
   [Symbol.iterator](): IterableIterator<FeatureIndexType> {
     return this;
   }
 
-  public next(): { done: boolean; value: FeatureIndexType } {
-    const nextType = this.type;
-    this.type = null;
-    const next = this.order.next();
-    if (next != null && next.value != null && this.manager.isIndexedForType(next.value)) {
-      this.type = next.value;
+  private getNextSupportedFeatureIndexType(): FeatureIndexType {
+    let next = this.order.next();
+    let type = null;
+    while (!next.done) {
+      if (this.manager.isIndexedForType(next.value)) {
+        type = next.value;
+        break;
+      }
+      next = this.order.next();
     }
-    return { value: nextType, done: this.type != null };
+    return type;
+  }
+
+  public next(): { value: FeatureIndexType, done: boolean } {
+    const currentType = this.type;
+    this.type = this.getNextSupportedFeatureIndexType();
+
+    return {
+      value: currentType,
+      done: currentType == null
+    };
   }
 }

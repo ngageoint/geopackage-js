@@ -17,16 +17,16 @@ export class FeaturePaintCache {
   constructor(public cacheSize = FeaturePaintCache.DEFAULT_STYLE_PAINT_CACHE_SIZE) {}
   /**
    * Get the cached featurePaint for the style row or null if not cached
-   * @param {module:extension/nga/style~StyleRow} styleRow style row
-   * @return {module:tiles/features~FeaturePaint} feature paint or null
+   * @param {StyleRow} styleRow style row
+   * @return {FeaturePaint} feature paint or null
    */
   getFeaturePaintForStyleRow(styleRow: StyleRow): FeaturePaint {
-    return this.getFeaturePaint(styleRow.id);
+    return this.getFeaturePaint(styleRow.getId());
   }
   /**
    * Get the cached featurePaint for the style row id or null if not cached
    * @param {Number} styleRowId style row id
-   * @return {module:tiles/features~FeaturePaint} feature paint or null
+   * @return {FeaturePaint} feature paint or null
    */
   getFeaturePaint(styleRowId: number): FeaturePaint {
     const featurePaint = this.paintCache[styleRowId];
@@ -41,18 +41,18 @@ export class FeaturePaintCache {
   }
   /**
    * Get the paint for the style row and draw type
-   * @param {module:extension/nga/style~StyleRow} styleRow style row
-   * @param {module:tiles/features~FeatureDrawType} type feature draw type
-   * @return {module:tiles/features~Paint} paint
+   * @param {StyleRow} styleRow style row
+   * @param {FeatureDrawType} type feature draw type
+   * @return {Paint} paint
    */
   getPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType): Paint {
-    return this.getPaint(styleRow.id, type);
+    return this.getPaint(styleRow.getId(), type);
   }
   /**
    * Get the paint for the style row id and draw type
    * @param {Number} styleId  style row id
    * @param {String} type feature draw type
-   * @return {module:tiles/features~Paint} paint
+   * @return {Paint} paint
    */
   getPaint(styleId: number, type: FeatureDrawType): Paint {
     let paint = null;
@@ -64,18 +64,18 @@ export class FeaturePaintCache {
   }
   /**
    * Cache the featurePaint for the style row
-   * @param {module:extension/nga/style~StyleRow} styleRow style row
-   * @param {module:tiles/features~FeatureDrawType} type feature draw type
-   * @param {module:tiles/features~Paint} paint paint
+   * @param {StyleRow} styleRow style row
+   * @param {FeatureDrawType} type feature draw type
+   * @param {Paint} paint paint
    */
   setPaintForStyleRow(styleRow: StyleRow, type: FeatureDrawType, paint: Paint): void {
-    this.setPaint(styleRow.id, type, paint);
+    this.setPaint(styleRow.getId(), type, paint);
   }
   /**
    * Cache the featurePaint for the style row id
    * @param {Number} styleRowId style row id
-   * @param {module:tiles/features~FeatureDrawType} type feature draw type
-   * @param {module:tiles/features~Paint} paint paint
+   * @param {FeatureDrawType} type feature draw type
+   * @param {Paint} paint paint
    */
   setPaint(styleRowId: number, type: FeatureDrawType, paint: Paint): void {
     let featurePaint = this.paintCache[styleRowId];
@@ -100,7 +100,7 @@ export class FeaturePaintCache {
   /**
    * Remove the cached featurePaint for the style row id
    * @param {Number} styleRowId style row id
-   * @return {module:tiles/features~FeaturePaint} removed feature paint or null
+   * @return {FeaturePaint} removed feature paint or null
    */
   remove(styleRowId: number): FeaturePaint {
     const removed = this.paintCache[styleRowId];

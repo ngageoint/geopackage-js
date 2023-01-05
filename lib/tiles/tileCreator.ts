@@ -611,8 +611,8 @@ export class TileCreator {
     // Check if the request overlaps the tile matrix set
     if (this.tileDao.getTileMatrices().length > 0 && projectedRequestBoundingBox.intersects(this.tileSetBoundingBox)) {
       // Get the tile distance
-      const distanceWidth = projectedRequestBoundingBox.getMaxLongitude() - projectedRequestBoundingBox.getMinLongitude();
-      const distanceHeight = projectedRequestBoundingBox.getMaxLatitude() - projectedRequestBoundingBox.getMinLatitude();
+      const distanceWidth = projectedRequestBoundingBox.getLongitudeRange();
+      const distanceHeight = projectedRequestBoundingBox.getLatitudeRange();
 
       // Get the zoom level to request based upon the tile size
       let requestZoomLevel;

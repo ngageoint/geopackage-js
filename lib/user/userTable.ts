@@ -8,11 +8,11 @@ import type { UserColumn } from './userColumn';
 
 /**
  * `UserTable` models optional [user data tables](https://www.geopackage.org/spec121/index.html#_options)
- * in a [GeoPackage]{@link module:geoPackage~GeoPackage}.
+ * in a [GeoPackage]{@link GeoPackage}.
  *
  * @class
  * @param  {string} tableName table name
- * @param  {module:user/userColumn~UserColumn[]} columns user columns
+ * @param  {UserColumn[]} columns user columns
  * @param  {string[]} [requiredColumns] required columns
  */
 export abstract class UserTable<TColumn extends UserColumn> {

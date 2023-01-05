@@ -50,10 +50,36 @@ export class BoundingBox {
     );
   }
 
+  /**
+   * Constructor
+   */
   public constructor();
+
+  /**
+   * Constructor
+   * @param boundingBox
+   */
   public constructor(boundingBox: BoundingBox);
+
+  /**
+   * Constructor
+   * @param envelope
+   */
   public constructor(envelope: GeometryEnvelope);
+
+  /**
+   * Constructor
+   * @param geometry
+   */
   public constructor(geometry: Geometry);
+
+  /**
+   * Constructor
+   * @param minLongitude
+   * @param minLatitude
+   * @param maxLongitude
+   * @param maxLatitude
+   */
   public constructor(minLongitude: number, minLatitude: number, maxLongitude: number, maxLatitude: number);
 
   /**
@@ -68,10 +94,10 @@ export class BoundingBox {
       this.maxLatitude = ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT;
     } else if (args.length === 1) {
       if (args[0] instanceof BoundingBox) {
-        this.minLongitude = args[0].minLongitude;
-        this.minLatitude = args[0].minLatitude;
-        this.maxLongitude = args[0].maxLongitude;
-        this.maxLatitude = args[0].maxLatitude;
+        this.minLongitude = args[0].getMinLongitude();
+        this.minLatitude = args[0].getMinLatitude();
+        this.maxLongitude = args[0].getMaxLongitude();
+        this.maxLatitude = args[0].getMaxLatitude();
       } else if (args[0] instanceof GeometryEnvelope) {
         this.minLongitude = args[0].minX;
         this.minLatitude = args[0].minY;
@@ -270,23 +296,15 @@ export class BoundingBox {
 
   /**
    * Build a Geometry Envelope from the bounding box
-   *
-   * @param boundingBox
-   *            bounding box
+   * @param boundingBox bounding box
    * @return geometry envelope
    */
   public static buildEnvelopeFromBoundingBox(boundingBox: BoundingBox): GeometryEnvelope {
-    const envelope = new GeometryEnvelope();
-    envelope.minX = boundingBox.minLongitude;
-    envelope.maxX = boundingBox.maxLongitude;
-    envelope.minY = boundingBox.minLatitude;
-    envelope.maxY = boundingBox.maxLatitude;
-    return envelope;
+    return new GeometryEnvelope(boundingBox.minLongitude, boundingBox.minLatitude, boundingBox.maxLongitude, boundingBox.maxLatitude);
   }
 
   /**
    * Build a geometry representation of the bounding box
-   *
    * @return geometry, polygon or point
    */
   public buildGeometry(): Geometry {
@@ -454,21 +472,31 @@ export class BoundingBox {
    */
   public transform(transform: GeometryTransform | ProjectionTransform): BoundingBox {
     const geometryTransform = transform instanceof GeometryTransform ? transform : GeometryTransform.create(transform);
-    let transformed = this.copy();
-    if (!transform.getFromProjection().equalsProjection(transform.getToProjection())) {
-      if (
-        Projections.getUnits(geometryTransform.getFromProjection().toString()) === 'degrees' &&
-        geometryTransform
-          .getToProjection()
-          .equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())
-      ) {
-        transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(transformed);
+    let transformed: BoundingBox = this;
+    if (transform.getFromProjection().equalsProjection(transform.getToProjection())) {
+      transformed = this.copy();
+    } else {
+      if (Projections.getUnits(geometryTransform.getFromProjection().toString()) === 'degrees' && geometryTransform.getToProjection().equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR.toString())) {
+        transformed = BoundingBox.boundDegreesBoundingBoxWithWebMercatorLimits(this);
       }
-      const envelope = transformed.buildEnvelope();
-      const bounds = geometryTransform.transformBounds(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY);
-      transformed = new BoundingBox(bounds[0], bounds[1], bounds[2], bounds[3]);
+      const envelope = BoundingBox.buildEnvelope(transformed);
+      const transformedEnvelope = geometryTransform.transformEnvelope(envelope);
+      transformed = new BoundingBox(transformedEnvelope);
     }
     return transformed;
+  }
+
+  /**
+   * Build an envelope from a bounding box
+   * @param boundingBox
+   */
+  public static buildEnvelope(boundingBox: BoundingBox): GeometryEnvelope {
+    const envelope = new GeometryEnvelope();
+    envelope.minX = boundingBox.getMinLongitude();
+    envelope.maxX = boundingBox.getMaxLongitude();
+    envelope.minY = boundingBox.getMinLatitude();
+    envelope.maxY = boundingBox.getMaxLatitude();
+    return envelope;
   }
 
   /**
@@ -641,7 +669,7 @@ export class BoundingBox {
   }
 
   /**
-   * {@inheritDoc}
+   * Checks if bounding boxes are equal
    */
   public equals(obj: BoundingBox): boolean {
     return (

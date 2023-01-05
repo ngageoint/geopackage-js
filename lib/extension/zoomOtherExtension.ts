@@ -47,14 +47,13 @@ export class ZoomOtherExtension extends BaseExtension {
    * @return extension
    */
   public getOrCreate(tableName: string): Extensions {
-    const extension = super.getOrCreate(
+    return super.getOrCreate(
       ZoomOtherExtension.EXTENSION_NAME,
       tableName,
       TileTable.COLUMN_TILE_DATA,
       ZoomOtherExtension.DEFINITION,
       ExtensionScopeType.READ_WRITE,
     );
-    return extension;
   }
 
   /**
@@ -65,7 +64,6 @@ export class ZoomOtherExtension extends BaseExtension {
    * @return true if has extension
    */
   public has(tableName: string): boolean {
-    const exists = this.hasExtension(ZoomOtherExtension.EXTENSION_NAME, tableName, TileTable.COLUMN_TILE_DATA);
-    return exists;
+    return this.hasExtension(ZoomOtherExtension.EXTENSION_NAME, tableName, TileTable.COLUMN_TILE_DATA);
   }
 }

@@ -7,6 +7,7 @@ import { GeoPackageDao } from '../../db/geoPackageDao';
 import { GeometryType } from '@ngageoint/simple-features-js';
 import { TableColumnKey } from '../../db/tableColumnKey';
 import type { GeoPackage } from '../../geoPackage';
+import { Contents } from '../../contents/contents';
 
 /**
  * Geometry Columns Data Access Object
@@ -89,7 +90,7 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
   /**
    *  Get the Spatial Reference System of the Geometry Columns
    *
-   *  @param {module:dao/geometryColumns~GeometryColumns} geometryColumns geometry columns
+   *  @param {GeometryColumns} geometryColumns geometry columns
    */
   getSrs(geometryColumns: GeometryColumns): SpatialReferenceSystem {
     return this.geoPackage.getSpatialReferenceSystemDao().queryForId(geometryColumns.getSrsId());
@@ -102,5 +103,14 @@ export class GeometryColumnsDao extends GeoPackageDao<GeometryColumns, TableColu
 
   queryForIdWithKey(key: TableColumnKey): GeometryColumns {
     return this.queryForMultiId([key.getTableName(), key.getColumnName()]);
+  }
+
+  /**
+   *  Get the Contents of the Geometry Columns
+   *  @param {GeometryColumns} geometryColumns geometry columns
+   *  @return {ContentsDao} contents dao
+   */
+  getContents(geometryColumns: GeometryColumns): Contents {
+    return this.geoPackage.getContentsDao().queryForId(geometryColumns.getTableName());
   }
 }

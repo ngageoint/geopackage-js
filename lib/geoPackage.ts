@@ -94,15 +94,8 @@ import { TileColumn } from './tiles/user/tileColumn';
 import { FeatureTiles } from './tiles/features/featureTiles';
 import { TileUtils } from './tiles/tileUtils';
 import { MetadataDao } from './extension/metadata/metadataDao';
-
-export interface ClosestFeature {
-  feature_count: number;
-  coverage: boolean;
-  gp_table: string;
-  gp_name: string;
-  distance?: number;
-}
-
+import { GeoPackageImage } from './image/geoPackageImage';
+import { SimpleAttributesRow } from './extension/related/simple/simpleAttributesRow';
 
 /**
  *  A single GeoPackage database connection implementation
@@ -236,10 +229,10 @@ export class GeoPackage {
 
   /**
    * Constructor
-   * @param name name
-   * @param path path
-   * @param database database
-   * @param writable true if writable
+   * @param {string} name name
+   * @param {string} path path
+   * @param {GeoPackageConnection} database database
+   * @param {boolean} writable true if writable
    */
   public constructor(name: string, path: string, database: GeoPackageConnection, writable = true) {
     this.name = name;
@@ -250,7 +243,11 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the feature table bounding box
+   * @param {Projection} projection
+   * @param {string} table
+   * @param {boolean} manual
+   * @return {BoundingBox}
    */
   public getFeatureBoundingBox(projection: Projection, table: string, manual: boolean): BoundingBox {
     let boundingBox = null;
@@ -268,7 +265,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the feature dao
+   * @param {GeometryColumns} geometryColumns
    */
   public getFeatureDaoWithGeometryColumns(geometryColumns: GeometryColumns): FeatureDao {
     if (geometryColumns == null) {
@@ -294,7 +292,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the feature dao
+   * @param {Contents} contents
    */
   public getFeatureDaoWithContents(contents: Contents): FeatureDao {
     if (contents == null) {
@@ -316,7 +315,8 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the feature dao
+   * @param {string} tableName
    */
   public getFeatureDao(tableName: string): FeatureDao {
     const dao = this.getGeometryColumnsDao();
@@ -468,14 +468,18 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the attributes dao
+   * @param {AttributesTable} table
+   * @return {AttributesDao}
    */
   public getAttributesDaoWithAttributesTable(table: AttributesTable): AttributesDao {
     return this.getAttributesDao(table.getTableName());
   }
 
   /**
-   * {@inheritDoc}
+   * Get the attributes dao
+   * @param {string} tableName
+   * @return {AttributesDao}
    */
   public getAttributesDao(tableName: string): AttributesDao {
     const dao = this.getContentsDao();
@@ -493,6 +497,8 @@ export class GeoPackage {
 
   /**
    * Get the Simple Attributes DAO
+   * @param {string} tableName
+   * @return {SimpleAttributesDao}
    */
   public getSimpleAttributesDao(tableName: string): SimpleAttributesDao {
     const reader = new UserCustomTableReader(tableName);
@@ -502,6 +508,8 @@ export class GeoPackage {
 
   /**
    * Get the Media DAO
+   * @param {string} tableName
+   * @return {MediaDao}
    */
   public getMediaDao(tableName: string): MediaDao {
     const reader = new UserCustomTableReader(tableName);
@@ -510,36 +518,45 @@ export class GeoPackage {
   }
 
   /**
-   * {@inheritDoc}
+   * Get the UserCustomDao
+   * @param {string} tableName
+   * @return {UserCustomDao}
    */
   public getUserCustomDao(tableName: string): UserCustomDao {
-    const table = UserCustomTableReader.readUserCustomTable(this.database, tableName);
+    const table = UserCustomTableReader.readUserCustomTable(this.getDatabase(), tableName);
     return this.getUserCustomDaoWithUserCustomTable(table);
   }
 
   /**
-   * {@inheritDoc}
+   * Get the UserCustomDao
+   * @param table
+   * @return {UserCustomDao}
    */
   public getUserCustomDaoWithUserCustomTable(table: UserCustomTable): UserCustomDao {
     return new UserCustomDao(this.getName(), this, table);
   }
 
   /**
-   * {@inheritDoc}
+   * Execute sql against the database
+   * @param {string} sql
    */
   public execSQL(sql: string): void {
     this.database.run(sql);
   }
 
   /**
-   * {@inheritDoc}
+   * Query the database
+   * @param {string} sql
+   * @param {any[]} args
+   * @return {ResultSet}
    */
   public query(sql: string, args: any[]): ResultSet {
     return this.database.query(sql, args);
   }
 
   /**
-   * {@inheritDoc}
+   * Gets the connection
+   * @return {GeoPackageConnection}
    */
   public getConnection(): GeoPackageConnection {
     return this.database;
@@ -1181,7 +1198,7 @@ export class GeoPackage {
       contents.setTableName(tableName);
       contents.setDataTypeName(metadata.getDataType(), ContentsDataType.FEATURES);
       contents.setIdentifier(tableName);
-      contents.setLastChange(new Date());
+      // contents.setLastChange(new Date());
       const boundingBox = metadata.getBoundingBox();
       if (boundingBox != null) {
         contents.setMinX(boundingBox.getMinLongitude());
@@ -1315,9 +1332,8 @@ export class GeoPackage {
   /**
    * Get the Spatial Reference System by id
    *
-   * @param srsId
-   *            srs id
-   * @return srs
+   * @param {number} srsId srs id
+   * @return {SpatialReferenceSystem} srs
    */
   private getSrs(srsId: number): SpatialReferenceSystem {
     let srs;
@@ -1366,12 +1382,13 @@ export class GeoPackage {
 
     try {
       // Create the contents
-      const contents = new Contents();
+      let contents = new Contents();
       contents.setTableName(tableName);
       contents.setDataTypeName(metadata.getDataType(), ContentsDataType.ATTRIBUTES);
       contents.setIdentifier(tableName);
 
       this.getContentsDao().create(contents);
+      contents = this.getContentsDao().refresh(contents);
       table.setContents(contents);
     } catch (e) {
       this.deleteTableQuietly(tableName);
@@ -1590,7 +1607,7 @@ export class GeoPackage {
     try {
       tileMatrices = tileMatrixDao.queryForEq(TileMatrix.COLUMN_TABLE_NAME, tableName);
     } catch (e) {
-      throw new GeoPackageException('Failed to retrieve table tile matrixes: ' + tableName);
+      throw new GeoPackageException('Failed to retrieve table tile matrices: ' + tableName);
     }
 
     const contents = this.copyUserTable(tableName, newTableName, transferContent);
@@ -1617,7 +1634,7 @@ export class GeoPackage {
    * @param tableName table name
    * @param newTableName new table name
    * @param transferContent transfer user table content flag
-   * @param validateContents true to validate a was: Contents copied
+   * @param validateContents true to validate
    * @return copied contents
    */
   protected copyUserTable(
@@ -2040,7 +2057,7 @@ export class GeoPackage {
    */
   queryForFeatures(tableName: string, boundingBox?: BoundingBox): FeatureIndexResults {
     const featureIndexManager = this.getFeatureIndexManager(tableName);
-    return boundingBox != null ? featureIndexManager.queryWithBoundingBox(false, undefined, boundingBox) : featureIndexManager.query();
+    return boundingBox != null ? featureIndexManager.queryWithBoundingBox(boundingBox) : featureIndexManager.query();
   }
 
   /**
@@ -2135,14 +2152,58 @@ export class GeoPackage {
   }
 
   /**
-   * Link a MediaRow to another table
+   * Link media to another table
    * @param baseTableName
    * @param baseId
    * @param mediaTableName
-   * @param mediaId
+   * @param mediaRowId
    */
-  linkMedia(baseTableName: string, baseId: number, mediaTableName: string, mediaId: number): number {
-    return this.linkRelatedRows(baseTableName, baseId, mediaTableName, mediaId, RelationType.MEDIA);
+  linkMedia(baseTableName: string, baseId: number, mediaTableName: string, mediaRowId: number): number {
+    return this.linkRelatedRows(baseTableName, baseId, mediaTableName, mediaRowId, RelationType.MEDIA);
+  }
+
+  /**
+   * Link simple attribute to another table
+   * @param baseTableName
+   * @param baseId
+   * @param simpleAttributesTableName
+   * @param simpleAttributesRowId
+   */
+  linkSimpleAttributes(baseTableName: string, baseId: number, simpleAttributesTableName: string, simpleAttributesRowId: number): number {
+    return this.linkRelatedRows(baseTableName, baseId, simpleAttributesTableName, simpleAttributesRowId, RelationType.SIMPLE_ATTRIBUTES);
+  }
+
+  /**
+   * Link attribute to another table
+   * @param baseTableName
+   * @param baseId
+   * @param attributesTableName
+   * @param attributesRowId
+   */
+  linkAttributes(baseTableName: string, baseId: number, attributesTableName: string, attributesRowId: number): number {
+    return this.linkRelatedRows(baseTableName, baseId, attributesTableName, attributesRowId, RelationType.ATTRIBUTES);
+  }
+
+  /**
+   * Link feature to another table
+   * @param baseTableName
+   * @param baseId
+   * @param featureTableName
+   * @param featureRowId
+   */
+  linkFeature(baseTableName: string, baseId: number, featureTableName: string, featureRowId: number): number {
+    return this.linkRelatedRows(baseTableName, baseId, featureTableName, featureRowId, RelationType.FEATURES);
+  }
+
+  /**
+   * Link tile to another table
+   * @param baseTableName
+   * @param baseId
+   * @param tileTableName
+   * @param tileRowId
+   */
+  linkTile(baseTableName: string, baseId: number, tileTableName: string, tileRowId: number): number {
+    return this.linkRelatedRows(baseTableName, baseId, tileTableName, tileRowId, RelationType.TILES);
   }
 
   /**
@@ -2153,7 +2214,7 @@ export class GeoPackage {
    * @param relatedTableName
    * @param  {string} relationType        relation type
    * @param  {string|UserMappingTable} [mappingTable]        mapping table
-   * @param  {module:dao/columnValues~ColumnValues} [mappingColumnValues] column values
+   * @param  {ColumnValues} [mappingColumnValues] column values
    * @return {number}
    */
   linkRelatedRows(
@@ -2195,18 +2256,97 @@ export class GeoPackage {
    * @param baseId
    */
   getLinkedMedia(baseTableName: string, baseId: number): MediaRow[] {
-    const relationships = this.getRelatedRows(baseTableName, baseId, [RelationType.MEDIA]);
-    const mediaRows = [];
-    Object.values(relationships).forEach((value: Map<UserMappingRow, UserRow<any, any>>) => {
-      Object.values(value).forEach((mediaRow: UserRow<any, any>) => {
-        mediaRows.push(mediaRow as MediaRow);
-      })
-    })
-    return mediaRows;
+    const extendedRelationsMap = this.getRelatedRows(baseTableName, baseId, [RelationType.MEDIA]);
+    const rows = [];
+    for (const extendedRelation of extendedRelationsMap.keys()) {
+      const mappingRowMap = extendedRelationsMap.get(extendedRelation);
+      for (const mappingRow of mappingRowMap.keys()) {
+        const row = mappingRowMap.get(mappingRow);
+        rows.push(row as MediaRow);
+
+      }
+    }
+    return rows;
   }
 
   /**
-   * Adds a list of features to a FeatureTable. Inserts features from the list in batches, providing progress updates
+   * Get Simple Attributes associated with a particular row.
+   * @param baseTableName
+   * @param baseId
+   */
+  getLinkedSimpleAttributes(baseTableName: string, baseId: number): SimpleAttributesRow[] {
+    const extendedRelationsMap = this.getRelatedRows(baseTableName, baseId, [RelationType.SIMPLE_ATTRIBUTES]);
+    const rows = [];
+    for (const extendedRelation of extendedRelationsMap.keys()) {
+      const mappingRowMap = extendedRelationsMap.get(extendedRelation);
+      for (const mappingRow of mappingRowMap.keys()) {
+        const row = mappingRowMap.get(mappingRow);
+        rows.push(row as SimpleAttributesRow);
+
+      }
+    }
+    return rows;
+  }
+
+  /**
+   * Get Attributes associated with a particular row.
+   * @param baseTableName
+   * @param baseId
+   */
+  getLinkedAttributes(baseTableName: string, baseId: number): AttributesRow[] {
+    const extendedRelationsMap = this.getRelatedRows(baseTableName, baseId, [RelationType.ATTRIBUTES]);
+    const rows = [];
+    for (const extendedRelation of extendedRelationsMap.keys()) {
+      const mappingRowMap = extendedRelationsMap.get(extendedRelation);
+      for (const mappingRow of mappingRowMap.keys()) {
+        const row = mappingRowMap.get(mappingRow);
+        rows.push(row as AttributesRow);
+
+      }
+    }
+    return rows;
+  }
+
+  /**
+   * Get Features associated with a particular row.
+   * @param baseTableName
+   * @param baseId
+   */
+  getLinkedFeatures(baseTableName: string, baseId: number): FeatureRow[] {
+    const extendedRelationsMap = this.getRelatedRows(baseTableName, baseId, [RelationType.FEATURES]);
+    const rows = [];
+    for (const extendedRelation of extendedRelationsMap.keys()) {
+      const mappingRowMap = extendedRelationsMap.get(extendedRelation);
+      for (const mappingRow of mappingRowMap.keys()) {
+        const row = mappingRowMap.get(mappingRow);
+        rows.push(row as FeatureRow);
+
+      }
+    }
+    return rows;
+  }
+
+  /**
+   * Get Tiles associated with a particular row.
+   * @param baseTableName
+   * @param baseId
+   */
+  getLinkedTiles(baseTableName: string, baseId: number): TileRow[] {
+    const extendedRelationsMap = this.getRelatedRows(baseTableName, baseId, [RelationType.TILES]);
+    const rows = [];
+    for (const extendedRelation of extendedRelationsMap.keys()) {
+      const mappingRowMap = extendedRelationsMap.get(extendedRelation);
+      for (const mappingRow of mappingRowMap.keys()) {
+        const row = mappingRowMap.get(mappingRow);
+        rows.push(row as TileRow);
+
+      }
+    }
+    return rows;
+  }
+
+  /**
+   * Adds a list of features to a FeatureTable, inserting them in batches and providing progress updates
    * after each batch completes.
    * @param  {object}   features    GeoJSON features to add
    * @param  {string}   tableName  name of the table that will store the feature
@@ -2424,14 +2564,14 @@ export class GeoPackage {
   }
 
   /**
-   * Create a new [tile table]{@link module:tiles/user/tileTable~TileTable} in this GeoPackage.
+   * Create a new [tile table]{@link TileTable} in this GeoPackage.
    *
    * @param {String} tableName tile table name
    * @param {BoundingBox} contentsBoundingBox bounding box of the contents table
    * @param {Number} contentsSrsId srs id of the contents table
    * @param {BoundingBox} tileMatrixSetBoundingBox bounding box of the matrix set
    * @param {Number} tileMatrixSetSrsId srs id of the matrix set
-   * @returns {TileMatrixSet} `Promise` of the created {@link module:tiles/matrixset~TileMatrixSet}
+   * @returns {TileMatrixSet} `Promise` of the created {@link TileMatrixSet}
    */
   createTileTableWithTableName(
     tableName: string,
@@ -2454,7 +2594,7 @@ export class GeoPackage {
     contents.setTableName(tableName);
     contents.setDataType(ContentsDataType.TILES);
     contents.setIdentifier(tableName);
-    contents.setLastChange(new Date());
+    // contents.setLastChange(new Date());
     contents.setMinX(contentsBoundingBox.getMinLongitude());
     contents.setMinY(contentsBoundingBox.getMinLatitude());
     contents.setMaxX(contentsBoundingBox.getMaxLongitude());
@@ -2478,26 +2618,26 @@ export class GeoPackage {
   /**
    * Create the [tables and rows](https://www.geopackage.org/spec121/index.html#tiles)
    * necessary to store tiles according to the ubiquitous [XYZ web/slippy-map tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) scheme.
-   * The extent for the [contents table]{@link module:core/contents~Contents} row,
+   * The extent for the [contents table]{@link Contents} row,
    * `contentsBoundingBox`, is [informational only](https://www.geopackage.org/spec121/index.html#gpkg_contents_cols),
-   * and need not match the [tile matrix set]{@link module:tiles/matrixset~TileMatrixSet}
+   * and need not match the [tile matrix set]{@link TileMatrixSet}
    * extent, `tileMatrixSetBoundingBox`, which should be the precise bounding box
    * used to calculate the tile row and column coordinates of all tiles in the
    * tile set.  The two SRS ID parameters, `contentsSrsId` and `tileMatrixSetSrsId`,
-   * must match, however.  See {@link module:tiles/matrixset~TileMatrixSet} for
-   * more information about how GeoPackage consumers use the bouding boxes for a
+   * must match, however.  See {@link TileMatrixSet} for
+   * more information about how GeoPackage consumers use the bounding boxes for a
    * tile set.
    *
    * @param {string} tableName the name of the table that will store the tiles
-   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link module:core/contents~Contents} table row for the tile matrix set
-   * @param {SRSRef} contentsSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}; must match `tileMatrixSetSrsId`
-   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link module:tiles/matrixset~TileMatrixSet} table row
-   * @param {SRSRef} tileMatrixSetSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}
+   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link Contents} table row for the tile matrix set
+   * @param {number} contentsSrsId the ID of a [spatial reference system]{@link SpatialReferenceSystem}; must match `tileMatrixSetSrsId`
+   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link TileMatrixSet} table row
+   * @param {number} tileMatrixSetSrsId the ID of a [spatial reference system]{@link SpatialReferenceSystem}
    *   for the [tile matrix set](https://www.geopackage.org/spec121/index.html#_tile_matrix_set) table; must match `contentsSrsId`
-   * @param {number} minZoom the zoom level of the lowest resolution [tile matrix]{@link module:tiles/matrix~TileMatrix} in the tile matrix set
-   * @param {number} maxZoom the zoom level of the highest resolution [tile matrix]{@link module:tiles/matrix~TileMatrix} in the tile matrix set
+   * @param {number} minZoom the zoom level of the lowest resolution [tile matrix]{@link TileMatrix} in the tile matrix set
+   * @param {number} maxZoom the zoom level of the highest resolution [tile matrix]{@link TileMatrix} in the tile matrix set
    * @param tileSize the width and height in pixels of the tile images; defaults to 256
-   * @returns {TileMatrixSet} the created {@link module:tiles/matrixset~TileMatrixSet} object, or rejects with an `Error`
+   * @returns {TileMatrixSet} the created {@link TileMatrixSet} object, or rejects with an `Error`
    *
    */
   createStandardWGS84TileTable(
@@ -2552,8 +2692,8 @@ export class GeoPackage {
     return tileMatrixSet;
   }
   /**
-   * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
-   * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
+   * Create the tables and rows necessary to store tiles in a {@link TileMatrixSet}.
+   * This will create a [tile matrix row]{@link TileMatrix}
    * for every integral zoom level in the range `[minZoom..maxZoom]`.
    *
    * @param {BoundingBox} wgs84BoundingBox
@@ -2561,7 +2701,7 @@ export class GeoPackage {
    * @param {number} minZoom
    * @param {number} maxZoom
    * @param {number} [tileSize=256] optional tile size in pixels
-   * @returns {module:geoPackage~GeoPackage} `this` `GeoPackage`
+   * @returns {GeoPackage} `this` `GeoPackage`
    */
   createStandardWGS84TileMatrix(
     wgs84BoundingBox: BoundingBox,
@@ -2580,26 +2720,26 @@ export class GeoPackage {
   /**
    * Create the [tables and rows](https://www.geopackage.org/spec121/index.html#tiles)
    * necessary to store tiles according to the ubiquitous [XYZ web/slippy-map tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) scheme.
-   * The extent for the [contents table]{@link module:core/contents~Contents} row,
+   * The extent for the [contents table]{@link Contents} row,
    * `contentsBoundingBox`, is [informational only](https://www.geopackage.org/spec121/index.html#gpkg_contents_cols),
-   * and need not match the [tile matrix set]{@link module:tiles/matrixset~TileMatrixSet}
+   * and need not match the [tile matrix set]{@link TileMatrixSet}
    * extent, `tileMatrixSetBoundingBox`, which should be the precise bounding box
    * used to calculate the tile row and column coordinates of all tiles in the
    * tile set.  The two SRS ID parameters, `contentsSrsId` and `tileMatrixSetSrsId`,
-   * must match, however.  See {@link module:tiles/matrixset~TileMatrixSet} for
-   * more information about how GeoPackage consumers use the bouding boxes for a
+   * must match, however.  See {@link TileMatrixSet} for
+   * more information about how GeoPackage consumers use the bounding boxes for a
    * tile set.
    *
    * @param {string} tableName the name of the table that will store the tiles
-   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link module:core/contents~Contents} table row for the tile matrix set
-   * @param {SRSRef} contentsSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}; must match `tileMatrixSetSrsId`
-   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link module:tiles/matrixset~TileMatrixSet} table row
-   * @param {SRSRef} tileMatrixSetSrsId the ID of a [spatial reference system]{@link module:core/srs~SpatialReferenceSystem}
+   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link Contents} table row for the tile matrix set
+   * @param {number} contentsSrsId the ID of a [spatial reference system]{@link SpatialReferenceSystem}; must match `tileMatrixSetSrsId`
+   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link TileMatrixSet} table row
+   * @param {number} tileMatrixSetSrsId the ID of a [spatial reference system]{@link SpatialReferenceSystem}
    *   for the [tile matrix set](https://www.geopackage.org/spec121/index.html#_tile_matrix_set) table; must match `contentsSrsId`
-   * @param {number} minZoom the zoom level of the lowest resolution [tile matrix]{@link module:tiles/matrix~TileMatrix} in the tile matrix set
-   * @param {number} maxZoom the zoom level of the highest resolution [tile matrix]{@link module:tiles/matrix~TileMatrix} in the tile matrix set
+   * @param {number} minZoom the zoom level of the lowest resolution [tile matrix]{@link TileMatrix} in the tile matrix set
+   * @param {number} maxZoom the zoom level of the highest resolution [tile matrix]{@link TileMatrix} in the tile matrix set
    * @param tileSize the width and height in pixels of the tile images; defaults to 256
-   * @returns {TileMatrixSet} the created {@link module:tiles/matrixset~TileMatrixSet} object, or rejects with an `Error`
+   * @returns {TileMatrixSet} the created {@link TileMatrixSet} object, or rejects with an `Error`
    *
    * @todo make `tileMatrixSetSrsId` optional because it always has to be the same anyway
    */
@@ -2651,19 +2791,19 @@ export class GeoPackage {
   /**
    * Create the [tables and rows](https://www.geopackage.org/spec121/index.html#tiles)
    * necessary to store tiles according to the ubiquitous [XYZ web/slippy-map tiles](https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames) scheme.
-   * The extent for the [contents table]{@link module:core/contents~Contents} row,
+   * The extent for the [contents table]{@link Contents} row,
    * `contentsBoundingBox`, is [informational only](https://www.geopackage.org/spec121/index.html#gpkg_contents_cols),
-   * and need not match the [tile matrix set]{@link module:tiles/matrixset~TileMatrixSet}
+   * and need not match the [tile matrix set]{@link TileMatrixSet}
    * extent, `tileMatrixSetBoundingBox`, which should be the precise bounding box
    * used to calculate the tile row and column coordinates of all tiles in the
    * tile set.
    *
    * @param {string} tableName the name of the table that will store the tiles
-   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link module:core/contents~Contents} table row for the tile matrix set. MUST BE EPSG:3857
-   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link module:tiles/matrixset~TileMatrixSet} table row. MUST BE EPSG:3857
+   * @param {BoundingBox} contentsBoundingBox the bounds stored in the [`gpkg_contents`]{@link Contents} table row for the tile matrix set. MUST BE EPSG:3857
+   * @param {BoundingBox} tileMatrixSetBoundingBox the bounds stored in the [`gpkg_tile_matrix_set`]{@link TileMatrixSet} table row. MUST BE EPSG:3857
    * @param {Set<number>} zoomLevels create tile of all resolutions in the set.
    * @param tileSize the width and height in pixels of the tile images; defaults to 256
-   * @returns {Promise} a `Promise` that resolves with the created {@link module:tiles/matrixset~TileMatrixSet} object, or rejects with an `Error`
+   * @returns {Promise} a `Promise` that resolves with the created {@link TileMatrixSet} object, or rejects with an `Error`
    */
   public  (
     tableName: string,
@@ -2695,8 +2835,8 @@ export class GeoPackage {
   }
 
   /**
-   * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
-   * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
+   * Create the tables and rows necessary to store tiles in a {@link TileMatrixSet}.
+   * This will create a [tile matrix row]{@link TileMatrix}
    * for every integral zoom level in the range `[minZoom..maxZoom]`.
    * @param epsg3857TileBoundingBox
    * @param tileMatrixSet
@@ -2720,8 +2860,8 @@ export class GeoPackage {
   }
 
   /**
-   * Create the tables and rows necessary to store tiles in a {@link module:tiles/matrixset~TileMatrixSet}.
-   * This will create a [tile matrix row]{@link module:tiles/matrix~TileMatrix}
+   * Create the tables and rows necessary to store tiles in a {@link TileMatrixSet}.
+   * This will create a [tile matrix row]{@link TileMatrix}
    * for every item in the set zoomLevels.
    * @param epsg3857TileBoundingBox
    * @param tileMatrixSet
@@ -2844,7 +2984,6 @@ export class GeoPackage {
 
   /**
    * Gets the tiles in the EPSG:4326 bounding box
-   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {string}   table      name of the tile table
    * @param  {Number}   zoom       Zoom of the tiles to query for
    * @param  {Number}   west       EPSG:4326 western boundary
@@ -2940,7 +3079,7 @@ export class GeoPackage {
         values: string[];
       } & Record<string, any>;
       tile.tableName = table;
-      tile.id = row.id;
+      tile.id = row.getId();
 
       const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
       tile.minLongitude = tileBB.getMinLongitude();
@@ -2967,9 +3106,8 @@ export class GeoPackage {
 
   /**
    * Gets the tiles in the EPSG:4326 bounding box
-   * @param  {module:geoPackage~GeoPackage}   geopackage open GeoPackage object
    * @param  {string}   table      name of the tile table
-   * @param  {Number}   zoom       Zoom of the tiles to query for
+   * @param  {Number}   webZoom       Zoom of the tiles to query for
    * @param  {Number}   west       EPSG:4326 western boundary
    * @param  {Number}   east       EPSG:4326 eastern boundary
    * @param  {Number}   south      EPSG:4326 southern boundary
@@ -3066,7 +3204,7 @@ export class GeoPackage {
         values: string[];
       } & Record<string, any>;
       tile.tableName = table;
-      tile.id = row.id;
+      tile.id = row.getId();
 
       const tileBB = TileBoundingBoxUtils.getBoundingBoxWithTileMatrix(tms.getBoundingBox(), tm, row.getTileColumn(), row.getTileRow());
       tile.minLongitude = tileBB.getMinLongitude();
@@ -3107,7 +3245,7 @@ export class GeoPackage {
     z: number,
     width: number,
     height: number,
-  ): Promise<any> {
+  ): Promise<GeoPackageImage> {
     x = Number(x);
     y = Number(y);
     z = Number(z);
@@ -3115,7 +3253,7 @@ export class GeoPackage {
     height = Number(height);
     const featureDao = this.getFeatureDao(table);
     if (!featureDao) return;
-    const ft = new FeatureTiles(this, featureDao, width, height);
+    const ft = new FeatureTiles(this, featureDao, width, height, TileUtils.tileScale(width, height));
     return ft.drawTile(x, y, z);
   }
 
@@ -3149,12 +3287,6 @@ export class GeoPackage {
     return this.tableCreator.createMetadataReference();
   }
 
-  createExtensionTable(): boolean {
-    if (this.getExtensionsDao().isTableExists()) {
-      return true;
-    }
-    return this.tableCreator.createExtensions();
-  }
   createTableIndexTable(): boolean {
     if (this.getTableIndexDao().isTableExists()) {
       return true;
@@ -3177,12 +3309,14 @@ export class GeoPackage {
    * @private
    */
   getColumnToDataColumnMap (featureDao: FeatureDao, dataColumnsDao: DataColumnsDao): Map<string, string> {
-    const dataColumns = dataColumnsDao.queryByTable(featureDao.getTableName());
     const columnMap = new Map();
-    featureDao.getColumnNames().forEach(columnName => {
-      const dataColumn = dataColumns.find(dc => dc.getColumnName() === columnName);
-      columnMap.set(columnName, dataColumn != null ? dataColumn.getName() : columnName);
-    })
+    if (dataColumnsDao.isTableExists()) {
+      const dataColumns = dataColumnsDao.queryByTable(featureDao.getTableName());
+      featureDao.getColumnNames().forEach(columnName => {
+        const dataColumn = dataColumns.find(dc => dc.getColumnName() === columnName);
+        columnMap.set(columnName, dataColumn != null ? dataColumn.getName() : columnName);
+      })
+    }
     return columnMap
   }
 
@@ -3190,24 +3324,47 @@ export class GeoPackage {
    * Queries the table for a specific feature id
    * @param table
    * @param featureId
+   * @return {FeatureRow}
    */
-  getFeature(table: string, featureId: number): Feature {
-    let feature = null;
+  getFeature(table: string, featureId: any): FeatureRow {
+    let featureRow = null;
     const featureDao = this.getFeatureDao(table);
-    const srs = featureDao.getSrs();
-    let featureRow = featureDao.queryForId(featureId);
+    featureRow = featureDao.queryForIdRow(featureId);
     if (featureRow == null) {
-      let resultSet = featureDao.queryForEq(false, undefined, '_feature_id', featureId);
+      let resultSet = featureDao.queryForEq('_feature_id', featureId);
       resultSet.moveToNext();
       featureRow = resultSet.getRow();
       if (featureRow == null) {
-        let resultSet = featureDao.queryForEq(false, undefined, '_properties_id', featureId);
+        let resultSet = featureDao.queryForEq('_properties_id', featureId);
+        resultSet.moveToNext();
+        featureRow = resultSet.getRow();
+      }
+    }
+    return featureRow;
+  }
+
+  /**
+   * Queries the table for a specific feature id
+   * @param table
+   * @param featureId
+   */
+  getFeatureAsGeoJSON(table: string, featureId: any): Feature {
+    let feature = null;
+    const featureDao = this.getFeatureDao(table);
+    const srs = featureDao.getSrs();
+    let featureRow = featureDao.queryForIdRow(featureId);
+    if (featureRow == null) {
+      let resultSet = featureDao.queryForEq('_feature_id', featureId);
+      resultSet.moveToNext();
+      featureRow = resultSet.getRow();
+      if (featureRow == null) {
+        let resultSet = featureDao.queryForEq('_properties_id', featureId);
         resultSet.moveToNext();
         featureRow = resultSet.getRow();
       }
     }
     if (featureRow != null) {
-      feature = GeoPackage.parseFeatureRowIntoGeoJSON(feature, srs, this.getColumnToDataColumnMap(featureDao, this.getDataColumnsDao()));
+      feature = GeoPackage.parseFeatureRowIntoGeoJSON(featureRow, srs, this.getColumnToDataColumnMap(featureDao, this.getDataColumnsDao()));
     }
     return feature;
   }
@@ -3231,14 +3388,12 @@ export class GeoPackage {
    * @param  {Number}   x       x tile number
    * @param  {Number}   y       y tile number
    * @param  {Number}   z      z tile number
-   * @param  {Boolean}   [skipVerification]      skip the extra verification to determine if the feature really is within the tile
    */
   public getGeoJSONFeaturesInTile(
     table: string,
     x: number,
     y: number,
     z: number,
-    skipVerification = false,
   ): GeoJSONResultSet {
     const webMercatorBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(x, y, z);
     const featureIndexManager = this.getFeatureIndexManager(table);
@@ -3248,7 +3403,7 @@ export class GeoPackage {
     if (!featureProjection.equalsProjection(webMercatorProjection)) {
       boundingBox = boundingBox.transform(new ProjectionTransform(webMercatorProjection, featureProjection));
     }
-    return featureIndexManager.queryForGeoJSONFeatures(boundingBox)
+    return featureIndexManager.queryForGeoJSONFeatures(boundingBox);
   }
 
   /**
@@ -3270,7 +3425,7 @@ export class GeoPackage {
     if (featureIndexManager.getFeatureDao() == null) {
       throw new GeoPackageException('Unable to find table ' + table);
     }
-    return featureIndexManager.queryWithBoundingBox(false, undefined, new BoundingBox(west, east, south, north));
+    return featureIndexManager.queryWithBoundingBox(new BoundingBox(west, east, south, north));
   }
 
   /**
@@ -3305,7 +3460,6 @@ export class GeoPackage {
    * @param  {Number}   z          zoom level of the tile
    * @param  {Number}   width      width of the resulting tile
    * @param  {Number}   height     height of the resulting tile
-   * @param canvas
    * @param zoomIn
    * @param zoomOut
    */
@@ -3350,7 +3504,6 @@ export class GeoPackage {
    * @param  {string}   projection project from tile's projection to this one.
    * @param  {Number}   width      width of the resulting tile
    * @param  {Number}   height     height of the resulting tile
-   * @param  {any}   canvas     canvas element to draw the tile into
    */
   async projectedTile(
     table: string,

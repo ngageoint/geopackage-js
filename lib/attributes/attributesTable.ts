@@ -21,7 +21,7 @@ export class AttributesTable extends UserTable<AttributesColumn> {
 
   /**
    * Set the contents
-   * @param  {module:core/contents~Contents} contents the contents
+   * @param  {Contents} contents the contents
    */
   setContents(contents: Contents): boolean {
     this.contents = contents;

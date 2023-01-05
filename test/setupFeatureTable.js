@@ -20,10 +20,11 @@ module.exports.buildFeatureTable = function(tableName, geometryColumn, geometryT
 
 module.exports.buildGeometryColumns = function(tableName, geometryColumn, geometryType) {
   const geometryColumns = new GeometryColumns();
-  geometryColumns.table_name = tableName;
-  geometryColumns.column_name = geometryColumn;
-  geometryColumns.geometry_type_name = GeometryType.nameFromType(geometryType);
-  geometryColumns.z = 0;
-  geometryColumns.m = 0;
+  geometryColumns.setTableName(tableName);
+  geometryColumns.setColumnName(geometryColumn);
+  geometryColumns.setGeometryType(geometryType);
+  geometryColumns.setZ(0);
+  geometryColumns.setM(0);
+  geometryColumns.setSrsId(4326);
   return geometryColumns;
 };

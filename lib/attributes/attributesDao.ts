@@ -45,7 +45,8 @@ export class AttributesDao extends UserDao<AttributesColumn, AttributesTable, At
   }
 
   /**
-   * {@inheritDoc}
+   * AttributesDao does not p
+   * @param projection
    */
   public getBoundingBoxWithProjection(projection: Projection): BoundingBox {
     throw new GeoPackageException('Bounding Box not supported for Attributes');

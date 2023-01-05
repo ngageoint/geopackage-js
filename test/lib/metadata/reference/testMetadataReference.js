@@ -1,4 +1,6 @@
 import { default as testSetup } from '../../../testSetup'
+import { MetadataScopeType } from "../../../../lib/extension/metadata/metadataScopeType";
+import { ReferenceScopeType } from "../../../../lib/extension/metadata/reference/referenceScopeType";
 
 var should = require('chai').should()
   , MetadataReference = require('../../../../lib/extension/metadata/reference/metadataReference').MetadataReference
@@ -29,48 +31,48 @@ describe('Metadata Reference tests', function() {
     Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
     Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geoPackage.metadataDao;
-    var metadataReferenceDao = geoPackage.metadataReferenceDao;
+    var metadataDao = geoPackage.getMetadataDao();
+    var metadataReferenceDao = geoPackage.getMetadataReferenceDao();
 
     var metadata1 = new Metadata();
-    metadata1.id = 1;
-    metadata1.md_scope = Metadata.DATASET;
-    metadata1.md_standard_uri = "TEST_URI_1";
-    metadata1.mime_type = 'text/xml';
-    metadata1.metadata = 'TEST METDATA 1';
+    metadata1.setId(1);
+    metadata1.setMetadataScopeType(MetadataScopeType.DATASET);
+    metadata1.setStandardUri("TEST_URI_1");
+    metadata1.setMimeType('text/xml');
+    metadata1.setMetadata('TEST METDATA 1');
 
     var metadata2 = new Metadata();
-    metadata2.id = 2;
-    metadata2.md_scope = Metadata.FEATURE_TYPE;
-    metadata2.md_standard_uri = "TEST_URI_2";
-    metadata2.mime_type = 'text/xml';
-    metadata2.metadata = 'TEST METDATA 2';
+    metadata2.setId(2);
+    metadata2.setMetadataScopeType(MetadataScopeType.FEATURE_TYPE);
+    metadata2.setStandardUri("TEST_URI_2");
+    metadata2.setMimeType('text/xml');
+    metadata2.setMetadata('TEST METDATA 2');
 
     var metadata3 = new Metadata();
-    metadata3.id = 3;
-    metadata3.md_scope = Metadata.TILE;
-    metadata3.md_standard_uri = "TEST_URI_3";
-    metadata3.mime_type = 'text/xml';
-    metadata3.metadata = 'TEST METDATA 3';
+    metadata3.setId(3);
+    metadata3.setMetadataScopeType(MetadataScopeType.TILE);
+    metadata3.setStandardUri("TEST_URI_3");
+    metadata3.setMimeType('text/xml');
+    metadata3.setMetadata('TEST METDATA 3');
 
-    [metadata1, metadata2, metadata3].forEach(function(metadata) {
+    [metadata1, metadata2, metadata3].forEach((metadata) => {
       var result = metadataDao.create(metadata);
-      result.should.be.equal(metadata.id);
+      result.should.be.equal(metadata.getId());
     });
 
     var ref1 = new MetadataReference();
-    ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-    ref1.timestamp = new Date();
+    ref1.setReferenceScopeType(ReferenceScopeType.GEOPACKAGE);
+    ref1.setTimestamp(new Date());
     ref1.setMetadata(metadata1);
 
     var ref2 = new MetadataReference();
-    ref2.setReferenceScopeType(MetadataReference.TABLE);
-    ref2.table_name = 'TEST_TABLE_NAME_2';
-    ref2.timestamp = new Date();
+    ref2.setReferenceScopeType(ReferenceScopeType.TABLE);
+    ref2.setTableName('TEST_TABLE_NAME_2');
+    ref2.setTimestamp(new Date());
     ref2.setMetadata(metadata2);
     ref2.setParentMetadata(metadata1);
 
-    [ref1, ref2].forEach(function(ref) {
+    [ref1, ref2].forEach((ref) => {
       metadataReferenceDao.create(ref);
     });
   });
@@ -81,22 +83,24 @@ describe('Metadata Reference tests', function() {
     Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
     Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geoPackage.metadataDao;
-    var metadataReferenceDao = geoPackage.metadataReferenceDao;
+    var metadataDao = geoPackage.getMetadataDao();
+    var metadataReferenceDao = geoPackage.getMetadataReferenceDao();
+
 
     var metadata1 = new Metadata();
-    metadata1.id = 1;
-    metadata1.md_scope = Metadata.DATASET;
-    metadata1.md_standard_uri = "TEST_URI_1";
-    metadata1.mime_type = 'text/xml';
-    metadata1.metadata = 'TEST METDATA 1';
+    metadata1.setId(1);
+    metadata1.setMetadataScopeType(MetadataScopeType.DATASET);
+    metadata1.setStandardUri("TEST_URI_1");
+    metadata1.setMimeType('text/xml');
+    metadata1.setMetadata('TEST METDATA 1');
 
     var metadata2 = new Metadata();
-    metadata2.id = 2;
-    metadata2.md_scope = Metadata.FEATURE_TYPE;
-    metadata2.md_standard_uri = "TEST_URI_2";
-    metadata2.mime_type = 'text/xml';
-    metadata2.metadata = 'TEST METDATA 2';
+    metadata2.setId(2);
+    metadata2.setMetadataScopeType(MetadataScopeType.FEATURE_TYPE);
+    metadata2.setStandardUri("TEST_URI_2");
+    metadata2.setMimeType('text/xml');
+    metadata2.setMetadata('TEST METDATA 2');
+
 
     [metadata1, metadata2].forEach(function(metadata) {
       var result = metadataDao.create(metadata);
@@ -104,9 +108,9 @@ describe('Metadata Reference tests', function() {
     });
 
     var ref = new MetadataReference();
-    ref.setReferenceScopeType(MetadataReference.TABLE);
-    ref.table_name = 'TEST_TABLE_NAME_2';
-    ref.timestamp = new Date();
+    ref.setReferenceScopeType(ReferenceScopeType.TABLE);
+    ref.setTableName('TEST_TABLE_NAME_2');
+    ref.setTimestamp(new Date());
     ref.setMetadata(metadata2);
     ref.setParentMetadata(metadata1);
     metadataReferenceDao.create(ref);
@@ -132,123 +136,123 @@ describe('Metadata Reference tests', function() {
     var metadataReferenceDao = geoPackage.metadataReferenceDao;
 
     var metadata1 = new Metadata();
-    metadata1.id = 1;
-    metadata1.md_scope = Metadata.DATASET;
-    metadata1.md_standard_uri = "TEST_URI_1";
-    metadata1.mime_type = 'text/xml';
-    metadata1.metadata = 'TEST METDATA 1';
+    metadata1.setId(1);
+    metadata1.setMetadataScopeType(MetadataScopeType.DATASET);
+    metadata1.setStandardUri("TEST_URI_1");
+    metadata1.setMimeType('text/xml');
+    metadata1.setMetadata('TEST METDATA 1');
 
     var metadata2 = new Metadata();
-    metadata2.id = 2;
-    metadata2.md_scope = Metadata.FEATURE_TYPE;
-    metadata2.md_standard_uri = "TEST_URI_2";
-    metadata2.mime_type = 'text/xml';
-    metadata2.metadata = 'TEST METDATA 2';
+    metadata2.setId(2);
+    metadata2.setMetadataScopeType(MetadataScopeType.FEATURE_TYPE);
+    metadata2.setStandardUri("TEST_URI_2");
+    metadata2.setMimeType('text/xml');
+    metadata2.setMetadata('TEST METDATA 2');
 
     var metadata3 = new Metadata();
-    metadata3.id = 3;
-    metadata3.md_scope = Metadata.TILE;
-    metadata3.md_standard_uri = "TEST_URI_3";
-    metadata3.mime_type = 'text/xml';
-    metadata3.metadata = 'TEST METDATA 3';
+    metadata3.setId(3);
+    metadata3.setMetadataScopeType(MetadataScopeType.TILE);
+    metadata3.setStandardUri("TEST_URI_3");
+    metadata3.setMimeType('text/xml');
+    metadata3.setMetadata('TEST METDATA 3');
 
     [metadata1, metadata2, metadata3].forEach(function(metadata) {
       var result = metadataDao.create(metadata);
-      result.should.be.equal(metadata.id);
+      result.should.be.equal(metadata.getId());
     });
 
     var ref1 = new MetadataReference();
-    ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-    ref1.timestamp = new Date();
+    ref1.setReferenceScopeType(ReferenceScopeType.GEOPACKAGE);
+    ref1.setTimestamp(new Date());
     ref1.setMetadata(metadata1);
-    ref1.md_file_id.should.be.equal(metadata1.id);
-    should.not.exist(ref1.table_name);
-    should.not.exist(ref1.column_name);
-    should.not.exist(ref1.row_id_value);
+    ref1.getMdFileId().should.be.equal(metadata1.getId());
+    should.not.exist(ref1.getTableName());
+    should.not.exist(ref1.getColumnName());
+    should.not.exist(ref1.getRowIdValue());
 
     var ref2 = new MetadataReference();
-    ref2.setReferenceScopeType(MetadataReference.TABLE);
-    ref2.table_name = 'TEST_TABLE_NAME_2';
-    ref2.timestamp = new Date();
+    ref2.setReferenceScopeType(ReferenceScopeType.TABLE);
+    ref2.setTableName('TEST_TABLE_NAME_2');
+    ref2.setTimestamp(new Date());
     ref2.setMetadata(metadata2);
     ref2.setParentMetadata(metadata1);
 
-    should.not.exist(ref2.column_name);
-    should.not.exist(ref2.row_id_value);
-    ref2.md_parent_id.should.be.equal(metadata1.id);
+    should.not.exist(ref2.getColumnName());
+    should.not.exist(ref2.getRowIdValue());
+    ref2.getMdParentId().should.be.equal(metadata1.getId());
 
     var ref3 = new MetadataReference();
-    ref3.setReferenceScopeType(MetadataReference.ROW);
-    ref3.timestamp = new Date();
+    ref3.setReferenceScopeType(ReferenceScopeType.ROW);
+    ref3.setTimestamp(new Date());
     ref3.setMetadata();
     ref3.setParentMetadata();
-    ref3.md_file_id.should.be.equal(-1);
-    ref3.md_parent_id.should.be.equal(-1);
-    should.not.exist(ref3.column_name);
+    ref3.getMdFileId().should.be.equal(-1);
+    ref3.getMdParentId().should.be.equal(-1);
+    should.not.exist(ref3.getColumnName());
 
     var ref4 = new MetadataReference();
-    ref4.setReferenceScopeType(MetadataReference.COLUMN);
-    ref4.timestamp = new Date();
+    ref4.setReferenceScopeType(ReferenceScopeType.COLUMN);
+    ref4.setTimestamp(new Date());
     ref4.setMetadata(metadata1);
 
-    should.not.exist(ref4.row_id_value);
+    should.not.exist(ref4.getRowIdValue());
 
     [ref1, ref2].forEach(function(ref) {
       metadataReferenceDao.create(ref);
     });
 
-    for (var row of metadataReferenceDao.queryByMetadataAndParent(metadata2.id, metadata1.id)) {
-      row.table_name.should.be.equal('TEST_TABLE_NAME_2');
-      row.md_file_id.should.be.equal(metadata2.id);
-      row.md_parent_id.should.be.equal(metadata1.id);
+    for (var row of metadataReferenceDao.queryByMetadataAndParent(metadata2.getId(), metadata1.getId())) {
+      const metadataReference = metadataReferenceDao.createObject(row);
+      metadataReference.getTableName().should.be.equal('TEST_TABLE_NAME_2');
+      metadataReference.getMdFileId().should.be.equal(metadata2.getId());
+      metadataReference.getMdParentId().should.be.equal(metadata1.getId());
     }
   });
 
   it('should query for metadatareference by metadata', function() {
-
     geoPackage.createMetadataTable();
     geoPackage.createMetadataReferenceTable();
     Verification.verifyMetadataReference(geoPackage).should.be.equal(true);
     Verification.verifyMetadata(geoPackage).should.be.equal(true);
 
-    var metadataDao = geoPackage.metadataDao;
-    var metadataReferenceDao = geoPackage.metadataReferenceDao;
+    var metadataDao = geoPackage.getMetadataDao();
+    var metadataReferenceDao = geoPackage.getMetadataReferenceDao();
 
     var metadata1 = new Metadata();
-    metadata1.id = 1;
-    metadata1.md_scope = Metadata.DATASET;
-    metadata1.md_standard_uri = "TEST_URI_1";
-    metadata1.mime_type = 'text/xml';
-    metadata1.metadata = 'TEST METDATA 1';
+    metadata1.setId(1);
+    metadata1.setMetadataScopeType(MetadataScopeType.DATASET);
+    metadata1.setStandardUri("TEST_URI_1");
+    metadata1.setMimeType('text/xml');
+    metadata1.setMetadata('TEST METDATA 1');
 
     var metadata2 = new Metadata();
-    metadata2.id = 2;
-    metadata2.md_scope = Metadata.FEATURE_TYPE;
-    metadata2.md_standard_uri = "TEST_URI_2";
-    metadata2.mime_type = 'text/xml';
-    metadata2.metadata = 'TEST METDATA 2';
+    metadata2.setId(2);
+    metadata2.setMetadataScopeType(MetadataScopeType.FEATURE_TYPE);
+    metadata2.setStandardUri("TEST_URI_2");
+    metadata2.setMimeType('text/xml');
+    metadata2.setMetadata('TEST METDATA 2');
 
     var metadata3 = new Metadata();
-    metadata3.id = 3;
-    metadata3.md_scope = Metadata.TILE;
-    metadata3.md_standard_uri = "TEST_URI_3";
-    metadata3.mime_type = 'text/xml';
-    metadata3.metadata = 'TEST METDATA 3';
+    metadata3.setId(3);
+    metadata3.setMetadataScopeType(MetadataScopeType.TILE);
+    metadata3.setStandardUri("TEST_URI_3");
+    metadata3.setMimeType('text/xml');
+    metadata3.setMetadata('TEST METDATA 3');
 
     [metadata1, metadata2, metadata3].forEach(function(metadata) {
       var result = metadataDao.create(metadata);
-      result.should.be.equal(metadata.id);
+      result.should.be.equal(metadata.getId());
     });
 
     var ref1 = new MetadataReference();
-    ref1.setReferenceScopeType(MetadataReference.GEOPACKAGE);
-    ref1.timestamp = new Date();
+    ref1.setReferenceScopeType(ReferenceScopeType.GEOPACKAGE);
+    ref1.setTimestamp(new Date());
     ref1.setMetadata(metadata2);
 
     var ref2 = new MetadataReference();
-    ref2.setReferenceScopeType(MetadataReference.TABLE);
-    ref2.table_name = 'TEST_TABLE_NAME_2';
-    ref2.timestamp = new Date();
+    ref2.setReferenceScopeType(ReferenceScopeType.TABLE);
+    ref2.setTableName('TEST_TABLE_NAME_2');
+    ref2.setTimestamp(new Date());
     ref2.setMetadata(metadata2);
     ref2.setParentMetadata(metadata1);
 
@@ -256,8 +260,9 @@ describe('Metadata Reference tests', function() {
       metadataReferenceDao.create(ref);
     });
     var count = 0;
-    for (var row of metadataReferenceDao.queryByMetadata(metadata2.id)) {
-      row.md_file_id.should.be.equal(metadata2.id);
+    for (var row of metadataReferenceDao.queryByMetadata(metadata2.getId())) {
+      const metadataReference = metadataReferenceDao.createObject(row);
+      metadataReference.getMdFileId().should.be.equal(metadata2.getId());
       count++;
     }
 

@@ -67,9 +67,13 @@ export class ResultSet {
    */
   public next(): boolean {
     if (this.hasNext) {
-      const nextResult = this.results.next();
-      this.nextValue = nextResult.value;
-      this.hasNext = !nextResult.done;
+      if (this.results != null) {
+        const nextResult = this.results.next();
+        this.nextValue = nextResult.value;
+        this.hasNext = !nextResult.done;
+      } else {
+        this.hasNext = false;
+      }
     }
     return this.hasNext;
   }

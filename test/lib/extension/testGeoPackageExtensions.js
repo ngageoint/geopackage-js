@@ -1,10 +1,13 @@
 import { default as testSetup } from '../../testSetup'
 import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
+import { FeatureTableMetadata } from "../../../lib/features/user/featureTableMetadata";
+import { FeatureIndexManager } from "../../../lib/features/index/featureIndexManager";
+import { FeatureIndexType } from "../../../lib/features/index/featureIndexType";
+import { Extensions } from "../../../lib/extension/extensions";
 
 var ExtensionManager = require('../../../lib/extension/extensionManager').ExtensionManager
   , FeatureColumn = require('../../../lib/features/user/featureColumn').FeatureColumn
   , Canvas = require('../../../lib/canvas/canvas').Canvas
-  , ExtensionDao = require('../../../lib/extension/extensionsDao').ExtensionsDao
   , SchemaExtension = require('../../../lib/extension/schema/schemaExtension').SchemaExtension
   , FeatureTableStyles = require('../../../lib/extension/nga/style/featureTableStyles').FeatureTableStyles
   , FeatureStyleExtension = require('../../../lib/extension/nga/style/featureStyleExtension').FeatureStyleExtension
@@ -13,8 +16,6 @@ var ExtensionManager = require('../../../lib/extension/extensionManager').Extens
   , GeometryData = require('../../../lib/geom/geoPackageGeometryData').GeoPackageGeometryData
   , GeometryType = require('@ngageoint/simple-features-js').GeometryType
   , ImageUtils = require('../../../lib/image/imageUtils').ImageUtils
-  , RTreeIndex = require('../../../lib/extension/rtree/rTreeIndexExtension').RTreeIndex
-  , FeatureTableIndex = require('../../../lib/extension/nga/index/featureTableIndex').FeatureTableIndex
   , MetadataExtension = require('../../../lib/extension/metadata/metadataExtension').MetadataExtension
   , should = require('chai').should()
   , expect = require('chai').expect
@@ -29,11 +30,10 @@ describe('GeoPackage Extensions tests', function() {
   var iconImage;
   var iconImageBuffer;
   var schemaExtension;
-  var rtreeIndex;
-  var rtreeExtension;
+  var rtreeIndexDao;
 
-  var randomStyle = function(featureTableStyles) {
-    var styleRow = featureTableStyles.getStyleDao().createObject();
+  const randomStyle = function(featureTableStyles) {
+    var styleRow = featureTableStyles.getStyleDao().newRow();
     styleRow.setName("Style Name");
     styleRow.setDescription("Style Description");
     styleRow.setColor(randomColor(), 1.0);
@@ -42,7 +42,7 @@ describe('GeoPackage Extensions tests', function() {
     return styleRow;
   };
 
-  var randomColor = function() {
+  const randomColor = function() {
     var length = 6;
     var chars = '0123456789ABCDEF';
     var hex = '#';
@@ -50,16 +50,16 @@ describe('GeoPackage Extensions tests', function() {
     return hex;
   };
 
-  var randomIcon = function(featureTableStyles) {
+  const randomIcon = function(featureTableStyles) {
     var iconRow = featureTableStyles.getIconDao().newRow();
-    iconRow.data = iconImageBuffer;
-    iconRow.contentType = 'image/png';
-    iconRow.name = "Icon Name";
-    iconRow.description = "Icon Description";
-    iconRow.width = Math.random() * iconImage.width;
-    iconRow.height = Math.random() * iconImage.height;
-    iconRow.anchorU = Math.random();
-    iconRow.anchorV = Math.random();
+    iconRow.setData(iconImageBuffer);
+    iconRow.setContentType('image/png');
+    iconRow.setName("Icon Name");
+    iconRow.setDescription("Icon Description");
+    iconRow.setWidth(Math.random() * iconImage.getWidth());
+    iconRow.setHeight(Math.random() * iconImage.getHeight());
+    iconRow.setAnchorU(Math.random());
+    iconRow.setAnchorV(Math.random());
     return iconRow;
   };
 
@@ -67,34 +67,33 @@ describe('GeoPackage Extensions tests', function() {
     let created = await testSetup.createTmpGeoPackage();
     testGeoPackage = created.path;
     geoPackage = created.geoPackage;
-    var columns = [];
+    const columns = [];
 
-    columns.push(FeatureColumn.createPrimaryKeyColumn(0, 'id'));
-    columns.push(FeatureColumn.createGeometryColumn(1, 'geom', GeometryType.GEOMETRY, false, null));
-    columns.push(FeatureColumn.createColumn(2, 'name', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(3, '_feature_id', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(4, '_properties_id', GeoPackageDataType.TEXT, false, ""));
-    columns.push(FeatureColumn.createColumn(5, 'test_col', GeoPackageDataType.INTEGER, true, 3));
+    columns.push(FeatureColumn.createColumn('name', GeoPackageDataType.TEXT, false, ""));
+    columns.push(FeatureColumn.createColumn('_feature_id', GeoPackageDataType.TEXT, false, ""));
+    columns.push(FeatureColumn.createColumn('_properties_id', GeoPackageDataType.TEXT, false, ""));
+    columns.push(FeatureColumn.createColumn('test_col', GeoPackageDataType.INTEGER, true, 3));
 
     const geometryColumns = new GeometryColumns();
-    geometryColumns.table_name = tableName;
-    geometryColumns.column_name = 'geom';
-    geometryColumns.geometry_type_name = GeometryType.nameFromType(GeometryType.GEOMETRY);
-    geometryColumns.z = 0;
-    geometryColumns.m = 0;
+    geometryColumns.setTableName(tableName);
+    geometryColumns.setColumnName('geom');
+    geometryColumns.setGeometryType(GeometryType.GEOMETRY);
+    geometryColumns.setZ(0);
+    geometryColumns.setM(0);
+    geometryColumns.setSrsId(4326);
 
-    geoPackage.createFeatureTable(tableName, geometryColumns, columns);
+    geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
 
-    var featureDao = geoPackage.getFeatureDao(tableName);
+    const featureDao = geoPackage.getFeatureDao(tableName);
 
-    var createRow = function(geoJson, name, featureDao) {
-      var srs = featureDao.srs;
+    const createRow = function(geoJson, name, featureDao) {
+      var srs = featureDao.getSrs();
       var featureRow = featureDao.newRow();
       var geometryData = new GeometryData();
-      geometryData.setSrsId(srs.srs_id);
+      geometryData.setSrsId(srs.getSrsId());
       var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
       geometryData.setGeometry(geometry);
-      featureRow.geometry = geometryData;
+      featureRow.setGeometry(geometryData);
       featureRow.setValue('name', name);
       featureRow.setValue('_feature_id', name);
       featureRow.setValue('_properties_id', 'properties' + name);
@@ -103,47 +102,62 @@ describe('GeoPackage Extensions tests', function() {
       }
       return featureDao.create(featureRow);
     };
-    var box1 = {
-      "type": "Polygon",
-      "coordinates": [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+    const box1 = {
+      type: 'Feature',
+      geometry: {
+        type: "Polygon",
+        coordinates: [[[-1, 1], [1, 1], [1, 3], [-1, 3], [-1, 1]]]
+      },
+      properties: {}
     };
 
-    var box2 = {
-      "type": "Polygon",
-      "coordinates": [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
+    const box2 = {
+      type: 'Feature',
+      geometry: {
+        type: "Polygon",
+        coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
+      },
+      properties: {}
     };
 
-    var line = {
-      "type": "LineString",
-      "properties": {
+    const line = {
+      type: 'Feature',
+      geometry: {
+        type: "LineString",
+        coordinates: [[2, 3], [-1, 0]]
+      },
+      properties: {
         "test_col": 26
       },
-      "coordinates": [[2, 3], [-1, 0]]
     };
 
-    // @ts-ignore
-    // @ts-ignore
-    var line2 = {
-      "type": "Feature",
-      "properties": {
+    const line2 = {
+      type: "Feature",
+      properties: {
         "test_col": 12
       },
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [[2.0, 2.5], [-0.5, 0]]
+      geometry: {
+        type: "LineString",
+        coordinates: [[2.0, 2.5], [-0.5, 0]]
       }
     };
 
-    var point = {
-      "type": "Point",
-      "properties": {
+    const point = {
+      type: 'Feature',
+      geometry: {
+        type: "Point",
+        coordinates: [0.5, 1.5]
       },
-      "coordinates": [0.5, 1.5]
+      properties: {}
     };
 
-    var point2 = {
-      "type": "Point",
-      "coordinates": [1.5, .5]
+    const point2 = {
+      type: 'Feature',
+      geometry: {
+        type: "Point",
+        coordinates: [1.5, .5]
+      },
+      properties: {}
     };
 
     createRow(box1, 'box1', featureDao);
@@ -152,9 +166,11 @@ describe('GeoPackage Extensions tests', function() {
     createRow(line, 'line2', featureDao);
     createRow(point, 'point', featureDao);
     createRow(point2, 'point2', featureDao);
-    geoPackage.featureStyleExtension.getOrCreateExtension(tableName);
-    geoPackage.featureStyleExtension.getRelatedTables().getOrCreateExtension();
-    geoPackage.featureStyleExtension.getContentsId().getOrCreateExtension();
+
+    const featureStyleExtension = new FeatureStyleExtension(geoPackage);
+    featureStyleExtension.getOrCreateExtension(tableName);
+    featureStyleExtension.getRelatedTables().getOrCreateExtension();
+    featureStyleExtension.getContentsId().getOrCreateExtension();
     const featureTableStyles = new FeatureTableStyles(geoPackage, tableName);
     featureTableStyles.createRelationships();
     featureTableStyles.setTableStyle(GeometryType.POINT, randomStyle(featureTableStyles));
@@ -168,19 +184,20 @@ describe('GeoPackage Extensions tests', function() {
     geoPackage.createDataColumns();
     geoPackage.createDataColumnConstraintsTable();
 
-    rtreeIndex = new RTreeIndex(geoPackage, featureDao);
-    rtreeExtension = rtreeIndex.create()[0];
-    var fti = new FeatureTableIndex(geoPackage, featureDao);
-    var indexed = fti.isIndexed();
+    // setup rtree index
+    const featureIndexManager = new FeatureIndexManager(geoPackage, featureDao);
+    featureIndexManager.setIndexLocation(FeatureIndexType.RTREE);
+    featureIndexManager.index();
+    const indexed = featureIndexManager.isIndexed();
     indexed.should.be.equal(true);
-    var exists = rtreeIndex.hasExtension(rtreeIndex.extensionName, rtreeIndex.tableName, rtreeIndex.columnName);
+    rtreeIndexDao = featureIndexManager.getRTreeIndexTableDao()
+    var exists = rtreeIndexDao.has();
     exists.should.be.equal(true);
     const metadataExtension = new MetadataExtension(geoPackage);
     metadataExtension.getOrCreateExtension();
 
     geoPackage.createMetadataTable();
     geoPackage.createMetadataReferenceTable();
-    const metadataDao = geoPackage.metadataDao;
   });
 
   afterEach(async function() {
@@ -194,9 +211,9 @@ describe('GeoPackage Extensions tests', function() {
     geoPackage.copyTable(tableName, newTableName, true, true);
     const featureTableStyles = new FeatureTableStyles(geoPackage, newTableName);
     featureTableStyles.hasIconRelationship().should.be.equal(true);
-    const rtreeIndexNewTable = new RTreeIndex(geoPackage, geoPackage.getFeatureDao(newTableName));
-    rtreeIndexNewTable.extensionExists.should.be.equal(true);
-    rtreeIndexNewTable.hasExtension(rtreeIndexNewTable.extensionName, rtreeIndexNewTable.tableName, rtreeIndexNewTable.columnName).should.be.equal(true);
+    const featureIndexManager = new FeatureIndexManager(geoPackage, newTableName);
+    featureIndexManager.isIndexedForType(FeatureIndexType.RTREE).should.be.equal(true);
+    featureIndexManager.getRTreeIndexTableDao().has().should.be.equal(true);
   });
 
   it('should delete extensions for table', function() {
@@ -205,9 +222,9 @@ describe('GeoPackage Extensions tests', function() {
   });
 
   it('should delete extensions', function() {
-    geoPackage.getConnection().isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(true);
+    geoPackage.getConnection().isTableExists(Extensions.TABLE_NAME).should.be.equal(true);
     new ExtensionManager(geoPackage).deleteExtensions();
-    geoPackage.getConnection().isTableExists(ExtensionDao.TABLE_NAME).should.be.equal(false);
+    geoPackage.getConnection().isTableExists(Extensions.TABLE_NAME).should.be.equal(false);
   });
 
   it('should copy table and then delete copy and style extension for original table should be unchanged', function() {

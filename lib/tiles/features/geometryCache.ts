@@ -24,16 +24,16 @@ export class GeometryCache {
   /**
    * Get the cached geometry for the feature row
    * @param featureRow
-   * @returns {module:tiles/features~Geometry}
+   * @returns {Geometry}
    */
   getGeometryDataForFeatureRow(featureRow: FeatureRow): GeoPackageGeometryData {
-    return this.getGeometryData(featureRow.id);
+    return this.getGeometryData(featureRow.getId());
   }
 
   /**
    * Get the cached geometry for the feature row id or null if not cached
    * @param {Number} featureRowId feature row id
-   * @return {module:tiles/features~Geometry} geometry or null
+   * @return {Geometry} geometry or null
    */
   getGeometryData(featureRowId: number): GeoPackageGeometryData {
     const Geometry = this.geometryCache[featureRowId];
@@ -70,7 +70,7 @@ export class GeometryCache {
   /**
    * Remove the cached Geometry for the style row id
    * @param {Number} featureRowId style row id
-   * @return {module:tiles/features~Geometry} removed feature paint or null
+   * @return {Geometry} removed feature paint or null
    */
   remove(featureRowId: number): GeoPackageGeometryData {
     const removed = this.geometryCache[featureRowId];

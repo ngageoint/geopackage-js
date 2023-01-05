@@ -194,7 +194,7 @@ export class GeoPackageTableCreator {
    * Create the given user table.
    *
    * @param {UserTable} userTable user table to create
-   * @return {object} the result of {@link module:db/geoPackageConnection~GeoPackageConnection#run}
+   * @return {object} the result of {@link GeoPackageConnection#run}
    * @throws {Error} if the table already exists
    */
   createUserTable(userTable: UserTable<UserColumn>): { lastInsertRowid: number; changes: number } {

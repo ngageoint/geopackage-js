@@ -79,11 +79,11 @@ export class Metadata {
    */
   public constructor(...args) {
     if (args.length === 1 && args[0] instanceof Metadata) {
-      this.id = args[0].id;
-      this.md_scope = args[0].md_scope;
-      this.md_standard_uri = args[0].md_standard_uri;
-      this.mime_type = args[0].mime_type;
-      this.metadata = args[0].metadata;
+      this.id = args[0].getId();
+      this.md_scope = args[0].getMetadataScopeName();
+      this.md_standard_uri = args[0].getStandardUri();
+      this.mime_type = args[0].getMimeType();
+      this.metadata = args[0].getMetadata();
     }
   }
 

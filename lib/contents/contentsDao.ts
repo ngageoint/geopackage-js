@@ -40,7 +40,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
 
   /**
    * Creates a new Contents object
-   * @return {module:core/contents~Contents} new Contents object
+   * @return {Contents} new Contents object
    */
   createObject(results?: Record<string, DBValue>): Contents {
     const c = new Contents();
@@ -95,8 +95,8 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
 
   /**
    * Get the GeometryColumns for the Contents
-   * @param  {module:core/contents~Contents} contents Contents
-   * @return {module:features/columns~GeometryColumns}
+   * @param  {Contents} contents Contents
+   * @return {GeometryColumns}
    */
   public getGeometryColumns(contents: Contents): GeometryColumns {
     const geometryColumnsDao = this.geoPackage.getGeometryColumnsDao();
@@ -110,8 +110,8 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
 
   /**
    * Get the TileMatrixSet for the Contents
-   * @param  {module:core/contents~Contents} contents Contents
-   * @return {module:tiles/matrixset~TileMatrixSet}
+   * @param  {Contents} contents Contents
+   * @return {TileMatrixSet}
    */
   public getTileMatrixSet(contents: Contents): TileMatrixSet {
     const tileMatrixSetDao = this.geoPackage.getTileMatrixSetDao();
@@ -366,7 +366,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    *            data types
    * @return data type names
    */
-  private dataTypeNames(dataTypes: ContentsDataType[]): string[] {
+  private getDataTypeNames(dataTypes: ContentsDataType[]): string[] {
     const types = [];
     if (dataTypes != null) {
       for (let i = 0; i < dataTypes.length; i++) {
@@ -382,7 +382,7 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param contents contents
    * @return table names
    */
-  private tableNames(contents: Contents[]): string[] {
+  private getTableNames(contents: Contents[]): string[] {
     const tableNames = [];
     if (contents != null) {
       for (const content of contents) {

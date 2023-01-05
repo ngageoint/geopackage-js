@@ -119,7 +119,7 @@ export class MetadataReference {
    */
   setMetadata(metadata?: Metadata): void {
     if (metadata) {
-      this.md_file_id = metadata.id;
+      this.md_file_id = metadata.getId();
     } else {
       this.md_file_id = -1;
     }
@@ -130,7 +130,7 @@ export class MetadataReference {
    */
   setParentMetadata(metadata?: Metadata): void {
     if (metadata) {
-      this.md_parent_id = metadata.id;
+      this.md_parent_id = metadata.getId();
     } else {
       this.md_parent_id = -1;
     }
@@ -144,8 +144,19 @@ export class MetadataReference {
     this.table_name = tableName;
   }
 
+  /**
+   * Getter for the table name
+   */
+  getTableName(): string {
+    return this.table_name;
+  }
+
+  /**
+   * Set the reference scope type
+   * @param referenceScopeType
+   */
   setReferenceScopeType(referenceScopeType: ReferenceScopeType): void {
-    this.reference_scope = referenceScopeType;
+    this.reference_scope = ReferenceScopeType.nameFromType(referenceScopeType).toLowerCase();
     switch (referenceScopeType) {
       case ReferenceScopeType.GEOPACKAGE:
         this.table_name = undefined;
@@ -166,11 +177,25 @@ export class MetadataReference {
   }
 
   /**
+   * Getter for the reference scope type
+   */
+  getReferenceScopeType(): string {
+    return ReferenceScopeType.fromName(this.reference_scope);
+  }
+
+  /**
    * Setter for the column name
    * @param columnName
    */
   setColumnName(columnName: string) {
     this.column_name = columnName;
+  }
+
+  /**
+   * Getter for the column name
+   */
+  getColumnName(): string {
+    return this.column_name;
   }
 
   /**
@@ -182,11 +207,25 @@ export class MetadataReference {
   }
 
   /**
+   * Getter for the row id value
+   */
+  getRowIdValue(): number {
+    return this.row_id_value;
+  }
+
+  /**
    * Setter for the timestamp
    * @param date
    */
   setTimestamp(date: Date) {
     this.timestamp = date;
+  }
+
+  /**
+   * Getter for the timestamp
+   */
+  getTimestamp(): Date {
+    return this.timestamp;
   }
 
   /**
@@ -198,10 +237,24 @@ export class MetadataReference {
   }
 
   /**
+   * Getter for the metadata file id
+   */
+  getMdFileId(): number {
+    return this.md_file_id;
+  }
+
+  /**
    * Setter for the metadata parent id
    * @param mdParentId
    */
   setMdParentId(mdParentId: number) {
     this.md_parent_id = mdParentId;
+  }
+
+  /**
+   * Getter for the metadata parent id
+   */
+  getMdParentId(): number {
+    return this.md_parent_id;
   }
 }

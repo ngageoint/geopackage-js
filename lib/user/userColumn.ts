@@ -14,12 +14,12 @@ import { Comparable } from '@ngageoint/simple-features-js';
 import { ConstraintParser } from '../db/table/constraintParser';
 
 /**
- * A `UserColumn` is meta-data about a single column from a {@link module:/user/userTable~UserTable}.
+ * A `UserColumn` is meta-data about a single column from a {@link UserTable}.
  *
  * @class
  * @param {Number} index column index
  * @param {string} name column name
- * @param {module:db/geoPackageDataType~GPKGDataType} dataType data type of the column
+ * @param {GPKGDataType} dataType data type of the column
  * @param {?Number} max max value
  * @param {Boolean} notNull not null
  * @param {?Object} defaultValue default value or null

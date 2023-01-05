@@ -274,14 +274,8 @@ export class TableInfo {
     if (defaultValue != null && type != null && defaultValue.toUpperCase() !== TableInfo.DEFAULT_NULL) {
       switch (type) {
         case GeoPackageDataType.TEXT:
-          break;
         case GeoPackageDataType.DATE:
         case GeoPackageDataType.DATETIME:
-          try {
-            value = DateConverter.convert(defaultValue);
-          } catch (e) {
-            console.warn("Invalid " + type + " format: " + defaultValue + ", String value used", e);
-          }
           break;
         case GeoPackageDataType.BOOLEAN:
           value = Number.parseInt(defaultValue) === 1

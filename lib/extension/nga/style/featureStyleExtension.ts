@@ -130,14 +130,14 @@ export class FeatureStyleExtension extends BaseExtension {
   }
   /**
    * Get the related tables extension
-   * @returns {module:extension/relatedTables~RelatedTablesExtension}
+   * @returns {RelatedTablesExtension}
    */
   getRelatedTables(): RelatedTablesExtension {
     return this.relatedTables;
   }
   /**
    * Get the contentsId extension
-   * @returns {module:extension/nga/contents~ContentsIdExtension}
+   * @returns {ContentsIdExtension}
    */
   getContentsId(): ContentsIdExtension {
     return this.contentsId;

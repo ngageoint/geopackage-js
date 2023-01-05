@@ -183,7 +183,6 @@ export abstract class UserResultSet<
           columnTypes.push(column.getDataType());
         }
       } catch (e) {
-        console.error(e);
         throw new GeoPackageException('Failed to retrieve the row');
       }
       row = this.getRowWithColumnTypesAndValues(columnTypes, values)
@@ -211,16 +210,15 @@ export abstract class UserResultSet<
   }
 
   public next(): { value: TRow; done: boolean } {
-    const value = this.getRow();
     if (this.moveToNext()) {
       return {
-        value: value,
-        done: false,
+        value: this.getRow(),
+        done: false
       };
     } else {
       return {
-        value: value,
-        done: true,
+        value: this.getRow(),
+        done: true
       };
     }
   }
@@ -244,15 +242,14 @@ export abstract class UserResultSet<
    * @private
    */
   private idNext(): { value: number; done: boolean } {
-    const value = this.getId();
     if (this.moveToNext()) {
       return {
-        value: value,
+        value: this.getId(),
         done: false,
       };
     } else {
       return {
-        value: value,
+        value: this.getId(),
         done: true,
       };
     }
