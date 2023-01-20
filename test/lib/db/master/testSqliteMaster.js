@@ -52,7 +52,7 @@ describe('SQLiteMaster tests', function() {
   it('should run a single query against the SQLiteMaster table', function() {
     try {
       const sqliteMaster = SQLiteMaster.query(geoPackage.getConnection(), [SQLiteMasterColumn.TBL_NAME], [], SQLiteMasterQuery.create());
-      sqliteMaster.count().should.be.equal(15);
+      sqliteMaster.count().should.be.equal(13);
     } catch (e) {
       console.error(e);
     }

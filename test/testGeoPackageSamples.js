@@ -33,11 +33,10 @@ describe('Create GeoPackage samples', function() {
         GeoPackageUtils.createCRSWKTExtension(gp);
         GeoPackageUtils.createFeatures(gp);
         GeoPackageUtils.createSchemaExtension(gp);
-        await GeoPackageUtils.createGeometryIndexExtension(gp);
-        GeoPackageUtils.createFeatureTileLinkExtension(gp);
+        GeoPackageUtils.createGeometryIndexExtension(gp);
         GeoPackageUtils.createNonLinearGeometryTypesExtension(gp);
-        await GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
-        GeoPackageUtils.createRelatedTablesMediaExtension(gp);
+        GeoPackageUtils.createRTreeSpatialIndexExtension(gp);
+        await GeoPackageUtils.createRelatedTablesMediaExtension(gp);
         GeoPackageUtils.createRelatedTablesFeaturesExtension(gp);
         await GeoPackageUtils.createTiles(gp);
         await GeoPackageUtils.createWebPExtension(gp);
@@ -46,6 +45,7 @@ describe('Create GeoPackage samples', function() {
         GeoPackageUtils.createMetadataExtension(gp);
         GeoPackageUtils.createCoverageDataExtension(gp);
         GeoPackageUtils.createPropertiesExtension(gp);
+        GeoPackageUtils.createFeatureTileLinkExtension(gp);
         gp.close();
       })
       .catch(function(error) {

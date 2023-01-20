@@ -77,7 +77,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
    */
   public constructor() {
     // Set the default text values
-    this.textSize = 30;
+    this.textSize = 18;
     this.textFont = 'Serif'; // Noto Mono
     this.textColor = 'rgba(255, 255, 255, 1.0)';
 
@@ -96,7 +96,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
     this.tileFillColor = 'rgba(0, 0, 0, 0.0625)';
 
     // Set the default circle padding percentage
-    this.circlePaddingPercentage = 0.2;
+    this.circlePaddingPercentage = 0.25;
 
     // Set the default draw unindexed tiles value
     this.drawUnindexedTiles = true;
@@ -350,13 +350,12 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
         const diameter = Math.max(textWidth, textHeight);
         let radius = Math.round(diameter / 2.0);
         radius = Math.round(radius + diameter * this.circlePaddingPercentage);
-        const paddedDiameter = Math.round(radius * 2);
 
         // Draw the filled circle
         if (this.circleFillColor != null) {
           context.fillStyle = this.circleFillColor;
           context.beginPath();
-          context.arc(centerX, centerY, paddedDiameter, 0, 2 * Math.PI, true);
+          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
           context.closePath();
           context.fill();
         }
@@ -366,7 +365,7 @@ export class NumberFeaturesTile implements CustomFeaturesTile {
           context.strokeStyle = this.circleColor;
           context.lineWidth = this.circleStrokeWidth;
           context.beginPath();
-          context.arc(centerX, centerY, paddedDiameter, 0, 2 * Math.PI, true);
+          context.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
           context.closePath();
           context.stroke();
         }

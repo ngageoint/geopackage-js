@@ -1,4 +1,5 @@
 import { default as testSetup } from '../../testSetup'
+import { Projections } from "@ngageoint/projections-js";
 
 var GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , BoundingBox = require('../../../lib/boundingBox').BoundingBox
@@ -33,10 +34,10 @@ describe('GeoPackage Tile Retriever tests', function() {
     it('should get the web mercator bounding box', function() {
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       var result = gpr.getWebMercatorBoundingBox();
-      result.minLongitude.should.be.equal(-20037508.342789244);
-      result.maxLongitude.should.be.equal(20037508.342789244);
-      result.minLatitude.should.be.equal(-20037508.342789244);
-      result.maxLatitude.should.be.equal(20037508.342789244);
+      result.getMinLongitude().should.be.equal(-20037508.342789244);
+      result.getMaxLatitude().should.be.equal(20037508.342789244);
+      result.getMinLatitude().should.be.equal(-20037508.342789244);
+      result.getMaxLatitude().should.be.equal(20037508.342789244);
     });
 
     it('should get all the tiles in the bounding box', function() {
@@ -48,7 +49,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(30000);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(2,1,2)
-      .then(function(tile) {
+      .then((tile) => {
         testSetup.diffImages(tile.getData(), path.join(__dirname, '..','..','fixtures','tiles','2','2','1.png'), function(err, equal) {
           try {
             equal.should.be.equal(true);
@@ -62,11 +63,11 @@ describe('GeoPackage Tile Retriever tests', function() {
 
     it('should get the tile with wgs84 bounds', function(done) {
       this.timeout(30000);
-      var wgs84BoundingBox = new BoundingBox(0, 90, 0, 66.51326044311185);
+      var wgs84BoundingBox = new BoundingBox(0, 0, 90, 66.51326044311185);
 
-      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
-      gpr.getTileWithWgs84BoundsInProjection(wgs84BoundingBox, 2, 'EPSG:3857')
-      .then(function(tile) {
+      var gpr = new GeoPackageTileRetriever(tileDao, 256, 256, 'image/png');
+      gpr.getTileWithBounds(wgs84BoundingBox, Projections.getWGS84Projection())
+      .then((tile) => {
         testSetup.diffImages(tile.getData(), path.join(__dirname, '..','..','fixtures','reprojTile.png'), function(err, equal) {
           try {
             equal.should.be.equal(true);
@@ -103,7 +104,6 @@ describe('GeoPackage Tile Retriever tests', function() {
                     gpr.getTile(x,y,zoom)
                     .then(function(tile) {
                       testSetup.diffImages(tile.getData(), path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'), function(err, equal) {
-                        console.log(path.join(__dirname, '..', '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png') + ' passes?', equal);
                         equal.should.be.equal(true);
                         resolve();
                       });
@@ -137,28 +137,22 @@ describe('GeoPackage Tile Retriever tests', function() {
     });
 
     it('should have a tile at XYZ 0, 0, 1', function() {
-      var maxZoom = tileDao.maxZoom;
-      var minZoom = tileDao.minZoom;
-
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       var hasTile = gpr.hasTile(0, 0, 1);
       hasTile.should.be.equal(true);
     });
 
     it('should not have a tile at -1, 0, 0', function() {
-      var maxZoom = tileDao.maxZoom;
-      var minZoom = tileDao.minZoom;
-
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       var hasTile = gpr.hasTile(-1, 0, 0);
       hasTile.should.be.equal(false);
     });
 
     it('should get a tile specified with wgs84 coordinates', function() {
-      var wgs84BoundingBox = new BoundingBox(0, 180, 0, 85.05112877980659);
+      var wgs84BoundingBox = new BoundingBox(0, 0, 180, 85.05112877980659);
 
       var gpr = new GeoPackageTileRetriever(tileDao, 512, 512);
-      return gpr.getTileWithWgs84Bounds(wgs84BoundingBox)
+      return gpr.getTileWithBounds(wgs84BoundingBox, Projections.getWGS84Projection())
       .then(function(tile) {
         should.exist(tile);
       });
@@ -217,7 +211,7 @@ describe('GeoPackage Tile Retriever tests', function() {
         } else {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles','450tileWeb.png');
         }
-        testSetup.diffImagesWithDimensions(tile, expectedPath, 450, 450, function (err, imagesAreSame) {
+        testSetup.diffImagesWithDimensions(tile.getData(), expectedPath, 450, 450, function (err, imagesAreSame) {
           try {
             imagesAreSame.should.be.equal(true);
             done();
@@ -225,6 +219,8 @@ describe('GeoPackage Tile Retriever tests', function() {
             done(e);
           }
         });
+      }).catch(e => {
+        done(e);
       });
     });
   });
@@ -275,7 +271,7 @@ describe('GeoPackage Tile Retriever tests', function() {
       this.timeout(0);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       gpr.getTile(0, 4, 4)
-      .then(function(tile) {
+      .then((tile) => {
         var expectedPath;
         if (isNode) {
           expectedPath = path.join(__dirname, '..','..','fixtures','tiles', isLinux ? 'reprojectTileLinux.png' : 'reprojectTile.png');

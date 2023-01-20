@@ -575,7 +575,9 @@ export class SQLUtils {
    */
   public static queryResults(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, limit: number): Array<Array<any>> {
     const result = SQLUtils.wrapQuery(connection, sql, args);
-    return ResultUtils.buildResults(result, limit);
+    const value = ResultUtils.buildResults(result, limit);
+    result.close();
+    return value;
   }
 
   /**
@@ -713,7 +715,9 @@ export class SQLUtils {
    */
   public static querySingleResult(connection: GeoPackageConnection, sql: string, args: [] | Record<string, any>, columnName: string): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
-    return ResultUtils.buildSingleResult(result, columnName);
+    const value =  ResultUtils.buildSingleResult(result, columnName);
+    result.close();
+    return value;
   }
 
   /**
@@ -726,7 +730,9 @@ export class SQLUtils {
    */
   public static querySingleResultWithColumnIndex(connection: GeoPackageConnection | DBAdapter, sql: string, args: [] | Record<string, any>, columnIdx: number = 0): any {
     const result = SQLUtils.wrapQuery(connection, sql, args);
-    return ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
+    const value = ResultUtils.buildSingleResultWithColumnIndex(result, columnIdx);
+    result.close();
+    return value;
   }
 
   /**

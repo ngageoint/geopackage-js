@@ -15,7 +15,7 @@ import { SQLiteMaster } from '../../db/master/sqliteMaster';
 import { SQLiteMasterQuery } from '../../db/master/sqliteMasterQuery';
 import { SQLiteMasterColumn } from '../../db/master/sqliteMasterColumn';
 import { TileTableMetadata } from '../user/tileTableMetadata';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { TileColumns } from '../user/tileColumns';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { ImageType } from '../../image/imageType';
@@ -753,9 +753,10 @@ export class TileReprojection {
       tileDao,
       tileWidth,
       tileHeight,
-      reprojectTileDao.getProjection(),
       ImageType.PNG,
     );
+
+    tileCreator.setRequestProjection(reprojectTileDao.getProjection());
 
     for (let tileRow = tileGrid.getMinY(); tileRow <= tileGrid.getMaxY(); tileRow++) {
       const tileMaxLatitude = maxLatitude - (tileRow / matrixHeight) * latitudeRange;
@@ -781,7 +782,7 @@ export class TileReprojection {
           }
 
           try {
-            await row.setTileDataWithGeoPackageImage(tile.getImage(), ImageType.PNG);
+            await row.setTileDataWithGeoPackageImage(await tile.getGeoPackageImage(), ImageType.PNG);
           } catch (e) {
             throw new GeoPackageException(
               'Failed to set tile data from image. GeoPackage: ' +
@@ -1376,8 +1377,8 @@ export class TileReprojection {
       }
 
       // Delete the existing tiles at the zoom level
-      const fieldValues = new ColumnValues();
-      fieldValues.addColumn(TileColumns.ZOOM_LEVEL, toTileMatrix.getZoomLevel());
+      const fieldValues = new FieldValues();
+      fieldValues.addFieldValue(TileColumns.ZOOM_LEVEL, toTileMatrix.getZoomLevel());
       this.reprojectTileDao.deleteWithFieldValues(fieldValues);
     } else {
       saveTileMatrix = false;

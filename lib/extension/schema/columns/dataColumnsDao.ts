@@ -4,7 +4,7 @@ import { DBValue } from '../../../db/dbValue';
 import { TableColumnKey } from '../../../db/tableColumnKey';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import type { GeoPackage } from '../../../geoPackage';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 
 /**
  * Contents object. Provides identifying and descriptive information that an
@@ -90,9 +90,9 @@ export class DataColumnsDao extends GeoPackageDao<DataColumns, TableColumnKey> {
     if (!exists) {
       return;
     }
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(DataColumns.COLUMN_TABLE_NAME, tableName);
-    columnValues.addColumn(DataColumns.COLUMN_COLUMN_NAME, columnName);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(DataColumns.COLUMN_TABLE_NAME, tableName);
+    columnValues.addFieldValue(DataColumns.COLUMN_COLUMN_NAME, columnName);
     const where = this.buildWhere(columnValues);
     const values = [tableName, columnName];
     let dataColumn: DataColumns;

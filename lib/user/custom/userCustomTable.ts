@@ -74,11 +74,14 @@ export class UserCustomTable extends UserTable<UserCustomColumn> {
    * @return {UserCustomTable}
    */
   copy(): UserCustomTable {
-    return new UserCustomTable(
+    const tableCopy = new UserCustomTable(
       this.getTableName(),
       this.getUserColumns().getColumns(),
       this.getUserColumns().getRequiredColumns(),
     );
+    tableCopy.setContents(this.getContents());
+    tableCopy.addConstraintsWithConstraints(this.getConstraints().copy());
+    return tableCopy;
   }
 
   /**

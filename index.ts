@@ -303,7 +303,7 @@ import { SQLiteMasterQuery } from './lib/db/master/sqliteMasterQuery';
 import { SQLiteMasterType } from './lib/db/master/sqliteMasterType';
 
 // dao
-import { ColumnValues } from './lib/dao/columnValues';
+import { FieldValues } from './lib/dao/fieldValues';
 import { Dao } from './lib/dao/dao';
 
 // context
@@ -568,7 +568,7 @@ export {
   SQLiteMasterColumn,
   SQLiteMasterQuery,
   SQLiteMasterType,
-  ColumnValues,
+  FieldValues,
   Dao,
   Context,
   Contents,

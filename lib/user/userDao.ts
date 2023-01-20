@@ -13,7 +13,7 @@ import { SQLUtils } from '../db/sqlUtils';
 import { UserResultSet } from './userResultSet';
 import { ColumnValue } from './columnValue';
 import { AlterTable } from '../db/alterTable';
-import { ColumnValues } from '../dao/columnValues';
+import { FieldValues } from '../dao/fieldValues';
 import { DBValue } from '../db/dbValue';
 import { ContentValues } from './contentValues';
 import { ResultUtils } from '../db/resultUtils';
@@ -846,28 +846,29 @@ export abstract class UserDao<
    * @param  [operation=AND] AND or OR
    * @return where clause
    */
-  buildWhereWithFields(fields: ColumnValues, operation = 'and'): string {
+  buildWhereWithFields(fields: FieldValues, operation = 'and'): string {
     let whereString = '';
     for (let i = 0; i < fields.columns.length; i++) {
       const column = fields.columns[i];
+      const value = fields.values[i];
       if (i) {
         whereString += ' ' + operation + ' ';
       }
-      whereString += this.buildWhere(column, fields.getValue(column));
+      whereString += this.buildWhere(column, value);
     }
     return whereString;
   }
 
   /**
    * Builds a where args array
-   * @param {any[]|ColumnValues|any} values argument values to push
+   * @param {any[]|FieldValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgsWithValues(values: DBValue[] | ColumnValues | DBValue): any[] | null {
+  buildWhereArgsWithValues(values: DBValue[] | FieldValues | DBValue): any[] | null {
     let args = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
-    } else if (values instanceof ColumnValues) {
+    } else if (values instanceof FieldValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
       if (values !== undefined && values !== null) {
@@ -895,14 +896,14 @@ export abstract class UserDao<
 
   /**
    * Builds a where args array
-   * @param {ColumnValues} values argument values to push
+   * @param {FieldValues} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithColumnValues(values: ColumnValues): DBValue[] {
+  _buildWhereArgsWithColumnValues(values: FieldValues): DBValue[] {
     const args = [];
     for (let i = 0; i < values.columns.length; i++) {
       const column = values.columns[i];
-      const value = values.getValue(column);
+      const value = values.values[i];
       if (value !== undefined && value !== null) {
         args.push(value);
       }
@@ -972,11 +973,11 @@ export abstract class UserDao<
    * @param values value
    * @return where args
    */
-  public buildWhereArgs(values: DBValue[] | ColumnValues | DBValue): DBValue[] | null {
+  public buildWhereArgs(values: DBValue[] | FieldValues | DBValue): DBValue[] | null {
     let args: DBValue[] = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
-    } else if (values instanceof ColumnValues) {
+    } else if (values instanceof FieldValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
       if (values !== undefined && values !== null) {
@@ -1026,7 +1027,7 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return count
    */
-  public countForFieldValues(fieldValues: ColumnValues): number {
+  public countForFieldValues(fieldValues: FieldValues): number {
     const where = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgsWithValues(fieldValues);
     return this.count(where, whereArgs);
@@ -1306,7 +1307,7 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return deleted count
    */
-  public deleteWithFieldValues(fieldValues: ColumnValues): number {
+  public deleteWithFieldValues(fieldValues: FieldValues): number {
     const whereClause = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgsWithValues(fieldValues);
     return this.delete(whereClause, whereArgs);
@@ -1322,7 +1323,9 @@ export abstract class UserDao<
    */
   public querySingleColumnTypedResults(sql: string, args: string[], columnName: string, limit?: number): any[] {
     const resultSet = this.db.query(sql, args);
-    return ResultUtils.buildSingleColumnResults(new ResultSetResult(resultSet), columnName, limit);
+    const value = ResultUtils.buildSingleColumnResults(new ResultSetResult(resultSet), columnName, limit);
+    resultSet.close();
+    return value;
   }
 
   /**
@@ -1335,11 +1338,13 @@ export abstract class UserDao<
    */
   public querySingleColumnTypedResultsWithColumnIndex(sql: string, args: string[], columnIndex = 0, limit?: number): any[] {
     const resultSet = this.db.query(sql, args);
-    return ResultUtils.buildSingleColumnResultsWithColumnIndex(new ResultSetResult(resultSet), columnIndex, limit);
+    const value = ResultUtils.buildSingleColumnResultsWithColumnIndex(new ResultSetResult(resultSet), columnIndex, limit);
+    resultSet.close();
+    return value;
   }
 
   /**
-   * {@inheritDoc}
+   * Updates a row
    */
   public update(row: TRow): number {
     const contentValues = row.toContentValues();
@@ -1353,15 +1358,12 @@ export abstract class UserDao<
   /**
    * Update all rows matching the where clause with the provided values
    *
-   * @param values
-   *            content values
-   * @param whereClause
-   *            where clause
-   * @param whereArgs
-   *            where arguments
+   * @param values content values
+   * @param whereClause where clause
+   * @param whereArgs where arguments
    * @return updated count
    */
-  public updateWithContentValues(values: ContentValues, whereClause: string, whereArgs: []): number {
+  public updateWithContentValues(values: ContentValues, whereClause?: string, whereArgs?: []): number {
     return SQLUtils.update(this.getDb(), this.getTableName(), values, whereClause, whereArgs);
   }
 
@@ -1430,7 +1432,7 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return result
    */
-  public queryForFieldValues(fieldValues: ColumnValues): TResult {
+  public queryForFieldValues(fieldValues: FieldValues): TResult {
     return this.queryForFieldValuesWithDistinctAndColumns(undefined, undefined, fieldValues);
   }
 
@@ -1441,7 +1443,7 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return result
    */
-  public queryForFieldValuesWithDistinct(distinct = false, fieldValues: ColumnValues): TResult {
+  public queryForFieldValuesWithDistinct(distinct = false, fieldValues: FieldValues): TResult {
     return this.queryForFieldValuesWithDistinctAndColumns(distinct, undefined, fieldValues);
   }
 
@@ -1452,7 +1454,7 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return result
    */
-  public queryForFieldValuesWithColumns(columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
+  public queryForFieldValuesWithColumns(columns: string[] = this.table.getColumnNames(), fieldValues: FieldValues): TResult {
     return this.queryForFieldValuesWithDistinctAndColumns(undefined, columns, fieldValues);
   }
 
@@ -1464,10 +1466,24 @@ export abstract class UserDao<
    * @param fieldValues field values
    * @return result
    */
-  public queryForFieldValuesWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: ColumnValues): TResult {
+  public queryForFieldValuesWithDistinctAndColumns(distinct = false, columns: string[] = this.table.getColumnNames(), fieldValues: FieldValues): TResult {
     const where = this.buildWhereWithFields(fieldValues);
     const whereArgs = this.buildWhereArgs(fieldValues);
     const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs);
+    this.prepareResult(result);
+    return result;
+  }
+
+  /**
+   * Query for the rows that are like the column
+   * @return result
+   * @param field
+   * @param value
+   */
+  public queryForLike(field: string, value: any): TResult {
+    const where = this.buildWhereLike(field, value);
+    const whereArgs = this.buildWhereArgs(value);
+    const result = this.userDb.query(false, SQLUtils.quoteWrap(this.getTableName()), this.table.getColumnNames(), where, whereArgs);
     this.prepareResult(result);
     return result;
   }
@@ -1532,5 +1548,12 @@ export abstract class UserDao<
     const result = this.userDb.query(distinct, SQLUtils.quoteWrap(this.getTableName()), columns, where, whereArgs, undefined, groupBy, having, orderBy);
     this.prepareResult(result);
     return result;
+  }
+
+  /**
+   * Checks if the table exists
+   */
+  isTableExists(): boolean {
+    return this.db.isTableExists(this.table.getTableName());
   }
 }

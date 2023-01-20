@@ -21,13 +21,16 @@ export class GeoJSONUtils {
       geometry: null,
     } as Feature;
     try {
-      let sfGeom = featureRow.getGeometry().getOrReadGeometry();
-      if (geometryTransform != null) {
-        sfGeom = geometryTransform.transformGeometry(sfGeom);
+      const geoPackageGeometryData = featureRow.getGeometry();
+      if (geoPackageGeometryData != null) {
+        let sfGeom = geoPackageGeometryData.getOrReadGeometry();
+        if (geometryTransform != null) {
+          sfGeom = geometryTransform.transformGeometry(sfGeom);
+        }
+        geoJson.geometry = FeatureConverter.toFeatureGeometry(sfGeom);
       }
-      geoJson.geometry = FeatureConverter.toFeatureGeometry(sfGeom);
     } catch (e) {
-      console.log('Error parsing Geometry', e);
+      console.log('Error parsing Geometry');
     }
     if (geoJson.geometry != null) {
       for (const columnName of featureRow.getColumns().getColumnNames()) {

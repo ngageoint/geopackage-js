@@ -237,7 +237,7 @@ export class FeatureColumn extends UserColumn {
    * @return true if a geometry column
    */
   isGeometry(): boolean {
-    return this.geometryType !== null;
+    return this.geometryType != null;
   }
 
   /**

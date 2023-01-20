@@ -2,6 +2,7 @@ var TileMatrixDao = require('../../../lib/tiles/matrix/tileMatrixDao').TileMatri
 , testSetup = require('../../testSetup').default
 , should = require('chai').should()
 , path = require('path');
+const { TileMatrixSetDao } = require("../../../lib/tiles/matrixset/tileMatrixSetDao");
 
 describe('Tile Matrix tests', function() {
 
@@ -59,7 +60,7 @@ describe('Tile Matrix tests', function() {
     contents.should.have.property('data_type', 'tiles');
     contents.should.have.property('identifier', 'TILESosmds');
     contents.should.have.property('description', null);
-    contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+    contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:53.871Z');
     contents.should.have.property('min_x', -180);
     contents.should.have.property('min_y', -85.0511287798066);
     contents.should.have.property('max_x', 180);
@@ -70,7 +71,8 @@ describe('Tile Matrix tests', function() {
   it('should get the TileMatrixSet from a TileMatrix', function() {
     var tileMatrices = tileMatrixDao.queryForAll();
     var tileMatrix = tileMatrixDao.createObject(tileMatrices[0]);
-    var tileMatrixSet = tileMatrixDao.getTileMatrixSet(tileMatrix);
+    var tileMatrixSetDao = new TileMatrixSetDao(geoPackage);
+    var tileMatrixSet = tileMatrixSetDao.queryWithTileMatrix(tileMatrix);
     should.exist(tileMatrixSet);
     tileMatrixSet.should.have.property('srs_id', 3857);
     tileMatrixSet.should.have.property('table_name', 'TILESosmds');

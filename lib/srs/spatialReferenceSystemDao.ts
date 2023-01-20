@@ -1,6 +1,6 @@
 import { SpatialReferenceSystem } from './spatialReferenceSystem';
 import { DBValue } from '../db/dbValue';
-import { ColumnValues } from '../dao/columnValues';
+import { FieldValues } from '../dao/fieldValues';
 import { Projection, ProjectionConstants } from '@ngageoint/projections-js';
 import { GeoPackageDao } from '../db/geoPackageDao';
 import { Contents } from '../contents/contents';
@@ -202,9 +202,9 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
   }
 
   getByOrganizationAndCoordSysId(organization: string, organizationCoordSysId: number): SpatialReferenceSystem {
-    const cv = new ColumnValues();
-    cv.addColumn('organization', organization);
-    cv.addColumn('organization_coordsys_id', organizationCoordSysId);
+    const cv = new FieldValues();
+    cv.addFieldValue('organization', organization);
+    cv.addFieldValue('organization_coordsys_id', organizationCoordSysId);
     const results: Record<string, DBValue>[] = this.queryForAll(this.buildWhere(cv), this.buildWhereArgs(cv));
     if (results && results.length) {
       return this.createObject(results[0]);
@@ -383,9 +383,9 @@ export class SpatialReferenceSystemDao extends GeoPackageDao<SpatialReferenceSys
    */
   public queryForOrganizationCoordsysId(organization: string, organizationCoordsysId: number): SpatialReferenceSystem {
     let srs = null;
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION, organization);
-    columnValues.addColumn(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION_COORDSYS_ID, organizationCoordsysId);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION, organization);
+    columnValues.addFieldValue(SpatialReferenceSystemConstants.COLUMN_ORGANIZATION_COORDSYS_ID, organizationCoordsysId);
     const results = [];
     for (const result of this.queryForFieldValues(columnValues)) {
       results.push(this.createObject(result));

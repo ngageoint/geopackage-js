@@ -24,6 +24,10 @@ export class MetadataDao extends GeoPackageDao<Metadata, number> {
     return new MetadataDao(geoPackage);
   }
 
+  public newRow(): Metadata {
+    return new Metadata();
+  }
+
   createObject(results?: Record<string, DBValue>): Metadata {
     const m = new Metadata();
     if (results) {

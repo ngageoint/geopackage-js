@@ -330,8 +330,8 @@ export abstract class UserTable<TColumn extends UserColumn> {
    *            constraint type
    * @return constraints
    */
-  public getConstraintsForType(type: ConstraintType): Constraint[] {
-    return this.constraints.getConstraintsForType(type);
+  public getConstraintsByType(type: ConstraintType): Constraint[] {
+    return this.constraints.getConstraintsByType(type);
   }
 
   /**

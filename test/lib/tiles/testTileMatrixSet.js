@@ -63,7 +63,7 @@ describe('Tile Matrix Set tests', function() {
     contents.should.have.property('data_type', 'tiles');
     contents.should.have.property('identifier', 'TILESosmds');
     contents.should.have.property('description', null);
-    contents.should.have.property('last_change', '2015-12-04T15:28:53.871Z');
+    contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:53.871Z')
     contents.should.have.property('min_x', -180);
     contents.should.have.property('min_y', -85.0511287798066);
     contents.should.have.property('max_x', 180);
@@ -75,19 +75,19 @@ describe('Tile Matrix Set tests', function() {
   it('should get the BoundingBox from the TileMatrixSet', function(done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
-    var bb = tileMatrixSet.boundingBox;
-    bb.minLongitude.should.be.equal(-20037508.342789244);
-    bb.maxLongitude.should.be.equal(20037508.342789244);
-    bb.minLatitude.should.be.equal(-20037508.342789244);
-    bb.maxLatitude.should.be.equal(20037508.342789244);
+    var bb = tileMatrixSet.getBoundingBox();
+    bb.getMinLongitude().should.be.equal(-20037508.342789244);
+    bb.getMaxLongitude().should.be.equal(20037508.342789244);
+    bb.getMinLatitude().should.be.equal(-20037508.342789244);
+    bb.getMaxLatitude().should.be.equal(20037508.342789244);
     done();
   });
 
   it('should set the BoundingBox from the TileMatrixSet', function(done) {
     var tileMatrixSet = tileMatrixSetDao.queryForId('TILESosmds');
     should.exist(tileMatrixSet);
-    var bb = new BoundingBox(-1, 1, -1, 1);
-    tileMatrixSet.boundingBox = bb;
+    var bb = new BoundingBox(-1, -1, 1, 1);
+    tileMatrixSet.setBoundingBox(bb);
     tileMatrixSet.should.have.property('min_x', -1);
     tileMatrixSet.should.have.property('min_y', -1);
     tileMatrixSet.should.have.property('max_x', 1);

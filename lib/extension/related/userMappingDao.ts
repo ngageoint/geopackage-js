@@ -193,7 +193,9 @@ export class UserMappingDao extends UserCustomDao {
         SQLUtils.quoteWrap(this.getTableName()),
     );
     for (const result of results) {
-      uniqueBaseIds.push(result[UserMappingTable.COLUMN_RELATED_ID]);
+      if (result[UserMappingTable.COLUMN_RELATED_ID] != null) {
+        uniqueBaseIds.push(result[UserMappingTable.COLUMN_RELATED_ID]);
+      }
     }
     return uniqueBaseIds;
   }

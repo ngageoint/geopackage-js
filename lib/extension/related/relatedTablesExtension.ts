@@ -453,7 +453,7 @@ export class RelatedTablesExtension extends BaseExtension {
     this.createUserMappingTableWithMappingTable(userMappingTable);
 
     // Add a row to gpkgext_relations
-    const extendedRelation = new ExtendedRelation();
+    let extendedRelation = new ExtendedRelation();
     extendedRelation.setBaseTableName(baseTableName);
     extendedRelation.setBasePrimaryColumn(this.getPrimaryKeyColumnName(baseTableName));
     extendedRelation.setRelatedTableName(relatedTableName);
@@ -461,12 +461,15 @@ export class RelatedTablesExtension extends BaseExtension {
     extendedRelation.setMappingTableName(userMappingTable.getTableName());
     extendedRelation.setRelationName(relationName);
     try {
-      const id = this.extendedRelationsDao.create(extendedRelation);
-      extendedRelation.setId(id);
+      const relations = this.extendedRelationsDao.getRelations(baseTableName, this.getPrimaryKeyColumnName(baseTableName), relatedTableName, this.getPrimaryKeyColumnName(relatedTableName), relationName, userMappingTable.getTableName());
+      if (relations.length > 0) {
+        extendedRelation = relations[0];
+      } else {
+        const id = this.extendedRelationsDao.create(extendedRelation);
+        extendedRelation.setId(id);
+      }
     } catch (e) {
-      throw new GeoPackageException(
-        "Failed to add relationship '" + relationName + "' between " + baseTableName + ' and ' + relatedTableName,
-      );
+      throw new GeoPackageException("Failed to add relationship '" + relationName + "' between " + baseTableName + ' and ' + relatedTableName,);
     }
     return extendedRelation;
   }

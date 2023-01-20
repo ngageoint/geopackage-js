@@ -41,13 +41,13 @@ describe('GeoPackage create tests', function() {
     created.should.be.equal(true);
     Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
     created = geoPackage.createGeometryColumnsTable();
-    created.should.be.equal(true);
+    created.should.be.equal(false);
     Verification.verifyGeometryColumns(geoPackage).should.be.equal(true);
   });
 
   it('should create a user feature table', function(done) {
     var featureTable = SetupFeatureTable.buildFeatureTable('test_features', 'geom',  GeometryType.POINT);
-    var result = geoPackage.createUserFeatureTable(featureTable);
+    var result = geoPackage.createFeatureTable(featureTable);
     Verification.verifyTableExists(geoPackage, 'test_features').should.be.equal(true);
     done();
   });
@@ -63,7 +63,7 @@ describe('GeoPackage create tests', function() {
     created.should.be.equal(true);
     Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
     created = geoPackage.createTileMatrixSetTable();
-    created.should.be.equal(true);
+    created.should.be.equal(false);
   });
 
   it('should create the tile matrix table', function() {
@@ -77,13 +77,13 @@ describe('GeoPackage create tests', function() {
     created.should.be.equal(true);
     Verification.verifyTileMatrix(geoPackage).should.be.equal(true);
     created = geoPackage.createTileMatrixTable();
-    created.should.be.equal(true);
+    created.should.be.equal(false);
   });
 
   it('should create a user tile table', function(done) {
     var columns = TileTable.createRequiredColumns();
     var tileTable = new TileTable('test_tiles', columns);
-    var result = geoPackage.createTileTable(tileTable);
+    geoPackage.createTileTable(tileTable);
     Verification.verifyTableExists(geoPackage, 'test_tiles').should.be.equal(true);
     done();
   });
@@ -99,7 +99,7 @@ describe('GeoPackage create tests', function() {
     created.should.be.equal(true);
     Verification.verifyDataColumns(geoPackage).should.be.equal(true);
     created = geoPackage.createDataColumns();
-    created.should.be.equal(true);
+    created.should.be.equal(false);
     Verification.verifyDataColumns(geoPackage).should.be.equal(true);
   });
 
@@ -159,7 +159,7 @@ describe('GeoPackage create tests', function() {
     created.should.be.equal(true);
     Verification.verifyExtensions(geoPackage).should.be.equal(true);
     created = geoPackage.createExtensionsTable();
-    created.should.be.equal(true);
+    created.should.be.equal(false);
     Verification.verifyExtensions(geoPackage).should.be.equal(true);
   });
 
@@ -193,8 +193,8 @@ describe('GeoPackage create tests', function() {
     Verification.verifyGeometryIndex(geoPackage).should.be.equal(true);
   });
 
-  it.skip('should create the feature tile link table', function(done) {
-    let created = geoPackage.createFeatureTileLink();
+  it('should create the feature tile link table', function() {
+    let created = geoPackage.createFeatureTileLinkTable();
     created.should.be.equal(true);
     Verification.verifyFeatureTileLink(geoPackage).should.be.equal(true);
   });

@@ -82,22 +82,18 @@ describe('Contents tests', function() {
   });
 
   it('should get the contents from the ID FEATURESriversds', function() {
-   try {
-     var contents = contentsDao.queryForId('FEATURESriversds');
-     should.exist(contents);
-     contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:59.122Z');
-     contents.getTableName().should.be.equal('FEATURESriversds');
-     contents.getDataType().should.be.equal(ContentsDataType.FEATURES);
-     contents.getIdentifier().should.be.equal('FEATURESriversds');
-     should.not.exist(contents.getDescription());
-     contents.getMinX().should.be.equal(-20037508.342789244);
-     contents.getMinY().should.be.equal(-19971868.88040857);
-     contents.getMaxX().should.be.equal(20037508.342789244);
-     contents.getMaxY().should.be.equal(19971868.880408563);
-     contents.getSrsId().should.be.equal(3857);
-   } catch (e) {
-     console.log(e);
-   }
+    var contents = contentsDao.queryForId('FEATURESriversds');
+    should.exist(contents);
+    contents.getLastChange().toISOString().should.be.equal('2015-12-04T15:28:59.122Z');
+    contents.getTableName().should.be.equal('FEATURESriversds');
+    contents.getDataType().should.be.equal(ContentsDataType.FEATURES);
+    contents.getIdentifier().should.be.equal('FEATURESriversds');
+    should.not.exist(contents.getDescription());
+    contents.getMinX().should.be.equal(-20037508.342789244);
+    contents.getMinY().should.be.equal(-19971868.88040857);
+    contents.getMaxX().should.be.equal(20037508.342789244);
+    contents.getMaxY().should.be.equal(19971868.880408563);
+    contents.getSrsId().should.be.equal(3857);
   });
 
   it('should get the projection from the ID TILESosmds', function() {

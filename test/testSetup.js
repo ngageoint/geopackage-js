@@ -211,6 +211,7 @@ module.exports.diffImagesWithDimensions = function(actualTile, expectedTilePath,
     let actualCtx = actual.getContext('2d');
     actualCtx.drawImage(actualImage.getImage(), 0, 0);
     const actualDataUrl = actual.toDataURL();
+
     new Promise(resolve => {
       if (!isNode) {
         module.exports.loadTile(expectedTilePath).then(expectedTileFileData => {

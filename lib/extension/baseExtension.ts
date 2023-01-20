@@ -143,7 +143,7 @@ export abstract class BaseExtension {
   }
 
   hasExtensions(extensionName: string): boolean {
-    return this.extensionsDao.queryAllByExtension(extensionName).length !== 0;
+    return this.extensionsDao.isTableExists() && this.extensionsDao.queryAllByExtension(extensionName).length !== 0;
   }
 
   /**

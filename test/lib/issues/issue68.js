@@ -1,5 +1,4 @@
 var GeoPackage = require('../../../lib/geoPackage').GeoPackage
-  , GeoPackageConnection = require('../../../lib/db/geoPackageConnection').GeoPackageConnection
   , GeoPackageManager = require('../../../lib/geoPackageManager').GeoPackageManager
   , GeoPackageTileRetriever = require('../../../lib/tiles/geoPackageTileRetriever').GeoPackageTileRetriever
   , path = require('path')
@@ -19,6 +18,7 @@ describe('Tests for issue 68', function() {
       var tileDao = geoPackage.getTileDao('package_tiles');
       should.exist(tileDao);
       var info = geoPackage.getInfoForTable(tileDao);
+      should.exist(info);
       var gpr = new GeoPackageTileRetriever(tileDao, 256, 256);
       return gpr.getTile(192,401,10)
         .then((tile) => {

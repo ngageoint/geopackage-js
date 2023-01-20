@@ -1,7 +1,3 @@
-/**
- * SpatialReferenceSystem module.
- * @module core/srs
- */
 import { Projection, ProjectionConstants, Projections } from '@ngageoint/projections-js';
 import { GeoPackageConstants } from '../geoPackageConstants';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
@@ -286,21 +282,22 @@ export class SpatialReferenceSystem {
    * @return {*}
    */
   get projection(): Projection {
-    if (this.organization === 'NONE') return null;
-    if (
-      !!this.organization &&
-      this.organization.toUpperCase() === ProjectionConstants.AUTHORITY_EPSG &&
-      (this.organization_coordsys_id === ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM ||
-        this.organization_coordsys_id === ProjectionConstants.EPSG_WEB_MERCATOR)
-    ) {
-      return Projections.getProjection(ProjectionConstants.AUTHORITY_EPSG, this.organization_coordsys_id);
-    } else if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
-      Projections.setProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition_12_063);
-      return Projections.getProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition_12_063);
-    } else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
-      Projections.setProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition);
-      return Projections.getProjection(this.organization.toUpperCase(), this.organization_coordsys_id, this.definition);
+    let projection = null;
+    const organization = this.organization != null ? this.organization.toUpperCase() : undefined;
+    const orgCoordSysId = this.organization_coordsys_id != null ? this.organization_coordsys_id : undefined;
+    if (organization === 'NONE') return null;
+    if (organization != null && orgCoordSysId != null) {
+      try {
+        projection = Projections.getProjection(organization, orgCoordSysId);
+      } catch (e) {}
     }
-    return null;
+    if (projection == null) {
+      if (this.definition_12_063 && this.definition_12_063 !== '' && this.definition_12_063 !== 'undefined') {
+        projection = Projections.getProjection(organization, orgCoordSysId, this.definition_12_063);
+      } else if (this.definition && this.definition !== '' && this.definition !== 'undefined') {
+        projection = Projections.getProjection(organization, orgCoordSysId, this.definition);
+      }
+    }
+    return projection;
   }
 }

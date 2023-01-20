@@ -9,7 +9,7 @@ import { AttributesDao } from '../../../attributes/attributesDao';
 import { AttributesRow } from '../../../attributes/attributesRow';
 import { GeoPackageException } from '../../../geoPackageException';
 import { DBValue } from '../../../db/dbValue';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { ExtensionScopeType } from '../../extensionScopeType';
 import { AttributesTableMetadata } from '../../../attributes/attributesTableMetadata';
 import type { GeoPackage } from '../../../geoPackage';
@@ -374,10 +374,10 @@ export class PropertiesExtension extends BaseExtension {
    * @param value property value
    * @return field values mapping
    */
-  private buildColumnValues(property: string, value: string): ColumnValues {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(PropertiesExtension.COLUMN_PROPERTY, property);
-    columnValues.addColumn(PropertiesExtension.COLUMN_VALUE, value);
+  private buildColumnValues(property: string, value: string): FieldValues {
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(PropertiesExtension.COLUMN_PROPERTY, property);
+    columnValues.addFieldValue(PropertiesExtension.COLUMN_VALUE, value);
     return columnValues;
   }
 

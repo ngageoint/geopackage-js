@@ -3,6 +3,8 @@ var GeoPackageTileRetriever = require('../../lib/tiles/geoPackageTileRetriever')
   , GeoPackageManager = require('../../lib/geoPackageManager').GeoPackageManager
   , should = require('chai').should()
   , path = require('path');
+const { FeatureConverter } = require("@ngageoint/simple-features-geojson-js");
+const { GeometryType } = require("@ngageoint/simple-features-js");
 
 describe('GeoPackage tests', function() {
   it('should get the feature table names', function(done) {
@@ -63,16 +65,18 @@ describe('GeoPackage tests', function() {
           throw new Error('No feature table exists');
         }
         var srs = featureDao.getSrs();
-        var each = featureDao.queryForAll();
-        for (var row of each) {
-          var currentRow = featureDao.getRow(row);
-          var geometry = currentRow.geometry;
+        var resultSet = featureDao.queryForAll();
+        while (resultSet.moveToNext()) {
+          var currentRow = resultSet.getRow();
+          var geometry = currentRow.getGeometry();
           if (!geometry) {
             continue;
           }
-          var geom = geometry.geometry;
-          var geoJson = geom.toGeoJSON();
+          var geom = geometry.getGeometry();
+
+          var geoJSON = FeatureConverter.toFeature(geom);
         }
+        resultSet.close();
       });
       connection.close();
     });
@@ -109,11 +113,11 @@ describe('GeoPackage tests', function() {
     return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var contents = geoPackage.contentsDao.queryForId('FEATURESriversds');
-      var featureDao = geoPackage.getFeatureDao(contents);
+      var contents = geoPackage.getContentsDao().queryForId('FEATURESriversds');
+      var featureDao = geoPackage.getFeatureDaoWithContents(contents);
       should.exist(featureDao);
-      featureDao.geometryType.should.be.equal('GEOMETRY');
-      featureDao.table_name.should.be.equal('FEATURESriversds');
+      featureDao.getGeometryType().should.be.equal(GeometryType.GEOMETRY);
+      featureDao.getTableName().should.be.equal('FEATURESriversds');
       connection.close();
     });
   });
@@ -122,8 +126,8 @@ describe('GeoPackage tests', function() {
     return GeoPackageManager.connect(path.join(__dirname, '..', 'fixtures', 'rivers.gpkg'))
     .then(function(connection) {
       var geoPackage = new GeoPackage('', '', connection);
-      var contents = geoPackage.contentsDao.queryForId('TILESosmds');
-      return geoPackage.getTileDao(contents);
+      var contents = geoPackage.getContentsDao().queryForId('TILESosmds');
+      return geoPackage.getTileDaoWithContents(contents);
     });
   });
 

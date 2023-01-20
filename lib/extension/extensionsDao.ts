@@ -1,5 +1,5 @@
 import { Extensions } from './extensions';
-import { ColumnValues } from '../dao/columnValues';
+import { FieldValues } from '../dao/fieldValues';
 import { DBValue } from '../db/dbValue';
 import { GeoPackageDao } from '../db/geoPackageDao';
 import { ExtensionsKey } from './extensionsKey';
@@ -78,9 +78,9 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    * @returns {Extensions[]}
    */
   queryByExtensionAndTableName(extensionName: string, tableName: string): Extensions[] {
-    const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
-    values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
+    const values = new FieldValues();
+    values.addFieldValue(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+    values.addFieldValue(Extensions.COLUMN_TABLE_NAME, tableName);
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
       extensions.push(this.createObject(row));
@@ -99,15 +99,15 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
     tableName: string,
     columnName: string,
   ): Extensions[] {
-    const values = new ColumnValues();
+    const values = new FieldValues();
     if (extensionName != null) {
-      values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+      values.addFieldValue(Extensions.COLUMN_EXTENSION_NAME, extensionName);
     }
     if (tableName != null) {
-      values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
+      values.addFieldValue(Extensions.COLUMN_TABLE_NAME, tableName);
     }
     if (columnName != null) {
-      values.addColumn(Extensions.COLUMN_COLUMN_NAME, columnName);
+      values.addFieldValue(Extensions.COLUMN_COLUMN_NAME, columnName);
     }
     const extensions = [];
     for (const row of this.queryForFieldValues(values)) {
@@ -122,8 +122,8 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    * @returns {Number} Number of extensions deleted
    */
   deleteByExtension(extensionName: string): number {
-    const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+    const values = new FieldValues();
+    values.addFieldValue(Extensions.COLUMN_EXTENSION_NAME, extensionName);
     return this.deleteWhere(this.buildWhere(values, '='), this.buildWhereArgs(values));
   }
   /**
@@ -132,8 +132,8 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    * @returns {Number} Number of extensions deleted
    */
   deleteByTableName(tableName: string): number {
-    const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
+    const values = new FieldValues();
+    values.addFieldValue(Extensions.COLUMN_TABLE_NAME, tableName);
     return this.deleteWhere(this.buildWhere(values, '='), this.buildWhereArgs(values));
   }
   /**
@@ -143,9 +143,9 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    * @returns {Number} Number of extensions deleted
    */
   deleteByExtensionAndTableName(extensionName: string, tableName: string): number {
-    const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
-    values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
+    const values = new FieldValues();
+    values.addFieldValue(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+    values.addFieldValue(Extensions.COLUMN_TABLE_NAME, tableName);
     return this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
   }
   /**
@@ -155,10 +155,10 @@ export class ExtensionsDao extends GeoPackageDao<Extensions, ExtensionsKey> {
    * @returns {Number} Number of extensions deleted
    */
   deleteByExtensionAndTableNameAndColumnName(extensionName: string, tableName: string, columnName: string): number {
-    const values = new ColumnValues();
-    values.addColumn(Extensions.COLUMN_EXTENSION_NAME, extensionName);
-    values.addColumn(Extensions.COLUMN_TABLE_NAME, tableName);
-    values.addColumn(Extensions.COLUMN_COLUMN_NAME, columnName);
+    const values = new FieldValues();
+    values.addFieldValue(Extensions.COLUMN_EXTENSION_NAME, extensionName);
+    values.addFieldValue(Extensions.COLUMN_TABLE_NAME, tableName);
+    values.addFieldValue(Extensions.COLUMN_COLUMN_NAME, columnName);
     return this.deleteWhere(this.buildWhere(values, 'and'), this.buildWhereArgs(values));
   }
 

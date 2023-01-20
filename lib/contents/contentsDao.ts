@@ -5,7 +5,7 @@ import { GeoPackageException } from '../geoPackageException';
 import { BoundingBox } from '../boundingBox';
 import { DBValue } from '../db/dbValue';
 import { Contents } from './contents';
-import { ColumnValues } from '../dao/columnValues';
+import { FieldValues } from '../dao/fieldValues';
 import { GeometryColumns } from '../features/columns/geometryColumns';
 import { TileMatrixSet } from '../tiles/matrixset/tileMatrixSet';
 import { TileMatrix } from '../tiles/matrix/tileMatrix';
@@ -74,10 +74,10 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
   getContentsForTypes(tableTypes?: (string | ContentsDataType)[]): Contents[] {
     const results: Contents[] = [];
     if (tableTypes && tableTypes.length > 0) {
-      const fieldValues = new ColumnValues();
+      const fieldValues = new FieldValues();
       tableTypes.forEach(type => {
         if (type != null) {
-          fieldValues.addColumn(
+          fieldValues.addFieldValue(
             Contents.COLUMN_DATA_TYPE,
             typeof type === 'string' ? type : ContentsDataType.nameFromType(type),
           );
@@ -252,8 +252,8 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param dataType data type
    * @return table names
    */
-  public getTables(dataType?: string | ContentsDataType): string[] {
-    return this.getTablesForTypes([dataType]);
+  public getTables(dataType?: ContentsDataType): string[] {
+    return this.getTablesForTypes(dataType != null ? [dataType] : [ContentsDataType.FEATURES, ContentsDataType.TILES, ContentsDataType.ATTRIBUTES]);
   }
 
   /**
@@ -262,17 +262,12 @@ export class ContentsDao extends GeoPackageDao<Contents, string> {
    * @param dataTypes data type
    * @return table names
    */
-  public getTablesForTypes(dataTypes?: (string | ContentsDataType)[]): string[] {
+  public getTablesForTypes(dataTypes?: ContentsDataType[]): string[] {
     let results;
     if (dataTypes != null && dataTypes.length > 0) {
-      const fieldValues = new ColumnValues();
+      const fieldValues = new FieldValues();
       dataTypes.forEach(type => {
-        if (type != null) {
-          fieldValues.addColumn(
-            Contents.COLUMN_DATA_TYPE,
-            typeof type === 'string' ? type : ContentsDataType.nameFromType(type),
-          );
-        }
+        fieldValues.addFieldValue(Contents.COLUMN_DATA_TYPE, ContentsDataType.nameFromType(type));
       });
       const where = this.buildWhere(fieldValues, 'or');
       const whereArgs = this.buildWhereArgs(fieldValues);

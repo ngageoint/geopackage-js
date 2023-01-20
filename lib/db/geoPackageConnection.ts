@@ -313,6 +313,9 @@ export class GeoPackageConnection {
     const buff = Buffer.from(GeoPackageConstants.APPLICATION_ID);
     const applicationId = buff.readUInt32BE(0);
     this.connectionSource.run('PRAGMA application_id = ' + applicationId);
+  }
+
+  setUserVersion(): void {
     this.connectionSource.run('PRAGMA user_version = ' + GeoPackageConstants.USER_VERSION);
   }
   /**
@@ -396,7 +399,7 @@ export class GeoPackageConnection {
       query.push(where);
     }
     const sql = query.join('');
-    return SQLUtils.querySingleResult(this, sql, args, column);
+    return SQLUtils.querySingleResultWithColumnIndex(this, sql, args, 0);
   }
 
  /**

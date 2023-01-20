@@ -57,24 +57,23 @@ export class GeoJSONResultSet implements IterableIterator<Feature> {
 
   next(...args: [] | [undefined]): IteratorResult<Feature> {
     let nextRow = this.featureIndexResultSet.next();
+    let feature: Feature;
+    let done: boolean = true;
     if (!nextRow.done) {
       let featureRow: FeatureRow = nextRow.value;
-      let geometry: GeoJsonObject;
-      while (!nextRow.done && !geometry) {
-        const feature = GeoJSONUtils.convertFeatureRowIntoGeoJSONFeature(featureRow, this.geometryTransform, this.dataColumnsMap);
+      while (!nextRow.done && !feature) {
+        feature = GeoJSONUtils.convertFeatureRowIntoGeoJSONFeature(featureRow, this.geometryTransform, this.dataColumnsMap);
         if (feature != null) {
-          return {
-            value: feature,
-            done: false,
-          };
+          done = nextRow.done;
+          break;
         } else {
           nextRow = this.featureIndexResultSet.next();
         }
       }
     }
     return {
-      done: true,
-      value: undefined,
+      done,
+      value: feature,
     };
   }
 

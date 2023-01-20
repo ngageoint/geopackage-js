@@ -1,6 +1,6 @@
 import { FeatureTileLink } from './featureTileLink';
 import { FeatureTileLinkKey } from './featureTileLinkKey';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { GeoPackageException } from '../../../geoPackageException';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
@@ -55,9 +55,9 @@ export class FeatureTileLinkDao extends GeoPackageDao<FeatureTileLink, FeatureTi
   public queryForFeatureTileLinkKey(key: FeatureTileLinkKey): FeatureTileLink {
     let featureTileLink = null;
     if (key != null) {
-      const fieldValues = new ColumnValues();
-      fieldValues.addColumn(FeatureTileLink.COLUMN_FEATURE_TABLE_NAME, key.getFeatureTableName());
-      fieldValues.addColumn(FeatureTileLink.COLUMN_TILE_TABLE_NAME, key.getTileTableName());
+      const fieldValues = new FieldValues();
+      fieldValues.addFieldValue(FeatureTileLink.COLUMN_FEATURE_TABLE_NAME, key.getFeatureTableName());
+      fieldValues.addFieldValue(FeatureTileLink.COLUMN_TILE_TABLE_NAME, key.getTileTableName());
       const results = [];
       for (const result of this.queryForFieldValues(fieldValues)) {
         results.push(this.createObject(result));

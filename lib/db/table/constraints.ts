@@ -81,7 +81,7 @@ export class Constraints {
    * @return true if has constraints
    */
   hasType(type: ConstraintType): boolean {
-    return this.getConstraintsForType(type).length !== 0;
+    return this.getConstraintsByType(type).length !== 0;
   }
 
   /**
@@ -106,7 +106,7 @@ export class Constraints {
    * @param type constraint type
    * @return constraints
    */
-  getConstraintsForType(type: ConstraintType): Constraint[] {
+  getConstraintsByType(type: ConstraintType): Constraint[] {
     let constraints = this.typedConstraints[type];
     if (constraints === null || constraints === undefined) {
       constraints = [];

@@ -1,4 +1,5 @@
 import { GeoPackageImage } from '../image/geoPackageImage';
+import { Canvas } from '../canvas/canvas';
 
 /**
  * GeoPackage tile wrapper containing tile dimensions and the image or raw image
@@ -29,16 +30,12 @@ export class GeoPackageTile {
    * Constructor
    * @param width tile width
    * @param height tile height
-   * @param imageOrData tile image
+   * @param data tile data
    */
-  public constructor(width: number, height: number, imageOrData: GeoPackageImage | Buffer | Uint8Array) {
+  public constructor(width: number, height: number, data: Buffer | Uint8Array) {
     this.width = width;
     this.height = height;
-    if (imageOrData instanceof GeoPackageImage) {
-      this.image = imageOrData as GeoPackageImage;
-    } else {
-      this.data = imageOrData;
-    }
+    this.data = data;
   }
 
   /**
@@ -58,11 +55,11 @@ export class GeoPackageTile {
   }
 
   /**
-   * Get the image
-   * @return image
+   * Get a GeoPackageImage for this GeoPackageTile
+   * @return {Promise<GeoPackageImage>} image
    */
-  public getImage(): GeoPackageImage {
-    return this.image;
+  public async getGeoPackageImage(): Promise<GeoPackageImage> {
+    return await Canvas.createImage(this.getData());
   }
 
   /**
@@ -71,14 +68,6 @@ export class GeoPackageTile {
    */
   public getData(): Buffer | Uint8Array {
     return this.data;
-  }
-
-  /**
-   * Set the image
-   * @param image buffered image
-   */
-  public setImage(image: GeoPackageImage): void {
-    this.image = image;
   }
 
   /**

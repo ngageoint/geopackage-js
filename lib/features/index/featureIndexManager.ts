@@ -11,7 +11,7 @@ import { FeatureIndexResults } from './featureIndexResults';
 import { BoundingBox } from '../../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { GeoPackageException } from '../../geoPackageException';
 import { FeatureIndexFeatureResults } from './featureIndexFeatureResults';
 import { FeaturePaginatedResults } from '../user/featurePaginatedResults';
@@ -715,7 +715,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public queryWithFieldValues(fieldValues: ColumnValues): FeatureIndexResults {
+  public queryWithFieldValues(fieldValues: FieldValues): FeatureIndexResults {
     return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, undefined);
   }
 
@@ -725,7 +725,7 @@ export class FeatureIndexManager {
    * @param distinct distinct rows
    * @return feature index results, close when done
    */
-  public queryWithFieldValuesAndDistinct(fieldValues: ColumnValues, distinct: boolean): FeatureIndexResults {
+  public queryWithFieldValuesAndDistinct(fieldValues: FieldValues, distinct: boolean): FeatureIndexResults {
     return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, distinct, undefined);
   }
 
@@ -735,7 +735,7 @@ export class FeatureIndexManager {
    * @param columns columns
    * @return feature index results, close when done
    */
-  public queryWithFieldValuesAndColumns(fieldValues: ColumnValues, columns: string[]): FeatureIndexResults {
+  public queryWithFieldValuesAndColumns(fieldValues: FieldValues, columns: string[]): FeatureIndexResults {
     return this.queryWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, columns);
   }
 
@@ -746,7 +746,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public queryWithFieldValuesAndDistinctAndColumns(fieldValues: ColumnValues, distinct: boolean, columns: string[]): FeatureIndexResults {
+  public queryWithFieldValuesAndDistinctAndColumns(fieldValues: FieldValues, distinct: boolean, columns: string[]): FeatureIndexResults {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
     return this.queryWithDistinctAndColumns(distinct, columns, where, whereArgs);
@@ -757,7 +757,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public countWithFieldValues(fieldValues: ColumnValues): number {
+  public countWithFieldValues(fieldValues: FieldValues): number {
     return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, undefined);
   }
 
@@ -768,7 +768,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public countWithFieldValuesAndDistinct(fieldValues: ColumnValues, distinct: boolean, column: string): number {
+  public countWithFieldValuesAndDistinct(fieldValues: FieldValues, distinct: boolean, column: string): number {
     return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, distinct, undefined);
   }
 
@@ -778,7 +778,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public countWithFieldValuesAndColumn(fieldValues: ColumnValues, column: string): number {
+  public countWithFieldValuesAndColumn(fieldValues: FieldValues, column: string): number {
     return this.countWithFieldValuesAndDistinctAndColumns(fieldValues, undefined, column);
   }
 
@@ -789,7 +789,7 @@ export class FeatureIndexManager {
    * @param fieldValues field values
    * @return feature index results, close when done
    */
-  public countWithFieldValuesAndDistinctAndColumns(fieldValues: ColumnValues, distinct: boolean, column: string): number {
+  public countWithFieldValuesAndDistinctAndColumns(fieldValues: FieldValues, distinct: boolean, column: string): number {
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
     return this.countWithDistinctAndColumns(distinct, column, where, whereArgs);
@@ -1022,7 +1022,7 @@ export class FeatureIndexManager {
    */
   public queryWithBoundingBoxAndFieldValues(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, undefined, undefined);
   }
@@ -1038,7 +1038,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndFieldValuesAndDistinct(
     distinct: boolean,
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, distinct, undefined);
   }
@@ -1054,7 +1054,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndFieldValuesAndColumns(
     columns: string[],
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(boundingBox, fieldValues, undefined, columns);
   }
@@ -1070,7 +1070,7 @@ export class FeatureIndexManager {
    */
   public queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     columns: string[],
   ): FeatureIndexResults {
@@ -1086,7 +1086,7 @@ export class FeatureIndexManager {
    */
   public countWithBoundingBoxAndFieldValues(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, undefined, undefined);
   }
@@ -1101,7 +1101,7 @@ export class FeatureIndexManager {
    */
   public countWithBoundingBoxAndFieldValuesAndDistinct(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
   ): number {
     return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, distinct, undefined);
@@ -1117,7 +1117,7 @@ export class FeatureIndexManager {
    */
   public countWithBoundingBoxAndFieldValuesAndColumn(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     column: string,
   ): number {
     return this.countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(boundingBox, fieldValues, undefined, column);
@@ -1134,7 +1134,7 @@ export class FeatureIndexManager {
    */
   public countWithBoundingBoxAndFieldValuesAndDistinctAndColumn(
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     column: string,
   ): number {
@@ -1299,7 +1299,7 @@ export class FeatureIndexManager {
    */
   public queryWithGeometryEnvelopeAndFieldValues(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): FeatureIndexResults {
     return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, undefined, undefined);
   }
@@ -1313,7 +1313,7 @@ export class FeatureIndexManager {
    */
   public queryWithGeometryEnvelopeAndFieldValuesAndDistinct(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
   ): FeatureIndexResults {
     return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, distinct, undefined);
@@ -1328,7 +1328,7 @@ export class FeatureIndexManager {
    */
   public queryWithGeometryEnvelopeAndFieldValuesAndColumns(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     columns: string[],
   ): FeatureIndexResults {
     return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(envelope, fieldValues, undefined, columns);
@@ -1344,7 +1344,7 @@ export class FeatureIndexManager {
    */
   public queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     columns: string[],
   ): FeatureIndexResults {
@@ -1361,7 +1361,7 @@ export class FeatureIndexManager {
    */
   public countWithGeometryEnvelopeAndFieldValues(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, undefined, undefined);
   }
@@ -1375,7 +1375,7 @@ export class FeatureIndexManager {
    */
   public countWithGeometryEnvelopeAndFieldValuesAndDistinct(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
   ): number {
     return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, distinct, undefined);
@@ -1391,7 +1391,7 @@ export class FeatureIndexManager {
   public countWithGeometryEnvelopeAndFieldValuesAndColumn(
     column: string,
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(envelope, fieldValues, undefined, column);
   }
@@ -1406,7 +1406,7 @@ export class FeatureIndexManager {
    */
   public countWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumn(
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     column: string
   ): number {
@@ -1645,7 +1645,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndProjectionAndFieldValues(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, undefined, undefined);
   }
@@ -1662,7 +1662,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinct(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, distinct, undefined);
@@ -1680,7 +1680,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndProjectionAndFieldValuesAndColumns(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     columns: string[],
   ): FeatureIndexResults {
     return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(boundingBox, projection, fieldValues, undefined, columns);
@@ -1699,7 +1699,7 @@ export class FeatureIndexManager {
   public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     columns: string[],
   ): FeatureIndexResults {
@@ -1720,7 +1720,7 @@ export class FeatureIndexManager {
   public countWithBoundingBoxAndProjectionAndFieldValues(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, undefined, undefined);
   }
@@ -1738,7 +1738,7 @@ export class FeatureIndexManager {
     distinct: boolean,
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, distinct, undefined);
   }
@@ -1758,7 +1758,7 @@ export class FeatureIndexManager {
     column: string,
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
   ): number {
     return this.countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(boundingBox, projection, fieldValues, undefined, column);
   }
@@ -1776,7 +1776,7 @@ export class FeatureIndexManager {
   public countWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumn(
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     distinct: boolean,
     column: string,
   ): number {
@@ -1866,7 +1866,7 @@ export class FeatureIndexManager {
   }
 
   /**
-   * Query for feature index count within the bounding box in the provided
+   * Query for feature index count intersecting the bounding box in the provided
    * projection
    * @param boundingBox bounding box
    * @param projection projection
@@ -2022,7 +2022,7 @@ export class FeatureIndexManager {
   public queryForChunkWithFieldValues(
     distinct: boolean,
     columns: string[],
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     orderBy: string,
     limit: number,
     offset: number,
@@ -2146,7 +2146,7 @@ export class FeatureIndexManager {
     distinct: boolean,
     columns: string[],
     boundingBox: BoundingBox,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     orderBy: string,
     limit: number,
     offset: number,
@@ -2244,7 +2244,7 @@ export class FeatureIndexManager {
     distinct: boolean,
     columns: string[],
     envelope: GeometryEnvelope,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     orderBy: string,
     limit: number,
     offset: number,
@@ -2384,7 +2384,7 @@ export class FeatureIndexManager {
     columns: string[],
     boundingBox: BoundingBox,
     projection: Projection,
-    fieldValues: ColumnValues,
+    fieldValues: FieldValues,
     orderBy: string,
     limit: number,
     offset: number,
@@ -2494,7 +2494,7 @@ export class FeatureIndexManager {
    * @param whereArgs
    */
   public queryForGeoJSONFeatures(boundingBox?: BoundingBox, where?: string, whereArgs?: any[]): GeoJSONResultSet {
-    const featureIndexResultSet: FeatureIndexResults = this.queryWithBoundingBox(boundingBox, where, whereArgs);
+    const featureIndexResultSet: FeatureIndexResults = boundingBox != null ? this.queryWithBoundingBox(boundingBox, where, whereArgs) : this.query(where, whereArgs);
     return new GeoJSONResultSet(featureIndexResultSet, this.getFeatureDao(), this.dataColumnsDao);
   }
 }

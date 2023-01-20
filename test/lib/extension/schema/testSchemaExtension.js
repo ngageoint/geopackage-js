@@ -18,12 +18,16 @@ describe('GeoPackage Schema Extension tests', function() {
   });
 
   it('should have the extension', function() {
+    geoPackage.create
     var schemaExtension = new SchemaExtension(geoPackage);
+    schemaExtension.has().should.be.equal(false);
+    schemaExtension.getOrCreateExtension();
     schemaExtension.has().should.be.equal(true);
   });
 
   it('should remove the extension', function() {
     var schemaExtension = new SchemaExtension(geoPackage);
+    schemaExtension.getOrCreateExtension();
     geoPackage.createDataColumns();
     geoPackage.createDataColumnConstraintsTable();
     schemaExtension.has().should.be.equal(true);

@@ -380,7 +380,6 @@ describe('FeatureDao tests', function() {
       return geoPackage.getFeatureTileFromXYZ('QueryTest', 1029, 1013, 11, 256, 256)
       .then(data => {
         console.timeEnd('generating indexed tile');
-        console.log(data);
         should.exist(data);
       }).catch(e => console.error(e));
     });
@@ -444,9 +443,6 @@ describe('FeatureDao tests', function() {
       const resultSet = queryTestFeatureDao.query();
       const featureRow = resultSet.next().value;
       resultSet.close();
-
-      console.log(featureRow.getId());
-      console.log(mediaRow.getId());
 
       geoPackage.linkMedia(queryTestFeatureDao.getTableName(), featureRow.getId(), 'media_table', mediaRow.getId());
       const linkedMedia = geoPackage.getLinkedMedia(queryTestFeatureDao.getTableName(), featureRow.getId());

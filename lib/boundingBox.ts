@@ -673,6 +673,7 @@ export class BoundingBox {
    */
   public equals(obj: BoundingBox): boolean {
     return (
+      obj != null &&
       this.minLongitude === obj.minLongitude &&
       this.minLatitude === obj.minLatitude &&
       this.maxLongitude === obj.maxLongitude &&

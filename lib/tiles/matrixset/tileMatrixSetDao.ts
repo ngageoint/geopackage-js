@@ -7,6 +7,7 @@ import { Projection } from '@ngageoint/projections-js';
 import type { GeoPackage } from '../../geoPackage';
 import { BoundingBox } from '../../boundingBox';
 import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
+import { TileMatrix } from '../matrix/tileMatrix';
 
 /**
  * Tile Matrix Set Data Access Object
@@ -96,5 +97,13 @@ export class TileMatrixSetDao extends GeoPackageDao<TileMatrixSet, string> {
       }
     }
     return boundingBox;
+  }
+
+  /**
+   * Queries for a TileMatrixSet with a TileMatrix
+   * @param tileMatrix
+   */
+  public queryWithTileMatrix(tileMatrix: TileMatrix): TileMatrixSet {
+    return this.queryForIdWithKey(tileMatrix.getTableName());
   }
 }

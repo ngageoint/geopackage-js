@@ -1,6 +1,6 @@
 import { Projection } from '@ngageoint/projections-js';
 import { BoundingBox } from '../../boundingBox';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { SQLUtils } from '../../db/sqlUtils';
 import { FeatureDao } from './featureDao';
 import { FeatureResultSet } from './featureResultSet';
@@ -233,7 +233,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return feature results
 	 */
-	public queryWithFieldValues(fieldValues: ColumnValues): FeatureResultSet {
+	public queryWithFieldValues(fieldValues: FieldValues): FeatureResultSet {
 		return this.queryWithFieldValuesAndDistinctAndColumns(undefined, undefined, fieldValues);
 	}
 
@@ -243,7 +243,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return feature results
 	 */
-	public queryWithFieldValuesAndDistinct(distinct: boolean, fieldValues: ColumnValues): FeatureResultSet {
+	public queryWithFieldValuesAndDistinct(distinct: boolean, fieldValues: FieldValues): FeatureResultSet {
 		return this.queryWithFieldValuesAndDistinctAndColumns(distinct, undefined, fieldValues);
 	}
 
@@ -253,7 +253,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return feature results
 	 */
-	public queryWithFieldValuesAndColumns(columns: string[], fieldValues: ColumnValues): FeatureResultSet {
+	public queryWithFieldValuesAndColumns(columns: string[], fieldValues: FieldValues): FeatureResultSet {
 		return this.queryWithFieldValuesAndDistinctAndColumns(undefined, columns, fieldValues);
 	}
 
@@ -264,7 +264,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return feature results
 	 */
-	public queryWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], fieldValues: ColumnValues): FeatureResultSet {
+	public queryWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], fieldValues: FieldValues): FeatureResultSet {
 		const where: string = this.featureDao.buildWhereWithFields(fieldValues);
 		const whereArgs: any[] = this.featureDao.buildWhereArgs(fieldValues);
 		return this.featureDao.queryInWithDistinctAndColumns(distinct, columns, where, whereArgs);
@@ -277,7 +277,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return count
 	 */
-	public countWithFieldValues(distinct: boolean = false, column: string, fieldValues: ColumnValues): number {
+	public countWithFieldValues(distinct: boolean = false, column: string, fieldValues: FieldValues): number {
 		const where: string = this.featureDao.buildWhereWithFields(fieldValues);
 		const whereArgs: any[] = this.featureDao.buildWhereArgs(fieldValues);
 		return this.featureDao.countColumn(distinct, column, where, whereArgs);
@@ -385,7 +385,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithGeometryEnvelopeAndFieldValues(boundingBox.buildEnvelope(), fieldValues);
 	}
 
@@ -396,7 +396,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinct(distinct, boundingBox.buildEnvelope(), fieldValues);
 	}
 
@@ -407,7 +407,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithGeometryEnvelopeAndFieldValuesAndColumns(columns, boundingBox.buildEnvelope(), fieldValues);
 	}
 
@@ -419,7 +419,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), fieldValues);
 	}
 
@@ -429,7 +429,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return count
 	 */
-	public countWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: ColumnValues): number {
+	public countWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: FieldValues): number {
 		return this.countWithGeometryEnvelopeAndFieldValues(boundingBox.buildEnvelope(), fieldValues);
 	}
 
@@ -501,7 +501,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndProjectionAndFieldValues(boundingBox: BoundingBox, projection: Projection, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndProjectionAndFieldValues(boundingBox: BoundingBox, projection: Projection, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(undefined, undefined, boundingBox, projection, fieldValues);
 	}
 
@@ -514,7 +514,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, projection: Projection, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(distinct, undefined, boundingBox, projection, fieldValues);
 	}
 
@@ -527,7 +527,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndProjectionAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, projection: Projection, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndProjectionAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, projection: Projection, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(undefined, columns, boundingBox, projection, fieldValues);
 	}
 
@@ -541,7 +541,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundingBoxAndProjectionAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, projection: Projection, fieldValues: FieldValues): ManualFeatureQueryResults {
 		const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
 		return this.queryWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct, columns, featureBoundingBox, fieldValues);
 	}
@@ -554,7 +554,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return count
 	 */
-	public countWithBoundingBoxAndProjectionAndFieldValues(boundingBox: BoundingBox, projection: Projection, fieldValues: ColumnValues): number {
+	public countWithBoundingBoxAndProjectionAndFieldValues(boundingBox: BoundingBox, projection: Projection, fieldValues: FieldValues): number {
 		const featureBoundingBox = this.featureDao.projectBoundingBox(boundingBox, projection);
 		return this.countWithBoundingBoxAndFieldValues(featureBoundingBox, fieldValues);
 	}
@@ -690,7 +690,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithGeometryEnvelopeAndFieldValues(envelope: GeometryEnvelope, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithGeometryEnvelopeAndFieldValues(envelope: GeometryEnvelope, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValues(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, fieldValues);
 	}
 
@@ -701,7 +701,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithGeometryEnvelopeAndFieldValuesAndDistinct(distinct: boolean, envelope: GeometryEnvelope, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithGeometryEnvelopeAndFieldValuesAndDistinct(distinct: boolean, envelope: GeometryEnvelope, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndDistinct(distinct, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, fieldValues);
 	}
 
@@ -712,7 +712,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithGeometryEnvelopeAndFieldValuesAndColumns(columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithGeometryEnvelopeAndFieldValuesAndColumns(columns: string[], envelope: GeometryEnvelope, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndColumns(columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, fieldValues);
 	}
 
@@ -725,7 +725,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithGeometryEnvelopeAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndDistinctAndColumns(distinct, columns, envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, fieldValues);
 	}
 
@@ -735,7 +735,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return count
 	 */
-	public countWithGeometryEnvelopeAndFieldValues(envelope: GeometryEnvelope, fieldValues: ColumnValues): number {
+	public countWithGeometryEnvelopeAndFieldValues(envelope: GeometryEnvelope, fieldValues: FieldValues): number {
 		return this.countWithBoundsAndFieldValues(envelope.minX, envelope.minY, envelope.maxX, envelope.maxY, fieldValues);
 	}
 
@@ -933,7 +933,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundsAndFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundsAndFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, fieldValues);
 	}
 
@@ -947,7 +947,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundsAndFieldValuesAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundsAndFieldValuesAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, fieldValues);
 
 	}
@@ -962,7 +962,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundsAndFieldValuesAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundsAndFieldValuesAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): ManualFeatureQueryResults {
 		return this.queryWithBoundsAndFieldValuesAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, fieldValues);
 	}
 
@@ -977,7 +977,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return results
 	 */
-	public queryWithBoundsAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): ManualFeatureQueryResults {
+	public queryWithBoundsAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): ManualFeatureQueryResults {
 		const where = this.featureDao.buildWhereWithFields(fieldValues);
 		const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
 		return this.queryWithBoundsAndDistinctAndColumns(distinct, columns, minX, minY, maxX, maxY, where, whereArgs);
@@ -992,7 +992,7 @@ export class ManualFeatureQuery {
 	 * @param fieldValues field values
 	 * @return count
 	 */
-	public countWithBoundsAndFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): number {
+	public countWithBoundsAndFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): number {
 		const where = this.featureDao.buildWhereWithFields(fieldValues);
 		const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
 		return this.countWithBounds(minX, minY, maxX, maxY, where, whereArgs);
@@ -1118,7 +1118,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return feature results
 	 */
-	public queryForChunkWithFieldValues(fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+	public queryForChunkWithFieldValues(fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
 		return this.queryForChunkWithFieldValuesAndDistinctAndColumns(undefined, undefined, fieldValues, orderBy, limit, offset);
 	}
 
@@ -1132,7 +1132,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return feature results
 	 */
-	public queryForChunkWithFieldValuesAndDistinct(distinct: boolean, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+	public queryForChunkWithFieldValuesAndDistinct(distinct: boolean, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
 		return this.queryForChunkWithFieldValuesAndDistinctAndColumns(distinct, undefined, fieldValues, orderBy, limit, offset);
 	}
 
@@ -1146,7 +1146,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return feature results
 	 */
-	public queryForChunkWithFieldValuesAndColumns(columns: string[], fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+	public queryForChunkWithFieldValuesAndColumns(columns: string[], fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
 		return this.queryForChunkWithFieldValuesAndDistinctAndColumns(undefined, columns, fieldValues, orderBy, limit, offset);
 	}
 
@@ -1161,7 +1161,7 @@ export class ManualFeatureQuery {
 	 * @param offset chunk query offset
 	 * @return feature results
 	 */
-	public queryForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+	public queryForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
 		const where = this.featureDao.buildWhereWithFields(fieldValues);
 		const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);
 		return this.featureDao.queryForChunkWithDistinctAndColumns(distinct, columns, where, whereArgs, undefined, undefined, orderBy, limit, offset);

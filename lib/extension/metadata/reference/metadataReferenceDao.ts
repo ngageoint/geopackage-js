@@ -1,4 +1,4 @@
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { MetadataReference } from './metadataReference';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
@@ -68,9 +68,9 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
    * @return {Iterable.<Object>}
    */
   queryByMetadataAndParent(fileId: number, parentId: number): IterableIterator<any> {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(MetadataReference.COLUMN_FILE_ID, fileId);
-    columnValues.addColumn(MetadataReference.COLUMN_PARENT_ID, parentId);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(MetadataReference.COLUMN_FILE_ID, fileId);
+    columnValues.addFieldValue(MetadataReference.COLUMN_PARENT_ID, parentId);
     return this.queryForFieldValues(columnValues);
   }
   /**
@@ -78,8 +78,8 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
    * @return {Iterable.<Object>}
    */
   queryByMetadata(fileId: number): IterableIterator<any> {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(MetadataReference.COLUMN_FILE_ID, fileId);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(MetadataReference.COLUMN_FILE_ID, fileId);
     return this.queryForFieldValues(columnValues);
   }
   /**
@@ -87,8 +87,8 @@ export class MetadataReferenceDao extends GeoPackageDao<MetadataReference, void>
    * @return {Iterable.<Object>}
    */
   queryByMetadataParent(parentId: number): IterableIterator<any> {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(MetadataReference.COLUMN_PARENT_ID, parentId);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(MetadataReference.COLUMN_PARENT_ID, parentId);
     return this.queryForFieldValues(columnValues);
   }
 

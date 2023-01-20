@@ -3,7 +3,7 @@ import { TableIndex } from './tableIndex';
 import { GeometryIndexDao } from './geometryIndexDao';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageException } from '../../../geoPackageException';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { GeometryIndex } from './geometryIndex';
 import { DateConverter } from '../../../db/dateConverter';
 import type { GeoPackage } from '../../../geoPackage';
@@ -62,8 +62,8 @@ export class TableIndexDao extends GeoPackageDao<TableIndex, string> {
       // Delete Geometry Indices
       const geometryIndexDao = this.getGeometryIndexDao();
       if (geometryIndexDao.isTableExists()) {
-        const columnValues = new ColumnValues();
-        columnValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, this.getTableName());
+        const columnValues = new FieldValues();
+        columnValues.addFieldValue(GeometryIndex.COLUMN_TABLE_NAME, this.getTableName());
         geometryIndexDao.deleteWhere(this.buildWhere(columnValues), this.buildWhereArgs([tableIndex.getTableName()]));
       }
       count = this.delete(tableIndex);

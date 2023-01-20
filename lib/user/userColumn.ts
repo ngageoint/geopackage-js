@@ -590,7 +590,7 @@ export abstract class UserColumn implements Comparable<UserColumn> {
 
    */
   public getConstraintsForType(type: ConstraintType): Constraint[] {
-    return this.constraints.getConstraintsForType(type);
+    return this.constraints.getConstraintsByType(type);
   }
 
   /**

@@ -2,7 +2,7 @@ import { TileMatrix } from './tileMatrix';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
 import { TileMatrixKey } from './tileMatrixKey';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import type { GeoPackage } from '../../geoPackage';
 import { Contents } from '../../contents/contents';
 
@@ -109,9 +109,9 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
    * {@inheritDoc}
    */
   public delete(data: TileMatrix): number {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(TileMatrix.COLUMN_TABLE_NAME, data.getTableName());
-    columnValues.addColumn(TileMatrix.COLUMN_ZOOM_LEVEL, data.getZoomLevel());
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(TileMatrix.COLUMN_TABLE_NAME, data.getTableName());
+    columnValues.addFieldValue(TileMatrix.COLUMN_ZOOM_LEVEL, data.getZoomLevel());
     const where = this.buildWhere(columnValues);
     const whereArgs = this.buildWhereArgs(columnValues);
     return this.deleteWhere(where, whereArgs);
@@ -150,8 +150,8 @@ export class TileMatrixDao extends GeoPackageDao<TileMatrix, TileMatrixKey> {
    * @return rows deleted
    */
   public deleteByTableName(table: string): number {
-    const columnValues = new ColumnValues();
-    columnValues.addColumn(TileMatrix.COLUMN_TABLE_NAME, table);
+    const columnValues = new FieldValues();
+    columnValues.addFieldValue(TileMatrix.COLUMN_TABLE_NAME, table);
     const where = this.buildWhere(columnValues);
     const whereArgs = this.buildWhereArgs(columnValues);
     return this.deleteWhere(where, whereArgs);

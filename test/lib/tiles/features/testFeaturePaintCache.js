@@ -1,3 +1,4 @@
+const { AttributesTable } = require("../../../../lib/attributes/attributesTable");
 var FeaturePaintCache = require('../../../../lib/tiles/features/featurePaintCache').FeaturePaintCache
   , StyleRow = require('../../../../lib/extension/nga/style/styleRow').StyleRow
   , StyleTable = require('../../../../lib/extension/nga/style/styleTable').StyleTable
@@ -19,7 +20,7 @@ describe('FeaturePaintCache Tests', function() {
     var paint = new Paint();
     var styleRowId = 0;
     should.not.exist(featurePaintCache.getFeaturePaint(styleRowId));
-    should.not.exist(featurePaintCache.setPaint(styleRowId, FeatureDrawType.STROKE, paint));
+    featurePaintCache.setPaint(styleRowId, FeatureDrawType.STROKE, paint);
     should.exist(featurePaintCache.getFeaturePaint(styleRowId));
     should.exist(featurePaintCache.remove(styleRowId));
     should.not.exist(featurePaintCache.getFeaturePaint(styleRowId));
@@ -34,11 +35,11 @@ describe('FeaturePaintCache Tests', function() {
         return 0;
       }
     }
-    var styleRow = new MockStyleRow(new StyleTable('test', []), null);
+    var styleRow = new MockStyleRow(new StyleTable(), null);
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
-    should.not.exist(featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint));
+    featurePaintCache.setPaintForStyleRow(styleRow, FeatureDrawType.STROKE, paint)
     should.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
-    should.exist(featurePaintCache.remove(styleRow.id));
+    should.exist(featurePaintCache.remove(styleRow.getId()));
     should.not.exist(featurePaintCache.getFeaturePaintForStyleRow(styleRow));
   });
 

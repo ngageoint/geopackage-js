@@ -30,7 +30,7 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     idColumnName?: string,
     autoincrement?: boolean,
   ): AttributesTableMetadata {
-    return new AttributesTableMetadata(null, tableName, idColumnName, additionalColumns, constraints, autoincrement);
+    return new AttributesTableMetadata(tableName, additionalColumns, idColumnName, null, constraints, autoincrement);
   }
 
   /**
@@ -46,10 +46,10 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     autoincrement = false,
   ): AttributesTableMetadata {
     return new AttributesTableMetadata(
-      null,
       columns.getTableName(),
-      columns.getPkColumnName(),
       columns.getColumns(),
+      columns.getPkColumnName(),
+      null,
       constraints,
       autoincrement,
     );
@@ -63,10 +63,10 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
    */
   public static createWithTable(table: AttributesTable, autoincrement = false): AttributesTableMetadata {
     return new AttributesTableMetadata(
-      null,
       table.getTableName(),
-      table.getPkColumnName(),
       table.getColumns(),
+      table.getPkColumnName(),
+      null,
       table.getConstraints(),
       autoincrement,
     );
@@ -91,10 +91,10 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     autoincrement?: boolean,
   ): AttributesTableMetadata {
     return new AttributesTableMetadata(
-      dataType,
       tableName,
-      idColumnName,
       additionalColumns,
+      idColumnName,
+      dataType,
       constraints,
       autoincrement,
     );
@@ -103,12 +103,9 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
   /**
    * Create metadata
    *
-   * @param dataType
-   *            data type
-   * @param columns
-   *            columns
-   * @param constraints
-   *            constraints
+   * @param dataType data type
+   * @param columns columns
+   * @param constraints constraints
    * @param autoincrement autoincrement ids
    * @return metadata
    */
@@ -119,10 +116,10 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     autoincrement = false,
   ): AttributesTableMetadata {
     return new AttributesTableMetadata(
-      dataType,
       columns.getTableName(),
-      columns.getPkColumnName(),
       columns.getColumns(),
+      columns.getPkColumnName(),
+      dataType,
       constraints,
       autoincrement,
     );
@@ -144,10 +141,10 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
     autoincrement = false,
   ): AttributesTableMetadata {
     return new AttributesTableMetadata(
-      dataType,
       table.getTableName(),
-      table.getPkColumnName(),
       table.getColumns(),
+      table.getPkColumnName(),
+      dataType,
       table.getConstraints(),
       autoincrement,
     );
@@ -160,42 +157,28 @@ export class AttributesTableMetadata extends UserTableMetadata<AttributesColumn>
 
   /**
    * Constructor
-   */
-  public constructor();
-
-  /**
-   * Constructor
-   *
-   * @param dataType data type
    * @param tableName table name
-   * @param idColumnName id column name
    * @param additionalColumns additional columns
+   * @param idColumnName id column name
+   * @param dataType data type
    * @param constraints constraints
    * @param autoincrement autoincrement ids
    */
   public constructor(
-    dataType: string,
-    tableName: string,
-    idColumnName: string,
-    additionalColumns: AttributesColumn[],
-    constraints: Constraints,
-    autoincrement: boolean,
-  );
-
-  /**
-   * Constructor
-   * @param args
-   */
-  public constructor(...args) {
+    tableName?: string,
+    additionalColumns?: AttributesColumn[],
+    idColumnName?: string,
+    dataType?: string,
+    constraints?: Constraints,
+    autoincrement?: boolean,
+  ) {
     super();
-    if (args.length === 6) {
-      this.dataType = args[0];
-      this.tableName = args[1];
-      this.idColumnName = args[2];
-      this.additionalColumns = args[3];
-      this.constraints = args[4];
-      this.autoincrement = args[5];
-    }
+    this.dataType = dataType;
+    this.tableName = tableName;
+    this.idColumnName = idColumnName;
+    this.additionalColumns = additionalColumns;
+    this.constraints = constraints;
+    this.autoincrement = autoincrement;
   }
 
   /**

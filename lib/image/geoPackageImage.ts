@@ -1,4 +1,5 @@
 import { Image } from '../../@types/canvaskit';
+import { Canvas } from '../canvas/canvas';
 
 /**
  * Image class to wrap HTML Images and CanvasKit Images and ImageBitmaps
@@ -8,6 +9,7 @@ export class GeoPackageImage {
   private readonly width: number;
   private readonly height: number;
   private readonly format: string;
+  private imageData: ImageData;
 
   /**
    * Constructor
@@ -51,7 +53,22 @@ export class GeoPackageImage {
     return this.format;
   }
 
-  isTransparent() {
-    return false;
+  public getImageData(): ImageData {
+    if (this.imageData == null) {
+      this.imageData = Canvas.getImageData(this);
+    }
+    return this.imageData;
+  }
+
+  public getPixel(x: number, y: number): number {
+    const imageData = this.getImageData().data;
+    const offset = y * this.width + x;
+    return imageData[offset + 3] << 24 | imageData[offset] << 16 | imageData[offset + 1] << 8 | imageData[offset + 2];
+  }
+
+  public isPixelTransparent(x: number, y: number): boolean {
+    const imageData = this.getImageData().data;
+    const offset = y * this.width + x;
+    return imageData[offset + 3] === 0;
   }
 }

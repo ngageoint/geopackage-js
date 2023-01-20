@@ -1795,7 +1795,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styleIds = null;
     const mappingDao = this.getTableStyleMappingDao(featureTable);
     if (mappingDao !== null) {
-      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
+      styleIds = mappingDao.uniqueRelatedIds();
     }
     return styleIds;
   }
@@ -1808,7 +1808,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styleIds = null;
     const mappingDao = this.getTableIconMappingDao(featureTable);
     if (mappingDao !== null) {
-      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
+      styleIds = mappingDao.uniqueRelatedIds();
     }
     return styleIds;
   }
@@ -1821,7 +1821,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styleIds = null;
     const mappingDao = this.getStyleMappingDao(featureTable);
     if (mappingDao !== null) {
-      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
+      styleIds = mappingDao.uniqueRelatedIds();
     }
     return styleIds;
   }
@@ -1834,7 +1834,7 @@ export class FeatureStyleExtension extends BaseExtension {
     let styleIds = null;
     const mappingDao = this.getIconMappingDao(featureTable);
     if (mappingDao !== null) {
-      styleIds = mappingDao.uniqueRelatedIds().map(row => row['related_id']);
+      styleIds = mappingDao.uniqueRelatedIds();
     }
     return styleIds;
   }

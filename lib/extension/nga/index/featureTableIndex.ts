@@ -16,7 +16,7 @@ import { GeoPackageProgress } from '../../../io/geoPackageProgress';
 import { GeoPackageGeometryData } from '../../../geom/geoPackageGeometryData';
 import { FeatureResultSet } from '../../../features/user/featureResultSet';
 import { GeometryIndexKey } from './geometryIndexKey';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { FeatureTableIndexConstants } from './featureTableIndexConstants';
 import type { GeoPackage } from '../../../geoPackage';
 import type { FeatureDao } from '../../../features/user/featureDao';
@@ -428,8 +428,8 @@ export class FeatureTableIndex extends BaseExtension {
   private clearGeometryIndices(): number {
     let deleted = 0;
     try {
-      const fieldValues = new ColumnValues();
-      fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
+      const fieldValues = new FieldValues();
+      fieldValues.addFieldValue(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
       deleted = this.geometryIndexDao.deleteWhere(
         this.geometryIndexDao.buildWhere(fieldValues),
         this.geometryIndexDao.buildWhereArgs(fieldValues),
@@ -601,8 +601,8 @@ export class FeatureTableIndex extends BaseExtension {
     let geometryIndices = null;
 
     try {
-      const fieldValues = new ColumnValues();
-      fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
+      const fieldValues = new FieldValues();
+      fieldValues.addFieldValue(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
       geometryIndices = this.geometryIndexDao.createTypedIterator(this.geometryIndexDao.queryWhere(
         this.geometryIndexDao.buildWhere(fieldValues),
         this.geometryIndexDao.buildWhereArgs(fieldValues),
@@ -702,8 +702,8 @@ export class FeatureTableIndex extends BaseExtension {
    * @return query builder
    */
   public queryBuilder(): { where: string; whereArgs: any[] } {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(GeometryIndex.COLUMN_TABLE_NAME, this.tableName);
     const where = this.geometryIndexDao.buildWhere(fieldValues);
     const whereArgs = this.geometryIndexDao.buildWhereArgs(fieldValues);
     return { where, whereArgs };
@@ -1488,7 +1488,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithFieldValues(envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValues(envelope: GeometryEnvelope, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, undefined, envelope, fieldValues, orderBy, limit, offset);
   }
 
@@ -1503,7 +1503,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, envelope: GeometryEnvelope, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct, undefined, envelope, fieldValues, orderBy, limit, offset);
   }
 
@@ -1518,7 +1518,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], envelope: GeometryEnvelope, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, columns, envelope, fieldValues, orderBy, limit, offset);
   }
 
@@ -1534,7 +1534,7 @@ export class FeatureTableIndex extends BaseExtension {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], envelope: GeometryEnvelope, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     const nestedQuery = this.queryIdsSQL(envelope);
     const where = this.featureDao.buildWhereWithFields(fieldValues);
     const whereArgs = this.featureDao.buildWhereArgsWithValues(fieldValues);

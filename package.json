@@ -26,10 +26,10 @@
   },
   "bin": "./cli",
   "dependencies": {
-    "@ngageoint/projections-js": "1.0.0",
+    "@ngageoint/projections-js": "1.0.1",
     "@ngageoint/simple-features-geojson-js": "1.1.1",
     "@ngageoint/simple-features-js": "1.1.1",
-    "@ngageoint/simple-features-proj-js": "1.1.1",
+    "@ngageoint/simple-features-proj-js": "1.1.2",
     "@ngageoint/simple-features-wkb-js": "1.1.1",
     "@ngageoint/simple-features-wkt-js": "1.1.1",
     "@types/geojson": "7946.0.10",

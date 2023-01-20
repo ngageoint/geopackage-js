@@ -1,5 +1,4 @@
 import { Result } from './result';
-import { GeoPackageDataType } from './geoPackageDataType';
 import { ResultSetResult } from './resultSetResult';
 
 /**
@@ -8,7 +7,6 @@ import { ResultSetResult } from './resultSetResult';
 export class ResultUtils {
   /**
    * Get the value from the cursor from the provided column
-   *
    * @param result result
    * @param columnName columnName
    * @return value value
@@ -19,7 +17,6 @@ export class ResultUtils {
 
   /**
    * Build single result value from the column
-   *
    * @param result result
    * @param columnName column name
    * @return value
@@ -27,15 +24,17 @@ export class ResultUtils {
   public static buildSingleResult(result: ResultSetResult, columnName: string): any {
     let value = null;
     if (result.moveToNext()) {
-      value = result.getValue(columnName);
+      if (columnName != null) {
+        value = result.getValue(columnName);
+      } else {
+        value = result.getValueWithIndex(0);
+      }
     }
-    result.close();
     return value;
   }
 
   /**
    * Build single result value from the column
-   *
    * @param result result
    * @param columnIdx column index
    * @return value
@@ -45,19 +44,17 @@ export class ResultUtils {
     if (result.moveToNext()) {
       value = result.getValueWithIndex(columnIdx);
     }
-    result.close();
     return value;
   }
 
   /**
    * Build single column result rows from the result and the optional limit
-   *
    * @param result  result
    * @param columnName column name
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResults(result: ResultSetResult, columnName: string, limit?: number): unknown[] {
+  public static buildSingleColumnResults(result: ResultSetResult, columnName: string, limit?: number): any[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValue(columnName);
@@ -66,19 +63,17 @@ export class ResultUtils {
         break;
       }
     }
-    result.close();
     return results;
   }
 
   /**
    * Build single column result rows from the result and the optional limit
-   *
    * @param result  result
    * @param columnIndex column name
    * @param limit  result row limit
    * @return single column results
    */
-  public static buildSingleColumnResultsWithColumnIndex(result: ResultSetResult, columnIndex = 0, limit?: number): unknown[] {
+  public static buildSingleColumnResultsWithColumnIndex(result: ResultSetResult, columnIndex = 0, limit?: number): any[] {
     const results = [];
     while (result.moveToNext()) {
       const value = result.getValueWithIndex(columnIndex);
@@ -87,18 +82,16 @@ export class ResultUtils {
         break;
       }
     }
-    result.close();
     return results;
   }
 
   /**
    * Build the result rows from the result and the optional limit
-   *
    * @param result result
    * @param limit result row limit
    * @return results
    */
-  public static buildResults(result: ResultSetResult, limit: number): unknown[][] {
+  public static buildResults(result: ResultSetResult, limit: number): any[][] {
     const results = [];
     let columns = null;
     while (result.moveToNext()) {
@@ -114,7 +107,7 @@ export class ResultUtils {
         break;
       }
     }
-    result.close();
     return results;
   }
+
 }

@@ -1,5 +1,9 @@
 import { default as testSetup } from '../../../testSetup'
 import { FeatureConverter } from "@ngageoint/simple-features-geojson-js";
+import { FeatureTableMetadata } from "../../../../lib/features/user/featureTableMetadata";
+import { FeatureIndexManager } from "../../../../lib/features/index/featureIndexManager";
+import { FeatureIndexLocation } from "../../../../lib/features/index/featureIndexLocation";
+import { FeatureIndexType } from "../../../../lib/features/index/featureIndexType";
 
 var FeatureTiles = require('../../../../lib/tiles/features/featureTiles').FeatureTiles
   , Canvas = require('../../../../lib/canvas/canvas').Canvas
@@ -68,13 +72,16 @@ describe('GeoPackage FeatureTiles tests', function() {
       };
 
       var createRow = function(geoJson, name, featureDao) {
-        var srs = featureDao.srs;
+        var srsId = featureDao.getSrsId();
         var featureRow = featureDao.newRow();
         var geometryData = new GeometryData();
-        geometryData.setSrsId(srs.srs_id);
-        var geometry = FeatureConverter.toSimpleFeaturesGeometry(geoJson);
+        geometryData.setSrsId(srsId);
+        var geometry = FeatureConverter.toSimpleFeaturesGeometry({
+          type: 'Feature',
+          geometry: geoJson
+        });
         geometryData.setGeometry(geometry);
-        featureRow.geometry = geometryData;
+        featureRow.setGeometry(geometryData);
         featureRow.setValue('name', name);
         featureRow.setValue('_feature_id', name);
         featureRow.setValue('_properties_id', 'properties' + name);
@@ -89,12 +96,14 @@ describe('GeoPackage FeatureTiles tests', function() {
       //      |/        |
       //      /_________|
       //     /
-      await geoPackage.createFeatureTable('QueryTest', geometryColumns, columns);
+      await geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumns, columns));
       featureDao = geoPackage.getFeatureDao('QueryTest');
       createRow(box, 'box', featureDao);
       createRow(line, 'line', featureDao);
       createRow(point, 'point', featureDao);
-      // await featureDao.featureTableIndex.index()
+      const indexManager = new FeatureIndexManager(geoPackage, featureDao);
+      indexManager.setIndexLocation(FeatureIndexType.RTREE);
+      indexManager.index();
     });
 
     afterEach('should close the geoPackage', async function() {
@@ -104,7 +113,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should handle empty points in a line', function() {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       return ft.drawTile(0, 0, 0)
         .then(function(image) {
           should.exist(image);
@@ -135,9 +144,9 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the 4326 x: 0, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.draw4326Tile(0, 0, 0)
-        .then(function(image) {
+      var ft = new FeatureTiles(geoPackage, featureDao);
+      ft.drawTileWGS84(0, 0, 0)
+        .then((image) => {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_0_0_0.png'), function(err, equal) {
             try {
               equal.should.be.equal(true);
@@ -151,8 +160,8 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the 4326 x: 1, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.draw4326Tile(1, 0, 0)
+      var ft = new FeatureTiles(geoPackage, featureDao);
+      ft.drawTileWGS84(1, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_1_0_0.png'), function(err, equal) {
             try {
@@ -167,7 +176,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 0, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(0, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '0_0_0.png'), function(err, equal) {
@@ -183,7 +192,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 1, y: 0, z: 1 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(1, 0, 1)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
@@ -256,7 +265,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 1, y: 0, z: 1 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(1, 0, 1)
       .then(function(imageStream) {
         testSetup.diffImages(imageStream, path.join(__dirname, '..','..','..','fixtures','featuretiles', isWeb ? 'web' : '', '1_1_0.png'), function(err, equal) {
@@ -272,8 +281,8 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the 4326 x: 0, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.draw4326Tile(0, 0, 0)
+      var ft = new FeatureTiles(geoPackage, featureDao);
+      ft.drawTileWGS84(0, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_0_0_0.png'), function(err, equal) {
             try {
@@ -288,8 +297,8 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the 4326 x: 1, y: 0, z: 0 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
-      ft.draw4326Tile(1, 0, 0)
+      var ft = new FeatureTiles(geoPackage, featureDao);
+      ft.drawTileWGS84(1, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '4326_1_0_0.png'), function(err, equal) {
             try {
@@ -379,9 +388,9 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153631, y: 91343, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153631, 91343, 18)
-        .then(function(image) {
+        .then(image => {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153631_91343_18.png'), function(err, equal) {
             try {
               equal.should.be.equal(true);
@@ -395,7 +404,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91342, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153632, 91342, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91342_18.png'), function(err, equal) {
@@ -411,7 +420,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18.png'), function(err, equal) {
@@ -427,7 +436,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153633, y: 91342, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153633, 91342, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153633_91342_18.png'), function(err, equal) {
@@ -443,7 +452,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153633, y: 91343, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153633, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153633_91343_18.png'), function(err, equal) {
@@ -549,7 +558,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile with a point icon set', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ImageUtils.getImage(path.join(__dirname, '..','..','..', 'fixtures','marker-icon.png')).then((icon) => {
         var ftpi = new FeatureTilePointIcon(icon);
         ftpi.setWidth(ftpi.getWidth());
@@ -596,7 +605,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the number features tile with the correct number of features listed', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.maxFeaturesPerTile = 1;
       ft.maxFeaturesTileDraw = new NumberFeaturesTile()
       ft.drawTile(0, 0, 0)
@@ -635,7 +644,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '153632_91343_18_styled_with_icon.png'), function(err, equal) {
@@ -689,7 +698,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile and scale the styles', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       should.exist(ft.featureDao);
       should.exist(ft.featureTableStyles);
       var featureTableStyles = ft.featureTableStyles;
@@ -725,7 +734,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile without styling', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.ignoreFeatureTableStyles();
       ft.clearCache();
       ft.stylePaintCacheSize = 100;
@@ -750,25 +759,22 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 153632, y: 91343, z: 18 tile with modified default styling', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.ignoreFeatureTableStyles();
-      ft.fillPolygon = true;
-      ft.fillPolygon.should.be.equal(true);
-      should.not.exist(ft.pointIcon);
-      ft.lineColor = '#FF0000FF';
-      ft.lineColor.should.be.equal('#FF0000FF');
-      ft.lineStrokeWidth = 5;
-      ft.lineStrokeWidth.should.be.equal(5);
-      ft.pointColor = '#FF0000FF';
-      ft.pointColor.should.be.equal('#FF0000FF');
-      ft.pointRadius = 5;
-      ft.pointRadius.should.be.equal(5);
-      ft.polygonColor = '#FF0000FF';
-      ft.polygonColor.should.be.equal('#FF0000FF');
-      ft.polygonFillColor = '#00FF00FF';
-      ft.polygonFillColor.should.be.equal('#00FF00FF')
-      ft.polygonStrokeWidth = 5;
-      ft.polygonStrokeWidth.should.be.equal(5);
+      ft.setLineColor('#FF0000FF');
+      ft.getLineColor().should.be.equal('#FF0000FF');
+      ft.setLineStrokeWidth(5);
+      ft.getLineStrokeWidth().should.be.equal(5);
+      ft.setPointColor('#FF0000FF');
+      ft.getPointColor().should.be.equal('#FF0000FF');
+      ft.setPointRadius(5);
+      ft.getPointRadius().should.be.equal(5);
+      ft.setPolygonColor('#FF0000FF');
+      ft.getPolygonColor().should.be.equal('#FF0000FF');
+      ft.setPolygonFillColor('#00FF00FF');
+      ft.getPolygonFillColor().should.be.equal('#00FF00FF');
+      ft.setPolygonStrokeWidth(5);
+      ft.getPolygonStrokeWidth().should.be.equal(5);
 
       ft.drawTile(153632, 91343, 18)
         .then(function(image) {
@@ -785,7 +791,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the max feature number tile and test various functions', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.maxFeaturesPerTile = 1;
       ft.maxFeaturesPerTile.should.be.equal(1);
       should.not.exist(ft.maxFeaturesTileDraw);
@@ -843,11 +849,6 @@ describe('GeoPackage FeatureTiles tests', function() {
       numberFeaturesTile.isDrawUnindexedTiles().should.be.equal(false);
       numberFeaturesTile.setDrawUnindexedTiles(true);
 
-      numberFeaturesTile.getCompressFormat().should.be.equal('png');
-      numberFeaturesTile.setCompressFormat('jpeg');
-      numberFeaturesTile.getCompressFormat().should.be.equal('jpeg');
-      numberFeaturesTile.setCompressFormat('png');
-
       ft.maxFeaturesTileDraw = numberFeaturesTile;
       should.exist(ft.maxFeaturesTileDraw);
 
@@ -886,7 +887,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 0, y: 0, z: 0 tile for geometry collection', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(0, 0, 0)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', 'geometrycollection_0_0_0.png'), function(err, equal) {
@@ -922,9 +923,9 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 1, y: 2, z: 2 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(1, 2, 2)
-        .then(function(image) {
+        .then((image) => {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '1_2_2.png'), function(err, equal) {
             try {
               equal.should.be.equal(true);
@@ -957,7 +958,7 @@ describe('GeoPackage FeatureTiles tests', function() {
 
     it('should get the x: 18, y: 24, z: 6 tile', function(done) {
       this.timeout(30000);
-      var ft = new FeatureTiles(featureDao);
+      var ft = new FeatureTiles(geoPackage, featureDao);
       ft.drawTile(18, 24, 6)
         .then(function(image) {
           testSetup.diffImages(image, path.join(__dirname, '..','..','..', 'fixtures','featuretiles', isWeb ? 'web' : '', '18_24_6.png'), function(err, equal) {

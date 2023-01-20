@@ -88,7 +88,6 @@ import { SimpleAttributesDao } from './extension/related/simple/simpleAttributes
 import { UserMappingRow } from './extension/related/userMappingRow';
 import { UserRow } from './user/userRow';
 import { SqliteQueryBuilder } from './db/sqliteQueryBuilder';
-import { FeatureTableIndex } from './extension/nga/index/featureTableIndex';
 import { TileRow } from './tiles/user/tileRow';
 import { TileColumn } from './tiles/user/tileColumn';
 import { FeatureTiles } from './tiles/features/featureTiles';
@@ -96,6 +95,15 @@ import { TileUtils } from './tiles/tileUtils';
 import { MetadataDao } from './extension/metadata/metadataDao';
 import { GeoPackageImage } from './image/geoPackageImage';
 import { SimpleAttributesRow } from './extension/related/simple/simpleAttributesRow';
+import { FeatureTileLinkDao } from './extension/nga/link/featureTileLinkDao';
+
+export interface ClosestFeature {
+  feature_count: number;
+  coverage: boolean;
+  gp_table: string;
+  gp_name: string;
+  distance?: number;
+}
 
 /**
  *  A single GeoPackage database connection implementation
@@ -399,7 +407,7 @@ export class GeoPackage {
       throw new GeoPackageException('No TileMatrixSet' + ' exists for Contents' + ' ' + contents.getId());
     }
 
-    return this.getTileDao(tileMatrixSet);
+    return this.getTileDaoWithTileMatrixSet(tileMatrixSet);
   }
 
   /**
@@ -827,9 +835,9 @@ export class GeoPackage {
 
   /**
    * Gets the tables for the provided ContentsDataType
-   * @param type
+   * @param type, if not provided, tables for every type will be returned
    */
-  public getTables(type: ContentsDataType): string[] {
+  public getTables(type?: ContentsDataType): string[] {
     let tableNames;
     try {
       tableNames = this.getContentsDao().getTables(type);
@@ -1167,6 +1175,7 @@ export class GeoPackage {
     geometryColumn.setGeometryType(GeometryType.GEOMETRY);
     geometryColumn.setZ(0);
     geometryColumn.setM(0);
+    geometryColumn.setSrsId(4326);
     const columns: FeatureColumn[] = [];
     for (let i = 0; properties && i < properties.length; i++) {
       const property = properties[i] as { name: string; dataType: string };
@@ -1411,7 +1420,6 @@ export class GeoPackage {
         created = this.getTableCreator().createExtensions();
       }
     } catch (e) {
-      console.error(e);
       throw new GeoPackageException('Failed to check if Extensions table exists and create it');
     }
     return created;
@@ -2064,7 +2072,7 @@ export class GeoPackage {
    * Query feature table and convert results to GeoJSON Features
    *  Note - unsupported geometry types will be omitted from the results.
    * @param tableName
-   * @param boundingBox
+   * @param boundingBox - must be in same projection as the feature table
    */
   queryForGeoJSONFeatures(tableName: string, boundingBox?: BoundingBox): GeoJSONResultSet {
     const featureIndexManager = this.getFeatureIndexManager(tableName);
@@ -2227,19 +2235,20 @@ export class GeoPackage {
     mappingColumnValues?: Record<string, any>,
   ): number {
     const rte = this.getRelatedTablesExtension();
-    const extension = new ExtendedRelation();
-    extension.setBaseTableName(baseTableName);
-    extension.setRelatedTableName(relatedTableName);
-    extension.setRelationName(relationType.getName());
     let mappingTableName: string;
-    if (!mappingTable || typeof mappingTable === 'string') {
+    if (mappingTable instanceof UserMappingTable) {
+      mappingTableName = mappingTable.getTableName();
+      rte.addRelationshipWithMappingTableAndRelationName(baseTableName, relatedTableName, mappingTable, relationType.getName())
+    } else {
+      const extension = new ExtendedRelation();
+      extension.setBaseTableName(baseTableName);
+      extension.setRelatedTableName(relatedTableName);
+      extension.setRelationName(relationType.getName());
       mappingTable = mappingTable || baseTableName + '_' + relatedTableName;
       mappingTableName = mappingTable as string;
-    } else {
-      mappingTableName = mappingTable.getTableName();
+      extension.setMappingTableName(mappingTableName);
+      rte.addRelationshipWithExtendedRelation(extension);
     }
-    extension.setMappingTableName(mappingTableName);
-    rte.addRelationshipWithExtendedRelation(extension);
     const userMappingDao = rte.getUserMappingDao(mappingTableName);
     const userMappingRow = userMappingDao.newRow();
     userMappingRow.setBaseId(baseId);
@@ -2358,7 +2367,7 @@ export class GeoPackage {
    * processed. The number of features added is sent as an argument to that function.
    * @return {Promise<number>} number of features inserted
    */
-  async addGeoJSONFeaturesToGeoPackage (features: Feature[], tableName: string, index = false, batchSize = 1000,  progress?: GeoPackageProgress): Promise<number> {
+  async addGeoJSONFeaturesToGeoPackage (features: Feature[], tableName: string, index = false, batchSize = 1000, progress?: GeoPackageProgress): Promise<number> {
     let inserted = 0;
     const featureDao = this.getFeatureDao(tableName);
     const connectionSource = featureDao.getFeatureDb().getConnection().getConnectionSource();
@@ -2384,11 +2393,14 @@ export class GeoPackage {
           const insertStatement = connectionSource.prepareStatement(insertSql);
 
           // determine if indexing is needed
-          let fti: FeatureTableIndex;
           let tableIndex;
-          if (index) {
-            fti = featureDao.featureTableIndex;
+          let featureIndexManager = new FeatureIndexManager(this, featureDao);
+          let fti;
+          if (index && featureIndexManager.isIndexedForType(FeatureIndexType.GEOPACKAGE)) {
+            fti = new FeatureIndexManager(this, featureDao).getFeatureTableIndex();
             tableIndex = fti.getTableIndex();
+          } else if (index && !featureIndexManager.isIndexedForType(FeatureIndexType.RTREE)) {
+            featureIndexManager.indexType(FeatureIndexType.RTREE);
           }
 
           for (let i = start; i < end; i++) {
@@ -2399,16 +2411,21 @@ export class GeoPackage {
             // reproject to target projection
             geometry = reprojectFunction(geometry);
             // setup geometry data
-            geometryData = new GeoPackageGeometryData();
-            geometryData.setSrsId(srs.srs_id);
-            geometryData.setGeometry(geometry);
+            geometryData = new GeoPackageGeometryData(srs.getSrsId(), geometry, false);
+            featureRow.setGeometry(geometryData);
             for (const propertyKey in feature.properties) {
               if (Object.prototype.hasOwnProperty.call(feature.properties, propertyKey)) {
                 featureRow.setValue(propertyKey, feature.properties[propertyKey]);
               }
             }
             // bind this feature's data to the insert statement and insert into the table
-            const id = connectionSource.bindAndInsert(insertStatement, SqliteQueryBuilder.buildUpdateOrInsertObject(featureRow));
+            const contentValues = featureRow.toContentValues(true);
+            const insertOrUpdate: { [key: string]: DBValue } = {};
+            insertOrUpdate[featureRow.getColumns().getPkColumnName()] = undefined;
+            for (const key of contentValues.keySet()) {
+              insertOrUpdate[key] = contentValues.get(key);
+            }
+            const id = connectionSource.bindAndInsert(insertStatement, insertOrUpdate);
             inserted++;
             // if table index exists, be sure to index the row (note, rtree will run using a trigger)
             if (tableIndex != null) {
@@ -2421,7 +2438,9 @@ export class GeoPackage {
           // close the prepared statement
           connectionSource.closeStatement(insertStatement);
         });
-        progress.addProgress(end - start);
+        if (progress != null) {
+          progress.addProgress(end - start);
+        }
         setTimeout(() => {
           stepFunction(end, Math.min(end + batchSize, features.length), resolve);
         })
@@ -2441,9 +2460,9 @@ export class GeoPackage {
    * Add a GeoJSON feature to an existing GeoPackage feature table.
    * @param feature
    * @param tableName
-   * @param index
+   * @param {FeatureIndexType} index
    */
-  addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index = false): number {
+  addGeoJSONFeatureToGeoPackage(feature: Feature, tableName: string, index: FeatureIndexType = FeatureIndexType.GEOPACKAGE): number {
     const featureDao = this.getFeatureDao(tableName);
     return this.addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature, featureDao, featureDao.getSrs(), index);
   }
@@ -2455,12 +2474,12 @@ export class GeoPackage {
    * @param srs
    * @param index
    */
-  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature: Feature, featureDao: FeatureDao, srs: SpatialReferenceSystem, index = false): number {
+  addGeoJSONFeatureToGeoPackageWithFeatureDaoAndSrs(feature: Feature, featureDao: FeatureDao, srs: SpatialReferenceSystem, index: FeatureIndexType = FeatureIndexType.GEOPACKAGE): number {
     const featureRow = featureDao.newRow();
     const geometryData = new GeoPackageGeometryData();
-    geometryData.setSrsId(srs.srs_id);
+    geometryData.setSrsId(srs.getSrsId());
     // convert GeoJSON to Simple Features
-    let geometry = FeatureConverter.toSimpleFeaturesGeometry(feature);
+    let geometry = feature.geometry != null ? FeatureConverter.toSimpleFeaturesGeometry(feature) : null;
     // reproject to target projection
     if (!srs.getProjection().equalsProjection(Projections.getWGS84Projection())) {
       geometry = new GeometryTransform(Projections.getWGS84Projection(), srs.getProjection()).transformGeometry(geometry);
@@ -2473,10 +2492,10 @@ export class GeoPackage {
       }
     }
     const id = featureDao.create(featureRow);
-    if (index) {
+    if (index != null && index != FeatureIndexType.NONE) {
       const featureIndexManager = new FeatureIndexManager(this, featureDao);
       if (featureIndexManager.isIndexed()) {
-        featureIndexManager.indexRow(featureRow);
+        featureIndexManager.indexRowWithType(featureRow, index);
       }
     }
     return id;
@@ -3058,7 +3077,7 @@ export class GeoPackage {
     if (!tm) {
       return tiles;
     }
-    let mapBoundingBox = new BoundingBox(Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west), Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH), south, north);
+    let mapBoundingBox = new BoundingBox(Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west), south, Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH), north);
     tiles.west = Math.max(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH, west).toFixed(2);
     tiles.east = Math.min(east, ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH).toFixed(2);
     tiles.south = south.toFixed(2);
@@ -3101,6 +3120,7 @@ export class GeoPackage {
       }
       tiles.tiles.push(tile);
     }
+    iterator.close();
     return tiles;
   }
 
@@ -3263,6 +3283,7 @@ export class GeoPackage {
   createDataColumns(): boolean {
     return new SchemaExtension(this).createDataColumnsTable();
   }
+
   /**
    * Create the Data Column Constraints table if it does not already exist
    */
@@ -3273,6 +3294,9 @@ export class GeoPackage {
     return this.tableCreator.createDataColumnConstraints();
   }
 
+  /**
+   * Create metadata table
+   */
   createMetadataTable(): boolean {
     if (this.getMetadataDao().isTableExists()) {
       return true;
@@ -3280,6 +3304,9 @@ export class GeoPackage {
     return this.tableCreator.createMetadata();
   }
 
+  /**
+   * Create metadata reference table
+   */
   createMetadataReferenceTable(): boolean {
     if (this.getMetadataReferenceDao().isTableExists()) {
       return true;
@@ -3287,6 +3314,9 @@ export class GeoPackage {
     return this.tableCreator.createMetadataReference();
   }
 
+  /**
+   * Create table index table
+   */
   createTableIndexTable(): boolean {
     if (this.getTableIndexDao().isTableExists()) {
       return true;
@@ -3294,12 +3324,26 @@ export class GeoPackage {
     return this.tableCreator.createTableIndex();
   }
 
+  /**
+   * Create geometry index table
+   */
   createGeometryIndexTable(): boolean {
     const dao = this.getGeometryIndexDao();
     if (dao.isTableExists()) {
       return true;
     }
     return this.tableCreator.createGeometryIndex();
+  }
+
+  /**
+   * Create the feature tile link table
+   */
+  createFeatureTileLinkTable(): boolean {
+    const dao = new FeatureTileLinkDao(this);
+    if (dao.isTableExists()) {
+      return true;
+    }
+    return this.tableCreator.createFeatureTileLink();
   }
 
   /**
@@ -3327,17 +3371,19 @@ export class GeoPackage {
    * @return {FeatureRow}
    */
   getFeature(table: string, featureId: any): FeatureRow {
-    let featureRow = null;
+    let featureRow;
     const featureDao = this.getFeatureDao(table);
     featureRow = featureDao.queryForIdRow(featureId);
     if (featureRow == null) {
       let resultSet = featureDao.queryForEq('_feature_id', featureId);
       resultSet.moveToNext();
       featureRow = resultSet.getRow();
+      resultSet.close();
       if (featureRow == null) {
         let resultSet = featureDao.queryForEq('_properties_id', featureId);
         resultSet.moveToNext();
         featureRow = resultSet.getRow();
+        resultSet.close();
       }
     }
     return featureRow;
@@ -3517,9 +3563,9 @@ export class GeoPackage {
     height = TileUtils.TILE_PIXELS_DEFAULT,
   ): Promise<GeoPackageTile> {
     const tileDao = this.getTileDao(table);
-    const retriever = new GeoPackageTileRetriever(tileDao, width, height, 'image/png', projection);
-    const bounds = new BoundingBox(minLon, maxLon, minLat, maxLat);
-    return retriever.getTileWithBounds(bounds);
+    const retriever = new GeoPackageTileRetriever(tileDao, width, height, 'image/png');
+    const bounds = new BoundingBox(minLon, minLat, maxLon, maxLat);
+    return retriever.getTileWithBounds(bounds, projection);
   }
 
   /**

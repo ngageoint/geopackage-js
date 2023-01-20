@@ -677,7 +677,7 @@ export class TileBoundingBoxUtils {
    * @return tiles per side
    */
   public static tilesPerSide(zoom: number): number {
-    return Math.round(Math.pow(2, zoom));
+    return Math.floor(Math.pow(2, zoom));
   }
 
   /**
@@ -725,7 +725,7 @@ export class TileBoundingBoxUtils {
    * @return zoom level
    */
   public static zoomFromTilesPerSide(tilesPerSide: number): number {
-    return Math.round(Math.log(tilesPerSide) / Math.log(2));
+    return Math.floor(Math.log(tilesPerSide) / Math.log(2));
   }
 
   /**
@@ -790,7 +790,7 @@ export class TileBoundingBoxUtils {
     } else {
       const matrixWidthMeters = totalBox.getMaxLongitude() - totalBox.getMinLongitude();
       const tileWidth = matrixWidthMeters / matrixWidth;
-      tileId = Math.round((longitude - minX) / tileWidth);
+      tileId = Math.floor((longitude - minX) / tileWidth);
     }
     return tileId;
   }
@@ -816,7 +816,7 @@ export class TileBoundingBoxUtils {
     } else {
       const matrixHeightMeters = totalBox.getMaxLatitude() - totalBox.getMinLatitude();
       const tileHeight = matrixHeightMeters / matrixHeight;
-      tileId = Math.round((maxY - latitude) / tileHeight);
+      tileId = Math.floor((maxY - latitude) / tileHeight);
     }
 
     return tileId;
@@ -950,8 +950,8 @@ export class TileBoundingBoxUtils {
       latitudeDistance = Number.MIN_VALUE;
     }
 
-    const widthTiles = Math.round(worldLength / longitudeDistance);
-    const heightTiles = Math.round(worldLength / latitudeDistance);
+    const widthTiles = Math.floor(worldLength / longitudeDistance);
+    const heightTiles = Math.floor(worldLength / latitudeDistance);
 
     let tilesPerSide = Math.min(widthTiles, heightTiles);
     tilesPerSide = Math.max(tilesPerSide, 1);
@@ -1068,21 +1068,16 @@ export class TileBoundingBoxUtils {
     const tilesPerLon = TileBoundingBoxUtils.tilesPerWGS84LonSide(zoom);
     const tileSizeLat = TileBoundingBoxUtils.tileSizeLatPerWGS84Side(tilesPerLat);
     const tileSizeLon = TileBoundingBoxUtils.tileSizeLonPerWGS84Side(tilesPerLon);
-    const minX = Math.round(
-      (boundingBox.getMinLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon,
-    );
+    const minX = Math.floor((boundingBox.getMinLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon);
     const tempMaxX = (boundingBox.getMaxLongitude() + ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) / tileSizeLon;
-    let maxX = Math.round(tempMaxX);
+    let maxX = Math.floor(tempMaxX);
     if (tempMaxX % 1 === 0) {
       maxX--;
     }
     maxX = Math.min(maxX, tilesPerLon - 1);
-    const minY = Math.round(
-      ((boundingBox.getMaxLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat,
-    );
-    const tempMaxY =
-      ((boundingBox.getMinLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat;
-    let maxY = Math.round(tempMaxY);
+    const minY = Math.floor(((boundingBox.getMaxLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat);
+    const tempMaxY = ((boundingBox.getMinLatitude() - ProjectionConstants.WGS84_HALF_WORLD_LAT_HEIGHT) * -1) / tileSizeLat;
+    let maxY = Math.floor(tempMaxY);
     if (tempMaxY % 1 === 0) {
       maxY--;
     }
@@ -1101,20 +1096,14 @@ export class TileBoundingBoxUtils {
     const tilesPerSide = this.tilesPerSide(zoom);
     const tileSize = this.tileSize(tilesPerSide);
 
-    const minX = Math.round(
-      (webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize,
-    );
-    const tempMaxX =
-      (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
-    let maxX = Math.round(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
+    const minX = Math.floor((webMercatorBoundingBox.getMinLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize);
+    const tempMaxX = (webMercatorBoundingBox.getMaxLongitude() + ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) / tileSize;
+    let maxX = Math.floor(tempMaxX - ProjectionConstants.WEB_MERCATOR_PRECISION);
     maxX = Math.min(maxX, tilesPerSide - 1);
 
-    const minY = Math.round(
-      ((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize,
-    );
-    const tempMaxY =
-      ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
-    let maxY = Math.round(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
+    const minY = Math.floor(((webMercatorBoundingBox.getMaxLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize);
+    const tempMaxY = ((webMercatorBoundingBox.getMinLatitude() - ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH) * -1) / tileSize;
+    let maxY = Math.floor(tempMaxY - ProjectionConstants.WEB_MERCATOR_PRECISION);
     maxY = Math.min(maxY, tilesPerSide - 1);
 
     return new TileGrid(minX, minY, maxX, maxY);

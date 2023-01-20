@@ -1,5 +1,8 @@
-import { default as testSetup } from '../../../../testSetup'
+import { createFeatureTable, default as testSetup } from "../../../../testSetup";
 import { ContentsIdExtension } from "../../../../../lib/extension/nga/contents/contentsIdExtension";
+import { FeatureTableMetadata } from "../../../../../lib/features/user/featureTableMetadata";
+import { GeometryColumns } from "../../../../../lib/features/columns/geometryColumns";
+import { GeometryType } from "@ngageoint/simple-features-js";
 
 var Verification = require('../../../../verification')
   , ContentsDataType = require('../../../../../lib/contents/contentsDataType').ContentsDataType
@@ -9,7 +12,6 @@ describe('ContentsIdExtension Tests', function() {
   var testGeoPackage;
   var geoPackage;
   var tableName = 'test';
-  var contentsDao;
   var contents;
   var contentsIdExtension;
 
@@ -21,15 +23,20 @@ describe('ContentsIdExtension Tests', function() {
 
   beforeEach('create the GeoPackage connection',function() {
     // create the contents for 'test'
-    contentsDao = geoPackage.getContentsDao();
-    contents = contentsDao.createObject();
-    contents.setTableName(tableName);
-    contents.setDataType(ContentsDataType.FEATURES);
-    contentsDao.create(contents);
+    const geometryColumn = new GeometryColumns();
+    geometryColumn.setTableName(tableName);
+    geometryColumn.setGeometryType(GeometryType.GEOMETRY);
+    geometryColumn.setColumnName('geometry');
+    geometryColumn.setSrsId(4326);
+    geometryColumn.setZ(0);
+    geometryColumn.setM(0);
+    geoPackage.createFeatureTableWithFeatureTableMetadata(FeatureTableMetadata.create(geometryColumn));
 
     // enable the contents_id extension
     contentsIdExtension = new ContentsIdExtension(geoPackage);
     contentsIdExtension.getOrCreateExtension();
+
+    contents = geoPackage.getFeatureDao(tableName).getContents();
   });
 
   afterEach(async function() {
@@ -54,7 +61,8 @@ describe('ContentsIdExtension Tests', function() {
   it('should retrieve table_name\'s of contents without record in contentsId table', function() {
     // test getMissing
     var missing = contentsIdExtension.getMissing();
-    missing.length.should.be.equal(geoPackage.getTables().length);
+    const tables = geoPackage.getTables();
+    (missing.length - 1).should.be.equal(tables.length);
     contentsIdExtension.getIds().length.should.be.equal(0);
 
     // test create
@@ -62,7 +70,7 @@ describe('ContentsIdExtension Tests', function() {
     contentsId.getTableName().should.be.equal(tableName);
     // test getMissing returns nothing when all contents records have entry in contentsId table
     missing = contentsIdExtension.getMissing();
-    missing.length.should.be.equal(geoPackage.getTables().length - 1);
+    (missing.length - 1).should.be.equal(geoPackage.getTables().length - 1);
     contentsIdExtension.getIds().length.should.be.equal(1);
   });
 

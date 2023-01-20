@@ -1,4 +1,4 @@
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { ExtendedRelation } from './extendedRelation';
 import { DBValue } from '../../db/dbValue';
 import { GeoPackageDao } from '../../db/geoPackageDao';
@@ -101,9 +101,9 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
    * @return {ExtendedRelation[]}
    */
   getBaseTableRelationsWithName(baseTable: string, name: string): ExtendedRelation[] {
-    const fields = new ColumnValues();
-    fields.addColumn(ExtendedRelation.COLUMN_BASE_TABLE_NAME, baseTable);
-    fields.addColumn(ExtendedRelation.COLUMN_RELATION_NAME, name);
+    const fields = new FieldValues();
+    fields.addFieldValue(ExtendedRelation.COLUMN_BASE_TABLE_NAME, baseTable);
+    fields.addFieldValue(ExtendedRelation.COLUMN_RELATION_NAME, name);
     const where = this.buildWhere(fields, 'and');
     const whereArgs = this.buildWhereArgs(fields);
     const results = [];
@@ -118,9 +118,9 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
    * @return {ExtendedRelation[]}
    */
   getTableRelations(table: string): ExtendedRelation[] {
-    const fields = new ColumnValues();
-    fields.addColumn(ExtendedRelation.COLUMN_BASE_TABLE_NAME, table);
-    fields.addColumn(ExtendedRelation.COLUMN_RELATED_TABLE_NAME, table);
+    const fields = new FieldValues();
+    fields.addFieldValue(ExtendedRelation.COLUMN_BASE_TABLE_NAME, table);
+    fields.addFieldValue(ExtendedRelation.COLUMN_RELATED_TABLE_NAME, table);
     const where = this.buildWhere(fields, 'or');
     const whereArgs = this.buildWhereArgs(fields);
     const results = [];
@@ -148,30 +148,30 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
     relation?: string,
     mappingTable?: string,
   ): ExtendedRelation[] {
-    const fields = new ColumnValues();
+    const fields = new FieldValues();
 
     if (baseTable != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_BASE_TABLE_NAME, baseTable);
+      fields.addFieldValue(ExtendedRelation.COLUMN_BASE_TABLE_NAME, baseTable);
     }
 
     if (baseColumn != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_BASE_PRIMARY_COLUMN, baseColumn);
+      fields.addFieldValue(ExtendedRelation.COLUMN_BASE_PRIMARY_COLUMN, baseColumn);
     }
 
     if (relatedTable != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_RELATED_TABLE_NAME, relatedTable);
+      fields.addFieldValue(ExtendedRelation.COLUMN_RELATED_TABLE_NAME, relatedTable);
     }
 
     if (relatedColumn != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_RELATED_PRIMARY_COLUMN, relatedColumn);
+      fields.addFieldValue(ExtendedRelation.COLUMN_RELATED_PRIMARY_COLUMN, relatedColumn);
     }
 
     if (relation != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_RELATION_NAME, relation);
+      fields.addFieldValue(ExtendedRelation.COLUMN_RELATION_NAME, relation);
     }
 
     if (mappingTable != null) {
-      fields.addColumn(ExtendedRelation.COLUMN_MAPPING_TABLE_NAME, mappingTable);
+      fields.addFieldValue(ExtendedRelation.COLUMN_MAPPING_TABLE_NAME, mappingTable);
     }
     const where = this.buildWhereLike(fields, 'and');
     const whereArgs = this.buildWhereArgs(fields);
@@ -188,8 +188,8 @@ export class ExtendedRelationsDao extends GeoPackageDao<ExtendedRelation, number
    * @return {ExtendedRelation[]}
    */
   queryByMappingTableName(mappingTableName: string): ExtendedRelation[] {
-    const fields = new ColumnValues();
-    fields.addColumn(ExtendedRelation.COLUMN_MAPPING_TABLE_NAME, mappingTableName);
+    const fields = new FieldValues();
+    fields.addFieldValue(ExtendedRelation.COLUMN_MAPPING_TABLE_NAME, mappingTableName);
     const where = this.buildWhere(fields, 'and');
     const whereArgs = this.buildWhereArgs(fields);
     const results = [];

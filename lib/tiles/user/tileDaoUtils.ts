@@ -131,7 +131,8 @@ export class TileDaoUtils {
   private static binarySearch(array: number[], value: number): number {
     let index = sortedIndexOf(array, value);
     if (index === -1) {
-      index = sortedIndex(array, value) * -1;
+      const insertionPoint = sortedIndex(array, value);
+     index = (-(insertionPoint) - 1);
     }
     return index;
   }

@@ -6,6 +6,9 @@ import { Contents } from '../../../lib/contents/contents';
 import { UniqueConstraint } from '../../../lib/db/table/uniqueConstraint';
 import { ConstraintType } from '../../../lib/db/table/constraintType';
 import { RawConstraint } from "../../../lib/db/table/rawConstraint";
+import { UserCustomColumn } from "../../../lib/user/custom/userCustomColumn";
+import { UserCustomColumns } from "../../../lib/user/custom/userCustomColumns";
+import { UserCustomTable } from "../../../lib/user/custom/userCustomTable";
 
 var path = require('path')
   , should = require('chai').should()
@@ -16,13 +19,13 @@ describe('UserTable tests', function() {
   var userColumnList;
   beforeEach(async function() {
     userColumnList = [];
-    userColumnList.push(UserColumn.createPrimaryKeyColumn(0, 'test_table_index'));
-    userColumnList.push(UserColumn.createColumn(1, 'test_table_text', GeoPackageDataType.TEXT, false, ''));
-    const userColumns = new UserColumns('test_table', userColumnList, false);
+    userColumnList.push(UserCustomColumn.createPrimaryKeyColumnWithIndex(0, 'test_table_index'));
+    userColumnList.push(UserCustomColumn.createColumnWithIndex(1, 'test_table_text', GeoPackageDataType.TEXT, false, ''));
+    const userColumns = new UserCustomColumns('test_table', userColumnList, false);
     userColumns.updateColumns();
-    userTable = new UserTable(userColumns);
+    userTable = new UserCustomTable(userColumns);
     const contents = new Contents();
-    contents.table_name = 'test_table_contents';
+    contents.setTableName('test_table_contents');
     userTable.setContents(contents);
     userTable.addConstraint(new UniqueConstraint('test_table_index_unique', userColumnList[0]));
   });
@@ -31,8 +34,8 @@ describe('UserTable tests', function() {
     userTable.getUserColumns().getColumns().length.should.be.equal(2);
     userTable.getTableName().should.be.equal('test_table');
     userTable.hasColumn('test_column_not_found').should.be.equal(false);
-    userTable.getIdColumn().getName().should.be.equal('test_table_index');
-    userTable.getIdColumnIndex().should.be.equal(0);
+    userTable.getPkColumnName().should.be.equal('test_table_index');
+    userTable.getPkColumnIndex().should.be.equal(0);
     userTable.hasConstraints().should.be.equal(true);
     userTable.addConstraint(new RawConstraint(ConstraintType.FOREIGN_KEY, 'test_fk', 'FOREIGN KEY (test_table_text) REFERENCES Persons(PersonID)'));
     userTable.addConstraint(new RawConstraint(ConstraintType.FOREIGN_KEY, 'test_fk_2', 'FOREIGN KEY (test_table_text2) REFERENCES Things(ThingID)'));
@@ -51,31 +54,31 @@ describe('UserTable tests', function() {
     userTable.renameColumn(userTable.getColumn('test_table_text'), 'test_table_string');
     expect(() => { userTable.getColumn('test_table_text')}).to.throw();
     should.exist(userTable.getColumn('test_table_string'));
-    userTable.renameColumnAtIndex(1, 'test_table_text');
+    userTable.renameColumnWithIndex(1, 'test_table_text');
     expect(() => { userTable.getColumn('test_table_string')}).to.throw();
     should.exist(userTable.getColumn('test_table_text'));
   });
 
   it('should add and drop UserTable columns', function() {
-    userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
+    userTable.addColumn(UserCustomColumn.createColumnWithIndex(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
     should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumnWithName('test_table_integer');
     expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
-    userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
+    userTable.addColumn(UserCustomColumn.createColumnWithIndex(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
     should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumnWithIndex(2);
     expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
-    userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
+    userTable.addColumn(UserCustomColumn.createColumnWithIndex(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
     should.exist(userTable.getColumn('test_table_integer'));
     userTable.dropColumn(userTable.getUserColumns().getColumns()[2]);
     expect(() => { userTable.getColumn('test_table_integer')}).to.throw();
   });
 
   it('should alter a UserTable column', function() {
-    const column = UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5);
+    const column = UserCustomColumn.createColumnWithIndex(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5);
     const columnAlter = column.copy();
     columnAlter.setDefaultValue(7);
-    userTable.addColumn(UserColumn.createColumn(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
+    userTable.addColumn(UserCustomColumn.createColumnWithIndex(2, 'test_table_integer', GeoPackageDataType.INTEGER, true, 5));
     should.exist(userTable.getColumn('test_table_integer'));
     userTable.alterColumn(columnAlter);
     userTable.getColumn('test_table_integer').getDefaultValue().should.be.equal(7);
@@ -88,8 +91,8 @@ describe('UserTable tests', function() {
     userTableCopy.getContents().getTableName().should.be.equal('test_table_contents');
     userTableCopy.getConstraints().size().should.be.equal(1);
     userTableCopy.hasColumn('test_column_not_found').should.be.equal(false);
-    userTableCopy.getIdColumn().getName().should.be.equal('test_table_index');
-    userTableCopy.getIdColumnIndex().should.be.equal(0);
+    userTableCopy.getPkColumn().getName().should.be.equal('test_table_index');
+    userTableCopy.getPkColumnIndex().should.be.equal(0);
     userTableCopy.hasConstraints().should.be.equal(true);
     userTableCopy.getConstraintsByType(ConstraintType.UNIQUE).length.should.be.equal(1);
     userTableCopy.getConstraintsByType(ConstraintType.DEFAULT).length.should.be.equal(0);
@@ -104,8 +107,8 @@ describe('UserTable tests', function() {
     should.not.exist(userTableCopy.getContents());
     userTableCopy.getConstraints().size().should.be.equal(1);
     userTableCopy.hasColumn('test_column_not_found').should.be.equal(false);
-    userTableCopy.getIdColumn().getName().should.be.equal('test_table_index');
-    userTableCopy.getIdColumnIndex().should.be.equal(0);
+    userTableCopy.getPkColumn().getName().should.be.equal('test_table_index');
+    userTableCopy.getPkColumnIndex().should.be.equal(0);
     userTableCopy.hasConstraints().should.be.equal(true);
     userTableCopy.getConstraintsByType(ConstraintType.UNIQUE).length.should.be.equal(1);
     userTableCopy.getConstraintsByType(ConstraintType.DEFAULT).length.should.be.equal(0);

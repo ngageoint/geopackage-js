@@ -7,6 +7,7 @@ import { GeoPackageConnection } from './db/geoPackageConnection';
 import { GeoPackageException } from './geoPackageException';
 import { GeoPackageValidate } from './validate/geoPackageValidate';
 import { Canvas } from './canvas/canvas';
+import { GeoPackageTableCreator } from './db/geoPackageTableCreator';
 
 /**
  * GeoPackage Manager used to create and open GeoPackages
@@ -78,15 +79,17 @@ export class GeoPackageManager {
     try {
       const connection = await GeoPackageManager.connect(gppath);
       connection.setApplicationId();
+      connection.setUserVersion();
+
       if (gppath) {
         geoPackage = new GeoPackage(path.basename(gppath), gppath, connection);
       } else {
         geoPackage = new GeoPackage('geopackage', undefined, connection);
       }
-      await geoPackage.createRequiredTables();
-      geoPackage.createSupportedExtensions();
+      // Create the minimum required tables
+      const tableCreator = new GeoPackageTableCreator(geoPackage);
+      tableCreator.createRequired();
     } catch (e) {
-      console.error(e);
       throw new GeoPackageException('Unable to create GeoPackage.');
     }
     return geoPackage;

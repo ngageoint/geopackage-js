@@ -25,21 +25,25 @@ export class ImageUtils {
     contentType = 'image/png',
   ): Promise<GeoPackageImage> {
     return new Promise(resolve => {
-      Canvas.initializeAdapter()
-        .then(() => {
-          Canvas.createImage(data, contentType)
-            .then(image => {
-              resolve(image);
-            })
-            .catch(e => {
-              console.error(e);
-              resolve(null);
-            });
-        })
-        .catch(e => {
-          console.error(e);
-          resolve(null);
-        });
+      if (data instanceof GeoPackageImage) {
+        resolve(data);
+      } else {
+        Canvas.initializeAdapter()
+          .then(() => {
+            Canvas.createImage(data, contentType)
+              .then(image => {
+                resolve(image);
+              })
+              .catch(e => {
+                console.error(e);
+                resolve(null);
+              });
+          })
+          .catch(e => {
+            console.error(e);
+            resolve(null);
+          });
+      }
     });
   }
 
@@ -135,16 +139,19 @@ export class ImageUtils {
    * Check if the image is fully transparent, meaning it contains only
    * transparent pixels as an empty image
    *
-   * @param image image
+   * @param data image as GeoPackageImage
+   * @param width
+   * @param height
    * @return true if fully transparent
    */
-  public static isFullyTransparent(image: GeoPackageImage): boolean {
+  public static async isFullyTransparent(data: Uint8Array | Buffer, width, height): Promise<boolean> {
     let transparent = true;
+    let image = await Canvas.createImage(data);
     const imageData = Canvas.getImageData(image);
-    const width = image.getWidth();
     for (let x = 0; x < width; x++) {
-      for (let y = 0; y < image.getHeight(); y++) {
-        transparent = imageData[width * y + x] >> 24 === 0x00;
+      for (let y = 0; y < height; y++) {
+        const offset = y * width + x;
+        transparent = imageData[offset + 3] === 0;
         if (!transparent) {
           break;
         }
@@ -153,6 +160,7 @@ export class ImageUtils {
         break;
       }
     }
+    Canvas.disposeImage(image);
     return transparent;
   }
 }

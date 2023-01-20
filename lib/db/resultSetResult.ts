@@ -69,7 +69,6 @@ export class ResultSetResult implements Result {
     try {
       next = this.resultSet.next();
     } catch (e) {
-      console.error(e);
       throw new GeoPackageException('Failed to move ResultSet cursor to next');
     }
     return next;

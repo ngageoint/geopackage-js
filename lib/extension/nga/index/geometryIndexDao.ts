@@ -4,7 +4,7 @@ import { GeometryEnvelope } from '@ngageoint/simple-features-js';
 import { DBValue } from '../../../db/dbValue';
 import { GeoPackageDao } from '../../../db/geoPackageDao';
 import { GeometryIndexKey } from './geometryIndexKey';
-import { ColumnValues } from '../../../dao/columnValues';
+import { FieldValues } from '../../../dao/fieldValues';
 import { GeoPackageException } from '../../../geoPackageException';
 import type { GeoPackage } from '../../../geoPackage';
 
@@ -35,9 +35,9 @@ export class GeometryIndexDao extends GeoPackageDao<GeometryIndex, GeometryIndex
   public queryForIdWithKey(key: GeometryIndexKey): GeometryIndex {
     let geometryIndex = null;
     if (key != null) {
-      const fieldValues = new ColumnValues();
-      fieldValues.addColumn(GeometryIndex.COLUMN_TABLE_NAME, key.getTableName());
-      fieldValues.addColumn(GeometryIndex.COLUMN_GEOM_ID, key.getGeomId());
+      const fieldValues = new FieldValues();
+      fieldValues.addFieldValue(GeometryIndex.COLUMN_TABLE_NAME, key.getTableName());
+      fieldValues.addFieldValue(GeometryIndex.COLUMN_GEOM_ID, key.getGeomId());
       const results = this.queryForFieldValues(fieldValues);
       const values = [];
       for (const result of results) {

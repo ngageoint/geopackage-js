@@ -122,7 +122,6 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
         height = image.height();
       }
     } catch (e) {
-      console.error(e)
       throw new GeoPackageException('Failed to create image.');
     }
 
@@ -271,7 +270,7 @@ export class CanvasKitCanvasAdapter implements CanvasAdapter {
    * @param compressionQuality
    * @return Promise<Uint8Array>
    */
-  toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality: number = 100): Promise<Uint8Array> {
+  async toBytes(canvas: any, imageFormat: ImageType = ImageType.PNG, compressionQuality: number = 100): Promise<Uint8Array> {
     const image = canvas.bf.makeImageSnapshot();
     return Promise.resolve(image.encodeToBytes(this.getTypeForImageFormat(imageFormat), compressionQuality));
   }

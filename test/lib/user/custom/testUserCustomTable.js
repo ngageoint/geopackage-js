@@ -9,8 +9,8 @@ var path = require('path')
 describe('UserCustomTable tests', function() {
   it('should create a UserCustomTable object', function() {
     const userColumnList = [];
-    userColumnList.push(UserCustomColumn.createPrimaryKeyColumn(0, 'test_table_index'));
-    userColumnList.push(UserCustomColumn.createColumn(1, 'test_table_text', GeoPackageDataType.TEXT, false, ''));
+    userColumnList.push(UserCustomColumn.createPrimaryKeyColumnWithIndex(0, 'test_table_index'));
+    userColumnList.push(UserCustomColumn.createColumnWithIndex(1, 'test_table_text', GeoPackageDataType.TEXT, false, ''));
     var userCustomTable = new UserCustomTable('test_table', userColumnList, ['test_table_index']);
     userCustomTable.getUserColumns().getColumns().length.should.be.equal(2);
     userCustomTable.getTableName().should.be.equal('test_table');

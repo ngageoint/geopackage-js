@@ -1,4 +1,5 @@
 import { default as testSetup } from '../testSetup'
+import { TileMatrixKey } from "../../lib/tiles/matrix/tileMatrixKey";
 
 const
   Verification = require('../verification')
@@ -33,9 +34,9 @@ describe('GeoPackage Tile table create tests', function() {
   });
 
   it('should create a tile table with parameters', function() {
-    var contentsBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var contentsBoundingBox = new BoundingBox(-180, -80, 180, 80);
     var contentsSrsId = 4326;
-    var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var tileMatrixSetBoundingBox = new BoundingBox(-180, -80, 180, 80);
     var tileMatrixSetSrsId = 4326;
     geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
     Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
@@ -44,9 +45,9 @@ describe('GeoPackage Tile table create tests', function() {
   });
 
   it('should create a tile table, then delete it, then create it again', function() {
-    var contentsBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var contentsBoundingBox = new BoundingBox(-180, -80, 180, 80);
     var contentsSrsId = 4326;
-    var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -80, 80);
+    var tileMatrixSetBoundingBox = new BoundingBox(-180, -80, 180, 80);
     var tileMatrixSetSrsId = 4326;
     geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
     Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
@@ -63,13 +64,13 @@ describe('GeoPackage Tile table create tests', function() {
   describe('GeoPackage tile create tile matrix tests', function() {
 
     var tileMatrixSet;
-    var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+    var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244);
 
     beforeEach(function() {
-      var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
+      var contentsBoundingBox = new BoundingBox(-180, -85.0511287798066, 180, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      geoPackage.getSpatialReferenceSystemDao().createWebMercator();
       tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
       Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
       Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
@@ -80,17 +81,17 @@ describe('GeoPackage Tile table create tests', function() {
       geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.getTileMatrixDao().queryForIdWithKey(new TileMatrixKey(tableName, zoom));
         const numTiles = Math.pow(2, zoom);
-        matrix.table_name.should.equal(tableName);
-        matrix.zoom_level.should.equal(zoom);
-        matrix.matrix_width.should.equal(Math.pow(2, zoom));
-        matrix.matrix_height.should.equal(Math.pow(2, zoom));
-        matrix.tile_width.should.equal(256);
-        matrix.tile_height.should.equal(256);
-        const metersPerTile = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / numTiles;
-        matrix.pixel_x_size.should.equal(metersPerTile / 256);
-        matrix.pixel_y_size.should.equal(metersPerTile / 256);
+        matrix.getTableName().should.equal(tableName);
+        matrix.getZoomLevel().should.equal(zoom);
+        matrix.getMatrixWidth().should.equal(Math.pow(2, zoom));
+        matrix.getMatrixHeight().should.equal(Math.pow(2, zoom));
+        matrix.getTileWidth().should.equal(256);
+        matrix.getTileHeight().should.equal(256);
+        const metersPerTile = (tileMatrixSetBoundingBox.getLongitudeRange()) / numTiles;
+        matrix.getPixelXSize().should.equal(metersPerTile / 256);
+        matrix.getPixelYSize().should.equal(metersPerTile / 256);
       }
     });
 
@@ -98,17 +99,17 @@ describe('GeoPackage Tile table create tests', function() {
       geoPackage.createStandardWebMercatorTileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 3, 100);
       let zoom = 4;
       while (zoom-- > 0) {
-        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.getTileMatrixDao().queryForId([tableName, zoom]);
         const numTiles = Math.pow(2, zoom);
-        matrix.table_name.should.equal(tableName);
-        matrix.zoom_level.should.equal(zoom);
-        matrix.matrix_width.should.equal(Math.pow(2, zoom));
-        matrix.matrix_height.should.equal(Math.pow(2, zoom));
-        matrix.tile_width.should.equal(100);
-        matrix.tile_height.should.equal(100);
-        const metersPerTile = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / numTiles;
-        matrix.pixel_x_size.should.equal(metersPerTile / 100);
-        matrix.pixel_y_size.should.equal(metersPerTile / 100);
+        matrix.getTableName().should.equal(tableName);
+        matrix.getZoomLevel().should.equal(zoom);
+        matrix.getMatrixWidth().should.equal(Math.pow(2, zoom));
+        matrix.getMatrixHeight().should.equal(Math.pow(2, zoom));
+        matrix.getTileWidth().should.equal(100);
+        matrix.getTileHeight().should.equal(100);
+        const metersPerTile = (tileMatrixSetBoundingBox.getLongitudeRange()) / numTiles;
+        matrix.getPixelXSize().should.equal(metersPerTile / 100);
+        matrix.getPixelYSize() .should.equal(metersPerTile / 100);
       }
     });
 
@@ -137,7 +138,6 @@ describe('GeoPackage Tile table create tests', function() {
                   return new Promise(async function(resolve, reject) {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
-                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
                     resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
@@ -151,13 +151,13 @@ describe('GeoPackage Tile table create tests', function() {
 
   describe('GeoPackage WGS84 tile create tile matrix tests', function() {
     var tileMatrixSet;
-    var tileMatrixSetBoundingBox = new BoundingBox(-180, 180, -90, 90);
+    var tileMatrixSetBoundingBox = new BoundingBox(-180, -90, 180, 90);
 
     beforeEach(function() {
-      var contentsBoundingBox = new BoundingBox(-180, 180, -90, 90);
+      var contentsBoundingBox = new BoundingBox(-180, -90, 180, 90);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 4326;
-      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      geoPackage.getSpatialReferenceSystemDao().createWebMercator();
       tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
       Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
       Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
@@ -168,17 +168,17 @@ describe('GeoPackage Tile table create tests', function() {
       geoPackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2);
       let zoom = 3;
       while (zoom-- > 0) {
-        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
-        matrix.table_name.should.equal(tableName);
-        matrix.zoom_level.should.equal(zoom);
-        matrix.matrix_width.should.equal(Math.pow(2, zoom + 1));
-        matrix.matrix_height.should.equal(Math.pow(2, zoom));
-        matrix.tile_width.should.equal(256);
-        matrix.tile_height.should.equal(256);
-        const degreesPerTileWidth = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / matrix.matrix_width;
-        const degreesPerTileHeight = (tileMatrixSetBoundingBox.maxLatitude - tileMatrixSetBoundingBox.minLatitude) / matrix.matrix_height;
-        matrix.pixel_x_size.should.equal(degreesPerTileWidth / 256);
-        matrix.pixel_y_size.should.equal(degreesPerTileHeight / 256);
+        const matrix = geoPackage.getTileMatrixDao().queryForIdWithKey(new TileMatrixKey(tableName, zoom));
+        matrix.getTableName().should.equal(tableName);
+        matrix.getZoomLevel().should.equal(zoom);
+        matrix.getMatrixWidth().should.equal(Math.pow(2, zoom + 1));
+        matrix.getMatrixHeight().should.equal(Math.pow(2, zoom));
+        matrix.getTileWidth().should.equal(256);
+        matrix.getTileHeight().should.equal(256);
+        const degreesPerTileWidth = (tileMatrixSetBoundingBox.getLongitudeRange()) / matrix.getMatrixWidth();
+        const degreesPerTileHeight = (tileMatrixSetBoundingBox.getLatitudeRange()) / matrix.getMatrixHeight();
+        matrix.getPixelXSize().should.equal(degreesPerTileWidth / 256);
+        matrix.getPixelYSize().should.equal(degreesPerTileHeight / 256);
       }
     });
 
@@ -186,18 +186,18 @@ describe('GeoPackage Tile table create tests', function() {
       geoPackage.createStandardWGS84TileMatrix(tileMatrixSetBoundingBox, tileMatrixSet, 0, 2, 100);
       let zoom = 3;
       while (zoom-- > 0) {
-        const matrix = geoPackage.tileMatrixDao.queryForId([tableName, zoom]);
+        const matrix = geoPackage.tileMatrixDao.queryForIdWithKey(new TileMatrixKey(tableName, zoom));
         const numTiles = Math.pow(2, zoom);
-        matrix.table_name.should.equal(tableName);
-        matrix.zoom_level.should.equal(zoom);
-        matrix.matrix_width.should.equal(Math.pow(2, zoom + 1));
-        matrix.matrix_height.should.equal(Math.pow(2, zoom));
-        matrix.tile_width.should.equal(100);
-        matrix.tile_height.should.equal(100);
-        const degreesPerTileWidth = (tileMatrixSetBoundingBox.maxLongitude - tileMatrixSetBoundingBox.minLongitude) / matrix.matrix_width;
-        const degreesPerTileHeight = (tileMatrixSetBoundingBox.maxLatitude - tileMatrixSetBoundingBox.minLatitude) / matrix.matrix_height;
-        matrix.pixel_x_size.should.equal(degreesPerTileWidth / 100);
-        matrix.pixel_y_size.should.equal(degreesPerTileHeight / 100);
+        matrix.getTableName().should.equal(tableName);
+        matrix.getZoomLevel().should.equal(zoom);
+        matrix.getMatrixWidth().should.equal(Math.pow(2, zoom + 1));
+        matrix.getMatrixHeight().should.equal(Math.pow(2, zoom));
+        matrix.getTileWidth().should.equal(100);
+        matrix.getTileHeight().should.equal(100);
+        const degreesPerTileWidth = (tileMatrixSetBoundingBox.getLongitudeRange()) / matrix.getMatrixWidth();
+        const degreesPerTileHeight = (tileMatrixSetBoundingBox.getLatitudeRange()) / matrix.getMatrixHeight();
+        matrix.getPixelXSize().should.equal(degreesPerTileWidth / 100);
+        matrix.getPixelYSize().should.equal(degreesPerTileHeight / 100);
       }
     });
 
@@ -226,7 +226,6 @@ describe('GeoPackage Tile table create tests', function() {
                   return new Promise(async function(resolve, reject) {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'wgs84Tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
-                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
                     resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
@@ -241,14 +240,14 @@ describe('GeoPackage Tile table create tests', function() {
   describe('delete tile tests', function() {
 
     var tileMatrixSet;
-    var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, 20037508.342789244, -20037508.342789244, 20037508.342789244);
+    var tileMatrixSetBoundingBox = new BoundingBox(-20037508.342789244, -20037508.342789244, 20037508.342789244, 20037508.342789244);
 
     beforeEach(function() {
       this.timeout(5000);
-      var contentsBoundingBox = new BoundingBox(-180, 180, -85.0511287798066, 85.0511287798066);
+      var contentsBoundingBox = new BoundingBox(-180, -85.0511287798066, 180, 85.0511287798066);
       var contentsSrsId = 4326;
       var tileMatrixSetSrsId = 3857;
-      geoPackage.spatialReferenceSystemDao.createWebMercator();
+      geoPackage.getSpatialReferenceSystemDao().createWebMercator();
       tileMatrixSet = geoPackage.createTileTableWithTableName(tableName, contentsBoundingBox, contentsSrsId, tileMatrixSetBoundingBox, tileMatrixSetSrsId);
       Verification.verifyTileMatrixSet(geoPackage).should.be.equal(true);
       Verification.verifyContentsForTable(geoPackage, tableName).should.be.equal(true);
@@ -276,7 +275,6 @@ describe('GeoPackage Tile table create tests', function() {
                   return new Promise(async function(resolve, reject) {
                     // @ts-ignore
                     let image = await loadTile(path.join(__dirname, '..', 'fixtures', 'tiles', zoom.toString(), x.toString(), y.toString()+'.png'));
-                    console.log('Adding tile z: %s x: %s y: %s to %s', zoom, x, y, tableName);
                     resolve(geoPackage.addTile(image, tableName, zoom, y, x));
                   });
                 });
@@ -295,8 +293,8 @@ describe('GeoPackage Tile table create tests', function() {
       result.should.be.equal(1);
       count = tileDao.getCount();
       count.should.be.equal(84);
-      var result = tileDao.dropTable();
-      result.should.be.equal(true);
+      tileDao.dropTable();
+      tileDao.isTableExists().should.be.equal(false);
     });
   });
 });

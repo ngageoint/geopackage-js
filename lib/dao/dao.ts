@@ -1,4 +1,4 @@
-import { ColumnValues } from './columnValues';
+import { FieldValues } from './fieldValues';
 import { SqliteQueryBuilder } from '../db/sqliteQueryBuilder';
 import { DBValue } from '../db/dbValue';
 import { SQLUtils } from '../db/sqlUtils';
@@ -209,8 +209,8 @@ export abstract class Dao<T, ID> {
    * @return {Object[]} raw object array from the database
    */
   queryForLike(fieldName: string, value: string): Record<string, DBValue>[] {
-    const values = new ColumnValues();
-    values.addColumn(fieldName, value);
+    const values = new FieldValues();
+    values.addFieldValue(fieldName, value);
     const where = this.buildWhereLike(values);
     const whereArgs = this.buildWhereArgs(value);
     const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, where);
@@ -220,10 +220,10 @@ export abstract class Dao<T, ID> {
   /**
    * Queries for all matches and returns them.  Only queries for the specified column name  Be aware this pulls all results into memory
    * @param {string}  columnName  name of the column to query for
-   * @param {ColumnValues} [fieldValues] optional values to filter on
+   * @param {FieldValues} [fieldValues] optional values to filter on
    * @return {Object[]} raw object array from the database
    */
-  queryForColumns(columnName: string, fieldValues?: ColumnValues): Record<string, DBValue>[] {
+  queryForColumns(columnName: string, fieldValues?: FieldValues): Record<string, DBValue>[] {
     let where: string | undefined = undefined;
     let whereArgs: DBValue[] | null = null;
     if (fieldValues) {
@@ -318,10 +318,10 @@ export abstract class Dao<T, ID> {
 
   /**
    * Iterate all objects in thet able that match the ColumnValues passed in
-   * @param  {ColumnValues} fieldValues ColumnValues to query for
+   * @param  {FieldValues} fieldValues ColumnValues to query for
    * @return {IterableIterator<any>}
    */
-  queryForFieldValues(fieldValues: ColumnValues): IterableIterator<Record<string, DBValue>> {
+  queryForFieldValues(fieldValues: FieldValues): IterableIterator<Record<string, DBValue>> {
     const whereString: string = this.buildWhere(fieldValues);
     const whereArgs: DBValue[] = this.buildWhereArgs(fieldValues);
     const query = SqliteQueryBuilder.buildQuery(false, SQLUtils.quoteWrap(this.gpkgTableName), undefined, whereString);
@@ -435,9 +435,9 @@ export abstract class Dao<T, ID> {
   buildPkWhere(idValue: any[] | any): string {
     if (Array.isArray(idValue)) {
       const idValuesArray = idValue;
-      const idColumnValues = new ColumnValues();
+      const idColumnValues = new FieldValues();
       for (let i = 0; i < idValuesArray.length; i++) {
-        idColumnValues.addColumn(this.idColumns[i], idValuesArray[i]);
+        idColumnValues.addFieldValue(this.idColumns[i], idValuesArray[i]);
       }
       return this.buildWhere(idColumnValues);
     }
@@ -466,18 +466,19 @@ export abstract class Dao<T, ID> {
 
   /**
    * Build where (or selection) LIKE statement for fields
-   * @param  {ColumnValues} fields    columns and values
+   * @param  {FieldValues} fields    columns and values
    * @param  {string} [operation] AND or OR
    * @return {string} where clause
    */
-  buildWhereLike(fields: ColumnValues, operation?: string): string {
+  buildWhereLike(fields: FieldValues, operation?: string): string {
     let whereString = '';
     for (let i = 0; i < fields.columns.length; i++) {
       const column = fields.columns[i];
+      const value = fields.values[i];
       if (i) {
         whereString += ' ' + operation + ' ';
       }
-      whereString += this.buildWhereWithFieldAndValue(column, fields.getValue(column), 'like');
+      whereString += this.buildWhereWithFieldAndValue(column, value, 'like');
     }
     return whereString;
   }
@@ -488,28 +489,29 @@ export abstract class Dao<T, ID> {
    * @param  [operation=AND] AND or OR
    * @return where clause
    */
-  buildWhere(fields: ColumnValues, operation = 'and'): string {
+  buildWhere(fields: FieldValues, operation = 'and'): string {
     let whereString = '';
     for (let i = 0; i < fields.columns.length; i++) {
       const column = fields.columns[i];
+      const value = fields.values[i];
       if (i) {
         whereString += ' ' + operation + ' ';
       }
-      whereString += this.buildWhereWithFieldAndValue(column, fields.getValue(column));
+      whereString += this.buildWhereWithFieldAndValue(column, value);
     }
     return whereString;
   }
 
   /**
    * Builds a where args array
-   * @param {any[]|ColumnValues|any} values argument values to push
+   * @param {any[]|FieldValues|any} values argument values to push
    * @returns {any[]}
    */
-  buildWhereArgs(values: DBValue[] | ColumnValues | DBValue): DBValue[] | null {
+  buildWhereArgs(values: DBValue[] | FieldValues | DBValue): DBValue[] | null {
     let args: DBValue[] = [];
     if (Array.isArray(values)) {
       args = this._buildWhereArgsWithArray(values);
-    } else if (values instanceof ColumnValues) {
+    } else if (values instanceof FieldValues) {
       args = this._buildWhereArgsWithColumnValues(values);
     } else {
       if (values !== undefined && values !== null) {
@@ -537,14 +539,14 @@ export abstract class Dao<T, ID> {
 
   /**
    * Builds a where args array
-   * @param {ColumnValues} values argument values to push
+   * @param {FieldValues} values argument values to push
    * @returns {any[]}
    */
-  _buildWhereArgsWithColumnValues(values: ColumnValues): DBValue[] {
+  _buildWhereArgsWithColumnValues(values: FieldValues): DBValue[] {
     const args = [];
     for (let i = 0; i < values.columns.length; i++) {
       const column = values.columns[i];
-      const value = values.getValue(column);
+      const value = values.values[i];
       if (value !== undefined && value !== null) {
         args.push(value);
       }
@@ -602,18 +604,18 @@ export abstract class Dao<T, ID> {
 
   /**
    * Count rows in the table optionally filtered by the parameters specified
-   * @param  {ColumnValues|string} [fields] Either a ColumnValues object or a string specifying a field name
+   * @param  {FieldValues|string} [fields] Either a ColumnValues object or a string specifying a field name
    * @param  {Object} [value]  value to filter on if fields is a string
    * @return {number} count of objects
    */
-  count(fields?: ColumnValues | string, value?: DBValue): number {
+  count(fields?: FieldValues | string, value?: DBValue): number {
     if (!fields) {
       return this.db.count(this.gpkgTableName);
     }
     let where;
     let whereArgs;
     let query;
-    if (fields instanceof ColumnValues) {
+    if (fields instanceof FieldValues) {
       where = this.buildWhere(fields, 'and');
       whereArgs = this.buildWhereArgs(fields);
       query = SqliteQueryBuilder.buildCount(SQLUtils.quoteWrap(this.gpkgTableName), where);
@@ -685,7 +687,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Delete the object specified by the ids
-   * @param  {ColumnValues} idValues id values
+   * @param  {FieldValues} idValues id values
    * @return {number} number of objects deleted
    */
   deleteByMultiId(idValues: any[]): number {
@@ -733,7 +735,7 @@ export abstract class Dao<T, ID> {
 
   /**
    * Update all rows that match the query
-   * @param  {ColumnValues} values    values to insert
+   * @param  {FieldValues} values    values to insert
    * @param  {string} where     where clause
    * @param  {Object[]} whereArgs where arguments
    * @return {number} number of objects updated

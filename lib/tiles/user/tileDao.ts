@@ -14,7 +14,7 @@ import { GeometryTransform } from '@ngageoint/simple-features-proj-js';
 import { TileGrid } from '../tileGrid';
 import { TileDaoUtils } from './tileDaoUtils';
 import { SpatialReferenceSystem } from '../../srs/spatialReferenceSystem';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { TileMatrixSetDao } from '../matrixset/tileMatrixSetDao';
 import { TileMatrixDao } from '../matrix/tileMatrixDao';
 import type { GeoPackage } from '../../geoPackage';
@@ -105,9 +105,10 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
       this.zoomLevelToTileMatrix[tileMatrix.getZoomLevel()] = tileMatrix;
       this.widths.push(tileMatrix.getPixelXSize() * tileMatrix.getTileWidth());
       this.heights.push(tileMatrix.getPixelYSize() * tileMatrix.getTileHeight());
-      this.widths = this.widths.sort();
-      this.heights = this.heights.sort();
     }
+
+    this.widths = this.widths.sort((a, b) => a - b);
+    this.heights = this.heights.sort((a, b) => a - b);
 
     if (this.geoPackage.getTileMatrixSetDao().getContents(tileMatrixSet) == null) {
       throw new GeoPackageException('TileMatrixSet ' + tileMatrixSet.getId() + ' has null Contents');
@@ -141,8 +142,8 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
       const singleTileHeight = totalTileHeight / tileMatrix.getMatrixHeight();
       const tileBox = new BoundingBox(
         this.tileMatrixSet.getMinX(),
-        this.tileMatrixSet.getMinX() + singleTileWidth,
         this.tileMatrixSet.getMinY(),
+        this.tileMatrixSet.getMinX() + singleTileWidth,
         this.tileMatrixSet.getMinY() + singleTileHeight,
       );
       if (transform != null) {
@@ -183,7 +184,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
     let tileGrid;
     const tileMatrix = this.getTileMatrix(zoomLevel);
     if (tileMatrix) {
-      tileGrid = new TileGrid(0, ~~tileMatrix.getMatrixWidth() - 1, 0, ~~tileMatrix.getMatrixHeight() - 1);
+      tileGrid = new TileGrid(0, 0, ~~tileMatrix.getMatrixWidth() - 1, ~~tileMatrix.getMatrixHeight() - 1);
     }
     return tileGrid;
   }
@@ -353,15 +354,16 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile row
    */
   public queryForTile(column: number, row: number, zoomLevel: number): TileRow {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
-    fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
-    fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_COLUMN, column);
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_ROW, row);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
     const resultSet = this.queryForFieldValues(fieldValues);
     let tileRow = null;
     if (resultSet.moveToNext()) {
       tileRow = resultSet.getRow();
     }
+    resultSet.close();
     return tileRow;
   }
 
@@ -396,9 +398,9 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile result set
    */
   public queryForTilesInColumn(column: number, zoomLevel: number): TileResultSet {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileTable.COLUMN_TILE_COLUMN, column);
-    fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_COLUMN, column);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
     return this.queryForFieldValues(fieldValues);
   }
 
@@ -410,9 +412,9 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    * @return tile result set
    */
   public queryForTilesInRow(row: number, zoomLevel: number): TileResultSet {
-    const fieldValues = new ColumnValues();
-    fieldValues.addColumn(TileTable.COLUMN_TILE_ROW, row);
-    fieldValues.addColumn(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+    const fieldValues = new FieldValues();
+    fieldValues.addFieldValue(TileTable.COLUMN_TILE_ROW, row);
+    fieldValues.addFieldValue(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
     return this.queryForFieldValues(fieldValues);
   }
 
@@ -545,7 +547,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
    */
   public queryForTileGrid(zoomLevel: number): TileGrid {
     const where = this.buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
-    const whereArgs = [];
+    const whereArgs = [zoomLevel];
 
     const minX = this.min(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
     const maxX = this.max(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
@@ -575,7 +577,7 @@ export class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileResultS
     where.push(' AND ');
     where.push(this.buildWhere(TileTable.COLUMN_TILE_ROW, row));
     const whereArgs = [zoomLevel, column, row];
-    return this.delete(where.toString(), whereArgs);
+    return this.delete(where.join(''), whereArgs);
   }
 
   /**

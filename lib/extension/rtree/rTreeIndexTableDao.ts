@@ -8,7 +8,7 @@ import { FeatureRow } from '../../features/user/featureRow';
 import { RTreeIndexTableRow } from './rTreeIndexTableRow';
 import { UserCustomRow } from '../../user/custom/userCustomRow';
 import { GeoPackageException } from '../../geoPackageException';
-import { ColumnValues } from '../../dao/columnValues';
+import { FieldValues } from '../../dao/fieldValues';
 import { BoundingBox } from '../../boundingBox';
 import { Projection } from '@ngageoint/projections-js';
 import { GeometryEnvelope } from '@ngageoint/simple-features-js';
@@ -892,7 +892,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param fieldValues field values
    * @return count
    */
-  public countFeaturesWithFieldValues(distinct: boolean, column: string, minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues): number {
+  public countFeaturesWithFieldValues(distinct: boolean, column: string, minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues): number {
     this.validateRTree();
     const whereBounds: string = this.buildWhereWithBounds(minX, minY, maxX, maxY);
     const whereBoundsArgs: string[] = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
@@ -1093,7 +1093,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValues(boundingBox: BoundingBox, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(undefined, undefined, boundingBox, fieldValues, orderBy, limit, offset);
   }
 
@@ -1108,7 +1108,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinct(distinct: boolean, boundingBox: BoundingBox, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct, undefined, boundingBox, fieldValues, orderBy, limit, offset);
   }
 
@@ -1123,7 +1123,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndColumns(columns: string[], boundingBox: BoundingBox, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(undefined, columns, boundingBox, fieldValues, orderBy, limit, offset);
   }
 
@@ -1139,7 +1139,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return feature results
    */
-  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithBoundingBoxAndFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], boundingBox: BoundingBox, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     const fieldWhere = this.buildWhereWithFields(fieldValues);
     const fieldWhereArgs = this.buildWhereArgsWithValues(fieldValues);
     return this.queryFeaturesForChunkWithGeometryEnvelopeAndDistinctAndColumns(distinct, columns, boundingBox.buildEnvelope(), fieldWhere, fieldWhereArgs, orderBy, limit, offset);
@@ -1599,7 +1599,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValues(minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, undefined, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
   }
 
@@ -1617,7 +1617,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinct(distinct: boolean, minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct, undefined, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
   }
 
@@ -1635,7 +1635,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndColumns(columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     return this.queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(undefined, columns, minX, minY, maxX, maxY, fieldValues, orderBy, limit, offset);
   }
 
@@ -1655,7 +1655,7 @@ export class RTreeIndexTableDao extends UserCustomDao {
    * @param offset chunk query offset
    * @return results
    */
-  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: ColumnValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
+  public queryFeaturesForChunkWithFieldValuesAndDistinctAndColumns(distinct: boolean, columns: string[], minX: number, minY: number, maxX: number, maxY: number, fieldValues: FieldValues, orderBy: string, limit: number, offset: number): FeatureResultSet {
     this.validateRTree();
     const where = this.buildWhereWithBounds(minX, minY, maxX, maxY);
     const whereArgs = this.buildWhereArgsWithBounds(minX, minY, maxX, maxY);
